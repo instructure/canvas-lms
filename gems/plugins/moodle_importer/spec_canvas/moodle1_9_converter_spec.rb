@@ -136,7 +136,7 @@ describe Moodle::Converter do
 
   context "quizzes" do
     before do
-      skip if !Qti.qti_enabled?
+      skip unless Qti.qti_enabled?
     end
 
     it "converts quizzes" do

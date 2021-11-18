@@ -93,7 +93,7 @@ module ActiveSupport
           if entry
             get_entry_value(entry, name, options)
           else
-            result = instrument(:generate, name, options) { block.call }
+            result = instrument(:generate, name, options, &block)
             instrument(:write, name, options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script

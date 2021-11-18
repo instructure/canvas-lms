@@ -373,7 +373,8 @@ class SisApiController < ApplicationController
   end
 
   def published_course_ids
-    if context.is_a?(Account)
+    case context
+    when Account
       course_scope = Course.published.where(account_id: [context.id] + Account.sub_account_ids_recursive(context.id))
       if (starts_before = CanvasTime.try_parse(params[:starts_before]))
         course_scope = course_scope.where("
@@ -390,7 +391,7 @@ class SisApiController < ApplicationController
         course_scope = course_scope.joins(:enrollment_term)
       end
       course_scope
-    elsif context.is_a?(Course)
+    when Course
       [context.id]
     end
   end
@@ -407,14 +408,12 @@ class SisApiController < ApplicationController
                             .preload(context: { active_course_sections: [:nonxlist_course] })
 
     if include_student_overrides?
-      assignments = assignments.preload(
+      assignments.preload(
         active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
       )
     else
-      assignments = assignments.preload(:active_assignment_overrides)
+      assignments.preload(:active_assignment_overrides)
     end
-
-    assignments
   end
 
   def paginated_assignments

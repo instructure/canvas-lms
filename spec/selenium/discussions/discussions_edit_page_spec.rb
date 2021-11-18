@@ -24,7 +24,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap { |course| course.offer! } }
+  let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }

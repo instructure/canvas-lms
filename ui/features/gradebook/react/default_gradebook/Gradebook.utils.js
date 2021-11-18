@@ -168,3 +168,10 @@ export function getAssignmentColumnId(assignmentId) {
 export function getAssignmentGroupColumnId(assignmentGroupId) {
   return `assignment_group_${assignmentGroupId}`
 }
+
+export function findAllAppliedFilterValuesOfType(type, filters) {
+  return filters
+    .filter(f => f.isApplied)
+    .flatMap(f => f.conditions.filter(c => c.type === type && c.value))
+    .map(c => c.value)
+}

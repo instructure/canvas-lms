@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::PageType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) {
+    course_with_teacher(active_all: true)
+    @course
+  }
   let_once(:wiki) { course.create_wiki! has_no_front_page: false, title: "asdf" }
   let_once(:page) { wiki.front_page.tap(&:save!) }
   let(:page_type) { GraphQLTypeTester.new(page, current_user: @teacher) }

@@ -57,8 +57,8 @@ describe SupportHelpers::Fixer do
       expect(Mailer).to receive(:create_message)
       begin
         fixer.monitor_and_fix
-      rescue => error
-        expect(error.message).to eq 'SupportHelpers::Fixer must implement #fix'
+      rescue => e
+        expect(e.message).to eq 'SupportHelpers::Fixer must implement #fix'
       end
     end
   end

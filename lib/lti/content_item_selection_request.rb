@@ -217,9 +217,9 @@ module Lti
       params[:accept_copy_advice] = !!assignment.submission_types.include?('online_upload')
       if assignment.submission_types.strip == 'online_upload' && assignment.allowed_extensions.present?
         params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
-        params[:accept_media_types] = assignment.allowed_extensions.map do |ext|
+        params[:accept_media_types] = assignment.allowed_extensions.filter_map do |ext|
           MimetypeFu::EXTENSIONS[ext]
-        end.compact.join(',')
+        end.join(',')
       end
       params
     end

@@ -81,7 +81,7 @@ module Canvas
           rescue ArgumentError
             raise StandardError, "TopException"
           end
-        rescue StandardError => e
+        rescue => e
           @raised_error = e
           @entry = LogEntry.new(e, data)
         end

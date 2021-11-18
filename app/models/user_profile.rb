@@ -131,7 +131,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_content_shares_tab(tabs, user, **)
-    if user && user.can_content_share?
+    if user&.can_content_share?
       tabs <<
         {
           id: TAB_CONTENT_SHARES,

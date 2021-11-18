@@ -397,7 +397,7 @@ module Lti
           end
 
           context 'when placement should create new module' do
-            let(:params) { super().merge({ course_id: course.id, placement: 'module_index_menu' }) }
+            let(:params) { super().merge({ course_id: course.id, placement: 'module_index_menu_modal' }) }
 
             context 'when feature flag is disabled' do
               it 'does not change anything' do
@@ -409,7 +409,7 @@ module Lti
 
             context 'when feature flag is enabled' do
               before :once do
-                course.root_account.enable_feature!(:lti_deep_linking_module_index_menu)
+                course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
               end
 
               it 'creates a new context module' do

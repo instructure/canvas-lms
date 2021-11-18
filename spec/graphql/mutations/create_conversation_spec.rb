@@ -29,7 +29,7 @@ RSpec.describe Mutations::CreateConversation do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_data = num_other_users.times.map { { name: 'User' } }
+    user_data = Array.new(num_other_users) { { name: 'User' } }
     users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')

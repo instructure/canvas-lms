@@ -52,10 +52,10 @@ describe Mutations::UpdateCommentBankItem do
   end
 
   it "updates a comment bank item" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{@comment.id}
       comment: "updated comment!"
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'updateCommentBankItem', 'errors')).to be_nil
@@ -66,10 +66,10 @@ describe Mutations::UpdateCommentBankItem do
   end
 
   it "allows relay id for comment bank item id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment.id.to_s)},
       comment: "updated comment!"
-    QUERY
+    GQL
     comment = execute_with_input(query).dig('data', 'updateCommentBankItem', 'commentBankItem', 'comment')
     expect(comment).to eq "updated comment!"
   end
@@ -82,36 +82,36 @@ describe Mutations::UpdateCommentBankItem do
     end
 
     it "invalid id" do
-      query = <<~QUERY
+      query = <<~GQL
         id: 0,
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Record not found')
     end
 
     it "blank comment field" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id},
         comment: ""
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, "is too short")
     end
 
     it "missing comment field" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id}
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Argument \'comment\' on InputObject \'UpdateCommentBankItemInput\' is required.')
     end
 
     it "invalid permissions" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment.id},
         comment: "comment"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @student)
       expect_error(result, 'not found')
     end

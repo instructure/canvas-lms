@@ -37,8 +37,16 @@ module PacePlansPageObject
     "[data-testid='pp-title-cell']"
   end
 
+  def pace_plan_end_date_selector
+    "[data-testid='paceplan-date-text']"
+  end
+
   def pace_plan_menu_selector
     "[data-position-target='pace-plan-menu']"
+  end
+
+  def pace_plan_start_date_selector
+    "[data-testid='pace-plan-start-date']"
   end
 
   def pace_plan_table_module_selector
@@ -107,8 +115,16 @@ module PacePlansPageObject
     ff(module_items_selector)
   end
 
+  def pace_plan_end_date
+    f(pace_plan_end_date_selector)
+  end
+
   def pace_plan_menu
     ff(pace_plan_menu_selector)
+  end
+
+  def pace_plan_start_date
+    f(pace_plan_start_date_selector)
   end
 
   def pace_plan_table_module_elements
@@ -211,8 +227,16 @@ module PacePlansPageObject
     element_exists?(module_items_selector)
   end
 
+  def pace_plan_end_date_exists?
+    element_exists?(pace_plan_end_date_selector)
+  end
+
   def pace_plan_menu_value
     element_value_for_attr(pace_plan_menu[1], "value")
+  end
+
+  def pace_plan_start_date_exists?
+    element_exists?(pace_plan_start_date_selector)
   end
 
   def publish_status_exists?

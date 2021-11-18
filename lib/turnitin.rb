@@ -139,7 +139,7 @@ module Turnitin
         settings[:exclude_value] = case settings[:exclude_type]
                                    when '0'; ''
                                    when '1'; [exclude_value, 1].max.to_s
-                                   when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+                                   when '2'; (0..100).cover?(exclude_value) ? exclude_value.to_s : '0'
                                    end
       end
       settings
@@ -288,14 +288,14 @@ module Turnitin
     def escape_params(params)
       escaped_params = {}
       params.each do |key, value|
-        if value.is_a?(String)
-          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
-          # turnitin uses %20 to encode spaces (instead of +)
-        else
-          escaped_params[key] = value
-        end
+        escaped_params[key] = if value.is_a?(String)
+                                CGI.escape(value).gsub("+", "%20")
+                              # turnitin uses %20 to encode spaces (instead of +)
+                              else
+                                value
+                              end
       end
-      return escaped_params
+      escaped_params
     end
 
     def prepare_params(command, fcmd, args)
@@ -336,7 +336,7 @@ module Turnitin
 
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
-      return params
+      params
     end
 
     def sendRequest(command, fcmd, args)

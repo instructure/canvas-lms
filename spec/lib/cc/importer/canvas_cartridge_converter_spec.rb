@@ -362,7 +362,7 @@ describe "Canvas Cartridge importing" do
     # convert to json
     doc = Nokogiri::XML(builder.target!)
     data = @converter.convert_learning_outcomes(doc)
-    data = data.map { |h| h.with_indifferent_access }
+    data = data.map(&:with_indifferent_access)
 
     # import json into new course
     Importers::LearningOutcomeImporter.process_migration({ 'learning_outcomes' => data }, @migration)
@@ -781,7 +781,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
     expect(page_2.notify_of_update).to eq page.notify_of_update
-    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(/png" \/>/, 'png">')
+    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(%r{png" />}, 'png">')
     expect(page_2.unpublished?).to eq true
   end
 
@@ -803,7 +803,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
-    expect(page_2.body).to match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
+    expect(page_2.body).to match(%r{/courses/#{@copy_to.id}/external_tools/retrieve})
   end
 
   it "imports assignments" do
@@ -1180,7 +1180,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "converts media tracks" do
-    doc = Nokogiri::XML(<<-XML)
+    doc = Nokogiri::XML(<<~XML)
       <?xml version="1.0" encoding="UTF-8"?>
       <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
         <media identifierref="xyz">
@@ -1196,7 +1196,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "imports media tracks" do
-    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder::root_folders(@course).first
+    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder.root_folders(@course).first
     media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
     media_file.migration_id = 'xyz'
     media_file.save!
@@ -1410,7 +1410,7 @@ describe "Canvas Cartridge importing" do
 
       expect(migration.migration_issues.count).to eq 2
 
-      warnings = migration.migration_issues.sort_by { |i| i.fix_issue_html_url }
+      warnings = migration.migration_issues.sort_by(&:fix_issue_html_url)
       warning1 = warnings[0]
       expect(warning1.issue_type).to eq "warning"
       expect(warning1.description.start_with?("Missing links found in imported content")).to eq true

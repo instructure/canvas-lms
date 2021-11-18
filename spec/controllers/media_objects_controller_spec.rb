@@ -587,7 +587,7 @@ describe MediaObjectsController do
       Timecop.freeze(2.seconds.ago) do
         MediaObject.create!(user_id: @user, context: @user, media_id: 'test', title: 'AAA')
       end
-      Timecop.freeze(1.seconds.ago) do
+      Timecop.freeze(1.second.ago) do
         MediaObject.create!(user_id: @user, context: @user, media_id: 'test2', title: 'BBB')
       end
       MediaObject.create!(user_id: @user, context: @user, media_id: 'test3', title: 'CCC')

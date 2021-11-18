@@ -306,7 +306,7 @@ class GradebookHistoryApiController < ApplicationController
     path = api_v1_gradebook_history_feed_url(@context, params.permit(:course_id, :assignment_id, :user_id, :ascending, :format))
     indexed_versions = Api.paginate(indexed_versions, self, path)
     ActiveRecord::Associations::Preloader.new.preload(indexed_versions, :version)
-    versions = indexed_versions.map(&:version).compact
+    versions = indexed_versions.filter_map(&:version)
 
     render :json => versions_json(@context, versions, api_context(nil), :assignment => assignment, :student => student)
   end

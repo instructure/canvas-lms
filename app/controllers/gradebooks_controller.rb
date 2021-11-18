@@ -122,7 +122,7 @@ class GradebooksController < ApplicationController
       json
     end
 
-    grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
+    grading_period = @grading_periods&.find { |period| period[:id] == gp_id }
 
     ags_json = light_weight_ags_json(@presenter.groups, { student: @presenter.student })
     root_account = @context.root_account
@@ -639,7 +639,7 @@ class GradebooksController < ApplicationController
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?
-        render nothing: true, status: 400
+        render nothing: true, status: :bad_request
         return
       end
 
@@ -658,8 +658,8 @@ class GradebooksController < ApplicationController
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
       submissions.select! { |submission| valid_user_ids.include? submission[:user_id].to_i }
 
-      user_ids = submissions.map { |submission| submission[:user_id] }
-      assignment_ids = submissions.map { |submission| submission[:assignment_id] }
+      user_ids = submissions.pluck(:user_id)
+      assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
       assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
@@ -831,7 +831,7 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader
-    if !@context.allows_speed_grader?
+    unless @context.allows_speed_grader?
       flash[:notice] = t(:speed_grader_disabled, 'SpeedGrader is disabled for this course')
       return redirect_to(course_gradebook_path(@context))
     end
@@ -983,7 +983,7 @@ class GradebooksController < ApplicationController
     if params[:selected_section_id]
       section_to_show = if params[:selected_section_id] == 'all'
                           nil
-                        elsif @context.active_course_sections.exists?(id: params[:selected_section_id])
+                        elsif @context.active_course_sections.where(id: params[:selected_section_id]).exists?
                           params[:selected_section_id]
                         end
 
@@ -1243,9 +1243,9 @@ class GradebooksController < ApplicationController
     ) { |period| period_as_assignment(period, options) }
   end
 
-  def as_assignments(objects = nil, options = {})
+  def as_assignments(objects = nil, options = {}, &block)
     fakes = []
-    fakes.concat(objects.map { |object| yield(object) }) if objects && block_given?
+    fakes.concat(objects.map(&block)) if objects && block
     fakes << total_as_assignment(options) unless options[:exclude_total]
     fakes
   end

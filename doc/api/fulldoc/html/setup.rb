@@ -23,7 +23,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'api_scopes'))
 require 'controller_list_view'
 require 'api_scope_mapping_writer'
 
-Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").sort.each { |file| require file }
+Dir.glob(Rails.root.join("doc/api/data_services/*.rb")).sort.each { |file| require file }
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -43,7 +43,7 @@ module YARD::Templates::Helpers::BaseHelper
     #   # => <a href="assignments.html#method.assignments_api.destroy">destruction</a>
     #
     # @note Action links inside the All Resources section will be relative.
-    if args.first.is_a?(String) && args.first =~ %r{^api:([^#]+)#(.*)}
+    if args.first.is_a?(String) && args.first =~ /^api:([^#]+)#(.*)/
       topic, controller = *lookup_topic($1.to_s)
       if topic
         html_file = "#{topicize topic.first}.html"
@@ -66,8 +66,8 @@ module YARD::Templates::Helpers::BaseHelper
     # @example Explicit resource reference with an overriden title
     #   # @return api:Assignments:AssignmentOverride An Assignment Override
     #   # => <a href="assignments.html#Assignment">An Assignment Override</a>
-    elsif args.first.is_a?(String) && args.first =~ %r{^api:([^:]+):(.*)}
-      scope_name, resource_name = $1.downcase, $2.gsub('+', ' ')
+    elsif args.first.is_a?(String) && args.first =~ /^api:([^:]+):(.*)/
+      scope_name, resource_name = $1.downcase, $2.tr('+', ' ')
       link_url("#{scope_name}.html##{resource_name}", args[1] || resource_name)
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
       errmsg = "unable to locate referenced appendix '#{args[1]}'"
@@ -80,7 +80,7 @@ module YARD::Templates::Helpers::BaseHelper
 
       if topic
         html_file = "#{topicize topic.first}.html"
-        bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
+        bookmark = "#{appendix.name.to_s.tr(' ', '+')}-appendix"
         link_url("#{html_file}##{bookmark}", appendix.title)
       else
         raise errmsg
@@ -128,7 +128,7 @@ module YARD::Templates::Helpers::HtmlHelper
   include CanvasAPI::Deprecatable
 
   def topicize(str)
-    str.gsub(' ', '_').underscore
+    str.tr(' ', '_').underscore
   end
 
   def url_for_file(filename, anchor = nil)
@@ -152,7 +152,7 @@ module YARD::Templates::Helpers::HtmlHelper
     end
 
     html_file = "#{topicize topic.first}.html"
-    bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
+    bookmark = "#{appendix.name.to_s.tr(' ', '+')}-appendix"
     link_url("#{html_file}##{bookmark}", appendix.title)
   end
 end
@@ -242,7 +242,7 @@ def serialize_index
 end
 
 def asset(path, content)
-  options[:serializer].serialize(path, content) if options[:serializer]
+  options[:serializer]&.serialize(path, content)
 end
 
 def generate_assets
@@ -299,7 +299,7 @@ def build_json_objects_map
   options[:resources].each do |r, cs|
     cs.each do |controller|
       (controller.tags(:object) + controller.tags(:model)).each do |obj|
-        name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
+        name, json = obj.text.split(/\n+/, 2).map(&:strip)
         obj_map[name] = topicize r
         resource_obj_list[r] ||= []
         resource_obj_list[r] << [name, json]

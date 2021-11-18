@@ -57,7 +57,10 @@ class InfoController < ApplicationController
        Account.connection != Delayed::Job.connection
       Delayed::Job.connection.active?
     end
-    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
+    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f|
+      f.write("heartbeat")
+      f.flush
+    }
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
     DynamicSettings.find(tree: :private)['enable_rack_brotli']
@@ -122,6 +125,11 @@ class InfoController < ApplicationController
     end
 
     render status: :not_found, template: "shared/errors/404_message"
+  end
+
+  def live_events_heartbeat
+    Canvas::LiveEvents.heartbeat
+    render plain: "heartbeat event sent at #{Time.now.utc.iso8601}"
   end
 
   def web_app_manifest

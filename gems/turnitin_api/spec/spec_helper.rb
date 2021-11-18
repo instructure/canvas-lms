@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'turnitin_api'
 require 'webmock/rspec'
 
@@ -31,7 +31,7 @@ RSpec.configure do |config|
 end
 
 def fixture(*file)
-  File.new(File.join(File.expand_path("../fixtures", __FILE__), *file))
+  File.new(File.join(File.expand_path('fixtures', __dir__), *file))
 end
 
 def json_fixture(*file)

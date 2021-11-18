@@ -24,11 +24,11 @@ class Alert < ActiveRecord::Base
 
   serialize :recipients
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :criteria
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :criteria, presence: true
   validates_associated :criteria
-  validates_presence_of :recipients
+  validates :recipients, presence: true
 
   before_save :infer_defaults
 
@@ -41,14 +41,14 @@ class Alert < ActiveRecord::Base
     include_teachers = false
     admin_role_ids = []
     self.recipients.try(:each) do |recipient|
-      case
-      when recipient == :student
+      case recipient
+      when :student
         include_student = true
-      when recipient == :teachers
+      when :teachers
         include_teachers = true
-      when recipient.is_a?(String)
+      when String
         admin_role_ids << find_role_by_name(recipient).id
-      when recipient.is_a?(Hash)
+      when Hash
         admin_role_ids << recipient[:role_id]
       else
         raise "Unsupported recipient type!"
@@ -71,9 +71,10 @@ class Alert < ActiveRecord::Base
 
   def as_json(**)
     converted_recipients = self.recipients.to_a.map do |recipient|
-      if recipient.is_a?(String)
+      case recipient
+      when String
         find_role_by_name(recipient).id
-      elsif recipient.is_a?(Hash)
+      when Hash
         recipient[:role_id]
       else
         ":#{recipient}"

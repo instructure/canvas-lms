@@ -30,12 +30,12 @@ class WebConference < ActiveRecord::Base
   has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 
   MAX_DURATION = 99999999
-  validates_numericality_of :duration, :less_than_or_equal_to => MAX_DURATION, :allow_nil => true
+  validates :duration, numericality: { :less_than_or_equal_to => MAX_DURATION, :allow_nil => true }
 
   before_validation :infer_conference_details
 
@@ -372,7 +372,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def active?(force_check = false, allow_check = true)
-    if !force_check
+    unless force_check
       return false if self.ended_at && Time.now > self.ended_at
       return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.now > self.start_at && Time.now < self.end_at))
       return true if self.ended_at && Time.now < self.ended_at
@@ -551,7 +551,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.plugin_types
-    plugins.map { |plugin|
+    plugins.filter_map { |plugin|
       next unless plugin.enabled? &&
                   (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
                   klass < self.base_class
@@ -563,7 +563,7 @@ class WebConference < ActiveRecord::Base
         :name => plugin.name,
         :plugin => plugin
       ).with_indifferent_access
-    }.compact
+    }
   end
 
   def self.config(context: nil, class_name: nil)
@@ -574,7 +574,9 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   def set_root_account_id
     case self.context

@@ -25,7 +25,7 @@ class StudentEnrollment < Enrollment
     e.saved_change_to_course_section_id? || e.saved_change_to_course_id? ||
       # or if an enrollment is deleted and they are in another section of the course
       (e.saved_change_to_workflow_state? && e.workflow_state == 'deleted' &&
-       e.user.enrollments.where('id != ?', e.id).active.where(course_id: e.course_id).exists?)
+       e.user.enrollments.where.not(id: e.id).active.where(course_id: e.course_id).exists?)
   }
   after_save :restore_submissions_and_scores
   after_save :republish_pace_plan_if_needed
@@ -39,9 +39,7 @@ class StudentEnrollment < Enrollment
                             .joins(:context_module)
                             .readonly(false)
                             .where(:context_modules => { :context_type => 'Course', :context_id => self.course_id })
-                            .each do |prog|
-      prog.mark_as_outdated!
-    end
+                            .each(&:mark_as_outdated!)
   end
 
   def update_override_score(override_score:, grading_period_id: nil, updating_user:, record_grade_change: true)

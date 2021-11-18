@@ -61,7 +61,7 @@ module Lti
       if validator.errors[:invalid_message_handlers]
         messages[:invalid_capabilities] = validator.errors[:invalid_message_handlers][:resource_handlers].map do |rh|
           rh[:messages].map do |message|
-            message[:invalid_capabilities] || message[:invalid_parameters].map { |param| param[:variable] }
+            message[:invalid_capabilities] || message[:invalid_parameters].pluck(:variable)
           end
         end.flatten
       end

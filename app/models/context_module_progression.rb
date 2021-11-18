@@ -33,7 +33,7 @@ class ContextModuleProgression < ActiveRecord::Base
   serialize :requirements_met, Array
   serialize :incomplete_requirements, Array
 
-  validates_presence_of :user_id, :context_module_id
+  validates :user_id, :context_module_id, presence: true
 
   def completion_requirements
     context_module.try(:completion_requirements) || []
@@ -155,13 +155,13 @@ class ContextModuleProgression < ActiveRecord::Base
 
     count_needed = self.context_module.requirement_count.to_i
     # if no requirement_count is specified, assume all are needed
-    if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
-      self.workflow_state = 'completed'
-    elsif result.met_requirement_count >= 1 || self.incomplete_requirements.count >= 1 # submitting to a min_score requirement should move it to started
-      self.workflow_state = 'started'
-    else
-      self.workflow_state = 'unlocked'
-    end
+    self.workflow_state = if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
+                            'completed'
+                          elsif result.met_requirement_count >= 1 || self.incomplete_requirements.count >= 1 # submitting to a min_score requirement should move it to started
+                            'started'
+                          else
+                            'unlocked'
+                          end
 
     if result.changed?
       self.requirements_met = result.actions_done
@@ -189,7 +189,7 @@ class ContextModuleProgression < ActiveRecord::Base
       end
 
       subs = get_submissions(tag) if tag.scoreable?
-      if subs && subs.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
+      if subs&.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
         calc.check_action!(req, true)
         next
       end
@@ -384,7 +384,7 @@ class ContextModuleProgression < ActiveRecord::Base
     if self.locked?
       self.workflow_state = 'unlocked' if prerequisites_satisfied?
     end
-    return !self.locked?
+    !self.locked?
   end
   private :check_prerequisites
 

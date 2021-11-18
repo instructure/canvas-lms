@@ -59,14 +59,16 @@ describe "varied due dates" do
     @section = @course.course_sections.create!
 
     # Add the second student to the new section
-    @s2enrollment.course_section = @section; @s2enrollment.save!
+    @s2enrollment.course_section = @section
+    @s2enrollment.save!
 
     # Let's enroll another student, this one in both sections
     @s3enrollment1 = student_in_course(:course => @course, :active_all => true)
     @student3 = user_with_pseudonym :user => @user
 
     @s3enrollment2 = @s3enrollment1.clone
-    @s3enrollment2.course_section = @section; @s3enrollment2.save!
+    @s3enrollment2.course_section = @section
+    @s3enrollment2.save!
 
     # Create an assignment
     @course_due_date = 3.days.from_now

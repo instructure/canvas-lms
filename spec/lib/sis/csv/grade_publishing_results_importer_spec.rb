@@ -29,7 +29,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
       "2,asplode"
     )
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["No enrollment_id given",
                           "Enrollment 1 doesn't exist",
                           "Improper grade_publishing_status \"asplode\" for enrollment 2"]
@@ -79,7 +79,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
       "enrollment_id,grade_publishing_status,message",
       "#{@enrollment.id},published,message1"
     )
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["Enrollment #{@enrollment.id} doesn't exist"]
   end
 end

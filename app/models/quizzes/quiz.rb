@@ -52,11 +52,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
   has_many :ignores, :as => :asset
 
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_numericality_of :points_possible, less_than_or_equal_to: 2000000000, allow_nil: true
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :points_possible, numericality: { less_than_or_equal_to: 2000000000, allow_nil: true }
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
@@ -121,7 +121,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def set_defaults
     self.cant_go_back = false unless self.one_question_at_a_time
-    if !self.show_correct_answers
+    unless self.show_correct_answers
       self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
@@ -144,7 +144,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       self.assignment_id = nil
     end
 
-    if !self.require_lockdown_browser
+    unless self.require_lockdown_browser
       self.require_lockdown_browser_for_results = false
     end
 
@@ -228,7 +228,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def valid_ip?(ip)
     require 'ipaddr'
-    ip_filter.split(/,/).any? do |filter|
+    ip_filter.split(",").any? do |filter|
       addr_range = ::IPAddr.new(filter) rescue nil
       addr = ::IPAddr.new(ip) rescue nil
       addr && addr_range && addr_range.include?(addr)
@@ -278,7 +278,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def muted?
-    self.assignment && self.assignment.muted?
+    self.assignment&.muted?
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -376,7 +376,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # NOTE: We don't have a submission user when the teacher is previewing the
     # quiz and displaying the results'
     return true if self.grants_right?(user, :grade) &&
-                   (submission && submission.user && submission.user != user)
+                   (submission&.user && submission.user != user)
 
     return false unless self.show_correct_answers
 
@@ -412,7 +412,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
-    self.quiz_submissions.each { |s| s.save! }
+    self.quiz_submissions.each(&:save!)
   end
 
   def update_learning_outcome_results(state)
@@ -441,7 +441,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     delay_if_production.set_unpublished_question_count if self.id
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.preload(:context_module => :content_tags).each(&:confirm_valid_module_requirements)
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       ::Assignment.where(
@@ -460,7 +460,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
-        a.quiz.clear_changes_information if a.quiz # AR#changes persist in after_saves now - needed to prevent an autosave loop
+        a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
         a.points_possible = self.points_possible
         a.description = self.description
         a.title = self.title
@@ -500,7 +500,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def clear_availability_cache
     if self.should_clear_availability_cache && !self.saved_by == :migration
       self.clear_cache_key(:availability)
-      self.assignment.clear_cache_key(:availability) if self.assignment
+      self.assignment&.clear_cache_key(:availability)
     end
   end
 
@@ -517,12 +517,12 @@ class Quizzes::Quiz < ActiveRecord::Base
     # 1. belong to this quiz;
     # 2. have been started; and
     # 3. won't lose time through this change.
-    where_clause = <<~END
+    where_clause = <<~SQL.squish
         quiz_id = ? AND
         started_at IS NOT NULL AND
         finished_at IS NULL AND
       #{update_sql} > end_at
-    END
+    SQL
 
     Quizzes::QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
   end
@@ -768,7 +768,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if opts[:persist] != false
       self.quiz_data = data
 
-      if !self.survey?
+      unless self.survey?
         possible = self.class.count_points_possible(data)
         self.points_possible = [possible, 0].max
       end
@@ -803,7 +803,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def low_level_locked_for?(user, opts = {})
     RequestCache.cache(locked_request_cache_key(user)) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
-      return false if user_submission && user_submission.manually_unlocked
+      return false if user_submission&.manually_unlocked
 
       quiz_for_user = self.overridden_for(user)
 
@@ -861,15 +861,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def hide_results=(val)
-    if val.is_a?(Hash)
-      if val[:last_attempt] == '1'
-        val = 'until_after_last_attempt'
-      elsif val[:never] != '1'
-        val = 'always'
-      else
-        val = nil
-      end
-    elsif val == ""
+    case val
+    when Hash
+      val = if val[:last_attempt] == '1'
+              'until_after_last_attempt'
+            elsif val[:never] != '1'
+              'always'
+            else
+              nil
+            end
+    when ""
       val = nil
     end
     write_attribute(:hide_results, val)
@@ -899,16 +900,16 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
-    return @significant_version[version_number] if @significant_version.has_key?(version_number)
+    return @significant_version[version_number] if @significant_version.key?(version_number)
 
     old_version = self.versions.get(version_number).model
 
     needs_review = false
     # Allow for floating point rounding error comparing to versions created before BigDecimal was used
-    needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
+    needs_review = true if [old_version.points_possible, self.points_possible].count(&:present?) == 1 ||
                            ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
-    if !needs_review
+    unless needs_review
       new_data = self.quiz_data
       old_data = old_version.quiz_data
       new_data.each_with_index do |q, i|
@@ -935,7 +936,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     require 'ipaddr'
     begin
-      self.ip_filter.split(/,/).each { |filter| ::IPAddr.new(filter) }
+      self.ip_filter.split(",").each { |filter| ::IPAddr.new(filter) }
     rescue
       errors.add(:invalid_ip_filter, t('#quizzes.quiz.errors.invalid_ip_filter', "IP filter is not valid"))
     end
@@ -1037,7 +1038,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def post_to_sis?
-    assignment && assignment.post_to_sis
+    assignment&.post_to_sis
   end
 
   def unpublished_changes?
@@ -1045,7 +1046,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").exists?
+    self.quiz_submissions.not_settings_only.where.not(user_id: nil).exists?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
@@ -1331,11 +1332,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs = nil)
     return unless quizzes.any?
 
-    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.filter_map(&:assignment_id))
 
     # yes, this is a complicated query, but it greatly improves the runtime to do it this way
     filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id")
-                                    .not_settings_only.where("user_id IS NOT NULL")
+                                    .not_settings_only.where.not(user_id: nil)
     values = quizzes.map { |q| "(#{q.id})" }.join(", ")
     constant_table = "( VALUES #{values} ) AS s(quiz_id)"
 
@@ -1418,7 +1419,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_regrades = Set.new
     quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
                  .eager_load(:quiz_question_regrades).each do |regrade|
-      ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
+      ids = regrade.quiz_question_regrades.map(&:quiz_question_id)
       question_regrades.merge(ids)
     end
     question_regrades.count
@@ -1429,9 +1430,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def excused_for_student?(student)
-    if assignment
-      assignment.submission_for_student(student).excused?
-    end
+    assignment&.submission_for_student(student)&.excused?
   end
 
   def due_for_any_student_in_closed_grading_period?(periods = nil)
@@ -1516,7 +1515,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # returns visible students for differentiated assignments
   def visible_students_with_da(context_students)
     quiz_students = context_students.joins(:quiz_student_visibilities)
-                                    .where('quiz_id = ?', self.id)
+                                    .where(quiz_student_visibilities: { quiz_id: id })
 
     # empty quiz_students means the quiz is for everyone
     return quiz_students if quiz_students.present?

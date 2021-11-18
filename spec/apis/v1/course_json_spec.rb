@@ -607,26 +607,31 @@ module Api
 
         describe '#course' do
           subject { super().course }
+
           it { is_expected.to eq course }
         end
 
         describe '#user' do
           subject { super().user }
+
           it { is_expected.to eq user }
         end
 
         describe '#includes' do
           subject { super().includes }
+
           it { is_expected.to eq [:these, :three, :keys] }
         end
 
         describe '#enrollments' do
           subject { super().enrollments }
+
           it { is_expected.to eq enrollments }
         end
 
         describe '#hash' do
           subject { super().hash }
+
           it { is_expected.to eq hash }
         end
       end

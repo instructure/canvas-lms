@@ -99,7 +99,10 @@ describe CanvasCassandra do
       db.batch { db.update("1") }
 
       expect(db).to receive(:execute).with("BEGIN BATCH UPDATE ? ? UPDATE ? ? APPLY BATCH", 1, 2, 3, 4, {})
-      db.batch { db.update("UPDATE ? ?", 1, 2); db.update("UPDATE ? ?", 3, 4) }
+      db.batch {
+        db.update("UPDATE ? ?", 1, 2)
+        db.update("UPDATE ? ?", 3, 4)
+      }
     end
 
     it "does not batch up execute statements" do

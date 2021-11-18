@@ -90,7 +90,7 @@ describe "Outcome Groups API", type: :request do
     assignment = assignment_model(context: context)
     rubric = add_or_get_rubric(outcome)
     user ||= user_factory(active_all: true)
-    context.enroll_student(user) unless context.student_enrollments.exists?(user_id: user.id)
+    context.enroll_student(user) unless context.student_enrollments.where(user_id: user.id).exists?
     a = rubric.associate_with(assignment, context, :purpose => 'grading')
     assignment.reload
     submission = assignment.grade_student(user, grade: "10", grader: @teacher).first
@@ -264,7 +264,7 @@ describe "Outcome Groups API", type: :request do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @links = 3.times.map { create_outcome }
+      @links = Array.new(3) { create_outcome }
     end
 
     it "returns active links" do

@@ -23,7 +23,7 @@ module Canvas
     class CacheAccountOnAssociation < ActiveRecord::Associations::BelongsToAssociation
       def find_target
         key = ["account2", owner._read_attribute(reflection.foreign_key)].cache_key
-        return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
+        RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
       end
     end
 
@@ -32,7 +32,7 @@ module Canvas
         return super unless klass == Account
 
         key = ["account", owner._read_attribute(reflection.foreign_key)].cache_key
-        return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
+        RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
       end
     end
 
@@ -68,7 +68,7 @@ module Canvas
         if klass.reflections.key?('root_account')
           m = Module.new
           polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]
-          m.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+          m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
             def #{name}
               return root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{polymorphic_condition}root_account_id && #{r.foreign_key} == root_account_id
               super

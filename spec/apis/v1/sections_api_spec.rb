@@ -130,7 +130,7 @@ describe SectionsController, type: :request do
                       { :include => ['students'] })
 
       expect(json.first["name"]).to eq @course.default_section.name
-      expect(json.first.keys.include?("students")).to be_falsey
+      expect(json.first.key?("students")).to be_falsey
     end
 
     it "returns all sections if :all are specified" do

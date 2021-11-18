@@ -24,7 +24,7 @@ module LtiOutbound
 
     attr_reader :substitution_objects
 
-    def initialize()
+    def initialize
       self.substitutions = {}
     end
 
@@ -34,16 +34,17 @@ module LtiOutbound
 
     def substitute!(data_hash)
       data_hash.each do |k, v|
-        if has_key?(v)
+        if key?(v)
           data_hash[k] = substitution_value(v)
         end
       end
       data_hash
     end
 
-    def has_key?(key)
-      substitutions.has_key? key
+    def key?(key)
+      substitutions.key? key
     end
+    alias_method :has_key?, :key?
 
     private
 

@@ -121,7 +121,7 @@ module AttachmentFu # :nodoc:
       if attachment_options[:path_prefix].nil?
         attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
       end
-      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..-1] if options[:path_prefix].first == '/'
+      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == '/'
 
       with_options :foreign_key => 'parent_id' do |m|
         m.has_many   :thumbnails, :class_name => "::#{attachment_options[:thumbnail_class]}"
@@ -159,14 +159,9 @@ module AttachmentFu # :nodoc:
     end
 
     def load_related_exception?(e) # :nodoc: implementation specific
-      case
-      when e.kind_of?(LoadError), e.kind_of?(MissingSourceFile), $!.class.name == "CompilationError"
-        # We can't rescue CompilationError directly, as it is part of the RubyInline library.
-        # We must instead rescue RuntimeError, and check the class' name.
-        true
-      else
-        false
-      end
+      # We can't rescue CompilationError directly, as it is part of the RubyInline library.
+      # We must instead rescue RuntimeError, and check the class' name.
+      e.is_a?(LoadError) || e.is_a?(MissingSourceFile) || e.instance_of?(CompilationError)
     end
     private :load_related_exception?
   end
@@ -252,7 +247,8 @@ module AttachmentFu # :nodoc:
 
       ext = nil
       basename = filename.gsub(/\.\w+$/) do |s|
-        ext = s; ''
+        ext = s
+        ''
       end
       # ImageScience doesn't create gif thumbnails, only pngs
       ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
@@ -292,7 +288,7 @@ module AttachmentFu # :nodoc:
       rescue ThumbnailError => e
         logger.warn("error creating thumbnail for attachment_id #{self.id}: #{e.inspect}")
       ensure
-        tmp.unlink if tmp
+        tmp&.unlink
       end
 
       res
@@ -327,7 +323,9 @@ module AttachmentFu # :nodoc:
     end
 
     # nil placeholder in case this field is used in a form.
-    def uploaded_data() nil; end
+    def uploaded_data
+      nil
+    end
 
     # This method handles the uploaded file object.  If you set the field name to uploaded_data, you don't need
     # any special code in your controller.
@@ -360,7 +358,7 @@ module AttachmentFu # :nodoc:
         # We first remove any root references for this file, and then we generate
         # a new unique filename for this file so anybody children of this attachment
         # will still be able to get at the original.
-        if !self.new_record?
+        unless self.new_record?
           self.root_attachment = nil
           self.root_attachment_id = nil
           self.workflow_state = nil
@@ -413,7 +411,7 @@ module AttachmentFu # :nodoc:
         GuardRail.activate(:secondary) do
           if self.md5.present? && (ns = self.infer_namespace)
             scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
-            scope = scope.where("filename IS NOT NULL")
+            scope = scope.where.not(filename: nil)
             scope = scope.where("id<>?", self) unless new_record?
             scope.detect { |a| a.store.exists? }
           end
@@ -422,14 +420,14 @@ module AttachmentFu # :nodoc:
     end
 
     def detect_mimetype(file_data)
-      if file_data && file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
+      if file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
         res = nil
         res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
         res ||= File.mime_type?(file_data)
-        res ||= "text/plain" if !file_data.respond_to?(:path)
+        res ||= "text/plain" unless file_data.respond_to?(:path)
         res || 'unknown/unknown'
       elsif file_data.respond_to?(:content_type)
-        return file_data.content_type
+        file_data.content_type
       else
         'unknown/unknown'
       end
@@ -496,14 +494,14 @@ module AttachmentFu # :nodoc:
 
     # Generates a unique filename for a Tempfile.
     def random_tempfile_filename
-      "#{rand Time.now.to_i}#{(filename && filename.last(50)) || 'attachment'}"
+      "#{rand Time.now.to_i}#{filename&.last(50) || 'attachment'}"
     end
 
     def sanitize_filename(filename)
       filename.strip.tap do |name|
         # NOTE: File.basename doesn't work right with Windows paths on Unix
         # get only the filename, not the whole path
-        name.gsub!(/^.*(\\|\/)/, '')
+        name.gsub!(%r{^.*(\\|/)}, '')
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
         name.gsub!(/[^\w.\-]/, '_')
@@ -589,7 +587,7 @@ module AttachmentFu # :nodoc:
 
     # Removes the thumbnails for the attachment, if it has any
     def destroy_thumbnails
-      self.thumbnails.each { |thumbnail| thumbnail.destroy } if thumbnailable?
+      self.thumbnails.each(&:destroy) if thumbnailable?
     end
   end
 end

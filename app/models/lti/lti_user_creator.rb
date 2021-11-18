@@ -28,7 +28,7 @@ module Lti
       ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
       AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
       StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
-    }
+    }.freeze
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
       @canvas_user = canvas_user
@@ -94,17 +94,15 @@ module Lti
                                                                .current
                                                                .where(course_id: @canvas_context)
                                                                .preload(:associated_user)
-                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+                                                               .filter_map { |e| e.try(:associated_user).try(:lti_context_id) }
     end
 
-    def current_account_enrollments()
-      unless @current_account_enrollments
-        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
-          @current_account_enrollments = @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
-        else
-          @current_account_enrollments = []
-        end
-      end
+    def current_account_enrollments
+      @current_account_enrollments ||= if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
+                                         @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
+                                       else
+                                         []
+                                       end
       @current_account_enrollments
     end
 

@@ -89,11 +89,9 @@ module ActiveSupport::Callbacks
     #   end
     #
     def suspended_callback?(callback, kind, type = nil)
-      val = (suspended_callbacks_defined? &&
+      (suspended_callbacks_defined? &&
             suspended_callbacks.include?(callback, kind, type)) ||
-            suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
-
-      val
+        suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
     end
 
     def any_suspensions_active?(kind)
@@ -176,7 +174,7 @@ module ActiveSupport::Callbacks
                 end
               end
               current.invoke_after(env)
-              skipped.pop.invoke_after(env) while skipped && skipped.first
+              skipped.pop.invoke_after(env) while skipped&.first
               break env.value
             end
           end

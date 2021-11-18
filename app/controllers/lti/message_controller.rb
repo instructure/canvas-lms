@@ -163,7 +163,7 @@ module Lti
 
       not_found
     rescue InvalidDomain => e
-      return render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
+      render json: { errors: { invalid_launch_url: { message: e.message } } }, status: :bad_request
     end
 
     def lti2_basic_launch(message_handler, lti_link = nil)
@@ -245,7 +245,7 @@ module Lti
       end
       account_ids = @context.account_chain.map(&:id)
       bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
+      binding_lookup = bindings.index_by(&:context_id)
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end
@@ -261,7 +261,7 @@ module Lti
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
       params = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
-      if parameters && (parameters.map { |p| p['variable'] }.compact & params).any?
+      if parameters && (parameters.filter_map { |p| p['variable'] } & params).any?
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,

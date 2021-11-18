@@ -72,7 +72,7 @@ describe Types::RubricAssessmentRatingType do
     it 'description' do
       expect(
         submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { description } } }')
-      ).to eq [rubric_assessment.data.map { |r| r[:description] }]
+      ).to eq [rubric_assessment.data.pluck(:description)]
     end
 
     it 'outcome' do
@@ -86,7 +86,7 @@ describe Types::RubricAssessmentRatingType do
     it 'points' do
       expect(
         submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { points } } }')
-      ).to eq [rubric_assessment.data.map { |r| r[:points] }]
+      ).to eq [rubric_assessment.data.pluck(:points)]
     end
   end
 end

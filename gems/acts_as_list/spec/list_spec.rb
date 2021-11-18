@@ -154,7 +154,7 @@ describe "ListTest" do
     it 'nil scope' do
       new1, new2, new3 = UnscopedListMixin.create, UnscopedListMixin.create, UnscopedListMixin.create
       new2.move_to_top
-      expect(UnscopedListMixin.where('parent_id IS NULL').order('pos').to_a).to eq [new2, new1, new3]
+      expect(UnscopedListMixin.where(parent_id: nil).order('pos').to_a).to eq [new2, new1, new3]
     end
 
     it 'remove_from_list should then fail in_list?' do

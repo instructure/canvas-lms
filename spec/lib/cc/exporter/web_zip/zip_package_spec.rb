@@ -491,7 +491,7 @@ describe "ZipPackage" do
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(module2)
-      expect(module_item_data.first.values.include?('<p>Hi</p>')).to be false
+      expect(module_item_data.first.value?('<p>Hi</p>')).to be false
     end
 
     it "does not export item content for items locked by prerequisites" do
@@ -508,7 +508,7 @@ describe "ZipPackage" do
       module_item_data = zip_package.parse_module_item_data(@module)
       expect(module_item_data.first[:content]).to eq '<p>Hi</p>'
       expect(module_item_data.last[:locked]).to be true
-      expect(module_item_data.last.values.include?('<p>Yo</p>')).to be false
+      expect(module_item_data.last.value?('<p>Yo</p>')).to be false
     end
 
     it "does not export items contents for items locked by content dates" do

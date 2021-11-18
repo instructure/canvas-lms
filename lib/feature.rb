@@ -144,11 +144,11 @@ class Feature
       apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      if attrs[:state] == STATE_DISABLED
-        @features[feature] = DISABLED_FEATURE
-      else
-        @features[feature] = Feature.new({ feature: feature }.merge(attrs))
-      end
+      @features[feature] = if attrs[:state] == STATE_DISABLED
+                             DISABLED_FEATURE
+                           else
+                             Feature.new({ feature: feature }.merge(attrs))
+                           end
     end
   end
 
@@ -208,15 +208,16 @@ class Feature
 
   def self.applicable_features(object, type: nil)
     applicable_types = []
-    if object.is_a?(Account)
+    case object
+    when Account
       applicable_types << 'Account'
       applicable_types << 'Course'
       applicable_types << 'RootAccount' if object.root_account?
       applicable_types << 'User' if object.site_admin?
       applicable_types << 'SiteAdmin' if object.site_admin?
-    elsif object.is_a?(Course)
+    when Course
       applicable_types << 'Course'
-    elsif object.is_a?(User)
+    when User
       applicable_types << 'User'
     end
     definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }

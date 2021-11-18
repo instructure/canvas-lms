@@ -33,10 +33,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   before_validation :default_values
   before_validation :clean_up_assignment_if_override_student_orphaned
 
-  validates_presence_of :assignment_override, :user
-  validates_uniqueness_of :user_id, scope: [:assignment_id, :quiz_id],
+  validates :assignment_override, :user, presence: true
+  validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
                                     conditions: -> { where.not(workflow_state: 'deleted') },
-                                    message: 'already belongs to an assignment override'
+                                    message: 'already belongs to an assignment override' }
 
   validate :assignment_override, if: :active? do |record|
     if record.assignment_override && record.assignment_override.set_type != 'ADHOC'
@@ -97,7 +97,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     AssignmentOverrideStudent
       .where(assignment: assignment)
       .where.not(user_id: valid_student_ids)
-      .each { |aos| aos.assignment_override.skip_broadcasts = true; aos.destroy }
+      .each { |aos|
+      aos.assignment_override.skip_broadcasts = true
+      aos.destroy
+    }
   end
 
   attr_writer :no_enrollment
@@ -126,7 +129,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       assignment.clear_cache_key(:availability)
       DueDateCacher.recompute_users_for_course(user_id, assignment.context, [assignment])
     end
-    self.quiz.clear_cache_key(:availability) if self.quiz
+    self.quiz&.clear_cache_key(:availability)
   end
 
   def set_root_account_id

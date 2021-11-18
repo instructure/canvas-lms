@@ -28,7 +28,7 @@ module Api::V1::Folders
   end
 
   def folder_json(folder, user, session, opts = {})
-    can_view_hidden_files = opts.has_key?(:can_view_hidden_files) ? opts[:can_view_hidden_files] : folder.grants_right?(user, :update)
+    can_view_hidden_files = opts.key?(:can_view_hidden_files) ? opts[:can_view_hidden_files] : folder.grants_right?(user, :update)
     json = api_json(folder, user, session,
                     :only => %w(id name full_name position parent_folder_id context_type context_id unlock_at lock_at created_at updated_at))
     if folder

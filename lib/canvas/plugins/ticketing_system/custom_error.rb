@@ -117,7 +117,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def pretty_http_env
-      if http_env && http_env.respond_to?(:each)
+      if http_env.respond_to?(:each)
         http_env.map { |key, val| "#{key}: #{val.inspect}" }.join("\n")
       else
         nil

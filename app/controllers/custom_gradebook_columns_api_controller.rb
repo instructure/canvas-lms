@@ -144,7 +144,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   # <b>200 OK</b> is returned if successful
   def reorder
     @context.custom_gradebook_columns.build.update_order(params[:order])
-    render :status => 200, :json => {}
+    render :status => :ok, :json => {}
   end
 
   private

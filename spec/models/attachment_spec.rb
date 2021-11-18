@@ -65,12 +65,12 @@ describe Attachment do
 
     it "returns http as the protocol by default" do
       attachment_with_context(@course)
-      expect(@attachment.public_url).to match(/^http:\/\//)
+      expect(@attachment.public_url).to match(%r{^http://})
     end
 
     it "returns the protocol if specified" do
       attachment_with_context(@course)
-      expect(@attachment.public_url(:secure => true)).to match(/^https:\/\//)
+      expect(@attachment.public_url(:secure => true)).to match(%r{^https://})
     end
 
     context "for a quiz submission upload" do
@@ -120,7 +120,7 @@ describe Attachment do
 
     it "gives back a signed s3 url" do
       a = attachment_model
-      expect(a.public_url(expires_in: 1.day)).to match(/^https:\/\//)
+      expect(a.public_url(expires_in: 1.day)).to match(%r{^https://})
       a.destroy_permanently!
     end
   end
@@ -2525,6 +2525,33 @@ describe Attachment do
       same_att = att.copy_to_student_annotation_documents_folder(@course)
 
       expect(same_att).to eq att
+    end
+  end
+
+  describe "#word_count" do
+    it "returns the word count for a PDF" do
+      attachment_model(filename: 'test.pdf', uploaded_data: fixture_file_upload('files/example.pdf', 'application/pdf'))
+      expect(@attachment.word_count).to eq 3320
+    end
+
+    it "returns the word count for a DOCX file" do
+      attachment_model(filename: 'test.docx', uploaded_data: fixture_file_upload('files/test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns the word count for an RTF file" do
+      attachment_model(filename: 'test.rtf', uploaded_data: fixture_file_upload('files/test.rtf', 'application/rtf'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns the word count for a text file" do
+      attachment_model(filename: 'test.txt', uploaded_data: fixture_file_upload('files/amazing_file.txt', 'text/plain'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns nil if the file is not supported" do
+      attachment_model(filename: 'test.png', uploaded_data: fixture_file_upload('files/instructure.png', 'image/png'))
+      expect(@attachment.word_count).to be_nil
     end
   end
 end

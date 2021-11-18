@@ -106,7 +106,7 @@ module CustomValidators
   end
 
   def assert_error_box(selector)
-    box = driver.execute_script <<-JS, selector
+    box = driver.execute_script <<~JS, selector
       var $result = $(arguments[0]).data('associated_error_box');
       return $result ? $result.toArray() : []
     JS
@@ -129,10 +129,8 @@ module CustomValidators
     true
   end
 
-  def expect_new_page_load(accept_alert = false)
-    success = wait_for_new_page_load(accept_alert) do
-      yield
-    end
+  def expect_new_page_load(accept_alert = false, &block)
+    success = wait_for_new_page_load(accept_alert, &block)
     expect(success).to be, "expected new page load, none happened"
   end
 end

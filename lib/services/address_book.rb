@@ -114,7 +114,7 @@ module Services
 
     def self.jwt # public only for testing, should not be used directly
       Canvas::Security.create_jwt({ iat: Time.now.to_i }, nil, jwt_secret, :HS512)
-    rescue StandardError => e
+    rescue => e
       Canvas::Errors.capture_exception(:address_book, e)
       nil
     end

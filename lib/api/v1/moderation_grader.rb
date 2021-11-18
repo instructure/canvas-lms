@@ -28,7 +28,7 @@ module Api::V1::ModerationGrader
     provisional_graders = assignment.provisional_moderation_graders
     if assignment.can_view_other_grader_identities?(user)
       graders = provisional_graders.preload(:user)
-      graders_by_id = graders.each_with_object({}) { |grader, map| map[grader.id] = grader }
+      graders_by_id = graders.index_by(&:id)
 
       api_json(graders, user, session, only: %w(id user_id)).tap do |hash|
         hash.each do |grader_json|

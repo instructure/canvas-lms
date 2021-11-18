@@ -44,7 +44,7 @@ module CC
       # QTI file there will be a Canvas-specific metadata file.
       def generate
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
-        FileUtils::mkdir_p non_cc_folder
+        FileUtils.mkdir_p non_cc_folder
 
         @course.assessment_question_banks.active.each do |bank|
           next unless export_object?(bank)
@@ -93,7 +93,7 @@ module CC
 
         cc_qti_migration_id = create_key(quiz)
         resource_dir = File.join(@export_dir, cc_qti_migration_id)
-        FileUtils::mkdir_p resource_dir
+        FileUtils.mkdir_p resource_dir
 
         # Create the CC-friendly QTI
         file_name = for_cc ? ASSESSMENT_CC_QTI : "#{cc_qti_migration_id}.xml"
@@ -143,10 +143,10 @@ module CC
       end
 
       def generate_qti_only
-        FileUtils::mkdir_p @export_dir
+        FileUtils.mkdir_p @export_dir
 
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
-        FileUtils::mkdir_p non_cc_folder
+        FileUtils.mkdir_p non_cc_folder
 
         @course.quizzes.active.each do |quiz|
           next unless export_object?(quiz)

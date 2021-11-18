@@ -52,7 +52,7 @@ describe UsersController, type: :request do
       before do
         @user.calendar_events.create!(
           :title => "Upcoming Event",
-          :start_at => 1.days.from_now
+          :start_at => 1.day.from_now
         ) { |c| c.context = @user }
       end
 
@@ -68,7 +68,7 @@ describe UsersController, type: :request do
       before do
         @course.calendar_events.create!(
           :title => "Upcoming Course Event",
-          :start_at => 1.days.from_now
+          :start_at => 1.day.from_now
         ) { |c| c.context = @course }
         @course.assignments.create!(
           :title => "Upcoming Assignment",

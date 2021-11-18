@@ -70,7 +70,7 @@ class BrandConfigsController < ApplicationController
     overridden_schema = duped_brandable_vars
     overridden_schema.each do |group|
       group["variables"].each do |var|
-        if variables.keys.include?(var["variable_name"])
+        if variables.key?(var["variable_name"])
           var["default"] = variables[var["variable_name"]]
         end
       end

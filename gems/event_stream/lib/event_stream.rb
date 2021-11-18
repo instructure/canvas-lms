@@ -33,7 +33,7 @@ module EventStream
   require 'event_stream/index'
 
   def self.current_shard
-    @current_shard_lookup and @current_shard_lookup.call
+    @current_shard_lookup&.call
   end
 
   def self.current_shard_lookup=(callable)

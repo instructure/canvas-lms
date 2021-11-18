@@ -33,7 +33,9 @@ describe 'RequestThrottle' do
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   # not a let so that actual and expected aren't the same object that get modified together
-  def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
+  def response
+    [200, { 'Content-Type' => 'text/plain' }, ['Hello']]
+  end
 
   after { RequestThrottle.reload! }
 
@@ -45,7 +47,7 @@ describe 'RequestThrottle' do
 
   describe "#client_identifier" do
     def req(hash)
-      ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
+      ActionDispatch::Request.new(hash).tap(&:fullpath)
     end
 
     it "uses access token" do
@@ -431,7 +433,7 @@ describe 'RequestThrottle' do
 
         it "uses regexes to predict up front costs by path if set" do
           hash = {
-            /\A\/files\/\d+\/download/ => 1,
+            %r{\A/files/\d+/download} => 1,
             "equation_images\/" => 2
           }
           expect(RequestThrottle).to receive(:dynamic_settings).and_return({ 'up_front_cost_by_path_regex' => hash })

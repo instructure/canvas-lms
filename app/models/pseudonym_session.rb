@@ -106,7 +106,7 @@ class PseudonymSession < Authlogic::Session::Base
     if too_many_attempts? || attempted_record.try(:audit_login, remote_ip, !invalid_password?) == :too_many_attempts
       self.too_many_attempts = true
       errors.add(password_field, I18n.t('errors.max_attempts', 'Too many failed login attempts. Please try again later or contact your system administrator.'))
-      return
+      nil
     end
   end
 

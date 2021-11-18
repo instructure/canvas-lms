@@ -72,7 +72,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(@data, @migration)
         rubric = Rubric.where(migration_id: @data[:migration_id]).first
         outcome_criterion = rubric.data[0]
-        expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ['best', 'worst']
+        expect(outcome_criterion[:ratings].pluck(:description)).to eq ['best', 'worst']
         expect(outcome_criterion[:mastery_points]).to eq 10
       end
     end
@@ -83,7 +83,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(@data, @migration)
         rubric = Rubric.where(migration_id: @data[:migration_id]).first
         outcome_criterion = rubric.data[0]
-        expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ['Rating 1']
+        expect(outcome_criterion[:ratings].pluck(:description)).to eq ['Rating 1']
       end
     end
   end

@@ -101,7 +101,7 @@ class GroupMembershipsController < ApplicationController
       scope = @group.group_memberships.preload(group: :root_account)
 
       only_states = ALLOWED_MEMBERSHIP_FILTER
-      only_states = only_states & params[:filter_states] if params[:filter_states]
+      only_states &= params[:filter_states] if params[:filter_states]
       scope = scope.where(:workflow_state => only_states)
       scope = scope.preload(group: :root_account)
 

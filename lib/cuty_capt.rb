@@ -49,7 +49,7 @@ class CutyCapt
     :domain_blacklist => [],
     :allowed_schemes => ['http', 'https'],
     :lang => 'en,*;q=0.9'
-  }
+  }.freeze
 
   cattr_writer :config
 
@@ -85,20 +85,20 @@ class CutyCapt
   end
 
   def self.enabled?
-    return !self.config.nil?
+    !self.config.nil?
   end
 
   def self.verify_url(url)
     config = self.config
 
     uri = URI.parse(url)
-    unless config[:allowed_schemes] && config[:allowed_schemes].include?(uri.scheme)
+    unless config[:allowed_schemes]&.include?(uri.scheme)
       logger.warn("Skipping non-http[s] URL: #{url}")
       return false
     end
 
     dns_host = Resolv::DNS::Name.create(uri.host)
-    if config[:domain_blacklist] && config[:domain_blacklist].any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
+    if config[:domain_blacklist]&.any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
       logger.warn("Skipping url because of blacklisted domain: #{url}")
       return false
     end
@@ -145,7 +145,7 @@ class CutyCapt
         Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
       else
         begin
-          Timeout::timeout(config[:timeout].to_i / 1000) do
+          Timeout.timeout(config[:timeout].to_i / 1000) do
             Process.waitpid(pid)
             unless $?.success?
               logger.error("Capture failed with code: #{$?.exitstatus}")
@@ -184,6 +184,6 @@ class CutyCapt
       # should probably be remedied at some point
       attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))
     end
-    return attachment
+    attachment
   end
 end

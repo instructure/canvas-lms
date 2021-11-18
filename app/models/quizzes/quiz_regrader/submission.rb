@@ -43,7 +43,7 @@ class Quizzes::QuizRegrader::Submission
 
   def rescored_submission
     previous_score = submission.score_before_regrade || submission.score
-    submission.score += answers_to_grade.map(&:regrade!).inject(&:+) || 0
+    submission.score += answers_to_grade.sum(&:regrade!)
     submission.score_before_regrade = previous_score
     submission.quiz_data = regraded_question_data
     submission
@@ -71,7 +71,7 @@ class Quizzes::QuizRegrader::Submission
   end
 
   def submitted_answer_ids
-    @submitted_answer_ids ||= submitted_answers.map { |q| q[:question_id] }.to_set
+    @submitted_answer_ids ||= submitted_answers.pluck(:question_id).to_set
   end
 
   REGRADE_KEEP_FIELDS = %w{id position name question_name published_at}.freeze

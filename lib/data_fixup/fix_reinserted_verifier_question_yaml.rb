@@ -20,7 +20,7 @@
 module DataFixup::FixReinsertedVerifierQuestionYaml
   def self.links_to_change(data)
     updates = {}
-    data.scan(/\/assessment_questions\/\d+\/files\/\d+[^'">\\]*(.\\&[^'">\\]*verifier[^'">\\]*)"/) do |match|
+    data.scan(%r{/assessment_questions/\d+/files/\d+[^'">\\]*(.\\&[^'">\\]*verifier[^'">\\]*)"}) do |match|
       verifier = match.first
       # remove the & if it was added in unnecessarily - i.e. we'll get a "?&verifier=blah"
       updates["#{verifier}\""] = verifier.start_with?("?") ? "#{verifier.sub("\\&", "")}\\\"" : "#{verifier.sub("\\&", "&")}\\\""

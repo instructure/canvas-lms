@@ -175,7 +175,7 @@ describe "SpeedGrader" do
       selections = @moderated_assignment.moderated_grading_selections
 
       expect(pg.score).to eq 12
-      expect(selections.exists?(selected_provisional_grade_id: pg.id)).to be true
+      expect(selections.where(selected_provisional_grade_id: pg.id).exists?).to be true
     end
   end
 

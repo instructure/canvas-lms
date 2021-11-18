@@ -183,7 +183,7 @@ module Canvas
             Thread.new { t3_val = described_class.read(credential_path) },
             Thread.new { t4_val = described_class.read(credential_path) }
           ]
-          threads.each { |t| t.join }
+          threads.each(&:join)
           expect(t1_val).to eq(credential_data)
           expect(t2_val).to eq(credential_data)
           expect(t3_val).to eq(credential_data)

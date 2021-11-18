@@ -55,13 +55,14 @@ describe('DirectShareCoursePanel', () => {
     fetchMock.restore()
   })
 
+  it('shows the overwrite warning', () => {
+    const {getByText} = render(<DirectShareCoursePanel />)
+    expect(getByText(/^Importing the same course content more than once/)).toBeInTheDocument()
+  })
+
   it('disables the copy button initially', () => {
     const {getByText} = render(<DirectShareCoursePanel />)
-    expect(
-      getByText(/copy/i)
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBe('')
+    expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
   })
 
   it('enables the copy button when a course is selected', async () => {
@@ -82,11 +83,7 @@ describe('DirectShareCoursePanel', () => {
     fireEvent.click(getByText('abc'))
     await act(() => fetchMock.flush(true))
     fireEvent.change(input, {target: {value: 'foo'}})
-    expect(
-      getByText(/copy/i)
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBe('')
+    expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
   })
 
   it('calls the onCancel property', () => {

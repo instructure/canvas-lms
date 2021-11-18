@@ -24,9 +24,9 @@ module OutcomesService
     end
 
     def learning_outcomes(context)
-      @migration.imported_migration_items_by_class(LearningOutcome).map do |item|
+      @migration.imported_migration_items_by_class(LearningOutcome).filter_map do |item|
         outcome_attributes(item) if item.context == context
-      end.compact
+      end
     end
 
     def learning_outcome_groups(context)
@@ -36,9 +36,9 @@ module OutcomesService
     end
 
     def learning_outcome_links
-      @migration.imported_migration_items_by_class(ContentTag).map do |item|
+      @migration.imported_migration_items_by_class(ContentTag).filter_map do |item|
         link_attributes(item) if valid_link?(item)
-      end.compact
+      end
     end
 
     private

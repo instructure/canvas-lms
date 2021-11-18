@@ -24,7 +24,11 @@ require 'folio/page'
 describe WillPaginateHelper do
   describe 'makes accessible pagination link titles' do
     before do
-      klass = Class.new(WillPaginateHelper::AccessibleLinkRenderer) { def url(page); "url://#{page}"; end }
+      klass = Class.new(WillPaginateHelper::AccessibleLinkRenderer) {
+        def url(page)
+          "url://#{page}"
+        end
+      }
       @renderer = klass.new
       @collection = Folio::Page.create
     end

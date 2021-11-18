@@ -251,7 +251,7 @@ describe MicrosoftSync::PartialMembershipDiff do
 
       subject.log_all_actions
 
-      logs = logs.map { |l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, '') }.compact.sort
+      logs = logs.filter_map { |l| l.dup.gsub!(/^MicrosoftSync::PartialMembershipDiff: /, '') }.sort
 
       expect(logs.join("\n")).to eq([
         'User 101 (m_X): change ["member"], enrolls [] -> [:remove_member]',

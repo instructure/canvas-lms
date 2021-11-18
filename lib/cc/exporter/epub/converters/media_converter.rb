@@ -55,14 +55,14 @@ module CC::Exporter::Epub::Converters
     # which will match the directory the content is stored in in the ePub.
     def convert_media_paths!(html_node)
       { a: 'href', img: 'src' }.each do |tag, attr|
-        selector = "#{tag}[#{attr}*='#{WEB_CONTENT_TOKEN.gsub('$', '')}']"
+        selector = "#{tag}[#{attr}*='#{WEB_CONTENT_TOKEN.delete('$')}']"
         html_node.search(selector).each do |match|
           unescaped = CGI.unescape(match[attr]).gsub(/\?.*/, '')
 
           if should_convert_file?(unescaped)
             match[attr] = converted_media_path(unescaped)
           else
-            message = I18n.t(<<-TEXT, filename: File.basename(unescaped))
+            message = I18n.t(<<~TEXT, filename: File.basename(unescaped))
               File %{filename} could not be included in the ePub document. Please see separate zip file for access.
             TEXT
             match.replace(format('<span>%s</span>', ERB::Util.h(message)))
@@ -118,11 +118,11 @@ module CC::Exporter::Epub::Converters
         "a[href$='mp3']"
       ].join(',')
       html_node.search(selector).each do |audio_link|
-        audio_link.replace(<<-AUDIO_TAG)
+        audio_link.replace(<<~HTML)
           <audio src="#{audio_link['href']}" controls="controls">
             #{I18n.t('Audio content is not supported by your device or app.')}
           </audio>
-        AUDIO_TAG
+        HTML
       end
     end
 
@@ -144,11 +144,11 @@ module CC::Exporter::Epub::Converters
         "a[href$='mp4']"
       ].join(',')
       html_node.search(selector).each do |video_link|
-        video_link.replace(<<-VIDEO_TAG)
+        video_link.replace(<<~HTML)
           <video src="#{video_link['href']}" controls="controls">
             #{I18n.t('Video content is not supported by your device or app.')}
           </video>
-        VIDEO_TAG
+        HTML
       end
     end
   end

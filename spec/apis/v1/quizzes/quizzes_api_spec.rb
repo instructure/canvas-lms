@@ -235,7 +235,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
                          { :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s }, {},
                          'Accept' => 'application/vnd.api+json')
-        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json = @json.fetch('quizzes').map(&:with_indifferent_access)
         expect(@json).to match_array [
           Quizzes::QuizApiSerializer.new(@quiz, scope: @user, controller: controller, session: session)
                                     .as_json[:quiz].with_indifferent_access
@@ -286,7 +286,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                          { :controller => "quizzes/quizzes_api", :action => "create", :format => "json", :course_id => @course.id.to_s },
                          { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
                          'Accept' => 'application/vnd.api+json')
-        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json = @json.fetch('quizzes').map(&:with_indifferent_access)
         @course.reload
         @quiz = @course.quizzes.first
         expect(@json).to match_array [
@@ -1046,7 +1046,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should reorder the quiz questions
-      order = @quiz.reload.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
+      order = @quiz.reload.quiz_questions.active.sort_by(&:position).map(&:id)
       expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
 
@@ -1079,7 +1079,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should remove items from the group
-      order = @group.reload.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
+      order = @group.reload.quiz_questions.active.sort_by(&:position).map(&:id)
       expect(order).to eq [@question1.id]
     end
   end

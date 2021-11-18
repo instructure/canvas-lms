@@ -23,8 +23,8 @@ describe ContentZipper do
   # all ALMOST exactly the same code, copied and pasted with slight changes.
   #
   # This really needs to get refactored at some point.
-  def grab_zip
-    expect { yield }.to change(Delayed::Job, :count).by(1)
+  def grab_zip(&block)
+    expect(&block).to change(Delayed::Job, :count).by(1)
     expect(response).to be_successful
     attachment_id = json_parse['attachment']['id']
     expect(attachment_id).to be_present
@@ -33,7 +33,7 @@ describe ContentZipper do
     expect(a).to be_to_be_zipped
 
     # a second query should just return status
-    expect { yield }.to change(Delayed::Job, :count).by(0)
+    expect(&block).to change(Delayed::Job, :count).by(0)
     expect(response).to be_successful
     expect(json_parse['attachment']['id']).to eq a.id
   end

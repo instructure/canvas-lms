@@ -40,9 +40,9 @@ class DelayedMessage < ActiveRecord::Base
     ]
   belongs_to :communication_channel
 
-  validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :link, maximum: maximum_text_length, allow_nil: true, allow_blank: true
-  validates_presence_of :communication_channel_id, :workflow_state
+  validates :summary, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :link, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :communication_channel_id, :workflow_state, presence: true
 
   before_save :set_send_at
 
@@ -102,8 +102,7 @@ class DelayedMessage < ActiveRecord::Base
     delayed_messages = uniqs.values
     delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
     first = delayed_messages.detect { |m|
-      m.communication_channel &&
-        m.communication_channel.active? &&
+      m.communication_channel&.active? &&
         !m.communication_channel.bouncing?
     }
     to = first.communication_channel rescue nil
@@ -111,7 +110,7 @@ class DelayedMessage < ActiveRecord::Base
     return nil if delayed_messages.empty?
 
     user = to.user rescue nil
-    context = delayed_messages.select { |m| m.context }.compact.first.try(:context)
+    context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
@@ -144,7 +143,7 @@ class DelayedMessage < ActiveRecord::Base
 
   def set_send_at
     # no cc yet = wait
-    return unless self.communication_channel and self.communication_channel.user
+    return unless self.communication_channel&.user
     return if self.send_at
 
     # I got tired of trying to figure out time zones in my head, and I realized

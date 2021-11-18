@@ -73,7 +73,7 @@ class ServicesApiController < ApplicationController
   #     }
   def start_kaltura_session
     @user = @current_user
-    if !@current_user
+    unless @current_user
       payload = { errors: { base: t('must_be_logged_in', "You must be logged in to use Kaltura") }, logged_in: false }
       return render json: payload, status: :unauthorized
     end

@@ -28,7 +28,7 @@ module CC::Importer::Standard
       conversion_dir = @package_root.item_path("temp_qti_conversions")
 
       resources_by_type("imsqti").each do |res|
-        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         full_path = path ? get_full_path(path) : nil
         id = res[:migration_id]
 

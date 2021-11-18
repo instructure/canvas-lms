@@ -101,9 +101,9 @@ module CC
 
         # URL element (choose secure or not based on protocol)
         case tool.url
-        when /^http:\/\//
+        when %r{^http://}
           cartridge_basiclti_link.blti :launch_url, tool.url
-        when /^https:\/\//
+        when %r{^https://}
           cartridge_basiclti_link.blti :secure_launch_url, tool.url
         end
 

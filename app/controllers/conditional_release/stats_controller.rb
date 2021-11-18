@@ -49,7 +49,7 @@ module ConditionalRelease
 
     def require_trigger_assignment
       unless params[:trigger_assignment].present?
-        return render :json => { :message => "trigger_assignment required" }, :status => :bad_request
+        render :json => { :message => "trigger_assignment required" }, :status => :bad_request
       end
     end
   end

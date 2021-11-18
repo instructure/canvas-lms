@@ -53,17 +53,17 @@ module DifferentiableAssignment
 
   # will not filter the collection for teachers, will for non-observer students
   # will filter for observers with observed students but not for observers without observed students
-  def self.filter(collection, user, context, opts = {}, &filter_block)
+  def self.filter(collection, user, context, opts = {})
     return collection if teacher_or_public_user?(user, context, opts)
 
-    return filter_block.call(collection, [user.id]) if user_not_observer?(user, context, opts)
+    return yield(collection, [user.id]) if user_not_observer?(user, context, opts)
 
     # observer following no students -> dont filter
     # observer following students -> filter based on own enrollments and observee enrollments
     observed_student_ids = opts[:observed_student_ids] || ObserverEnrollment.observed_student_ids(context, user)
     user_ids = [user.id].concat(observed_student_ids)
 
-    observed_student_ids.any? ? filter_block.call(collection, user_ids) : collection
+    observed_student_ids.any? ? yield(collection, user_ids) : collection
   end
 
   # can filter scope of Assignments, DiscussionTopics, Quizzes, or ContentTags

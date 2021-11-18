@@ -210,7 +210,7 @@ describe "API Authentication", type: :request do
             response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
             st.user = response.user
             st.success = response.is_success?
-            return st
+            st
           end
           allow(CASClient::Client).to receive(:new).and_return(cas)
 
@@ -253,9 +253,9 @@ describe "API Authentication", type: :request do
         get "/login/oauth2/deny"
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/auth\?})
-        error = response['Location'].match(%r{error=([^?&]+)})[1]
+        error = response['Location'].match(/error=([^?&]+)/)[1]
         expect(error).to eq "access_denied"
-        expect(response['Location']).not_to match(%r{code=})
+        expect(response['Location']).not_to match(/code=/)
         get response['Location']
         expect(response).to be_successful
       end

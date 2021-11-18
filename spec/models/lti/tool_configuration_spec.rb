@@ -511,7 +511,7 @@ module Lti
             end
 
             it 'adds an error to the model' do
-              expect { tool_configuration }.to raise_error(/Content type must be "application\/json"/)
+              expect { tool_configuration }.to raise_error(%r{Content type must be "application/json"})
             end
           end
         end

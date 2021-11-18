@@ -56,7 +56,7 @@ describe "speed grader - rubrics" do
     # test rubric input
     f('td[data-testid="criterion-points"] input').send_keys('3')
     expand_right_pane
-    ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
+    ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
     f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
     f("textarea[data-selenium='criterion_comments_text']").send_keys('special rubric comment')
     wait_for_ajaximations

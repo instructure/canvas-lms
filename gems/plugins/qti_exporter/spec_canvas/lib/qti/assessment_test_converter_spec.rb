@@ -39,11 +39,11 @@ describe Qti::AssessmentTestConverter do
   end
 
   def test_section(select)
-    Nokogiri::XML(<<~SECTION).at_css('testPart')
+    Nokogiri::XML(<<~XML).at_css('testPart')
       <testPart identifier="BaseTestPart">
       #{select && %Q{<selection select="#{select}">}}
       </testPart>
-    SECTION
+    XML
   end
 
   it "accepts a numeric pick count even if it's zero" do

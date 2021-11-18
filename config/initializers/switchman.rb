@@ -142,7 +142,7 @@ Rails.application.config.after_initialize do
 
   Switchman::DatabaseServer.class_eval do
     def self.regions
-      @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
+      @regions ||= all.filter_map { |db| db.config[:region] }.uniq.sort
     end
 
     def in_region?(region)
@@ -168,7 +168,7 @@ Rails.application.config.after_initialize do
         (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end
 
-      next_day = maintenance_days.find { |d| d.future? }
+      next_day = maintenance_days.find(&:future?)
       # Time offsets are strange
       start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
@@ -203,7 +203,7 @@ Rails.application.config.after_initialize do
       return klass.send(method, *args) if DatabaseServer.all.all? { |db| !db.config[:region] }
 
       regions = Set.new
-      if !run_current_region_asynchronously
+      unless run_current_region_asynchronously
         klass.send(method, *args)
         regions << Shard.current.database_server.config[:region]
       end

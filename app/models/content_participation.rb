@@ -29,7 +29,7 @@ class ContentParticipation < ActiveRecord::Base
   before_create :set_root_account_id
   after_save :update_participation_count
 
-  validates_presence_of :content_type, :content_id, :user_id, :workflow_state
+  validates :content_type, :content_id, :user_id, :workflow_state, presence: true
 
   workflow do
     state :unread

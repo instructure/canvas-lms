@@ -147,7 +147,7 @@ module Factories
   # hashes of attributes you want to insert
   def create_courses(records, options = {})
     account = options[:account] || Account.default
-    records = records.times.map { |i| { name: "Course #{i}" } } if records.is_a?(Integer)
+    records = Array.new(records) { |i| { name: "Course #{i}" } } if records.is_a?(Integer)
     now = Time.now.utc
     records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id, created_at: now, updated_at: now).merge(record) }
     course_data = create_records(Course, records, options[:return_type])

@@ -209,7 +209,7 @@ class SubmissionsBaseController < ApplicationController
           message: 'Assignment is locked for student.',
           error_code: 'ASSIGNMENT_LOCKED'
         }
-      }, status: 422
+      }, status: :unprocessable_entity
     else
       @submission.update!(redo_request: true)
       head :no_content

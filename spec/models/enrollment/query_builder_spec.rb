@@ -77,7 +77,7 @@ describe "Enrollment::QueryBuilder" do
     def enrollments(course_workflow_state = nil)
       scope = user.enrollments.joins(:course)
       if course_workflow_state
-        scope = scope.where("courses.workflow_state = ?", course_workflow_state)
+        scope = scope.where(courses: { workflow_state: course_workflow_state })
       end
       scope
     end

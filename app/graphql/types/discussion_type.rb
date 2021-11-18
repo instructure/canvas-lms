@@ -215,9 +215,7 @@ module Types
       argument :filter, DiscussionFilterType, required: false
     end
     def search_entry_count(**args)
-      get_entries(args).then do |entries|
-        entries.count
-      end
+      get_entries(args).then(&:count)
     end
 
     field :mentionable_users_connection, Types::MessageableUserType.connection_type, null: true do

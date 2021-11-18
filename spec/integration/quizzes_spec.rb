@@ -104,20 +104,20 @@ describe Quizzes::QuizzesController do
         @course.large_roster = false
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).to match(%r{SpeedGrader})
+        expect(response.body).to match(/SpeedGrader/)
       end
 
       it "does not link to SpeedGrader when large_roster" do
         @course.large_roster = true
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).not_to match(%r{SpeedGrader})
+        expect(response.body).not_to match(/SpeedGrader/)
       end
 
       it "does not link to SpeedGrader when moderated grader limit is reached" do
         allow_any_instance_of(Assignment).to receive(:can_view_speed_grader?).and_return(false)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(response.body).not_to match(%r{SpeedGrader})
+        expect(response.body).not_to match(/SpeedGrader/)
       end
     end
   end
@@ -167,8 +167,8 @@ describe Quizzes::QuizzesController do
       it "lists the questions needing review" do
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).to match(%r{The following questions need review})
-        expect(response.body).not_to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(/The following questions need review/)
+        expect(response.body).not_to match(/The quiz has changed significantly since this submission was made/)
         doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present
@@ -182,16 +182,16 @@ describe Quizzes::QuizzesController do
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
         @quiz_submission.save
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).not_to match(%r{The following questions need review})
-        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).not_to match(/The following questions need review/)
+        expect(response.body).to match(/The quiz has changed significantly since this submission was made/)
       end
 
       it "displays both messages" do
         allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
-        expect(response.body).to match(%r{The following questions need review})
-        expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
+        expect(response.body).to match(/The following questions need review/)
+        expect(response.body).to match(/The quiz has changed significantly since this submission was made/)
         doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present

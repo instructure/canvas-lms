@@ -27,7 +27,7 @@ class CanvadocsAnnotationContext < ApplicationRecord
   validates :root_account_id, presence: true
   validates :submission_id, presence: true
 
-  validates_uniqueness_of :submission_attempt, scope: [:attachment_id, :submission_id]
+  validates :submission_attempt, uniqueness: { scope: [:attachment_id, :submission_id] }
 
   before_validation :set_launch_id, if: :new_record?
   before_validation :set_root_account_id, if: :new_record?

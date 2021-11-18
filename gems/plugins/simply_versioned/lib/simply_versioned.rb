@@ -44,7 +44,7 @@ module SimplyVersioned
     :on_create => nil,
     :on_update => nil,
     :on_load => nil
-  }
+  }.freeze
 
   module ClassMethods
     # Marks this ActiveRecord model as being versioned. Calls to +create+ or +save+ will,
@@ -141,7 +141,7 @@ module SimplyVersioned
 
       options[:except] = options[:except].map(&:to_s)
 
-      self.update(YAML::load(version.yaml).except(*options[:except]))
+      self.update(YAML.load(version.yaml).except(*options[:except]))
     end
 
     # Invoke the supplied block passing the receiver as the sole block argument with
@@ -297,9 +297,7 @@ module SimplyVersioned
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where('number <= ?', self.maximum(:number) - versions_to_keep).each do |version|
-        version.destroy
-      end
+      where('number <= ?', self.maximum(:number) - versions_to_keep).each(&:destroy)
     end
     alias_method :purge, :clean_old_versions
 

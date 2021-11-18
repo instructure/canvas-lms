@@ -85,7 +85,7 @@ module GoogleDrive
 
         current_url = @entry['exportLinks'][mime_type]
         current_extension = /([a-z]+)$/.match(current_url).to_s
-        has_preferred_extension = preferred_extensions && preferred_extensions.include?(current_extension)
+        has_preferred_extension = preferred_extensions&.include?(current_extension)
 
         # our extension is in the preferred list or we have no preferences
         [current_url, current_extension] if has_preferred_extension || !preferred_extensions

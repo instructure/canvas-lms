@@ -91,15 +91,15 @@ class Message < ActiveRecord::Base
 
   # Validations
   validate :prevent_updates
-  validates :body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :html_body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :transmission_errors, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :to, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :from, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :url, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :subject, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :from_name, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :reply_to_name, length: { maximum: maximum_string_length }, allow_nil: true, allow_blank: true
+  validates :body, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :html_body, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :transmission_errors, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :to, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :from, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :url, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :subject, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :from_name, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :reply_to_name, length: { maximum: maximum_string_length }, allow_blank: true
 
   def prevent_updates
     unless self.new_record?
@@ -196,7 +196,7 @@ class Message < ActiveRecord::Base
   def save_using_update_all
     self.shard.activate do
       self.updated_at = Time.now.utc
-      updates = Hash[self.changes_to_save.map { |k, v| [k, v.last] }]
+      updates = self.changes_to_save.transform_values(&:last)
       self.class.in_partition(attributes).where(:id => self.id, :created_at => self.created_at).update_all(updates)
       self.clear_changes_information
     end
@@ -402,7 +402,7 @@ class Message < ActiveRecord::Base
       context = context.root_account if context.respond_to?(:root_account)
 
       # Going through SisPseudonym.for is important since the account could change
-      if context && context.respond_to?(:root_account)
+      if context.respond_to?(:root_account)
         p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
       else
@@ -496,7 +496,7 @@ class Message < ActiveRecord::Base
 
     instance_variable_set(:"@message_content_#{name}",
                           @output_buffer.to_s.strip)
-    @output_buffer = old_output_buffer.sub(/\n\z/, '')
+    @output_buffer = old_output_buffer.delete_suffix("\n")
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
       @output_buffer = old_output_buffer.class.new(@output_buffer)
@@ -529,14 +529,14 @@ class Message < ActiveRecord::Base
   def get_template(filename)
     path = Canvas::MessageHelper.find_message_path(filename)
 
-    if !(File.exist?(path) rescue false)
+    unless (File.exist?(path) rescue false)
       return false if filename.include?('slack')
 
       filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb"
       path = Canvas::MessageHelper.find_message_path(filename)
     end
 
-    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
+    @i18n_scope = "messages." + filename.delete_suffix('.erb')
 
     if (File.exist?(path) rescue false)
       File.read(path)
@@ -602,7 +602,7 @@ class Message < ActiveRecord::Base
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
       if footer_message.present? && !self.notification&.registration?
-        self.body = <<-END.strip_heredoc
+        self.body = <<~TEXT.strip_heredoc
           #{self.body}
 
 
@@ -612,7 +612,7 @@ class Message < ActiveRecord::Base
           ________________________________________
 
           #{footer_message}
-        END
+        TEXT
       end
     end
 
@@ -671,7 +671,7 @@ class Message < ActiveRecord::Base
     # Set the timezone back to what it originally was
     Time.zone = original_time_zone if original_time_zone.present?
 
-    hacked_course.apply_nickname_for!(nil) if hacked_course
+    hacked_course&.apply_nickname_for!(nil)
 
     @i18n_scope = nil
   end
@@ -892,8 +892,7 @@ class Message < ActiveRecord::Base
     context = context.context if context.respond_to?(:context)
     return context if context.is_a?(Course)
 
-    context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
-    context
+    (context.respond_to?(:course) && context.course) ? context.course : link_root_account
   end
 
   def notification_service_id
@@ -1076,7 +1075,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_sms
-    if to =~ /^\+[0-9]+$/
+    if /^\+[0-9]+$/.match?(to)
       begin
         unless user.account.feature_enabled?(:international_sms)
           raise "International SMS is currently disabled for this user's account"
@@ -1089,7 +1088,7 @@ class Message < ActiveRecord::Base
             from_recipient_country: true
           )
         end
-      rescue StandardError => e
+      rescue => e
         logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         Canvas::Errors.capture(
           e,
@@ -1117,7 +1116,7 @@ class Message < ActiveRecord::Base
       notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
     end
     complete_dispatch
-  rescue StandardError => e
+  rescue => e
     @exception = e
     error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     logger.error error_string
@@ -1131,7 +1130,7 @@ class Message < ActiveRecord::Base
     return name_helper.from_name if name_helper.from_name.present?
 
     if name_helper.asset.is_a? AppointmentGroup
-      if !name_helper.asset.contexts_for_user(user).nil?
+      unless name_helper.asset.contexts_for_user(user).nil?
         names = name_helper.asset.contexts_for_user(user).map(&:name).join(", ")
         if names == ""
           return name_helper.asset.context.name
@@ -1170,7 +1169,7 @@ class Message < ActiveRecord::Base
                     elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
                       asset.course
                     end
-    hacked_course.apply_nickname_for!(user) if hacked_course
+    hacked_course&.apply_nickname_for!(user)
     hacked_course
   end
 end
