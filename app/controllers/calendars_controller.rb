@@ -31,12 +31,12 @@ class CalendarsController < ApplicationController
       c.grants_right?(@current_user, session, :manage_calendar)
     }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
-    @selected_contexts = if params[:include_contexts]
-                           params[:include_contexts].split(",")
-                         else
-                           @current_user.get_preference(:selected_calendar_contexts)
-                         end
-    @wrap_titles = @domain_root_account&.feature_enabled?(:wrap_calendar_event_titles)
+    if params[:include_contexts]
+      @selected_contexts = params[:include_contexts].split(",")
+    else
+      @selected_contexts = @current_user.get_preference(:selected_calendar_contexts)
+    end
+    @wrap_titles = @domain_root_account && @domain_root_account.feature_enabled?(:wrap_calendar_event_titles)
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
@@ -51,7 +51,7 @@ class CalendarsController < ApplicationController
         if ag.grants_right? @current_user, session, :create
           ag_permission = { :all_sections => true }
         else
-          section_ids = context.section_visibilities_for(@current_user).pluck(:course_section_id)
+          section_ids = context.section_visibilities_for(@current_user).map { |v| v[:course_section_id] }
           ag_permission = { :all_sections => false, :section_ids => section_ids } if section_ids.any?
         end
       end

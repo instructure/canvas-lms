@@ -60,10 +60,10 @@ module MicrosoftSync
         def initialize(msg, responses)
           super(msg)
 
-          @retry_after_seconds = responses.filter_map do |resp|
+          @retry_after_seconds = responses.map do |resp|
             headers = resp['headers']&.transform_keys(&:downcase) || {}
             headers['retry-after'].presence&.to_f
-          end.max
+          end.compact.max
         end
 
         def self.public_message
@@ -112,11 +112,7 @@ module MicrosoftSync
           end
         end
 
-        special_case_value = SpecialCase.match(
-          special_cases,
-          status_code: response.code, body: response.body
-        )
-        if special_case_value
+        if (special_case_value = SpecialCase.match(special_cases, response.code, response.body))
           log_and_increment(method, path, statsd_tags, :expected, response.code)
           if special_case_value.is_a?(StandardError)
             raise ExpectedErrorWrapper, special_case_value
@@ -132,16 +128,16 @@ module MicrosoftSync
         result
       rescue ExpectedErrorWrapper => e
         raise e.wrapped_exception
-      rescue => e
-        response_code = response&.code&.to_s || e.class.name.tr(':', '_')
+      rescue => error
+        response_code = response&.code&.to_s || error.class.name.tr(':', '_')
 
-        if intermittent_non_throttled?(e) && retries > 0
+        if intermittent_non_throttled?(error) && retries > 0
           retries -= 1
           log_and_increment(method, path, statsd_tags, :retried, response_code)
           retry
         end
 
-        log_and_increment(method, path, statsd_tags, statsd_name_for_error(e), response_code)
+        log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
         raise
       end
 
@@ -349,9 +345,7 @@ module MicrosoftSync
         special_cases_values = {}
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
-            special_cases,
-            status_code: subresponse['status'], body: subresponse['body'].to_json,
-            batch_request_id: subresponse['id']
+            special_cases, subresponse['status'], subresponse['body'].to_json
           )
 
           if special_case_value

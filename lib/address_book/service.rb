@@ -84,7 +84,7 @@ module AddressBook
       end
 
       def update(user_ids, cursors)
-        @cursors = user_ids.zip(cursors).to_h
+        @cursors = Hash[user_ids.zip(cursors)]
         @more = !!@cursors[user_ids.last]
       end
 
@@ -156,7 +156,7 @@ module AddressBook
       ids = ids.map { |id| Shard.global_id_for(id) }
       hydrated = User.select(::MessageableUser::SELECT).where(id: ids)
       reverse_lookup = hydrated.index_by(&:global_id)
-      ids.filter_map { |id| reverse_lookup[id] }
+      ids.map { |id| reverse_lookup[id] }.compact
     end
 
     # caches with common contexts for each user in the list, pulling the

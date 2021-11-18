@@ -1275,7 +1275,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_section_id] = 'SIS123'
             json = api_call(:get, @path, @params)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
+            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             expect(json_user_ids).to match_array(section_user_ids)
           end
@@ -1285,7 +1285,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
+            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(section_user_ids)
           end
 
@@ -1306,7 +1306,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map(&:user_id)
+            course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
           end
 
@@ -1315,7 +1315,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map(&:user_id)
+            course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
           end
 
@@ -1964,8 +1964,10 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.user.created_at.iso8601,
             'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
           }
-          user_json['sis_user_id'] = e.user.pseudonym.sis_user_id
-          user_json['integration_id'] = e.user.pseudonym.integration_id
+          user_json.merge!({
+                             'sis_user_id' => e.user.pseudonym.sis_user_id,
+                             'integration_id' => e.user.pseudonym.integration_id,
+                           })
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2576,8 +2578,7 @@ describe EnrollmentsApiController, type: :request do
           enrollment = @teacher.enrollments.first
 
           @path.sub!(@enrollment.id.to_s, enrollment.id.to_s)
-          @params[:id] = enrollment.id.to_param
-          @params[:task] = 'delete'
+          @params.merge!(:id => enrollment.id.to_param, :task => 'delete')
 
           raw_api_call(:delete, "#{@path}?task=delete", @params)
 

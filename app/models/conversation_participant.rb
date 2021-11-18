@@ -34,12 +34,12 @@ class ConversationParticipant < ActiveRecord::Base
 
   after_destroy :destroy_conversation_message_participants
 
-  scope :visible, -> { where.not(last_message_at: nil) }
+  scope :visible, -> { where("last_message_at IS NOT NULL") }
   scope :default, -> { where(:workflow_state => ['read', 'unread']) }
   scope :unread, -> { where(:workflow_state => 'unread') }
   scope :archived, -> { where(:workflow_state => 'archived') }
   scope :starred, -> { where(:label => 'starred') }
-  scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
+  scope :sent, -> { where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC") }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
     next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
@@ -98,7 +98,7 @@ class ConversationParticipant < ActiveRecord::Base
       scope_shard = s
     end
     scope_shard ||= Shard.current
-    exterior_user_ids = tags.map { |t| t.delete_prefix('user_').to_i }
+    exterior_user_ids = tags.map { |t| t.sub(/\Auser_/, '').to_i }
 
     # which users have conversations on which shards?
     users_by_conversation_shard =
@@ -128,7 +128,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids = users_by_conversation_shard[Shard.current]
 
       shard_conditions = if options[:mode] == :or || user_ids.size == 1
-                           [<<~SQL.squish, user_ids]
+                           [<<~SQL, user_ids]
                              EXISTS (
                                SELECT *
                                FROM #{ConversationParticipant.quoted_table_name} cp
@@ -137,7 +137,7 @@ class ConversationParticipant < ActiveRecord::Base
                              )
                            SQL
                          else
-                           [<<~SQL.squish, user_ids, user_ids.size]
+                           [<<~SQL, user_ids, user_ids.size]
                              (
                                SELECT COUNT(*)
                                FROM #{ConversationParticipant.quoted_table_name} cp
@@ -195,8 +195,8 @@ class ConversationParticipant < ActiveRecord::Base
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 
-  validates :conversation_id, :user_id, :workflow_state, presence: true
-  validates :label, inclusion: { :in => ['starred'], :allow_nil => true }
+  validates_presence_of :conversation_id, :user_id, :workflow_state
+  validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
 
   def as_json(options = {})
     latest = last_message
@@ -374,7 +374,7 @@ class ConversationParticipant < ActiveRecord::Base
   def update(hash)
     # subscribed= can update the workflow_state, but an explicit
     # workflow_state should trump that. so we do this first
-    subscribed = (hash.key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
+    subscribed = (hash.has_key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
     self.subscribed = subscribed unless subscribed.nil?
     super
   end
@@ -442,7 +442,7 @@ class ConversationParticipant < ActiveRecord::Base
                                # closest one after it)
                                times = messages.map(&:created_at)
                                older = times.reject! { |t| t <= last_message_at } || []
-                               older.first || times.last
+                               older.first || times.reverse.first
                              end
       self.has_attachments = messages.with_attachments.exists?
       self.has_media_objects = messages.with_media_comments.exists?

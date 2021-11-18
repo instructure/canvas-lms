@@ -389,7 +389,7 @@ describe "Outcomes API", type: :request do
               )
               json = controller.outcome_json(@outcome, @account_user.user, session)
               ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
-                expect(json).not_to have_key(key)
+                expect(json.key?(key)).to be false
               end
             end
           end
@@ -913,8 +913,8 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
-        expect(json.filter_map { |j| j['assessment_id'] }.sort).to eq([@live_assessment.id].sort)
+        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.map { |j| j['assessment_id'] }.compact.sort).to eq([@live_assessment.id].sort)
       end
 
       it "allows teacher to return aligned assignments for a student" do
@@ -925,7 +925,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "allows observer to return aligned assignments for a student" do
@@ -936,7 +936,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "does not return outcomes aligned to quizzes in other courses" do
@@ -965,7 +965,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "requires a student_id to be present" do

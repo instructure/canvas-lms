@@ -56,11 +56,11 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: 'Account'
 
-  validates :context, :workflow_state, presence: true
+  validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
-  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
-  validates :comments, length: { maximum: 255, allow_blank: true }
+  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
   validate :validate_conference_visibility
   before_create :set_root_account
   before_save :default_values
@@ -88,13 +88,13 @@ class CalendarEvent < ActiveRecord::Base
     events = events.values if events.is_a?(Hash)
     next record.errors.add(attr, t('errors.no_updating_user', "Can't update child events unless an updating_user is set")) if events.present? && !record.updating_user
 
-    context_codes = events.pluck(:context_code)
+    context_codes = events.map { |e| e[:context_code] }
     next record.errors.add(attr, t('errors.duplicate_child_event_contexts', "Duplicate child event contexts")) if context_codes != context_codes.uniq
 
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
-      next if context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
+      next if context && context.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
 
       break record.errors.add(attr, t('errors.invalid_child_event_context', "Invalid child event context"))
     end
@@ -344,8 +344,8 @@ class CalendarEvent < ActiveRecord::Base
   def sync_child_events
     locked_changes = LOCKED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
-    child_events.are_locked.update_all(locked_changes.index_with { |attr| send(attr) }) if locked_changes.present?
-    child_events.are_unlocked.update_all(cascaded_changes.index_with { |attr| send(attr) }) if cascaded_changes.present?
+    child_events.are_locked.update_all Hash[locked_changes.map { |attr| [attr, send(attr)] }] if locked_changes.present?
+    child_events.are_unlocked.update_all Hash[cascaded_changes.map { |attr| [attr, send(attr)] }] if cascaded_changes.present?
   end
 
   def sync_conference
@@ -380,8 +380,8 @@ class CalendarEvent < ActiveRecord::Base
 
     if events.present?
       CalendarEvent.where(:id => self)
-                   .update_all(:start_at => events.filter_map(&:start_at).min,
-                               :end_at => events.filter_map(&:end_at).max)
+                   .update_all(:start_at => events.map(&:start_at).compact.min,
+                               :end_at => events.map(&:end_at).compact.max)
       reload
     end
   end
@@ -422,7 +422,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   has_a_broadcast_policy
@@ -716,11 +716,11 @@ class CalendarEvent < ActiveRecord::Base
         event.x_alt_desc = Icalendar::Values::Text.new(html, { 'FMTTYPE' => 'text/html' })
       end
 
-      loc_string = if @event.is_a?(CalendarEvent)
-                     [@event.location_name, @event.location_address].reject(&:blank?).join(", ")
-                   else
-                     nil
-                   end
+      if @event.is_a?(CalendarEvent)
+        loc_string = [@event.location_name, @event.location_address].reject { |e| e.blank? }.join(", ")
+      else
+        loc_string = nil
+      end
 
       if @event.context_type.eql?("AppointmentGroup")
         # We should only enter this block if a user has made an appointment, so
@@ -735,7 +735,7 @@ class CalendarEvent < ActiveRecord::Base
 
           event.description.concat("Participants: ")
           current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
-          comments = current_appts.pluck(:comments).join(",\n")
+          comments = current_appts.map { |appt| appt[:comments] }.join(",\n")
           event.description.concat("\n\n" + comments)
         end
       end
@@ -754,7 +754,7 @@ class CalendarEvent < ActiveRecord::Base
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
       event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
-      event.uid =         "event-#{tag_name.tr('_', '-')}-#{@event.id}"
+      event.uid =         "event-#{tag_name.gsub('_', '-')}-#{@event.id}"
       event.sequence =    0
 
       if @event.respond_to?(:applied_overrides)
@@ -762,7 +762,7 @@ class CalendarEvent < ActiveRecord::Base
           next unless override.due_at_overridden
 
           tag_name = override.class.name.underscore
-          event.uid       = "event-#{tag_name.tr('_', '-')}-#{override.id}"
+          event.uid       = "event-#{tag_name.gsub('_', '-')}-#{override.id}"
           event.summary   = "#{@event.title} (#{override.title})"
           # TODO: event.url
         end
@@ -787,7 +787,7 @@ class CalendarEvent < ActiveRecord::Base
 
       cal.add_event(event) if event
 
-      cal.to_ical
+      return cal.to_ical
     end
   end
 

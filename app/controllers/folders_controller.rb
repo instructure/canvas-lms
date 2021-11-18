@@ -146,11 +146,11 @@ class FoldersController < ApplicationController
       unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
-      scope = if params[:sort_by] == 'position'
-                scope.by_position
-              else
-                scope.by_name
-              end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, opts)
     end
@@ -177,11 +177,11 @@ class FoldersController < ApplicationController
       unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
-      scope = if params[:sort_by] == 'position'
-                scope.by_position
-              else
-                scope.by_name
-              end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
 
       folders = Api.paginate(scope, self, url)
       render json: folders_json(folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files, :context => @context)
@@ -237,11 +237,11 @@ class FoldersController < ApplicationController
         @folder = Folder.root_folders(@context).first
       else
         get_context
-        @folder = if @context
-                    @context.folders.active.find(params[:id])
-                  else
-                    Folder.find(params[:id])
-                  end
+        if @context
+          @folder = @context.folders.active.find(params[:id])
+        else
+          @folder = Folder.find(params[:id])
+        end
       end
     else
       require_context
@@ -414,7 +414,7 @@ class FoldersController < ApplicationController
 
     if (folder_params[:folder_id] && (folder_params[:parent_folder_path] || folder_params[:parent_folder_id])) ||
        (folder_params[:parent_folder_path] && folder_params[:parent_folder_id])
-      render :json => { :message => t('only_one_folder', "Can't set folder path and folder id") }, :status => :bad_request
+      render :json => { :message => t('only_one_folder', "Can't set folder path and folder id") }, :status => 400
       return
     elsif folder_params[:folder_id]
       folder_params.delete(:folder_id)
@@ -492,13 +492,13 @@ class FoldersController < ApplicationController
     @folder = Folder.find(params[:id])
     if authorized_action(@folder, @current_user, :delete)
       if @folder.root_folder?
-        render :json => { :message => t('no_deleting_root', "Can't delete the root folder") }, :status => :bad_request
+        render :json => { :message => t('no_deleting_root', "Can't delete the root folder") }, :status => 400
       elsif @folder.context.is_a?(Course) &&
             MasterCourses::ChildSubscription.is_child_course?(@folder.context) &&
             MasterCourses::FolderHelper.locked_folder_ids_for_course(@folder.context).include?(@folder.id)
-        render :json => { :message => "Can't delete folder containing files locked by Blueprint Course" }, :status => :bad_request
+        render :json => { :message => "Can't delete folder containing files locked by Blueprint Course" }, :status => 400
       elsif @folder.has_contents? && params[:force] != 'true'
-        render :json => { :message => t('no_deleting_folders_with_content', "Can't delete a folder with content") }, :status => :bad_request
+        render :json => { :message => t('no_deleting_folders_with_content', "Can't delete a folder with content") }, :status => 400
       else
         @context = @folder.context
         @folder.destroy

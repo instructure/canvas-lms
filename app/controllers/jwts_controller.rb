@@ -84,7 +84,7 @@ class JwtsController < ApplicationController
     if params[:jwt].nil?
       return render(
         json: { errors: { jwt: "required" } },
-        status: :bad_request
+        status: 400
       )
     end
     services_jwt = CanvasSecurity::ServicesJwt.refresh_for_user(
@@ -99,7 +99,7 @@ class JwtsController < ApplicationController
   rescue CanvasSecurity::ServicesJwt::InvalidRefresh
     render(
       json: { errors: { jwt: "invalid refresh" } },
-      status: :bad_request
+      status: 400
     )
   end
 end

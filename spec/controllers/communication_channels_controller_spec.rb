@@ -523,7 +523,7 @@ describe CommunicationChannelsController do
         expect(@not_logged_user).to be_deleted
         @logged_user.reload
         expect(@logged_user.communication_channels.map(&:path).sort).to eq ['jt@instructure.com', 'jt+1@instructure.com'].sort
-        expect(@logged_user.communication_channels.all?(&:active?)).to be_truthy
+        expect(@logged_user.communication_channels.all? { |cc| cc.active? }).to be_truthy
       end
 
       it "does not allow merging with someone that's observed through a UserObserver relationship" do
@@ -1006,7 +1006,7 @@ describe CommunicationChannelsController do
 
           user_with_pseudonym
 
-          ccs = Array.new(CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1) do |n|
+          ccs = (CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1).times.map do |n|
             @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
               cc.workflow_state = 'active'
               cc.bounce_count = 1
@@ -1119,7 +1119,7 @@ describe CommunicationChannelsController do
 
           user_with_pseudonym
 
-          ccs = Array.new(CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1) do |n|
+          ccs = (CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1).times.map do |n|
             @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
               cc.workflow_state = 'active'
               cc.bounce_count = 1

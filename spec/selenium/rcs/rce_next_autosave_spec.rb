@@ -216,7 +216,6 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear # blur tinymce to force autosave
     end
   end
-
   context 'WYSIWYG generic as an admin' do
     before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
@@ -225,7 +224,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       stub_rcs_config
     end
 
-    def account_with_admin_logged_in
+    def account_with_admin_logged_in()
       @account = Account.default
       account_admin_user
       user_session(@admin)

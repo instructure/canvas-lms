@@ -171,7 +171,7 @@ module Canvas::OAuth
         REMEMBER_ACCESS => options[:remember_access]
       }
       Canvas.redis.setex("#{REDIS_PREFIX}#{code}", Setting.get('oath_token_request_timeout', 10.minutes.to_s).to_i, code_data.to_json)
-      code
+      return code
     end
 
     def self.expire_code(code)

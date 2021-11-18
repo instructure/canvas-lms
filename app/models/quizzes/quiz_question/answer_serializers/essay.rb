@@ -48,7 +48,9 @@ module Quizzes::QuizQuestion::AnswerSerializers
     def deserialize(submission_data, full: false)
       text = submission_data[question_key]
 
-      text.presence
+      if text.present?
+        text
+      end
     end
   end
 end

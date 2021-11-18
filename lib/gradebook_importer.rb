@@ -88,7 +88,7 @@ class GradebookImporter
   end
 
   CSV::Converters[:decimal_comma_to_period] = ->(field) do
-    if /^-?[0-9.,]+%?$/.match?(field)
+    if field =~ /^-?[0-9.,]+%?$/
       # This field is a pure number or percentage => let's normalize it
       number_parts = field.split(/[,.]/)
       last_number_part = number_parts.pop
@@ -135,7 +135,6 @@ class GradebookImporter
     @gradebook_importer_assignments = {}
     @gradebook_importer_custom_columns = {}
     @gradebook_importer_override_scores = {}
-    @has_student_first_last_names = false
 
     begin
       csv_stream do |row|
@@ -380,7 +379,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false unless /Section/.match?(last_student_info_column(row))
+    return false if last_student_info_column(row) !~ /Section/
 
     true
   end
@@ -391,31 +390,25 @@ class GradebookImporter
   end
 
   def row_has_student_headers?(row)
-    (row.length > 3 && row[0].include?("Student") && row[1].include?("ID")) ||
-      (row.length > 4 && row[0].include?("LastName") && row[1].include?("FirstName") && row[2].include?("ID"))
+    row.length > 3 && row[0].include?('Student') && row[1].include?('ID')
   end
 
   def update_column_count(row)
     # A side effect that's necessary to finish validation, but needs to come
     # after the row.length check above.
-
-    # includes name, ID, section
-    @has_student_first_last_names = (row[0] == "LastName" && row[1] == "FirstName")
-    raise InvalidHeaderRow if @has_student_first_last_names && !allow_student_last_first_names?
-
-    @student_columns = student_name_column_count = @has_student_first_last_names ? 4 : 3
-    if /SIS\s+Login\s+ID/.match?(row[student_name_column_count - 1])
-      @sis_login_id_column = student_name_column_count - 1
+    @student_columns = 3 # name, user id, section
+    if row[2] =~ /SIS\s+Login\s+ID/
+      @sis_login_id_column = 2
       @student_columns += 1
-    elsif row[student_name_column_count - 1] =~ /SIS\s+User\s+ID/ && row[student_name_column_count] =~ /SIS\s+Login\s+ID/
+    elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
       # Integration id might be after sis id and login id, ignore it.
-      i = /Integration\s+ID/.match?(row[student_name_column_count + 1]) ? 1 : 0
-      @sis_user_id_column = student_name_column_count - 1
-      @sis_login_id_column = student_name_column_count
+      i = row[4] =~ /Integration\s+ID/ ? 1 : 0
+      @sis_user_id_column = 2
+      @sis_login_id_column = 3
       @student_columns += 2 + i
-      if /Root\s+Account/.match?(row[student_name_column_count + 1 + i])
+      if row[4 + i] =~ /Root\s+Account/
         @student_columns += 1
-        @root_account_column = student_name_column_count + 1 + i
+        @root_account_column = 4 + i
       end
     end
 
@@ -425,8 +418,6 @@ class GradebookImporter
 
   GRADEBOOK_IMPORTER_RESERVED_NAMES = [
     "Student",
-    "LastName",
-    "FirstName",
     "ID",
     "SIS User ID",
     "SIS Login ID",
@@ -461,7 +452,7 @@ class GradebookImporter
 
   # this method requires non-assignment columns to be stripped from the row
   def parse_assignments(stripped_row)
-    stripped_row.filter_map do |name_and_id|
+    stripped_row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @all_assignments[id.to_i] if id.present?
       # backward compat
@@ -474,7 +465,7 @@ class GradebookImporter
       @missing_assignment ||= assignment.new_record?
 
       { assignment: assignment, header_name: name_and_id } if assignment
-    end
+    end.compact
   end
 
   def detect_override_columns(row)
@@ -519,8 +510,7 @@ class GradebookImporter
   end
 
   def process_student(row)
-    # second or third column in the csv should have the student_id for each row
-    student_id = @has_student_first_last_names ? row[2] : row[1]
+    student_id = row[1] # the second column in the csv should have the student_id for each row
     student = @all_students[student_id.to_i] if student_id.present?
     unless student
       ra_sis_id = row[@root_account_column].presence if @root_account_column
@@ -539,15 +529,13 @@ class GradebookImporter
       pseudonym = @pseudonyms_by_sis_id[sis_user_id] if sis_user_id
       pseudonym ||= @pseudonyms_by_login_id[sis_login_id] if sis_login_id
       student = @all_students[pseudonym.user_id] if pseudonym
-
-      unless student
-        name = @has_student_first_last_names ? "#{row[1]} #{row[0]}".strip : row[0]
-        student = @all_students.find do |_id, s|
-          s.name == name || s.sortable_name == name
-        end.try(:last)
-        student ||= User.new(name: name)
-      end
     end
+    if row[0].present?
+      student ||= @all_students.find do |_id, s|
+        s.name == row[0] || s.sortable_name == row[0]
+      end.try(:last)
+    end
+    student ||= User.new(:name => row[0])
     student.previous_id = student.id
     student.id ||= NegativeId.generate
     @missing_student ||= student.new_record?
@@ -560,7 +548,7 @@ class GradebookImporter
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip
-      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
+      if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
         grade = ''
       end
       new_submission = {
@@ -629,7 +617,7 @@ class GradebookImporter
 
     @gradebook_importer_override_scores.each_value do |changes_for_student|
       includes_course_scores ||= changes_for_student.any?(&:course_score?)
-      grading_period_ids = grading_period_ids.merge(changes_for_student.filter_map(&:grading_period_id))
+      grading_period_ids = grading_period_ids.merge(changes_for_student.map(&:grading_period_id).compact)
     end
 
     {
@@ -693,7 +681,7 @@ class GradebookImporter
     false # nothing unusual, signal to process as a student row
   end
 
-  def csv_stream(&block)
+  def csv_stream
     csv_file = attachment.open(need_local_file: true)
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
@@ -705,7 +693,9 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, **csv_parse_options, &block)
+    CSV.foreach(csv_file.path, **csv_parse_options) do |row|
+      yield row
+    end
   end
 
   def add_root_account_to_pseudonym_cache(root_account)
@@ -871,9 +861,5 @@ class GradebookImporter
 
   def allow_override_scores?
     @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
-  end
-
-  def allow_student_last_first_names?
-    @context.root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names)
   end
 end

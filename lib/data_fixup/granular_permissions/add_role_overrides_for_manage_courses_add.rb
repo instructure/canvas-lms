@@ -39,12 +39,11 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
         role_context = role.built_in? ? root_account : role.account
         scope = root_account.enrollments.active
 
-        case base_role_types
-        when %w[TeacherEnrollment DesignerEnrollment]
+        if base_role_types == %w[TeacherEnrollment DesignerEnrollment]
           if root_account.teachers_can_create_courses? && scope.where(type: base_role_types).exists?
             create_role_override(role, role_context)
           end
-        when %w[StudentEnrollment ObserverEnrollment]
+        elsif base_role_types == %w[StudentEnrollment ObserverEnrollment]
           if root_account.students_can_create_courses? && scope.where(type: base_role_types).exists?
             create_role_override(role, role_context)
           end

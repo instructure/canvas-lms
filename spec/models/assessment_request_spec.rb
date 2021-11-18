@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe AssessmentRequest do
   before :once do
     course_with_teacher(active_all: true)
@@ -28,10 +26,7 @@ describe AssessmentRequest do
     @assignment = @course.assignments.create!
     submission = @assignment.find_or_create_submission(@user)
     assessor_submission = @assignment.find_or_create_submission(@review_student)
-    @request = AssessmentRequest.create!(
-      user: @submission_student, asset: submission, assessor_asset: assessor_submission, assessor: @review_student
-    )
-    communication_channel(@student, { username: "test@example.com", active_cc: true })
+    @request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: assessor_submission, assessor: @review_student)
   end
 
   describe "workflow" do
@@ -45,98 +40,86 @@ describe AssessmentRequest do
     end
   end
 
-  describe "peer review invitation" do
+  describe 'peer review invitations' do
     before :once do
+      communication_channel(@student, { username: 'test@example.com', active_cc: true })
       @notification_name = "Peer Review Invitation"
-      notification = Notification.create!(:name => @notification_name, :category => "Invitation")
-      NotificationPolicy.create!(
-        :notification => notification,
-        :communication_channel => @student.communication_channel,
-        :frequency => "immediately"
-      )
+      notification = Notification.create!(:name => @notification_name, :category => 'Invitation')
+      NotificationPolicy.create!(:notification => notification, :communication_channel => @student.communication_channel, :frequency => 'immediately')
     end
 
-    it "sends a notification if the course and assignment are published" do
+    it 'sends a notification if the course and assignment are published' do
       @request.send_reminder!
-
       expect(@request.messages_sent.keys).to include(@notification_name)
     end
 
-    it "does not send a notification if the course is unpublished" do
-      @course.update!(workflow_state: "created")
-      @request.reload
-      @request.send_reminder!
+    it 'does not send a notification if the course is unpublished' do
+      submission = @assignment.find_or_create_submission(@user)
+      assessor_submission = @assignment.find_or_create_submission(@review_student)
+      @course.update!(workflow_state: 'created')
+      peer_review_request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: assessor_submission, assessor: @review_student)
+      peer_review_request.send_reminder!
 
-      expect(@request.messages_sent.keys).to be_empty
+      expect(peer_review_request.messages_sent.keys).to be_empty
     end
 
-    it "does not send a notification if the assignment is unpublished" do
-      @assignment.update!(workflow_state: "unpublished")
-      @request.reload
-      @request.send_reminder!
+    it 'does not send a notification if the assignment is unpublished' do
+      @assignment.update!(workflow_state: 'unpublished')
+      submission = @assignment.find_or_create_submission(@user)
+      assessor_submission = @assignment.find_or_create_submission(@review_student)
+      peer_review_request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: assessor_submission, assessor: @review_student)
+      peer_review_request.send_reminder!
 
-      expect(@request.messages_sent.keys).to be_empty
+      expect(peer_review_request.messages_sent.keys).to be_empty
     end
   end
 
-  describe "rubric assessment reminder" do
-    before :once do
-      @notification_name = "Rubric Assessment Submission Reminder"
-      notification = Notification.create!(:name => @notification_name, :category => "Invitation")
-      NotificationPolicy.create!(
-        :notification => notification,
-        :communication_channel => @student.communication_channel,
-        :frequency => "immediately"
-      )
+  describe "notifications" do
+    let(:notification_name) { 'Rubric Assessment Submission Reminder' }
+    let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
+
+    it "sends submission reminders" do
+      communication_channel(@student, { username: 'test@example.com', active_cc: true })
+      NotificationPolicy.create!(:notification => notification,
+                                 :communication_channel => @student.communication_channel, :frequency => 'immediately')
+
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => "grading", :use_for_grading => true)
-      @assignment.update_attribute(:title, "new assmt title")
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @assignment.update_attribute(:title, 'new assmt title')
+
       @request.rubric_association = @association
       @request.save!
-    end
-
-    it "sends a notification if the course and assignment are published" do
       @request.send_reminder!
 
-      expect(@request.messages_sent.keys).to include(@notification_name)
-      expect(@request.messages_sent[@notification_name].count).to eq 1
-      message = @request.messages_sent[@notification_name].first
+      expect(@request.messages_sent.keys).to include(notification_name)
+      expect(@request.messages_sent[notification_name].count).to eq 1
+      message = @request.messages_sent[notification_name].first
       expect(message.body).to include(@assignment.title)
     end
 
-    it "does not send a notification if the course is unpublished" do
-      @course.update!(workflow_state: "created")
-      @request.reload
-      @request.send_reminder!
+    it "sends to the correct url if anonymous" do
+      communication_channel(@student, { username: 'test@example.com', active_cc: true })
+      NotificationPolicy.create!(:notification => notification,
+                                 :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
-      expect(@request.messages_sent.keys).to be_empty
-    end
-
-    it "does not send a notification if the assignment is unpublished" do
-      @assignment.update!(workflow_state: "unpublished")
-      @request.reload
-      @request.send_reminder!
-
-      expect(@request.messages_sent.keys).to be_empty
-    end
-
-    it "sends the correct url if anonymous" do
+      rubric_model
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assignment.update(:anonymous_peer_reviews => true)
-      @request.reload
+
+      @request.rubric_association = @association
+      @request.save!
       @request.send_reminder!
 
-      expect(@request.messages_sent.keys).to include(@notification_name)
-      message = @request.messages_sent[@notification_name].first
-      expect(message.body).to include(
-        "/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@request.asset.anonymous_id}"
-      )
+      expect(@request.messages_sent.keys).to include(notification_name)
+      message = @request.messages_sent[notification_name].first
+      expect(message.body).to include("/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@request.asset.anonymous_id}")
     end
   end
 
-  describe "policies" do
+  describe 'policies' do
     before :once do
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => "grading", :use_for_grading => true)
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @reviewed = @student
       @reviewer = student_in_course(active_all: true, course: @course).user
@@ -146,34 +129,34 @@ describe AssessmentRequest do
     end
 
     it "prevents reviewer from seeing reviewed name" do
-      expect(@assessment_request).not_to be_grants_right(@reviewer, :read_assessment_user)
+      expect(@assessment_request.grants_right?(@reviewer, :read_assessment_user)).to be_falsey
     end
 
     it "allows reviewed to see own name" do
-      expect(@assessment_request).to be_grants_right(@reviewed, :read_assessment_user)
+      expect(@assessment_request.grants_right?(@reviewed, :read_assessment_user)).to be_truthy
     end
 
     it "allows teacher to see reviewed users name" do
-      expect(@assessment_request).to be_grants_right(@teacher, :read_assessment_user)
+      expect(@assessment_request.grants_right?(@teacher, :read_assessment_user)).to be_truthy
     end
   end
 
-  describe "#delete_ignores" do
+  describe '#delete_ignores' do
     before :once do
-      @ignore = Ignore.create!(asset: @request, user: @student, purpose: "reviewing")
+      @ignore = Ignore.create!(asset: @request, user: @student, purpose: 'reviewing')
     end
 
-    it "deletes ignores if the request is completed" do
+    it 'deletes ignores if the request is completed' do
       @request.complete!
       expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it "deletes ignores if the request is deleted" do
+    it 'deletes ignores if the request is deleted' do
       @request.destroy!
       expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it "does not delete ignores if the request is updated, but not completed or deleted" do
+    it 'does not delete ignores if the request is updated, but not completed or deleted' do
       @request.assessor = @teacher
       @request.save!
       expect(@ignore.reload).to eq @ignore
@@ -183,7 +166,7 @@ describe AssessmentRequest do
   describe "#active_rubric_association?" do
     before(:once) do
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
       @request.rubric_association = @association
       @request.save!
     end

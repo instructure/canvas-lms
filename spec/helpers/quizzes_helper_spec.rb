@@ -190,10 +190,7 @@ describe QuizzesHelper do
       @answer_list = []
       @answers = []
 
-      # double #user_content
-      def user_content(stuff)
-        stuff
-      end
+      def user_content(stuff); stuff; end # double #user_content
     end
 
     it 'extracts the answers by blank' do
@@ -266,10 +263,7 @@ describe QuizzesHelper do
 
   context "multiple_dropdowns_question" do
     before do
-      # double #user_content
-      def user_content(stuff)
-        stuff
-      end
+      def user_content(stuff); stuff; end # double #user_content
     end
 
     it "selects the user's answer" do

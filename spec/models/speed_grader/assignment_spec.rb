@@ -114,7 +114,7 @@ describe SpeedGrader::Assignment do
 
         before do
           json = SpeedGrader::Assignment.new(assignment, teacher).json
-          student_a_submission = json.fetch(:submissions).find { |s| s[:user_id] == first_student.id.to_s }
+          student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
             comment.slice(:author_id, :comment)
           end
@@ -263,10 +263,10 @@ describe SpeedGrader::Assignment do
     it "includes only students and sections with overrides for differentiated assignments" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
-      expect(json[:context][:students].pluck(:id)).not_to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].pluck(:id)).not_to include(@section2.id.to_s)
+      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
+      expect(json[:context][:students].map { |s| s[:id] }).not_to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).not_to include(@section2.id.to_s)
     end
 
     it "sorts student view students last" do
@@ -280,10 +280,10 @@ describe SpeedGrader::Assignment do
       @assignment.save!
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
-      expect(json[:context][:students].pluck(:id)).to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section2.id.to_s)
+      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
+      expect(json[:context][:students].map { |s| s[:id] }).to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section2.id.to_s)
     end
   end
 
@@ -921,7 +921,9 @@ describe SpeedGrader::Assignment do
       assignment = quiz.assignment
       assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      expect(json[:submissions]).to all(have_key('submission_history'))
+      expect(json[:submissions]).to be_all do |s|
+        s.key? 'submission_history'
+      end
     end
 
     context "with quiz_submissions" do

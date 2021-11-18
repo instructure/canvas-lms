@@ -46,7 +46,7 @@ class TempCache
   def self.cache(*args)
     if @enabled
       key = create_key(*args)
-      if @cache.key?(key)
+      if @cache.has_key?(key)
         @cache[key]
       else
         @cache[key] = yield

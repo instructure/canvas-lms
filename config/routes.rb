@@ -79,7 +79,6 @@ CanvasRails::Application.routes.draw do
 
   # This is a debug route that makes working on error pages easier
   get 'test_error' => 'info#test_error' unless Rails.env.production?
-  get 'live_events/heartbeat' => 'info#live_events_heartbeat' unless Rails.env.production?
 
   concern :question_banks do
     resources :question_banks do
@@ -163,9 +162,9 @@ CanvasRails::Application.routes.draw do
     end
 
     get 'wiki' => 'wiki_pages#front_page', as: :wiki
-    get 'wiki/:id' => 'wiki_pages#show_redirect', id: %r{[^/]+}
-    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: %r{[^/]+}
-    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: %r{[^/]+}
+    get 'wiki/:id' => 'wiki_pages#show_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
+    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
   end
 
   concern :conferences do

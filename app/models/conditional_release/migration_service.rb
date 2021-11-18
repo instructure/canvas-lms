@@ -27,12 +27,12 @@ module ConditionalRelease
       def begin_export(course, opts)
         assignment_ids = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].filter_map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }
+          assignment_ids = opts[:exported_assets].map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }.compact
           return unless assignment_ids.any?
         end
 
         # just pretend like we started an export even if we're not actually hitting a service anymore
-        { :native => true, :course => course, :assignment_ids => assignment_ids }
+        return { :native => true, :course => course, :assignment_ids => assignment_ids }
       end
 
       def export_completed?(export_data)
@@ -80,10 +80,12 @@ module ConditionalRelease
           next unless valid_id?(trigger_id)
 
           rule = course.conditional_release_rules.active.where(:trigger_assignment_id => trigger_id).first
-          # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
-          # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
-          # but today is not that day
-          rule&.scoring_ranges&.destroy_all
+          if rule
+            # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
+            # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
+            # but today is not that day
+            rule.scoring_ranges.destroy_all
+          end
           rule ||= course.conditional_release_rules.new(:trigger_assignment_id => trigger_id)
 
           ranges = rule_hash['scoring_ranges'].map do |range_hash|

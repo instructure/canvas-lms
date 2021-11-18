@@ -71,7 +71,7 @@ describe NotificationMessageCreator do
       end
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      paths = messages.collect(&:to)
+      paths = messages.collect { |message| message.to }
       expect(paths).to include(a.path)
       expect(paths).to include(b.path)
       expect(paths).to include(c.path)
@@ -265,7 +265,7 @@ describe NotificationMessageCreator do
 
       @a = assignment_model
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => [u1, u2]).create_message
-      expect(messages.filter_map(&:communication_channel)).to eq [cc2] # doesn't include u1's cc
+      expect(messages.map(&:communication_channel).compact).to eq [cc2] # doesn't include u1's cc
     end
 
     it "makes a delayed message for each user policy with a delayed frequency" do
@@ -280,24 +280,15 @@ describe NotificationMessageCreator do
 
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
-        np.frequency = 'never'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'never'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
-        np.frequency = 'daily'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'daily'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
 
-      nps.each { |np|
-        np.frequency = 'weekly'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'weekly'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
@@ -399,13 +390,13 @@ describe NotificationMessageCreator do
       expect(messages).not_to be_empty
       expect(messages.length).to eql(2)
 
-      expect(all_messages.count { |m|
+      expect(all_messages.select { |m|
         m.to == m1.to and m.notification == m1.notification and m.communication_channel == m1.communication_channel
-      }).to eql(2)
+      }.length).to eql(2)
 
-      expect(all_messages.count { |m|
+      expect(all_messages.select { |m|
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
-      }).to eql(2)
+      }.length).to eql(2)
     end
 
     it "creates stream items" do
@@ -460,13 +451,13 @@ describe NotificationMessageCreator do
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD - 1
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 1
+      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 1
 
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
       @communication_channel.save!
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 0
+      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 0
     end
 
     it "persists a message and delayed message for bounced emails" do
@@ -477,7 +468,7 @@ describe NotificationMessageCreator do
       delayed = @communication_channel.delayed_messages.count
       immediate = @communication_channel.messages.count
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 0
+      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 0
       expect(@communication_channel.messages.count).to eq immediate + 1
       expect(@communication_channel.messages.last.workflow_state).to eq 'bounced'
       expect(@communication_channel.delayed_messages.count).to eq delayed + 1

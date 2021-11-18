@@ -36,11 +36,11 @@ module CustomDateHelpers
       "#{date} at #{time_string(time)}"
     else
       datetime_string(time, :no_words)
-    end.squeeze(' ')
+    end.gsub(/ +/, ' ')
   end
 
   def calendar_time_string(time)
-    time_string(time).delete_suffix('m').strip
+    time_string(time).sub(/m\z/, "").strip
   end
 
   # this is for a datepicker that uses Intl.DateTimeFormat to format the field.

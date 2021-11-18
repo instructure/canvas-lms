@@ -35,7 +35,7 @@ class GradebookUploadsController < ApplicationController
         else
           # let them continue on with their old upload
           redirect_to course_gradebook_upload_path(@context)
-          nil
+          return
         end
       end
     end

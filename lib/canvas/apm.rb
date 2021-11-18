@@ -185,11 +185,13 @@ module Canvas
       #
       # see available "Options" to be passed on here:
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
-      def trace(resource_name, opts = {}, &block)
+      def trace(resource_name, opts = {})
         opts[:service] = opts.fetch(:service, 'canvas_custom')
         opts[:resource] = resource_name
         opts[:span_type] = opts.fetch(:span_type, 'canvas_ruby')
-        tracer.trace("application.code", opts, &block)
+        tracer.trace("application.code", opts) do |span|
+          yield span
+        end
       end
     end
   end

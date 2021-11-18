@@ -44,7 +44,7 @@ class CustomData < ActiveRecord::Base
 
   serialize :data, Hash
 
-  validates :user, :namespace, presence: true
+  validates_presence_of :user, :namespace
 
   def get_data(scope)
     hash_data_from_scope(data_frd, "d/#{scope}")

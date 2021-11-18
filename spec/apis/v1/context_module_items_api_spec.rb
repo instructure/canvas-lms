@@ -57,8 +57,7 @@ describe "Module Items API", type: :request do
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
     @wiki_page = @course.wiki_pages.create!(:title => "wiki title", :body => "")
-    @wiki_page.workflow_state = 'active'
-    @wiki_page.save!
+    @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
     @attachment = attachment_model(:context => @course)
     @attachment_tag = @module2.add_item(:id => @attachment.id, :type => 'attachment')
@@ -506,7 +505,7 @@ describe "Module Items API", type: :request do
         expect(tag).not_to be_nil
         expect(tag.position).to eq 3
 
-        tags.each(&:reload)
+        tags.each { |t| t.reload }
         # 2 is deleted; 3 is the new one, that displaced the others to 4-6
         expect(tags.map(&:position)).to eq [1, 4, 5, 6]
       end
@@ -633,7 +632,7 @@ describe "Module Items API", type: :request do
 
         expect(json['position']).to eq 2
 
-        tags.each(&:reload)
+        tags.each { |t| t.reload }
         expect(tags.map(&:position)).to eq [2, 1, 3, 4, 5]
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
@@ -643,7 +642,7 @@ describe "Module Items API", type: :request do
 
         expect(json['position']).to eq 4
 
-        tags.each(&:reload)
+        tags.each { |t| t.reload }
         expect(tags.map(&:position)).to eq [4, 1, 2, 3, 5]
       end
 
@@ -741,10 +740,8 @@ describe "Module Items API", type: :request do
         it "moves a module item" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module2.touch
-            old_updated_ats << @module2.updated_at
-            @module3.touch
-            old_updated_ats << @module3.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
+            @module3.touch; old_updated_ats << @module3.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",
@@ -760,10 +757,8 @@ describe "Module Items API", type: :request do
         it "moves completion requirements" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module1.touch
-            old_updated_ats << @module1.updated_at
-            @module2.touch
-            old_updated_ats << @module2.updated_at
+            @module1.touch; old_updated_ats << @module1.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",
@@ -782,10 +777,8 @@ describe "Module Items API", type: :request do
         it "sets the position in the target module" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module1.touch
-            old_updated_ats << @module1.updated_at
-            @module2.touch
-            old_updated_ats << @module2.updated_at
+            @module1.touch; old_updated_ats << @module1.updated_at
+            @module2.touch; old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",
@@ -1132,7 +1125,7 @@ describe "Module Items API", type: :request do
 
     def override_assignment
       @due_at = Time.zone.now + 2.days
-      @unlock_at = Time.zone.now + 1.day
+      @unlock_at = Time.zone.now + 1.days
       @lock_at = Time.zone.now + 3.days
       @override = assignment_override_model(:assignment => @assignment, :due_at => @due_at, :unlock_at => @unlock_at, :lock_at => @lock_at)
       @override_student = @override.assignment_override_students.build
@@ -1186,7 +1179,6 @@ describe "Module Items API", type: :request do
             expect(json.map { |item| item['id'] }.sort).to eq @module1.content_tags.map(&:id).sort
           end
         end
-
         context 'without override' do
           it "excludes unassigned assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
@@ -1286,7 +1278,8 @@ describe "Module Items API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
                           :controller => "context_module_items_api", :action => "index", :format => "json",
                           :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
-          expect(json).to all(have_key('mastery_paths'))
+          mastery_paths = json.all? { |item| item.key? 'mastery_paths' }
+          expect(mastery_paths).to be_truthy
         end
 
         it 'properly omits a wiki page item locked by CYOE from progressions' do

@@ -44,9 +44,9 @@ describe Mutations::DeleteConversations do
   end
 
   it "removes all messages from the participant's view" do
-    query = <<~GQL
+    query = <<~QUERY
       ids: [#{conv.id}]
-    GQL
+    QUERY
     expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
@@ -63,17 +63,17 @@ describe Mutations::DeleteConversations do
     end
 
     it "fails if the conversation doesn't exist" do
-      query = <<~GQL
+      query = <<~QUERY
         ids: [#{Conversation.maximum(:id)&.next || 0}]
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'Unable to find Conversation')
     end
 
     it "fails if the requesting user is not a participant" do
-      query = <<~GQL
+      query = <<~QUERY
         ids: [#{conv.id}]
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: user_model)
       expect_error(result, 'Insufficient permissions')
     end
@@ -84,9 +84,9 @@ describe Mutations::DeleteConversations do
       let(:conv2) { conversation(sender, user_model).conversation }
 
       it "removes messages from each view" do
-        query = <<~GQL
+        query = <<~QUERY
           ids: [#{conv.id}, #{conv2.id}]
-        GQL
+        QUERY
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
         expect(sender.all_conversations.find_by(conversation: conv2).messages.length).to eq 1
         result = execute_with_input(query)
@@ -110,9 +110,9 @@ describe Mutations::DeleteConversations do
       end
 
       it "handles valid data and errors on invalid" do
-        query = <<~GQL
+        query = <<~QUERY
           ids: [#{conv.id}, #{another_conv.id}, #{invalid_id}]
-        GQL
+        QUERY
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
         result = execute_with_input(query)
         expect_error(result, another_conv.id, 'Insufficient permissions')

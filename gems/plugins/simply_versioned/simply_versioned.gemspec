@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "lib/simply_versioned/gem_version"
+$:.push File.expand_path("../lib", __FILE__)
+
+# Maintain your gem's version:
+require "simply_versioned/gem_version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|

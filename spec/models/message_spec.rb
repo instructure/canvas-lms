@@ -27,7 +27,7 @@ describe Message do
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
       template = msg.get_template('alert.email.erb')
-      expect(template).to match(/An alert has been triggered/)
+      expect(template).to match(%r{An alert has been triggered})
     end
   end
 
@@ -42,9 +42,9 @@ describe Message do
     end
 
     it 'sanitizes html' do
-      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<~HTML, 'template.html.erb']
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
-      HTML
+      ZOMGXSS
       user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)

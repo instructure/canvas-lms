@@ -34,7 +34,7 @@ module CanvasPartmanTest::SchemaHelper
         #
         # see http://apidock.com/rails/ActiveRecord/ConnectionAdapters/SchemaStatements/drop_table
         if opts[:cascade]
-          ActiveRecord::Base.connection.execute <<~SQL.squish
+          ActiveRecord::Base.connection.execute <<-SQL
             DROP TABLE #{table_name}
             CASCADE
           SQL

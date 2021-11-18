@@ -26,7 +26,7 @@ describe I18nliner::Extractors::RubyExtractor do
     extractor = I18nliner::Extractors::RubyExtractor.new(sexps, scope)
     translations = []
     extractor.each_translation { |translation| translations << translation }
-    translations.to_h
+    Hash[translations]
   end
 
   context "labels" do

@@ -264,7 +264,7 @@ class ContentSharesController < ApplicationController
     if @content_share.update(update_params)
       render json: content_share_json(@content_share, @current_user, session)
     else
-      render json: @content_share.errors.to_json, :status => :bad_request
+      render json: @content_share.errors.to_json, :status => 400
     end
   end
 
@@ -276,7 +276,7 @@ class ContentSharesController < ApplicationController
 
     unless @receivers.any?
       render(json: { message: 'No valid receiving users found' }, status: :bad_request)
-      false
+      return false
     end
 
     # TODO verify we're allowed to send content to these users, once we decide how to do that

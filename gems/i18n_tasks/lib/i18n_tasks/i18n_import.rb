@@ -128,13 +128,13 @@ module I18nTasks
       end
     end
 
-    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/.freeze
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/
 
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside
       # placeholders (as placeholder names) we need to be unambiguous about
       # underscores in placeholders:
-      dashed_str = str.gsub(/%\{([^}]+)\}/) { |x| x.tr("_", "-") }
+      dashed_str = str.gsub(/%\{([^}]+)\}/) { |x| x.gsub("_", "-") }
       # some stuff this doesn't check (though we don't use):
       #   blockquotes, e.g. "> some text"
       #   reference links, e.g. "[an example][id]"
@@ -148,7 +148,7 @@ module I18nTasks
         matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
                .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0] == '=' ? 'h1' : 'h2' }) # moar headings
                .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
-               .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| /\d/.match?(m.first) ? "1." : "*" })
+               .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| m.first =~ /\d/ ? "1." : "*" })
       end
       matches.uniq.sort
     end
@@ -162,7 +162,7 @@ module I18nTasks
       stack = []
       result = []
       parts.each do |part|
-        next unless part&.match?(pattern)
+        next if part !~ pattern
 
         if stack.last == part
           result << "#{part}-wrap"
@@ -191,7 +191,7 @@ module I18nTasks
     private
 
     def init_source(translations)
-      raise "Source does not have any English strings" unless translations.key?('en')
+      raise "Source does not have any English strings" unless translations.keys.include?('en')
 
       translations['en'].flatten_keys
     end

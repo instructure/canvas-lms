@@ -42,7 +42,7 @@ require 'canvas_text_helper'
 module HtmlTextHelper
   def self.strip_tags(text)
     text ||= ""
-    text.gsub(%r{</?[^<>\n]*>?}, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
+    text.gsub(/<\/?[^<>\n]*>?/, "").gsub(/&#\d+;/) { |m| puts m; m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
   end
 
   def strip_tags(text)
@@ -206,7 +206,7 @@ module HtmlTextHelper
 
     tags.each do |tag|
       url = tag.attributes['href'].value
-      next if url.match?(/^https?|mailto|ftp/)
+      next if url.match(/^https?|mailto|ftp/)
 
       url.sub!("/", "") if url.start_with?("/") && base.end_with?("/")
       tag.attributes['href'].value = "#{base}#{url}"
@@ -249,7 +249,7 @@ module HtmlTextHelper
     ) | (
       #{AUTO_LINKIFY_PLACEHOLDER}
     )
-  }xi.freeze
+  }xi
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
   def format_message(message, opts = { :url => nil, :notification_id => nil })
@@ -287,15 +287,15 @@ module HtmlTextHelper
     quote_block = []
     message.split("\n").each do |line|
       # check for lines starting with '>'
-      if /^(&gt;|>)/.match?(line)
+      if /^(&gt;|>)/ =~ line
         quote_block << line
       else
-        processed_lines << quote_clump(quote_block) unless quote_block.empty?
+        processed_lines << quote_clump(quote_block) if !quote_block.empty?
         quote_block = []
         processed_lines << line
       end
     end
-    processed_lines << quote_clump(quote_block) unless quote_block.empty?
+    processed_lines << quote_clump(quote_block) if !quote_block.empty?
     message = processed_lines.join("\n")
     links.unshift opts[:url] if opts[:url]
     links.unshift message.html_safe
@@ -309,18 +309,18 @@ module HtmlTextHelper
     link += parts[1] if parts[1]
     link
   rescue
-    ""
+    return ""
   end
 
   def self.escape_html(text)
-    CGI.escapeHTML text
+    CGI::escapeHTML text
   end
 
   def self.unescape_html(text)
-    CGI.unescapeHTML text
+    CGI::unescapeHTML text
   end
 
   def self.strip_and_truncate(text, options = {})
-    CanvasTextHelper.truncate_text(strip_tags(text), options)
+    CanvasTextHelper::truncate_text(strip_tags(text), options)
   end
 end

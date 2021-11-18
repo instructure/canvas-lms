@@ -53,8 +53,8 @@ class Folder < ActiveRecord::Base
   after_destroy :clean_up_children
   after_save :touch_context
   before_save :infer_hidden_state
-  validates :context_id, :context_type, presence: true
-  validates :name, length: { :maximum => maximum_string_length }
+  validates_presence_of :context_id, :context_type
+  validates_length_of :name, :maximum => maximum_string_length
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
@@ -70,13 +70,13 @@ class Folder < ActiveRecord::Base
   end
 
   def populate_root_account_id
-    self.root_account_id = if self.context_type == "User"
-                             0
-                           elsif context_type == 'Account' && context.root_account?
-                             self.context_id
-                           else
-                             self.context.root_account_id
-                           end
+    if self.context_type == "User"
+      self.root_account_id = 0
+    elsif context_type == 'Account' && context.root_account?
+      self.root_account_id = self.context_id
+    else
+      self.root_account_id = self.context.root_account_id
+    end
   end
 
   def protect_root_folder_name
@@ -84,16 +84,16 @@ class Folder < ActiveRecord::Base
       if self.new_record?
         root_folder = Folder.root_folders(context).first
         self.parent_folder_id = root_folder.id
-        true
+        return true
       else
         errors.add(:name, t("errors.invalid_root_folder_name", "Root folder name cannot be changed"))
-        false
+        return false
       end
     end
   end
 
   def reject_recursive_folder_structures
-    return true unless self.parent_folder_id_changed?
+    return true if !self.parent_folder_id_changed?
 
     seen_folders = Set.new([self])
     folder = self
@@ -105,7 +105,7 @@ class Folder < ActiveRecord::Base
       end
       seen_folders << folder
     end
-    true
+    return true
   end
 
   def restrict_submission_folder_context
@@ -125,8 +125,8 @@ class Folder < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.active_file_attachments.each(&:destroy)
-    self.active_sub_folders.each(&:destroy)
+    self.active_file_attachments.each { |a| a.destroy }
+    self.active_sub_folders.each { |s| s.destroy }
     self.deleted_at = Time.now.utc
     self.save
   end
@@ -165,7 +165,7 @@ class Folder < ActiveRecord::Base
     # TODO i18n
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if self.name.blank?
-    self.name = self.name.strip.tr('/', "_")
+    self.name = self.name.strip.gsub(/\//, "_")
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
     self.context = self.parent_folder.context if self.parent_folder
@@ -217,7 +217,9 @@ class Folder < ActiveRecord::Base
   end
 
   def clean_up_children
-    Attachment.where(folder_id: @folder_id).each(&:destroy)
+    Attachment.where(folder_id: @folder_id).each do |a|
+      a.destroy
+    end
   end
 
   def subcontent(opts = {})
@@ -236,7 +238,7 @@ class Folder < ActiveRecord::Base
   def hidden?
     return @hidden if defined?(@hidden)
 
-    @hidden = self.workflow_state == 'hidden' || self.parent_folder&.hidden?
+    @hidden = self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
   end
 
   def hidden
@@ -254,7 +256,7 @@ class Folder < ActiveRecord::Base
   def public?
     return @public if defined?(@public)
 
-    @public = self.workflow_state == 'public' || self.parent_folder&.public?
+    @public = self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
   end
 
   def mime_class
@@ -290,12 +292,11 @@ class Folder < ActiveRecord::Base
       dup.save!
       self.subcontent.each do |item|
         if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
-          case item
-          when Attachment
+          if item.is_a?(Attachment)
             file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
             file.folder_id = dup.id
             file.save_without_broadcasting!
-          when Folder
+          elsif item.is_a?(Folder)
             sub = item.clone_for(context, nil, options)
             sub.parent_folder_id = dup.id
             sub.save!
@@ -313,10 +314,9 @@ class Folder < ActiveRecord::Base
   end
 
   def self.root_folder_name_for_context(context)
-    case context
-    when Course
+    if context.is_a? Course
       ROOT_FOLDER_NAME
-    when User
+    elsif context.is_a? User
       MY_FILES_FOLDER_NAME
     else
       "files"
@@ -366,7 +366,7 @@ class Folder < ActiveRecord::Base
   def self.is_locked?(folder_id)
     RequestCache.cache('folder_is_locked', folder_id) do
       folder = Folder.where(:id => folder_id).first
-      folder&.locked?
+      folder && folder.locked?
     end
   end
 

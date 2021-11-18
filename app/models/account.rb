@@ -174,7 +174,7 @@ class Account < ActiveRecord::Base
   alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
-  validates :name, length: { :maximum => maximum_string_length, :allow_blank => true }
+  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
   validates :workflow_state, presence: true
@@ -374,11 +374,11 @@ class Account < ActiveRecord::Base
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
                 if opts[:values].include?(inner_key)
-                  new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
-                                          Canvas::Plugin.value_to_boolean(inner_val)
-                                        else
-                                          inner_val.to_s
-                                        end
+                  if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                    new_hash[inner_key] = Canvas::Plugin.value_to_boolean(inner_val)
+                  else
+                    new_hash[inner_key] = inner_val.to_s
+                  end
                 end
               end
             end
@@ -497,7 +497,7 @@ class Account < ActiveRecord::Base
   end
 
   def require_acceptance_of_terms?(user)
-    return false unless terms_required?
+    return false if !terms_required?
     return true if user.nil? || user.new_record?
 
     soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
@@ -515,7 +515,7 @@ class Account < ActiveRecord::Base
     require 'ipaddr'
     params.each do |key, str|
       ips = []
-      vals = str.split(",")
+      vals = str.split(/,/)
       vals.each do |val|
         ip = IPAddr.new(val) rescue nil
         # right now the ip_filter column on quizzes is just a string,
@@ -674,8 +674,10 @@ class Account < ActiveRecord::Base
       end
     end
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
-    preloaded_accounts[self.id]&.each do |account|
-      res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
+    if preloaded_accounts[self.id]
+      preloaded_accounts[self.id].each do |account|
+        res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
+      end
     end
     res
   end
@@ -961,7 +963,7 @@ class Account < ActiveRecord::Base
       guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
-          Account.find_by_sql(<<~SQL.squish)
+          Account.find_by_sql(<<~SQL)
             WITH RECURSIVE t AS (
               SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
               UNION
@@ -986,7 +988,7 @@ class Account < ActiveRecord::Base
 
         if starting_account_id
           GuardRail.activate(:secondary) do
-            ids = Account.connection.select_values(<<~SQL.squish)
+            ids = Account.connection.select_values(<<~SQL)
               WITH RECURSIVE t AS (
                 SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
@@ -1008,7 +1010,7 @@ class Account < ActiveRecord::Base
     if connection.adapter_name == 'PostgreSQL'
       original_shard = Shard.current
       Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
-        ids = Account.connection.select_values(<<~SQL.squish)
+        ids = Account.connection.select_values(<<~SQL)
           WITH RECURSIVE t AS (
             SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
             UNION
@@ -1141,11 +1143,7 @@ class Account < ActiveRecord::Base
     account_roles = available_custom_account_roles(include_inactive)
     account_roles << Role.get_built_in_role('AccountAdmin', root_account_id: resolved_root_account_id)
     if user
-      account_roles.select! { |role|
-        au = account_users.new
-        au.role_id = role.id
-        au.grants_right?(user, :create)
-      }
+      account_roles.select! { |role| au = account_users.new; au.role_id = role.id; au.grants_right?(user, :create) }
     end
     account_roles
   end
@@ -1162,7 +1160,8 @@ class Account < ActiveRecord::Base
 
   def available_custom_roles(include_inactive = false)
     scope = Role.where(:account_id => account_chain_ids)
-    include_inactive ? scope.not_deleted : scope.active
+    scope = include_inactive ? scope.not_deleted : scope.active
+    scope
   end
 
   def available_roles(include_inactive = false)
@@ -1171,12 +1170,12 @@ class Account < ActiveRecord::Base
 
   def get_account_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.account_role?
+    return role if role && role.account_role?
   end
 
   def get_course_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.course_role?
+    return role if role && role.course_role?
   end
 
   def get_role_by_name(role_name)
@@ -1186,8 +1185,8 @@ class Account < ActiveRecord::Base
 
     self.shard.activate do
       role_scope = Role.not_deleted.where(:name => role_name)
-      role_scope = if self.class.connection.adapter_name == 'PostgreSQL'
-                     role_scope.where("account_id = ? OR
+      if self.class.connection.adapter_name == 'PostgreSQL'
+        role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
               SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
@@ -1196,9 +1195,9 @@ class Account < ActiveRecord::Base
             )
             SELECT id FROM t
           )", self.id, self.id)
-                   else
-                     role_scope.where(:account_id => self.account_chain.map(&:id))
-                   end
+      else
+        role_scope = role_scope.where(:account_id => self.account_chain.map(&:id))
+      end
 
       role_scope.first
     end
@@ -1243,11 +1242,7 @@ class Account < ActiveRecord::Base
       shard.activate do
         all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
           # this is a plain ruby hash to keep the cached portion as small as possible
-          self.account_users.active.inject({}) { |result, au|
-            result[au.user_id] ||= []
-            result[au.user_id] << [au.id, au.role_id]
-            result
-          }
+          self.account_users.active.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
         end
         (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
           au = AccountUser.new
@@ -1264,7 +1259,7 @@ class Account < ActiveRecord::Base
         end
       end
     else
-      @account_chain_ids ||= self.account_chain(:include_site_admin => true).filter_map { |a| a.active? ? a.id : nil }
+      @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
       Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
@@ -1496,7 +1491,7 @@ class Account < ActiveRecord::Base
   end
 
   def find_users(string)
-    self.pseudonyms.map(&:user).select { |u| u.name.match(string) }
+    self.pseudonyms.map { |p| p.user }.select { |u| u.name.match(string) }
   end
 
   class << self
@@ -1525,7 +1520,7 @@ class Account < ActiveRecord::Base
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
       self.special_account_list << key
-      instance_eval <<~RUBY, __FILE__, __LINE__ + 1
+      instance_eval <<-RUBY, __FILE__, __LINE__ + 1
         def self.#{key}(force_create = false)
           get_special_account(:#{key}, #{name.inspect}, force_create)
         end
@@ -1834,7 +1829,7 @@ class Account < ActiveRecord::Base
     # set the type to custom for any existing custom links that don't have a type set
     # the new ui will set the type ('custom' or 'default') for any new custom links
     # since we now allow reordering the links, the default links get stored in the settings as well
-    unless links.blank?
+    if !links.blank?
       links.each do |link|
         if link[:type].blank?
           link[:type] = 'custom'
@@ -1934,7 +1929,7 @@ class Account < ActiveRecord::Base
     when :none
       self.allowed_services_hash.empty?
     else
-      self.allowed_services_hash.key?(service)
+      self.allowed_services_hash.has_key?(service)
     end
   end
 
@@ -2005,7 +2000,7 @@ class Account < ActiveRecord::Base
 
   scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
   scope :non_root_accounts, -> { where.not(root_account_id: [0, nil]) }
-  scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
+  scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
 
@@ -2036,12 +2031,12 @@ class Account < ActiveRecord::Base
 
   def trusted_referers=(value)
     self.settings[:trusted_referers] = unless value.blank?
-                                         value.split(',').filter_map { |referer_url| format_referer(referer_url) }.join(',')
+                                         value.split(',').map { |referer_url| format_referer(referer_url) }.compact.join(',')
                                        end
   end
 
   def trusted_referer?(referer_url)
-    return if !self.settings.key?(:trusted_referers) || self.settings[:trusted_referers].blank?
+    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].blank?
 
     if (referer_with_port = format_referer(referer_url))
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
@@ -2098,7 +2093,7 @@ class Account < ActiveRecord::Base
   def update_terms_of_service(terms_params)
     terms = TermsOfService.ensure_terms_for_account(self)
     terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
-    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.key?(:passive)
+    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.has_key?(:passive)
 
     if terms.custom?
       TermsOfServiceContent.ensure_content_for_account(self)
