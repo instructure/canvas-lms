@@ -151,7 +151,7 @@ class ContentSharesController < ApplicationController
                                                      select: { create_params[:content_type].pluralize => [create_params[:content_id]] },
                                                      export_type: ContentExport::COMMON_CARTRIDGE)
     export = create_content_export_from_api(export_params, content.context, @current_user)
-    return unless export.class == ContentExport
+    return unless export.instance_of?(ContentExport)
     return render(json: { message: 'Unable to export content' }, status: :bad_request) unless export.id
 
     name = Context.asset_name(content)

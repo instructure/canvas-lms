@@ -396,8 +396,8 @@ class SplitUsers
       c = r.context
       next unless c && c.class.columns_hash.key?('workflow_state')
 
-      c.workflow_state = r.previous_workflow_state unless c.class == Attachment
-      c.file_state = r.previous_workflow_state if c.class == Attachment
+      c.workflow_state = r.previous_workflow_state unless c.instance_of?(Attachment)
+      c.file_state = r.previous_workflow_state if c.instance_of?(Attachment)
       c.save! if c.changed? && c.valid?
     end
   end

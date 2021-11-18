@@ -41,7 +41,7 @@ class Attachments::Storage
       data.original_filename
     elsif data.respond_to?(:filename)
       data.filename
-    elsif data.class == File
+    elsif data.instance_of?(File)
       File.basename(data)
     end
   end

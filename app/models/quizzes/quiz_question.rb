@@ -121,7 +121,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   def question_data
-    if (data = read_attribute(:question_data)) && data.class == Hash
+    if (data = read_attribute(:question_data)) && data.instance_of?(Hash)
       write_attribute(:question_data, data.with_indifferent_access)
       data = read_attribute(:question_data)
     end

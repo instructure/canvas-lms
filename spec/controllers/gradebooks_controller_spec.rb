@@ -371,7 +371,7 @@ describe GradebooksController do
           assignment_group: assignment_group, title: "Carrot", due_at: 2.days.from_now, position: 1
         )
       end
-      let(:assignment_ids) { assigns[:presenter].assignments.select { |a| a.class == Assignment }.map(&:id) }
+      let(:assignment_ids) { assigns[:presenter].assignments.select { |a| a.instance_of?(Assignment) }.map(&:id) }
 
       it "sorts assignments by due date (null last), then title if there is no saved order preference" do
         get 'grade_summary', params: { course_id: @course.id, id: @student.id }
@@ -530,7 +530,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', params: { :course_id => @course.id, :id => @student.id }
-          assignment_due_at = assigns[:presenter].assignments.find { |a| a.class == Assignment }.due_at
+          assignment_due_at = assigns[:presenter].assignments.find { |a| a.instance_of?(Assignment) }.due_at
           expect(assignment_due_at.to_i).to eq due_at.to_i
         end
       end
@@ -562,7 +562,7 @@ describe GradebooksController do
         session[:become_user_id] = @fake_student.id
 
         get 'grade_summary', params: { :course_id => @course.id, :id => @fake_student.id }
-        assignment_due_at = assigns[:presenter].assignments.find { |a| a.class == Assignment }.due_at
+        assignment_due_at = assigns[:presenter].assignments.find { |a| a.instance_of?(Assignment) }.due_at
         expect(assignment_due_at.to_i).to eq @due_at.to_i
       end
 

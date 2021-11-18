@@ -930,7 +930,7 @@ class ContextExternalTool < ActiveRecord::Base
 
       all_external_tools = query.to_a
       sorted_external_tools = all_external_tools.sort_by do |t|
-        [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last]
+        [contexts.index { |c| c.id == t.context_id && c.class.polymorphic_name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last]
       end
 
       search_options = { exclude_tool_id: exclude_tool_id }

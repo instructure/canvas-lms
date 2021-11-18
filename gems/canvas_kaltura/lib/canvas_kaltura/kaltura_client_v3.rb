@@ -335,7 +335,7 @@ module CanvasKaltura
       playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
 
       res = sendRequest(Net::HTTP::Get.new(playlist_url))
-      return nil unless res.kind_of?(Net::HTTPSuccess)
+      return nil unless res.is_a?(Net::HTTPSuccess)
 
       doc = Nokogiri::XML(res.body)
       mediaNode = doc.css('manifest media').first

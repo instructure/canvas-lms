@@ -94,7 +94,7 @@ module CC
                     if ct.content && ct.content.context != @course
                       item_node.global_identifierref ct.content.id
                     end
-                    if ct.associated_asset.class == Lti::ResourceLink
+                    if ct.associated_asset.instance_of?(Lti::ResourceLink)
                       item_node.lti_resource_link_lookup_uuid ct.associated_asset.lookup_uuid
                     end
                   end
