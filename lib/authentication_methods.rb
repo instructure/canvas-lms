@@ -94,7 +94,7 @@ module AuthenticationMethods
 
   def filter_includes(key)
     # no funny business
-    params.delete(key) unless params[key].class == Array
+    params.delete(key) unless params[key].instance_of?(Array)
     return unless params.key?(key)
 
     params[key] &= ALLOWED_SCOPE_INCLUDES

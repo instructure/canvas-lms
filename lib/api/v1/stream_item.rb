@@ -49,7 +49,7 @@ module Api::V1::StreamItem
       when 'DiscussionTopic', 'Announcement'
         context = stream_item.context
         hash['message'] = api_user_content(data.message, context)
-        if stream_item.data.class.name == 'DiscussionTopic'
+        if stream_item.data.instance_of?(DiscussionTopic)
           hash['discussion_topic_id'] = stream_item.asset_id
           hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
         else

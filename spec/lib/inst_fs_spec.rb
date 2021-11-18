@@ -499,11 +499,11 @@ describe InstFS do
     context "direct upload" do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
-        allow(CanvasHttp).to receive(:post).and_return(double(
-                                                         class: Net::HTTPCreated,
-                                                         code: 200,
-                                                         body: { instfs_uuid: instfs_uuid }.to_json
-                                                       ))
+        allow(CanvasHttp).to receive(:post).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: 201,
+                          body: { instfs_uuid: instfs_uuid }.to_json)
+        )
 
         res = InstFS.direct_upload(
           file_name: "a.png",
@@ -514,11 +514,11 @@ describe InstFS do
 
       it "requests a streaming upload to allow large files" do
         instfs_uuid = "1234-abcd"
-        expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(double(
-                                                                                                          class: Net::HTTPCreated,
-                                                                                                          code: 200,
-                                                                                                          body: { instfs_uuid: instfs_uuid }.to_json
-                                                                                                        ))
+        expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: 201,
+                          body: { instfs_uuid: instfs_uuid }.to_json)
+        )
 
         InstFS.direct_upload(
           file_name: "a.png",
@@ -538,11 +538,11 @@ describe InstFS do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
         new_instfs_uuid = "5678-efgh"
-        allow(CanvasHttp).to receive(:post).with(%r{/files/#{instfs_uuid}/duplicate}).and_return(double(
-                                                                                                   class: Net::HTTPCreated,
-                                                                                                   code: 200,
-                                                                                                   body: { id: new_instfs_uuid }.to_json
-                                                                                                 ))
+        allow(CanvasHttp).to receive(:post).with(%r{/files/#{instfs_uuid}/duplicate}).and_return(
+          instance_double("Net::HTTPCreated",
+                          code: 201,
+                          body: { id: new_instfs_uuid }.to_json)
+        )
         expect(InstFS.duplicate_file(instfs_uuid)).to eq new_instfs_uuid
       end
     end
@@ -550,10 +550,9 @@ describe InstFS do
     context "deletion" do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
-        allow(CanvasHttp).to receive(:delete).with(%r{/files/#{instfs_uuid}}).and_return(double(
-                                                                                           class: Net::HTTPOK,
-                                                                                           code: 200
-                                                                                         ))
+        allow(CanvasHttp).to receive(:delete).with(%r{/files/#{instfs_uuid}}).and_return(
+          instance_double("Net::HTTPOK", code: 200)
+        )
         expect(InstFS.delete_file(instfs_uuid)).to eq true
       end
     end

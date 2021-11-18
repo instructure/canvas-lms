@@ -204,7 +204,7 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
-        if @assignment[attr].class == Hash
+        if @assignment[attr].instance_of?(Hash)
           expect(@assignment[attr].stringify_keys).to eq new_assignment[attr].stringify_keys
         else
           expect(@assignment[attr]).to eq new_assignment[attr]

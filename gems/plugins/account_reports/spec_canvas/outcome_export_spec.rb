@@ -31,7 +31,7 @@ describe "Outcome Reports" do
     end
 
     def match_outcome(outcome)
-      object_type = outcome.class == LearningOutcome ? 'canvas_outcome' : 'canvas_outcome_group'
+      object_type = outcome.instance_of?(LearningOutcome) ? 'canvas_outcome' : 'canvas_outcome_group'
       vendor_guid = outcome.vendor_guid || "#{object_type}:#{outcome.id}"
       match_row('vendor_guid' => vendor_guid)
     end

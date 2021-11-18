@@ -37,7 +37,7 @@ module CoursesHelper
 
     # because this happens in a sidebar, the context may be wrong. check and fix
     # it if that's the case.
-    context = context.class == recent_event.class && context.id == recent_event.context_id ?
+    context = context.instance_of?(recent_event.class) && context.id == recent_event.context_id ?
       context : recent_event.context
 
     icon_data = [nil] + event_type

@@ -1715,7 +1715,7 @@ class RoleOverride < ActiveRecord::Base
     end
 
     def has_asset?(asset)
-      asset.class == Account && asset.id == context_id
+      asset.instance_of?(Account) && asset.id == context_id
     end
   end
   private_constant :OverrideDummy

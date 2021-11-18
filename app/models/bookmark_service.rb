@@ -59,7 +59,7 @@ class BookmarkService < UserService
     case service.service
     when 'diigo'
       data = Diigo::Connection.diigo_get_bookmarks(service)
-      if data.class == Array and data.first.is_a?(Hash)
+      if data.instance_of?(Array) && data.first.is_a?(Hash)
         data.each do |bookmark|
           bookmarks << {
             :title => bookmark['title'],

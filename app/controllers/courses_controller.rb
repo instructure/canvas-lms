@@ -3687,7 +3687,7 @@ class CoursesController < ApplicationController
         enrollments.select! { |e| e.role_id == params[:enrollment_role_id].to_i }
       elsif params[:enrollment_type]
         e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-        enrollments.select! { |e| e.class.name == e_type }
+        enrollments.select! { |e| e.class.sti_name == e_type }
       end
 
       if params[:enrollment_state] && params[:enrollment_state] != "active"

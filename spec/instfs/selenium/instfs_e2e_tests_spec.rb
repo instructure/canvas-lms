@@ -136,7 +136,7 @@ describe "instfs file uploads" do
     # if a file is less than 10K, it will return a StringIO, not a file object.
     # in that case get the string from the StringIO
     downloaded_data = open(file_link)
-    if downloaded_data.class == StringIO
+    if downloaded_data.instance_of?(StringIO)
       downloaded_data = downloaded_data.string
     elsif !downloaded_data.empty?
       downloaded_data = File.read(downloaded_data)

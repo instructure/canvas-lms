@@ -152,7 +152,7 @@ class ContentExportsApiController < ApplicationController
       return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
 
       export = create_content_export_from_api(params, @context, @current_user)
-      return unless export.class == ContentExport
+      return unless export.instance_of?(ContentExport)
 
       if export.id
         includes = Array(params[:include]) || []

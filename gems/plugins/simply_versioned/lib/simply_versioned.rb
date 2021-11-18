@@ -131,9 +131,10 @@ module SimplyVersioned
                                :except => [:created_at, :updated_at]
                              })
 
-      version = if version.kind_of?(Version)
+      version = case version
+                when Version
                   version
-                elsif version.kind_of?(Integer)
+                when Integer
                   self.versions.where(number: version).first
                 end
 

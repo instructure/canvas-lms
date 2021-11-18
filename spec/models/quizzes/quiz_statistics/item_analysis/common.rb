@@ -31,7 +31,7 @@ class BeApproximately
 
   def approximates?(target, expected)
     return true  if target == expected
-    return false unless target.class == expected.class
+    return false unless target.instance_of?(expected.class)
 
     case target
     when Array then array_approximates(target, expected)

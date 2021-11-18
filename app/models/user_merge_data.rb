@@ -42,7 +42,7 @@ class UserMergeData < ActiveRecord::Base
         user ||= o.user_id
         r = self.records.new(context: o, previous_user_id: user)
         r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
-        r.previous_workflow_state = o.file_state if o.class == Attachment
+        r.previous_workflow_state = o.file_state if o.instance_of?(Attachment)
         r.previous_workflow_state = workflow_state if workflow_state
         data << r
       end

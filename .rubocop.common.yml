@@ -197,6 +197,10 @@ Style/BarePercentLiterals:
   Severity: error
 Style/CaseLikeIf:
   Severity: error
+Style/ClassCheck:
+  Severity: error
+Style/ClassEqualityComparison:
+  Severity: error
 Style/ColonMethodCall:
   Severity: error
 Style/ConditionalAssignment:
