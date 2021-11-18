@@ -40,7 +40,6 @@ import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!discussion_topics_post'
-import {ISOLATED_VIEW_INITIAL_PAGE_SIZE, PER_PAGE} from '../../utils/constants'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -60,7 +59,7 @@ export const IsolatedViewContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
       discussionEntryID: newDiscussionEntry.rootEntryId,
-      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      last: ENV.isolated_view_initial_page_size,
       sort: 'asc',
       courseID: window.ENV?.course_id,
       includeRelativeEntry: false
@@ -245,7 +244,7 @@ export const IsolatedViewContainer = props => {
   const isolatedEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
-      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      last: ENV.isolated_view_initial_page_size,
       sort: 'asc',
       courseID: window.ENV?.course_id,
       ...(props.relativeEntryId &&
@@ -273,7 +272,7 @@ export const IsolatedViewContainer = props => {
     isolatedEntryOlderDirection.fetchMore({
       variables: {
         discussionEntryID: props.discussionEntryId,
-        last: PER_PAGE,
+        last: ENV.per_page,
         before:
           isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.pageInfo
             .startCursor,
@@ -303,7 +302,7 @@ export const IsolatedViewContainer = props => {
     isolatedEntryNewerDirection.fetchMore({
       variables: {
         discussionEntryID: props.discussionEntryId,
-        first: PER_PAGE,
+        first: ENV.per_page,
         after:
           isolatedEntryNewerDirection.data.legacyNode.discussionSubentriesConnection.pageInfo
             .endCursor,
