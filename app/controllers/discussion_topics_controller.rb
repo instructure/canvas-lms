@@ -662,6 +662,25 @@ class DiscussionTopicsController < ApplicationController
 
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post)
+      env_hash = {
+        per_page: 20,
+        isolated_view_initial_page_size: 5,
+        current_page: 0
+      }
+      if params[:entry_id]
+        entry = @topic.discussion_entries.find(params[:entry_id])
+        env_hash[:discussions_deep_link] = {
+          root_entry_id: entry.root_entry_id,
+          entry_id: entry.id
+        }
+        if entry.root_entry_id.nil?
+          condition = ">="
+          count_before = @topic.root_discussion_entries.where("created_at #{condition}?", entry.created_at).count
+          env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
+        end
+      end
+      js_env(env_hash)
+
       topics = groups_and_group_topics if @topic.for_group_discussion?
       if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
         redirect_params = { root_discussion_topic_id: @topic.id }

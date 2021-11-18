@@ -45,6 +45,9 @@ describe('DiscussionFullPage', () => {
 
   beforeAll(() => {
     window.ENV = {
+      per_page: 20,
+      isolated_view_initial_page_size: 5,
+      current_page: 0,
       discussion_topic_id: '1',
       manual_mark_as_read: false,
       current_user: {
@@ -501,6 +504,16 @@ describe('DiscussionFullPage', () => {
       // should be able to highlight the topic multiple times
       fireEvent.click(await container.findByTestId('thread-actions-menu'))
       fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    })
+
+    it('should highlight the deep linked discussion entry', async () => {
+      window.ENV.discussions_deep_link = {
+        entry_id: '1',
+        root_entry_id: null
+      }
+      const container = setup(getDiscussionQueryMock())
+
       expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
     })
   })
