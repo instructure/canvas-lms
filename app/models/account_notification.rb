@@ -101,14 +101,12 @@ class AccountNotification < ActiveRecord::Base
       sub_account_ids_map = {}
 
       current.select! do |announcement|
-        # need to have these variables to be able to access them outside of the
-        # announcement.shard.activate block
-        enrollments = nil
         # use role.id instead of role_id to trigger Role#id magic for built in
         # roles. try(:id) because the AccountNotificationRole may have an
         # explicitly nil role_id to indicate the announcement's intended for
         # users not enrolled in any courses
         role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_root_account_id(root_account.id)&.id }
+        global_account_id = Shard.global_id_for(announcement.account_id, announcement.shard)
 
         unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
           unless announcement.account.root_account?
@@ -118,30 +116,16 @@ class AccountNotification < ActiveRecord::Base
               # store the announcements for the user's shards which could be
               # many. This also avoids storing the same local_id and using the
               # wrong chain.
-              global_account_id = Shard.global_id_for(announcement.account_id)
               sub_account_ids_map[global_account_id] ||=
                 Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
             end
           end
 
           # choose enrollments and account users to inspect
-          if announcement.account.site_admin?
-            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
-          else
-            announcement.shard.activate do
-              if announcement.account.root_account?
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date
-                                        .where(root_account_id: announcement.account_id).select(:role_id).to_a
-              else
-                global_account_id = Shard.global_id_for(announcement.account_id)
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course)
-                                        .where(:courses => { :account_id => sub_account_ids_map[global_account_id] }).select(:role_id).to_a
-              end
-            end
-          end
-
           account_users = announcement.account_user_roles(user)
-
+          enrollments = announcement.shard.activate do
+            announcement.enrollment_role_ids(user, account_ids: sub_account_ids_map[global_account_id])
+          end
           # preload role objects for those enrollments and account users
           ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
           ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
@@ -190,6 +174,19 @@ class AccountNotification < ActiveRecord::Base
 
       current.sort_by { |item| item[:end_at] }.reverse
     end
+  end
+
+  def enrollment_role_ids(user, account_ids:)
+    if account.site_admin?
+      scope = user.enrollments.shard(user.in_region_associated_shards)
+    else
+      scope = account.root_account.all_enrollments.where(user_id: user)
+      unless account.root_account?
+        scope = scope.where(courses: { account_id: account_ids })
+                     .joins(:course)
+      end
+    end
+    scope.active_or_pending_by_date.distinct.select(:role_id).to_a
   end
 
   def account_user_roles(user)

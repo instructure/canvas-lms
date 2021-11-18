@@ -636,6 +636,13 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to match_array(expected)
       end
 
+      it "works for roles from siteadmin" do
+        # visible notifications
+        @visible = account_notification(account: Account.site_admin, role_ids: [teacher_role.id])
+        @user = @shard2.activate { @course1 = course_with_teacher(account: @shard2_account, active_all: true).user }
+        expect(AccountNotification.for_user_and_account(@user, @account1)).to match_array([@visible])
+      end
+
       it "is able to set notifications to be restricted to own domain" do
         expected = []
         expected << account_notification(:account => @account1, :domain_specific => true)
