@@ -146,7 +146,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       allow(settings_mock).to receive(:enabled?).and_return(true)
 
@@ -173,7 +173,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -197,7 +197,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -217,7 +217,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization')
       allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
@@ -285,7 +285,7 @@ describe UsersController do
 
     it "sorts the results of manageable_courses by name" do
       course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
-      %w(c d a).each do |name|
+      %w[c d a].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
       end
 
@@ -293,7 +293,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+      expect(courses.map { |c| c['label'] }).to eq %w[a B c d]
     end
 
     it "sorts the results of manageable_courses by term with default term first then alphabetically" do
@@ -302,11 +302,11 @@ describe UsersController do
       future_term = EnrollmentTerm.create(start_at: 1.day.from_now, root_account: @teacher.account)
       past_term = EnrollmentTerm.create(start_at: 1.day.ago, root_account: @teacher.account)
       # Future terms
-      %w(b a).each do |name|
+      %w[b a].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => future_term.id)
       end
       # Past terms
-      %w(d c).each do |name|
+      %w[d c].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
       end
 
@@ -314,7 +314,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(E c d a b)
+      expect(courses.map { |c| c['label'] }).to eq %w[E c d a b]
     end
 
     it "does not include courses that an admin can't content-manage" do
@@ -335,7 +335,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+      expect(courses.map { |c| c['label'] }).to eq %w[A C]
     end
 
     it "does not include courses that an admin doesn't have rights to see" do
@@ -352,7 +352,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+      expect(courses.map { |c| c['label'] }).to eq %w[A C]
     end
 
     context "query matching" do

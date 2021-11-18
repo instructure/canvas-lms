@@ -29,7 +29,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   validates :discussion_entry_id, :user_id, :workflow_state, presence: true
   validate :prevent_creates
 
-  validates :report_type, inclusion: { in: %w(inappropriate offensive other),
+  validates :report_type, inclusion: { in: %w[inappropriate offensive other],
                                        message: "%{value} is not valid" }
 
   def prevent_creates
@@ -81,7 +81,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
-      insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
+      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state]
       update_columns = []
       update_values = []
 
@@ -98,7 +98,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       end
 
       unless report_type.nil?
-        unless %w(inappropriate offensive other).include? report_type
+        unless %w[inappropriate offensive other].include? report_type
           raise(ArgumentError)
         end
 

@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["zachp@instructure.com", "stephan@pivotallabs.com"]
   spec.summary       = 'Strip invalid UTF8 characters'
 
-  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(Rakefile test.sh)
+  spec.files         = Dir.glob("{lib,spec}/**/*") + %w[Rakefile test.sh]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]

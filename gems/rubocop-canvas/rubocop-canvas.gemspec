@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["brianp@instructure.com"]
   spec.summary       = 'custom cops for canvas'
 
-  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
+  spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 

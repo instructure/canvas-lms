@@ -59,8 +59,8 @@ describe AppointmentGroup do
       )
 
       expect(group).to be_valid
-      selected = [c1section1.asset_string, c1section2.asset_string, c2section1.asset_string].sort()
-      expect(group.sub_context_codes.sort()).to eql selected
+      selected = [c1section1.asset_string, c1section2.asset_string, c2section1.asset_string].sort
+      expect(group.sub_context_codes.sort).to eql selected
     end
 
     it "ignores invalid sub context types" do

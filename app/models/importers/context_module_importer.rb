@@ -155,7 +155,7 @@ module Importers
             end
           end
         end
-        item.prerequisites = preqs if preqs.length > 0 || migration.for_master_course_import?
+        item.prerequisites = preqs if !preqs.empty? || migration.for_master_course_import?
       end
       item.save!
 
@@ -190,7 +190,7 @@ module Importers
             c_reqs << req
           end
         end
-        if c_reqs.length > 0 || migration.for_master_course_import? # allow clearing requirements on sync
+        if !c_reqs.empty? || migration.for_master_course_import? # allow clearing requirements on sync
           item.completion_requirements = c_reqs
           item.save
         end

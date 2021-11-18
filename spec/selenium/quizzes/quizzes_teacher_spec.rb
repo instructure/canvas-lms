@@ -250,7 +250,7 @@ describe "quizzes" do
         expect(f('.attempts_left').text).to eq '1'
 
         # valid values
-        f('#extension_extra_attempts').clear()
+        f('#extension_extra_attempts').clear
         f('#extension_extra_attempts').send_keys('2')
         submit_dialog_form('#moderate_student_form')
         wait_for_ajax_requests

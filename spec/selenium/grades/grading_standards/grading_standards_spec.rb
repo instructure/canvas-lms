@@ -58,7 +58,7 @@ describe "grading standards" do
     @standard = @course.grading_standards.create!(title: "some standard", standard_data: { a: { name: 'A', value: '95' }, b: { name: 'B', value: '80' }, f: { name: 'F', value: '' } })
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-    f("#assignment_points_possible").clear()
+    f("#assignment_points_possible").clear
     f("#assignment_points_possible").send_keys("1")
     click_option('#assignment_grading_type', "Letter Grade")
     expect(f('.edit_letter_grades_link')).to be_displayed

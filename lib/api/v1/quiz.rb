@@ -21,7 +21,7 @@ module Api::V1::Quiz
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
-    :only => (%w(
+    :only => (%w[
       access_code
       allowed_attempts
       anonymous_submissions
@@ -52,7 +52,7 @@ module Api::V1::Quiz
       disable_timer_autosubmission
       title
       unlock_at
-    ) + [{ 'hide_results' => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
+    ] + [{ 'hide_results' => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
              ).freeze
   }.freeze
 

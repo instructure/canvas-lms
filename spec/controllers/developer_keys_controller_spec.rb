@@ -199,8 +199,8 @@ describe DeveloperKeysController do
 
       describe 'scopes' do
         let(:valid_scopes) do
-          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+          %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
         end
         let(:invalid_scopes) { ['url:POST/banana', 'url:POST/invalid/scope'] }
         let(:root_account) { account_model }
@@ -254,8 +254,8 @@ describe DeveloperKeysController do
 
       describe 'scopes' do
         let(:valid_scopes) do
-          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+          %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
         end
         let(:invalid_scopes) { ['url:POST|/api/v1/banana', 'not_a_scope'] }
         let(:root_account) { account_model }

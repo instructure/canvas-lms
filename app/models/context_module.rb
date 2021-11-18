@@ -513,9 +513,9 @@ class ContextModule < ActiveRecord::Base
     tags = self.content_tags.not_deleted.index_by(&:id)
     validated_reqs = requirements.select do |req|
       if req[:id] && (tag = tags[req[:id]])
-        if %w(must_view must_mark_done must_contribute).include?(req[:type])
+        if %w[must_view must_mark_done must_contribute].include?(req[:type])
           true
-        elsif %w(must_submit min_score).include?(req[:type])
+        elsif %w[must_submit min_score].include?(req[:type])
           true if tag.scoreable?
         end
       end
@@ -756,7 +756,7 @@ class ContextModule < ActiveRecord::Base
     new_tags = []
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
-      next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
+      next unless %w[Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool].include?(item.class_name)
 
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }

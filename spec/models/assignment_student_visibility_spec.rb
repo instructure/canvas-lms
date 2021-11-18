@@ -62,7 +62,7 @@ describe "differentiated_assignments" do
   def student_in_course_with_adhoc_override(assignment, opts = {})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course)
-    ao = AssignmentOverride.new()
+    ao = AssignmentOverride.new
     ao.assignment = assignment
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
@@ -109,7 +109,7 @@ describe "differentiated_assignments" do
   end
 
   def create_override_for_assignment(assignment)
-    ao = AssignmentOverride.new()
+    ao = AssignmentOverride.new
     ao.assignment = assignment
     ao.title = "Lorem"
     ao.workflow_state = "active"

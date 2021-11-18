@@ -46,7 +46,7 @@ module Lti
       }.freeze
     ].freeze
 
-    USER_INCLUDES = %w(email lti_id).freeze
+    USER_INCLUDES = %w[email lti_id].freeze
 
     def lti2_service_name
       USER_SERVICE

@@ -74,7 +74,7 @@ class SubmissionsBaseController < ApplicationController
 
         render :json => @submission.as_json(
           Submission.json_serialization_full_parameters(
-            except: %i(quiz_submission submission_history)
+            except: %i[quiz_submission submission_history]
           ).merge({
                     except: submission_json_exclusions,
                     permissions: {

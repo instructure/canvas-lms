@@ -188,7 +188,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
     end
 
     it "includes description when lock settings allow" do
@@ -368,15 +368,15 @@ describe Types::AssignmentType do
 
   describe 'groupSubmissionConnection' do
     before(:once) do
-      course_with_teacher()
+      course_with_teacher
       assignment_model(group_category: 'GROUPS!')
       @group_category.create_groups(2)
       2.times {
-        student_in_course()
+        student_in_course
         @group_category.groups.first.add_user(@user)
       }
       2.times {
-        student_in_course()
+        student_in_course
         @group_category.groups.last.add_user(@user)
       }
       @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')

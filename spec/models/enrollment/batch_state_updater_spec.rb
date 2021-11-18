@@ -183,7 +183,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   it 'accounts for all enrollment callbacks in Enrollment::BatchStateUpdater.destroy_batch' do
-    accounted_for_callbacks = %i(
+    accounted_for_callbacks = %i[
       add_to_favorites_later
       assign_uuid
       audit_groups_for_deleted_enrollments
@@ -214,7 +214,7 @@ describe "Enrollment::BatchStateUpdater" do
       update_assignment_overrides_if_needed
       update_linked_enrollments
       update_user_account_associations_if_necessary
-    )
+    ]
     expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
   end
 end

@@ -26,7 +26,7 @@ describe "API", type: :request do
       obj = Object.new
       obj.extend Api::V1::Json
       course_with_teacher
-      session = double()
+      session = double
       expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [:name, :sis_source_id] })
       obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
     end
@@ -36,7 +36,7 @@ describe "API", type: :request do
     it "skips attribute filtering if obj doesn't respond" do
       course_with_teacher
       expect(@course.respond_to?(:filter_attributes_for_user)).to be_truthy
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name permissions sis_source_id)
+      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name permissions sis_source_id]
     end
 
     it "does attribute filtering if obj responds" do
@@ -47,19 +47,19 @@ describe "API", type: :request do
         expect(session).to be_nil
         hash.delete('sis_source_id')
       end
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name permissions)
+      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name permissions]
     end
 
     it "does not return the permissions list if include_permissions is false" do
       course_with_teacher
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name sis_source_id)
+      expect(@course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name sis_source_id]
     end
 
     it "serializes permissions if obj responds" do
       course_with_teacher
       expect(@course).to receive(:serialize_permissions).once.with(anything, @teacher, nil)
-      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => ["update"] }, :only => %w(name))
-      expect(json.keys.sort).to eq %w(name permissions)
+      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => ["update"] }, :only => %w[name])
+      expect(json.keys.sort).to eq %w[name permissions]
     end
   end
 

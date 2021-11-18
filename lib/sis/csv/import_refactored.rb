@@ -34,11 +34,11 @@ module SIS
       #  * Course must be imported before Section
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
-      IMPORTERS = %i{change_sis_id account term abstract_course course section
+      IMPORTERS = %i[change_sis_id account term abstract_course course section
                      xlist user login enrollment admin group_category group group_membership
-                     grade_publishing_results user_observer}.freeze
+                     grade_publishing_results user_observer].freeze
 
-      HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w{password ssha_password}.freeze
+      HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w[password ssha_password].freeze
 
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
@@ -362,7 +362,7 @@ module SIS
 
       def is_last_parallel_importer_of_type?(parallel_importer)
         importer_type = parallel_importer.importer_type.to_sym
-        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running retry}).exists?
+        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w[queued running retry]).exists?
 
         SisBatch.transaction do
           @batch.reload(:lock => true)

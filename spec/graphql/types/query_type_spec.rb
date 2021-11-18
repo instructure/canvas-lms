@@ -91,7 +91,7 @@ describe Types::QueryType do
     }
     let_once(:admin) { account_admin_user(account: Account.default) }
 
-    %w/account course assignment assignmentGroup term/.each do |type|
+    %w[account course assignment assignmentGroup term].each do |type|
       it "doesn't allow searching #{type} when given both types of ids" do
         expect(
           CanvasSchema.execute("{#{type}(id: \"123\", sisId: \"123\") { id }}").dig("errors", 0, "message")

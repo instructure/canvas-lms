@@ -152,7 +152,7 @@ class TabsController < ApplicationController
       pos = tab_config.index { |t| t['id'] == tab['id'] }
       if pos.nil?
         pos = (tab['position'] || tab_config.size) - 1
-        tab_config.insert(pos, tab.with_indifferent_access.slice(*%w{id hidden position}))
+        tab_config.insert(pos, tab.with_indifferent_access.slice(*%w[id hidden position]))
       end
 
       if value_to_boolean(params['hidden'])

@@ -191,7 +191,7 @@ def init
 end
 
 def generate_swagger(filename, json)
-  output_dir = File.join(%w(public doc api))
+  output_dir = File.join(%w[public doc api])
   FileUtils.mkdir_p output_dir
 
   path = File.join(output_dir, filename)

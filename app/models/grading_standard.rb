@@ -239,7 +239,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def self.default_instance
-    gs = GradingStandard.new()
+    gs = GradingStandard.new
     gs.data = default_grading_scheme
     gs.title = 'Default Grading Scheme'
     gs.default_standard = true

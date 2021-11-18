@@ -463,7 +463,7 @@ module Lti
         end
 
         context 'when the response is not a success' do
-          let(:stubbed_response) { double() }
+          let(:stubbed_response) { double }
 
           before do
             allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false

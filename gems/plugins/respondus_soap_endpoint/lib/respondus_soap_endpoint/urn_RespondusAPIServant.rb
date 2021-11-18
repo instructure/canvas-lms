@@ -107,7 +107,7 @@ module RespondusSoapEndpoint
     end
 
     def load_user(method, userName, password)
-      return nil if %w(identifyServer).include?(method.to_s)
+      return nil if %w[identifyServer].include?(method.to_s)
 
       domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
       if userName == OAUTH_TOKEN_USERNAME
@@ -142,7 +142,7 @@ module RespondusSoapEndpoint
       userName, password, context, *args = args
       Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env['REMOTE_ADDR']} at #{Time.now}) [SOAP]"
       log_args = args.dup
-      log_args.pop if %w(publishServerItem replaceServerItem appendServerItem).include?(method.to_s)
+      log_args.pop if %w[publishServerItem replaceServerItem appendServerItem].include?(method.to_s)
       Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"
       load_user(method, userName, password)
       load_session(context)
@@ -203,10 +203,10 @@ module RespondusSoapEndpoint
     #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
     #
     def identifyServer(_userName, _password, _context)
-      [%{
+      [%(
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS}]
+Implemented for: Canvas LMS)]
     end
 
     # SYNOPSIS
@@ -532,10 +532,10 @@ Implemented for: Canvas LMS}]
 
     def do_import(item, itemType, uploadType, _fileName, fileData)
       if fileData == "\x0" && session['pending_migration_id']
-        return poll_for_completion()
+        return poll_for_completion
       end
 
-      unless %w(quiz qdb).include?(itemType)
+      unless %w[quiz qdb].include?(itemType)
         raise OtherError, "Invalid item type"
       end
       if uploadType != 'zipPackage'
@@ -595,13 +595,13 @@ Implemented for: Canvas LMS}]
       session['pending_migration_itemType'] = itemType
 
       if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        poll_for_completion()
+        poll_for_completion
       else
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.
         timeout(5.minutes.to_i) do
           loop do
-            ret = poll_for_completion()
+            ret = poll_for_completion
             if ret == ['pending']
               sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f) # rubocop:disable Lint/NoSleep
             else

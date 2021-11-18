@@ -191,6 +191,8 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/BarePercentLiterals:
+  Severity: error
 Style/CaseLikeIf:
   Severity: error
 Style/ColonMethodCall:
@@ -228,6 +230,8 @@ Style/IfUnlessModifier:
   Enabled: false # can obscure important decisions or put too much code in a line
 Style/IfWithBooleanLiteralBranches:
   Severity: error
+Style/MethodCallWithoutArgsParentheses:
+  Severity: error
 Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
@@ -241,6 +245,11 @@ Style/NumericPredicate:
 Style/OrAssignment:
   Severity: error
 Style/ParenthesesAroundCondition:
+  Severity: error
+Style/PercentLiteralDelimiters:
+  Severity: error
+Style/PercentQLiterals:
+  EnforcedStyle: upper_case_q
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
@@ -292,10 +301,15 @@ Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/SymbolProc:
   Severity: error
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
+Style/ZeroLengthPredicate:
+  Severity: error
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
@@ -352,17 +366,9 @@ Style/HashSyntax:
   Enabled: false # TODO: autocorrect
 Style/Lambda: # TODO: autocorrect
   Enabled: false
-Style/MethodCallWithArgsParentheses: # TODO: autocorrect
-  Enabled: false
-Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
-  Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
 Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
-  Enabled: false
-Style/PercentLiteralDelimiters: # TODO: autocorrect
-  Enabled: false
-Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false
 Style/RedundantSelf: # TODO: autocorrect
   Enabled: false
@@ -389,6 +395,4 @@ Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
   Enabled: false
 Style/WordArray: # TODO: autocorrect
-  Enabled: false
-Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
   Enabled: false

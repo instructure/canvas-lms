@@ -33,7 +33,7 @@ module Api::V1::Assignment
               :rubric_association].freeze
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
-    :only => %w(
+    :only => %w[
       id
       position
       description
@@ -64,11 +64,11 @@ module Api::V1::Assignment
       anonymous_grading
       allowed_attempts
       annotatable_attachment_id
-    )
+    ]
   }.freeze
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
-    :only => %w(
+    :only => %w[
       graders_anonymous_to_graders
       grader_comments_visible_to_graders
       grader_names_visible_to_final_grader
@@ -77,7 +77,7 @@ module Api::V1::Assignment
       assignment_group_id
       post_to_sis
       annotatable_attachment_id
-    )
+    ]
   }.freeze
 
   EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD = %w[
@@ -455,7 +455,7 @@ module Api::V1::Assignment
     settings.slice(*API_ALLOWED_VERICITE_SETTINGS)
   end
 
-  API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
+  API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w[
     name
     description
     position
@@ -489,9 +489,9 @@ module Api::V1::Assignment
     anonymous_instructor_annotations
     allowed_attempts
     important_dates
-  ).freeze
+  ].freeze
 
-  API_ALLOWED_TURNITIN_SETTINGS = %w(
+  API_ALLOWED_TURNITIN_SETTINGS = %w[
     originality_report_visibility
     s_paper_check
     internet_check
@@ -501,14 +501,14 @@ module Api::V1::Assignment
     exclude_small_matches_type
     exclude_small_matches_value
     submit_papers_to
-  ).freeze
+  ].freeze
 
-  API_ALLOWED_VERICITE_SETTINGS = %w(
+  API_ALLOWED_VERICITE_SETTINGS = %w[
     originality_report_visibility
     exclude_quoted
     exclude_self_plag
     store_in_index
-  ).freeze
+  ].freeze
 
   def create_api_assignment(assignment, assignment_params, user, context = assignment.context, calculate_grades: nil)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)

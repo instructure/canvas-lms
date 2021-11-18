@@ -130,7 +130,7 @@ module CoursesHelper
     end
 
     type = enrollment.type.remove(/Enrollment/).downcase
-    type = "student" if %w/studentview observer/.include?(type)
+    type = "student" if %w[studentview observer].include?(type)
 
     type
   end

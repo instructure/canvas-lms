@@ -106,7 +106,7 @@ describe 'UpdateCustomParams' do
   end
 
   it 'validates that valid domains are passed in' do
-    strings = %w|api.quiz.docker/lti/launch jdoe.quiz-api-dev-pdx.inseng.net t.t2.quiz-lti-prod-iad.instructure.com|
+    strings = %w[api.quiz.docker/lti/launch jdoe.quiz-api-dev-pdx.inseng.net t.t2.quiz-lti-prod-iad.instructure.com]
     results = DataFixup::Lti::UpdateCustomParams.validate_domains!(strings)
     expect(results.size).to eq(2) # no /lti/launch
   end

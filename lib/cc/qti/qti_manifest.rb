@@ -105,7 +105,7 @@ module CC
         end # manifest
 
         # write any errors to the manifest file
-        if @exporter.errors.length > 0
+        unless @exporter.errors.empty?
           @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
           @exporter.errors.each do |error|
             @document.comment! error.first
@@ -119,7 +119,7 @@ module CC
         md.imsmd :lom do |lom|
           lom.imsmd :general do |general|
             general.imsmd :title do |title|
-              title.imsmd :string, %{QTI Quiz Export for course "#{course.name}"}
+              title.imsmd :string, %(QTI Quiz Export for course "#{course.name}")
             end
           end
           lom.imsmd :lifeCycle do |general|

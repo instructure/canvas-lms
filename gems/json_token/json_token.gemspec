@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["nickc@instructure.com", "jrodriguez@pivotallabs.com"]
   spec.summary       = 'Convenience methods for encoding and decoding a slug of data into base64 encoded JSON'
 
-  spec.files         = Dir.glob("{lib}/**/*") + %w(Rakefile)
+  spec.files         = Dir.glob("{lib}/**/*") + %w[Rakefile]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]

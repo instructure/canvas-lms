@@ -126,4 +126,4 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-DockerfileWriter.new(**options).run()
+DockerfileWriter.new(**options).run

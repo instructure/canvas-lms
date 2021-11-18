@@ -216,7 +216,7 @@ describe "User Profile API", type: :request do
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
                       :controller => "profile", :action => "settings",
                       :user_id => @student.to_param, :format => "json",
-                      :include => %w(user_services))
+                      :include => %w[user_services])
       expect(json["user_services"]).to eq [
         { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" },
       ]
@@ -230,7 +230,7 @@ describe "User Profile API", type: :request do
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=links",
                       :controller => "profile", :action => "settings",
                       :user_id => @student.to_param, :format => "json",
-                      :include => %w(links))
+                      :include => %w[links])
       expect(json["links"]).to eq [
         { "url" => "http://instructure.com", "title" => "Instructure" }
       ]

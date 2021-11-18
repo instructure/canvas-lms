@@ -43,7 +43,7 @@ module InstFS
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
-        %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+        %(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
       end
     end
 

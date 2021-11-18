@@ -229,7 +229,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   def has_frozen_assignments?(user)
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
-    return false unless self.active_assignments.length > 0
+    return false if self.active_assignments.empty?
 
     self.active_assignments.any? do |assignment|
       assignment.frozen_for_user?(user)
@@ -238,7 +238,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   def has_frozen_assignment_group_id_assignment?(user)
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
-    return false unless self.active_assignments.length > 0
+    return false if self.active_assignments.empty?
 
     self.active_assignments.any? do |assignment|
       assignment.att_frozen?(:assignment_group_id, user)

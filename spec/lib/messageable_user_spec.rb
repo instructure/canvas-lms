@@ -80,7 +80,7 @@ describe "MessageableUser" do
     end
 
     it "groups by id" do
-      expect(group_scope(MessageableUser.prepped()))
+      expect(group_scope(MessageableUser.prepped))
         .to match(MessageableUser::COLUMNS.first)
     end
 
@@ -107,19 +107,19 @@ describe "MessageableUser" do
     it "orders by sortable_name before id" do
       user1 = user_factory(active_all: true, :name => 'Yellow Bob')
       user2 = user_factory(active_all: true, :name => 'Zebra Alice')
-      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
+      expect(MessageableUser.prepped.where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "ignores case when ordering by sortable_name" do
       user1 = user_factory(active_all: true, :name => 'bob')
       user2 = user_factory(active_all: true, :name => 'ALICE')
-      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user2.id
+      expect(MessageableUser.prepped.where(id: [user1, user2]).first.id).to eq user2.id
     end
 
     it "orders by id as tiebreaker" do
       user1 = user_factory(active_all: true, :name => 'Alice')
       user2 = user_factory(active_all: true, :name => 'Alice')
-      expect(MessageableUser.prepped().where(id: [user1, user2]).first.id).to eq user1.id
+      expect(MessageableUser.prepped.where(id: [user1, user2]).first.id).to eq user1.id
     end
 
     it "excludes creation_pending students with strict_checks true" do
@@ -149,7 +149,7 @@ describe "MessageableUser" do
 
     it "defaults strict_checks to true" do
       user_factory(:user_state => 'creation_pending')
-      expect(MessageableUser.prepped().where(id: @user).length).to eq 0
+      expect(MessageableUser.prepped.where(id: @user).length).to eq 0
     end
 
     it "defaults include_delete to false" do
@@ -164,7 +164,7 @@ describe "MessageableUser" do
     end
 
     it "is empty with no common_courses selected" do
-      expect(MessageableUser.prepped().where(id: @user).first.common_courses)
+      expect(MessageableUser.prepped.where(id: @user).first.common_courses)
         .to eq({})
     end
 
@@ -202,7 +202,7 @@ describe "MessageableUser" do
     end
 
     it "is empty with no common_groups selected" do
-      expect(MessageableUser.prepped().where(id: @user).first.common_groups)
+      expect(MessageableUser.prepped.where(id: @user).first.common_groups)
         .to eq({})
     end
 

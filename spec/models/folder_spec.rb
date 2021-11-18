@@ -296,12 +296,12 @@ describe Folder do
 
     it "includes all files for teachers" do
       teacher_in_course active_all: true
-      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
+      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w[normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt]
     end
 
     it "excludes locked and hidden files for students" do
       student_in_course active_all: true
-      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
+      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w[normal.txt date_restricted_unlocked.txt]
     end
   end
 

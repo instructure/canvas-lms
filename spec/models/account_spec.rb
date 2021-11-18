@@ -577,7 +577,7 @@ describe Account do
 
       describe "services_exposed_to_ui_hash" do
         it "returns services defined in a plugin" do
-          expect(Account.services_exposed_to_ui_hash().keys).to be_include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash.keys).to be_include(:myplugin)
           expect(Account.services_exposed_to_ui_hash(:setting).keys).to be_include(:myplugin)
         end
       end

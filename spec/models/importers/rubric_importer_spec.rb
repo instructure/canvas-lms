@@ -26,7 +26,7 @@ describe "Importing Rubrics" do
       it "imports from #{system}" do
         data = get_import_data(system, 'rubric')
         context = get_import_context(system)
-        migration = double()
+        migration = double
         allow(migration).to receive(:context).and_return(context)
         allow(migration).to receive(:add_imported_item)
 

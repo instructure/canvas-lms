@@ -127,7 +127,7 @@ class MethodView < HashView
       ''
     else
       @nickname_suffix ||= create_nickname_suffix
-      if @nickname_suffix[route.swagger_path].length > 0
+      if !@nickname_suffix[route.swagger_path].empty?
         "_#{@nickname_suffix[route.swagger_path]}"
       else
         ''

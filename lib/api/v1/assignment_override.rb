@@ -192,7 +192,7 @@ module Api::V1::AssignmentOverride
 
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
 
-    if %w(ADHOC Noop).include?(set_type) && data.key?(:title)
+    if %w[ADHOC Noop].include?(set_type) && data.key?(:title)
       override_data[:title] = data[:title]
     end
 

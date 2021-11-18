@@ -246,7 +246,7 @@ describe DeveloperKeysController, type: :request do
 
   def destroy_call
     admin_session
-    key = DeveloperKey.create!()
+    key = DeveloperKey.create!
     api_call(:delete, "/api/v1/developer_keys/#{key.id}.json", {
                controller: 'developer_keys',
                action: 'destroy',

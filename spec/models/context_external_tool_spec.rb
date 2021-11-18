@@ -2271,7 +2271,7 @@ describe ContextExternalTool do
       end
 
       it 'grants update_manually to the proper individuals' do
-        @admin = account_admin_user()
+        @admin = account_admin_user
 
         course_with_teacher(:active_all => true, :account => Account.default)
         @teacher = user_factory(active_all: true)

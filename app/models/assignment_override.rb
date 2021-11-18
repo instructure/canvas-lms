@@ -296,7 +296,7 @@ class AssignmentOverride < ActiveRecord::Base
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
-  OVERRIDDEN_DATES = %i(due_at unlock_at lock_at).freeze
+  OVERRIDDEN_DATES = %i[due_at unlock_at lock_at].freeze
   OVERRIDDEN_DATES.each do |field|
     override field
   end

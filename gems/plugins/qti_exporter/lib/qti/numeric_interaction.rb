@@ -28,10 +28,10 @@ module Qti
     end
 
     def parse_question_data
-      get_answer_values()
+      get_answer_values
       get_canvas_answers
       attach_feedback_values(@question[:answers])
-      get_feedback()
+      get_feedback
       @question
     end
 

@@ -40,7 +40,7 @@ describe BookmarkedCollection::Proxy do
     end
 
     it 'requires per_page parameter' do
-      expect { @proxy.paginate() }.to raise_error(ArgumentError)
+      expect { @proxy.paginate }.to raise_error(ArgumentError)
     end
 
     it('ignores total_entries parameter') do

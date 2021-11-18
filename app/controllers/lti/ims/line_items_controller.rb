@@ -69,7 +69,7 @@ module Lti
       include Concerns::GradebookServices
 
       before_action :prepare_line_item_for_ags!, only: :create
-      before_action :verify_line_item_in_context, only: %i(show update destroy)
+      before_action :verify_line_item_in_context, only: %i[show update destroy]
       before_action :verify_valid_resource_link, only: :create
 
       ACTION_SCOPE_MATCHERS = {
@@ -221,7 +221,7 @@ module Lti
       private
 
       def line_item_params
-        @_line_item_params ||= params.permit(%i(resourceId resourceLinkId scoreMaximum label tag),
+        @_line_item_params ||= params.permit(%i[resourceId resourceLinkId scoreMaximum label tag],
                                              Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => [:type, :external_tool_url]).transform_keys do |k|
           k.to_s.underscore
         end.except(:resource_link_id)

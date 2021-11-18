@@ -58,14 +58,14 @@ namespace :i18n do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
-    special_keys = %w{
+    special_keys = %w[
       locales
       crowdsourced
       custom
       bigeasy_locale
       fullcalendar_locale
       moment_locale
-    }.freeze
+    ].freeze
 
     Rails.root.join(yaml_file).open("w") do |file|
       file.write(
@@ -445,7 +445,7 @@ namespace :i18n do
         languages.split(',')
       end
     else
-      %w(ar zh fr ja pt es ru)
+      %w[ar zh fr ja pt es ru]
     end
   end
 

@@ -59,7 +59,7 @@ describe Mutations::DeleteConversationMessages do
     result = execute_with_input(query)
     expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W(#{message.id})
+    expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W[#{message.id}]
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0
   end
 
@@ -95,7 +95,7 @@ describe Mutations::DeleteConversationMessages do
         result = execute_with_input(query)
         expect(result['errors']).to be_nil
         expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
-        expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W(#{message.id} #{message2.id})
+        expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W[#{message.id} #{message2.id}]
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0
       end
     end

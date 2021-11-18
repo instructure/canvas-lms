@@ -200,7 +200,7 @@ module Lti
       context 'placements' do
         RSpec::Matchers.define :include_placement do |placement|
           match do |resource_placements|
-            (resource_placements.select { |p| p.placement == placement }).size > 0
+            !(resource_placements.select { |p| p.placement == placement }).empty?
           end
         end
 
@@ -219,7 +219,7 @@ module Lti
         it 'creates default placements when none are specified' do
           tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
           rh = tool_proxy.resources.first
-          expect(rh.message_handlers.first.placements).to include_placements %w(assignment_selection link_selection)
+          expect(rh.message_handlers.first.placements).to include_placements %w[assignment_selection link_selection]
         end
 
         it "doesn't include defaults placements when one is provided" do

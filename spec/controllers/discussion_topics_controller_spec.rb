@@ -259,6 +259,17 @@ describe DiscussionTopicsController do
       expect(response).to be_successful
       expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
     end
+
+    it "sets discussions reporting and anonymity when their flags are enabled" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_anonymity
+
+      user_session(@teacher)
+      get 'index', params: { course_id: @course.id }
+      expect(assigns[:js_env][:student_reporting_enabled]).to be(true)
+      expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
+    end
   end
 
   describe "GET 'show'" do
@@ -630,7 +641,7 @@ describe DiscussionTopicsController do
 
     it "marks as read when topic is in the future as teacher" do
       course_topic(:skip_set_user => true)
-      teacher2 = @course.shard.activate { user_factory() }
+      teacher2 = @course.shard.activate { user_factory }
       teacher2enrollment = @course.enroll_user(teacher2, "TeacherEnrollment")
       teacher2.save!
       teacher2enrollment.course = @course # set the reverse association

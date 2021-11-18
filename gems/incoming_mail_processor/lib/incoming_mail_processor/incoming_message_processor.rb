@@ -31,7 +31,7 @@ module IncomingMailProcessor
       :sqs => IncomingMailProcessor::SqsMailbox,
     }.freeze
 
-    ImportantHeaders = %w(To From Subject Content-Type).freeze
+    ImportantHeaders = %w[To From Subject Content-Type].freeze
 
     BULK_PRECEDENCE_VALUES = %w[bulk list junk].freeze
     private_constant :BULK_PRECEDENCE_VALUES

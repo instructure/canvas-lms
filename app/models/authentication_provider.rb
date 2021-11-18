@@ -235,7 +235,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w[
     admin_roles
     display_name
     email
@@ -247,7 +247,7 @@ class AuthenticationProvider < ActiveRecord::Base
     sortable_name
     surname
     time_zone
-  }.freeze
+  ].freeze
 
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do

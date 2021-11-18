@@ -147,7 +147,7 @@ module GradebooksHelper
   def ungraded_submission_display(submission_type)
     sub_score = ungraded_submission_icon_attributes_for(submission_type)
     if sub_score
-      screenreadable_icon(sub_score, %w{submission_icon})
+      screenreadable_icon(sub_score, %w[submission_icon])
     else
       '-'
     end
@@ -159,7 +159,7 @@ module GradebooksHelper
                  else
                    fail_icon_attributes
                  end
-    screenreadable_icon(icon_attrs, %w{graded_icon})
+    screenreadable_icon(icon_attrs, %w[graded_icon])
   end
 
   def screenreadable_icon(icon_attrs, html_classes = [])

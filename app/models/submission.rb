@@ -22,7 +22,7 @@ require 'atom'
 require 'anonymity'
 
 class Submission < ActiveRecord::Base
-  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts context_code}
+  self.ignored_columns = %w[has_admin_comment has_rubric_assessment process_attempts context_code]
 
   include Canvas::GradeValidations
   include CustomValidations
@@ -906,7 +906,7 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitinable?
-    %w(online_upload online_text_entry).include?(submission_type) &&
+    %w[online_upload online_text_entry].include?(submission_type) &&
       assignment.turnitin_enabled?
   end
 
@@ -1000,7 +1000,7 @@ class Submission < ActiveRecord::Base
       if recheck_score || data[:similarity_score].blank?
         if attempt < VERICITE_STATUS_RETRY
           data[:similarity_score_check_time] = Time.now.to_i
-          vericite ||= VeriCite::Client.new()
+          vericite ||= VeriCite::Client.new
           res = vericite.generateReport(self, asset_string)
           if res[:similarity_score]
             # keep track of when we updated the score so that we can ask VC again once it is stale (i.e. cache for 20 mins)
@@ -1053,7 +1053,7 @@ class Submission < ActiveRecord::Base
 
   def vericite_report_url(asset_string, user, session)
     if self.vericite_data_hash && self.vericite_data_hash[asset_string] && self.vericite_data_hash[asset_string][:similarity_score]
-      vericite = VeriCite::Client.new()
+      vericite = VeriCite::Client.new
       if self.grants_right?(user, :grade)
         vericite.submissionReportUrl(self, user, asset_string)
       elsif can_view_plagiarism_report('vericite', user, session)
@@ -1074,7 +1074,7 @@ class Submission < ActiveRecord::Base
     end
     return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
 
-    vericite = VeriCite::Client.new()
+    vericite = VeriCite::Client.new
     reset_vericite_assets
 
     # Make sure the assignment exists and user is enrolled
@@ -1193,7 +1193,7 @@ class Submission < ActiveRecord::Base
   end
 
   def vericiteable?
-    %w(online_upload online_text_entry).include?(submission_type) &&
+    %w[online_upload online_text_entry].include?(submission_type) &&
       assignment.vericite_enabled?
   end
 
@@ -1956,7 +1956,7 @@ class Submission < ActiveRecord::Base
 
   def grade_change_audit(force_audit: self.assignment_changed_not_sub, skip_insert: false)
     newly_graded = self.saved_change_to_workflow_state? && self.workflow_state == 'graded'
-    grade_changed = (self.saved_changes.keys & %w(grade score excused)).present?
+    grade_changed = (self.saved_changes.keys & %w[grade score excused]).present?
     return true unless newly_graded || grade_changed || force_audit
 
     if grade_change_event_author_id.present?
@@ -2486,7 +2486,7 @@ class Submission < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
-      %w(score grade published_score published_grade entered_score entered_grade).each do |secret_attr|
+      %w[score grade published_score published_grade entered_score entered_grade].each do |secret_attr|
         hash.delete secret_attr
       end
     end

@@ -229,10 +229,10 @@ module ConditionalRelease
       end
 
       def assignment_keys
-        %i(id title name description due_at unlock_at lock_at
+        %i[id title name description due_at unlock_at lock_at
            points_possible min_score max_score grading_type
            submission_types workflow_state context_id
-           context_type updated_at context_code)
+           context_type updated_at context_code]
       end
     end
   end

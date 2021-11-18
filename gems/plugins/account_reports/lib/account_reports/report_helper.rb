@@ -274,7 +274,7 @@ module AccountReports::ReportHelper
   end
 
   def valid_enrollment_workflow_states
-    %w(invited creation_pending active completed inactive deleted rejected).freeze &
+    %w[invited creation_pending active completed inactive deleted rejected].freeze &
       Api.value_to_array(@account_report.parameters["enrollment_states"])
   end
 

@@ -329,7 +329,7 @@ module Api
     collection = paginate_collection!(collection, controller, pagination_args)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    controller.response.headers["Link"] = links.join(',') unless links.empty?
     if response_args[:enhanced_return]
       { hash: hash, collection: collection }
     else
@@ -351,7 +351,7 @@ module Api
     meta = jsonapi_meta(collection, controller, base_url)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    controller.response.headers["Link"] = links.join(',') unless links.empty?
     [collection, meta]
   end
 
@@ -420,7 +420,7 @@ module Api
 
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
   LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
-  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key).freeze
+  EXCLUDE_IN_PAGINATION_LINKS = %w[page per_page access_token api_key].freeze
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)

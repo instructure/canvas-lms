@@ -157,7 +157,7 @@ module Importers
             obj = context.wiki_pages.where(migration_id: sub_item[:migration_id]).first
             contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
           elsif sub_item[:type] == 'embedded_content'
-            if contents && contents.length > 0
+            if contents && !contents.empty?
               description += "<ul>\n#{contents}\n</ul>"
               contents = ""
             end
@@ -196,7 +196,7 @@ module Importers
             end
           end
         end
-        description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
+        description += "<ul>\n#{contents}\n</ul>" if contents && !contents.empty?
 
         if hash[:footer]
           description += if hash[:footer][:is_html]

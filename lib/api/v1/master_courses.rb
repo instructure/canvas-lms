@@ -21,7 +21,7 @@ module Api::V1::MasterCourses
   include Api::V1::User
 
   def master_template_json(template, user, session, **)
-    hash = api_json(template, user, session, :only => %w(id course_id), :methods => %w{last_export_completed_at associated_course_count})
+    hash = api_json(template, user, session, :only => %w[id course_id], :methods => %w[last_export_completed_at associated_course_count])
     migration = template.active_migration
     hash[:latest_migration] = master_migration_json(migration, user, session) if migration
     hash
@@ -30,7 +30,7 @@ module Api::V1::MasterCourses
   def master_migration_json(migration, user, session, opts = {})
     migration.expire_if_necessary!
     hash = api_json(migration, user, session,
-                    :only => %w(id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment))
+                    :only => %w[id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment])
     if opts[:subscription]
       hash['subscription_id'] = opts[:subscription].id
     else
@@ -101,7 +101,7 @@ module Api::V1::MasterCourses
 
   def course_summary_json(course, opts = {})
     can_read_sis = opts[:can_read_sis] || course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
-    hash = api_json(course, @current_user, session, :only => %w{id name course_code})
+    hash = api_json(course, @current_user, session, :only => %w[id name course_code])
     hash['sis_course_id'] = course.sis_source_id if can_read_sis
     hash['term_name'] = course.enrollment_term.name
     if opts[:include_teachers]

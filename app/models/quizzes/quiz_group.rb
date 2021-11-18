@@ -72,7 +72,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   end
 
   def self.update_all_positions!(groups)
-    return unless groups.size > 0
+    return if groups.empty?
 
     updates = groups.map do |group|
       "WHEN id=#{group.id.to_i} THEN #{group.position.to_i}"

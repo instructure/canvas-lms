@@ -1009,12 +1009,12 @@ module RCENextPage
     if text
       linktext = f('input[name="linktext')
 
-      linktext.send_keys(:backspace) while linktext.property('value').length > 0
+      linktext.send_keys(:backspace) until linktext.property('value').empty?
       linktext.send_keys(text) if text
     end
     if href
       linklink = f('input[name="linklink"]')
-      linklink.send_keys(:backspace) while linklink.property('value').length > 0
+      linklink.send_keys(:backspace) until linklink.property('value').empty?
       linklink.send_keys(href)
     end
     fj('[role="dialog"] button:contains("Done")').click

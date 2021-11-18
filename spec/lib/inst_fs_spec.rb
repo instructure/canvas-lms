@@ -145,7 +145,7 @@ describe InstFS do
         it "no matter what time it is, the token has no less than 12 hours of validity left and never more than 24" do
           24.times do |i|
             Timecop.freeze(i.hours.from_now) do
-              claims = claims_for()
+              claims = claims_for
               now = Time.zone.now
               exp = Time.zone.at(claims['exp'])
               expect(exp).to be > now + 12.hours

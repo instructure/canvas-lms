@@ -222,7 +222,7 @@ describe Api do
     end
 
     it "finds assignment by id" do
-      assignment = assignment_model()
+      assignment = assignment_model
       expect(@api.api_find(Assignment, assignment.id.to_s)).to eq assignment
     end
 
@@ -308,7 +308,7 @@ describe Api do
     end
 
     it "does not hit the database if no valid conditions were found" do
-      collection = double()
+      collection = double
       allow(collection).to receive(:table_name).and_return("courses")
       expect(collection).to receive(:none).once
       relation = @api.api_find_all(collection, ["sis_invalid:1"])
@@ -405,7 +405,7 @@ describe Api do
     end
 
     it 'tries and make params when non-ar_id columns have returned with ar_id columns' do
-      collection = double()
+      collection = double
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
@@ -416,7 +416,7 @@ describe Api do
     end
 
     it 'tries and make params when non-ar_id columns have returned without ar_id columns' do
-      collection = double()
+      collection = double
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
@@ -427,7 +427,7 @@ describe Api do
     end
 
     it 'does not try and make params when no non-ar_id columns have returned with ar_id columns' do
-      collection = double()
+      collection = double
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"] })
@@ -436,7 +436,7 @@ describe Api do
     end
 
     it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
-      collection = double()
+      collection = double
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})
@@ -700,11 +700,11 @@ describe Api do
     end
 
     it 'converts string ids to numeric' do
-      expect(Api.map_non_sis_ids(%w{5 4 3 2})).to eq [5, 4, 3, 2]
+      expect(Api.map_non_sis_ids(%w[5 4 3 2])).to eq [5, 4, 3, 2]
     end
 
     it "excludes things that don't look like ids" do
-      expect(Api.map_non_sis_ids(%w{1 2 lolrus 4chan 5 6!})).to eq [1, 2, 5]
+      expect(Api.map_non_sis_ids(%w[1 2 lolrus 4chan 5 6!])).to eq [1, 2, 5]
     end
 
     it "strips whitespace" do
@@ -743,9 +743,11 @@ describe Api do
 
     it "ignores non-kaltura instructure_inline_media_comment links" do
       student_in_course
-      html = %{<div>This is an awesome youtube:
-<a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
-</div>}
+      html = <<~HTML
+        <div>This is an awesome youtube:
+          <a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
+        </div>
+      HTML
       res = klass.new.api_user_content(html, @course, @student)
       expect(res).to eq html
     end
@@ -830,29 +832,33 @@ describe Api do
       course_factory
       attachment_model(:context => @course)
 
-      html = %{<div>
-        Here are some bad links
-        <a href="/files/#{@attachment.id}/download">here</a>
-        <a href="/files/#{@attachment.id}/download?verifier=lollercopter&amp;anotherparam=something">here</a>
-        <a href="/files/#{@attachment.id}/preview?sneakyparam=haha&amp;verifier=lollercopter&amp;another=blah">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
-        <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
-      </div>}
+      html = <<~HTML
+        <div>
+          Here are some bad links
+          <a href="/files/#{@attachment.id}/download">here</a>
+          <a href="/files/#{@attachment.id}/download?verifier=lollercopter&amp;anotherparam=something">here</a>
+          <a href="/files/#{@attachment.id}/preview?sneakyparam=haha&amp;verifier=lollercopter&amp;another=blah">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+          <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
+        </div>
+      HTML
       fixed_html = klass.process_incoming_html_content(html)
-      expect(fixed_html).to eq %{<div>
-        Here are some bad links
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?anotherparam=something">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?sneakyparam=haha&amp;another=blah">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
-        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
-        <a href="/courses/#{@course.id}/assignments">absolute!</a>
-      </div>}
+      expect(fixed_html).to eq <<~HTML
+        <div>
+          Here are some bad links
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?anotherparam=something">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?sneakyparam=haha&amp;another=blah">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
+          <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+          <a href="/courses/#{@course.id}/assignments">absolute!</a>
+        </div>
+      HTML
     end
 
     it 'passes host and port to Content.process_incoming' do
@@ -861,7 +867,7 @@ describe Api do
     end
 
     it "doesn't explode with invalid mailtos" do
-      html = %{<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks}
+      html = %(<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks)
       expect(klass.process_incoming_html_content(html)).to eq html
     end
   end

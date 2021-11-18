@@ -77,7 +77,7 @@ class GroupMembershipsController < ApplicationController
 
   include Api::V1::Group
 
-  ALLOWED_MEMBERSHIP_FILTER = %w(accepted invited requested).freeze
+  ALLOWED_MEMBERSHIP_FILTER = %w[accepted invited requested].freeze
 
   # @API List group memberships
   #
@@ -162,7 +162,7 @@ class GroupMembershipsController < ApplicationController
     end
   end
 
-  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w(workflow_state moderator).freeze
+  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w[workflow_state moderator].freeze
 
   # @API Update a membership
   #

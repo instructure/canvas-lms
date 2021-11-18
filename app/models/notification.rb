@@ -93,7 +93,7 @@ class Notification < Switchman::UnshardedRecord
     "Web Conference Invitation"
   ].freeze
 
-  NON_CONFIGURABLE_TYPES = %w(Migration Registration Summaries Alert).freeze
+  NON_CONFIGURABLE_TYPES = %w[Migration Registration Summaries Alert].freeze
 
   COURSE_TYPES = [
     # Course Activities

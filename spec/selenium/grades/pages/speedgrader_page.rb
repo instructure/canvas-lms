@@ -597,7 +597,7 @@ class Speedgrader
     end
 
     def rubric_grade_input(criteria_id)
-      f(%{#criterion_#{criteria_id} td[data-testid="criterion-points"] input})
+      f(%(#criterion_#{criteria_id} td[data-testid="criterion-points"] input))
     end
 
     def rubric_graded_points(index = 0)

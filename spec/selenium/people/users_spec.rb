@@ -44,7 +44,7 @@ describe "users" do
 
       new_login = f('.login:not(.blank)')
       expect(new_login).not_to be_nil
-      expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
+      expect(new_login.find_element(:css, '.account_name').text).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
       expect(pseudonym.valid_password?('qwertyuiop')).to be_truthy
     end
@@ -236,7 +236,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -251,7 +251,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -264,7 +264,7 @@ describe "users" do
 
       get "/register"
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         input = f('input[name="user[terms_of_use]"]', form)

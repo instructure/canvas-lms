@@ -175,7 +175,7 @@ describe ContentMigration do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
-      body = %{<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>}
+      body = %(<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>)
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
 
       run_course_copy
@@ -190,7 +190,7 @@ describe ContentMigration do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
-      body = %{<p>Link to module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>}
+      body = %(<p>Link to module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>)
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, asmnt1.id, tag.id])
 
       run_course_copy
@@ -206,7 +206,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       mod1 = @copy_from.context_modules.create!(:name => "some module")
-      body = %{<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>}
+      body = %(<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>)
       quiz = @copy_from.quizzes.create!(:title => "some page", :description => body % [@copy_from.id, mod1.id])
 
       run_course_copy
@@ -824,8 +824,8 @@ describe ContentMigration do
     end
 
     it "does not try to translate links to similarishly looking urls" do
-      body = %{<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>
-        <p>another link to external thing <a href="https://someotherexampledomain2.com/files">so sad</a></p>}
+      body = %(<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>
+        <p>another link to external thing <a href="https://someotherexampledomain2.com/files">so sad</a></p>)
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body)
 
       run_course_copy
@@ -835,7 +835,7 @@ describe ContentMigration do
     end
 
     it "still translates links to /course/X/files" do
-      body = %{<p>link to course files <a href="/courses/%s/files">files</a></p>}
+      body = %(<p>link to course files <a href="/courses/%s/files">files</a></p>)
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % @copy_from.id.to_s)
       run_course_copy
 

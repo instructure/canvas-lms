@@ -491,7 +491,7 @@ class AccountsController < ApplicationController
   #
   # @returns TermsOfService
   def terms_of_service
-    keys = %w(id terms_type passive account_id)
+    keys = %w[id terms_type passive account_id]
     tos = @account.root_account.terms_of_service
     res = tos.attributes.slice(*keys)
     res['content'] = tos.terms_of_service_content&.content
@@ -614,12 +614,12 @@ class AccountsController < ApplicationController
     starts_before = CanvasTime.try_parse(params[:starts_before])
     ends_after = CanvasTime.try_parse(params[:ends_after])
 
-    params[:state] ||= %w{created claimed available completed}
-    params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
+    params[:state] ||= %w[created claimed available completed]
+    params[:state] = %w[created claimed available completed deleted] if Array(params[:state]).include?('all')
     if value_to_boolean(params[:published])
-      params[:state] -= %w{created claimed completed deleted}
+      params[:state] -= %w[created claimed completed deleted]
     elsif !params[:published].nil? && !value_to_boolean(params[:published])
-      params[:state] -= %w{available}
+      params[:state] -= %w[available]
     end
 
     sortable_name_col = User.sortable_name_order_by_clause('users')
@@ -1088,7 +1088,7 @@ class AccountsController < ApplicationController
 
         # privacy settings
         unless @account.grants_right?(@current_user, :manage_privacy_settings)
-          %w{enable_fullstory enable_google_analytics}.each do |setting|
+          %w[enable_fullstory enable_google_analytics].each do |setting|
             params[:account][:settings].try(:delete, setting)
           end
         end
@@ -1565,7 +1565,7 @@ class AccountsController < ApplicationController
       courses_to_fetch_users_for = courses_to_fetch_users_for.reject { |c| @master_template_index[c.id] } # don't fetch the counts for the master/blueprint courses
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w{rejected deleted} })
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w[rejected deleted] })
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.each_with_object({}) do |teacher, result|
       result[teacher.course_id] ||= []

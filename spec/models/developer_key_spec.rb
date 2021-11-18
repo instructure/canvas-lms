@@ -455,8 +455,8 @@ describe DeveloperKey do
 
     context 'when api token scoping FF is enabled' do
       let(:valid_scopes) do
-        %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+        %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
       end
 
       describe 'before_save' do

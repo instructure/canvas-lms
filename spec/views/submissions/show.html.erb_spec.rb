@@ -523,7 +523,7 @@ describe "/submissions/show" do
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render 'submissions/show'
-          expect(response.body).to include %{<span class="rubric_comment unread_indicator"}
+          expect(response.body).to include %(<span class="rubric_comment unread_indicator")
         end
 
         it "does not show the indicator if unread comments aren't present" do
@@ -532,7 +532,7 @@ describe "/submissions/show" do
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render 'submissions/show'
-          expect(response.body).not_to include %{<span class="rubric_comment unread_indicator"}
+          expect(response.body).not_to include %(<span class="rubric_comment unread_indicator")
         end
       end
     end

@@ -23,7 +23,7 @@ require_relative '../../import_helper'
 describe Course do
   describe "import_content" do
     before(:once) do
-      @course = course_factory()
+      @course = course_factory
     end
 
     it "imports a whole json file" do
@@ -535,7 +535,7 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
 
     it "can insert items from one module to an existing module" do
@@ -559,7 +559,7 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(Assignment ContextModuleSubHeader))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[Assignment ContextModuleSubHeader])
     end
 
     it "respects insert_into_module_type" do
@@ -570,7 +570,7 @@ describe Course do
       migration.migration_settings[:insert_into_module_type] = 'assignment'
       migration.save!
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
   end
 

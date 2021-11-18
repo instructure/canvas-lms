@@ -783,7 +783,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
       @versions   = @submission ? get_versions : []
 
-      if @versions.size > 0 && !hide_quiz?
+      if !@versions.empty? && !hide_quiz?
         render :layout => false
       else
         head :ok

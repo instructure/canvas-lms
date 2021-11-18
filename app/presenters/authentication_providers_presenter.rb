@@ -59,7 +59,7 @@ class AuthenticationProvidersPresenter
   end
 
   def ldap_config?
-    ldap_configs.size > 0
+    !ldap_configs.empty?
   end
 
   def ldap_ips

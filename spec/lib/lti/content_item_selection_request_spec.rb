@@ -282,7 +282,7 @@ describe Lti::ContentItemSelectionRequest do
             assignment = assignment_model(
               course: course,
               submission_types: 'online_upload',
-              allowed_extensions: %w(txt jpg)
+              allowed_extensions: %w[txt jpg]
             )
             opts = { assignment: assignment, launch_url: launch_url }
             lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', opts: opts)

@@ -27,7 +27,7 @@ class Quizzes::QuizRegrader::Submission
   end
 
   def regrade!
-    return unless answers_to_grade.size > 0 || needs_regrade?
+    return unless !answers_to_grade.empty? || needs_regrade?
 
     # regrade all previous versions
     submission.attempts.last_versions.each do |version|
@@ -74,7 +74,7 @@ class Quizzes::QuizRegrader::Submission
     @submitted_answer_ids ||= submitted_answers.pluck(:question_id).to_set
   end
 
-  REGRADE_KEEP_FIELDS = %w{id position name question_name published_at}.freeze
+  REGRADE_KEEP_FIELDS = %w[id position name question_name published_at].freeze
 
   def regraded_question_data
     pos = 0

@@ -104,11 +104,11 @@ describe "Enrollment::QueryBuilder" do
 
       before do
         create_enrollments(
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed StudentEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed StudentEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment]
         )
       end
 
@@ -118,9 +118,9 @@ describe "Enrollment::QueryBuilder" do
         it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{active available StudentEnrollment},
-            %w{active available TeacherEnrollment},
-            %w{active claimed TeacherEnrollment}
+            %w[active available StudentEnrollment],
+            %w[active available TeacherEnrollment],
+            %w[active claimed TeacherEnrollment]
           ]
         end
 
@@ -128,8 +128,8 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
           expect(matches_for(result)).to eq [
-            %w{active available StudentEnrollment},
-            %w{active available TeacherEnrollment}
+            %w[active available StudentEnrollment],
+            %w[active available TeacherEnrollment]
           ]
         end
 
@@ -137,7 +137,7 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
           expect(matches_for(result)).to eq [
-            %w{active claimed TeacherEnrollment}
+            %w[active claimed TeacherEnrollment]
           ]
         end
 
@@ -153,10 +153,10 @@ describe "Enrollment::QueryBuilder" do
         it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{active available StudentEnrollment},
-            %w{active available TeacherEnrollment},
-            %w{active claimed StudentEnrollment},
-            %w{active claimed TeacherEnrollment}
+            %w[active available StudentEnrollment],
+            %w[active available TeacherEnrollment],
+            %w[active claimed StudentEnrollment],
+            %w[active claimed TeacherEnrollment]
           ]
         end
 
@@ -169,10 +169,10 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'claimed' # not enforcing state, so we get both claimed and available
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{active available StudentEnrollment},
-            %w{active available TeacherEnrollment},
-            %w{active claimed StudentEnrollment},
-            %w{active claimed TeacherEnrollment}
+            %w[active available StudentEnrollment],
+            %w[active available TeacherEnrollment],
+            %w[active claimed StudentEnrollment],
+            %w[active claimed TeacherEnrollment]
           ]
         end
       end
@@ -185,15 +185,15 @@ describe "Enrollment::QueryBuilder" do
 
       before do
         create_enrollments(
-          %w{creation_pending available StudentEnrollment},
-          %w{creation_pending available TeacherEnrollment},
-          %w{creation_pending claimed StudentEnrollment},
-          %w{creation_pending claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{invited available TeacherEnrollment},
-          %w{invited claimed StudentEnrollment},
-          %w{invited claimed TeacherEnrollment},
-          %w{active available StudentEnrollment}
+          %w[creation_pending available StudentEnrollment],
+          %w[creation_pending available TeacherEnrollment],
+          %w[creation_pending claimed StudentEnrollment],
+          %w[creation_pending claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[invited available TeacherEnrollment],
+          %w[invited claimed StudentEnrollment],
+          %w[invited claimed TeacherEnrollment],
+          %w[active available StudentEnrollment]
         )
       end
 
@@ -203,9 +203,9 @@ describe "Enrollment::QueryBuilder" do
         it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{invited available StudentEnrollment},
-            %w{invited available TeacherEnrollment},
-            %w{invited claimed TeacherEnrollment}
+            %w[invited available StudentEnrollment],
+            %w[invited available TeacherEnrollment],
+            %w[invited claimed TeacherEnrollment]
           ]
         end
 
@@ -213,8 +213,8 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
           expect(matches_for(result)).to eq [
-            %w{invited available StudentEnrollment},
-            %w{invited available TeacherEnrollment}
+            %w[invited available StudentEnrollment],
+            %w[invited available TeacherEnrollment]
           ]
         end
 
@@ -222,7 +222,7 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
           expect(matches_for(result)).to eq [
-            %w{invited claimed TeacherEnrollment}
+            %w[invited claimed TeacherEnrollment]
           ]
         end
 
@@ -239,14 +239,14 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{creation_pending available StudentEnrollment},
-            %w{creation_pending available TeacherEnrollment},
-            %w{creation_pending claimed StudentEnrollment},
-            %w{creation_pending claimed TeacherEnrollment},
-            %w{invited available StudentEnrollment},
-            %w{invited available TeacherEnrollment},
-            %w{invited claimed StudentEnrollment},
-            %w{invited claimed TeacherEnrollment}
+            %w[creation_pending available StudentEnrollment],
+            %w[creation_pending available TeacherEnrollment],
+            %w[creation_pending claimed StudentEnrollment],
+            %w[creation_pending claimed TeacherEnrollment],
+            %w[invited available StudentEnrollment],
+            %w[invited available TeacherEnrollment],
+            %w[invited claimed StudentEnrollment],
+            %w[invited claimed TeacherEnrollment]
           ]
         end
 
@@ -259,14 +259,14 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
-            %w{creation_pending available StudentEnrollment},
-            %w{creation_pending available TeacherEnrollment},
-            %w{creation_pending claimed StudentEnrollment},
-            %w{creation_pending claimed TeacherEnrollment},
-            %w{invited available StudentEnrollment},
-            %w{invited available TeacherEnrollment},
-            %w{invited claimed StudentEnrollment},
-            %w{invited claimed TeacherEnrollment}
+            %w[creation_pending available StudentEnrollment],
+            %w[creation_pending available TeacherEnrollment],
+            %w[creation_pending claimed StudentEnrollment],
+            %w[creation_pending claimed TeacherEnrollment],
+            %w[invited available StudentEnrollment],
+            %w[invited available TeacherEnrollment],
+            %w[invited claimed StudentEnrollment],
+            %w[invited claimed TeacherEnrollment]
           ]
         end
       end
@@ -280,7 +280,7 @@ describe "Enrollment::QueryBuilder" do
 
         it "only returns #{state} enrollments" do
           create_enrollments(
-            %w{active available StudentEnrollment},
+            %w[active available StudentEnrollment],
             [state.to_s, "available", "StudentEnrollment"]
           )
 
@@ -300,25 +300,25 @@ describe "Enrollment::QueryBuilder" do
 
       it "returns sensible defaults" do
         create_enrollments(
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed StudentEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{invited available TeacherEnrollment},
-          %w{invited claimed StudentEnrollment},
-          %w{invited claimed TeacherEnrollment},
-          %w{creation_pending available StudentEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed StudentEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[invited available TeacherEnrollment],
+          %w[invited claimed StudentEnrollment],
+          %w[invited claimed TeacherEnrollment],
+          %w[creation_pending available StudentEnrollment]
         )
 
         result = enrollments.where(conditions)
         expect(matches_for(result)).to eq [
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{invited available TeacherEnrollment},
-          %w{invited claimed TeacherEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[invited available TeacherEnrollment],
+          %w[invited claimed TeacherEnrollment]
         ]
       end
     end
@@ -328,26 +328,26 @@ describe "Enrollment::QueryBuilder" do
 
       it "returns sensible defaults" do
         create_enrollments(
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed StudentEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{invited available TeacherEnrollment},
-          %w{invited claimed StudentEnrollment},
-          %w{invited claimed TeacherEnrollment},
-          %w{creation_pending available StudentEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed StudentEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[invited available TeacherEnrollment],
+          %w[invited claimed StudentEnrollment],
+          %w[invited claimed TeacherEnrollment],
+          %w[creation_pending available StudentEnrollment]
         )
 
         result = enrollments.where(conditions)
         expect(matches_for(result)).to eq [
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed StudentEnrollment}, # students can see that they have an active enrollment in an unpublished course
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{invited available TeacherEnrollment},
-          %w{invited claimed TeacherEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed StudentEnrollment], # students can see that they have an active enrollment in an unpublished course
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[invited available TeacherEnrollment],
+          %w[invited claimed TeacherEnrollment]
         ]
       end
     end
@@ -357,20 +357,20 @@ describe "Enrollment::QueryBuilder" do
 
       it "returns sensible defaults" do
         create_enrollments(
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed StudentEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{invited available StudentEnrollment},
-          %w{completed available StudentEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed StudentEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[invited available StudentEnrollment],
+          %w[completed available StudentEnrollment]
         )
 
         result = enrollments.where(conditions)
         expect(matches_for(result)).to eq [
-          %w{active available StudentEnrollment},
-          %w{active available TeacherEnrollment},
-          %w{active claimed TeacherEnrollment},
-          %w{completed available StudentEnrollment}
+          %w[active available StudentEnrollment],
+          %w[active available TeacherEnrollment],
+          %w[active claimed TeacherEnrollment],
+          %w[completed available StudentEnrollment]
         ]
       end
     end

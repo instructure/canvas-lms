@@ -42,15 +42,15 @@ class MicrosoftSync::Group < ActiveRecord::Base
   include Workflow
 
   # States at which a manual sync is allowed
-  COOLDOWN_NOT_REQUIRED_STATES = %i(
+  COOLDOWN_NOT_REQUIRED_STATES = %i[
     pending
     errored
-  ).freeze
+  ].freeze
 
-  RUNNING_STATES = %i(
+  RUNNING_STATES = %i[
     running
     retrying
-  ).freeze
+  ].freeze
 
   belongs_to :course
   belongs_to :last_error_report, class_name: 'ErrorReport'

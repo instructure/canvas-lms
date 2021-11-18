@@ -24,7 +24,7 @@ module Api::V1::WikiPage
   include Api::V1::Locked
   include Api::V1::Assignment
 
-  WIKI_PAGE_JSON_ATTRS = %w(url title created_at editing_roles).freeze
+  WIKI_PAGE_JSON_ATTRS = %w[url title created_at editing_roles].freeze
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true, opts = {})
     opts = opts.reverse_merge(include_assignment: true, assignment_opts: {})

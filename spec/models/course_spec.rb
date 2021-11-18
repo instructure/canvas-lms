@@ -3302,7 +3302,7 @@ describe Course, 'grade_publishing' do
   context 'mocked plugin settings' do
     before do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
-      @plugin = double()
+      @plugin = double
       allow(Canvas::Plugin).to receive(:find!).with('grade_export').and_return(@plugin)
       allow(@plugin).to receive(:settings).and_return(@plugin_settings)
     end
@@ -3623,10 +3623,10 @@ describe Course, 'grade_publishing' do
     context 'valid_grade_export_types' do
       it "supports instructure_csv" do
         expect(Course.valid_grade_export_types["instructure_csv"][:name]).to eq "Instructure formatted CSV"
-        course = double()
-        enrollments = [double(), double()]
-        publishing_pseudonym = double()
-        publishing_user = double()
+        course = double
+        enrollments = [double, double]
+        publishing_pseudonym = double
+        publishing_user = double
         allow(course).to receive(:allow_final_grade_override?).and_return false
         expect(course).to receive(:generate_grade_publishing_csv_output).with(
           enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false
@@ -5560,7 +5560,7 @@ describe Course do
       expect(c1.self_enrollment_code).not_to be_nil
       expect(c1.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
 
-      c2 = course_factory()
+      c2 = course_factory
       c2.update_attribute(:self_enrollment, true)
       expect(c2.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
       expect(c1.self_enrollment_code).not_to eq c2.self_enrollment_code
@@ -6376,17 +6376,17 @@ describe Course, '#modules_visible_to' do
   end
 
   it "shows published modules to students" do
-    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w(published)
+    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w[published]
   end
 
   it "shows all modules to teachers" do
-    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
   end
 
   it "shows all modules to teachers even when course is concluded" do
     @course.complete!
     expect(@course.grants_right?(@teacher, :manage_content)).to eq(false)
-    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
   end
 end
 
@@ -6400,16 +6400,16 @@ describe Course, '#module_items_visible_to' do
   end
 
   it "shows published items to students" do
-    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w(published)
+    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w[published]
   end
 
   it "shows all items to teachers" do
-    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w[published unpublished]
   end
 
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
-    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w[published unpublished]
   end
 
   context "with section specific discussions" do

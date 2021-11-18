@@ -49,19 +49,19 @@ module DataFixup
     end
 
     def drop_table
-      database.execute %{DROP TABLE #{LAST_BATCH_TABLE};}
+      database.execute %(DROP TABLE #{LAST_BATCH_TABLE};)
     end
 
-    SEARCH_CQL = %{
+    SEARCH_CQL = <<~SQL.squish
       SELECT id, created_at, course_id, account_id
       FROM courses
       WHERE token(id) > token(?)
       LIMIT ?
-    }
+    SQL
 
-    UPDATE_CQL = %{
+    UPDATE_CQL = <<~SQL.squish
       UPDATE courses SET account_id = ? WHERE id = ?
-    }
+    SQL
 
     ResultStruct = Struct.new(:index, :record, :key)
 
@@ -127,7 +127,7 @@ module DataFixup
     end
 
     def write_updates_in_batches(updates)
-      while updates.size > 0
+      until updates.empty?
         write_batch_updates(updates.shift(write_batch_size))
       end
     end
@@ -139,7 +139,7 @@ module DataFixup
     end
 
     def write_inserts_in_batches(inserts)
-      while inserts.size > 0
+      until inserts.empty?
         write_batch_inserts(inserts.shift(write_batch_size))
       end
     end
@@ -172,11 +172,11 @@ module DataFixup
     end
 
     def table_exists?(table)
-      cql = %{
+      cql = <<~SQL.squish
         SELECT *
         FROM #{table}
         LIMIT 1
-      }
+      SQL
       database.execute(cql)
       true
     rescue CassandraCQL::Error::InvalidRequestException

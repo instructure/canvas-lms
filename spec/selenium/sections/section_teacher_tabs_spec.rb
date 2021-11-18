@@ -26,7 +26,7 @@ describe "section tabs on the left side" do
     it "highlights which tab is active" do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       course_with_teacher_logged_in
-      %w{assignments quizzes settings}.each do |feature|
+      %w[assignments quizzes settings].each do |feature|
         get "/courses/#{@course.id}/#{feature}"
         element_that_is_not_left_side = f('#content')
         # make sure to mouse off the link so the :hover and :focus styles do not apply

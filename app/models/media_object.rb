@@ -303,7 +303,7 @@ class MediaObject < ActiveRecord::Base
 
   def ensure_attachment
     return if self.attachment_id
-    return unless %w{Account Course Group User}.include?(self.context_type)
+    return unless %w[Account Course Group User].include?(self.context_type)
 
     sources = self.media_sources
     return unless sources.present?

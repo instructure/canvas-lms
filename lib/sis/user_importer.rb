@@ -77,7 +77,7 @@ module SIS
       end
 
       def any_left_to_process?
-        @batched_users.size > 0
+        !@batched_users.empty?
       end
 
       def infer_user_name(user_row, prior_name = nil)
@@ -290,7 +290,7 @@ module SIS
             User.transaction(:requires_new => true) do
               if user.changed?
                 user_touched = true
-                if !user.save && user.errors.size > 0
+                if !user.save && !user.errors.empty?
                   message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
@@ -303,7 +303,7 @@ module SIS
                 if pseudo.save_without_broadcasting
                   p_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: pseudo)
                   @roll_back_data << p_data if p_data
-                elsif pseudo.errors.size > 0
+                elsif !pseudo.errors.empty?
                   message = generate_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end

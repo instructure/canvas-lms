@@ -129,7 +129,7 @@ describe "instfs file uploads" do
 
   def check_file_link(file_link)
     downloaded_data = open(file_link)
-    downloaded_data.size > 0
+    !downloaded_data.empty?
   end
 
   def download_file(file_link)
@@ -138,7 +138,7 @@ describe "instfs file uploads" do
     downloaded_data = open(file_link)
     if downloaded_data.class == StringIO
       downloaded_data = downloaded_data.string
-    elsif downloaded_data.size > 0
+    elsif !downloaded_data.empty?
       downloaded_data = File.read(downloaded_data)
     else
       return false

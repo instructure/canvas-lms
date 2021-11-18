@@ -75,7 +75,7 @@ describe EnrollmentTerm do
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
@@ -339,7 +339,7 @@ describe EnrollmentTerm do
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
@@ -352,7 +352,7 @@ describe EnrollmentTerm do
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 

@@ -67,7 +67,7 @@ describe MicrosoftSync::PartialSyncChange do
     end
 
     it 'returns no results if array is empty' do
-      expect(described_class.with_values_in(%[id course_id], []).to_a).to be_empty
+      expect(described_class.with_values_in(%(id course_id), []).to_a).to be_empty
     end
   end
 

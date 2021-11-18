@@ -107,7 +107,7 @@ module SIS
           course.sis_source_id = course_id
           active_state = status.casecmp?('published') ? 'available' : 'claimed'
           unless course.stuck_sis_fields.include?(:workflow_state)
-            if %w(active unpublished published).include?(status.downcase)
+            if %w[active unpublished published].include?(status.downcase)
               case course.workflow_state
               when 'completed'
                 # not using active state here, because it has always been set to available

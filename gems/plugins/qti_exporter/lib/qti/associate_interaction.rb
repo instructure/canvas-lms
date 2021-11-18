@@ -59,7 +59,7 @@ module Qti
         get_all_answers_from_body
       end
 
-      get_feedback()
+      get_feedback
       ensure_correct_format
 
       @question
@@ -316,7 +316,7 @@ module Qti
         @question[:matches].each_with_index do |match, i|
           match[:text] = long_matches[i].text.strip.squeeze(' ') if long_matches[i]
         end
-        if long_matches.size > 0 && long_matches.size != @question[:matches].size
+        if !long_matches.empty? && long_matches.size != @question[:matches].size
           @question[:qti_warning] = "The matching options for this question may have been incorrectly imported."
         end
       end

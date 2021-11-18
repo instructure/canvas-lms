@@ -159,7 +159,7 @@ describe CollaborationsController, type: :request do
 
       it 'is formatted by collaborator_json' do
         json = api_call(:get, url, url_options)
-        expect(json.first.keys.sort).to eq %w{collaborator_id id name type}
+        expect(json.first.keys.sort).to eq %w[collaborator_id id name type]
       end
 
       it 'includes groups' do

@@ -53,7 +53,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
         ]
         "(#{vals.join(',')})"
       end
-      if values.size > 0
+      unless values.empty?
         # if the user has no communication channels, there really isn't anything
         # to do here for them.
         connection.execute(<<~SQL.squish)

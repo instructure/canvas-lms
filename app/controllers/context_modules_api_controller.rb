@@ -274,7 +274,7 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :manage_content)
       event = params[:event]
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless event.present?
-      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(publish unpublish delete).include? event
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w[publish unpublish delete].include? event
       return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
 
       module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))

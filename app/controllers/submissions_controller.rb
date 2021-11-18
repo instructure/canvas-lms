@@ -321,7 +321,7 @@ class SubmissionsController < SubmissionsBaseController
         end
         format.json do
           if api_request?
-            includes = %|submission_comments attachments|
+            includes = %(submission_comments attachments)
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
             render json: json,
                    status: :created,

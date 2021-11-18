@@ -212,7 +212,7 @@ module SearchHelper
             result = synthetic_contexts_for(course, context_name, options[:base_url])
             found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
             result << { :id => "#{context_name}_sections", :name => I18n.t(:course_sections, "Course Sections"), :item_count => sections.size, :type => :context } if found_custom_sections
-            result << { :id => "#{context_name}_groups", :name => I18n.t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context } if groups.size > 0
+            result << { :id => "#{context_name}_groups", :name => I18n.t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context } unless groups.empty?
             return result
           end
         when /\Acourse_\d+_groups\z/

@@ -36,9 +36,9 @@ module Users
     end
 
     describe "#dispatch!" do
-      let(:user) { double() }
+      let(:user) { double }
       let(:pseudonym) { double(account: Account.default) }
-      let(:channel) { double() }
+      let(:channel) { double }
 
       context "for self_registration" do
         let(:policy) { CreationNotifyPolicy.new(true, { force_self_registration: true }) }

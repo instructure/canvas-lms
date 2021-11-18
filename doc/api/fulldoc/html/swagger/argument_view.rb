@@ -93,7 +93,7 @@ class ArgumentView < HashView
 
   def types
     enum_and_types.last.reject do |t|
-      %w(optional required).include?(t.downcase)
+      %w[optional required].include?(t.downcase)
     end
   end
 

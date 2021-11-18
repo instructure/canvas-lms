@@ -284,10 +284,10 @@ class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
   include CalendarConferencesHelper
 
-  before_action :require_user, :except => %w(public_feed index)
+  before_action :require_user, :except => %w[public_feed index]
   before_action :get_calendar_context, :only => :create
   before_action :require_user_or_observer, :only => [:user_index]
-  before_action :require_authorization, :only => %w(index user_index)
+  before_action :require_authorization, :only => %w[index user_index]
 
   RECURRING_EVENT_LIMIT = 200
 
@@ -1260,7 +1260,7 @@ class CalendarEventsApiController < ApplicationController
 
   def apply_assignment_overrides(events, user)
     ActiveRecord::Associations::Preloader.new.preload(events, [:context, :assignment_overrides])
-    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.size == 0 }
+    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.empty? }
 
     if AssignmentOverrideApplicator.should_preload_override_students?(events, user, "calendar_events_api")
       AssignmentOverrideApplicator.preload_assignment_override_students(events, user)
@@ -1442,7 +1442,7 @@ class CalendarEventsApiController < ApplicationController
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them
-    if codes && codes.length > 0
+    if codes && !codes.empty?
       selected_context_codes = Set.new(@context_codes)
       codes.each do |c|
         unless selected_context_codes.include?(c)

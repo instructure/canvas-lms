@@ -46,7 +46,7 @@ describe AppCenter::AppApi do
           'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=60" },
           'current_offset' => 0,
           'limit' => 50,
-          'objects' => %w(object1 object2 object3 object4)
+          'objects' => %w[object1 object2 object3 object4]
         }.to_json
       )
       response
@@ -87,7 +87,7 @@ describe AppCenter::AppApi do
     end
 
     it "can omit next page" do
-      message = { "objects" => %w(object1 object2 object3 object4), "meta" => {} }
+      message = { "objects" => %w[object1 object2 object3 object4], "meta" => {} }
       allow(response).to receive(:body).and_return(message.to_json)
       endpoint = '/?myparam=value'
       per_page = 5
@@ -104,7 +104,7 @@ describe AppCenter::AppApi do
       it "resets the cache when getting an invalid response" do
         enable_cache do
           allow(response).to receive(:body).and_return('')
-          expect(CanvasHttp).to receive(:get).and_return(response).twice()
+          expect(CanvasHttp).to receive(:get).and_return(response).twice
           expect(api.fetch_app_center_response('', 13.minutes, 7, 4)).to eq({})
           expect(api.fetch_app_center_response('', 13.minutes, 7, 4)).to eq({})
         end
@@ -112,7 +112,7 @@ describe AppCenter::AppApi do
 
       it "uses the configured token as part of the cache key" do
         enable_cache do
-          expect(CanvasHttp).to receive(:get).and_return(response).twice()
+          expect(CanvasHttp).to receive(:get).and_return(response).twice
 
           api.fetch_app_center_response('/endpoint/url', 13.minutes, 7, 4)
 
@@ -257,7 +257,7 @@ describe AppCenter::AppApi do
 
     it "gets a list of apps" do
       allow(CanvasHttp).to receive(:get).and_return(response)
-      apps = api.get_apps()['lti_apps']
+      apps = api.get_apps['lti_apps']
       expect(apps).to be_a Array
       expect(apps.size).to eq 2
     end
@@ -269,7 +269,7 @@ describe AppCenter::AppApi do
 
       expect(api.app_center).not_to be_enabled
 
-      response = api.get_apps()
+      response = api.get_apps
       expect(response).to be_a Hash
       expect(response.size).to eq 0
     end
@@ -285,8 +285,8 @@ describe AppCenter::AppApi do
     it "caches apps results" do
       enable_cache do
         expect(CanvasHttp).to receive(:get).and_return(response).once
-        api.get_apps()
-        api.get_apps()
+        api.get_apps
+        api.get_apps
       end
     end
 

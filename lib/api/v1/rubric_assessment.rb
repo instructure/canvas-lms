@@ -22,7 +22,7 @@ module Api::V1::RubricAssessment
   include Api::V1::Json
 
   API_ALLOWED_RUBRIC_ASSESSMENT_OUTPUT_FIELDS = {
-    only: %w(
+    only: %w[
       id
       rubric_id
       rubric_association_id
@@ -32,7 +32,7 @@ module Api::V1::RubricAssessment
       artifact_attempt
       assessment_type
       assessor_id
-    )
+    ]
   }.freeze
 
   def rubric_assessments_json(rubric_assessments, user, session, opts = {})

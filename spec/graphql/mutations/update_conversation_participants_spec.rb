@@ -116,7 +116,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateConversationParticipants', 'errors')).to be_nil
         updated_attrs = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
-        expect(updated_attrs.map { |i| i["label"] }).to match_array %w(starred starred)
+        expect(updated_attrs.map { |i| i["label"] }).to match_array %w[starred starred]
 
         participant1 = participant1.reload
         expect(participant1.starred).to be_truthy

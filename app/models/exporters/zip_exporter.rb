@@ -35,11 +35,11 @@ module Exporters
         folders = (content_export.selected_content['folders'] || {})
                   .select { |_tag, included| Canvas::Plugin.value_to_boolean(included) }
                   .keys
-                  .filter_map { |folder_tag| context.folders.active.find_by_asset_string(folder_tag, %w(Folder)) }
+                  .filter_map { |folder_tag| context.folders.active.find_by_asset_string(folder_tag, %w[Folder]) }
         files = (content_export.selected_content['attachments'] || {})
                 .select { |_tag, included| Canvas::Plugin.value_to_boolean(included) }
                 .keys
-                .filter_map { |att_tag| context.attachments.not_deleted.find_by_asset_string(att_tag, %w(Attachment)) }
+                .filter_map { |att_tag| context.attachments.not_deleted.find_by_asset_string(att_tag, %w[Attachment]) }
       end
       [folders, files]
     end

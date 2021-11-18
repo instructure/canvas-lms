@@ -590,7 +590,7 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))
@@ -615,7 +615,7 @@ describe SubmissionsController do
       end
 
       it "gracefully reports a gdrive timeout" do
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))
@@ -630,7 +630,7 @@ describe SubmissionsController do
       end
 
       it "gracefully reports an invalid entry" do
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))

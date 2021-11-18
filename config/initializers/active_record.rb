@@ -1656,7 +1656,7 @@ end
 # but _none_ of them (as of writing) will invert them on reversion. Some will
 # purposely strip the option, but most don't do anything.
 module ExistenceInversions
-  %w{index foreign_key column}.each do |type|
+  %w[index foreign_key column].each do |type|
     # these methods purposely pull the flag from the incoming args,
     # and assign to the outgoing args, not relying on it getting
     # passed through. and sometimes they even modify args.

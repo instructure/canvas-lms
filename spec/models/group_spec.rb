@@ -580,7 +580,7 @@ describe Group do
   end
 
   it "as_json should include group_category" do
-    course_factory()
+    course_factory
     gc = group_category(name: "Something")
     group = Group.create(:group_category => gc)
     hash = group.as_json

@@ -346,7 +346,7 @@ class UserObserveesController < ApplicationController
   end
 
   def root_account_for_new_link
-    if %w{create update}.include?(action_name)
+    if %w[create update].include?(action_name)
       case params[:root_account_id]
       when "all"
         nil

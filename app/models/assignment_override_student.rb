@@ -91,7 +91,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
     valid_student_ids = Enrollment
                         .where(course_id: assignment.context_id)
-                        .where.not(workflow_state: %w{completed inactive deleted})
+                        .where.not(workflow_state: %w[completed inactive deleted])
                         .pluck(:user_id)
 
     AssignmentOverrideStudent

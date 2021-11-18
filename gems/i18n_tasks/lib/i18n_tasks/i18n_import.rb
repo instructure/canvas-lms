@@ -61,7 +61,7 @@ module I18nTasks
         [@placeholder_mismatches, "placeholder mismatches"],
         [@markdown_mismatches, "markdown/wrapper mismatches"],
       ].each do |mismatches, description|
-        if mismatches.size > 0
+        unless mismatches.empty?
           case (action = yield(mismatches, description))
           when :abort then
             throw(:abort)

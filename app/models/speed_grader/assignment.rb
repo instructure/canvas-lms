@@ -35,22 +35,22 @@ module SpeedGrader
 
     def json
       Attachment.skip_thumbnails = true
-      submission_json_fields = %i(id submitted_at workflow_state grade
+      submission_json_fields = %i[id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
                                   grading_period_id excused updated_at attempt posted_at resource_link_lookup_uuid
-                                  redo_request cached_due_date)
+                                  redo_request cached_due_date]
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
 
-      attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
-                                  filename mime_class size submitter_id workflow_state)
+      attachment_json_fields = %i[id comment_id content_type context_id context_type display_name
+                                  filename mime_class size submitter_id workflow_state]
 
       if !assignment.anonymize_students? || course.account_membership_allows(current_user)
         attachment_json_fields << :viewed_at
       end
 
-      enrollment_json_fields = %i(course_section_id workflow_state user_id)
+      enrollment_json_fields = %i[course_section_id workflow_state user_id]
 
       res = assignment.as_json(
         :include => [
@@ -103,7 +103,7 @@ module SpeedGrader
       includes << { all_submission_comments: { submission: { assignment: { context: :root_account } } } }
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
-      student_json_fields = anonymous_students?(current_user: current_user, assignment: assignment) ? [] : %i(name id sortable_name)
+      student_json_fields = anonymous_students?(current_user: current_user, assignment: assignment) ? [] : %i[name id sortable_name]
 
       res[:context][:students] = students.map do |student|
         json = student.as_json(include_root: false, methods: submission_comment_methods, only: student_json_fields)
@@ -140,7 +140,7 @@ module SpeedGrader
       end
       res[:context][:quiz] = assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      attachment_includes = %i(crocodoc_document canvadoc root_attachment)
+      attachment_includes = %i[crocodoc_document canvadoc root_attachment]
       # Preload attachments for later looping
       attachments_for_submission =
         ::Submission.bulk_load_attachments_for_submissions(submissions, preloads: attachment_includes)
@@ -171,7 +171,7 @@ module SpeedGrader
       end
 
       res[:submissions] = submissions.map do |sub|
-        submission_methods = %i(submission_history late external_tool_url entered_score entered_grade seconds_late missing)
+        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing]
         submission_methods << :word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
         json = sub.as_json(
           include_root: false,

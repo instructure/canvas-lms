@@ -230,7 +230,7 @@ module Canvas::Migration
       file_name = File.expand_path(file_name)
       @course[:overview_file_path] = file_name
       logger.debug "Writing the overview course json file to: #{file_name}"
-      File.open(file_name, 'w') { |file| file << overview().to_json }
+      File.open(file_name, 'w') { |file| file << overview.to_json }
       file_name
     end
 
@@ -471,7 +471,7 @@ module Canvas::Migration
         end
       end
 
-      if dates.length > 0
+      unless dates.empty?
         @overview[:start_timestamp] ||= dates.min
         @overview[:end_timestamp] ||= dates.max
       end

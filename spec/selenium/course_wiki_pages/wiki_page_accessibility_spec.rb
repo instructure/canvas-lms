@@ -198,7 +198,7 @@ describe "Wiki Pages" do
       before :once do
         account_model
         course_with_teacher :account => @account, :active_all => true
-        @timestamps = %w(2015-01-01 2015-01-02 2015-01-03).map { |d| Time.zone.parse(d) }
+        @timestamps = %w[2015-01-01 2015-01-02 2015-01-03].map { |d| Time.zone.parse(d) }
 
         Timecop.freeze(@timestamps[0]) do      # rev 1
           @vpage = @course.wiki_pages.build :title => 'bar'
@@ -299,7 +299,7 @@ describe "Wiki Pages" do
       it "alerts user if navigating away from page after title change", priority: "1", test_id: 267832 do
         skip_if_safari(:alert)
         switch_editor_views
-        f('.title').clear()
+        f('.title').clear
         f('.title').send_keys("derpy-title")
         fln('Home').click
         expect(driver.switch_to.alert).to be_present

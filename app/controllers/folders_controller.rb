@@ -570,7 +570,7 @@ class FoldersController < ApplicationController
       if authorized_action(@attachment, @current_user, :create)
         on_duplicate, name = params[:on_duplicate].presence, params[:name].presence
         duplicate_options = (on_duplicate == 'rename' && name) ? { name: name } : {}
-        return render :json => { :message => "on_duplicate must be 'overwrite' or 'rename'" }, :status => :bad_request if on_duplicate && %w(overwrite rename).exclude?(on_duplicate)
+        return render :json => { :message => "on_duplicate must be 'overwrite' or 'rename'" }, :status => :bad_request if on_duplicate && %w[overwrite rename].exclude?(on_duplicate)
         if on_duplicate.nil? && @dest_folder.active_file_attachments.where(display_name: @source_file.display_name).exists?
           return render :json => { :message => "file already exists; set on_duplicate to 'rename' or 'overwrite'" }, :status => :conflict
         end

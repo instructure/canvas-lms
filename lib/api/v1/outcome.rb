@@ -63,7 +63,7 @@ module Api::V1::Outcome
           Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
     end
 
-    json_attributes = %w(id context_type context_id vendor_guid display_name)
+    json_attributes = %w[id context_type context_id vendor_guid display_name]
     api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
       hash['can_edit'] = can_edit.call
@@ -103,7 +103,7 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcome_group_json(outcome_group, user, session, style = :full)
     path_context = outcome_group.context || :global
-    api_json(outcome_group, user, session, :only => %w(id title vendor_guid)).tap do |hash|
+    api_json(outcome_group, user, session, :only => %w[id title vendor_guid]).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
       hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
       hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id
@@ -141,7 +141,7 @@ module Api::V1::Outcome
   def outcome_link_json(outcome_link, user, session, opts = {})
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
-    api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
+    api_json(outcome_link, user, session, :only => %w[context_type context_id]).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
                                      :id => outcome_link.associated_asset_id,
                                      :outcome_id => outcome_link.content_id

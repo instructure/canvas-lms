@@ -174,7 +174,7 @@ describe AssignmentGroup do
       rules += "never_drop:#{val}\n"
     end
     assignment_group_model :rules => rules
-    result = @ag.rules_hash()
+    result = @ag.rules_hash
     expect(result['never_drop']).to eql(expected)
   end
 
@@ -193,7 +193,7 @@ describe AssignmentGroup do
   it "returns rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
     assignment_group_model :rules => rules
-    result = @ag.rules_hash()
+    result = @ag.rules_hash
     expect(result['drop_highest']).to eql(25)
   end
 
@@ -220,7 +220,7 @@ describe AssignmentGroup do
       @quiz.assignment_group_id = @assignment_group.id
       @quiz.save!
 
-      @admin = account_admin_user()
+      @admin = account_admin_user
       teacher_in_course(:course => @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term

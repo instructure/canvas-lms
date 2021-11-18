@@ -24,7 +24,7 @@
 module Factories
   def grading_periods(options = {})
     now = Time.zone.now
-    course = options[:context] || @course || course_factory()
+    course = options[:context] || @course || course_factory
     count = options[:count] || 2
 
     default_weights = [1] * count

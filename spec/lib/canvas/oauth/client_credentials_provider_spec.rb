@@ -34,7 +34,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
@@ -169,7 +169,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
@@ -320,7 +320,7 @@ module Canvas::OAuth
         it { is_expected.to be_a Hash }
 
         it 'has the correct expected keys' do
-          %i(access_token token_type expires_in scope).each do |key|
+          %i[access_token token_type expires_in scope].each do |key|
             expect(subject).to have_key key
           end
         end

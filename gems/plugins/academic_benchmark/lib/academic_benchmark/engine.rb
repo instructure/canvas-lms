@@ -35,7 +35,7 @@ module AcademicBenchmark
           :worker => 'CCWorker',
           :converter_class => AcademicBenchmark::Converter,
           :provides => { :academic_benchmark => AcademicBenchmark::Converter },
-          :valid_contexts => %w{Account}
+          :valid_contexts => %w[Account]
         }
       }
     end

@@ -21,8 +21,8 @@
 module Api::V1::ExternalFeeds
   include Api::V1::Json
 
-  API_ALLOWED_EXTERNAL_FEED_PARAMS = %w{url header_match verbosity}.freeze
-  API_EXPOSED_EXTERNAL_FEED_PARAMS = %w(id url header_match created_at verbosity).freeze
+  API_ALLOWED_EXTERNAL_FEED_PARAMS = %w[url header_match verbosity].freeze
+  API_EXPOSED_EXTERNAL_FEED_PARAMS = %w[id url header_match created_at verbosity].freeze
 
   def external_feeds_api_json(external_feeds, context, user, session)
     external_feeds.map do |external_feed|

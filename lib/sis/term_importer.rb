@@ -52,7 +52,7 @@ module SIS
         if date_override_enrollment_type
           # only configure the date override if this row is present
           raise ImportError, "Cannot set date override on non-existent term" if term.new_record?
-          unless %w(StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment).include?(date_override_enrollment_type)
+          unless %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment].include?(date_override_enrollment_type)
             raise ImportError, "Invalid date_override_enrollment_type"
           end
 

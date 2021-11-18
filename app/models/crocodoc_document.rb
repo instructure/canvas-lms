@@ -27,7 +27,7 @@ class CrocodocDocument < ActiveRecord::Base
 
   has_many :canvadocs_submissions
 
-  MIME_TYPES = %w(
+  MIME_TYPES = %w[
     application/pdf
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
@@ -36,7 +36,7 @@ class CrocodocDocument < ActiveRecord::Base
     application/excel
     application/vnd.ms-excel
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-  ).freeze
+  ].freeze
 
   def upload
     return if uuid.present?
@@ -194,7 +194,7 @@ class CrocodocDocument < ActiveRecord::Base
   def self.update_process_states
     bs = Setting.get('crocodoc_status_check_batch_size', '45').to_i
     GuardRail.activate(:secondary) do
-      CrocodocDocument.where(:process_state => %w(QUEUED PROCESSING)).find_in_batches do |docs|
+      CrocodocDocument.where(:process_state => %w[QUEUED PROCESSING]).find_in_batches do |docs|
         GuardRail.activate(:primary) do
           statuses = []
           docs.each_slice(bs) do |sub_docs|

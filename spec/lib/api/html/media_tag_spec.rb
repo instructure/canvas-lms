@@ -24,7 +24,7 @@ require_dependency "api/html/media_tag"
 module Api
   module Html
     describe MediaTag do
-      let(:doc) { double() }
+      let(:doc) { double }
 
       before do
         stub_const("StubbedNode",

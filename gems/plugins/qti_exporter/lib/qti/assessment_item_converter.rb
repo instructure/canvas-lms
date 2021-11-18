@@ -122,7 +122,7 @@ module Qti
             node.at_css('choiceInteraction') || node.at_css('associateInteraction')
         }
 
-        if text_nodes.length > 0
+        if !text_nodes.empty?
           @question[:question_text] = ''
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0
@@ -148,7 +148,7 @@ module Qti
         if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
           @question[:question_type] = @migration_type
           @question[:unsupported] = true
-        elsif !%w(text_only_question file_upload_question).include?(@migration_type)
+        elsif !%w[text_only_question file_upload_question].include?(@migration_type)
           self.parse_question_data
         else
           self.get_feedback if @migration_type == 'file_upload_question'

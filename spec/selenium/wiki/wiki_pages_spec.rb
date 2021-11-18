@@ -143,7 +143,7 @@ describe "Wiki Pages" do
       f('tbody .al-trigger').click
       f('.edit-menu-item').click
       expect(f('.edit-control-text').attribute(:value)).to include('B-Team')
-      f('.edit-control-text').clear()
+      f('.edit-control-text').clear
       f('.edit-control-text').send_keys('A-Team')
       fj('button:contains("Save")').click
       expect(f('.collectionViewItems')).to include_text('A-Team')

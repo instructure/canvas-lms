@@ -146,8 +146,8 @@ module Api::V1::Conversation
     result = api_json batch,
                       current_user,
                       session,
-                      :only => %w{id workflow_state},
-                      :methods => %w{completion recipient_count}
+                      :only => %w[id workflow_state],
+                      :methods => %w[completion recipient_count]
     result[:message] = conversation_message_json(batch.root_conversation_message, current_user, session)
     result[:tags] = batch.local_tags
     result

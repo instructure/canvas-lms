@@ -89,7 +89,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       guards.push(text) if /_GUARD$/.match? text
     end
 
-    guards.push('ALWAYS') if guards.size == 0
+    guards.push('ALWAYS') if guards.empty?
     guards
   end
 

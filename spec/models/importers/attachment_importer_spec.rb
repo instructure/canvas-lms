@@ -206,9 +206,9 @@ module Importers
           ]
         }
 
-        active_folders_association = double()
+        active_folders_association = double
         expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double()
+        folder = double
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
         expect(folder).to receive(:locked=).with(true)
@@ -225,9 +225,9 @@ module Importers
           ]
         }
 
-        active_folders_association = double()
+        active_folders_association = double
         expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double()
+        folder = double
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
         expect(folder).to receive(:workflow_state=).with("hidden")

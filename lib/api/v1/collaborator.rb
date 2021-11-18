@@ -23,7 +23,7 @@ module Api::V1::Collaborator
 
   def collaborator_json(collaborator, current_user, session, options = {}, context: nil)
     includes = options[:include] || []
-    api_json(collaborator, current_user, session, :only => %w{id}).tap do |hash|
+    api_json(collaborator, current_user, session, :only => %w[id]).tap do |hash|
       hash['type'] = collaborator.group_id.present? ? 'group' : 'user'
       hash['name'] = collaborator.user.try(:sortable_name) ||
                      collaborator.group.try(:name)

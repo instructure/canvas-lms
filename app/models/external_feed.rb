@@ -35,7 +35,7 @@ class ExternalFeed < ActiveRecord::Base
             uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
             length: { maximum: maximum_string_length }
 
-  VERBOSITIES = %w(full link_only truncate).freeze
+  VERBOSITIES = %w[full link_only truncate].freeze
   validates :verbosity, inclusion: { :in => VERBOSITIES, :allow_nil => true }
 
   def infer_defaults

@@ -2804,7 +2804,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index "stream_item_instances", ["stream_item_id"]
-    add_index :stream_item_instances, %w(user_id hidden id stream_item_id), :name => "index_stream_item_instances_global"
+    add_index :stream_item_instances, %w[user_id hidden id stream_item_id], :name => "index_stream_item_instances_global"
     add_index :stream_item_instances, [:context_type, :context_id]
     add_index :stream_item_instances, [:stream_item_id, :user_id], :unique => true
 

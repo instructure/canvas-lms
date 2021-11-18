@@ -63,7 +63,7 @@ class UnzipAttachment
 
     if @progress_proc.arity == 0
       # for backwards compatibility with callback procs that expect no arguments
-      @progress_proc.call()
+      @progress_proc.call
     else
       @progress_proc.call(pct)
     end

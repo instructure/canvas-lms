@@ -59,7 +59,7 @@ module Types
 
     field :url, Types::UrlType, null: true
     def url
-      object.login_or_launch_url()
+      object.login_or_launch_url
     end
 
     field :name, String, null: true

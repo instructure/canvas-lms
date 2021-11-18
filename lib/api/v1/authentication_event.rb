@@ -82,7 +82,7 @@ module Api::V1::AuthenticationEvent
     end
 
     page_view_ids = events.filter_map(&:request_id)
-    page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
+    page_views = PageView.find_all_by_id(page_view_ids) unless page_view_ids.empty?
     page_views ||= []
 
     {

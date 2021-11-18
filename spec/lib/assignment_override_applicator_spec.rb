@@ -462,7 +462,7 @@ describe AssignmentOverrideApplicator do
         it "enforces lenient date" do
           adhoc_due_at = 10.days.from_now
 
-          ao = AssignmentOverride.new()
+          ao = AssignmentOverride.new
           ao.assignment = @assignment
           ao.title = "ADHOC OVERRIDE"
           ao.workflow_state = "active"

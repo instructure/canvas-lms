@@ -64,7 +64,7 @@ module SIS
         raise ImportError, "No role_id or role given for admin" if role.blank? && role_id.blank?
 
         state = status.downcase.strip
-        raise ImportError, "Invalid status #{status} for admin" unless %w(active deleted).include? state
+        raise ImportError, "Invalid status #{status} for admin" unless %w[active deleted].include? state
         return if @batch.skip_deletes? && state == 'deleted'
 
         get_account(account_id)
