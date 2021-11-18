@@ -220,6 +220,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -241,6 +242,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -248,6 +250,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections
@@ -258,6 +261,7 @@ describe "differentiated_assignments" do
         end
       end
     end
+
     context "quiz with false only_visible_to_overrides" do
       before do
         quiz_with_false_only_visible_to_overrides
@@ -269,6 +273,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -276,6 +281,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -283,6 +289,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections

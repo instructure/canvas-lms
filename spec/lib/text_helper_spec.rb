@@ -143,6 +143,7 @@ describe TextHelper do
         expect(th.markdown_escape(escaped)).to eq expected
       end
     end
+
     context "i18n" do
       it "automatically escapes Strings" do
         expect(th.mt(:foo, "We **do not** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))

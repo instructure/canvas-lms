@@ -333,6 +333,7 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
+
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
 
@@ -372,6 +373,7 @@ describe "differentiated_assignments" do
             expect(visible_assignment_ids.count).to eq 1
           end
         end
+
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
 
@@ -379,6 +381,7 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
+
         context "user in section with override and one without override" do
           before do
             enroller_user_in_both_sections
@@ -389,6 +392,7 @@ describe "differentiated_assignments" do
           end
         end
       end
+
       context "assignment with false only_visible_to_overrides" do
         before do
           assignment_with_false_only_visible_to_overrides
@@ -405,6 +409,7 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
+
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
 
@@ -412,6 +417,7 @@ describe "differentiated_assignments" do
             ensure_user_sees_assignment
           end
         end
+
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
 
@@ -419,6 +425,7 @@ describe "differentiated_assignments" do
             ensure_user_sees_assignment
           end
         end
+
         context "user in section with override and one without override" do
           before do
             enroller_user_in_both_sections

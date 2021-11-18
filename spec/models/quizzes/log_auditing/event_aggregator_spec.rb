@@ -80,6 +80,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       expect(@aggregated_submission_data).to eq({})
     end
   end
+
   context "with set of events" do
     let(:latest_submission_data) { { "question_#{@questions[0].id}" => "goodbye", "question_#{@questions[0].id}_marked" => false } }
 

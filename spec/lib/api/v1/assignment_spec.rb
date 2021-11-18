@@ -57,6 +57,7 @@ end
 
 describe "Api::V1::Assignment" do
   subject(:api) { AssignmentApiHarness.new }
+
   let(:assignment) { assignment_model }
 
   describe "#assignment_json" do

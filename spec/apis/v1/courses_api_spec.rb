@@ -418,6 +418,7 @@ describe Api::V1::Course do
 
     describe '#calendar' do
       subject { super().calendar }
+
       it { is_expected.to eq({ 'ics' => "feed_calendar_url(573).ics" }) }
     end
 
@@ -426,11 +427,13 @@ describe Api::V1::Course do
 
       describe '#syllabus_body' do
         subject { super().syllabus_body }
+
         it { is_expected.to be_nil }
       end
 
       describe '#html_url' do
         subject { super().html_url }
+
         it { is_expected.to be_nil }
       end
     end
@@ -440,11 +443,13 @@ describe Api::V1::Course do
 
       describe '#syllabus_body' do
         subject { super().syllabus_body }
+
         it { is_expected.to eq "api_user_content(syllabus text, 42)" }
       end
 
       describe '#html_url' do
         subject { super().html_url }
+
         it { is_expected.to eq "course_url(Course.find(42), :host => localhost)" }
       end
     end
@@ -1955,6 +1960,7 @@ describe CoursesController, type: :request do
         expect(response.code).to eql '401'
       end
     end
+
     context "an unauthorized user" do
       it "returns 401" do
         @user = @student
@@ -4797,6 +4803,7 @@ describe CoursesController, type: :request do
     end
   end
 end
+
 describe CoursesController, type: :request do
   describe "/quizzes" do
     context "as teacher" do

@@ -148,9 +148,13 @@ RSpec/EmptyExampleGroup:
   Severity: error
 RSpec/EmptyLineAfterExample:
   Severity: error
-RSpec/EmptyLineAfterHook:
+RSpec/EmptyLineAfterExampleGroup:
   Severity: error
 RSpec/EmptyLineAfterFinalLet:
+  Severity: error
+RSpec/EmptyLineAfterHook:
+  Severity: error
+RSpec/EmptyLineAfterSubject:
   Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop

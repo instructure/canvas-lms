@@ -37,6 +37,7 @@ module Lti
 
   describe ApiServiceHelper do
     subject { TestClass.new(request) }
+
     let(:request) do
       m = double('request')
       allow(m).to receive_messages(authorization: "")

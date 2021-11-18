@@ -2585,6 +2585,7 @@ describe Course, "gradebook_to_csv_in_background" do
       end
     end
   end
+
   it "create_attachment uses inst-fs if inst-fs is enabled" do
     @uuid = "1234-abcd"
     allow(InstFS).to receive(:direct_upload).and_return(@uuid)
