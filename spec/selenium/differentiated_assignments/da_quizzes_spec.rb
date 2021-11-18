@@ -132,6 +132,7 @@ describe "interaction with differentiated quizzes" do
       end
     end
   end
+
   context "Observer with student" do
     before do
       observer_setup

@@ -25,7 +25,7 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -64,7 +64,7 @@ describe "calendar2" do
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
       ]
-      student1, student2 = 2.times.map do
+      student1, student2 = Array.new(2) do
         student_in_course :course => @course, :active_all => true
         @student
       end

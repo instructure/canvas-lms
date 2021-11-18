@@ -33,7 +33,7 @@ describe "jquery ui" do
   end
 
   def create_simple_modal
-    driver.execute_script(<<-JS)
+    driver.execute_script(<<~JS)
       $('<div><select /><input /></div>')
         .dialog()
         .find('select')
@@ -47,13 +47,13 @@ describe "jquery ui" do
   end
 
   it "makes dialogs modal by default" do
-    expect(driver.execute_script(<<-JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to eq true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
     expect(f(".ui-widget-overlay")).to be_displayed
 
     # make sure that hiding then showing the same dialog again, it still looks modal
-    expect(driver.execute_script(<<-JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to eq true
       return $('<div />')
         .dialog()
         .dialog('close')
@@ -120,7 +120,7 @@ describe "jquery ui" do
     # see http://bugs.jqueryui.com/ticket/6016
     it "html-escapes inferred dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
           .dialog()
           .parent('.ui-dialog')
@@ -130,7 +130,7 @@ describe "jquery ui" do
     end
 
     it "uses a non-breaking space for empty titles" do
-      expect(driver.execute_script(<<-JS)).to eq "\302\240"
+      expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('<div id="jqueryui_test">hello</div>')
           .dialog()
           .parent('.ui-dialog')
@@ -138,7 +138,7 @@ describe "jquery ui" do
           .text();
       JS
 
-      expect(driver.execute_script(<<-JS)).to eq "\302\240"
+      expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', 'foo')
@@ -151,7 +151,7 @@ describe "jquery ui" do
 
     it "html-escapes explicit string dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
           .dialog({title: #{title.inspect}})
           .parent('.ui-dialog')
@@ -160,7 +160,7 @@ describe "jquery ui" do
       JS
 
       new_title = "and now <i>this</i> is the title"
-      expect(driver.execute_script(<<-JS)).to eq new_title
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', #{new_title.inspect})
@@ -172,7 +172,7 @@ describe "jquery ui" do
 
     it "accepts jquery object dialog titles" do
       title = "<i>i want formatting <b>for realz</b></i>"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">here we go</div>')
           .dialog({title: $(#{title.inspect})})
           .parent('.ui-dialog')
@@ -181,7 +181,7 @@ describe "jquery ui" do
       JS
 
       new_title = "<i>i <b>still</b> want formatting</i>"
-      expect(driver.execute_script(<<-JS)).to eq new_title
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', $(#{new_title.inspect}))
@@ -194,7 +194,7 @@ describe "jquery ui" do
 
   context 'admin-links' do
     before do
-      driver.execute_script(<<-JS)
+      driver.execute_script(<<~JS)
         $('<div class="al-selenium">\
             <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">\
               <i class="icon-settings"></i>\

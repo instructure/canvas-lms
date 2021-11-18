@@ -33,7 +33,7 @@ describe GradeChangeAuditApiController do
       event.fetch("links").fetch("assignment") == assignment.id
     end
   end
-  let(:student_ids) { events_for_assignment.map { |event| event.fetch("links").fetch("student") }.compact }
+  let(:student_ids) { events_for_assignment.filter_map { |event| event.fetch("links").fetch("student") } }
 
   before do
     user_session(admin)

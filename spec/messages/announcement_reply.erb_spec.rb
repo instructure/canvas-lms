@@ -38,8 +38,8 @@ describe 'announcement_reply' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement value for title: value for name"
-      expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
-      expect(msg.body).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
     end
 
     it "renders correct footer if replys are enabled" do
@@ -75,7 +75,7 @@ describe 'announcement_reply' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement: value for title: value for name"
-      expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
       expect(msg.body.strip).to eq "value for message"
     end
   end
@@ -86,7 +86,7 @@ describe 'announcement_reply' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "Canvas Alert"
-      expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
       expect(msg.body).to include("Canvas Alert - Announcement Comment: value for title, value for name")
     end
   end

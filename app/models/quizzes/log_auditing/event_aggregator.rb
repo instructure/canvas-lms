@@ -49,7 +49,7 @@ module Quizzes::LogAuditing
     # @return [Hash] Submission data is returned
     #
     def run(quiz_submission_id, attempt, timestamp)
-      sql_string = <<~SQL
+      sql_string = <<~SQL.squish
         quiz_submission_id = :qs_id
         AND attempt = :attempt
         AND event_type IN(:filter)
@@ -89,7 +89,7 @@ module Quizzes::LogAuditing
       submission_data = {}
       answers.each do |question_id, answer|
         question = quiz.quiz_questions.find { |qq| qq.id == question_id.to_i }
-        question = Quizzes::QuizQuestion.where(id: question_id).first unless question
+        question ||= Quizzes::QuizQuestion.where(id: question_id).first
         if question.question_data["question_type"] != "text_only_question"
           serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
           thing = serializer.serialize(answer).answer

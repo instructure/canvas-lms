@@ -20,62 +20,62 @@
 describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
   require_relative '../../../quiz_spec_helper'
   def multiple_choice_question_data
-    JSON.parse <<-JSON
-    {
-      "id": 1,
-      "points_possible": 1,
-      "name": "MC Question",
-      "question_name": "MC Question",
-      "question_type": "multiple_choice_question",
-      "question_text": "A (hint: choose it!!), B, C, or D?",
-      "answers": [
-        {
-          "id": 11,
-          "text": "A",
-          "weight": 100
-        },
-        {
-          "id": 12,
-          "text": "B",
-          "weight": 0
-        },
-        {
-          "id": 13,
-          "text": "C",
-          "weight": 0
-        },
-        {
-          "id": 14,
-          "text": "D",
-          "weight": 0
-        }
-      ]
-    }
+    JSON.parse <<~JSON
+      {
+        "id": 1,
+        "points_possible": 1,
+        "name": "MC Question",
+        "question_name": "MC Question",
+        "question_type": "multiple_choice_question",
+        "question_text": "A (hint: choose it!!), B, C, or D?",
+        "answers": [
+          {
+            "id": 11,
+            "text": "A",
+            "weight": 100
+          },
+          {
+            "id": 12,
+            "text": "B",
+            "weight": 0
+          },
+          {
+            "id": 13,
+            "text": "C",
+            "weight": 0
+          },
+          {
+            "id": 14,
+            "text": "D",
+            "weight": 0
+          }
+        ]
+      }
     JSON
   end
 
   def true_false_question_data
-    JSON.parse <<-JSON
-    {
-      "id": 2,
-      "points_possible": 1,
-      "name": "T/F Question",
-      "question_name": "T/F Question",
-      "question_type": "true_false_question",
-      "question_text": "Yes (hint: probably!!!), or no?",
-      "answers": [
-        {
-          "id": 21,
-          "text": "Yes",
-          "weight": 100
-        },
-        {
-          "id": 22,
-          "text": "No",
-          "weight": 0
-        }
-      ]
-    }
+    JSON.parse <<~JSON
+      {
+        "id": 2,
+        "points_possible": 1,
+        "name": "T/F Question",
+        "question_name": "T/F Question",
+        "question_type": "true_false_question",
+        "question_text": "Yes (hint: probably!!!), or no?",
+        "answers": [
+          {
+            "id": 21,
+            "text": "Yes",
+            "weight": 100
+          },
+          {
+            "id": 22,
+            "text": "No",
+            "weight": 0
+          }
+        ]
+      }
     JSON
   end
 

@@ -115,7 +115,7 @@ describe "API", type: :request do
       @submission = @assignment.submissions.where(user_id: @user).first
       sub_a1 = Attachment.where(:root_attachment_id => a1).first
       sub_a2 = Attachment.where(:root_attachment_id => a2).first
-      expect(@submission.attachments.map { |a| a.id }.sort).to eq [sub_a1.id, sub_a2.id]
+      expect(@submission.attachments.map(&:id).sort).to eq [sub_a1.id, sub_a2.id]
       expect(@submission.submission_comments.first.comment).to eq "yay"
     end
   end

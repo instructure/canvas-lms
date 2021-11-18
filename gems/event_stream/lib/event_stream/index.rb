@@ -53,9 +53,10 @@ class EventStream::Index
   end
 
   def strategy_for(strategy_name)
-    if strategy_name == :active_record
+    case strategy_name
+    when :active_record
       @_ar_decorator ||= EventStream::IndexStrategy::ActiveRecord.new(self)
-    elsif strategy_name == :cassandra
+    when :cassandra
       @_cass_decorator ||= EventStream::IndexStrategy::Cassandra.new(self)
     else
       raise "Unknown Indexing Strategy: #{strategy_name}"

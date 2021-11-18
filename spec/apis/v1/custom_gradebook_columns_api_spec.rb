@@ -32,10 +32,10 @@ describe CustomGradebookColumnsApiController, type: :request do
 
   describe 'index' do
     before :once do
-      @cols = 2.times.map { |i|
+      @cols = Array.new(2) do |i|
         @course.custom_gradebook_columns.create! title: "Col #{i + 1}",
                                                  position: i
-      }
+      end
       c = @course.custom_gradebook_columns.create! title: "deleted col",
                                                    position: 1
       @hidden = @course.custom_gradebook_columns.create! title: "hidden col",
@@ -177,12 +177,12 @@ describe CustomGradebookColumnsApiController, type: :request do
   describe 'reorder' do
     it 'works' do
       names = %w(A B C)
-      c1, c2, c3 = 3.times.map { |i|
+      c1, c2, c3 = Array.new(3) do |i|
         c = @course.custom_gradebook_columns.build(title: names.shift)
         c.position = i
         c.save!
         c
-      }
+      end
       expect(@course.custom_gradebook_columns).to eq [c1, c2, c3]
 
       api_call :post,

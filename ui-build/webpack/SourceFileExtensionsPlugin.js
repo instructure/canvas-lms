@@ -71,7 +71,7 @@ class SourceFileExtensionsPlugin {
   // @param tmpDir: <Path>
   //        Directory that will hold the generated extended files. This is
   //        intended for internal use by the bundler and should not be served.
-  constructor({ context, include, tmpDir }) {
+  constructor({context, include, tmpDir}) {
     this.context = context
     this.include = include
     this.tmpDir = tmpDir
@@ -87,23 +87,25 @@ class SourceFileExtensionsPlugin {
       }
     })
 
-    compiler.resolverFactory.plugin('resolver normal', resolver => {
-      resolver.hooks.result.tap('SourceFileExtensionsPlugin', request => {
-        if (extended[request.path] && request.context.issuer !== extended[request.path]) {
-          request.path = extended[request.path]
-        }
+    compiler.resolverFactory.hooks.resolver
+      .for('normal')
+      .tap('SourceFileExtensionsPlugin', resolver => {
+        resolver.hooks.result.tap('SourceFileExtensionsPlugin', request => {
+          if (extended[request.path] && request.context.issuer !== extended[request.path]) {
+            request.path = extended[request.path]
+          }
+        })
       })
-    })
   }
 
   scanManifestsForExtensions() {
-    const { context, include } = this
+    const {context, include} = this
     const extensions = {}
     const errors = []
 
     for (const file of include) {
       const manifest = require(file)
-      const mapping = manifest.canvas && manifest.canvas['source-file-extensions'] || {}
+      const mapping = (manifest.canvas && manifest.canvas['source-file-extensions']) || {}
 
       for (const [fileInCanvas, filesInPlugin] of Object.entries(mapping)) {
         const sourceFile = path.resolve(context, fileInCanvas)
@@ -114,13 +116,12 @@ class SourceFileExtensionsPlugin {
             extensions[sourceFile] = extensions[sourceFile] || []
             extensions[sourceFile].push(path.join(path.dirname(file), fileInPlugin))
           }
-        }
-        else {
+        } else {
           errors.push(
             new Error(
               `${path.relative(context, file)} - file marked for extension does not exist:\n\n` +
-              `    ${fileInCanvas}\n\n` +
-              `(by SourceFileExtensionsPlugin)`
+                `    ${fileInCanvas}\n\n` +
+                `(by SourceFileExtensionsPlugin)`
             )
           )
         }
@@ -131,7 +132,7 @@ class SourceFileExtensionsPlugin {
   }
 
   generateAndPersistExtendedModules(extensions) {
-    const { context, tmpDir } = this
+    const {context, tmpDir} = this
     const extended = {}
 
     mkdirp.sync(tmpDir)
@@ -154,9 +155,9 @@ class SourceFileExtensionsPlugin {
   }
 }
 
-const md5 = string => crypto.createHash('md5').update(string).digest('hex');
+const md5 = string => crypto.createHash('md5').update(string).digest('hex')
 
-const generateExtendedModule = ({ context, extensionFiles, sourceFile }) => {
+const generateExtendedModule = ({context, extensionFiles, sourceFile}) => {
   const relative = file => path.relative(context, file)
   const imports = [`import orig from "${relative(sourceFile)}";`]
   const pipeline = []
@@ -170,7 +171,7 @@ const generateExtendedModule = ({ context, extensionFiles, sourceFile }) => {
     `${imports.join('\n')}\n` +
     `export default ${pipeline.reduce((buf, fn) => `${fn}(${buf})`, 'orig')};` +
     `\n`
-  );
+  )
 }
 
 module.exports = SourceFileExtensionsPlugin

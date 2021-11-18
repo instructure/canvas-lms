@@ -25,7 +25,7 @@ describe "/quizzes/quizzes/moderate" do
 
   before do
     course_with_teacher
-    @students = num_students.times.map do |i|
+    @students = Array.new(num_students) do |i|
       name = "#{(i + 'a'.ord).chr}_student"
       course_with_student(name: name, course: @course)
       @student

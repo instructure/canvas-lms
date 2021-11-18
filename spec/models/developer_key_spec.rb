@@ -1079,6 +1079,7 @@ describe DeveloperKey do
 
   describe "issue_token" do
     subject { DeveloperKey.create! }
+
     let(:claims) { { "key" => "value" } }
     let(:asymmetric_keypair) { CanvasSecurity::RSAKeyPair.new.to_jwk }
     let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }

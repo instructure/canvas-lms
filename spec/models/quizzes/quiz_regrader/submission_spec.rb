@@ -29,10 +29,10 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:question_regrades) do
-    1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
-                       :question_data => { :id => i },
-                       :regrade_option => regrade_options[i])
+    1.upto(3).index_with do |i|
+      double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
+             :question_data => { :id => i },
+             :regrade_option => regrade_options[i])
     end
   end
 
@@ -177,11 +177,9 @@ describe Quizzes::QuizRegrader::Submission do
     end
 
     it "doesn't change question names" do
-      allow(regrade_submission).to receive_messages(submitted_answer_ids: questions.map { |q| q[:id] })
+      allow(regrade_submission).to receive_messages(submitted_answer_ids: questions.pluck(:id))
 
-      question_names = regrade_submission.rescored_submission.questions.map do |q|
-        q[:question_name]
-      end
+      question_names = regrade_submission.rescored_submission.questions.pluck(:question_name)
 
       expect(question_names.sort).to eq [
         'Question 1',

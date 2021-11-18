@@ -140,7 +140,7 @@ describe "security" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
-      expect(SessionPersistenceToken.find_by_id(token.id)).to be_nil
+      expect(SessionPersistenceToken.find_by(id: token.id)).to be_nil
       reset!
       https!
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }

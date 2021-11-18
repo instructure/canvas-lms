@@ -197,7 +197,7 @@ shared_context "in-process server selenium tests" do
 
     # log INSTUI deprecation warnings
     if browser_logs.present?
-      spec_file = example.file_path.sub(/.*spec\/selenium\//, '')
+      spec_file = example.file_path.sub(%r{.*spec/selenium/}, '')
       deprecations = browser_logs.select { |l| l.message =~ /\[.*deprecated./ }.map do |l|
         ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, 'Warning')}"
       end

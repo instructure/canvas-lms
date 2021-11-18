@@ -24,7 +24,7 @@ describe "Gradebook - group weights" do
   include_context "in-process server selenium tests"
   include GradebookCommon
 
-  def student_totals()
+  def student_totals
     totals = ff('.total-cell')
     points = []
     for i in totals do

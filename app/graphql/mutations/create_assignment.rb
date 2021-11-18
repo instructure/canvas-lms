@@ -28,7 +28,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase
   def resolve(input:)
     course_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:course_id], "Course")
 
-    @course = Course.find_by_id(course_id)
+    @course = Course.find_by(id: course_id)
     @working_assignment = @course.assignments.build if @course
 
     raise GraphQL::ExecutionError, "invalid course: #{course_id}" unless @working_assignment&.grants_right? current_user, :create

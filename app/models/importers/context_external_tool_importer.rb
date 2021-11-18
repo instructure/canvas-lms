@@ -24,7 +24,7 @@ module Importers
     self.item_class = ContextExternalTool
 
     def self.process_migration(data, migration)
-      tools = data['external_tools'] ? data['external_tools'] : []
+      tools = data['external_tools'] || []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin
@@ -82,7 +82,7 @@ module Importers
       end
 
       item.save! if persist
-      migration.add_imported_item(item) if migration
+      migration&.add_imported_item(item)
       item
     end
 
@@ -112,8 +112,9 @@ module Importers
       if migration.migration_settings[:prefer_existing_tools] && (tool = self.check_for_existing_tool(hash, migration))
         return tool
       end
+
       if migration.migration_type == "common_cartridge_importer" && (tool = self.check_for_tool_compaction(hash, migration))
-        return tool
+        tool
       end
     end
 

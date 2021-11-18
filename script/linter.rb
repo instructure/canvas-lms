@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-$LOAD_PATH.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
+$LOAD_PATH.push File.expand_path('../gems/dr_diff/lib', __dir__)
 require 'dr_diff'
 require 'json'
 

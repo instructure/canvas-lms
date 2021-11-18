@@ -24,7 +24,7 @@ module CC::Importer::Standard
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
         if (doc = get_node_or_open_file(res, 'assignment'))
-          path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+          path = res[:href] || (res[:files]&.first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
 
           asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
@@ -110,7 +110,7 @@ module CC::Importer::Standard
       end
       if meta_doc.at_css("similarity_detection_tool")
         node = meta_doc.at_css("similarity_detection_tool")
-        similarity_settings = node.attributes.each_with_object({}) { |(k, v), h| h[k] = v.value }
+        similarity_settings = node.attributes.transform_values(&:value)
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
@@ -184,14 +184,12 @@ module CC::Importer::Standard
     private
 
     def get_tool_setting(meta_doc)
-      tool_setting = {
+      {
         product_code: meta_doc.at_css('tool_setting tool_proxy').attribute('product_code').value,
         vendor_code: meta_doc.at_css('tool_setting tool_proxy').attribute('vendor_code').value,
         custom: meta_doc.css("tool_setting custom property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text },
         custom_parameters: meta_doc.css("tool_setting custom_parameters property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text }
       }
-
-      tool_setting
     end
   end
 end

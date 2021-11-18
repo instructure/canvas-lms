@@ -33,8 +33,7 @@ describe "links", priority: "2" do
 
     def find_link(link_css)
       link_section = f('#section-tabs')
-      link_element = link_section.find_element(:css, link_css)
-      link_element
+      link_section.find_element(:css, link_css)
     end
 
     it "navigates user to home page after home link is clicked" do

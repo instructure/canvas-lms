@@ -100,7 +100,7 @@ module CopyToTrayPage
   # ------------------------------ Actions --------------------------------
   # the course dropdown triggers a fetch that needs to then fetch the modules
 
-  def wait_for_module_search_dropdown
+  def wait_for_search_dropdown
     wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2 }
   end
 end

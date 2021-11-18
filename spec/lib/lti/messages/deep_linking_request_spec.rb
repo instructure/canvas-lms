@@ -166,8 +166,8 @@ describe Lti::Messages::DeepLinkingRequest do
       end
     end
 
-    context 'when resource type is "module_index_menu"' do
-      let(:opts) { { resource_type: 'module_index_menu' } }
+    context 'when resource type is "module_index_menu_modal"' do
+      let(:opts) { { resource_type: 'module_index_menu_modal' } }
 
       it_behaves_like 'sets deep linking attributes' do
         let(:accept_types) { %w[ltiResourceLink] }

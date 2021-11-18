@@ -91,7 +91,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
 
       students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         courses_by_id = Course.where(id: student_chunk.map(&:course_id)).preload(:grading_standard).index_by(&:id)
@@ -201,11 +201,11 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
       courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
       students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
-        students_by_course = student_chunk.group_by { |x| x.course_id }
+        students_by_course = student_chunk.group_by(&:course_id)
         students_by_course.each do |_course_id, course_students|
           scores = indexed_scores(course_students, grading_periods)
           course_students.each_with_index do |student, i|
@@ -297,7 +297,7 @@ module AccountReports
 
       if @include_deleted
         students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
-        if @account_report.parameters.has_key? 'limiting_period'
+        if @account_report.parameters.key? 'limiting_period'
           limiting_period = @account_report.parameters['limiting_period'].to_i
           students = students.where("enrollments.workflow_state = 'active'
                                     OR c.conclude_at >= ?

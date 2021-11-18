@@ -36,9 +36,9 @@ class ToDoListPresenter
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
-      @needs_reviewing = assessment_requests.map do |ar|
+      @needs_reviewing = assessment_requests.filter_map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
-      end.compact
+      end
 
       # we need a complete list of courses first because we only care about the courses
       # from the assignments involved. not just the contexts handed in.

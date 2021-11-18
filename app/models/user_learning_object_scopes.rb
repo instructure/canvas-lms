@@ -31,7 +31,7 @@ module UserLearningObjectScopes
   def _params_hash(parent_binding)
     caller_method = method(caller_locations(1, 1).first.base_label)
     caller_param_names = caller_method.parameters.map(&:last)
-    param_values = caller_param_names.each_with_object({}) { |v, h| h[v] = parent_binding.local_variable_get(v) }
+    param_values = caller_param_names.index_with { |v| parent_binding.local_variable_get(v) }
     opts = param_values[:opts]
     param_values = param_values.except(:opts).merge(opts) if opts
     param_values
@@ -56,9 +56,8 @@ module UserLearningObjectScopes
                                                                  *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     published_visible_assignments = course.active_assignments.published
-    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
-                                                                          self, course, is_teacher: false)
-    published_visible_assignments
+    DifferentiableAssignment.scope_filter(published_visible_assignments,
+                                          self, course, is_teacher: false)
   end
 
   # everything is relative to the user's shard
@@ -373,7 +372,7 @@ module UserLearningObjectScopes
       scope = assignment_scope.active
                               .expecting_submission
                               .where(final_grader: self, moderated_grading: true)
-                              .where("assignments.grades_published_at IS NULL")
+                              .where(assignments: { grades_published_at: nil })
                               .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
           .where("submissions.assignment_id=assignments.id")
           .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))

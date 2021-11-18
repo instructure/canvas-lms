@@ -58,6 +58,8 @@ describe 'modules' do
     manage_module_button(@module1).click
     module_index_menu_tool_link('Copy To...').click
     course_search_dropdown.click
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click
@@ -80,6 +82,8 @@ describe 'modules' do
     manage_module_item_button(@item1).click
     module_index_menu_tool_link('Copy To...').click
     course_search_dropdown.click
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click
@@ -104,6 +108,8 @@ describe 'modules' do
     manage_module_item_button(ContentTag.last).click
     module_index_menu_tool_link('Copy To...').click
     course_search_dropdown.click
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@other_course.name).click
     course_search_dropdown.send_keys(:tab)
     copy_button.click

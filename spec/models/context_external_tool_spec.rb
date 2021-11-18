@@ -269,7 +269,7 @@ describe ContextExternalTool do
     end
 
     it 'sends only 255 chars' do
-      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return(256.times.map { 'a' }.join)
+      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
       expect(tool.deployment_id.size).to eq 255
     end
   end
@@ -357,6 +357,7 @@ describe ContextExternalTool do
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       subject { second_tool.duplicated_in_context? }
+
       let(:context) { raise 'Override in spec' }
       let(:second_tool) { tool.dup }
       let(:settings) do
@@ -1155,7 +1156,7 @@ describe ContextExternalTool do
 
         expect(hash["custom_a"]).to eq "1"
         expect(hash["custom_b"]).to eq "2"
-        expect(hash.has_key?("custom_c")).to eq false
+        expect(hash).not_to have_key("custom_c")
       end
     end
   end
@@ -1272,13 +1273,13 @@ describe ContextExternalTool do
 
         tool.homework_submission = { enabled: true }
         expect(tool.settings[:homework_submission]).to include({ enabled: true, selection_height: 300 })
-        expect(tool.settings.key?(:inactive_placements)).to be_falsey
+        expect(tool.settings).not_to have_key(:inactive_placements)
       end
 
       it 'moves placement data to inactive placements when disabled' do
         tool.homework_submission = { enabled: false }
         expect(tool.settings[:inactive_placements][:homework_submission]).to include({ enabled: false, selection_height: 300 })
-        expect(tool.settings.key?(:homework_submission)).to be_falsey
+        expect(tool.settings).not_to have_key(:homework_submission)
       end
 
       it 'keeps already inactive placement data when disabled again' do
@@ -1639,7 +1640,7 @@ describe ContextExternalTool do
         it 'accepts `nil` and removes visibility' do
           set_visibility('members')
           set_visibility(nil)
-          expect(tool.file_menu.key?(:visibility)).to be false
+          expect(tool.file_menu).not_to have_key(:visibility)
         end
       end
     end
@@ -2058,7 +2059,7 @@ describe ContextExternalTool do
           )[:original_visibility]).to eq 'admins'
         end
 
-        Timecop.freeze(time + 2.second) do
+        Timecop.freeze(time + 2.seconds) do
           @user.teacher_enrollments.update_all(:workflow_state => 'deleted')
           # should not have affected the earlier cache
           expect(ContextExternalTool.global_navigation_granted_permissions(
@@ -2096,7 +2097,7 @@ describe ContextExternalTool do
           expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, { :original_visibility => 'members' })).to eq @member_cache_key
         end
 
-        Timecop.freeze(time + 2.second) do
+        Timecop.freeze(time + 2.seconds) do
           @admin_tool.global_navigation = nil
           @admin_tool.save!
           # should update the admin key

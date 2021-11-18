@@ -82,7 +82,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     # if we have old stale data, silently swallow any
     # errors fetching fresh data, and return the stale entry
     Canvas::Errors.capture(e)
-    return @safe_redis_internal_options[:stale_entry].value
+    @safe_redis_internal_options[:stale_entry].value
   ensure
     # only unlock if we have an actual lock nonce, not just "true"
     # that happens on failure
@@ -127,7 +127,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # is written to delete a key, but only if it's value matches the
   # provided value (so if someone else has re-written it since we won't delete it)
   def delif_script
-    @_delif ||= Redis::Scripting::Script.new(File.expand_path("../delif.lua", __FILE__))
+    @_delif ||= Redis::Scripting::Script.new(File.expand_path('delif.lua', __dir__))
   end
 
   # vanilla Rails is weird, and assumes "race_condition_ttl" is 5 minutes; override that to actually do math

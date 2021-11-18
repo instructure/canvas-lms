@@ -107,8 +107,8 @@ module CanvasErrors
   end
 
   def self.run_callbacks(exception, extra, level = :error)
-    registry.each_with_object({}) do |(key, callback), outputs|
-      outputs[key] = callback.call(exception, extra, level)
+    registry.transform_values do |callback|
+      callback.call(exception, extra, level)
     end
   end
   private_class_method :run_callbacks

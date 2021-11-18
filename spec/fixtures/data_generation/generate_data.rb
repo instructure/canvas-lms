@@ -419,8 +419,8 @@ end
 
 begin
   option_parser.parse!(into: options)
-rescue OptionParser::InvalidOption => error
-  puts error.message
+rescue OptionParser::InvalidOption => e
+  puts e.message
   puts option_parser.help
   exit 1
 end

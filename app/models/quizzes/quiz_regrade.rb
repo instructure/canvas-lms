@@ -25,9 +25,9 @@ class Quizzes::QuizRegrade < ActiveRecord::Base
   has_many :quiz_regrade_runs, class_name: 'Quizzes::QuizRegradeRun'
   has_many :quiz_question_regrades, class_name: 'Quizzes::QuizQuestionRegrade'
 
-  validates_presence_of :quiz_version
-  validates_presence_of :quiz_id
-  validates_presence_of :user_id
+  validates :quiz_version, presence: true
+  validates :quiz_id, presence: true
+  validates :user_id, presence: true
 
   delegate :teachers, :context, to: :quiz
 end

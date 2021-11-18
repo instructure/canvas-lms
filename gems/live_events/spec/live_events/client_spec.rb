@@ -88,7 +88,7 @@ describe LiveEvents::Client do
                                             "aws_endpoint" => "example.com:6543/"
                                           })
 
-      expect(res.key?(:endpoint)).to eq false
+      expect(res).not_to have_key(:endpoint)
     end
 
     it "loads custom creds" do

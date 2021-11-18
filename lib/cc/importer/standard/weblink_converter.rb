@@ -23,7 +23,7 @@ module CC::Importer::Standard
     def get_weblink_title_and_url(resource)
       title = ''
       url = ''
-      if resource[:files] && resource[:files].first
+      if resource[:files]&.first
         path = get_full_path(resource[:files].first[:href])
         if File.exist?(path)
           xml = File.open(path).read

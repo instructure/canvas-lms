@@ -57,7 +57,7 @@ require 'rubocop_canvas/cops/specs/scope_includes'
 module RuboCop
   module Canvas
     module Inject
-      DEFAULT_FILE = File.expand_path("../../config/default.yml", __FILE__)
+      DEFAULT_FILE = File.expand_path('../config/default.yml', __dir__)
 
       def self.defaults!
         path = File.absolute_path(DEFAULT_FILE)

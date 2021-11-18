@@ -34,7 +34,7 @@ module Lti
     serialize :capabilities
     serialize :parameters
 
-    validates_presence_of :message_type, :resource_handler, :launch_path
+    validates :message_type, :resource_handler, :launch_path, presence: true
 
     scope :by_message_types, lambda { |*message_types| where(message_type: message_types) }
 

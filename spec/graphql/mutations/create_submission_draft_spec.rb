@@ -108,7 +108,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       attempt: @submission.attempt,
       file_ids: @attachments.map(&:id)
     )
-    attachment_ids = first_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = first_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
     expect(attachment_ids.count).to eq 2
     @attachments.each do |attachment|
       expect(attachment_ids.include?(attachment[:id].to_s)).to be true
@@ -120,7 +120,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       attempt: @submission.attempt,
       file_ids: [@attachments[0].id]
     )
-    attachment_ids = second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
     expect(attachment_ids.count).to eq 1
     expect(attachment_ids[0]).to eq @attachments[0].id.to_s
 
@@ -185,7 +185,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       body: 'some text body',
       file_ids: @attachments.map(&:id)
     )
-    attachment_ids = result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
 
     expect(attachment_ids.count).to eq 2
     @attachments.each do |attachment|

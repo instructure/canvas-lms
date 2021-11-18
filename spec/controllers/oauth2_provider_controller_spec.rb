@@ -162,7 +162,7 @@ describe OAuth2ProviderController do
                       response_type: 'code',
                       scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       it 'accepts the deprecated name of scopes for scope param' do
@@ -173,7 +173,7 @@ describe OAuth2ProviderController do
                       response_type: 'code',
                       scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       it 'does not reuse userinfo tokens for other scopes' do
@@ -192,7 +192,7 @@ describe OAuth2ProviderController do
                              response_type: 'code',
                              scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       context 'when "prompt=none"' do
@@ -210,7 +210,7 @@ describe OAuth2ProviderController do
           @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects to the redirect uri if the developer key is trusted' do
@@ -218,13 +218,13 @@ describe OAuth2ProviderController do
           key.save!
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects with "interaction_required" if the current session cannot be used without a prompt' do
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params['error']).to eq 'interaction_required'
         end

@@ -269,7 +269,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Login / Logout Activity")
         end
 
@@ -281,7 +281,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Grade Change Activity")
         end
 
@@ -293,7 +293,7 @@ describe "admin_tools" do
           click_view_tab "logging"
 
           options = ffj("#loggingType > option")
-          options.map! { |o| o.text }
+          options.map!(&:text)
           expect(options).not_to include("Course Activity")
         end
       end

@@ -49,7 +49,7 @@ describe ContentMigration do
                                        folder: folder)
 
         @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
-                                   :unlock_at => @old_start + 1.days,
+                                   :unlock_at => @old_start + 1.day,
                                    :lock_at => @old_start + 5.days,
                                    :show_correct_answers_at => @old_start + 6.days,
                                    :hide_correct_answers_at => @old_start + 7.days)
@@ -63,10 +63,10 @@ describe ContentMigration do
         @copy_from.calendar_events.create!(:title => "an event",
                                            :start_at => @old_start + 4.days,
                                            :end_at => @old_start + 4.days + 1.hour)
-        cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
+        cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.day)
         cm.save!
 
-        cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
+        cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.day)
         cm2.save!
       end
 
@@ -87,35 +87,35 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
 
         new_att = @copy_to.attachments.where(display_name: 'hi.txt').first
-        expect(new_att.unlock_at.to_i).to eq (@new_start - 2.day).to_i
-        expect(new_att.lock_at.to_i).to eq (@new_start + 3.day).to_i
+        expect(new_att.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+        expect(new_att.lock_at.to_i).to eq (@new_start + 3.days).to_i
 
         new_folder = @copy_to.folders.where(name: 'shifty').first
-        expect(new_folder.unlock_at.to_i).to eq (@new_start - 3.day).to_i
-        expect(new_folder.lock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_folder.unlock_at.to_i).to eq (@new_start - 3.days).to_i
+        expect(new_folder.lock_at.to_i).to eq (@new_start + 2.days).to_i
 
         new_quiz = @copy_to.quizzes.first
-        expect(new_quiz.due_at.to_i).to eq (@new_start + 4.day).to_i
+        expect(new_quiz.due_at.to_i).to eq (@new_start + 4.days).to_i
         expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_quiz.lock_at.to_i).to eq (@new_start + 5.day).to_i
-        expect(new_quiz.show_correct_answers_at.to_i).to eq (@new_start + 6.day).to_i
-        expect(new_quiz.hide_correct_answers_at.to_i).to eq (@new_start + 7.day).to_i
+        expect(new_quiz.lock_at.to_i).to eq (@new_start + 5.days).to_i
+        expect(new_quiz.show_correct_answers_at.to_i).to eq (@new_start + 6.days).to_i
+        expect(new_quiz.hide_correct_answers_at.to_i).to eq (@new_start + 7.days).to_i
 
         new_disc = @copy_to.discussion_topics.first
-        expect(new_disc.delayed_post_at.to_i).to eq (@new_start + 3.day).to_i
-        expect(new_disc.lock_at.to_i).to eq (@new_start + 7.day).to_i
+        expect(new_disc.delayed_post_at.to_i).to eq (@new_start + 3.days).to_i
+        expect(new_disc.lock_at.to_i).to eq (@new_start + 7.days).to_i
 
         new_ann = @copy_to.announcements.first
-        expect(new_ann.delayed_post_at.to_i).to eq (@new_start + 10.day).to_i
+        expect(new_ann.delayed_post_at.to_i).to eq (@new_start + 10.days).to_i
 
         new_event = @copy_to.calendar_events.first
-        expect(new_event.start_at.to_i).to eq (@new_start + 4.day).to_i
-        expect(new_event.end_at.to_i).to eq (@new_start + 4.day + 1.hour).to_i
+        expect(new_event.start_at.to_i).to eq (@new_start + 4.days).to_i
+        expect(new_event.end_at.to_i).to eq (@new_start + 4.days + 1.hour).to_i
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
@@ -141,9 +141,9 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
       end
 
       it "ignores a bad end date" do
@@ -163,9 +163,9 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
       end
 
       it "removes dates" do

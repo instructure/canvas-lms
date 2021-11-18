@@ -92,7 +92,7 @@ module GradebooksHelper
   end
 
   def display_grade(grade)
-    grade.blank? ? '-' : grade
+    grade.presence || '-'
   end
 
   def graded_by_title(graded_at, grader_name)
@@ -154,11 +154,11 @@ module GradebooksHelper
   end
 
   def pass_fail_icon(score, grade)
-    if (score && score > 0) || grade == 'complete'
-      icon_attrs = pass_icon_attributes
-    else
-      icon_attrs = fail_icon_attributes
-    end
+    icon_attrs = if (score && score > 0) || grade == 'complete'
+                   pass_icon_attributes
+                 else
+                   fail_icon_attributes
+                 end
     screenreadable_icon(icon_attrs, %w{graded_icon})
   end
 

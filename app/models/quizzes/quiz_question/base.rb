@@ -51,11 +51,11 @@ class Quizzes::QuizQuestion::Base
     # currently all the attributes are synthesized from @question_data
     # since questions are stored in this format anyway, it prevents us from
     # having to do a bunch of translation to some other format
-    unless question_data.is_a? Quizzes::QuizQuestion::QuestionData
-      @question_data = Quizzes::QuizQuestion::QuestionData.new(question_data)
-    else
-      @question_data = question_data
-    end
+    @question_data = unless question_data.is_a? Quizzes::QuizQuestion::QuestionData
+                       Quizzes::QuizQuestion::QuestionData.new(question_data)
+                     else
+                       question_data
+                     end
   end
 
   def question_id

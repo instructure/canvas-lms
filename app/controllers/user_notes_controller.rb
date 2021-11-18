@@ -37,7 +37,7 @@ class UserNotesController < ApplicationController
     return render_unauthorized_action unless @context.root_account.enable_user_notes
 
     if authorized_action(@context, @current_user, :manage_user_notes)
-      if @context && @context.is_a?(Account)
+      if @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments
       else # it's a course
         @users = @context.students_visible_to(@current_user).order_by_sortable_name

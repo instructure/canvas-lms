@@ -19,6 +19,7 @@
 
 describe RuboCop::Cop::Specs::NoNoSuchElementError do
   subject(:cop) { described_class.new }
+
   let(:msg_regex) { /Avoid using Selenium::WebDriver::Error::NoSuchElementError/ }
 
   it 'disallows Selenium::WebDriver::Error::NoSuchElementError' do

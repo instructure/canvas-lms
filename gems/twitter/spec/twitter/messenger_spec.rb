@@ -65,7 +65,7 @@ describe Twitter::Messenger do
 
     it { is_expected.to match(/host/) }
     it { is_expected.to match(/#{id}$/) }
-    it { is_expected.to match(/^http:\/\//) }
+    it { is_expected.to match(%r{^http://}) }
   end
 
   describe '#body' do

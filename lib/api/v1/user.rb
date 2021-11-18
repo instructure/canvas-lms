@@ -71,8 +71,8 @@ module Api::V1::User
         # that's called sis_source_id.
 
         if user_can_read_sis_data?(current_user, context)
-          json.merge! :sis_user_id => pseudonym&.sis_user_id,
-                      :integration_id => pseudonym&.integration_id
+          json[:sis_user_id] = pseudonym&.sis_user_id
+          json[:integration_id] = pseudonym&.integration_id
         end
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
@@ -116,7 +116,7 @@ module Api::V1::User
 
       if includes.include?('sections')
         json[:sections] = user.enrollments
-                              .map(&:course_section).compact.uniq
+                              .filter_map(&:course_section).uniq
                               .map(&:name).join(", ")
       end
 
@@ -265,7 +265,7 @@ module Api::V1::User
                               :created_at,
                               :start_at,
                               :end_at,
-                              :type]
+                              :type].freeze
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup

@@ -444,7 +444,7 @@ class Speedgrader
     end
 
     def select_rubric_criterion(criterion)
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == criterion }[0].click
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == criterion }.click
     end
 
     def clear_new_comment
@@ -577,7 +577,7 @@ class Speedgrader
     end
 
     def rating_by_text(rating_text)
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == rating_text }[0]
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == rating_text }
     end
 
     def saved_rubric_ratings

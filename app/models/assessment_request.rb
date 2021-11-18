@@ -31,7 +31,7 @@ class AssessmentRequest < ActiveRecord::Base
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
   belongs_to :rubric_assessment
-  validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
+  validates :user_id, :asset_id, :asset_type, :workflow_state, presence: true
 
   before_save :infer_uuid
   after_save :delete_ignores
@@ -57,20 +57,15 @@ class AssessmentRequest < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
     p.to { self.assessor }
-    p.whenever { |record|
-      record.assigned? && @send_reminder && active_rubric_association?
+    p.whenever {
+      should_send_reminder? && active_rubric_association?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
     p.to { self.assessor }
-    p.whenever { |record|
-      send_notification = record.assigned? && @send_reminder && !active_rubric_association?
-      # Do not send notifications if the context is an unpublished course
-      # or if the asset is a submission and the assignment is unpublished
-      send_notification = false if self.context.is_a?(Course) && !self.context.workflow_state.in?(['available', 'completed'])
-      send_notification = false if self.asset.is_a?(Submission) && self.asset.assignment.workflow_state != "published"
-      send_notification
+    p.whenever {
+      should_send_reminder? && !active_rubric_association?
     }
     p.data { course_broadcast_data }
   end
@@ -114,6 +109,16 @@ class AssessmentRequest < ActiveRecord::Base
     @send_reminder = nil
   end
 
+  def should_send_reminder?
+    # Do not send notifications if the context is an unpublished course
+    return false if context.is_a?(Course) && !context.published?
+
+    # or if the asset is a submission and the assignment is unpublished
+    return false if asset.is_a?(Submission) && asset.assignment.workflow_state != "published"
+
+    @send_reminder && assigned?
+  end
+
   def context
     submission.try(:context)
   end
@@ -154,7 +159,9 @@ class AssessmentRequest < ActiveRecord::Base
     self.asset.user.name rescue t("#unknown", "Unknown")
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'

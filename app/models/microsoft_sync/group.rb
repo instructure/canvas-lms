@@ -54,8 +54,8 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
   belongs_to :course
   belongs_to :last_error_report, class_name: 'ErrorReport'
-  validates_presence_of :course
-  validates_uniqueness_of :course_id
+  validates :course, presence: true
+  validates :course_id, uniqueness: true
 
   scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
 

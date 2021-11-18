@@ -48,16 +48,16 @@ class AppointmentGroup < ActiveRecord::Base
     appointment_group_sub_contexts.map(&:sub_context)
   end
 
-  validates_presence_of :workflow_state
+  validates :workflow_state, presence: true
   before_validation :default_values
   before_validation :update_contexts_and_sub_contexts
   before_save :update_cached_values
   after_save :update_appointments
 
-  validates_length_of :title, :maximum => maximum_string_length
-  validates_length_of :location_name, :maximum => maximum_string_length
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_inclusion_of :participant_visibility, :in => ['private', 'protected'] # presumably we might add public if we decide to show appointments on the public calendar feed
+  validates :title, length: { :maximum => maximum_string_length }
+  validates :location_name, length: { :maximum => maximum_string_length }
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :participant_visibility, inclusion: { :in => ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
     next unless record.new_appointments.present? || record.validation_event_override
 
@@ -152,14 +152,14 @@ class AppointmentGroup < ActiveRecord::Base
                                                .flatten.map(&:asset_string)
         @new_sub_context_codes -= disallowed_sub_context_codes
 
-        new_sub_contexts = @new_sub_context_codes.map { |code|
+        new_sub_contexts = @new_sub_context_codes.filter_map { |code|
           next unless code =~ /\Acourse_section_(.*)/
 
           cs = CourseSection.where(id: $1).first
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
-        }.compact
+        }
       end
     end
 
@@ -201,14 +201,14 @@ class AppointmentGroup < ActiveRecord::Base
              "ON appointment_groups.id = agc.appointment_group_id " \
              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
              "ON appointment_groups.id = sc.appointment_group_id")
-      .where(<<~COND, codes[:primary], codes[:secondary])
+      .where(<<~SQL.squish, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
         AND (
           sc.sub_context_code IS NULL
           OR sc.sub_context_code IN (?)
         )
-      COND
+      SQL
   }
   # complements :manage permission
   scope :manageable_by, lambda { |*options|
@@ -225,14 +225,14 @@ class AppointmentGroup < ActiveRecord::Base
              "ON appointment_groups.id = agc.appointment_group_id " \
              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
              "ON appointment_groups.id = sc.appointment_group_id")
-      .where(<<~COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
+      .where(<<~SQL.squish, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
         AND (
           agc.context_code IN (?)
           OR sc.sub_context_code IN (?)
         )
-      COND
+      SQL
   }
   scope :current, -> { where("end_at>=?", Time.zone.now) }
   scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now) }
@@ -251,7 +251,7 @@ class AppointmentGroup < ActiveRecord::Base
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_section_ids = contexts.map { |c|
-          c.section_visibilities_for(user).map { |v| v[:course_section_id] }
+          c.section_visibilities_for(user).pluck(:course_section_id)
         }.flatten
         next true if (sub_context_ids - user_visible_section_ids).empty?
       end
@@ -371,7 +371,7 @@ class AppointmentGroup < ActiveRecord::Base
     return false unless min_appointments_per_participant
     return false if all_appointments_filled?
 
-    return reservations_for(participant).size < min_appointments_per_participant
+    reservations_for(participant).size < min_appointments_per_participant
   end
 
   def all_appointments_filled?
@@ -384,7 +384,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def participant_for(user)
     @participant_for ||= {}
-    return @participant_for[user.global_id] if @participant_for.has_key?(user.global_id)
+    return @participant_for[user.global_id] if @participant_for.key?(user.global_id)
 
     @participant_for[user.global_id] = begin
       participant = if participant_type == 'User'
@@ -417,13 +417,12 @@ class AppointmentGroup < ActiveRecord::Base
     :description,
     :location_name,
     :location_address
-  ]
+  ].freeze
 
   def update_appointments
-    changed = Hash[
+    changed =
       EVENT_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
-                      .map { |attr| [attr, send(attr)] }
-    ]
+                      .index_with { |attr| send(attr) }
 
     if @contexts_changed
       changed[:root_account_id] = self.context&.root_account_id
@@ -498,7 +497,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts_for_user(user)
     @contexts_for_user ||= {}
-    return @contexts_for_user[user.global_id] if @contexts_for_user.has_key?(user.global_id)
+    return @contexts_for_user[user.global_id] if @contexts_for_user.key?(user.global_id)
 
     @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
@@ -509,7 +508,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def context_codes_for_user(user)
     @context_codes_for_user ||= {}
-    return @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
+    return @context_codes_for_user[user.global_id] if @context_codes_for_user.key?(user.global_id)
 
     @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes

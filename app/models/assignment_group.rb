@@ -51,7 +51,7 @@ class AssignmentGroup < ActiveRecord::Base
   }, class_name: 'Assignment'
 
   validates :context_id, :context_type, :workflow_state, presence: true
-  validates :rules, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :rules, length: { maximum: maximum_text_length }, allow_blank: true
   validates :default_assignment_name, length: { maximum: maximum_string_length }, allow_nil: true
   validates :name, length: { maximum: maximum_string_length }, allow_nil: true
 
@@ -173,10 +173,8 @@ class AssignmentGroup < ActiveRecord::Base
     rule_string = ""
     rule_string += "drop_lowest:#{incoming_hash['drop_lowest']}\n" if incoming_hash['drop_lowest']
     rule_string += "drop_highest:#{incoming_hash['drop_highest']}\n" if incoming_hash['drop_highest']
-    if incoming_hash['never_drop']
-      incoming_hash['never_drop'].each do |r|
-        rule_string += "never_drop:#{r}\n"
-      end
+    incoming_hash['never_drop']&.each do |r|
+      rule_string += "never_drop:#{r}\n"
     end
     self.rules = rule_string
   end

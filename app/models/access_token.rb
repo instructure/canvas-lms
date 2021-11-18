@@ -211,8 +211,8 @@ class AccessToken < ActiveRecord::Base
     scopes.select { |scope| re =~ scope }.map do |scope|
       path = scope.split('|').last
       # build up the scope matching regexp from the route path
-      path = path.gsub(/:[^\/)]+/, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
-      path = path.gsub(/\*[^\/)]+/, '.+') # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(%r{:[^/)]+}, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(%r{\*[^/)]+}, '.+') # handle glob segments /files/*path -> /files/.+
       path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
       path = "#{path}(?:\\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
@@ -229,7 +229,7 @@ class AccessToken < ActiveRecord::Base
 
     scopes.size == req_scopes.size &&
       scopes.all? do |scope|
-        req_scopes.any? { |req_scope| scope[/(^|\/)#{req_scope}$/] }
+        req_scopes.any? { |req_scope| scope[%r{(^|/)#{req_scope}$}] }
       end
   end
 

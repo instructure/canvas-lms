@@ -52,7 +52,7 @@ module CanvasQuizStatistics::Analyzers
     metric :full_credit do |responses|
       full_credit = @question_data[:points_possible].to_f
 
-      responses.select { |response| response[:points].to_f >= full_credit }.length
+      responses.count { |response| response[:points].to_f >= full_credit }
     end
 
     # A set of scores and the number of students who received them.

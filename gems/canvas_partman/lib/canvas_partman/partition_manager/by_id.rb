@@ -41,7 +41,7 @@ module CanvasPartman
           partition_table = [base_class.table_name, partition].join('_')
           # make sure we're only moving rows for one partition at a time
           ids.reject! { |(_id, partitioning_field)| partitioning_field / base_class.partition_size != partition }
-          base_class.connection.execute(<<-SQL)
+          base_class.connection.execute(<<~SQL.squish)
             WITH x AS (
               DELETE FROM ONLY #{base_class.quoted_table_name}
               WHERE id IN (#{ids.map(&:first).join(', ')})
@@ -63,11 +63,11 @@ module CanvasPartman
         empties = 0
         partitions = partition_tables
 
-        if partitions.empty?
-          current = -1
-        else
-          current = partitions.last[base_class.table_name.length + 1..-1].to_i
-        end
+        current = if partitions.empty?
+                    -1
+                  else
+                    partitions.last[base_class.table_name.length + 1..].to_i
+                  end
 
         if self.partition_on_primary_key?
           partitions.reverse_each do |partition|
@@ -96,7 +96,7 @@ module CanvasPartman
       end
 
       def partition_tables
-        super.sort_by { |t| t[base_class.table_name.length + 1..-1].to_i }
+        super.sort_by { |t| t[base_class.table_name.length + 1..].to_i }
       end
 
       protected
@@ -119,7 +119,7 @@ module CanvasPartman
           else
             [reflection.klass]
           end
-        klasses.map { |klass| klass.maximum(klass.primary_key) }.compact.max
+        klasses.filter_map { |klass| klass.maximum(klass.primary_key) }.max
       end
 
       def table_regex

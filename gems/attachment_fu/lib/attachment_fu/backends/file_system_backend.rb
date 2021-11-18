@@ -61,7 +61,7 @@ module AttachmentFu # :nodoc:
       # Gets the public path to the file
       # The optional thumbnail argument will output the thumbnail's filename.
       def public_filename(thumbnail = nil)
-        full_filename(thumbnail).gsub %r(^#{Regexp.escape(base_path)}), ''
+        full_filename(thumbnail).gsub(/^#{Regexp.escape(base_path)}/, '')
       end
 
       def authenticated_s3_url(*args)
@@ -92,7 +92,9 @@ module AttachmentFu # :nodoc:
         filename
       end
 
-      def bucket_name; "no-bucket"; end
+      def bucket_name
+        "no-bucket"
+      end
 
       # Creates a temp file from the currently saved file.
       def create_temp_file

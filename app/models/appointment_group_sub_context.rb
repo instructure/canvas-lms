@@ -24,10 +24,10 @@ class AppointmentGroupSubContext < ActiveRecord::Base
 
   validates_each :sub_context do |record, attr, value|
     if record.participant_type == 'User'
-      record.errors.add(attr, t('errors.invalid_course_section', 'Invalid course section')) unless value.blank? || (value.is_a?(CourseSection) && record.appointment_group.contexts.any? { |c| c == value.course })
+      record.errors.add(attr, t('errors.invalid_course_section', 'Invalid course section')) unless value.blank? || (value.is_a?(CourseSection) && record.appointment_group.contexts.any?(value.course))
     else
       record.errors.add(attr, t('errors.missing_group_category', 'Group appointments must have a group category')) unless value.present? && value.is_a?(GroupCategory)
-      record.errors.add(attr, t('errors.invalid_group_category', 'Invalid group category')) unless value && record.appointment_group.contexts.any? { |c| c == value.context }
+      record.errors.add(attr, t('errors.invalid_group_category', 'Invalid group category')) unless value && record.appointment_group.contexts.any?(value.context)
     end
   end
 

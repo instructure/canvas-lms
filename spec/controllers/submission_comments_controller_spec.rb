@@ -41,7 +41,7 @@ RSpec.describe SubmissionCommentsController do
 
         specify { expect(response).to have_http_status :ok }
         specify { expect(response).to render_template(:index) }
-        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Aapplication/pdf}) }
       end
 
       context "when course is in a concluded term" do
@@ -55,7 +55,7 @@ RSpec.describe SubmissionCommentsController do
 
         specify { expect(response).to have_http_status :ok }
         specify { expect(response).to render_template(:index) }
-        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Aapplication/pdf}) }
       end
 
       context 'given a request where no submission is present' do
@@ -67,7 +67,7 @@ RSpec.describe SubmissionCommentsController do
 
         specify { expect(response).to have_http_status :not_found }
         specify { expect(response).to render_template('shared/errors/404_message') }
-        specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
       end
 
       context 'given a request where no submission comments are present' do
@@ -78,7 +78,7 @@ RSpec.describe SubmissionCommentsController do
 
         specify { expect(response).to have_http_status :ok }
         specify { expect(response).to render_template(:index) }
-        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Aapplication/pdf}) }
       end
 
       context 'given an anonymized assignment' do
@@ -89,7 +89,7 @@ RSpec.describe SubmissionCommentsController do
 
         specify { expect(response).to have_http_status :unauthorized }
         specify { expect(response).to render_template('shared/unauthorized') }
-        specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe SubmissionCommentsController do
 
       specify { expect(response).to have_http_status :unauthorized }
       specify { expect(response).to render_template('shared/unauthorized') }
-      specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+      specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
     end
   end
 

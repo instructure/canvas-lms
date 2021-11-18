@@ -47,12 +47,12 @@ describe Mutations::UpdateConversationParticipants do
   end
 
   it "updates the requesting user's participation record" do
-    query = <<~QUERY
+    query = <<~GQL
       conversationIds: [#{conv.id}],
       starred: true,
       subscribed: false,
       workflowState: "archived"
-    QUERY
+    GQL
     participant = sender.all_conversations.find_by(conversation: conv)
     expect(participant).to be_subscribed
     expect(participant).to be_read
@@ -82,17 +82,17 @@ describe Mutations::UpdateConversationParticipants do
     end
 
     it "fails if the conversation doesn't exist" do
-      query = <<~QUERY
+      query = <<~GQL
         conversationIds: [#{Conversation.maximum(:id)&.next || 0}]
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find Conversation')
     end
 
     it "fails if the requesting user is not a participant" do
-      query = <<~QUERY
+      query = <<~GQL
         conversationIds: [#{conv.id}]
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: user_model)
       expect_error(result, 'Insufficient permissions')
     end
@@ -103,10 +103,10 @@ describe Mutations::UpdateConversationParticipants do
       let(:conv2) { conversation(sender, user_model).conversation }
 
       it "updates each view" do
-        query = <<~QUERY
+        query = <<~GQL
           conversationIds: [#{conv.id}, #{conv2.id}],
           starred: true
-        QUERY
+        GQL
         participant1 = sender.all_conversations.find_by(conversation: conv)
         expect(participant1.starred).to be_falsey
         participant2 = sender.all_conversations.find_by(conversation: conv2)
@@ -137,10 +137,10 @@ describe Mutations::UpdateConversationParticipants do
       end
 
       it "handles valid data and errors on invalid" do
-        query = <<~QUERY
+        query = <<~GQL
           conversationIds: [#{conv.id}, #{another_conv.id}, #{invalid_id}],
           starred: true
-        QUERY
+        GQL
         participant = sender.all_conversations.find_by(conversation: conv)
         expect(participant.starred).to be_falsey
 

@@ -144,6 +144,7 @@ describe "Course Account Reports" do
                                "Math 101", nil, nil]
     end
   end
+
   describe "Unused Course report" do
     before(:once) do
       @type = 'unused_courses_csv'

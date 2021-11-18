@@ -116,8 +116,7 @@ module MicrosoftSync
 
     # Used as a helper to enqueue actual delayed jobs
     def direct_enqueue_run(run_at, step, initial_mem_state)
-      StateMachineJob.instance_method(:delay).bind(self)
-                     .call(sender: self, strand: strand, run_at: run_at)
+      StateMachineJob.instance_method(:delay).bind_call(self, sender: self, strand: strand, run_at: run_at)
                      .run(step, initial_mem_state)
     end
 

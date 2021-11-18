@@ -39,9 +39,9 @@ class Pseudonym < ActiveRecord::Base
 
   CAS_TICKET_TTL = 1.day
 
-  validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
-  validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
-  validates_presence_of :account_id
+  validates :unique_id, length: { :maximum => MAX_UNIQUE_ID_LENGTH }
+  validates :sis_user_id, length: { :maximum => maximum_string_length, :allow_blank => true }
+  validates :account_id, presence: true
   validate :must_be_root_account
   # allows us to validate the user and pseudonym together, before saving either
   validates_each :user_id do |record, attr, value|
@@ -366,7 +366,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def email
-    user.email if user
+    user&.email
   end
 
   def email_channel
@@ -382,7 +382,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def sms
-    user.sms if user
+    user&.sms
   end
 
   def sms=(s)
@@ -445,12 +445,12 @@ class Pseudonym < ActiveRecord::Base
   def valid_ssha?(plaintext_password)
     return false if plaintext_password.blank? || self.sis_ssha.blank?
 
-    decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
+    decoded = Base64.decode64(self.sis_ssha.delete_prefix('{SSHA}'))
     digest = decoded[0, 40]
-    salt = decoded[40..-1]
+    salt = decoded[40..]
     return false unless digest && salt
 
-    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first
+    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack1('H*')
     digest == digested_password
   end
 
@@ -534,7 +534,9 @@ class Pseudonym < ActiveRecord::Base
   scope :active_only, -> { where(workflow_state: 'active') }
   scope :deleted, -> { where(workflow_state: 'deleted') }
 
-  def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
+  def self.serialization_excludes
+    [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]
+  end
 
   def self.associated_shards(_unique_id_or_sis_user_id)
     [Shard.default]

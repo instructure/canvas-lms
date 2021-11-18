@@ -557,7 +557,7 @@ describe "Feature Flags API", type: :request do
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
                                                                                            custom_transition_proc: ->(_user, _context, from_state, transitions) do
                                                                                                                      transitions['off'] = { 'locked' => true, 'message' => "don't ever turn this off" } if from_state == 'on'
-                                                                                                                     transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.has_key?('on')
+                                                                                                                     transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.key?('on')
                                                                                                                    end),
                                                            'compact_live_event_payloads' => live_event_feature,
                                                            'granular_permissions_manage_courses' => granular_permissions_feature

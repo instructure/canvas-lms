@@ -316,7 +316,7 @@ class OutcomesApiController < ApplicationController
         .select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types")
         .joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'")
         .joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'")
-        .where('assignments.workflow_state NOT IN (?)', assignment_states)
+        .where.not(assignments: { workflow_state: assignment_states })
         .to_sql).to_a
       alignments.each { |a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}" }
 
@@ -326,10 +326,10 @@ class OutcomesApiController < ApplicationController
                 .select(:title, :id, :assignment_id).preload(:quiz_questions)
                 .joins(assignment: :submissions)
                 .where(context: course)
-                .where("submissions.user_id = ?", student_id)
+                .where(submissions: { user_id: student_id })
                 .where("submissions.workflow_state <> 'deleted'")
       quiz_alignments = quizzes.map do |quiz|
-        bank_ids = quiz.quiz_questions.map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.compact.uniq
+        bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq
         outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
         outcome_ids.map do |id|
           {

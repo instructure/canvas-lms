@@ -443,8 +443,8 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.map { |x| x[:id] }).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
-      expect(new_help_links.map { |x| x[:id] }).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
+      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
+      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 
@@ -608,24 +608,6 @@ describe "admin settings tab" do
       else
         expect(features_text).to include(feature.display_name.call)
       end
-    end
-  end
-
-  context 'feature flag search and filters' do
-    before do
-      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
-      Account.site_admin.enable_feature!(:feature_flag_filters)
-    end
-
-    it 'allows for searching and deleting a feature flag filter ' do
-      go_to_feature_options(Account.site_admin.id)
-      select_filter_option('Pending Enforcement')
-      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
-
-      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
-      f(pending_enforcement_filter_button_selector).click
-      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
     end
   end
 

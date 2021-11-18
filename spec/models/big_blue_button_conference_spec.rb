@@ -73,11 +73,11 @@ describe BigBlueButtonConference do
 
     it "recreates the conference" do
       allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
       # load a new instance to clear out @conference_active
       @conference = WebConference.find(@conference.id)
       allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
     end
 
     it "does not recreate the conference if it is active" do
@@ -86,7 +86,7 @@ describe BigBlueButtonConference do
                                                                                             })
       @conference.initiate_conference
       expect(@conference).to be_active
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
     end
 
     it "has a well formed user string as for recording_user_ready" do
@@ -110,8 +110,8 @@ describe BigBlueButtonConference do
   end
 
   describe 'plugin setting recording_enabled is enabled' do
-    let(:get_recordings_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json')) }
-    let(:get_recordings_bulk_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_bulk.json')) }
+    let(:get_recordings_fixture) { Rails.root.join('spec/fixtures/files/conferences/big_blue_button_get_recordings_two.json').read }
+    let(:get_recordings_bulk_fixture) { Rails.root.join('spec/fixtures/files/conferences/big_blue_button_get_recordings_bulk.json').read }
 
     before do
       allow(WebConference).to receive(:plugins).and_return([
@@ -247,8 +247,8 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
 
       it "makes a separate api call for old conferences" do
@@ -273,8 +273,8 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
 
       it "does not make a call for conferences without keys" do
@@ -304,7 +304,7 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         expect(@bbb2).to_not receive(:send_request)
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
     end
   end

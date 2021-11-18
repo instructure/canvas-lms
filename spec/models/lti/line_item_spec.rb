@@ -89,6 +89,7 @@ RSpec.describe Lti::LineItem, type: :model do
 
   it_behaves_like "soft deletion" do
     subject { Lti::LineItem }
+
     let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
   end
 

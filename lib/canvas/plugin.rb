@@ -89,11 +89,11 @@ module Canvas
     end
 
     [:name, :description, :website, :author, :author_website].each do |method|
-      class_eval <<-METHOD
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}
           t_if_proc(@meta[:#{method}]) || ''
         end
-      METHOD
+      RUBY
     end
 
     def setting(name)
@@ -135,7 +135,7 @@ module Canvas
     end
 
     def translate(key, default, options = {})
-      key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
+      key = "canvas.plugins.#{@id}.#{key}" unless key.start_with?('#')
       I18n.translate(key, default, options)
     end
     alias_method :t, :translate
@@ -199,7 +199,7 @@ module Canvas
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized
 
-      return value.to_i != 0
+      value.to_i != 0
     end
   end
 

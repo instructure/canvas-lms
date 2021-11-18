@@ -81,6 +81,7 @@ describe ObserverEnrollment do
       end
     end
   end
+
   describe 'observed_student_ids_by_observer_id' do
     it "returns a properly formatted hash" do
       @observer_two = user_factory

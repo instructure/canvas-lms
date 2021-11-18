@@ -79,7 +79,7 @@ if Qti.migration_executable
         :points_possible => 1,
         :question_type => "multiple_choice_question",
         :question_text =>
-                      "A peer review team is reviewing a course.  They are considering Standard 1.1.  Reviewer 1 scores the standard \"No.\"  Reviewer 2 scores the standard \"No.\" The Master Reviewer scores the standard \"Yes.\" How many points will the course receive for Standard 1.1?" }
+                      "A peer review team is reviewing a course.  They are considering Standard 1.1.  Reviewer 1 scores the standard \"No.\"  Reviewer 2 scores the standard \"No.\" The Master Reviewer scores the standard \"Yes.\" How many points will the course receive for Standard 1.1?" }.freeze
     TRUE_FALSE =
       { :question_type => "multiple_choice_question",
         :migration_id => "0ee472e8-5bc2-4b30-a341-2fa93a50bc54",
@@ -91,7 +91,7 @@ if Qti.migration_executable
         :incorrect_comments => "",
         :correct_comments => "",
         :points_possible => 1,
-        :question_name => "" }
+        :question_name => "" }.freeze
 
     MULTIPLE_ANSWER =
       { :points_possible => 1,
@@ -117,7 +117,7 @@ if Qti.migration_executable
         :incorrect_comments =>
                       "The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer. While an instructional designer may be involved in preparing the course for review or may happen to be one of the reviewers, QM does not require that an instructional designer be part of the review team. Likewise, while the peer reviewers examine the course from the perspective of a student, students do not review the course in a QM review.",
         :correct_comments =>
-                      "Correct! The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer." }
+                      "Correct! The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer." }.freeze
     ESSAY =
       { :incorrect_comments => "",
         :correct_comments => "",
@@ -127,7 +127,7 @@ if Qti.migration_executable
         :question_type => "essay_question",
         :migration_id => "f6129250-3baf-4128-8c81-efc5d495eef1",
         :question_text =>
-                      "Explain what happens when a course meets expectations and when a course does not meet expectations." }
+                      "Explain what happens when a course meets expectations and when a course does not meet expectations." }.freeze
     ASSESSMENT =
       { :grading =>
                { :grade_type => "numeric",
@@ -158,6 +158,6 @@ if Qti.migration_executable
                          :migration_id => "ID_0ee472e8-5bc2-4b30-a341-2fa93a50bc54" },
                        { :question_type => "question_reference",
                          :migration_id => "ID_3f9f4eed-4698-4690-9f9d-851b31ce5eb0" }],
-        :points_possible => "237.0" }
+        :points_possible => "237.0" }.freeze
   end
 end

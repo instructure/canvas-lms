@@ -561,8 +561,8 @@ class OutcomeGroupsApiController < ApplicationController
     begin
       @outcome_link.destroy
       render :json => outcome_link_json(@outcome_link, @current_user, session)
-    rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
-      render :json => { 'message' => error.message }, :status => :bad_request
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
+      render :json => { 'message' => e.message }, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request
     end

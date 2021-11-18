@@ -99,7 +99,10 @@ describe EportfoliosController do
     end
 
     it "prevents creation for unverified users if account requires it" do
-      Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
+      Account.default.tap { |a|
+        a.settings[:require_confirmed_email] = true
+        a.save!
+      }
 
       user_session(@user)
       post 'create', params: { :eportfolio => { :name => "some portfolio" } }
@@ -466,7 +469,7 @@ describe EportfoliosController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "includes an author for each entry" do

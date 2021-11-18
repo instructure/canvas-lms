@@ -51,12 +51,12 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
   describe '[:answers][]' do
     describe '[:id]' do
       it 'stringifies ids' do
-        expect(subject.run([])[:answers].map { |a| a[:id] }.sort).to eq(%w[
-                                                                          3023
-                                                                          5646
-                                                                          7907
-                                                                          8899
-                                                                        ])
+        expect(subject.run([])[:answers].pluck(:id).sort).to eq(%w[
+                                                                  3023
+                                                                  5646
+                                                                  7907
+                                                                  8899
+                                                                ])
       end
     end
 

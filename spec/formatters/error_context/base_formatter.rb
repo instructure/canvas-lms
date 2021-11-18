@@ -123,7 +123,7 @@ module ErrorContext
       end
 
       def base_error_path
-        @base_error_path ||= ENV.fetch("ERROR_CONTEXT_BASE_PATH", Rails.root.join("log", "spec_failures", "Initial"))
+        @base_error_path ||= ENV.fetch("ERROR_CONTEXT_BASE_PATH", Rails.root.join("log/spec_failures/Initial"))
       end
     end
 
@@ -215,7 +215,7 @@ module ErrorContext
     end
 
     def spec_path
-      @spec_path ||= RerunArgument.for(example).sub(/\A[.\/]+/, "")
+      @spec_path ||= RerunArgument.for(example).sub(%r{\A[./]+}, "")
     end
 
     def errors_path

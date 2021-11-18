@@ -19,13 +19,14 @@
 #
 
 require 'net/imap'
-require File.expand_path('../configurable_timeout', __FILE__)
+
+require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class ImapMailbox
     include ConfigurableTimeout
 
-    UsedImapMethods = [:login, :logout, :disconnect, :select, :search, :fetch, :expunge, :store, :list, :create, :copy]
+    UsedImapMethods = [:login, :logout, :disconnect, :select, :search, :fetch, :expunge, :store, :list, :create, :copy].freeze
 
     attr_accessor :server, :port, :ssl, :username, :password, :folder, :filter
 

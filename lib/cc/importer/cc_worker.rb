@@ -56,12 +56,12 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
 
       if overview_file_path
         file = File.new(overview_file_path)
-        Canvas::Migration::Worker::upload_overview_file(file, cm)
+        Canvas::Migration::Worker.upload_overview_file(file, cm)
         cm.update_conversion_progress(95)
       end
       if export_folder_path
-        Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
-        Canvas::Migration::Worker::clear_exported_data(export_folder_path)
+        Canvas::Migration::Worker.upload_exported_data(export_folder_path, cm)
+        Canvas::Migration::Worker.clear_exported_data(export_folder_path)
       end
 
       cm.migration_settings[:worker_class] = converter_class.name
@@ -84,7 +84,7 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
     rescue Canvas::Migration::Error, Attachment::OverQuotaError => e
       cm.fail_with_error!(e, error_message: e.message, issue_level: :warning)
     rescue => e
-      cm.fail_with_error!(e) if cm
+      cm&.fail_with_error!(e)
     end
   end
 

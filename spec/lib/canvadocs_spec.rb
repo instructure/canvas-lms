@@ -457,7 +457,7 @@ describe Canvadocs do
 
             it 'omits other graders when comments from other graders are hidden' do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expect(user_filter_ids).to match_array([student.global_id.to_s, provisional_grader.global_id.to_s])
             end
 
@@ -489,7 +489,7 @@ describe Canvadocs do
 
             it 'always includes other graders when the final grader is viewing' do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expected_ids = [final_grader.global_id.to_s, provisional_grader.global_id.to_s, student.global_id.to_s]
               expect(user_filter_ids).to match_array(expected_ids)
             end
@@ -752,7 +752,7 @@ describe Canvadocs do
 
             it 'omits other graders when comments from other graders are hidden' do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expect(user_filter_ids).to match_array([student.global_id.to_s, provisional_grader.global_id.to_s])
             end
 
@@ -784,7 +784,7 @@ describe Canvadocs do
 
             it 'always includes other graders when the final grader is viewing' do
               assignment.update!(grader_comments_visible_to_graders: false)
-              user_filter_ids = user_filter.map { |entry| entry[:id] }
+              user_filter_ids = user_filter.pluck(:id)
               expected_ids = [final_grader.global_id.to_s, provisional_grader.global_id.to_s, student.global_id.to_s]
               expect(user_filter_ids).to match_array(expected_ids)
             end

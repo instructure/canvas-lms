@@ -125,7 +125,7 @@ describe ContextModule do
           @mod1.save!
         end
 
-        Timecop.freeze(2.second.ago) do
+        Timecop.freeze(2.seconds.ago) do
           @mod2 = @course.context_modules.create!(:name => "dependant module")
           @mod2.prerequisites = "module_#{@mod1.id}"
           @mod2.save!
@@ -174,7 +174,7 @@ describe ContextModule do
         expect(response).to be_successful
         html = Nokogiri::HTML5(response.body)
         if @is_attachment
-          expect(html.at_css('#file_content')['src']).to match %r{#{@test_url.split("?").first}}
+          expect(html.at_css('#file_content')['src']).to match(/#{@test_url.split("?").first}/)
         elsif @is_wiki_page
           expect(html.css('#wiki_page_show').length).to eq 1
         else

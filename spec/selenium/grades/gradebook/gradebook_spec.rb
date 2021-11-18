@@ -298,7 +298,7 @@ describe "Gradebook" do
       f('[data-menu-item-id="reupload-submissions"]').click
 
       # When I attach a submissions zip file
-      fixture_file = Rails.root.join('spec', 'fixtures', 'files', 'submissions.zip')
+      fixture_file = Rails.root.join('spec/fixtures/files/submissions.zip')
       f('input[name=submissions_zip]').send_keys(fixture_file)
 
       # And I upload it

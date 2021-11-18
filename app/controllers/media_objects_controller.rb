@@ -232,7 +232,7 @@ class MediaObjectsController < ApplicationController
 
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
-    mo.viewed! if mo
+    mo&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
@@ -257,7 +257,7 @@ class MediaObjectsController < ApplicationController
                                                             :width => width,
                                                             :height => height,
                                                             :type => type),
-                  :status => 301
+                  :status => :moved_permanently
     else
       render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end

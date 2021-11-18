@@ -179,6 +179,7 @@ describe CanvasPartman::Concerns::Partitioned do
 
   context :by_id do
     subject { CanvasPartman::PartitionManager.create(Trail) }
+
     let(:zoo) { Zoo.create! }
 
     describe 'creating records' do

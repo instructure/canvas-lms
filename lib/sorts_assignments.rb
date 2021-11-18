@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SortsAssignments
-  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :unsubmitted, :upcoming, :future]
+  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :unsubmitted, :upcoming, :future].freeze
   AssignmentsSortedByDueDate = Struct.new(*VALID_BUCKETS)
 
   class << self
@@ -94,7 +94,8 @@ class SortsAssignments
     end
 
     def without_graded_submission(assignments, submissions)
-      assignments ||= []; submissions ||= [];
+      assignments ||= []
+      submissions ||= []
       submissions_by_assignment = submissions.inject({}) do |memo, sub|
         memo[sub.assignment_id] = sub
         memo
