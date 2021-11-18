@@ -226,6 +226,10 @@ Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
   Severity: error
+Style/NegatedUnless:
+  Severity: error
+Style/NegatedWhile:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/OrAssignment:

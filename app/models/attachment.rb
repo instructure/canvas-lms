@@ -777,7 +777,7 @@ class Attachment < ActiveRecord::Base
         valid_name = false
         self.shard.activate do
           iter_count = 1
-          while !valid_name
+          until valid_name
             existing_names = self.folder.active_file_attachments.where.not(id: self.id).pluck(:display_name)
             new_name = opts[:name] || self.display_name
             self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)

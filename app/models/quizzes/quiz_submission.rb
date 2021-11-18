@@ -165,7 +165,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def temporary_data
-    raise "Cannot view temporary data for completed quiz" unless !self.completed?
+    raise "Cannot view temporary data for completed quiz" if self.completed?
     raise "Cannot view temporary data for completed quiz" if graded?
 
     (self.submission_data || {}).with_indifferent_access
