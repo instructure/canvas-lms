@@ -815,7 +815,7 @@ class User < ActiveRecord::Base
 
     # Doe, John, Sr.
     # Otherwise change Ho, Chi, Min to Ho, Chi Min
-    if suffix && !(suffix =~ SUFFIXES)
+    if suffix && suffix !~ SUFFIXES
       given = "#{given} #{suffix}"
       suffix = nil
     end

@@ -219,6 +219,8 @@ Style/HashTransformKeys:
   Severity: error
 Style/HashTransformValues:
   Severity: error
+Style/InverseMethods:
+  Severity: error
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line

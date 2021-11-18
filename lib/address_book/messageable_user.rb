@@ -135,7 +135,7 @@ module AddressBook
 
       # but then prefer in-process cache over rails cache. if they differ, we
       # can pretty much guarantee the in-process cache is fresher.
-      newly_loaded = loaded.select { |user| !cached?(user) }
+      newly_loaded = loaded.reject { |user| cached?(user) }
       newly_loaded.each { |user| @cache.store(user, user.common_courses, user.common_groups) }
     end
   end

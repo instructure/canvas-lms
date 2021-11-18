@@ -168,7 +168,7 @@ class Notification < Switchman::UnshardedRecord
     # and we don't allow editing system notification types
     @configurable_types ||= YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
                                 .map(&:first).map(&:last)
-                                .select { |type| !type.include?('DEPRECATED') }
+                                .reject { |type| type.include?('DEPRECATED') }
                                 .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end
 

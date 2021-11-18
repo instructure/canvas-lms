@@ -174,7 +174,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def question_answered?(id)
     keys = temporary_data.keys.select { |key|
       # find keys with answers for this question; skip question_x_marked and _read
-      (key =~ /question_#{id}(_|$)/) && !(key =~ /_(marked|read)$/)
+      (key =~ /question_#{id}(_|$)/) && key !~ /_(marked|read)$/
     }
 
     if keys.present?

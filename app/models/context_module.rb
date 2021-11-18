@@ -258,9 +258,7 @@ class ContextModule < ActiveRecord::Base
   def duplicate
     copy_title = get_copy_title(self, t("Copy"), self.name)
     new_module = duplicate_base_model(copy_title)
-    living_tags = self.content_tags.select do |content_tag|
-      !content_tag.deleted?
-    end
+    living_tags = self.content_tags.reject(&:deleted?)
     new_module.content_tags = living_tags.map do |content_tag|
       duplicate_content_tag(content_tag)
     end
@@ -625,7 +623,7 @@ class ContextModule < ActiveRecord::Base
   def cached_not_deleted_tags
     @cached_not_deleted_tags ||= if self.content_tags.loaded?
                                    # don't reload the preloaded content
-                                   self.content_tags.select { |tag| !tag.deleted? }
+                                   self.content_tags.reject(&:deleted?)
                                  else
                                    self.content_tags.not_deleted.to_a
                                  end
@@ -851,7 +849,7 @@ class ContextModule < ActiveRecord::Base
     progressions = self.context_module_progressions.where(user_id: users)
     progressions_hash = {}
     progressions.each { |p| progressions_hash[p.user_id] = p }
-    newbies = users.select { |u| !progressions_hash[u.id] }
+    newbies = users.reject { |u| progressions_hash[u.id] }
     progressions += newbies.map { |u| find_or_create_progression(u) }
     progressions.each { |p| p.user = users_hash[p.user_id] }
     progressions.uniq

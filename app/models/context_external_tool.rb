@@ -687,7 +687,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
 
-    sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| !!settings[type] }.map(&:to_s))
+    sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| settings[type] }.map(&:to_s))
     true
   end
 

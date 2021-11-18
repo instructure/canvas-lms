@@ -122,7 +122,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     ]
     # We require that the 4 arguments listed above be present in order
     # to update notification policies or policy overrides
-    if !policy_update_input.all? && !policy_update_input.none?
+    if !policy_update_input.all? && policy_update_input.any?
       err_klass = ::Mutations::UpdateNotificationPreferences::ValidationError
       raise err_klass, I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
     end

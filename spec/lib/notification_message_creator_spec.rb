@@ -431,16 +431,16 @@ describe NotificationMessageCreator do
       allow(User).to receive(:max_messages_per_day).and_return(1)
       User.max_messages_per_day.times do
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        expect(messages.select { |m| m.to != 'dashboard' }).not_to be_empty
+        expect(messages.reject { |m| m.to == 'dashboard' }).not_to be_empty
       end
       expect(DelayedMessage.count).to eql(0)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to != 'dashboard' }).to be_empty
+      expect(messages.reject { |m| m.to == 'dashboard' }).to be_empty
       expect(DelayedMessage.count).to eql(1)
       expect(NotificationPolicy.count).to eq 2
       # should not create more dummy policies
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to != 'dashboard' }).to be_empty
+      expect(messages.reject { |m| m.to == 'dashboard' }).to be_empty
       expect(NotificationPolicy.count).to eq 2
     end
 

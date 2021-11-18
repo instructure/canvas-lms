@@ -620,7 +620,7 @@ class GroupsController < ApplicationController
           end
         end
 
-        if !@group.errors.any?
+        if @group.errors.none?
           @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }

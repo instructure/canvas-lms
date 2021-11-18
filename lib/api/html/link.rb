@@ -82,7 +82,7 @@ module Api
       end
 
       def is_not_actually_a_file_link?
-        !(link =~ FILE_LINK_REGEX)
+        link !~ FILE_LINK_REGEX
       end
 
       def attachment

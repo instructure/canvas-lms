@@ -1282,7 +1282,7 @@ class DiscussionTopicsController < ApplicationController
         @topic.update(discussion_topic_hash)
         @topic.root_topic.try(:save)
       end
-      if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)
+      if @topic.errors.none? && !@topic.root_topic.try(:errors).try(:any?)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
 
         apply_positioning_parameters

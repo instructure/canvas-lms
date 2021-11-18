@@ -206,11 +206,11 @@ class ProfileController < ApplicationController
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select { |c| c.path_type == "email" }
     @sms_channels = @channels.select { |c| c.path_type == 'sms' }
-    @other_channels = @channels.select { |c| c.path_type != "email" }
+    @other_channels = @channels.reject { |c| c.path_type == "email" }
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active_only
-    @password_pseudonyms = @pseudonyms.select { |p| !p.managed_password? }
+    @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
     js_env :enable_gravatar => @domain_root_account&.enable_gravatar?

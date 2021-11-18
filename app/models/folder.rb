@@ -381,7 +381,7 @@ class Folder < ActiveRecord::Base
     key = [context.global_asset_string, path].join('//')
     return @@path_lookups[key] if @@path_lookups[key]
 
-    folders = path.split('/').select { |f| !f.empty? }
+    folders = path.split('/').reject(&:empty?)
     @@root_folders ||= {}
     current_folder = (@@root_folders[context.global_asset_string] ||= Folder.root_folders(context).first)
     if folders[0] == current_folder.name

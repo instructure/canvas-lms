@@ -83,7 +83,7 @@ module Qti
           # raise warning if the left hand side of the answers also has images
           @question[:import_warnings] ||= []
           @question[:import_warnings] << I18n.t(:qti_img_matching_question, "Imported matching question contains images on both sides, which is unsupported")
-        elsif @question[:matches].any? { |m| m[:match_id].present? && !@question[:answers].any? { |a| a[:match_id] == m[:match_id] } }
+        elsif @question[:matches].any? { |m| m[:match_id].present? && @question[:answers].none? { |a| a[:match_id] == m[:match_id] } }
           # or if there are distractors
           @question[:import_warnings] ||= []
           @question[:import_warnings] << I18n.t(:qti_img_matching_question_distractors, "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors")
