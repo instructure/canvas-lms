@@ -28,7 +28,8 @@ import {
   isFileLink,
   isImageEmbed,
   isVideoElement,
-  findVideoPlayerIframe
+  isAudioElement,
+  findMediaPlayerIframe
 } from '../ContentSelection'
 import FakeEditor from './FakeEditor'
 
@@ -295,27 +296,27 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
     })
   })
 
-  describe('findVideoPlayerIframe', () => {
-    let wrapper, videoIframe, shim
+  describe('findMediaPlayerIframe', () => {
+    let wrapper, mediaIframe, shim
     beforeEach(() => {
       wrapper = document.createElement('span')
-      videoIframe = document.createElement('iframe')
+      mediaIframe = document.createElement('iframe')
       shim = document.createElement('span')
       shim.setAttribute('class', 'mce-shim')
-      wrapper.appendChild(videoIframe)
+      wrapper.appendChild(mediaIframe)
       wrapper.appendChild(shim)
     })
     it('returns the iframe if given the video iframe', () => {
-      const result = findVideoPlayerIframe(videoIframe)
-      expect(result).toEqual(videoIframe)
+      const result = findMediaPlayerIframe(mediaIframe)
+      expect(result).toEqual(mediaIframe)
     })
     it('returns the iframe if given the tinymce wrapper span', () => {
-      const result = findVideoPlayerIframe(wrapper)
-      expect(result).toEqual(videoIframe)
+      const result = findMediaPlayerIframe(wrapper)
+      expect(result).toEqual(mediaIframe)
     })
     it('returns the iframe if given the shim', () => {
-      const result = findVideoPlayerIframe(shim)
-      expect(result).toEqual(videoIframe)
+      const result = findMediaPlayerIframe(shim)
+      expect(result).toEqual(mediaIframe)
     })
   })
 
@@ -327,6 +328,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(isFileLink($selectedNode, editor)).toBeTruthy()
       expect(isImageEmbed($selectedNode)).toBeFalsy()
       expect(isVideoElement($selectedNode)).toBeFalsy()
+      expect(isAudioElement($selectedNode)).toBeFalsy()
     })
 
     it('detect an embeded image', () => {
@@ -336,6 +338,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(isFileLink($selectedNode, editor)).toBeFalsy()
       expect(isImageEmbed($selectedNode)).toBeTruthy()
       expect(isVideoElement($selectedNode)).toBeFalsy()
+      expect(isAudioElement($selectedNode)).toBeFalsy()
     })
 
     it('detect a video element', () => {
@@ -347,6 +350,19 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(isFileLink($selectedNode, editor)).toBeFalsy()
       expect(isImageEmbed($selectedNode)).toBeFalsy()
       expect(isVideoElement($selectedNode)).toBeTruthy()
+      expect(isAudioElement($selectedNode)).toBeFalsy()
+    })
+
+    it('detect an audio element', () => {
+      const $selectedNode = document.createElement('span')
+      $selectedNode.setAttribute('data-mce-p-data-media-id', 'm-id')
+      $selectedNode.setAttribute('data-mce-p-data-media-type', 'audio')
+      $selectedNode.innerHTML = '<iframe/>'
+      editor.setSelectedNode($selectedNode)
+      expect(isFileLink($selectedNode, editor)).toBeFalsy()
+      expect(isImageEmbed($selectedNode)).toBeFalsy()
+      expect(isVideoElement($selectedNode)).toBeFalsy()
+      expect(isAudioElement($selectedNode)).toBeTruthy()
     })
 
     it('ignore some random markup', () => {
@@ -356,6 +372,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(isFileLink($selectedNode, editor)).toBeFalsy()
       expect(isImageEmbed($selectedNode)).toBeFalsy()
       expect(isVideoElement($selectedNode)).toBeFalsy()
+      expect(isAudioElement($selectedNode)).toBeFalsy()
     })
   })
 })
