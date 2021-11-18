@@ -270,6 +270,8 @@ Style/RedundantCondition:
   Severity: error
 Style/RedundantInterpolation:
   Severity: error
+Style/RedundantFileExtensionInRequire:
+  Severity: error
 Style/RedundantFreeze:
   Severity: error
 Style/RedundantParentheses:
