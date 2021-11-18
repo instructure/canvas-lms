@@ -42,7 +42,7 @@ module BasicLTI
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
         sourcedid = BasicLTI::Sourcedid.load!(sourceid)
-        raise BasicLTI::Errors::InvalidSourceId, 'Tool is invalid' unless tool == sourcedid.tool
+        raise BasicLTI::Errors::InvalidSourceId.new('Tool is invalid', :tool_invalid) unless tool == sourcedid.tool
 
         return sourcedid.assignment, sourcedid.user
       end
@@ -74,7 +74,7 @@ module BasicLTI
 
     class LtiResponse
       include TextHelper
-      attr_accessor :code_major, :severity, :description, :body
+      attr_accessor :code_major, :severity, :description, :body, :error_code
 
       def initialize(lti_request)
         @lti_request = lti_request
@@ -141,6 +141,10 @@ module BasicLTI
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_messageRefIdentifier').content = message_ref_identifier
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_operationRefIdentifier').content = operation_ref_identifier
         xml.at_css('imsx_POXBody').inner_html = body if body.present?
+
+        error_code_node = xml.at_css('imsx_POXHeader imsx_statusInfo ext_canvas_error_code')
+        error_code.present? ? error_code_node.content = error_code : error_code_node.remove
+
         xml.to_s
       end
 
@@ -159,6 +163,7 @@ module BasicLTI
                   <imsx_description></imsx_description>
                   <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
                   <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
+                  <ext_canvas_error_code></ext_canvas_error_code>
                 </imsx_statusInfo>
               </imsx_POXResponseHeaderInfo>
             </imsx_POXHeader>
@@ -182,8 +187,7 @@ module BasicLTI
         begin
           assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue Errors::InvalidSourceId => e
-          self.code_major = 'failure'
-          self.description = e.to_s
+          report_failure(e.code, e.to_s)
           self.body = "<#{operation_ref_identifier}Response />"
           return true
         end
@@ -191,8 +195,7 @@ module BasicLTI
         op = self.operation_ref_identifier.underscore
         # Write results are disabled for concluded users, read results are still allowed
         if op != 'read_result' && !user_enrollment_active?(assignment, user)
-          self.code_major = 'failure'
-          self.description = 'Course not available for student'
+          report_failure(:course_not_available, 'Course not available for student')
           self.body = "<#{operation_ref_identifier}Response />"
           return true
         elsif self.respond_to?("handle_#{op}", true)
@@ -240,25 +243,38 @@ module BasicLTI
 
       protected
 
+      def report_failure(code, description)
+        self.code_major = "failure"
+        self.description = description
+        self.error_code = code
+      end
+
+      def failure?
+        self.code_major == "failure"
+      end
+
       def handle_replace_result(tool, assignment, user)
         text_value = self.result_score
         score_value = self.result_total_score
-        error_message = nil
         begin
           new_score = Float(text_value)
         rescue
           new_score = false
-          error_message = text_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, :grade => text_value)
-            Unable to parse resultScore: %{grade}
-          TEXT
+          unless text_value.nil?
+            report_failure(:no_parseable_result_score, I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, :grade => text_value))
+              Unable to parse resultScore: %{grade}
+            TEXT
+          end
         end
         begin
           raw_score = Float(score_value)
         rescue
           raw_score = false
-          error_message ||= score_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, :grade => score_value)
-            Unable to parse resultTotalScore: %{grade}
-          TEXT
+          unless score_value.nil? || failure?
+            report_failure(:no_parseable_result_total_score, I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, :grade => score_value))
+              Unable to parse resultTotalScore: %{grade}
+            TEXT
+          end
         end
         submission_hash = {}
         existing_submission = assignment.submissions.where(user_id: user.id).first
@@ -303,27 +319,23 @@ module BasicLTI
               submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
               submission_hash[:grader_id] = -tool.id
             else
-              error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
+              report_failure(:bad_score, I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1"))
             end
-          elsif !error_message && !text && !url && !launch_url
-            error_message = I18n.t('lib.basic_lti.no_score', "No score given")
+          elsif !failure? && !text && !url && !launch_url
+            report_failure(:no_score, I18n.t('lib.basic_lti.no_score', "No score given"))
           end
         end
 
         xml_submitted_at = submission_submitted_at
         submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
         if xml_submitted_at.present? && submitted_at.nil?
-          error_message = I18n.t('Invalid timestamp - timestamp not parseable')
+          report_failure(:timestamp_not_parseable, I18n.t('Invalid timestamp - timestamp not parseable'))
         elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
-          error_message = I18n.t('Invalid timestamp - timestamp in future')
+          report_failure(:timestamp_in_future, I18n.t('Invalid timestamp - timestamp in future'))
         end
         submission_hash[:submitted_at] = submitted_at || Time.zone.now
 
-        if error_message
-          self.code_major = 'failure'
-          self.description = error_message
-        elsif assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
-
+        if !failure? && assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
           unless (submission = existing_submission)
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
@@ -332,9 +344,8 @@ module BasicLTI
             An external tool attempted to grade this assignment as %{grade}, but was unable
             to because the assignment has no points possible.
           TEXT
-          self.code_major = 'failure'
-          self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
-        else
+          report_failure(:no_points_possible, I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.'))
+        elsif !failure?
           if attachment
             job_options = {
               priority: Delayed::HIGH_PRIORITY,
@@ -349,8 +360,7 @@ module BasicLTI
               user
             )
           elsif !(@submission = self.class.create_homework_submission(submission_hash, assignment, user))
-            self.code_major = 'failure'
-            self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+            report_failure(:no_submission_created, I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.'))
           end
         end
 
@@ -402,14 +412,11 @@ module BasicLTI
         end
 
         def operation_ref_identifier
-          case @params[:lti_message_type].try(:downcase)
-          when 'basic-lis-updateresult'
-            'replaceResult'
-          when 'basic-lis-readresult'
-            'readResult'
-          when 'basic-lis-deleteresult'
-            'deleteResult'
-          end
+          {
+            'basic-lis-updateresult' => 'replaceResult',
+            'basic-lis-readresult' => 'readResult',
+            'basic-lis-deleteresult' => 'deleteResult'
+          }[@params[:lti_message_type].try(:downcase)]
         end
 
         def to_xml
