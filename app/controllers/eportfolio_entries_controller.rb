@@ -120,7 +120,7 @@ class EportfolioEntriesController < ApplicationController
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
-      rescue StandardError => e
+      rescue => e
         Canvas::Errors.capture_exception(:eportfolios, e, :warn)
         raise EportfolioNotFound, t('errors.not_found', "Not Found")
       end

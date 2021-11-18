@@ -19,7 +19,8 @@
 #
 
 require 'net/imap'
-require File.expand_path('configurable_timeout', __dir__)
+
+require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class ImapMailbox

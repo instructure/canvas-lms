@@ -82,7 +82,7 @@ RSpec.configure do |config|
   config.after do
     connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       SchemaHelper.drop_table(partition_table_name)
-    rescue StandardError => e
+    rescue => e
       puts "[WARN] Partition table dropping failed: #{e.message}"
     end
   end
