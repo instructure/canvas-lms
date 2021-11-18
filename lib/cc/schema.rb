@@ -29,9 +29,8 @@ module CC
     end
 
     def self.whitelist
-      @whitelist ||= Dir.entries(XSD_DIRECTORY).inject([]) do |memo, entry|
+      @whitelist ||= Dir.entries(XSD_DIRECTORY).each_with_object([]) do |entry, memo|
         memo << entry.gsub(REGEX, '') if REGEX.match?(entry)
-        memo
       end
     end
   end

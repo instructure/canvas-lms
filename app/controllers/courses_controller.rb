@@ -3570,7 +3570,7 @@ class CoursesController < ApplicationController
     changes.delete("settings") if changes.key?("settings")
 
     unless old_settings == new_settings
-      settings = Course.settings_options.keys.inject({}) do |results, key|
+      settings = Course.settings_options.keys.each_with_object({}) do |key, results|
         old_value = if old_settings.present? && old_settings.key?(key)
                       old_settings[key]
                     else
@@ -3584,8 +3584,6 @@ class CoursesController < ApplicationController
                     end
 
         results[key.to_s] = [old_value, new_value] unless old_value == new_value
-
-        results
       end
       changes.merge!(settings)
     end

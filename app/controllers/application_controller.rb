@@ -2067,9 +2067,8 @@ class ApplicationController < ActionController::Base
 
   def conversations_path(params = {})
     if @current_user
-      query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
+      query_string = params.slice(:context_id, :user_id, :user_name).each_with_object([]) do |(k, v), res|
         res << "#{k}=#{v}"
-        res
       end.join('&')
       "/conversations?#{query_string}"
     else

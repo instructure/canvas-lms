@@ -179,11 +179,10 @@ class ContextController < ApplicationController
       @services = @services.select { |service|
         feature_and_service_enabled?(service.service.to_sym)
       }
-      @services_hash = @services.to_a.inject({}) do |hash, item|
+      @services_hash = @services.to_a.each_with_object({}) do |item, hash|
         mapped = item.service
         hash[mapped] ||= []
         hash[mapped] << item
-        hash
       end
     end
   end

@@ -139,13 +139,11 @@ module IncomingMailProcessor
       end
 
       def flatten_account_configs(account_configs)
-        account_configs.reduce([]) do |flat_account_configs, (mailbox_protocol, mailbox_config)|
+        account_configs.each_with_object([]) do |(mailbox_protocol, mailbox_config), flat_account_configs|
           flat_mailbox_configs = flatten_mailbox_overrides(mailbox_config)
           flat_mailbox_configs.each do |single_mailbox_config|
             flat_account_configs << [mailbox_protocol, single_mailbox_config]
           end
-
-          flat_account_configs
         end
       end
 

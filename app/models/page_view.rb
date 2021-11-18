@@ -203,9 +203,8 @@ class PageView < ActiveRecord::Base
   end
 
   def self.from_attributes(attrs, new_record = false)
-    @blank_template ||= columns.inject({}) { |h, c|
+    @blank_template ||= columns.each_with_object({}) { |c, h|
       h[c.name] = nil
-      h
     }
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current

@@ -1830,13 +1830,12 @@ class User < ActiveRecord::Base
       accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
       return [] if accts.blank?
 
-      children = accts.inject({}) do |hash, acct|
+      children = accts.each_with_object({}) do |acct, hash|
         pid = acct.parent_account_id
         if pid.present?
           hash[pid] ||= []
           hash[pid] << acct
         end
-        hash
       end
 
       enrollment_account_ids = in_root_account

@@ -1275,7 +1275,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
-    events = events.inject([]) do |assignments, assignment|
+    events = events.each_with_object([]) do |assignment, assignments|
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day(Time.zone)
@@ -1303,7 +1303,6 @@ class CalendarEventsApiController < ApplicationController
           end
         end
       end
-      assignments
     end
 
     if !@all_events && !@undated

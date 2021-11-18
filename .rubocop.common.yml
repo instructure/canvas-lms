@@ -203,6 +203,8 @@ Style/Dir:
   Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/EachWithObject:
+  Severity: error
 Style/EmptyCaseCondition:
   Severity: error
 Style/Encoding:

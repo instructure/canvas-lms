@@ -2625,10 +2625,9 @@ class Course < ActiveRecord::Base
   end
 
   def all_dates
-    (self.calendar_events.active + self.assignments.active).inject([]) { |list, e|
+    (self.calendar_events.active + self.assignments.active).each_with_object([]) { |e, list|
       list << e.end_at if e.end_at
       list << e.start_at if e.start_at
-      list
     }.compact.flatten.map(&:to_date).uniq rescue []
   end
 

@@ -96,10 +96,7 @@ class SortsAssignments
     def without_graded_submission(assignments, submissions)
       assignments ||= []
       submissions ||= []
-      submissions_by_assignment = submissions.inject({}) do |memo, sub|
-        memo[sub.assignment_id] = sub
-        memo
-      end
+      submissions_by_assignment = submissions.index_by(&:assignment_id)
       assignments.select do |assignment|
         match = submissions_by_assignment[assignment.id]
         !match || match.without_graded_submission?

@@ -68,9 +68,8 @@ module AdheresToPolicy
       session, sought_rights = parse_args(args)
       sought_rights ||= []
       sought_rights = self.class.policy.available_rights if sought_rights.empty?
-      sought_rights.inject({}) do |h, r|
-        h[r] = check_right?(user, session, r)
-        h
+      sought_rights.index_with do |r|
+        check_right?(user, session, r)
       end
     end
 

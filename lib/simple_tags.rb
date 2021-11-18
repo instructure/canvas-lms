@@ -91,7 +91,7 @@ module SimpleTags
   end
 
   def self.normalize_tags(tags)
-    tags.inject([]) { |ary, tag|
+    tags.each_with_object([]) { |tag, ary|
       case tag
       when /\A((course|group)_\d+).*/
         ary << $1
@@ -100,7 +100,6 @@ module SimpleTags
         ary << section.course.asset_string if section
         # TODO: allow user-defined tags, e.g. #foo
       end
-      ary
     }.uniq
   end
 

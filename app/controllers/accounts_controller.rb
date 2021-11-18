@@ -1567,10 +1567,9 @@ class AccountsController < ApplicationController
 
     teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w{rejected deleted} })
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
-    courses_to_teachers = teachers.inject({}) do |result, teacher|
+    courses_to_teachers = teachers.each_with_object({}) do |teacher, result|
       result[teacher.course_id] ||= []
       result[teacher.course_id] << teacher
-      result
     end
     courses_to_fetch_users_for.each do |course|
       course.student_count = course_to_student_counts[course.id] || 0
