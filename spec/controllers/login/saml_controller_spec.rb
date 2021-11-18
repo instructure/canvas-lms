@@ -489,7 +489,7 @@ describe Login::SamlController do
         expect(response.location.starts_with?(@aac2.log_in_url)).to be_truthy
       end
 
-      it "reject  unknown specified AAC" do
+      it "reject unknown specified AAC" do
         get_new("0")
         expect(response.status).to eq 404
       end

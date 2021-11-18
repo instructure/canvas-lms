@@ -166,7 +166,7 @@ module Lti
         }.to change { tool_proxy.reload.tool_settings.first.custom }.from({ "customerId" => "394892759526" }).to({ "customerId" => "bar" })
       end
 
-      it 'updates a tool setting  by merging' do
+      it 'updates a tool setting by merging' do
         tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.custom = { "foo" => "bar" }

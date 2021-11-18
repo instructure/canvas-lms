@@ -278,7 +278,7 @@ describe "Screenreader Gradebook" do
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
   end
 
-  it 'can message students who... ', priority: '1', test_id: 164002 do
+  it 'can message students who...', priority: '1', test_id: 164002 do
     basic_percent_setup
     SRGB.visit(@course.id)
 

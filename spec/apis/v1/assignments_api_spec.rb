@@ -5093,7 +5093,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "when user requesting the deletion has permission to delete" do
-      it "deletes the assignment " do
+      it "deletes the assignment" do
         teacher_in_course(:course => @course, :active_all => true)
         api_call(:delete,
                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",

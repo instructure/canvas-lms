@@ -160,7 +160,7 @@ describe "context modules" do
       expect(f('.due_date_display').text).to eq date_string(due_at, :no_words)
     end
 
-    it 'shows the todo date on an ungraded discussion in a module ', priority: "1" do
+    it 'shows the todo date on an ungraded discussion in a module', priority: "1" do
       todo_date = 1.day.from_now
       @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion', todo_date: todo_date)
       @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)

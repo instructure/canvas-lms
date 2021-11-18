@@ -2513,8 +2513,7 @@ describe CoursesController, type: :request do
         expect(enrollment_json).to_not include(*grading_period_score_keys)
       end
 
-      it "does not include current grading period scores if final grades are hidden, " \
-         " even if 'total_scores' and 'current_grading_period_scores' are requested" do
+      it "does not include current grading period scores if final grades are hidden, even if 'total_scores' and 'current_grading_period_scores' are requested" do
         @course2.hide_final_grades = true
         @course2.save
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])

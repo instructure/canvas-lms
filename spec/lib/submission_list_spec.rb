@@ -263,7 +263,7 @@ describe SubmissionList do
         assignment.grade_student student, { grade: 3, grader: grader }
       end
 
-      it "remembers the 'Before' grade " do
+      it "remembers the 'Before' grade" do
         expect(submission.previous_grade).to eq "5"
       end
 

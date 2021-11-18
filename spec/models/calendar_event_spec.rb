@@ -1168,7 +1168,7 @@ describe CalendarEvent do
         expect(event.web_conference.reload.title).to eq 'updated title'
       end
 
-      it "keeps date  of conference in sync with event" do
+      it "keeps date of conference in sync with event" do
         event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
         start_at = Time.zone.now + 3.days
         event.reload.update! start_at: start_at

@@ -7861,7 +7861,7 @@ describe Assignment do
       expect(assignment.max_name_length).to eq(15)
     end
 
-    it "returns default of 255 if sis_assignment_name_length_input is not present " do
+    it "returns default of 255 if sis_assignment_name_length_input is not present" do
       expect(assignment.max_name_length).to eq(255)
     end
   end
@@ -9259,7 +9259,7 @@ describe Assignment do
 
       let(:params) { { moderated_grading: true, final_grader: @teacher, grader_count: 2, updating_user: @teacher } }
 
-      it "creates exactly one AnonymousOrModerationEvent on creation " do
+      it "creates exactly one AnonymousOrModerationEvent on creation" do
         expect {
           course.assignments.create!(params)
         }.to change { AnonymousOrModerationEvent.count }.by(1)
