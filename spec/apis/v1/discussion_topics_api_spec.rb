@@ -191,7 +191,7 @@ describe DiscussionTopicsController, type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",
-        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s },
+        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s }
       )
     end
   end

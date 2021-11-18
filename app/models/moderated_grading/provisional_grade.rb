@@ -201,7 +201,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
         params.merge(
           assessor: provisional_assessment.assessor,
           user: self.student,
-          rubric: rubric_association.rubric,
+          rubric: rubric_association.rubric
         )
       )
 

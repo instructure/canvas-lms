@@ -259,7 +259,7 @@ module Outcomes
           missing = guids - parents.map(&:vendor_guid)
           raise InvalidDataError, I18n.t(
             'Parent references not found prior to this row: %{missing}',
-            missing: missing.inspect,
+            missing: missing.inspect
           )
         end
       end

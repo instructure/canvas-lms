@@ -59,7 +59,7 @@ module Services
         allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(
           domain,
           user,
-          include(real_user: masq_user),
+          include(real_user: masq_user)
         ).and_return(jwt)
         env = described_class.env_for(user: user, domain: domain, real_user: masq_user)
         expect(env[:JWT]).to eql(jwt)

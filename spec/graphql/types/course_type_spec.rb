@@ -405,7 +405,7 @@ describe Types::CourseType do
         expect(
           course_type.resolve(
             "enrollmentsConnection { nodes { _id } }",
-            current_user: @teacher,
+            current_user: @teacher
           )
         ).to match_array @course.all_enrollments.map(&:to_param)
       end

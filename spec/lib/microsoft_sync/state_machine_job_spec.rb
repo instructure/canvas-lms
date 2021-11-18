@@ -68,7 +68,7 @@ module MicrosoftSync
         StateMachineJob::Retry.new(
           error: StandardError.new('foo'),
           delay_amount: 2.seconds,
-          job_state_data: 'retry2',
+          job_state_data: 'retry2'
         )
       when ['retry2', nil]
         StateMachineJob::NextStep.new(:step_second, 'first_data')

@@ -46,7 +46,7 @@ describe "Notifications" do
         setup_notification(@teacher, name: 'Assignment Resubmitted')
         @assignment = @course.assignments.create!(name: 'assignment',
                                                   submission_types: 'online_text_entry',
-                                                  due_at: Time.zone.now.advance(days: 2),)
+                                                  due_at: Time.zone.now.advance(days: 2))
         @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'hello')
         @submission.workflow_state = 'submitted'
         @submission.save!

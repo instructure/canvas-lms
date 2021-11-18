@@ -105,7 +105,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'index'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
   end
 
@@ -125,7 +125,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'observers'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
   end
 
@@ -139,7 +139,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'create'),
       data,
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -157,7 +157,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'show'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -175,7 +175,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'show_observer'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -193,7 +193,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'update'),
       opts.slice(:root_account_id),
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -210,7 +210,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'destroy'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 

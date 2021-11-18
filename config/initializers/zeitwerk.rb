@@ -63,7 +63,7 @@ if CANVAS_ZEITWERK
       "turnitin_id" => "TurnitinID",
       "uk_federation" => "UKFederation",
       "vericite" => "VeriCite",
-      "xml_helper" => "XMLHelper",
+      "xml_helper" => "XMLHelper"
     )
   end
 end

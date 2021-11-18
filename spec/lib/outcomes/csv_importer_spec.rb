@@ -446,7 +446,7 @@ describe Outcomes::CSVImporter do
           group_row(
             vendor_guid: 'a',
             calculation_method: 'n_mastery',
-            calculation_int: '5',
+            calculation_int: '5'
           ) + ['1', 'Sad Trombone'],
         ],
         [[2, 'Invalid fields for a group: ["calculation_method", "calculation_int", "ratings"]']]

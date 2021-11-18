@@ -78,7 +78,7 @@ describe Mutations::ImportOutcomes do
     attrs.reverse_merge!(
       target_group_id: target_group.id,
       source_context_id: source_context_id,
-      source_context_type: source_context_type,
+      source_context_type: source_context_type
     )
     source_context = attrs[:source_context_type].constantize.find_by(id: attrs[:source_context_id]) if attrs[:source_context_type]
     group = LearningOutcomeGroup.find_by(id: attrs[:group_id]) if attrs[:group_id]
@@ -167,7 +167,7 @@ describe Mutations::ImportOutcomes do
       @course2 = Course.create!(name: "Second", account: Account.default)
       @course2_group = outcome_group_model(context: @course2)
       @course2_outcome = outcome_model(context: @course2, outcome_group: @course2_group)
-      @global_outcome = outcome_model(global: true, title: "Global outcome",)
+      @global_outcome = outcome_model(global: true, title: "Global outcome")
       @outcome_without_group = LearningOutcome.create!(title: "Outcome without group")
     end
 
@@ -339,7 +339,7 @@ describe Mutations::ImportOutcomes do
       outcome_id: get_outcome_id("0 Group E outcome"),
       target_group_id: nil,
       target_context_type: 'Course',
-      target_context_id: @course.id,
+      target_context_id: @course.id
     )
   end
 

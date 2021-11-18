@@ -308,6 +308,8 @@ Style/SymbolProc:
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
   Severity: error
+Style/TrailingCommaInArguments:
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhileUntilModifier:
@@ -391,8 +393,6 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
   Enabled: false # TODO: autocorrect
 Style/SymbolArray: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false

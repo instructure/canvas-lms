@@ -40,7 +40,7 @@ describe "Pages API", type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/pages/#{locked_item.url}",
-        { :controller => 'wiki_pages_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :url => locked_item.url },
+        { :controller => 'wiki_pages_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :url => locked_item.url }
       )
     end
 

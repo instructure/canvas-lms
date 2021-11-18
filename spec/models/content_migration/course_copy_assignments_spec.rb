@@ -985,7 +985,7 @@ describe ContentMigration do
         let(:assignment) do
           @course.assignments.create!(
             name: 'test assignment',
-            submission_types: 'none',
+            submission_types: 'none'
           )
         end
 

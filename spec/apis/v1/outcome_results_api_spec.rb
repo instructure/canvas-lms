@@ -108,7 +108,7 @@ describe "Outcome Results API", type: :request do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 

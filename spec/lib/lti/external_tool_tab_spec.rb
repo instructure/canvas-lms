@@ -58,7 +58,7 @@ describe Lti::ExternalToolTab do
       name: "external tool",
       course_navigation: course_navigation,
       account_navigation: account_navigation,
-      user_navigation: user_navigation,
+      user_navigation: user_navigation
     )
     allow(tool).to receive(:id).and_return(2)
     tool

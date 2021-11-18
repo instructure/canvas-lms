@@ -447,7 +447,7 @@ describe Assignment do
       it 'sets root_account_id before_create' do
         assignment = Assignment.create!(
           course: @course,
-          name: 'some assignment',
+          name: 'some assignment'
         )
         expect(assignment.root_account_id).to eq @course.root_account_id
       end
@@ -3297,7 +3297,7 @@ describe Assignment do
             @student1,
             grade: 38,
             grader: @teacher,
-            excuse: false,
+            excuse: false
           )
 
           expect(sub1.user).to eq @student1

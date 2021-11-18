@@ -42,7 +42,7 @@ describe 'Account Notification API', type: :request do
 
     it "lists notifications" do
       second_announcement
-      json = api_call(:get, @path, @api_params,)
+      json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 2
       expect(json.map { |r| r["message"] }).to match_array(%w[default second])
     end
@@ -71,13 +71,13 @@ describe 'Account Notification API', type: :request do
 
     it "includes dismissed past announcements" do
       @user.close_announcement(second_announcement)
-      json = api_call(:get, @path, @api_params.merge(include_past: true),)
+      json = api_call(:get, @path, @api_params.merge(include_past: true))
       expect(json.length).to eq 2
     end
 
     it "does not include dismissed past announcements by default" do
       @user.close_announcement(second_announcement)
-      json = api_call(:get, @path, @api_params,)
+      json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 1
     end
   end
@@ -94,7 +94,7 @@ describe 'Account Notification API', type: :request do
     end
 
     it "shows a notification" do
-      json = api_call(:get, @path, @api_params,)
+      json = api_call(:get, @path, @api_params)
       expect(json["id"]).to eq @an.id
     end
 
@@ -130,7 +130,7 @@ describe 'Account Notification API', type: :request do
       @admin.reload
       expect(@admin.get_preference(:closed_notifications)).to eq [@a.id]
 
-      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/account_notifications", @api_params.merge(action: 'user_index'),)
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/account_notifications", @api_params.merge(action: 'user_index'))
       expect(json.length).to eq 0
     end
   end

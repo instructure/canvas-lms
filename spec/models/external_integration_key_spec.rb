@@ -31,7 +31,7 @@ describe ExternalIntegrationKey do
   let!(:external_integration_key) do
     account.external_integration_keys.create!(
       key_type: key_type,
-      key_value: '42',
+      key_value: '42'
     )
   end
 

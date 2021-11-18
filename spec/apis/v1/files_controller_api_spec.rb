@@ -42,7 +42,7 @@ describe "Files API", type: :request do
       api_call(
         :get,
         "/api/v1/files/#{locked_item.id}",
-        { :controller => 'files', :action => 'api_show', :format => 'json', :id => locked_item.id.to_s },
+        { :controller => 'files', :action => 'api_show', :format => 'json', :id => locked_item.id.to_s }
       )
     end
 
@@ -469,7 +469,7 @@ describe "Files API", type: :request do
         folder: folder,
         uploaded_data: StringIO.new('existing'),
         filename: params[:name],
-        display_name: params[:name],
+        display_name: params[:name]
       )
       api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))

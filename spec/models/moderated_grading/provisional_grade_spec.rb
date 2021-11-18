@@ -150,7 +150,7 @@ describe ModeratedGrading::ProvisionalGrade do
             grade: grade,
             final: final,
             source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously,
+            graded_anonymously: graded_anonymously
           )
           @provisional_grade.save!
         end
@@ -189,7 +189,7 @@ describe ModeratedGrading::ProvisionalGrade do
             grade: grade,
             final: final,
             source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously,
+            graded_anonymously: graded_anonymously
           )
           @provisional_grade.save!
           Timecop.freeze(updated_graded_at) do

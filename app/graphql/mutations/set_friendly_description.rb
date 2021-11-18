@@ -95,7 +95,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
         raise GraphQL::ExecutionError, I18n.t(
           "No such context for %{context_type}#%{context_id}",
           context_type: context_type,
-          context_id: context_id.to_s,
+          context_id: context_id.to_s
         )
       end
     end

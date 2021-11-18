@@ -102,7 +102,7 @@ module Api::V1::DiscussionTopics
       include_root_topic_data: false,
       root_topic_fields: [],
       include_overrides: false,
-      assignment_opts: {},
+      assignment_opts: {}
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?

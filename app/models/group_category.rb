@@ -286,7 +286,7 @@ class GroupCategory < ActiveRecord::Base
       remaining_member_count -= allocate_members_into_watermark(
         remaining_member_count,
         next_watermark,
-        water_allocation,
+        water_allocation
       )
     end
     water_allocation

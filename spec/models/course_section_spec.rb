@@ -394,7 +394,7 @@ describe CourseSection, "moving to new course" do
         :message => "I announce that i am lying",
         :user => @teacher,
         :context => course,
-        :workflow_state => "published",
+        :workflow_state => "published"
       )
       announcement1.is_section_specific = true
       announcement2 = Announcement.create!(
@@ -402,7 +402,7 @@ describe CourseSection, "moving to new course" do
         :message => "I announce that i am lying again",
         :user => @teacher,
         :context => course,
-        :workflow_state => "published",
+        :workflow_state => "published"
       )
       announcement2.is_section_specific = true
       announcement1.discussion_topic_section_visibilities <<

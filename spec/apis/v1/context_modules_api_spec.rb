@@ -203,7 +203,7 @@ describe "Modules API", type: :request do
 
         it 'includes user specific details' do
           expect(assignment_details).to include(
-            'points_possible' => @assignment.points_possible,
+            'points_possible' => @assignment.points_possible
           )
         end
 
@@ -221,11 +221,11 @@ describe "Modules API", type: :request do
 
         it 'includes lock information' do
           expect(assignment_details).to include(
-            'locked_for_user' => false,
+            'locked_for_user' => false
           )
 
           expect(wiki_page_details).to include(
-            'locked_for_user' => false,
+            'locked_for_user' => false
           )
         end
       end
@@ -334,17 +334,17 @@ describe "Modules API", type: :request do
 
         it 'includes user specific details' do
           expect(assignment_details).to include(
-            'points_possible' => @assignment.points_possible,
+            'points_possible' => @assignment.points_possible
           )
         end
 
         it 'sould include lock information' do
           expect(assignment_details).to include(
-            'locked_for_user' => false,
+            'locked_for_user' => false
           )
 
           expect(wiki_page_details).to include(
-            'locked_for_user' => false,
+            'locked_for_user' => false
           )
         end
       end
@@ -811,23 +811,23 @@ describe "Modules API", type: :request do
 
       it 'includes user specific details' do
         expect(assignment_details).to include(
-          'points_possible' => @assignment.points_possible,
+          'points_possible' => @assignment.points_possible
         )
       end
 
       it 'sould include lock information' do
         expect(assignment_details).to include(
-          'locked_for_user' => false,
+          'locked_for_user' => false
         )
 
         expect(wiki_page_details).to include(
           'lock_info',
           'lock_explanation',
-          'locked_for_user' => true,
+          'locked_for_user' => true
         )
         expect(wiki_page_details['lock_info']).to include(
           'asset_string' => @wiki_page.asset_string,
-          'unlock_at' => @christmas.as_json,
+          'unlock_at' => @christmas.as_json
         )
       end
     end

@@ -479,7 +479,7 @@ describe "assignments_2 feature flag and parameter" do
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: true))
       course = course_factory(
         active_all: true,
-        is_public: true,
+        is_public: true
       )
       assignment = assignment_model(
         course: course,

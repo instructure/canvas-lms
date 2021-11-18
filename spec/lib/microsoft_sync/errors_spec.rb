@@ -197,7 +197,7 @@ describe MicrosoftSync::Errors do
 
     it 'gives a public message with the service name, status code, and tenant' do
       expect(subject).to be_a_microsoft_sync_public_error(
-        'Unexpected response from Microsoft API: got 422 status code',
+        'Unexpected response from Microsoft API: got 422 status code'
       )
     end
 

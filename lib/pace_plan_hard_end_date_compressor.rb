@@ -43,7 +43,7 @@ class PacePlanHardEndDateCompressor
         due_dates[starting_item.id],
         1,
         pace_plan.exclude_weekends,
-        pace_plan.course.blackout_dates,
+        pace_plan.course.blackout_dates
       )
       items = items[compress_items_after + 1..]
     end
@@ -54,7 +54,7 @@ class PacePlanHardEndDateCompressor
       pace_plan.end_date,
       pace_plan.exclude_weekends,
       inclusive_end: true,
-      blackout_dates: pace_plan.course.blackout_dates,
+      blackout_dates: pace_plan.course.blackout_dates
     )
 
     final_item_due_date = due_dates[items[-1].id]
@@ -68,7 +68,7 @@ class PacePlanHardEndDateCompressor
       start_date_of_item_group > final_item_due_date ? start_date_of_item_group : final_item_due_date,
       pace_plan.exclude_weekends,
       inclusive_end: true,
-      blackout_dates: pace_plan.course.blackout_dates,
+      blackout_dates: pace_plan.course.blackout_dates
     )
 
     # This is the percentage that we should modify the plan by, so it hits our specified end date

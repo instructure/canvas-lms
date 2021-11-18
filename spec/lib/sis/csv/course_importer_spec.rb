@@ -683,7 +683,7 @@ describe SIS::CSV::CourseImporter do
     )
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
-      "student_user,user1,User,Uno,user@example.com,active",
+      "student_user,user1,User,Uno,user@example.com,active"
     )
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
@@ -901,7 +901,7 @@ describe SIS::CSV::CourseImporter do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status,homeroom_course",
           "test_1,TC 101,Test Course 101,,,active,false",
-          "test_2,TC 101,Test Course 101,,,active,1",
+          "test_2,TC 101,Test Course 101,,,active,1"
         )
         expect(course1.reload).not_to be_homeroom_course
         expect(course2.reload).to be_homeroom_course
@@ -915,7 +915,7 @@ describe SIS::CSV::CourseImporter do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,,,active",
-          "test_2,TC 101,Test Course 101,,,active",
+          "test_2,TC 101,Test Course 101,,,active"
         )
         expect(course1.reload).to be_homeroom_course
         expect(course2.reload).not_to be_homeroom_course
