@@ -214,8 +214,8 @@ describe "shared/_select_content_dialog" do
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
     expect(page.css(%Q{#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]})).not_to be_empty
-    expect(page.css(%Q{#quizs_select .module_item_select option[value="new"]})).to be_empty
-    expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).to be_empty
+    expect(page.css('#quizs_select .module_item_select option[value="new"]')).to be_empty
+    expect(page.css('#assignments_select .module_item_select option[value="new"]')).to be_empty
   end
 
   it "offers to create assignments if the user has permission" do
@@ -224,7 +224,7 @@ describe "shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).not_to be_empty
+    expect(page.css('#assignments_select .module_item_select option[value="new"]')).not_to be_empty
   end
 
   it "creates new topics in unpublished state if draft state is enabled" do
@@ -232,7 +232,7 @@ describe "shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    expect(page.at_css(%Q{#discussion_topics_select .new input[name="published"][value="false"]})).not_to be_nil
+    expect(page.at_css('#discussion_topics_select .new input[name="published"][value="false"]')).not_to be_nil
   end
 
   describe "sorting" do

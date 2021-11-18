@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Jon Willesen"]
   spec.email         = ["jonw@instructure.com"]
-  spec.summary       = %q{Read mail from IMAP inbox and process it.}
+  spec.summary       = 'Read mail from IMAP inbox and process it.'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

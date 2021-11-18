@@ -577,7 +577,7 @@ describe "Common Cartridge exporting" do
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
       page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
-      page.body = %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>}
+      page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
       page.save!
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!

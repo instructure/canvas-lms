@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Raphael Weiner"]
   spec.email         = ["rweiner@pivotallabs.com"]
-  spec.summary       = %q{Canvas Slug generation}
+  spec.summary       = 'Canvas Slug generation'
 
   spec.files         = Dir.glob("{lib,test}/**/*") + %w(Rakefile)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

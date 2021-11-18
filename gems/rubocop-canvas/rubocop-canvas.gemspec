@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Rubocop::Canvas::VERSION
   spec.authors       = ["Brian Palmer"]
   spec.email         = ["brianp@instructure.com"]
-  spec.summary       = %q{custom cops for canvas}
+  spec.summary       = 'custom cops for canvas'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})

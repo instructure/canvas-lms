@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Jeremy Stanley"]
   spec.email         = ["jeremy@instructure.com"]
-  spec.summary       = %q{Safe archive extraction}
+  spec.summary       = 'Safe archive extraction'
 
   spec.files         = Dir.glob("{lib,test}/**/*") + %w(Rakefile)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

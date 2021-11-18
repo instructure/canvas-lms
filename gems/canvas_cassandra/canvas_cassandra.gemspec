@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.1.0"
   spec.authors       = ["Ethan Vizitei"]
   spec.email         = ["evizitei@instructure.com"]
-  spec.summary       = %q{Cassandra wrapper for Canvas LMS}
+  spec.summary       = 'Cassandra wrapper for Canvas LMS'
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
 

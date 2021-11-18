@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Raphael Weiner", "Nick Cloward"]
   spec.email         = ["rweiner@pivotallabs.com", "nickc@instructure.com"]
-  spec.summary       = %q{Bookmarked collections for Canvas}
+  spec.summary       = 'Bookmarked collections for Canvas'
 
   spec.files         = Dir.glob("{lib}/**/*") + %w(Rakefile)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

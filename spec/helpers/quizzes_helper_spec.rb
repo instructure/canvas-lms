@@ -211,7 +211,7 @@ describe QuizzesHelper do
     it 'sanitizes user input' do
       malicious_answer_list = [{
         blank_id: 'color',
-        answer: %q|><script>alert()</script><img|
+        answer: '><script>alert()</script><img'
       }]
 
       html = fill_in_multiple_blanks_question(

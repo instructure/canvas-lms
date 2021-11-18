@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Brian Palmer"]
   spec.email         = ["brianp@instructure.com"]
-  spec.summary       = %q{This acts_as extension provides the capabilities for sorting and reordering a number of objects in a list.}
+  spec.summary       = 'This acts_as extension provides the capabilities for sorting and reordering a number of objects in a list.'
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
 

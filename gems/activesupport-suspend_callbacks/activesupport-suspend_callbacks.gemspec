@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = '0.0.1'
   spec.authors       = ["Jacob Fugal"]
   spec.email         = ["jacob@instructure.com"]
-  spec.summary       = %q{Temporarily suspend specific ActiveSupport::Callbacks callbacks}
+  spec.summary       = 'Temporarily suspend specific ActiveSupport::Callbacks callbacks'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(LICENSE.txt Rakefile README.md test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
