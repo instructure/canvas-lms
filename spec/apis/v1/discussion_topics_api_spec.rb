@@ -2666,7 +2666,7 @@ describe DiscussionTopicsController, type: :request do
 
       it "sets and return editor_id if editing another user's post" do
         pending "WIP: Not implemented"
-        fail
+        raise
       end
 
       it "fails if the max entry depth is reached" do

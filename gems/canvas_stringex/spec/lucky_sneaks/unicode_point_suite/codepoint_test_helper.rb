@@ -28,7 +28,7 @@ module CodepointTestHelper
       if expected != actual
         message = "<#{expected.inspect}> expected but was <#{actual.inspect}>\n"
         message << "  defined in #{LuckySneaks::Unidecoder.in_json_file(encoded)}"
-        fail message
+        raise message
         # raise Test::Unit::AssertionFailedError.new(message)
       end
     end

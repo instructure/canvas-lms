@@ -181,7 +181,7 @@ class GradingPeriodsController < ApplicationController
   def grading_period(inherit: true)
     @grading_period ||= begin
       grading_period = GradingPeriod.for(@context, inherit: inherit).find_by(id: params[:id])
-      fail ActionController::RoutingError, 'Not Found' if grading_period.blank?
+      raise ActionController::RoutingError, 'Not Found' if grading_period.blank?
 
       grading_period
     end

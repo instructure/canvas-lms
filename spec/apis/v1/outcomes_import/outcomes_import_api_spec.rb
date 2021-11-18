@@ -122,7 +122,7 @@ describe "Outcomes Import API", type: :request do
           case type
           when "available" then return available_json(expected_status: expected_status)
           when "create" then return create_json(guid: guid, expected_status: expected_status)
-          else fail "unknown request type"
+          else raise "unknown request type"
           end
         end
       end
