@@ -168,7 +168,7 @@ class AccountUser < ActiveRecord::Base
     account_users = account.cached_account_users_for(user)
     result = {}
     account_users.each do |account_user|
-      RoleOverride.permissions.keys.each do |permission|
+      RoleOverride.permissions.each_key do |permission|
         result[permission] ||= []
         result[permission] |= account_user.enabled_for?(account, permission)
       end

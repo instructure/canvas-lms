@@ -33,7 +33,7 @@ module StringifyIds
   def self.stringify_ids(value, opts = {})
     return unless value.is_a?(Hash)
 
-    value.keys.each do |key|
+    value.each_key do |key|
       next unless key.is_a?(String) || key.is_a?(Symbol)
 
       if /(^|_)id$/i.match?(key)

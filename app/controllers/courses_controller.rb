@@ -535,7 +535,7 @@ class CoursesController < ApplicationController
 
     completed_states = %i[completed rejected]
     active_states = %i[active invited]
-    all_enrollments.group_by { |e| [e.course_id, e.type] }.values.each do |enrollments|
+    all_enrollments.group_by { |e| [e.course_id, e.type] }.each_value do |enrollments|
       first_enrollment = enrollments.min_by(&:state_with_date_sortable)
       if enrollments.count > 1
         # pick the last one so if all sections have "ended" it still shows up in past enrollments because dates are still terrible

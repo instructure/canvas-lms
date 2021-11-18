@@ -133,7 +133,7 @@ module ActiveModel
 
     module AutosaveAssociation
       def _ensure_no_duplicate_errors
-        errors.error_collection.keys.each do |attribute|
+        errors.error_collection.each_key do |attribute|
           errors[attribute].uniq!
         end
       end

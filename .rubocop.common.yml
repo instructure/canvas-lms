@@ -223,6 +223,8 @@ Style/FrozenStringLiteralComment:
   Severity: error
 Style/HashConversion:
   Severity: error
+Style/HashEachMethods:
+  Severity: error
 Style/HashTransformKeys:
   Severity: error
 Style/HashTransformValues:

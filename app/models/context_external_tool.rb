@@ -703,12 +703,12 @@ class ContextExternalTool < ActiveRecord::Base
 
     self.url = replace_host.call(self.url, new_domain) if self.url
 
-    settings.keys.each do |setting|
+    settings.each_key do |setting|
       next if [:custom_fields, :environments].include? setting.to_sym
 
       case settings[setting]
       when Hash
-        settings[setting].keys.each do |property|
+        settings[setting].each_key do |property|
           if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
             settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
           end

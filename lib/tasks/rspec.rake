@@ -48,7 +48,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       t.spec_opts += ['-e', %("#{ENV['SINGLE_TEST']}")]
     end
     spec_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r{spec_canvas/selenium}) + FileList['spec/**/*_spec.rb'].exclude(%r{spec/selenium})
-    Gem.loaded_specs.values.each do |spec|
+    Gem.loaded_specs.each_value do |spec|
       path = spec.full_gem_path
       spec_canvas_path = File.expand_path(path + "/spec_canvas")
       next unless File.directory?(spec_canvas_path)

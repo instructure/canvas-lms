@@ -554,7 +554,7 @@ class RoleOverridesController < ApplicationController
                 @context.available_course_roles(true)
               end
       if params[:permissions]
-        RoleOverride.permissions.keys.each do |key|
+        RoleOverride.permissions.each_key do |key|
           if params[:permissions][key]
             roles.each do |role|
               if (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])

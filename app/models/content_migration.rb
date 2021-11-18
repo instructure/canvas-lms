@@ -711,7 +711,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def process_master_deletions(deletions)
-    deletions.keys.each do |klass|
+    deletions.each_key do |klass|
       next unless MasterCourses::CONTENT_TYPES_FOR_DELETIONS.include?(klass)
 
       mig_ids = deletions[klass]

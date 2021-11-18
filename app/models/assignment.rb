@@ -2228,7 +2228,7 @@ class Assignment < ActiveRecord::Base
 
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
-    opts.keys.each { |k|
+    opts.each_key { |k|
       opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
     }
 

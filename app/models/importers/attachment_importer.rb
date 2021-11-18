@@ -29,7 +29,7 @@ module Importers
         created_usage_rights_map = {}
         attachments = data['file_map'] || {}
         attachments = attachments.with_indifferent_access
-        attachments.values.each do |att|
+        attachments.each_value do |att|
           if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
             begin
               import_from_migration(att, migration.context, migration, nil, created_usage_rights_map)

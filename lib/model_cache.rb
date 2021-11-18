@@ -70,7 +70,7 @@ module ModelCache
     def add_to_caches
       return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
-      cache.keys.each do |key|
+      cache.each_key do |key|
         cache[key][send(key)] = self
       end
     end
@@ -78,7 +78,7 @@ module ModelCache
     def update_in_caches
       return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
-      cache.keys.each do |key|
+      cache.each_key do |key|
         if saved_change_to_attribute?(key)
           cache[key][send(key)] = self
           cache[key].delete(attribute_before_last_save(key))

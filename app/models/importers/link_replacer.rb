@@ -166,7 +166,7 @@ module Importers
       subbed = false
       case object
       when Hash
-        object.values.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
+        object.each_value { |o| subbed = true if recursively_sub_placeholders!(o, links) }
       when Array
         object.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
       when String

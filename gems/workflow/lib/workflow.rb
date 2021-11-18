@@ -131,7 +131,7 @@ module Workflow
       workflow_methods = const_get(:WorkflowMethods, false)
       self.workflow_spec ||= Specification.new
       self.workflow_spec.add(&specification)
-      self.workflow_spec.states.values.each do |state|
+      self.workflow_spec.states.each_value do |state|
         state_name = state.name
         workflow_methods.module_eval do
           define_method "#{state_name}?" do
@@ -139,7 +139,7 @@ module Workflow
           end
         end
 
-        state.events.values.each do |event|
+        state.events.each_value do |event|
           event_name = event.name
           workflow_methods.module_eval do
             define_method "#{event_name}!".to_sym do |*args|

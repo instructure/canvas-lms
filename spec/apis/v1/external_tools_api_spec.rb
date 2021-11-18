@@ -715,16 +715,16 @@ describe ExternalToolsController, type: :request do
     hash.delete "created_at"
     hash.delete "updated_at"
     hash.delete "id"
-    hash.keys.each do |key|
-      val = hash[key]
-      next unless val.is_a?(Hash)
+    hash.each_with_object({}) do |(key, val), result|
+      unless val.is_a?(Hash)
+        result[key] = val
+        next
+      end
 
       val.each_pair do |sub_key, sub_val|
-        hash["#{key}[#{sub_key}]"] = sub_val
+        result["#{key}[#{sub_key}]"] = sub_val
       end
-      hash.delete key
     end
-    hash
   end
 
   def sessionless_launch(context, type, params)

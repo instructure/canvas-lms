@@ -319,7 +319,7 @@ module AssignmentOverrideApplicator
   end
 
   def self.copy_preloaded_associations_to_clone(orig, clone)
-    orig.class.reflections.keys.each do |association|
+    orig.class.reflections.each_key do |association|
       association = association.to_sym
       clone.send(:association_instance_set, association, orig.send(:association_instance_get, association))
     end

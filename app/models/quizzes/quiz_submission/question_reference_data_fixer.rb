@@ -178,12 +178,8 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     #  - question_xxx_marked
     #  - _question_xxx_read
     #
-    submission_data.keys.each do |key|
-      new_key = key.sub(/question_(\d+)/) { "question_#{id_map[$1.to_i] || $1}" }
-
-      if new_key != key
-        submission_data[new_key] = submission_data.delete(key)
-      end
+    submission_data.transform_keys! do |key|
+      key.sub(/question_(\d+)/) { "question_#{id_map[$1.to_i] || $1}" }
     end
 
     # Adjust the "next_question_path" for OQAAT quizzes. This is a URL entry

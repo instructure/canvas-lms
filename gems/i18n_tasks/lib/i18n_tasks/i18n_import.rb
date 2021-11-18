@@ -115,7 +115,7 @@ module I18nTasks
     def find_mismatches
       @placeholder_mismatches = []
       @markdown_mismatches = []
-      new_translations.keys.each do |key|
+      new_translations.each_key do |key|
         next unless source_translations[key]
 
         p1 = placeholders(source_translations[key].to_s)

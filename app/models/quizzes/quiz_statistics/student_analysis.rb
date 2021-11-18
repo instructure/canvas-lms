@@ -148,7 +148,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
     end
 
-    questions_hash.keys.each do |id|
+    questions_hash.each_key do |id|
       obj = questions[id]
       unless obj
         obj = questions_hash[id]
