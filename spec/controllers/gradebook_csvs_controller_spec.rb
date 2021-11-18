@@ -44,8 +44,8 @@ describe GradebookCsvsController do
 
       post :create, params: { course_id: @course.id }, format: :json
       json = json_parse(response.body)
-      expect(Attachment.find json['attachment_id']).not_to be_nil
-      expect(Progress.find json['progress_id']).not_to be_nil
+      expect(Attachment.find(json['attachment_id'])).not_to be_nil
+      expect(Progress.find(json['progress_id'])).not_to be_nil
     end
 
     it "accepts an assignment_order param to be passed to the CSV exporter" do

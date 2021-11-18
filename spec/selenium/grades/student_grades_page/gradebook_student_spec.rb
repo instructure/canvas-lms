@@ -136,7 +136,7 @@ describe 'Student Gradebook' do
     f('#show_all_details_button').click
     details = ff('[id^="grade_info"]')
     details.each do |detail|
-      expect(detail.css_value 'display').to eq 'none'
+      expect(detail.css_value('display')).to eq 'none'
     end
   end
 

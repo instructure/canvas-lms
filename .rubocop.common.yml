@@ -240,6 +240,8 @@ Style/NegatedUnless:
   Severity: error
 Style/NegatedWhile:
   Severity: error
+Style/NestedParenthesizedCalls:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/OrAssignment:

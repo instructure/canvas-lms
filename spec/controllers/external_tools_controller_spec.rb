@@ -2194,19 +2194,19 @@ describe ExternalToolsController do
 
     it 'redirects if there is no matching tool for the launch_url, and tool id' do
       params = { course_id: @course.id, url: 'http://my_non_esisting_tool_domain.com', id: -1 }
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
+      expect(get(:generate_sessionless_launch, params: params)).to redirect_to course_url(@course)
     end
 
     it 'redirects if there is no matching tool for the and tool id' do
       params = { :course_id => @course.id, id: -1 }
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
+      expect(get(:generate_sessionless_launch, params: params)).to redirect_to course_url(@course)
     end
 
     it 'redirects if there is no launch url associated with the tool' do
       no_url_tool = new_valid_tool(@course)
       no_url_tool.update!(url: nil)
       params = { :course_id => @course.id, id: no_url_tool.id }
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
+      expect(get(:generate_sessionless_launch, params: params)).to redirect_to course_url(@course)
     end
 
     context 'with 1.3 tool' do

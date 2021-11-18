@@ -203,11 +203,11 @@ describe BrandConfig do
       it 'uploads json, css & js file to s3' do
         @upload_expectation.with(eq(
           @subaccount_bc.public_json_path
-        ).or eq(
+        ).or(eq(
           @subaccount_bc.public_css_path
-        ).or eq(
-          @subaccount_bc.public_js_path
-        ))
+        ).or(eq(
+               @subaccount_bc.public_js_path
+             ))))
         @subaccount_bc.save_all_files!
       end
     end
