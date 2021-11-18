@@ -136,7 +136,7 @@ module CC
         if item.data && (criterion = item.data[:rubric_criterion])
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]
-          if criterion[:ratings] && criterion[:ratings].length > 0
+          if criterion[:ratings] && !criterion[:ratings].empty?
             out_node.ratings do |ratings_node|
               criterion[:ratings].each do |rating|
                 ratings_node.rating do |rating_node|

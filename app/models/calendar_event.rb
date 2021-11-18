@@ -126,7 +126,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def hidden?
-    !appointment_group? && child_events.size > 0
+    !appointment_group? && !child_events.empty?
   end
 
   def effective_context
@@ -413,7 +413,7 @@ class CalendarEvent < ActiveRecord::Base
         appointment_group.clear_cached_available_slots!
         appointment_group.save!
       end
-      if parent_event && parent_event.child_events.size == 0
+      if parent_event && parent_event.child_events.empty?
         parent_event.workflow_state = parent_event.locked? ? 'active' : 'deleted'
         parent_event.save!
       end

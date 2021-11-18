@@ -250,7 +250,7 @@ module GoogleDrive
         folder.add_file(entry) unless is_folder
       end
 
-      if extensions && extensions.length > 0
+      if extensions && !extensions.empty?
         root = root.select { |e| extensions.include?(e.extension) }
       end
 

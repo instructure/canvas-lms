@@ -504,7 +504,7 @@ describe OutcomeResultsController do
 
       def expect_score_order(rollups, scores)
         rollup_scores = rollups.map do |r|
-          r['scores'].length == 0 ? nil : r['scores'][0]['score'].to_i
+          r['scores'].empty? ? nil : r['scores'][0]['score'].to_i
         end
         expect(rollup_scores).to eq scores
       end

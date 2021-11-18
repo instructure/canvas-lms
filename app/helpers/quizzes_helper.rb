@@ -663,7 +663,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
   end
 
   def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
@@ -688,7 +688,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
   end
 
   def show_correct_answers?

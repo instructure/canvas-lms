@@ -46,7 +46,7 @@ module Api::V1::DiscussionTopics
   # The ids of the root topics are always included.
   def get_root_topic_data(topics, fields)
     root_topic_ids = topics.pluck(:root_topic_id).reject(&:blank?).uniq
-    return {} unless root_topic_ids && root_topic_ids.length > 0
+    return {} unless root_topic_ids && !root_topic_ids.empty?
 
     fields_with_id = fields.unshift(:id)
     root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
@@ -135,7 +135,7 @@ module Api::V1::DiscussionTopics
 
     json[:todo_date] = topic.todo_date
 
-    if opts[:root_topic_fields] && opts[:root_topic_fields].length > 0
+    if opts[:root_topic_fields] && !opts[:root_topic_fields].empty?
       # If this is called from discussion_topics_api_json then we already
       # have the topics, so don't get them again.
       root_topics ||= get_root_topic_data([topic], opts[:root_topic_fields])

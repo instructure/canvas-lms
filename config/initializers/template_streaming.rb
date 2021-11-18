@@ -100,7 +100,7 @@ ActionView::StreamingFlow.prepend(StreamingContentChecks) unless ::Rails.env.pro
 
 module SkipEmptyTemplateConcats
   def initialize(original_block)
-    new_block = ->(value) { original_block.call(value) if value.size > 0 }
+    new_block = ->(value) { original_block.call(value) unless value.empty? }
     super(new_block)
   end
 end

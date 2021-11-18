@@ -27,7 +27,7 @@ class Quizzes::QuizRegrader::Submission
   end
 
   def regrade!
-    return unless answers_to_grade.size > 0 || needs_regrade?
+    return unless !answers_to_grade.empty? || needs_regrade?
 
     # regrade all previous versions
     submission.attempts.last_versions.each do |version|

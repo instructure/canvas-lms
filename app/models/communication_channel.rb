@@ -497,7 +497,7 @@ class CommunicationChannel < ActiveRecord::Base
 
       ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
-          merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
+          merge_candidates[u.global_id] = !u.all_active_pseudonyms.empty?
         end
         return [u] if result && break_on_first_found
 

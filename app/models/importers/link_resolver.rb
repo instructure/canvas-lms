@@ -163,7 +163,7 @@ module Importers
       rel_path_parts = Pathname.new(rel_path).each_filename.to_a
 
       # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"
-      while new_url.nil? && rel_path_parts.length > 0
+      while new_url.nil? && !rel_path_parts.empty?
         sub_path = File.join(rel_path_parts)
         if (file = find_file_in_context(sub_path))
           new_url = "#{context_path}/files/#{file.id}"

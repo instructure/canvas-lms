@@ -70,7 +70,7 @@ module CC
             r_node.description rubric.description if rubric.description
 
             r_node.criteria do |c_node|
-              if rubric.data && rubric.data.length > 0
+              if rubric.data && !rubric.data.empty?
                 rubric.data.each do |crit|
                   add_criterion(c_node, crit)
                 end
@@ -103,7 +103,7 @@ module CC
           end
         end
 
-        if criterion[:ratings] && criterion[:ratings].length > 0
+        if criterion[:ratings] && !criterion[:ratings].empty?
           c_node.ratings do |ratings_node|
             criterion[:ratings].each do |rating|
               ratings_node.rating do |rating_node|

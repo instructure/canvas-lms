@@ -337,7 +337,7 @@ module CustomSeleniumActions
     if iframe_id
       in_frame iframe_id do
         tinymce_element = f('body')
-        while tinymce_element.text.length > 0
+        until tinymce_element.text.empty?
           tinymce_element.click
           tinymce_element.send_keys(Array.new(100, :backspace))
           tinymce_element = f('body')

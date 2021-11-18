@@ -495,7 +495,7 @@ class AssetUserAccessLog
           # transaction ensures that aggregation results and iterator
           # state are updated in lock step, so if we fail we should re-aggregate from the same point.
           AssetUserAccess.transaction do
-            if aggregation_results.size > 0
+            unless aggregation_results.empty?
               self.log_message("message bus batch updating (sometimes these queries don't get logged)...")
               AssetUserAccess.connection.execute(self.compaction_sql(aggregation_results))
             end
@@ -605,7 +605,7 @@ class AssetUserAccessLog
     ps = plugin_setting
     yesterday_ts = ts - 1.day
     yesterday_model = log_model(yesterday_ts)
-    if yesterday_model.take(1).size > 0
+    unless yesterday_model.take(1).empty?
       yesterday_completed = compact_partition(yesterday_ts)
       ps.reload
       compaction_state = self.metadatum_payload
@@ -713,7 +713,7 @@ class AssetUserAccessLog
           agg_sql = pulsar_ripcord_aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary, root_account_max_ids_map, ts.wday)
         end
         log_segment_aggregation = partition_model.connection.execute(agg_sql)
-        if log_segment_aggregation.to_a.size > 0
+        if !log_segment_aggregation.to_a.empty?
           # we found records in this segment, we need to both
           # compute the new iterator position (it's just the max
           # of all ids because we constrained the aggregation to a range of ids,

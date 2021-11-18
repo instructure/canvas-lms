@@ -78,7 +78,7 @@ module CC
       end # manifest
 
       # write any errors to the manifest file
-      if @exporter.errors.length > 0
+      unless @exporter.errors.empty?
         @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
         @exporter.errors.each do |error|
           @document.comment! error.first

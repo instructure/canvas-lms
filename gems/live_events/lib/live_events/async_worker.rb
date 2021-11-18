@@ -83,16 +83,16 @@ module LiveEvents
 
     def run_thread
       loop do
-        return unless @running || @queue.size > 0
+        return unless @running || !@queue.empty?
 
         # pause thread so it will allow main thread to run
-        r = @queue.pop if @queue.size == 0
+        r = @queue.pop if @queue.empty?
 
         begin
           # r will be nil on first pass
           records = [r].compact
           total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
-          while @queue.size > 0 && total_bytes < MAX_BYTE_THRESHOLD
+          while !@queue.empty? && total_bytes < MAX_BYTE_THRESHOLD
             r = @queue.pop
             break if r == :stop || (records.size == 1 && records.first == :stop)
 

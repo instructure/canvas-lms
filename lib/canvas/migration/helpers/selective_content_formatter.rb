@@ -185,7 +185,7 @@ module Canvas::Migration::Helpers
     end
 
     def attachment_data(content_list, course_data)
-      return [] unless course_data['attachments'] && course_data['attachments'].length > 0
+      return [] unless course_data['attachments'] && !course_data['attachments'].empty?
 
       remove_name_regex = %r{/[^/]*\z}
       course_data['attachments'].each { |a|
@@ -439,7 +439,7 @@ module Canvas::Migration::Helpers
 
     def course_attachments_data(content_list, source_course)
       Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').preload(:active_file_attachments), &:full_name).each do |folder|
-        next if folder.active_file_attachments.length == 0
+        next if folder.active_file_attachments.empty?
 
         item = course_item_hash('folders', folder)
         item[:sub_items] = []

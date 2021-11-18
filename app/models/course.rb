@@ -1973,7 +1973,7 @@ class Course < ActiveRecord::Base
       grade_publishing_status_translation(e.grade_publishing_status, e.grade_publishing_message)
     end
     overall_status = "error"
-    overall_status = "unpublished" unless found_statuses.size > 0
+    overall_status = "unpublished" if found_statuses.empty?
     overall_status = %w[error unpublished pending publishing published unpublishable].detect { |s| found_statuses.include?(s) } || overall_status
     [enrollments, overall_status]
   end
@@ -2090,7 +2090,7 @@ class Course < ActiveRecord::Base
 
     Enrollment.where(:id => (all_enrollment_ids.to_set - posted_enrollment_ids.to_set).to_a).update_all(:grade_publishing_status => "unpublishable", :grade_publishing_message => nil)
 
-    raise errors[0] if errors.size > 0
+    raise errors[0] unless errors.empty?
   end
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)

@@ -846,7 +846,7 @@ class AssignmentsApiController < ApplicationController
       override_dates = value_to_boolean(override_param)
       if override_dates || include_all_dates || include_override_objects
         ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
-        assignments.select { |a| a.assignment_overrides.size == 0 }
+        assignments.select { |a| a.assignment_overrides.empty? }
                    .each { |a| a.has_no_overrides = true }
 
         if AssignmentOverrideApplicator.should_preload_override_students?(assignments, user, "assignments_api")

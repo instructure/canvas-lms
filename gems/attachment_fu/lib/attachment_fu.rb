@@ -339,9 +339,9 @@ module AttachmentFu # :nodoc:
     #
     # TODO: Allow it to work with Merb tempfiles too.
     def uploaded_data=(file_data)
-      if self.is_a?(Attachment)
-        return if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
+      return if file_data.blank?
 
+      if self.is_a?(Attachment)
         # glean information from the file handle
         self.content_type = detect_mimetype(file_data)
         self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
@@ -393,8 +393,6 @@ module AttachmentFu # :nodoc:
         end
         file_data
       else
-        return if file_data.nil? || file_data.size == 0
-
         self.content_type = file_data.content_type
         self.filename     = file_data.original_filename if respond_to?(:filename)
         unless file_data.respond_to?(:path)

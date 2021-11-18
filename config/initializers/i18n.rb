@@ -61,7 +61,7 @@ module CanvasI18nFallbacks
 
     return [] unless result
 
-    existing_elements = result.captures.map { |e| !!e && e.length > 0 }
+    existing_elements = result.captures.map { |e| !!e && !e.empty? }
 
     order = []
     FALLBACK_ORDER.each do |a|

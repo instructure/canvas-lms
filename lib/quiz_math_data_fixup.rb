@@ -115,12 +115,12 @@ module QuizMathDataFixup
       mjnodes =
         html.search('[class^="MathJax"]')
 
-      if mjnodes.length > 0
+      unless mjnodes.empty?
         n = mjnodes.filter('[data-mathml]')[0]
         mml = n.attribute('data-mathml') if n
         mjnodes.each(&:remove)
       end
-      if latex.content.length > 0
+      if !latex.content.empty?
         if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/ && latex.content !~ /[\\+-^=<>]|{.+}/
           # the content is not delimineted latex,
           # and doesn't even _look like_ latex
@@ -149,7 +149,7 @@ module QuizMathDataFixup
     html.search('[id^="MathJax"]').each(&:remove)
     html.search('span.hidden-readable').each(&:remove)
 
-    return html_str if html.content.length == 0 && html.search('img.equation_image').length == 0
+    return html_str if html.content.empty? && html.search('img.equation_image').empty?
 
     html.to_s
   end

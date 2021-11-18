@@ -747,7 +747,7 @@ class ContextModulesController < ApplicationController
 
       if overrideables.any?
         ActiveRecord::Associations::Preloader.new.preload(overrideables, :assignment_overrides)
-        overrideables.each { |o| o.has_no_overrides = true if o.assignment_overrides.size == 0 }
+        overrideables.each { |o| o.has_no_overrides = true if o.assignment_overrides.empty? }
       end
     end
   end

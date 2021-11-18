@@ -214,7 +214,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: qs_id)
 
       # Check if there are any events in the QLA
-      if events.size == 0
+      if events.empty?
         Rails.logger.warn LOG_PREFIX + "Skipping because there are no QLA events\tsubmission_id: #{submission.id}"
         return false
       end

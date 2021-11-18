@@ -371,7 +371,7 @@ class Collaboration < ActiveRecord::Base
   def add_groups_to_collaborators(group_ids)
     return unless context.respond_to?(:groups)
 
-    if group_ids.length > 0
+    unless group_ids.empty?
       existing_groups = collaborators.where(:group_id => group_ids).select(:group_id)
       context.groups.where(:id => group_ids).where.not(:id => existing_groups).each do |g|
         collaborator = collaborators.build
@@ -388,7 +388,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def add_users_to_collaborators(users)
-    if users.length > 0
+    unless users.empty?
       existing_users = collaborators.where(:user_id => users).select(:user_id)
       context.potential_collaborators.where(:id => users).where.not(:id => existing_users).each do |u|
         collaborators.create(:user => u, :authorized_service_user_id => authorized_service_user_id_for(u))

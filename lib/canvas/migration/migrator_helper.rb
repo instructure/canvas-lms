@@ -471,7 +471,7 @@ module Canvas::Migration
         end
       end
 
-      if dates.length > 0
+      unless dates.empty?
         @overview[:start_timestamp] ||= dates.min
         @overview[:end_timestamp] ||= dates.max
       end

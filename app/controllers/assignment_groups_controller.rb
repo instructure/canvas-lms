@@ -449,7 +449,7 @@ class AssignmentGroupsController < ApplicationController
     end
 
     if assignment_includes.include?(:assignment_overrides)
-      assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
+      assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.empty? }
     end
 
     assignments

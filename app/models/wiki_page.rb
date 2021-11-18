@@ -168,7 +168,7 @@ class WikiPage < ActiveRecord::Base
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
     # instead of "front-page-1"
-    if urls.size > 0 && urls.detect { |u| u == base_url }
+    if !urls.empty? && urls.detect { |u| u == base_url }
       n = 2
       while urls.detect { |u| u == "#{base_url}-#{n}" }
         n = n.succ

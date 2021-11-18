@@ -59,7 +59,7 @@ module CanvasBreachMitigation
       private
 
       def unmasked_token(encoded_masked_token)
-        if encoded_masked_token.nil? || encoded_masked_token.length == 0
+        if encoded_masked_token.nil? || encoded_masked_token.empty?
           return SecureRandom.base64(AUTHENTICITY_TOKEN_LENGTH)
         end
 

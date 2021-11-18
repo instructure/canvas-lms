@@ -33,7 +33,7 @@ module CC
     def create_grading_standards(document = nil)
       add_referenced_grading_standards if for_course_copy
       standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact.uniq(&:id).select { |s| export_object?(s) }
-      return nil unless standards_to_copy.size > 0
+      return nil if standards_to_copy.empty?
 
       if document
         standards_file = nil

@@ -122,7 +122,7 @@ module Qti
             node.at_css('choiceInteraction') || node.at_css('associateInteraction')
         }
 
-        if text_nodes.length > 0
+        if !text_nodes.empty?
           @question[:question_text] = ''
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0

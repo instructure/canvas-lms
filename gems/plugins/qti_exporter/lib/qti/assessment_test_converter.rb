@@ -144,7 +144,7 @@ module Qti
     end
 
     def self.parse_time_limit(time_limit)
-      time_indicator = time_limit[0..0].downcase if time_limit.length > 0
+      time_indicator = time_limit[0..0].downcase unless time_limit.empty?
       case time_indicator
       when 'd'
         24 * 60 * time_limit[1..].to_i

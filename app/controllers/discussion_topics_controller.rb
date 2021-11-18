@@ -1109,7 +1109,7 @@ class DiscussionTopicsController < ApplicationController
   def reorder
     if authorized_action(@context.discussion_topics.temp_record, @current_user, :update)
       order = Api.value_to_array(params[:order])
-      reject! "order parameter required" unless order && order.length > 0
+      reject! "order parameter required" unless order && !order.empty?
       topics = pinned_topics.where(id: order)
       reject! "topics not found" unless topics.length == order.length
       topics[0].update_order(order)
@@ -1489,7 +1489,7 @@ class DiscussionTopicsController < ApplicationController
     # handle creating/removing attachment
     if @topic.grants_right?(@current_user, session, :attach)
       attachment = params[:attachment] &&
-                   params[:attachment].size > 0 &&
+                   !params[:attachment].empty? &&
                    params[:attachment]
 
       return if attachment && attachment.size > 1.kilobytes &&
