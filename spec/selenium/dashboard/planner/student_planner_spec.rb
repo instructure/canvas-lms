@@ -354,7 +354,7 @@ describe "student planner" do
       view_todo_item
       element = ff('input', @modal)[1]
       element.click
-      date = format_date_for_view(Time.zone.now, :long).split(" ")
+      date = format_date_for_view(Time.zone.now, :long).split
       day =
         if date[1] == '15'
           date[1] = '20'

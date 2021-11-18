@@ -434,7 +434,7 @@ describe "Outcomes API", type: :request do
       end
 
       it "fails (400) if the outcome is invalid" do
-        too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
+        too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
         raw_api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                      { :controller => 'outcomes_api',
                        :action => 'update',

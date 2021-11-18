@@ -249,6 +249,8 @@ Style/PreferredHashMethods:
 Style/QuotedSymbols:
   EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
   Severity: error
+Style/RedundantArgument:
+  Severity: error
 Style/RedundantAssignment:
   Severity: error
 Style/RedundantBegin:

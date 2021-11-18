@@ -30,7 +30,7 @@ module ColorCommon
     r_g_b_a = rgba.sub('rgba(', '').sub(')', '').split(',').map(&:strip)
 
     r_g_b = r_g_b_a[0..2]
-    r_g_b.map { |num| format("%02X", num.to_i) }.join('')
+    r_g_b.map { |num| format("%02X", num.to_i) }.join
   end
   module_function :rgba_to_hex
 

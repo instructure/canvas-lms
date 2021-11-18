@@ -508,7 +508,7 @@ describe "/submissions/show" do
         assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML5.fragment(response.body)
-        classes = html.css('div.rubric_container').attribute('class').value.split(' ')
+        classes = html.css('div.rubric_container').attribute('class').value.split
         expect(classes).not_to include('assessing')
       end
 
@@ -544,7 +544,7 @@ describe "/submissions/show" do
         assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML5.fragment(response.body)
-        classes = html.css('div.rubric_container').attribute('class').value.split(' ')
+        classes = html.css('div.rubric_container').attribute('class').value.split
         expect(classes).to include('assessing')
       end
     end
@@ -560,7 +560,7 @@ describe "/submissions/show" do
         assign(:submission, @submission)
         render 'submissions/show'
         html = Nokogiri::HTML5.fragment(response.body)
-        classes = html.css('div.rubric_container').attribute('class').value.split(' ')
+        classes = html.css('div.rubric_container').attribute('class').value.split
         expect(classes).not_to include('assessing')
       end
     end
@@ -612,7 +612,7 @@ describe "/submissions/show" do
         assign(:assessment_request, @assessment_request)
         render 'submissions/show'
         html = Nokogiri::HTML5.fragment(response.body)
-        classes = html.css('div.rubric_container').attribute('class').value.split(' ')
+        classes = html.css('div.rubric_container').attribute('class').value.split
         expect(classes).to include('assessing')
       end
     end

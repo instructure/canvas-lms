@@ -440,7 +440,7 @@ describe "Screenreader Gradebook" do
       curve_form.curve_grade_submit
       accept_alert
 
-      assignment_score = SRGB.assignment_scores.text.split(' ')
+      assignment_score = SRGB.assignment_scores.text.split
       # assignment avg score, high score, low score
       scores_as_string = ['13', '20', '8']
       (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }

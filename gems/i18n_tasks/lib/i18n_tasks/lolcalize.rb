@@ -46,7 +46,7 @@ module I18nTasks
           s
         end
       end
-      result.join('')
+      result.join
     end
 
     def i18n_lolcalize(default_thing)
