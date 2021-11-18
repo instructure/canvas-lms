@@ -1860,7 +1860,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.find_from_path(path, context)
-    list = path.split("/").select { |f| !f.empty? }
+    list = path.split("/").reject(&:empty?)
     if list[0] != Folder.root_folders(context).first.name
       list.unshift(Folder.root_folders(context).first.name)
     end

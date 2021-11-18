@@ -3684,12 +3684,12 @@ class CoursesController < ApplicationController
     # in pure ruby
     if include_observed || !params[:state]
       if params[:enrollment_role]
-        enrollments.reject! { |e| e.role.name != params[:enrollment_role] }
+        enrollments.select! { |e| e.role.name == params[:enrollment_role] }
       elsif params[:enrollment_role_id]
-        enrollments.reject! { |e| e.role_id != params[:enrollment_role_id].to_i }
+        enrollments.select! { |e| e.role_id == params[:enrollment_role_id].to_i }
       elsif params[:enrollment_type]
         e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-        enrollments.reject! { |e| e.class.name != e_type }
+        enrollments.select! { |e| e.class.name == e_type }
       end
 
       if params[:enrollment_state] && params[:enrollment_state] != "active"

@@ -763,7 +763,7 @@ class Submission < ActiveRecord::Base
     submission_response.each do |res_asset_string, response|
       self.turnitin_data[res_asset_string].merge!(response)
       self.turnitin_data_changed!
-      if !response[:object_id] && !(attempt < TURNITIN_RETRY)
+      if !response[:object_id] && attempt >= TURNITIN_RETRY
         self.turnitin_data[res_asset_string][:status] = 'error'
       end
     end
@@ -1104,7 +1104,7 @@ class Submission < ActiveRecord::Base
       # keep track of when we first submitted
       self.vericite_data_hash[res_asset_string][:submit_time] = Time.now.to_i if self.vericite_data_hash[res_asset_string][:submit_time].blank?
       self.vericite_data_changed!
-      if !response[:object_id] && !(attempt < VERICITE_RETRY)
+      if !response[:object_id] && attempt >= VERICITE_RETRY
         self.vericite_data_hash[res_asset_string][:status] = 'error'
       elsif response[:object_id]
         # success, make sure any error messages are cleared

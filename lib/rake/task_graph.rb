@@ -108,7 +108,7 @@ module Rake
 
     def ensure_all_nodes_are_defined!
       undefined = nodes.reduce([]) do |errors, (_node, deps)|
-        errors + deps.select { |dep| !nodes.key?(dep) }
+        errors + deps.reject { |dep| nodes.key?(dep) }
       end
 
       if undefined.any?

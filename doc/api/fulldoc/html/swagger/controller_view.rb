@@ -62,7 +62,7 @@ class ControllerView < HashView
     @controller.children.select do |method|
       method.tags.find do |tag|
         tag.tag_name.casecmp?("api")
-      end && !method.tags.any? do |tag|
+      end && method.tags.none? do |tag|
         tag.tag_name.casecmp?("internal")
       end
     end

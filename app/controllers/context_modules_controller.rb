@@ -744,7 +744,7 @@ class ContextModulesController < ApplicationController
 
       preload_has_too_many_overrides(assignments, :assignment_id)
       preload_has_too_many_overrides(plain_quizzes, :quiz_id)
-      overrideables = (assignments + plain_quizzes).select { |o| !o.has_too_many_overrides }
+      overrideables = (assignments + plain_quizzes).reject(&:has_too_many_overrides)
 
       if overrideables.any?
         ActiveRecord::Associations::Preloader.new.preload(overrideables, :assignment_overrides)

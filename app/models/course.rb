@@ -404,7 +404,7 @@ class Course < ActiveRecord::Base
   def modules_visible_to(user, array_is_okay: false)
     if self.grants_right?(user, :view_unpublished_items)
       if array_is_okay && association(:context_modules).loaded?
-        context_modules.select { |cm| !cm.deleted? }
+        context_modules.reject(&:deleted?)
       else
         context_modules.not_deleted
       end
@@ -1074,7 +1074,7 @@ class Course < ActiveRecord::Base
 
     if @user_ids_by_enroll_type
       self.shard.activate do
-        return !@user_ids_by_enroll_type.values.any? { |arr| arr.include?(user.id) }
+        return @user_ids_by_enroll_type.values.none? { |arr| arr.include?(user.id) }
       end
     end
 

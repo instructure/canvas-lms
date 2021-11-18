@@ -1270,7 +1270,7 @@ class CalendarEventsApiController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(events, [:rubric, :rubric_association])
       # improves locked_json performance
 
-      student_events = events.select { |e| !e.context.grants_right?(user, session, :read_as_admin) }
+      student_events = events.reject { |e| e.context.grants_right?(user, session, :read_as_admin) }
       Assignment.preload_context_module_tags(student_events) if student_events.any?
     end
 

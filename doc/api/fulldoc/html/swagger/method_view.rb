@@ -102,8 +102,8 @@ class MethodView < HashView
   def routes
     @routes ||= raw_routes.map do |raw_route|
       RouteView.new(raw_route, self)
-    end.select do |route|
-      route.api_path !~ /json$/
+    end.reject do |route|
+      route.api_path =~ /json$/
     end.uniq(&:swagger_path)
   end
 

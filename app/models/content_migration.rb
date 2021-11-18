@@ -63,7 +63,7 @@ class ContentMigration < ActiveRecord::Base
 
   def self.migration_plugins(exclude_hidden = false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
-    exclude_hidden ? plugins.select { |p| !p.meta[:hide_from_users] } : plugins
+    exclude_hidden ? plugins.reject { |p| p.meta[:hide_from_users] } : plugins
   end
 
   set_policy do

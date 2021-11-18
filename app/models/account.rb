@@ -1922,9 +1922,9 @@ class Account < ActiveRecord::Base
   # if it's :service or :setting, then only services set to be exposed as that type are returned
   def self.services_exposed_to_ui_hash(expose_as = nil, current_user = nil, account = nil)
     if expose_as
-      AccountServices.allowable_services.reject { |_, setting| setting[:expose_to_ui] != expose_as }
+      AccountServices.allowable_services.select { |_, setting| setting[:expose_to_ui] == expose_as }
     else
-      AccountServices.allowable_services.reject { |_, setting| !setting[:expose_to_ui] }
+      AccountServices.allowable_services.select { |_, setting| setting[:expose_to_ui] }
     end.reject { |_, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user, account) }
   end
 
@@ -2173,7 +2173,7 @@ class Account < ActiveRecord::Base
   end
 
   def user_needs_verification?(user)
-    self.require_confirmed_email? && (user.nil? || !user.cached_active_emails.any?)
+    self.require_confirmed_email? && (user.nil? || user.cached_active_emails.none?)
   end
 
   def allow_disable_post_to_sis_when_grading_period_closed?

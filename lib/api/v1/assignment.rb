@@ -1064,7 +1064,7 @@ module Api::V1::Assignment
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
       (
-        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment.submission_types.split(',').none? { |t| assignment_params['submission_types'].include?(t) } ||
         assignment_params['submission_types'].blank?
       )
   end
