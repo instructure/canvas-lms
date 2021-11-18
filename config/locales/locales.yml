@@ -602,7 +602,7 @@ fi:
     event: "%{date} klo %{time}"
     formats:
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k%M"
+      tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
 fr:
   bigeasy_locale: fr_FR
