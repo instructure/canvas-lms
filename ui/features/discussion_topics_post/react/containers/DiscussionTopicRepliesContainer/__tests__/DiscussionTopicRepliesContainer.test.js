@@ -38,7 +38,8 @@ jest.mock('../../../utils/constants', () => ({
 describe('DiscussionTopicRepliesContainer', () => {
   beforeAll(() => {
     window.ENV = {
-      course_id: '1'
+      course_id: '1',
+      per_page: 20
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
