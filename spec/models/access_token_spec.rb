@@ -173,7 +173,7 @@ describe AccessToken do
       trustedkey = DeveloperKey.create!(internal_service: true)
       user.access_tokens.create!({ developer_key: trustedkey })
 
-      untrustedkey = DeveloperKey.create!()
+      untrustedkey = DeveloperKey.create!
       third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
 
       expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
@@ -182,7 +182,7 @@ describe AccessToken do
 
     it "access token and developer key scoping work cross-shard" do
       trustedkey = DeveloperKey.new(internal_service: true)
-      untrustedkey = DeveloperKey.new()
+      untrustedkey = DeveloperKey.new
 
       @shard1.activate do
         trustedkey.save!

@@ -296,7 +296,7 @@ describe Login::SamlController do
         [saml_response, "https://otheraccount/courses/1"]
       )
 
-      account2 = double()
+      account2 = double
       expect(Account).to receive(:find_by_domain).and_return(account2)
       expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
 

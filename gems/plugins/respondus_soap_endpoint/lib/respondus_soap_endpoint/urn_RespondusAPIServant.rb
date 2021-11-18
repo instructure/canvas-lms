@@ -532,7 +532,7 @@ Implemented for: Canvas LMS)]
 
     def do_import(item, itemType, uploadType, _fileName, fileData)
       if fileData == "\x0" && session['pending_migration_id']
-        return poll_for_completion()
+        return poll_for_completion
       end
 
       unless %w[quiz qdb].include?(itemType)
@@ -595,13 +595,13 @@ Implemented for: Canvas LMS)]
       session['pending_migration_itemType'] = itemType
 
       if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        poll_for_completion()
+        poll_for_completion
       else
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.
         timeout(5.minutes.to_i) do
           loop do
-            ret = poll_for_completion()
+            ret = poll_for_completion
             if ret == ['pending']
               sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f) # rubocop:disable Lint/NoSleep
             else

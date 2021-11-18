@@ -53,7 +53,7 @@ describe Canvas::Migration::MigratorHelper do
         helper = subject.new
         helper.course = {}
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to be_nil
       end
 
@@ -61,7 +61,7 @@ describe Canvas::Migration::MigratorHelper do
         helper = subject.new
         helper.course = course
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to match_array [
           {
             title: 'Test Tool',
@@ -75,7 +75,7 @@ describe Canvas::Migration::MigratorHelper do
         course[:tool_profiles].first['tool_profile']['product_instance'] = {}
         helper.course = course
         helper.settings = { content_migration: content_migration }
-        helper.overview()
+        helper.overview
         expect(helper.overview[:tool_profiles]).to match_array []
       end
     end

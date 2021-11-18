@@ -58,7 +58,7 @@ describe LinkedIn::Connection do
                               "<last-name>doe</last-name>"\
                               "<public-profile-url>http://example.com/linkedin</public-profile-url>"\
                               "</html>"
-        mock_access_token = double()
+        mock_access_token = double
         expect(mock_access_token).to receive(:get)
           .with('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)')
           .and_return(double(body: token_response_body))

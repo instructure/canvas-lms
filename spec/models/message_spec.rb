@@ -346,7 +346,7 @@ describe Message do
       end
 
       it "deletes unreachable push endpoints" do
-        ne = double()
+        ne = double
         expect(ne).to receive(:push_json).and_return(false)
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
@@ -359,7 +359,7 @@ describe Message do
       end
 
       it "delivers to each of a user's push endpoints" do
-        ne = double()
+        ne = double
         expect(ne).to receive(:push_json).twice.and_return(true)
         expect(ne).not_to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
@@ -535,7 +535,7 @@ describe Message do
         end
 
         it 'uses the default host url if the asset context wont override it' do
-          message = message_model()
+          message = message_model
           expect(message.from_name).to eq HostUrl.outgoing_email_default_name
         end
 

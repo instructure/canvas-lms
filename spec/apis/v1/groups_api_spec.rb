@@ -146,7 +146,7 @@ describe "Groups API", type: :request do
       @group.add_user(@member, 'accepted', true)
       @group.reload
       account = @course.account
-      @admin_user = User.create!()
+      @admin_user = User.create!
       account.account_users.create!(user: @admin_user, account: account)
     end
 

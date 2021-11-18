@@ -362,7 +362,7 @@ describe NotificationMessageCreator do
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       communication_channel(u1, { username: 'user1@example.com', active_cc: true })
-      @a = @course.assignments.create()
+      @a = @course.assignments.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).not_to be_empty
       expect(messages.length).to be(1)

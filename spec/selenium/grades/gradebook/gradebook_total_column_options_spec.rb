@@ -91,18 +91,18 @@ describe "Gradebook - total column menu options" do
     it 'changes the text on the toggle option when toggling' do
       dropdown_text = []
 
-      Gradebook.select_total_column_option()
+      Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
       Gradebook.select_total_column_option('grade-display-switcher', already_open: true)
       Gradebook.close_dialog_and_dont_show_again
 
-      Gradebook.select_total_column_option()
+      Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
       Gradebook.select_total_column_option('grade-display-switcher', already_open: true)
 
-      Gradebook.select_total_column_option()
+      Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
       expect(dropdown_text).to eq ['Display as Points', 'Display as Percentage', 'Display as Points']

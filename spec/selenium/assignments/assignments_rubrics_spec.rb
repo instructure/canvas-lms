@@ -431,7 +431,7 @@ describe "assignment rubrics" do
         f(' .rubric_title .icon-edit').click
         wait_for_ajaximations
 
-        fj('.criterion_use_range:visible').click()
+        fj('.criterion_use_range:visible').click
         wait_for_ajaximations
 
         expect(ffj(".range_rating:visible").count).to eq 2

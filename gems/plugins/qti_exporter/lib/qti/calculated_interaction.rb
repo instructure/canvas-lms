@@ -45,10 +45,10 @@ module Qti
       get_calculated_property('partial_credit_tolerance')
       @question[:partial_credit_tolerance] = @question[:partial_credit_tolerance].to_f if @question[:partial_credit_tolerance]
 
-      get_variables()
-      get_answer_sets()
-      get_feedback()
-      get_formulas()
+      get_variables
+      get_answer_sets
+      get_feedback
+      get_formulas
 
       if !@question[:answer_tolerance] &&
          (tolerance = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_tolerance]', 'value'))

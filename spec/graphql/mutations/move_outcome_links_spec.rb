@@ -27,8 +27,8 @@ describe Mutations::MoveOutcomeLinks do
     @site_admin = site_admin_user
     course_with_teacher
     @context = @course
-    @source_group = outcome_group_model()
-    @destination_group = outcome_group_model()
+    @source_group = outcome_group_model
+    @destination_group = outcome_group_model
 
     # belonging to other account
     @other_account = account_model

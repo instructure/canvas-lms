@@ -174,7 +174,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches for set length" do
         create_config_with_mock(2)
-        m = double()
+        m = double
         expect(m).to receive(:write).with(['media_sources2', 'hi', 2].join('/'), [@source], { :expires_in => 2 })
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -183,7 +183,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches indefinitely" do
         create_config_with_mock(nil)
-        m = double()
+        m = double
         expect(m).to receive(:write).with(['media_sources2', 'hi', nil].join('/'), [@source])
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }

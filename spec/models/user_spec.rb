@@ -1357,9 +1357,9 @@ describe User do
       end
 
       it "optionally shows pending enrollments in unpublished courses" do
-        course_factory()
+        course_factory
         teacher_in_course(:active_all => true)
-        student_in_course()
+        student_in_course
         expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string).map(&:id)).to include @student.id
       end
     end
@@ -2977,7 +2977,7 @@ describe User do
 
       it "checks for associated accounts on shards the user shares with the seeker" do
         # create target user on defualt shard
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -2989,7 +2989,7 @@ describe User do
       end
 
       it 'checks all shards, even if not actually associated' do
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -3003,7 +3003,7 @@ describe User do
 
       it 'falls back to user shard for callsite, if no account associations found for target user' do
         account = Account.default
-        target = user_factory()
+        target = user_factory
         seeker = account_admin_user(
           account: account,
           role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id)

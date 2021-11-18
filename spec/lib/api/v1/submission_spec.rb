@@ -592,7 +592,7 @@ describe Api::V1::Submission do
     end
 
     it "does not blow up when a quiz has a prior attachment" do
-      qsub = quiz_with_submission()
+      qsub = quiz_with_submission
       quiz = qsub.quiz
       quiz.attachments.create!(
         display_name: "submissions.zip",

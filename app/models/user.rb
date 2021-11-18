@@ -3206,7 +3206,7 @@ class User < ActiveRecord::Base
   def generate_observer_pairing_code
     code = nil
     loop do
-      code = SecureRandom.base64().gsub(/\W/, '')[0..5]
+      code = SecureRandom.base64.gsub(/\W/, '')[0..5]
       break unless ObserverPairingCode.active.where(code: code).exists?
     end
     observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)

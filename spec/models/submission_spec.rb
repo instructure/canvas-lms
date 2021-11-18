@@ -5835,7 +5835,7 @@ describe Submission do
 
   describe '#ensure_grader_can_grade' do
     before do
-      @submission = Submission.new()
+      @submission = Submission.new
     end
 
     context 'when #grader_can_grade? returns true' do
@@ -5873,7 +5873,7 @@ describe Submission do
 
   describe '#grader_can_grade?' do
     before do
-      @submission = Submission.new()
+      @submission = Submission.new
     end
 
     it "returns true if grade hasn't been changed" do

@@ -73,18 +73,18 @@ describe Quizzes::QuizReportsController, type: :request do
           end
 
           it 'defaults to false' do
-            expect(student_analysis()['includes_all_versions']).to eq false
+            expect(student_analysis['includes_all_versions']).to eq false
           end
         end
 
         describe 'includes_sis_ids' do
           it 'includes sis ids for users with access' do
-            expect(student_analysis()['includes_sis_ids']).to eq true
+            expect(student_analysis['includes_sis_ids']).to eq true
           end
 
           it 'does not include sis ids for users without access' do
             ta_in_course(active_all: true)
-            expect(student_analysis()['includes_sis_ids']).to eq false
+            expect(student_analysis['includes_sis_ids']).to eq false
           end
         end
       end

@@ -3020,7 +3020,7 @@ describe DiscussionTopicsController, type: :request do
       course_with_teacher(:active_all => true)
       @student = User.create!(:name => "foo", :short_name => "fo")
       student_in_course(:course => @course, :active_all => true)
-      group_discussion_topic_model()
+      group_discussion_topic_model
     end
 
     it "checks permissions" do
@@ -3038,7 +3038,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "cannot duplicate announcements" do
       @user = @teacher
-      announcement_model()
+      announcement_model
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@a.id}/duplicate",
                { :controller => "discussion_topics_api",
                  :action => "duplicate",
@@ -3080,7 +3080,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "404s if deleted" do
       @user = @teacher
-      discussion_topic_model()
+      discussion_topic_model
       @topic.destroy
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
                { :controller => "discussion_topics_api",

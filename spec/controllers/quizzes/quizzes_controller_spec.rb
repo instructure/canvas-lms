@@ -263,7 +263,7 @@ describe Quizzes::QuizzesController do
 
     context 'DIRECT_SHARE_ENABLED' do
       before :once do
-        course_quiz()
+        course_quiz
       end
 
       it "js_env DIRECT_SHARE_ENABLED is true when user can manage" do

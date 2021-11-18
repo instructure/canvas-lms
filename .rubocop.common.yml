@@ -230,6 +230,8 @@ Style/IfUnlessModifier:
   Enabled: false # can obscure important decisions or put too much code in a line
 Style/IfWithBooleanLiteralBranches:
   Severity: error
+Style/MethodCallWithoutArgsParentheses:
+  Severity: error
 Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
@@ -363,10 +365,6 @@ Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
   Enabled: false # TODO: autocorrect
 Style/Lambda: # TODO: autocorrect
-  Enabled: false
-Style/MethodCallWithArgsParentheses: # TODO: autocorrect
-  Enabled: false
-Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
   Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
   Enabled: false

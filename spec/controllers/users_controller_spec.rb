@@ -146,7 +146,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       allow(settings_mock).to receive(:enabled?).and_return(true)
 
@@ -173,7 +173,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -197,7 +197,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -217,7 +217,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization')
       allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')

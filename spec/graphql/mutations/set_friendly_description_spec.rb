@@ -84,7 +84,7 @@ describe Mutations::SetFriendlyDescription do
 
   context "passing description" do
     it "creates description if not on database" do
-      result = exec()
+      result = exec
       expect(res_field(result, "_id")).to be_present
       expect(res_field(result, "description")).to eql(description)
       expect(res_field(result, "workflowState")).to eql("active")
@@ -96,7 +96,7 @@ describe Mutations::SetFriendlyDescription do
         context: @course,
         description: "Some description"
       )
-      result = exec()
+      result = exec
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       friendly_description.reload
       expect(friendly_description.description).to eql(description)
@@ -110,7 +110,7 @@ describe Mutations::SetFriendlyDescription do
       )
       friendly_description.destroy
       expect(friendly_description.workflow_state).to eql("deleted")
-      result = exec()
+      result = exec
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       friendly_description.reload
       expect(friendly_description.workflow_state).to eql("active")
@@ -202,7 +202,7 @@ describe Mutations::SetFriendlyDescription do
       let(:current_user) { @student }
 
       it "returns error" do
-        result = exec()
+        result = exec
         expect_error(result, "not found")
       end
     end

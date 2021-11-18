@@ -139,7 +139,7 @@ module VeriCite
               paper_ext = ""
             end
             paper_size = 100 # File.size(
-            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open() }.merge!(opts))
+            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open }.merge!(opts))
           end
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
@@ -206,7 +206,7 @@ module VeriCite
       # default response is "ok" since VeriCite doesn't implement all functions
       response = {}
       begin
-        vericite_config = VeriCiteClient::Configuration.new()
+        vericite_config = VeriCiteClient::Configuration.new
         vericite_config.host = @host
         vericite_config.base_path = '/lms/v1'
         api_client = VeriCiteClient::ApiClient.new(vericite_config)
@@ -222,7 +222,7 @@ module VeriCite
         when :create_assignment
           context_id = course.id
           assignment_id = assignment.id
-          assignment_data = VeriCiteClient::AssignmentData.new()
+          assignment_data = VeriCiteClient::AssignmentData.new
           assignment_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
           assignment_data.assignment_instructions = assignment.description != nil ? assignment.description : ""
           assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
@@ -248,7 +248,7 @@ module VeriCite
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
-          report_meta_data = VeriCiteClient::ReportMetaData.new()
+          report_meta_data = VeriCiteClient::ReportMetaData.new
           report_meta_data.user_first_name = user.first_name
           report_meta_data.user_last_name = user.last_name
           report_meta_data.user_email = email(user)
@@ -259,7 +259,7 @@ module VeriCite
           if course
             report_meta_data.context_title = course.name != nil ? course.name : context_id
           end
-          external_content_data = VeriCiteClient::ExternalContentData.new()
+          external_content_data = VeriCiteClient::ExternalContentData.new
           external_content_data.external_content_id = "#{consumer}/#{context_id}/#{assignment_id}/#{user_id}/#{args[:pid]}"
           external_content_data.file_name = args[:ptl]
           external_content_data.upload_content_type = args[:pext]

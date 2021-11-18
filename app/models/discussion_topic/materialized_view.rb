@@ -118,7 +118,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     end
 
     if self.json_structure.present?
-      json_structure = relativize_json_structure_ids()
+      json_structure = relativize_json_structure_ids
       participant_ids = relativize_ids(self.participants_array)
       entry_ids = relativize_ids(self.entry_ids_array)
 

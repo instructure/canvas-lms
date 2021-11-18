@@ -322,7 +322,7 @@ describe "Screenreader Gradebook" do
 
       SRGB.visit(@course.id)
 
-      ui_options = Selenium::WebDriver::Support::Select.new(f("#section_select")).options().map(&:text)
+      ui_options = Selenium::WebDriver::Support::Select.new(f("#section_select")).options.map(&:text)
       sections.each do |section|
         expect(ui_options.include? section[:name]).to be_truthy
       end

@@ -131,7 +131,7 @@ module LtiOutbound
       tool.set_custom_fields(hash, resource_type)
       hash.merge!(tool.format_lti_params('custom', @link_params[:custom] || {}))
       hash.merge!(tool.format_lti_params('ext', @link_params[:ext] || {}))
-      set_resource_type_keys()
+      set_resource_type_keys
       hash['oauth_callback'] = 'about:blank'
 
       hash['ext_platform'] = overrides[:platform] if overrides.key?(:platform)

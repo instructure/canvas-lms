@@ -2702,7 +2702,7 @@ describe Enrollment do
     it "removes assignment overrides if they are only linked to this enrollment" do
       course_with_student
       assignment = assignment_model(:course => @course)
-      ao = AssignmentOverride.new()
+      ao = AssignmentOverride.new
       ao.assignment = assignment
       ao.title = "ADHOC OVERRIDE"
       ao.workflow_state = "active"

@@ -179,7 +179,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
 
       it 'lets me in' do
-        expect(api_index()).to have_key('quiz_submission_events')
+        expect(api_index).to have_key('quiz_submission_events')
       end
 
       context 'with a specific attempt' do

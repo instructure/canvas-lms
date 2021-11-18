@@ -558,14 +558,14 @@ describe CommunicationChannel do
             suppression_bounce: false
           )
         end
-        expect { bounce_action.call() }.to change {
+        expect { bounce_action.call }.to change {
           cc.reload.last_transient_bounce_at
         }
-        expect { bounce_action.call() }.to not_change {
+        expect { bounce_action.call }.to not_change {
           cc.reload.last_transient_bounce_at
         }
         Timecop.travel(3.hours) do
-          expect { bounce_action.call() }.to change {
+          expect { bounce_action.call }.to change {
             cc.reload.last_transient_bounce_at
           }
         end
@@ -739,7 +739,7 @@ describe CommunicationChannel do
     it "sends directly via SMS if configured" do
       expect(cc.e164_path).to eq '+18015555555'
       allow(InstStatsd::Statsd).to receive(:increment)
-      account = double()
+      account = double
       allow(account).to receive(:feature_enabled?).and_return(true)
       allow(account).to receive(:global_id).and_return('totes_an_ID')
       expect(Services::NotificationService).to receive(:process).with(

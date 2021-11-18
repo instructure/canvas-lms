@@ -2249,7 +2249,7 @@ describe AssignmentsController do
   end
 
   describe "GET list_google_docs" do
-    let(:connection) { double() }
+    let(:connection) { double }
     let(:params) { { course_id: @course.id, id: @assignment.id } }
 
     before do

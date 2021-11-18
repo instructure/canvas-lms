@@ -112,7 +112,7 @@ describe "assignments" do
 
         it "shows the moderate button when the assignment is published", priority: "1", test_id: 609412 do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          f('#assignment_publish_button').click()
+          f('#assignment_publish_button').click
           wait_for_ajaximations
           expect(f('#moderated_grading_button')).to be_displayed
         end
@@ -120,7 +120,7 @@ describe "assignments" do
         it "removes the moderate button when the assignment is unpublished", priority: "1", test_id: 609413 do
           @assignment.publish
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          f('#assignment_publish_button').click()
+          f('#assignment_publish_button').click
           wait_for_ajaximations
           expect(f('#moderated_grading_button')).not_to be_displayed
         end

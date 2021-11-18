@@ -49,7 +49,7 @@ module Canvas::Plugins::TicketingSystem
   describe BasePlugin do
     describe "#register!" do
       it "interacts with the ticketing system to get this plugin registered" do
-        ticketing = double()
+        ticketing = double
         plugin = FakePlugin.new(ticketing)
         expect(ticketing).to receive(:register_plugin).with("fake_plugin", plugin.settings)
         plugin.register!
@@ -69,7 +69,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#enabled?" do
-      let(:ticketing) { double() }
+      let(:ticketing) { double }
       let(:plugin) { FakePlugin.new(ticketing) }
 
       it "is true if the plugin is selected and the config has values" do

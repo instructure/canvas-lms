@@ -216,7 +216,7 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#show_submission_details?" do
     before do
-      @submission_stub = double()
+      @submission_stub = double
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end
 

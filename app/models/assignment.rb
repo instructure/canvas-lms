@@ -868,7 +868,7 @@ class Assignment < ActiveRecord::Base
     return false unless Canvas::Plugin.find(:vericite).try(:enabled?)
     return true if self.turnitin_settings[:current] && self.turnitin_settings[:vericite]
 
-    vericite = VeriCite::Client.new()
+    vericite = VeriCite::Client.new
     res = vericite.createOrUpdateAssignment(self, self.turnitin_settings)
 
     # make sure the defaults get serialized

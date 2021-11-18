@@ -272,7 +272,7 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course.asset_string]
 
       # second context the user cannot access
-      course_factory()
+      course_factory
       @course.calendar_events.create(:title => "unauthorized_course", :start_at => '2012-01-08 12:00:00')
       contexts.push(@course.asset_string)
 

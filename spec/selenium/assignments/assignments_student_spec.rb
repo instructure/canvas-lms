@@ -249,7 +249,7 @@ describe "assignments" do
     context "google drive" do
       before do
         PluginSetting.create!(:name => 'google_drive', :settings => {})
-        setup_google_drive()
+        setup_google_drive
       end
 
       after do
@@ -268,7 +268,7 @@ describe "assignments" do
       context "select file or folder" do
         before do
           # double out function calls
-          google_drive_connection = double()
+          google_drive_connection = double
           allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
           allow(google_drive_connection).to receive(:retrieve_access_token).and_return('access_token')
           allow(google_drive_connection).to receive(:authorized?).and_return(true)
@@ -305,7 +305,7 @@ describe "assignments" do
 
       it "forces users to authenticate", priority: "1", test_id: 161892 do
         # double out google drive
-        google_drive_connection = double()
+        google_drive_connection = double
         allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
         allow(google_drive_connection).to receive(:retrieve_access_token).and_return(nil)
         allow(google_drive_connection).to receive(:authorized?).and_return(nil)

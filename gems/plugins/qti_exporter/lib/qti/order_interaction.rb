@@ -33,7 +33,7 @@ module Qti
       else
         get_all_answers(match_map)
       end
-      get_feedback()
+      get_feedback
       @question
     end
 

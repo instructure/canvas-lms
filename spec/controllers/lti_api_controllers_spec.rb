@@ -165,7 +165,7 @@ describe LtiApiController, type: :request do
     result_data = opts[:result_data]
     raw_score = opts[:raw_score]
 
-    sourceid ||= source_id()
+    sourceid ||= source_id
 
     score_xml = ''
     if score
@@ -224,7 +224,7 @@ describe LtiApiController, type: :request do
   end
 
   def read_result(sourceid = nil)
-    sourceid ||= source_id()
+    sourceid ||= source_id
     <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -248,7 +248,7 @@ describe LtiApiController, type: :request do
   end
 
   def delete_result(sourceid = nil)
-    sourceid ||= source_id()
+    sourceid ||= source_id
     <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -660,7 +660,7 @@ describe LtiApiController, type: :request do
     end
 
     def update_result(score, sourcedid = nil)
-      sourcedid ||= source_id()
+      sourcedid ||= source_id
       {
         'lti_message_type' => 'basic-lis-updateresult',
         'sourcedid' => sourcedid,
@@ -669,7 +669,7 @@ describe LtiApiController, type: :request do
     end
 
     def read_result(sourcedid = nil)
-      sourcedid ||= source_id()
+      sourcedid ||= source_id
       {
         'lti_message_type' => 'basic-lis-readresult',
         'sourcedid' => sourcedid,
@@ -677,7 +677,7 @@ describe LtiApiController, type: :request do
     end
 
     def delete_result(sourcedid = nil)
-      sourcedid ||= source_id()
+      sourcedid ||= source_id
       {
         'lti_message_type' => 'basic-lis-deleteresult',
         'sourcedid' => sourcedid,
@@ -708,7 +708,7 @@ describe LtiApiController, type: :request do
         make_call('body' => update_result('0.6'))
         xml = check_success
 
-        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id()
+        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id
         expect(xml.at_css('message_response > result > resultscore > resultvaluesourcedid').content).to eq 'decimal'
         expect(xml.at_css('message_response > result > resultscore > textstring').content).to eq '0.6'
         submission = @assignment.submissions.where(user_id: @student).first
@@ -764,7 +764,7 @@ describe LtiApiController, type: :request do
 
         make_call('body' => read_result)
         xml = check_success
-        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id()
+        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id
         expect(xml.at_css('message_response > result > resultscore > textstring').content).to eq '0.4'
       end
     end

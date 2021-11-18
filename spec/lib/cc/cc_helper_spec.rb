@@ -265,7 +265,7 @@ describe CC::CCHelper do
       html = <<~HTML
         <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>
       HTML
-      keygen = double()
+      keygen = double
       expect(keygen).to receive(:create_key).and_return("silly-migration-id")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true, :key_generator => keygen)
       doc = Nokogiri::HTML5(@exporter.html_content(html))

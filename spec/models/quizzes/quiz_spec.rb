@@ -531,8 +531,8 @@ describe Quizzes::Quiz do
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
     q.quiz_questions.create!(:quiz_group => g)
     q.quiz_questions.create!(:quiz_group => g)
-    q.quiz_questions.create!()
-    q.quiz_questions.create!()
+    q.quiz_questions.create!
+    q.quiz_questions.create!
     q.quiz_questions.create!(:question_data => { :question_type => "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
@@ -1954,7 +1954,7 @@ describe Quizzes::Quiz do
   describe "#grants_right?" do
     before(:once) do
       quiz_model(course: @course)
-      @admin = account_admin_user()
+      @admin = account_admin_user
       teacher_in_course(:course => @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term

@@ -641,7 +641,7 @@ describe DiscussionTopicsController do
 
     it "marks as read when topic is in the future as teacher" do
       course_topic(:skip_set_user => true)
-      teacher2 = @course.shard.activate { user_factory() }
+      teacher2 = @course.shard.activate { user_factory }
       teacher2enrollment = @course.enroll_user(teacher2, "TeacherEnrollment")
       teacher2.save!
       teacher2enrollment.course = @course # set the reverse association

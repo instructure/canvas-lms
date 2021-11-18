@@ -359,7 +359,7 @@ describe SupportHelpers::Tii do
       it 'refreshes the attachments' do
         expect(Turnitin::AttachmentManager).to receive(:update_attachment).with(submission, attachment)
         fixer = SupportHelpers::Tii::LtiAttachmentFixer.new('email', nil, submission.id, attachment.id)
-        fixer.fix()
+        fixer.fix
       end
     end
   end

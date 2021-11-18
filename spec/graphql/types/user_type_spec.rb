@@ -501,7 +501,7 @@ describe Types::UserType do
     end
 
     it 'returns known users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 4)
+      known_users = @student.address_book.search_users.paginate(per_page: 4)
       result = type.resolve('recipients { usersConnection { nodes { _id } } }')
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
@@ -512,7 +512,7 @@ describe Types::UserType do
     end
 
     it 'searches users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 3)
+      known_users = @student.address_book.search_users.paginate(per_page: 3)
       User.find(known_users.first.id).update!(name: 'Matthew Lemon')
       result = type.resolve('recipients(search: "lemon") { usersConnection { nodes { _id } } }')
       expect(result[0]).to eq(known_users.first.id.to_s)

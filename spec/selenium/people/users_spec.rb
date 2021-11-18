@@ -44,7 +44,7 @@ describe "users" do
 
       new_login = f('.login:not(.blank)')
       expect(new_login).not_to be_nil
-      expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
+      expect(new_login.find_element(:css, '.account_name').text).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
       expect(pseudonym.valid_password?('qwertyuiop')).to be_truthy
     end

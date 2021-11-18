@@ -22,7 +22,7 @@ require_dependency "broadcast_policies/assignment_policy"
 module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) {
-      ctx = double()
+      ctx = double
       allow(ctx).to receive(:available?).and_return(true)
       allow(ctx).to receive(:concluded?).and_return(false)
       ctx

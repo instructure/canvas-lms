@@ -58,7 +58,7 @@ describe ExternalToolsController do
 
     it "does not return a JWT token for another context" do
       teacher_course = @course
-      other_course = course_factory()
+      other_course = course_factory
 
       @tool.context_id = other_course.id
       @tool.save!

@@ -253,7 +253,7 @@ module MessageBus
         # if we're forcing fresh, we want to close our existing
         # connections as politely as possible
         begin
-          cached_object.close()
+          cached_object.close
         rescue ::Pulsar::Error::AlreadyClosed
           Rails.logger.warn("evicting an already-closed pulsar topic client for #{path}")
         end
@@ -387,7 +387,7 @@ module MessageBus
       if thread_conn_pool['producers'].present?
         thread_conn_pool['producers'].each do |_namespace, topic_map|
           topic_map.each do |topic, producer|
-            producer.close()
+            producer.close
           rescue Pulsar::Error::AlreadyClosed
             Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
           end
@@ -399,7 +399,7 @@ module MessageBus
       thread_conn_pool['consumers'].each do |_namespace, topic_map|
         topic_map.each do |topic, subscription_map|
           subscription_map.each do |sub_name, consumer|
-            consumer.close()
+            consumer.close
           rescue Pulsar::Error::AlreadyClosed
             Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
           end

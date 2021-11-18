@@ -335,7 +335,7 @@ class UserMerge
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
         merge_data.build_more_data(scope, data: data)
-        scope.touch_all()
+        scope.touch_all
         scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
     end

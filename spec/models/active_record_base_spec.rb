@@ -386,8 +386,8 @@ describe ActiveRecord::Base do
 
   context "distinct_values" do
     before :once do
-      User.create()
-      User.create()
+      User.create
+      User.create
       User.create(:locale => "en")
       User.create(:locale => "en")
       User.create(:locale => "es")
@@ -405,7 +405,7 @@ describe ActiveRecord::Base do
   context "find_ids_in_batches" do
     it "returns ids from the table in batches of specified size" do
       ids = []
-      5.times { ids << User.create!().id }
+      5.times { ids << User.create!.id }
       batches = []
       User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
         batches << found_ids
@@ -417,7 +417,7 @@ describe ActiveRecord::Base do
   describe "find_ids_in_ranges" do
     before :once do
       @ids = []
-      10.times { @ids << User.create!().id }
+      10.times { @ids << User.create!.id }
     end
 
     it "returns ids from the table in ranges" do

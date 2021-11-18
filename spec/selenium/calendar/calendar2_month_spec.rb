@@ -266,7 +266,7 @@ describe "calendar2" do
 
       it "deletes an assignment" do
         create_middle_day_assignment
-        f('.fc-event').click()
+        f('.fc-event').click
         hover_and_click '.delete_event_link'
         expect(f('.ui-dialog .ui-dialog-buttonset')).to be_displayed
         wait_for_ajaximations
