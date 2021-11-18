@@ -29,6 +29,33 @@ import DimensionInput from './DimensionInput'
 
 export {default as useDimensionsState} from './useDimensionsState'
 
+const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
+  let result = {text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}
+  if (dimensionsState.usePercentageUnits) {
+    if (!dimensionsState.isNumeric) {
+      result = {text: formatMessage('Percentage must be a number'), type: 'error'}
+    } else if (!dimensionsState.isAtLeastMinimums) {
+      result = {
+        text: formatMessage('Must be at least {percentage}%', {
+          percentage: minPercentage
+        }),
+        type: 'error'
+      }
+    }
+  } else if (!dimensionsState.isNumeric) {
+    result = {text: formatMessage('Width and height must be numbers'), type: 'error'}
+  } else if (!dimensionsState.isAtLeastMinimums) {
+    result = {
+      text: formatMessage('Must be at least {width} x {height}px', {
+        width: minWidth,
+        height: minHeight
+      }),
+      type: 'error'
+    }
+  }
+  return result
+}
+
 export default function DimensionsInput(props) {
   const {dimensionsState, minHeight, minWidth, minPercentage} = props
 
@@ -36,45 +63,12 @@ export default function DimensionsInput(props) {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
   }
 
-  let messages = [{text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}]
-
-  if (!dimensionsState.isNumeric) {
-    messages = [
-      {
-        text: formatMessage('Width and height must be numbers'),
-        type: 'error'
-      }
-    ]
-  } else if (!dimensionsState.isAtLeastMinimums) {
-    if (dimensionsState.usePercentageUnits) {
-      messages = [
-        {
-          text: formatMessage('Must be at least {percentage}%', {
-            percentage: minPercentage
-          }),
-          type: 'error'
-        }
-      ]
-    } else {
-      messages = [
-        {
-          text: formatMessage('Must be at least {width} x {height}px', {
-            width: minWidth,
-            height: minHeight
-          }),
-          type: 'error'
-        }
-      ]
-    }
-  }
+  const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
 
   return (
-    <FormFieldGroup
-      description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
-      messages={messages}
-    >
+    <>
       <Flex direction="column">
-        <Flex.Item margin="small none none none" padding="small">
+        <Flex.Item padding="small">
           <RadioInputGroup
             data-testid="dimension-type"
             name="dimension-type"
@@ -87,43 +81,48 @@ export default function DimensionsInput(props) {
           </RadioInputGroup>
         </Flex.Item>
       </Flex>
-      <Flex alignItems="start" direction="row" data-testid="input-number-container">
-        {dimensionsState.usePercentageUnits ? (
-          <>
-            <Flex.Item shouldShrink shouldGrow>
-              <DimensionInput
-                dimensionState={dimensionsState.percentageState}
-                label={formatMessage('Percentage')}
-              />
-            </Flex.Item>
+      <FormFieldGroup
+        description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
+        messages={[message]}
+      >
+        <Flex alignItems="start" direction="row" data-testid="input-number-container">
+          {dimensionsState.usePercentageUnits ? (
+            <>
+              <Flex.Item shouldShrink shouldGrow>
+                <DimensionInput
+                  dimensionState={dimensionsState.percentageState}
+                  label={formatMessage('Percentage')}
+                />
+              </Flex.Item>
 
-            <Flex.Item padding="x-small small">%</Flex.Item>
-          </>
-        ) : (
-          <>
-            <Flex.Item shrink>
-              <DimensionInput
-                dimensionState={dimensionsState.widthState}
-                label={formatMessage('Width')}
-                minValue={minWidth}
-              />
-            </Flex.Item>
+              <Flex.Item padding="x-small small">%</Flex.Item>
+            </>
+          ) : (
+            <>
+              <Flex.Item shrink>
+                <DimensionInput
+                  dimensionState={dimensionsState.widthState}
+                  label={formatMessage('Width')}
+                  minValue={minWidth}
+                />
+              </Flex.Item>
 
-            <Flex.Item padding="x-small small">
-              <IconLockLine />
-            </Flex.Item>
+              <Flex.Item padding="x-small small">
+                <IconLockLine />
+              </Flex.Item>
 
-            <Flex.Item shrink>
-              <DimensionInput
-                dimensionState={dimensionsState.heightState}
-                label={formatMessage('Height')}
-                minValue={minHeight}
-              />
-            </Flex.Item>
-          </>
-        )}
-      </Flex>
-    </FormFieldGroup>
+              <Flex.Item shrink>
+                <DimensionInput
+                  dimensionState={dimensionsState.heightState}
+                  label={formatMessage('Height')}
+                  minValue={minHeight}
+                />
+              </Flex.Item>
+            </>
+          )}
+        </Flex>
+      </FormFieldGroup>
+    </>
   )
 }
 
