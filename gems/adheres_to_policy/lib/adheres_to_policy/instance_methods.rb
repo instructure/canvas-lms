@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'active_support/core_ext/enumerable'
+
 module AdheresToPolicy
   module InstanceMethods
     # Public: Gets the requested rights granted to a user.
