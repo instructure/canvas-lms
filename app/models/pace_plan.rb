@@ -84,12 +84,23 @@ class PacePlan < ActiveRecord::Base
     pace_plan
   end
 
+  def create_publish_progress(run_at: Setting.get("pace_plan_publish_interval", "300").to_i.seconds.from_now)
+    progress = Progress.create!(context: self, tag: "pace_plan_publish")
+    progress.process_job(self, :publish, {
+                           run_at: run_at,
+                           singleton: "pace_plan_publish:#{id}",
+                           on_conflict: :overwrite
+                         })
+    progress
+  end
+
   def publish(progress = nil)
     assignments_to_refresh = Set.new
     Assignment.suspend_due_date_caching do
       Assignment.suspend_grading_period_grade_recalculation do
         progress&.calculate_completion!(0, student_enrollments.size)
         ordered_module_items = pace_plan_module_items.not_deleted
+                                                     .sort_by { |ppmi| ppmi.module_item.position }
                                                      .group_by { |ppmi| ppmi.module_item.context_module }
                                                      .sort_by { |context_module, _items| context_module.position }
                                                      .to_h.values.flatten

@@ -31,7 +31,6 @@ describe PacePlan do
     @pace_plan_module_item = @pace_plan.pace_plan_module_items.create! module_item: @tag
     @unpublished_assignment = @course.assignments.create! workflow_state: "unpublished"
     @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module", workflow_state: "unpublished"
-    @pace_plan.pace_plan_module_items.create! module_item: @unpublished_tag
   end
 
   context "associations" do
