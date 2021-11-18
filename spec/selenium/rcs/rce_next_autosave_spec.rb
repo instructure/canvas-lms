@@ -216,6 +216,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear # blur tinymce to force autosave
     end
   end
+
   context 'WYSIWYG generic as an admin' do
     before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)

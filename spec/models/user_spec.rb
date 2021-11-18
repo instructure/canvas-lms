@@ -2230,6 +2230,7 @@ describe User do
       expect(User.avatar_key(0)).to eq "0"
     end
   end
+
   describe "user_id_from_avatar_key" do
     it "returns a valid user id for a valid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0, 10]}")).to eq '1'

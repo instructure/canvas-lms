@@ -1394,6 +1394,7 @@ describe ExternalToolsController do
         post 'create', params: params, format: 'json'
         ContextExternalTool.find_by(id: tool_id)
       end
+
       let(:tool_id) { response.status == 200 ? JSON.parse(response.body)['id'] : -1 }
       let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
       let(:developer_key) { DeveloperKey.create!(account: account) }

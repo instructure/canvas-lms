@@ -5091,6 +5091,7 @@ describe AssignmentsApiController, type: :request do
         expect(@assignment.reload).not_to be_deleted
       end
     end
+
     context "when user requesting the deletion has permission to delete" do
       it "deletes the assignment " do
         teacher_in_course(:course => @course, :active_all => true)

@@ -304,11 +304,13 @@ module Canvas::OAuth
     context 'with valid client_id' do
       describe '#error_message' do
         subject { provider.error_message }
+
         it { is_expected.to be_empty }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
+
         it { is_expected.to be true }
       end
 
@@ -330,11 +332,13 @@ module Canvas::OAuth
 
       describe '#error_message' do
         subject { provider.error_message }
+
         it { is_expected.to eq("Unknown client_id") }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
+
         it { is_expected.to be false }
       end
     end

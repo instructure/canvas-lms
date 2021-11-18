@@ -2639,6 +2639,7 @@ describe Assignment do
   describe "#submission_type?" do
     shared_examples_for "submittable" do
       subject(:assignment) { Assignment.new }
+
       let(:be_type) { "be_#{submission_type}".to_sym }
       let(:build_type) { "build_#{submission_type}".to_sym }
 

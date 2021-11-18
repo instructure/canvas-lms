@@ -357,6 +357,7 @@ describe ContextExternalTool do
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       subject { second_tool.duplicated_in_context? }
+
       let(:context) { raise 'Override in spec' }
       let(:second_tool) { tool.dup }
       let(:settings) do

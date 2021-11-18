@@ -1186,6 +1186,7 @@ describe "Module Items API", type: :request do
             expect(json.map { |item| item['id'] }.sort).to eq @module1.content_tags.map(&:id).sort
           end
         end
+
         context 'without override' do
           it "excludes unassigned assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",

@@ -292,6 +292,7 @@ describe Lti::IMS::NamesAndRolesController do
         end
       end
     end
+
     context 'when the rlid param does not specify the course context LTI ID' do
       let(:rlid_param) { "nonsense-#{expected_lti_id(course)}" }
 

@@ -2751,6 +2751,7 @@ describe Quizzes::QuizzesController do
         expect(controller.js_env[:QUIZZES][:assignment]).to eq []
       end
     end
+
     context 'show' do
       it 'shows the page to students with visibility' do
         user_session(@student1)

@@ -843,6 +843,7 @@ describe MicrosoftSync::SyncerSteps do
 
   describe '#step_partial_sync' do
     subject { syncer_steps.step_partial_sync(nil, nil) }
+
     let(:sync_type_statsd_tag) { 'partial' }
 
     before { group.update! ms_group_id: 'mygroup' }
