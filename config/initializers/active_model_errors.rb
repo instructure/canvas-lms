@@ -26,11 +26,10 @@ module ActiveModel
     # take a long time though.
     class InstructureHashReporter < HashReporter
       def to_hash
-        error_hash = collection.to_hash.inject({}) do |hash, (attribute, error_message_set)|
+        error_hash = collection.to_hash.each_with_object({}) do |(attribute, error_message_set), hash|
           hash[attribute] = error_message_set.map do |error_message|
             format_error_message(attribute, error_message)
           end
-          hash
         end
         { errors: error_hash }
       end

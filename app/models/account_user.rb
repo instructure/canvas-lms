@@ -177,9 +177,8 @@ class AccountUser < ActiveRecord::Base
   end
 
   def self.is_subset_of?(user, account, role)
-    needed_permissions = RoleOverride.manageable_permissions(account).keys.inject({}) do |result, permission|
-      result[permission] = RoleOverride.enabled_for?(account, permission, role, account)
-      result
+    needed_permissions = RoleOverride.manageable_permissions(account).keys.index_with do |permission|
+      RoleOverride.enabled_for?(account, permission, role, account)
     end
     target_permissions = AccountUser.all_permissions_for(user, account)
     needed_permissions.all? do |(permission, needed_permission)|

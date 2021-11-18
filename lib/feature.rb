@@ -226,10 +226,9 @@ class Feature
   def default_transitions(context, orig_state)
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
-    (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
+    (valid_states - [orig_state]).index_with do |state|
+      { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
         context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
-      transitions
     end
   end
 

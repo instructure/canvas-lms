@@ -738,9 +738,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                     @mm.master_template.content_tags.where(:migration_id => tags.map(&:migration_id))
                   end
 
-    master_tags.inject(Set.new) do |ids, tag|
+    master_tags.each_with_object(Set.new) do |tag, ids|
       ids << tag.migration_id if tag.restrictions&.values&.any?
-      ids
     end
   end
 

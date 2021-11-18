@@ -1243,10 +1243,9 @@ class Account < ActiveRecord::Base
       shard.activate do
         all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
           # this is a plain ruby hash to keep the cached portion as small as possible
-          self.account_users.active.inject({}) { |result, au|
+          self.account_users.active.each_with_object({}) { |au, result|
             result[au.user_id] ||= []
             result[au.user_id] << [au.id, au.role_id]
-            result
           }
         end
         (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|

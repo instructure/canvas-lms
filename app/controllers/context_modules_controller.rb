@@ -33,14 +33,13 @@ class ContextModulesController < ApplicationController
 
     def load_module_file_details
       attachment_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').preload(:content => :folder).to_a }
-      attachment_tags.inject({}) do |items, file_tag|
+      attachment_tags.each_with_object({}) do |file_tag, items|
         items[file_tag.id] = {
           id: file_tag.id,
           content_id: file_tag.content_id,
           content_details: content_details(file_tag, @current_user, :for_admin => true),
           module_id: file_tag.context_module_id
         }
-        items
       end
     end
 

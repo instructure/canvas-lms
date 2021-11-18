@@ -137,12 +137,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
 
-    answers = params.to_unsafe_h.fetch(:quiz_questions, []).reduce({}) do |hsh, p|
+    answers = params.to_unsafe_h.fetch(:quiz_questions, []).each_with_object({}) do |p, hsh|
       if p[:id].present?
         hsh[p[:id].to_i] = p[:answer] || []
       end
-
-      hsh
     end
 
     quiz_questions = @quiz.quiz_questions.where(id: answers.keys)

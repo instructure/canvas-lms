@@ -80,9 +80,8 @@ class WebConference < ActiveRecord::Base
 
   def user_settings
     @user_settings ||=
-      self.class.user_setting_fields.keys.inject({}) { |hash, key|
-        hash[key] = settings[key]
-        hash
+      self.class.user_setting_fields.keys.index_with { |key|
+        settings[key]
       }
   end
 
@@ -142,9 +141,8 @@ class WebConference < ActiveRecord::Base
 
   def default_settings
     @default_settings ||=
-      self.class.user_setting_fields.inject({}) { |hash, (name, data)|
+      self.class.user_setting_fields.each_with_object({}) { |(name, data), hash|
         hash[name] = data[:default] if data[:default]
-        hash
       }
   end
 

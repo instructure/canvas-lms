@@ -156,21 +156,20 @@ class SubmissionList
 
   # Returns an array of graders with an array of assignment open structs
   def graders_for_day(day)
-    hsh = self.list[day].inject({}) do |h, submission|
+    hsh = self.list[day].each_with_object({}) do |submission, h|
       grader = submission[:grader]
       h[grader] ||= OpenObject.new(
         :assignments => assignments_for_grader_and_day(grader, day),
         :name => grader,
         :grader_id => submission[:grader_id]
       )
-      h
     end
     hsh.values
   end
 
   # Returns an array of assignments with an array of submission open structs.
   def assignments_for_grader_and_day(grader, day)
-    hsh = submission_entries.find_all { |e| e[:grader] == grader and e[:graded_on] == day }.inject({}) do |h, submission|
+    hsh = submission_entries.find_all { |e| e[:grader] == grader and e[:graded_on] == day }.each_with_object({}) do |submission, h|
       assignment = submission[:assignment_name]
       h[assignment] ||= OpenObject.new(
         :name => assignment,
@@ -179,8 +178,6 @@ class SubmissionList
       )
 
       h[assignment].submissions << OpenObject.new(submission)
-
-      h
     end
 
     hsh.each_value do |v|
@@ -195,16 +192,15 @@ class SubmissionList
   # all the meta data we need and no banned keys included.
   def process
     @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }
-                .inject(Hashery::Dictionary.new) do |d, se|
+                .each_with_object(Hashery::Dictionary.new) do |se, d|
       d[se[:graded_on]] ||= []
       d[se[:graded_on]] << se
-      d
     end
   end
 
   # A hash of the current grades of each submission, keyed by submission.id
   def current_grade_map
-    @current_grade_map ||= self.course.submissions.not_placeholder.inject({}) do |hash, submission|
+    @current_grade_map ||= self.course.submissions.not_placeholder.each_with_object({}) do |submission, hash|
       grader = if submission.grader_id.present?
                  self.grader_map[submission.grader_id].try(:name)
                end
@@ -213,7 +209,6 @@ class SubmissionList
       hash[submission.id] = OpenObject.new(:grade => translate_grade(submission),
                                            :graded_at => submission.graded_at,
                                            :grader => grader)
-      hash
     end
   end
 
@@ -243,7 +238,7 @@ class SubmissionList
     full_hash_list.sort_by! { |a| [a[:id], a[:updated_at]] }
     prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
 
-    @filtered_submissions = full_hash_list.inject([]) do |l, h|
+    @filtered_submissions = full_hash_list.each_with_object([]) do |h, l|
       # If the submission is different (not null for the first one, or just
       # different than the last one), set the previous_grade to nil (this is
       # the first version that changes a grade), set the new_grade to this
@@ -283,7 +278,6 @@ class SubmissionList
       prior_graded_at = h[:graded_at]
       prior_grader = h[:grader]
       prior_submission_id = h[:submission_id]
-      l
     end
   end
 
@@ -362,10 +356,7 @@ class SubmissionList
 
   # A hash of graders by their ids, for easy lookup in full_hash_list
   def grader_map
-    @grader_map ||= graders.inject({}) do |h, g|
-      h[g.id] = g
-      h
-    end
+    @grader_map ||= graders.index_by(&:id)
   end
 
   # A unique list of all student ids
@@ -381,10 +372,7 @@ class SubmissionList
 
   # A hash of students by their ids, for easy lookup in full_hash_list
   def student_map
-    @student_map ||= students.inject({}) do |h, s|
-      h[s.id] = s
-      h
-    end
+    @student_map ||= students.index_by(&:id)
   end
 
   # A unique list of all assignment ids
@@ -399,9 +387,6 @@ class SubmissionList
 
   # A hash of assignments by their ids, for easy lookup in full_hash_list
   def assignment_map
-    @assignment_map ||= assignments.inject({}) do |h, a|
-      h[a.id] = a
-      h
-    end
+    @assignment_map ||= assignments.index_by(&:id)
   end
 end
