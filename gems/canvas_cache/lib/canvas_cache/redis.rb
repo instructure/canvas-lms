@@ -361,7 +361,6 @@ module CanvasCache
       # one-off in script/console if you aren't using twemproxy, or in specs:
       ALLOWED_UNSUPPORTED = %w[
         keys
-        auth
         quit
         flushall
         flushdb
