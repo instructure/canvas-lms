@@ -1381,6 +1381,19 @@ describe GradebooksController do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
           expect(response).to redirect_to(action: "show")
         end
+
+        it "increments inst_statsd when learning mastery gradebook is visited" do
+          # The initial show view will redirect to show without the view query param the first time,
+          #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
+          #  the redirects
+          allow(InstStatsd::Statsd).to receive(:increment)
+          allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
+          get "show", params: { course_id: @course.id, view: "" }
+          expect(InstStatsd::Statsd).to have_received(:increment).with(
+            "outcomes_page_views",
+            tags: { type: "teacher_lmgb" }
+          )
+        end
       end
 
       context "when the user prefers gradebook" do
