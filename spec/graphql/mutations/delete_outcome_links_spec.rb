@@ -41,9 +41,9 @@ describe Mutations::DeleteOutcomeLinks do
   end
 
   def variables(args = {})
-    <<~YAML
+    <<~VARS
       ids: #{args[:ids] || [@outcome_link1.id]}
-    YAML
+    VARS
   end
 
   def execute_with_input(input, user_executing: @admin)

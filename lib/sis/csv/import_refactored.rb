@@ -27,7 +27,7 @@ module SIS
       attr_accessor :root_account, :batch, :finished, :counts,
                     :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
 
-      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i.freeze
+      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
       # The order of this array is important:
       #  * Account must be imported before Term and Course
@@ -91,20 +91,19 @@ module SIS
         @batch.data[:downloadable_attachment_ids] ||= []
         @files.each do |file|
           if File.file?(file)
-            case File.extname(file).downcase
-            when '.zip'
+            if File.extname(file).downcase == '.zip'
               tmp_dir = Dir.mktmpdir
               @tmp_dirs << tmp_dir
-              CanvasUnzip.extract_archive(file, tmp_dir)
+              CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
                 next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
 
-                file_name = fn[tmp_dir.size + 1..]
+                file_name = fn[tmp_dir.size + 1..-1]
                 att = create_batch_attachment(File.join(tmp_dir, file_name))
                 process_file(tmp_dir, file_name, att)
               end
-            when '.csv'
-              att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?('.csv')
+            elsif File.extname(file).downcase == '.csv'
+              att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).downcase == '.csv'
               att ||= create_batch_attachment file
               process_file(File.dirname(file), File.basename(file), att)
             end
@@ -189,7 +188,7 @@ module SIS
         if @run_immediately
           run_all_importers
         else
-          @parallel_importers = @parallel_importers.transform_values { |v| v.map(&:id) } # save as ids in handler
+          @parallel_importers = Hash[@parallel_importers.map { |k, v| [k, v.map(&:id)] }] # save as ids in handler
           remove_instance_variable(:@csvs) # don't need anymore
           queue_next_importer_set
         end
@@ -211,7 +210,7 @@ module SIS
 
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
-        current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.sum(&:count)).round, 99].min
+        current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round, 99].min
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
@@ -321,7 +320,7 @@ module SIS
           end
         end
         @parallel_importers.each do |type, importers|
-          @batch.data[:counts][type.to_s.pluralize.to_sym] = importers.sum(&:rows_processed)
+          @batch.data[:counts][type.to_s.pluralize.to_sym] = importers.map(&:rows_processed).sum
         end
         finish
       end
@@ -391,7 +390,7 @@ module SIS
 
       def process_file(base, file, att)
         csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
-        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?('.csv')
+        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return

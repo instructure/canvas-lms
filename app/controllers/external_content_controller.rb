@@ -42,8 +42,8 @@ class ExternalContentController < ApplicationController
     @retrieved_data = {}
     if params[:service] == 'equella'
       params.each do |key, value|
-        if key.to_s.start_with?('eq_')
-          @retrieved_data[key.to_s.delete_prefix('eq_')] = value
+        if key.to_s.match(/\Aeq_/)
+          @retrieved_data[key.to_s.gsub(/\Aeq_/, "")] = value
         end
       end
     elsif params[:return_type] == 'oembed'
@@ -101,7 +101,7 @@ class ExternalContentController < ApplicationController
       res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
       content_item = Lti::ContentItemConverter.convert_oembed(data)
-    rescue
+    rescue StandardError
       content_item = {}
     end
     render :json => [content_item]

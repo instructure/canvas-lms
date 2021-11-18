@@ -20,7 +20,7 @@ import sinon from 'sinon'
 
 import waitForCondition from '@canvas/network/NetworkFake/waitForCondition'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 
 QUnit.module('Gradebook > DataLoader', suiteHooks => {
@@ -296,6 +296,12 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
       await loadInitialData()
       strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 1)
+    })
+
+    test('loads context modules', async () => {
+      sinon.spy(dataLoader.contextModulesLoader, 'loadContextModules')
+      await loadInitialData()
+      strictEqual(dataLoader.contextModulesLoader.loadContextModules.callCount, 1)
     })
 
     test('loads custom columns', async () => {

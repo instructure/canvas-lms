@@ -86,7 +86,7 @@ describe ContentMigration do
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to eq topic.message
-      expect(@copy_to.syllabus_body).to match(%r{/courses/#{@copy_to.id}/discussion_topics/#{new_topic.id}})
+      expect(@copy_to.syllabus_body).to match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
     end
 
     it "copies course syllabus when the everything option is selected" do
@@ -625,13 +625,13 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       @copy_from.media_objects.create!(:media_id => '0_12345678')
-      @copy_from.syllabus_body = <<~HTML.strip
-        <p>
-          Hello, students.<br>
-          With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
-          Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
-          another type: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@copy_from.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
-        </p>
+      @copy_from.syllabus_body = <<-HTML.strip
+      <p>
+        Hello, students.<br>
+        With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
+        another type: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@copy_from.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
+      </p>
       HTML
 
       run_course_copy
@@ -841,14 +841,6 @@ describe ContentMigration do
 
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to.body).to eq(body % @copy_to.id.to_s)
-    end
-
-    it "copies over late policy" do
-      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: 'day')
-      run_course_copy
-
-      new_late_policy = @copy_to.late_policy
-      expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
     end
   end
 end

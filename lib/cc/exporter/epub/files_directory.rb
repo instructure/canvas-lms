@@ -48,7 +48,7 @@ module CC::Exporter::Epub
       begin
         add_files
       ensure
-        zip_file&.close
+        zip_file.close if zip_file
       end
 
       zip_file.to_s

@@ -28,7 +28,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       quiz_submission = restore_quiz_submission_from_versions_table_by_submission(submission, timestamp)
 
       # save the result
-      quiz_submission&.save_with_versioning!
+      quiz_submission.save_with_versioning! if quiz_submission
     end
 
     # Time.zone.parse("2015-05-08")

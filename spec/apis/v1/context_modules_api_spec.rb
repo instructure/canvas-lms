@@ -55,8 +55,7 @@ describe "Modules API", type: :request do
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
     @wiki_page = @course.wiki_pages.create!(:title => "Front Page", :body => "")
-    @wiki_page.workflow_state = 'active'
-    @wiki_page.save!
+    @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
     @module3 = @course.context_modules.create(:name => "module3")
@@ -65,7 +64,7 @@ describe "Modules API", type: :request do
   end
 
   before do
-    @attachment = attachment_model(:context => @course, :usage_rights => @course.usage_rights.create!(legal_copyright: '(C) 2012 Initrode', use_justification: 'creative_commons', license: 'cc_by_sa'), :uploaded_data => stub_file_data("test_image.jpg", Rails.root.join("spec/fixtures/test_image.jpg").read, "image/jpeg"))
+    @attachment = attachment_model(:context => @course, :usage_rights => @course.usage_rights.create!(legal_copyright: '(C) 2012 Initrode', use_justification: 'creative_commons', license: 'cc_by_sa'), :uploaded_data => stub_file_data("test_image.jpg", File.read(Rails.root + "spec/fixtures/test_image.jpg"), "image/jpeg"))
 
     @attachment_tag = @module2.add_item(:id => @attachment.id, :type => 'attachment')
     @module2.save!
@@ -429,7 +428,7 @@ describe "Modules API", type: :request do
       end
 
       it "does not update soft-deleted modules" do
-        @modules_to_update.each(&:destroy)
+        @modules_to_update.each { |m| m.destroy }
         api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end
@@ -587,7 +586,7 @@ describe "Modules API", type: :request do
 
         expect(json['prerequisite_module_ids'].sort).to eq [@module1.id, @module2.id].sort
         new_module.reload
-        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
       end
 
       it "only resets prerequisites if parameter is included and is blank" do
@@ -596,7 +595,7 @@ describe "Modules API", type: :request do
         new_module.save!
 
         new_module.reload
-        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
 
         api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                  { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -604,7 +603,7 @@ describe "Modules API", type: :request do
                  { :module => { :name => 'new name',
                                 :require_sequential_progress => true } })
         new_module.reload
-        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
 
         api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                  { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -612,7 +611,7 @@ describe "Modules API", type: :request do
                  { :module => { :name => 'new name',
                                 :prerequisite_module_ids => '' } })
         new_module.reload
-        expect(new_module.prerequisites.pluck(:id).sort).to be_empty
+        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to be_empty
       end
     end
 
@@ -688,7 +687,7 @@ describe "Modules API", type: :request do
         expect(json['prerequisite_module_ids'].sort).to eq [module1.id, module2.id].sort
 
         new_module = @course.context_modules.find(json['id'])
-        expect(new_module.prerequisites.pluck(:id).sort).to eq [module1.id, module2.id].sort
+        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [module1.id, module2.id].sort
       end
     end
 
@@ -914,8 +913,7 @@ describe "Modules API", type: :request do
 
   context "differentiated assignments" do
     before(:once) do
-      @assignment.only_visible_to_overrides = true
-      @assignment.save!
+      @assignment.only_visible_to_overrides = true; @assignment.save!
       @other_section = @course.course_sections.create! name: "other section"
       create_section_override_for_assignment(@assignment, { course_section: @other_section })
     end

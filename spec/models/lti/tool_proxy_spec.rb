@@ -384,7 +384,6 @@ module Lti
           raw_data: 'some raw data'
         )
       end
-
       let(:product_family) do
         ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
       end

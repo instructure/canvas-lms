@@ -332,7 +332,7 @@ class ConferencesController < ApplicationController
           return redirect_to(urls.first[:url])
         end
       end
-      redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
+      return redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
     end
   end
 
@@ -404,7 +404,7 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
       end
     end
-  rescue => e
+  rescue StandardError => e
     Canvas::Errors.capture(e)
     flash[:error] = t("There was an error joining the conference.")
     redirect_to named_context_url(@context, :context_conferences_url)

@@ -65,7 +65,7 @@ module SIS
         ids_to_touch = (batch + UserObserver.where(user_id: batch).pluck(:observer_id)).uniq
         User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
-      i.enrollments_to_add_to_favorites.filter_map(&:id).each_slice(1000) do |sliced_ids|
+      i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
         Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}")
                   .batch_add_to_favorites(sliced_ids)
       end
@@ -123,7 +123,7 @@ module SIS
       end
 
       def any_left_to_process?
-        @enrollment_batch.size > 0
+        return @enrollment_batch.size > 0
       end
 
       def process_batch
@@ -151,11 +151,11 @@ module SIS
             root_account = @root_account
           end
 
-          pseudo = if !enrollment_info.user_integration_id.blank?
-                     root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
-                   else
-                     root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
-                   end
+          if !enrollment_info.user_integration_id.blank?
+            pseudo = root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
+          else
+            pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
+          end
 
           unless pseudo
             err = +"User not found for enrollment "
@@ -230,16 +230,15 @@ module SIS
           type = if role
                    role.base_role_type
                  else
-                   case enrollment_info.role
-                   when /\Ateacher\z/i
+                   if enrollment_info.role =~ /\Ateacher\z/i
                      'TeacherEnrollment'
-                   when /\Astudent/i
+                   elsif enrollment_info.role =~ /\Astudent/i
                      'StudentEnrollment'
-                   when /\Ata\z/i
+                   elsif enrollment_info.role =~ /\Ata\z/i
                      'TaEnrollment'
-                   when /\Aobserver\z/i
+                   elsif enrollment_info.role =~ /\Aobserver\z/i
                      'ObserverEnrollment'
-                   when /\Adesigner\z/i
+                   elsif enrollment_info.role =~ /\Adesigner\z/i
                      'DesignerEnrollment'
                    end
                  end
@@ -272,7 +271,9 @@ module SIS
                                                       associated_user_id: associated_user_id,
                                                       role_id: role).take
 
-          enrollment ||= Enrollment.typed_enrollment(type).new
+          unless enrollment
+            enrollment = Enrollment.typed_enrollment(type).new
+          end
           enrollment.root_account = @root_account
           enrollment.user = user
           enrollment.type = type
@@ -373,15 +374,14 @@ module SIS
         all_done = false
         return true if enrollment.workflow_state == 'deleted' && pseudo.workflow_state == 'deleted'
 
-        case enrollment_info.status
-        when /\Aactive/i
+        if enrollment_info.status =~ /\Aactive/i
           message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
           @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
-        when /\Acompleted/i
+        elsif enrollment_info.status =~ /\Acompleted/i
           completed_status(enrollment)
-        when /\Ainactive/i
+        elsif enrollment_info.status =~ /\Ainactive/i
           enrollment.workflow_state = 'inactive'
-        when /\Adeleted_last_completed/i
+        elsif enrollment_info.status =~ /\Adeleted_last_completed/i
           # if any matching enrollment for the same user in the same course
           # exists, we will mark the enrollment as deleted, but if it is the
           # last enrollment it gets marked as completed
@@ -390,7 +390,7 @@ module SIS
           else
             completed_status(enrollment)
           end
-        when /\Adeleted/i
+        elsif enrollment_info.status =~ /\Adeleted/i
           # we support creating deleted enrollments, but we want to preserve
           # the state for roll_back_data so only set workflow_state for new
           # objects otherwise delete them in a batch at the end unless it is

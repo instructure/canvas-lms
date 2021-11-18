@@ -337,7 +337,9 @@ describe AssignmentGroupsController, type: :request do
                       },
                       include: ['assignments', 'assignment_visibility'])
       json.each do |ag|
-        expect(ag["assignments"]).to all(have_key("assignment_visibility"))
+        ag["assignments"].each do |a|
+          expect(a.has_key?("assignment_visibility")).to eq true
+        end
       end
     end
   end
@@ -712,7 +714,9 @@ describe AssignmentGroupsApiController, type: :request do
                         assignment_group_id: @group.id.to_s
                       },
                       include: ['assignments', 'assignment_visibility'])
-      expect(json['assignments']).to all(have_key("assignment_visibility"))
+      json['assignments'].each do |a|
+        expect(a.has_key?("assignment_visibility")).to eq true
+      end
     end
 
     it "does not include assignment_visibility when requested as a student" do
@@ -728,7 +732,7 @@ describe AssignmentGroupsApiController, type: :request do
                       },
                       include: ['assignments', 'assignment_visibility'])
       json['assignments'].each do |a|
-        expect(a).not_to have_key("assignment_visibility")
+        expect(a.has_key?("assignment_visibility")).to eq false
       end
     end
 

@@ -54,10 +54,9 @@ module Outcomes
       check_object(object)
 
       type = object[:object_type]
-      case type
-      when 'outcome'
+      if type == 'outcome'
         import_outcome(object)
-      when 'group'
+      elsif type == 'group'
         import_group(object)
       else
         raise InvalidDataError, I18n.t(

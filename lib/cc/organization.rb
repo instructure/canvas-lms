@@ -63,8 +63,7 @@ module CC
           unless ct.content_type == 'ContextModuleSubHeader'
             attributes[:identifierref] = create_key(ct.content)
           end
-          case ct.content_type
-          when 'ExternalUrl'
+          if ct.content_type == 'ExternalUrl'
             # Need to create web link objects in the resources
             link = {
               :migration_id => create_key(ct, 'weblink'),
@@ -73,7 +72,7 @@ module CC
             }
             @manifest.weblinks << link
             attributes[:identifierref] = link[:migration_id]
-          when 'ContextExternalTool'
+          elsif ct.content_type == 'ContextExternalTool'
             attributes[:identifierref] = attributes[:identifier]
             attributes[:identifier] = create_key(ct, "module_item")
           end

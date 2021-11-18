@@ -26,7 +26,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  validates :discussion_entry_id, :user_id, :workflow_state, presence: true
+  validates_presence_of :discussion_entry_id, :user_id, :workflow_state
   validate :prevent_creates
 
   validates :report_type, inclusion: { in: %w(inappropriate offensive other),
@@ -50,8 +50,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
-    ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
+    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
+    Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)

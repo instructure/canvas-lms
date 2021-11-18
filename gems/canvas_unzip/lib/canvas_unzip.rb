@@ -71,14 +71,14 @@ class CanvasUnzip
   #     :filename_too_long => [list of entries],
   #     :unknown_compression_method => [list of entries] }
 
-  def self.extract_archive(archive_filename, dest_folder = nil, limits: nil, nested_dir: nil)
+  def self.extract_archive(archive_filename, dest_folder = nil, limits: nil, nested_dir: nil, &block)
     warnings = {}
     limits ||= default_limits(File.size(archive_filename))
     bytes_left = limits.maximum_bytes
     files_left = limits.maximum_files
 
     raise ArgumentError, "File not found" unless File.exist?(archive_filename)
-    raise ArgumentError, "Needs block or destination path" unless dest_folder || block_given?
+    raise ArgumentError, "Needs block or destination path" unless dest_folder || block
 
     each_entry(archive_filename) do |entry, index|
       if unsafe_entry?(entry)
@@ -86,8 +86,8 @@ class CanvasUnzip
         next
       end
 
-      if block_given?
-        yield(entry, index)
+      if block
+        block.call(entry, index)
       else
         raise FileLimitExceeded if files_left <= 0
 
@@ -127,14 +127,13 @@ class CanvasUnzip
       mime_type = 'application/x-tar' # it may not actually be a tar though, so rescue if there's a problem
     end
 
-    case mime_type
-    when 'application/zip'
+    if mime_type == 'application/zip'
       Zip::File.open(file) do |zipfile|
         zipfile.entries.each_with_index do |zip_entry, index|
           yield(Entry.new(zip_entry), index)
         end
       end
-    when 'application/x-tar'
+    elsif mime_type == 'application/x-tar'
       index = 0
       begin
         Gem::Package::TarReader.new(file).each do |tar_entry|
@@ -161,10 +160,9 @@ class CanvasUnzip
     attr_reader :entry, :type
 
     def initialize(entry)
-      case entry
-      when Zip::Entry
+      if entry.is_a?(Zip::Entry)
         @type = :zip
-      when Gem::Package::TarReader::Entry
+      elsif entry.is_a?(Gem::Package::TarReader::Entry)
         @type = :tar
       end
 
@@ -174,10 +172,9 @@ class CanvasUnzip
     end
 
     def symlink?
-      case type
-      when :zip
+      if type == :zip
         entry.symlink?
-      when :tar
+      elsif type == :tar
         entry.header.typeflag == "2"
       end
     end
@@ -191,21 +188,19 @@ class CanvasUnzip
     end
 
     def name
-      @name ||= case type
-                when :zip
+      @name ||= if type == :zip
                   # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
                   normalize_name(entry.name, 'cp437')
-                when :tar
+                elsif type == :tar
                   # there is no standard. this seems like a reasonable fallback to me
-                  normalize_name(entry.full_name.sub(%r{^\./}, ''), 'iso-8859-1')
+                  normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
                 end
     end
 
     def size
-      case type
-      when :zip
+      if type == :zip
         entry.size
-      when :tar
+      elsif type == :tar
         entry.header.size
       end
     end
@@ -223,8 +218,7 @@ class CanvasUnzip
 
       digest = Digest::MD5.new
       ::File.open(dest_path, "wb") do |os|
-        case type
-        when :zip
+        if type == :zip
           entry.get_input_stream do |is|
             entry.set_extra_attributes_on_path(dest_path)
             buf = +''
@@ -234,7 +228,7 @@ class CanvasUnzip
               yield(buf.size) if block_given?
             end
           end
-        when :tar
+        elsif type == :tar
           while (buf = entry.read(BUFFER_SIZE))
             os << buf
             digest.update(buf)

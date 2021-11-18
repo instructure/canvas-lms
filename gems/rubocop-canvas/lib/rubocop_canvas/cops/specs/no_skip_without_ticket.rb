@@ -51,7 +51,7 @@ module RuboCop
         end
 
         def refs_ticket?(reason)
-          reason =~ /#{JiraRefParser::IssueIdRegex}/o
+          reason =~ /#{JiraRefParser::IssueIdRegex}/
         end
       end
     end

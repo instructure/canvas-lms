@@ -27,7 +27,7 @@ describe Polling::PollSubmissionsController, type: :request do
     @poll = @teacher.polls.create!(question: "What is your favorite color?")
 
     ["Red", "Blue", "Green"].each do |choice|
-      correct = choice == "Green"
+      correct = choice == "Green" ? true : false
       @poll.poll_choices.create!(text: choice, is_correct: correct)
     end
 

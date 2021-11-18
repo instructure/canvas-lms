@@ -155,7 +155,7 @@ module AttachmentFu # :nodoc:
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || Rails.root.join('config/amazon_s3.yml')
+        s3_config_path = path || (Rails.root + 'config/amazon_s3.yml')
         YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
@@ -167,12 +167,13 @@ module AttachmentFu # :nodoc:
 
       def sanitize_filename(filename)
         if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
-          self.root_attachment.filename
+          filename = self.root_attachment.filename
         else
-          Attachment.truncate_filename(filename, 255) do |component, len|
+          filename = Attachment.truncate_filename(filename, 255) do |component, len|
             CanvasTextHelper.cgi_escape_truncate(component, len)
           end
         end
+        filename
       end
 
       # The attachment ID used in the full path of a file
@@ -201,7 +202,7 @@ module AttachmentFu # :nodoc:
       def full_filename(thumbnail = nil)
         # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
         # them as spaces. Continue that behavior.
-        basename = thumbnail_name_for(thumbnail).tr('+', ' ')
+        basename = thumbnail_name_for(thumbnail).gsub('+', ' ')
         File.join(base_path, basename)
       end
 

@@ -61,7 +61,8 @@ module ConversationsCommon
 
     # should be one filter applied i every situation
     expect(selected.size).to eq 1
-    selected[0].attribute('value')
+    value = selected[0].attribute('value')
+    value
   end
 
   def course_filter
@@ -228,18 +229,18 @@ module ConversationsCommon
 
   # Allows you to select between
   def click_more_options(opts, message = 0)
+    case
     # First case is for clicking on message gear menu
-    if opts[:message]
+    when opts[:message]
       # The More Options gear menu only shows up on mouse over of message
       driver.action.move_to(ff('.message-item-view')[message]).perform
       wait_for_ajaximations
       f('.actions li .inline-block .al-trigger').click
     # This case is for clicking on gear menu at conversation heading level
-    elsif opts[:convo]
+    when opts[:convo]
       f('.message-header .al-trigger').click
     # Otherwise, it clicks the topmost gear menu
-    else
-      f('#admin-btn.al-trigger').click
+    else f('#admin-btn.al-trigger').click
     end
     wait_for_ajaximations
   end

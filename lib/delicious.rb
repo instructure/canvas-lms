@@ -54,7 +54,7 @@ module Delicious
     case response
     when Net::HTTPSuccess
       updated = Nokogiri::XML(response.body).root["time"]
-      Time.parse(updated)
+      return Time.parse(updated)
     else
       response.error!
     end
@@ -67,7 +67,7 @@ module Delicious
     case response
     when Net::HTTPSuccess
       code = Nokogiri::XML(response.body).root["code"]
-      code == 'done'
+      return code == 'done'
     else
       response.error!
     end

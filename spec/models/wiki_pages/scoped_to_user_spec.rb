@@ -36,7 +36,9 @@ describe WikiPages::ScopedToUser do
   let_once(:unpublished) do
     @course.wiki_pages.create({
                                 title: 'unpublished page'
-                              }).tap(&:unpublish)
+                              }).tap do |page|
+      page.unpublish
+    end
   end
 
   describe '#scope' do

@@ -158,13 +158,10 @@ module SpeedGrader
       res[:too_many_quiz_submissions] = too_many = assignment.too_many_qs_versions?(submissions)
       qs_versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      enrollment_types_by_id = enrollments.inject({}) { |h, e|
-        h[e.user_id] ||= e.type
-        h
-      }
+      enrollment_types_by_id = enrollments.inject({}) { |h, e| h[e.user_id] ||= e.type; h }
 
       if assignment.quiz
-        if assignment.quiz.assignment_overrides.to_a.count(&:active?) == 0
+        if assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
           assignment.quiz.has_no_overrides = true
         else
           assignment.quiz.context.preload_user_roles!
@@ -262,7 +259,6 @@ module SpeedGrader
                         upload_status: AttachmentUploadStatus.upload_status(a),
                       }
                     )
-                    attachment_json[:attachment][:word_count] = a.word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
                   end
                 end
               end
@@ -335,15 +331,14 @@ module SpeedGrader
           provisional_grades = provisional_grades.preload(:scorer)
         end
 
-        case grading_role
-        when :provisional_grader
+        if grading_role == :provisional_grader
           provisional_grades = if grader_comments_hidden?(current_user: current_user, assignment: assignment)
                                  provisional_grades.not_final.where(scorer: current_user)
                                else
                                  select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
                                  provisional_grades.select(select_fields)
                                end
-        when :grader
+        elsif grading_role == :grader
           provisional_grades = ModeratedGrading::ProvisionalGrade.none
         end
         provisional_grades.order(:id).to_a.group_by(&:submission_id)
@@ -429,7 +424,7 @@ module SpeedGrader
       group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
 
       # If we selected a group that is now deleted, don't use it
-      Group.active.where(id: group_id).exists? ? group_id : nil
+      Group.active.exists?(id: group_id) ? group_id : nil
     end
 
     def section_id_filter

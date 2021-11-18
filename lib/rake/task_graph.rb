@@ -112,13 +112,13 @@ module Rake
       end
 
       if undefined.any?
-        fail <<~TEXT
+        fail <<~ERR
 
           The following nodes are listed as dependents but were not defined:
 
             - #{undefined.uniq.join("\n  - ")}
 
-        TEXT
+        ERR
       end
     end
 

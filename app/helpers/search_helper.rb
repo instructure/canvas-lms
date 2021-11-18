@@ -107,8 +107,7 @@ module SearchHelper
         end
       end
 
-      case context
-      when Course
+      if context.is_a?(Course)
         add_courses.call [context], :current
         visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), require_message_permission: true)
         sections = case visibility
@@ -121,12 +120,12 @@ module SearchHelper
                    end
         add_sections.call sections
         add_groups.call context.groups.active, context
-      when Group
+      elsif context.is_a?(Group)
         if context.grants_right?(@current_user, session, :read)
           add_groups.call [context]
           add_courses.call [context.context], :current if context.context.is_a?(Course)
         end
-      when CourseSection
+      elsif context.is_a?(CourseSection)
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
         sections = visibility == :restricted ? [] : [context]
         add_courses.call [context.course], :current
@@ -278,7 +277,7 @@ module SearchHelper
     end
 
     # bulk count users in the remainder
-    asset_strings = result.pluck(:asset_string)
+    asset_strings = result.map { |context| context[:asset_string] }
     user_counts = @current_user.address_book.count_in_contexts(asset_strings)
 
     # build up the final representations

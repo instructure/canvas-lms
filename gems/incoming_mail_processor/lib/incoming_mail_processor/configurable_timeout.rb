@@ -100,8 +100,10 @@ module IncomingMailProcessor
     # Returns the return value of the block.
     # Raises Timeout::Error if the block takes longer than the default timeout
     #   duration.
-    def default_timeout_method(&block)
-      Timeout.timeout(default_timeout_duration, &block)
+    def default_timeout_method()
+      Timeout.timeout(default_timeout_duration) do
+        yield
+      end
     end
 
     # Internal: The default timeout duration for default_timeout_method. The

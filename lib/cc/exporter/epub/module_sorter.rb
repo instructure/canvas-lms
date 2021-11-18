@@ -49,11 +49,15 @@ module CC::Exporter::Epub
     private
 
     def module_ids
-      cartridge_json[:modules].pluck(:identifier)
+      cartridge_json[:modules].map { |mod| mod[:identifier] }
     end
 
     def module_item_ids
-      @_module_item_ids ||= cartridge_json[:modules].pluck(:items).flatten.pluck(:linked_resource_id).uniq
+      @_module_item_ids ||= cartridge_json[:modules].map do |mod|
+        mod[:items]
+      end.flatten.map do |module_item|
+        module_item[:linked_resource_id]
+      end.uniq
     end
 
     def merge_with_original_item_data!(module_item)

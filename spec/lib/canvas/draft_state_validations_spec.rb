@@ -31,7 +31,7 @@ shared_examples_for "Canvas::DraftStateValidations" do
 
       expect(subject.errors[:workflow_state]).to be_present
       expect(subject.errors[:workflow_state][0].to_s).to match(
-        /can't unpublish if there are student submissions/i
+        %r{can't unpublish if there are student submissions}i
       )
     end
   end

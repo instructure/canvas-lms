@@ -76,8 +76,8 @@ describe Canvas::Errors::Reporter do
 
   def error_instance
     typical_usage
-  rescue MyTestError => e
-    e
+  rescue MyTestError => err
+    return err
   end
 
   def typical_usage

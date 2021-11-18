@@ -233,7 +233,9 @@ class BrandConfig < ActiveRecord::Base
                           .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
                           .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5"))
                           .first
-    unused_brand_config&.destroy
+    if unused_brand_config
+      unused_brand_config.destroy
+    end
   end
 
   def self.clean_unused_from_db!

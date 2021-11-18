@@ -4,18 +4,7 @@
   </div>
   <div class="head-content" tabindex="0">
     {{#if path}}
-    <div class="title">{{title}}</div>
-    <div class="outcome-info">
-      {{#if description}}
-        <div class="description">{{{description}}}</div>
-      {{/if}}
-    </div>
-    {{#if friendly_description}}
-      <div class="friendly-description">
-        <div class="friendly-description-title">{{#t}}Friendly Description{{/t}}</div>
-        <div class="friendly-description-info">{{{friendly_description}}}</div>
-      </div>
-    {{/if}}
+    <div class="title">{{path}}</div>
     <div class="chart">
       {{#if ratings.result_count}}
         <div class="chart-image pull-left"></div>
@@ -33,7 +22,10 @@
         <p>{{#t "no_results"}}(no results){{/t}}</p>
       {{/if}}
     </div>
-    <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{nf mastery_points format="outcomeScore"}}</div>
+    <div class="outcome-info">
+      <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{nf mastery_points format="outcomeScore"}}</div>
+      {{#if description}}<div class="description">{{{description}}}</div>{{/if}}
+    </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
       {{#if scoreDefined}}
@@ -65,8 +57,7 @@
     </div>
     {{/if}}
   </div>
-  <hr />
-  <div>
-    {{#t}}Calculation Method{{/t}}: {{method}}
+  <div class="calculation-method-example method-details content-box pad-box-mini border border-trbl border-round">
+    {{> ui/shared/outcomes/jst/_calculationMethodExample.handlebars }}
   </div>
 </div>

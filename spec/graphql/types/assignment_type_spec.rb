@@ -69,10 +69,7 @@ describe Types::AssignmentType do
   end
 
   context "sis field" do
-    let_once(:sis_assignment) {
-      assignment.update!(sis_source_id: "sisAssignment")
-      assignment
-    }
+    let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 

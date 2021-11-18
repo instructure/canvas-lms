@@ -334,7 +334,7 @@ class ProfileController < ApplicationController
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save
 
-      return head :already_reported
+      return head 208
     end
 
     respond_to do |format|
@@ -342,7 +342,7 @@ class ProfileController < ApplicationController
         .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
                 :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
         : {}
-      unless @user.user_can_edit_name?
+      if !@user.user_can_edit_name?
         user_params.delete(:name)
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
@@ -500,7 +500,7 @@ class ProfileController < ApplicationController
 
   def qr_mobile_login
     unless instructure_misc_plugin_available? && !!@domain_root_account&.mobile_qr_login_is_enabled?
-      head :not_found
+      head 404
       return
     end
 

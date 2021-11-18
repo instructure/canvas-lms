@@ -47,7 +47,7 @@ module CC
       end
 
       def close
-        @file&.close
+        @file.close if @file
         @document = nil
         @file
       end
@@ -81,7 +81,7 @@ module CC
 
             zipper = ContentZipper.new(:check_user => false)
             @html_exporter.referenced_files.keys.each do |file_id|
-              att = course.attachments.find_by(id: file_id)
+              att = course.attachments.find_by_id(file_id)
               next unless att
 
               path = att.full_display_path.sub("course files/", '')
