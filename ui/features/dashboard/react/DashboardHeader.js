@@ -123,7 +123,12 @@ class DashboardHeader extends React.Component {
 
   loadCardDashboard() {
     // I put this in so I can spy on the imported function in a spec :'(
-    loadCardDashboard()
+    const observerMode =
+      ENV.FEATURES?.observer_picker && ENV.current_user_roles?.includes('observer')
+    if (!observerMode) {
+      loadCardDashboard()
+    }
+    // if in observer mode, ObserverOptions will handle loading the cards for the right user
   }
 
   loadStreamItemDashboard() {

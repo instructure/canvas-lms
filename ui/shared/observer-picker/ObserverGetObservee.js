@@ -18,6 +18,7 @@
 
 import getCookie from 'get-cookie'
 
+// cookie name prefixed with k5_ for historical reasons but not exclusively used in k5 mode
 export const OBSERVER_COOKIE_PREFIX = 'k5_observed_user_for_'
 
 export const savedObservedCookieName = currentUserId => `${OBSERVER_COOKIE_PREFIX}${currentUserId}`

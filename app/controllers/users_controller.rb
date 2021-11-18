@@ -517,8 +517,18 @@ class UsersController < ApplicationController
              CREATE_COURSES_PERMISSIONS: {
                PERMISSION: create_permission_root_account || create_permission_mcc_account,
                RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
-             }
+             },
+             OBSERVER_LIST: observed_users(@current_user, session),
+             CAN_ADD_OBSERVEE: @current_user
+                                 .profile
+                                 .tabs_available(@current_user, root_account: @domain_root_account)
+                                 .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
            })
+
+    # prefetch dashboard cards with the right observer url param
+    if @current_user.roles(@domain_root_account).include?("observer") && (Account.site_admin.feature_enabled?(:k5_parent_support) || Account.site_admin.feature_enabled?(:observer_picker))
+      @cards_prefetch_observer_param = @selected_observed_user&.id
+    end
 
     if k5_user?
       # things needed only for k5 dashboard
@@ -527,21 +537,11 @@ class UsersController < ApplicationController
 
       js_env({
                HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all? { |c| c.tab_hidden?(Course::TAB_GRADES) },
-               OBSERVER_LIST: observed_users(@current_user, session),
                SELECTED_CONTEXT_CODES: @current_user.get_preference(:selected_calendar_contexts),
                SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
                INITIAL_NUM_K5_CARDS: Rails.cache.read(["last_known_k5_cards_count", @current_user.global_id].cache_key) || 5,
-               CAN_ADD_OBSERVEE: @current_user
-                          .profile
-                          .tabs_available(@current_user, root_account: @domain_root_account)
-                          .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
                OPEN_TEACHER_TODOS_IN_NEW_TAB: @current_user.feature_enabled?(:open_todos_in_new_tab)
              })
-
-      # prefetch dashboard cards with the right observer url param
-      if Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user.roles(@domain_root_account).include?("observer")
-        @cards_prefetch_observer_param = @selected_observed_user&.id
-      end
 
       css_bundle :k5_common, :k5_dashboard, :dashboard_card
       js_bundle :k5_dashboard
