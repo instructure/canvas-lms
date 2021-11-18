@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,15 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-group :development do
-  gem 'letter_opener', '1.7.0'
-  gem 'spring', '2.1.1'
-  gem 'spring-commands-parallel-rspec', '1.1.0'
-  gem 'spring-commands-rspec', '1.0.4'
-  gem 'spring-commands-rubocop', '0.2.0'
-  gem 'active_record_query_trace', '1.8'
+module ARQueryTraceInitializer
+  VALID_QUERY_TYPES = %i(all read write).freeze
 
-  gem 'byebug', '11.1.3', platform: :mri
-  gem 'debase', '0.2.4.1', require: false
-  gem 'ruby-debug-ide', '0.7.2', require: false
+  def self.configure!
+    return unless Rails.env.development?
+    return if ENV['AR_QUERY_TRACE'].blank?
+
+    lines_in_trace = ENV['AR_QUERY_TRACE_LINES'].to_i
+    query_types = ENV['AR_QUERY_TRACE_TYPE']&.to_sym
+
+    ActiveRecordQueryTrace.enabled = true
+    ActiveRecordQueryTrace.lines = lines_in_trace.zero? ? 10 : lines_in_trace
+    ActiveRecordQueryTrace.query_type = VALID_QUERY_TYPES.include?(query_types) ? query_types : :all
+  end
 end
+
+ARQueryTraceInitializer.configure!
