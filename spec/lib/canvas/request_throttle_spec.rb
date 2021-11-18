@@ -51,15 +51,15 @@ describe 'RequestThrottle' do
     end
 
     it "uses access token" do
-      expect(throttler.client_identifier(req request_header_token)).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
+      expect(throttler.client_identifier(req(request_header_token))).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
     it "uses user id" do
-      expect(throttler.client_identifier(req request_user_2)).to eq "user:2"
+      expect(throttler.client_identifier(req(request_user_2))).to eq "user:2"
     end
 
     it "uses session id" do
-      expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
+      expect(throttler.client_identifier(req(request_logged_out))).to eq 'session:sess1'
     end
 
     it "falls back to ip" do

@@ -326,7 +326,7 @@ describe "new groups" do
       expect(f('.ui-cnvs-scrollable')).to include_text(@students[0].name)
       expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (2)")
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text("1 / 2 students")
-      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value('display')).to eq 'none'
     end
 
     it 'moves group leader', priority: "1", test_id: 96023 do
@@ -444,7 +444,7 @@ describe "new groups" do
       get "/courses/#{@course.id}/groups"
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('0 / 7 students')
-      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value('display')).to eq 'none'
 
       f('a.al-trigger.btn').click
       wait_for_ajaximations
@@ -460,7 +460,7 @@ describe "new groups" do
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('7 / 7 students')
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
-      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full").css_value('display')).to eq 'none'
     end
 
     it 'creates a group with a given name and limit', priority: "2", test_id: 94166 do
@@ -593,7 +593,7 @@ describe "new groups" do
       drag_and_drop_element(fj(drag_item1), fj(drop_target1))
       wait_for_ajaximations
 
-      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value('display')).to eq 'none'
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('4 / 5 students')
       expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
       expect(fj(drop_target1)).to include_text('Test Student 3')

@@ -2233,7 +2233,7 @@ describe Attachment do
         expect { subject }.to raise_error(
           an_instance_of(
             CanvasHttp::InvalidResponseCodeError
-          ).and having_attributes(body: "#{body}...")
+          ).and(having_attributes(body: "#{body}..."))
         )
       end
 

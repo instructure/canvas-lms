@@ -665,7 +665,7 @@ describe "Common Cartridge exporting" do
 
       shared_examples_for 'an export that includes lti resource links' do
         it 'includes a "resource" element in the manifest for each link' do
-          expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+          expect(subject.css("resource[type='imsbasiclti_xmlv1p3']")).to have(2).items
         end
 
         it 'includes a "file" element pointing to the resource link document' do
@@ -681,7 +681,7 @@ describe "Common Cartridge exporting" do
           before { tool.destroy! }
 
           it 'does not export the resource links' do
-            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+            expect(subject.css("resource[type='imsbasiclti_xmlv1p3']")).to be_blank
           end
         end
 
@@ -689,7 +689,7 @@ describe "Common Cartridge exporting" do
           let(:custom_params) { nil }
 
           it 'exports resource links that have custom params and those that do not' do
-            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+            expect(subject.css("resource[type='imsbasiclti_xmlv1p3']")).to have(2).items
           end
         end
 
@@ -699,7 +699,7 @@ describe "Common Cartridge exporting" do
           end
 
           it 'does not export the resource links' do
-            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+            expect(subject.css("resource[type='imsbasiclti_xmlv1p3']")).to be_blank
           end
         end
       end
