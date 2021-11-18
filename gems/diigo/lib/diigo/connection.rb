@@ -89,7 +89,7 @@ module Diigo
     end
 
     def self.config
-      @config.call()
+      @config.call
     end
   end
 end

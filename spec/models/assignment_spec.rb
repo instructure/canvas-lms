@@ -1552,7 +1552,7 @@ describe Assignment do
   end
 
   describe ".clean_up_duplicating_assignments" do
-    before { allow(described_class).to receive(:duplicating_for_too_long).and_return(double()) }
+    before { allow(described_class).to receive(:duplicating_for_too_long).and_return(double) }
 
     it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
       now = double('now')
@@ -1623,7 +1623,7 @@ describe Assignment do
   end
 
   describe ".cleanup_importing_assignments" do
-    before { allow(described_class).to receive(:importing_for_too_long).and_return(double()) }
+    before { allow(described_class).to receive(:importing_for_too_long).and_return(double) }
 
     it "marks all assignments that have been importing for too long as failed_to_import" do
       now = double('now')
@@ -4714,7 +4714,7 @@ describe Assignment do
   describe "#grants_right?" do
     before(:once) do
       assignment_model(course: @course)
-      @admin = account_admin_user()
+      @admin = account_admin_user
       teacher_in_course(:course => @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
@@ -5249,7 +5249,7 @@ describe Assignment do
       @quiz = @a.quiz
       expect(@quiz).not_to be_nil
       expect(@quiz.assignment_id).to eql(@a.id)
-      @quiz.quiz_questions.create!()
+      @quiz.quiz_questions.create!
       @quiz.generate_quiz_data
       @quiz.save!
       @a.quiz.reload
@@ -6389,7 +6389,7 @@ describe Assignment do
 
     context "assignments are frozen" do
       before :once do
-        @admin = account_admin_user()
+        @admin = account_admin_user
         teacher_in_course(:course => @course)
       end
 

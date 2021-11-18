@@ -63,32 +63,32 @@ module Services
       end
 
       let(:non_root_account_context) do
-        non_root_account = double()
+        non_root_account = double
         allow(non_root_account).to receive(:global_root_account_id).and_return(10000000000007)
         non_root_account
       end
 
       let(:root_account_context) do
-        root_account = double()
+        root_account = double
         allow(root_account).to receive(:global_root_account_id).and_return(nil)
         allow(root_account).to receive(:global_id).and_return(10000000000004)
         root_account
       end
 
       let(:root_account_object) do
-        root_account_object = double()
+        root_account_object = double
         allow(root_account_object).to receive(:uuid).and_return('random-account-uuid')
         root_account_object
       end
 
       let(:product_family) do
-        product_family = double()
+        product_family = double
         allow(product_family).to receive(:developer_key).and_return(developer_key)
         product_family
       end
 
       let(:tool_proxy) do
-        tool_proxy = double()
+        tool_proxy = double
         allow(tool_proxy).to receive(:id).and_return('1')
         allow(tool_proxy).to receive(:guid).and_return('151b52cd-d670-49fb-bf65-6a327e3aaca0')
         allow(tool_proxy).to receive(:product_family).and_return(product_family)

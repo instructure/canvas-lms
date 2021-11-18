@@ -542,7 +542,7 @@ class AssetUserAccessLog
       # we want to stay in "exclusive" mode so that only one job
       # can be updating the iterator state.
       begin
-        consumer.close()
+        consumer.close
       rescue ::Pulsar::Error::ConnectError => e
         # if we fail to close the connection, but we're already here
         # the job didn't really fail; we already got past all the state updating.

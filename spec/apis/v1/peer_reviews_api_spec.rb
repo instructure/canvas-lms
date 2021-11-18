@@ -88,7 +88,7 @@ describe PeerReviewsApiController, type: :request do
 
     context 'with admin context' do
       before :once do
-        account_admin_user()
+        account_admin_user
       end
 
       it 'deletes peer review' do
@@ -141,7 +141,7 @@ describe PeerReviewsApiController, type: :request do
 
     context 'with admin_context' do
       before :once do
-        account_admin_user()
+        account_admin_user
       end
 
       it 'creates peer review' do
@@ -244,7 +244,7 @@ describe PeerReviewsApiController, type: :request do
 
     context 'with admin_context' do
       before :once do
-        account_admin_user()
+        account_admin_user
       end
 
       it 'returns all peer reviews' do

@@ -299,7 +299,7 @@ describe "Wiki Pages" do
       it "alerts user if navigating away from page after title change", priority: "1", test_id: 267832 do
         skip_if_safari(:alert)
         switch_editor_views
-        f('.title').clear()
+        f('.title').clear
         f('.title').send_keys("derpy-title")
         fln('Home').click
         expect(driver.switch_to.alert).to be_present

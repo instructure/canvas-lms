@@ -182,7 +182,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     context 'when the response is not a success' do
       subject { json_parse['errors'].first['message'] }
 
-      let(:stubbed_response) { double() }
+      let(:stubbed_response) { double }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false

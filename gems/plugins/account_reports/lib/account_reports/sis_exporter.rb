@@ -53,7 +53,7 @@ module AccountReports
 
       case @reports.length
       when 0
-        send_report()
+        send_report
       when 1
         csv = self.send(@reports.first)
         send_report(csv)

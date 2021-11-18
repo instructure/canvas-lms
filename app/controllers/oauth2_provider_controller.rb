@@ -29,7 +29,7 @@ class OAuth2ProviderController < ApplicationController
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
-      return render()
+      return render
     end
 
     scopes = (params[:scope] || params[:scopes] || '').split

@@ -51,14 +51,14 @@ describe "outcomes as a teacher" do
 
     it "adds account outcomes to course" do
       f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes()
+      import_account_level_outcomes
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
     end
 
     it "removes account outcomes from course" do
       skip("no delete button when seeding, functionality should be available")
       f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes()
+      import_account_level_outcomes
       f(".ellipsis[title='outcome 0']").click
       wait_for_ajaximations
       msg = "redmine bug on this functionality"
@@ -179,7 +179,7 @@ describe "outcomes as a teacher" do
       wait_for_ajaximations
 
       # bring up modal
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
       fj('.form-controls .btn-primary').click
@@ -194,7 +194,7 @@ describe "outcomes as a teacher" do
       get outcome_url
       f('.outcomes-sidebar .outcome-link').click
 
-      f(".move_button").click()
+      f(".move_button").click
 
       # should show modal tree
       expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move first new outcome?"
@@ -220,7 +220,7 @@ describe "outcomes as a teacher" do
 
       # confirm that error appears if moving into parent group it already belongs to
       f('.outcomes-sidebar .outcome-link').click
-      f(".move_button").click()
+      f(".move_button").click
 
       f('.treeLabel').click
       wait_for_ajaximations
@@ -241,7 +241,7 @@ describe "outcomes as a teacher" do
       wait_for_ajaximations
 
       # bring up modal
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
       # should show modal tree
@@ -272,7 +272,7 @@ describe "outcomes as a teacher" do
       fj('.outcomes-sidebar .outcome-group').click
       wait_for_ajaximations
 
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
       fj('.treeLabel').click

@@ -119,7 +119,7 @@ describe SearchController do
       end
 
       it "returns sub-contexts" do
-        account_admin_user()
+        account_admin_user
         user_session(@user)
         course_factory(active_all: true).course_sections.create(:name => "other section")
 

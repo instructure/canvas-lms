@@ -38,7 +38,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#sub_account_tag" do
-      let(:asset_manager) { double() }
+      let(:asset_manager) { double }
 
       it "prefixes the account_id with subaccount" do
         report.data['context_asset_string'] = "42"

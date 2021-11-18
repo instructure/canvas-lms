@@ -21,12 +21,12 @@
 require "spec_helper"
 
 describe CanvasCassandra do
-  let(:conn) { double() }
+  let(:conn) { double }
 
   let(:db) do
     CanvasCassandra::Database.allocate.tap do |db|
       db.send(:instance_variable_set, :@db, conn)
-      db.send(:instance_variable_set, :@logger, double().as_null_object)
+      db.send(:instance_variable_set, :@logger, double.as_null_object)
       allow(db).to receive(:sanitize).and_return("")
     end
   end

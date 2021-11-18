@@ -1192,8 +1192,8 @@ describe Canvas::LiveEvents do
   end
 
   describe '.content_migration_completed' do
-    let(:course) { course_factory() }
-    let(:source_course) { course_factory() }
+    let(:course) { course_factory }
+    let(:source_course) { course_factory }
     let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do

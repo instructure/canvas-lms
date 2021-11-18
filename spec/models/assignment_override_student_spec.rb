@@ -127,7 +127,7 @@ describe AssignmentOverrideStudent do
   def adhoc_override_with_student
     student_in_course(:active_all => true)
     @assignment = assignment_model(:course => @course)
-    @ao = AssignmentOverride.new()
+    @ao = AssignmentOverride.new
     @ao.assignment = @assignment
     @ao.title = "ADHOC OVERRIDE"
     @ao.workflow_state = "active"

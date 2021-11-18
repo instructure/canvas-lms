@@ -759,7 +759,7 @@ class ConversationsController < ApplicationController
       messages = participant.messages
 
       participant.message_count = messages.count(:id)
-      participant.last_message_at = messages.first().created_at
+      participant.last_message_at = messages.first.created_at
       participant.save!
 
       render :json => cmp.map { |c| conversation_message_json(c.conversation_message, @current_user, session) }

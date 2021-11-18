@@ -179,7 +179,7 @@ module Qti
               @doc.at_css('responseIf > and > match')
           process_blackboard_9_multiple_answers(answers_hash)
         elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
-          migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
+          migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip
           migration_id = migration_id.sub('.', '_') if is_either_or
           answer = answers_hash[migration_id] || answers_hash.values.detect { |a| a[:text] == migration_id }
           answer[:weight] = get_response_weight(cond)
@@ -197,7 +197,7 @@ module Qti
           @question[:question_type] = "true_false_question"
         elsif cond.at_css('responseIf and > member')
           cond.css('responseIf > and > member').each do |m|
-            migration_id = m.at_css('baseValue[baseType=identifier]').text.strip()
+            migration_id = m.at_css('baseValue[baseType=identifier]').text.strip
             answer = answers_hash[migration_id]
             answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
             answer[:feedback_id] ||= get_feedback_id(cond)
@@ -207,7 +207,7 @@ module Qti
             migration_id = r_if.at_css('match baseValue[baseType=identifier]')
             migration_id ||= r_if.at_css('member baseValue[baseType=identifier]')
             if migration_id
-              migration_id = migration_id.text.strip()
+              migration_id = migration_id.text.strip
 
               answer = answers_hash[migration_id]
               answer ||= answers_hash.values.detect { |a| a[:text]&.casecmp?(migration_id) }
@@ -285,8 +285,8 @@ module Qti
     # BB9 does these questions a little differently, so we will special-case them
     def process_blackboard_9_multiple_answers(answers_hash)
       and_node = @doc.at_css('responseIf > and')
-      matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
-      not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+      matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip }
+      not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip }
       get_real_blackboard_match_ids(answers_hash, matches, not_matches).each do |migration_id|
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(and_node.parent)

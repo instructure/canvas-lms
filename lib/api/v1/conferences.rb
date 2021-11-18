@@ -107,7 +107,7 @@ module Api::V1::Conferences
       if v.is_a? Array
         v.map { |a| translate_strings(a) }
       else
-        v.respond_to?(:call) ? v.call() : v
+        v.respond_to?(:call) ? v.call : v
       end
     end
   end

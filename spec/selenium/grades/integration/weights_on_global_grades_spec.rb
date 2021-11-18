@@ -29,7 +29,7 @@ describe 'gradebook' do
     grading_period_titles = ["All Grading Periods", @gp1.title, @gp2.title]
 
     user_session(@student)
-    GlobalGrades.visit()
+    GlobalGrades.visit
 
     if @grading_period_index
       GlobalGrades.select_grading_period(@course, grading_period_titles[@grading_period_index])

@@ -194,7 +194,7 @@ module Turnitin
       if submission.submission_type == 'online_upload'
         attachments = submission.attachments.select { |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
-          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
+          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open, :ptype => '2' }.merge!(opts))
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
         responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))

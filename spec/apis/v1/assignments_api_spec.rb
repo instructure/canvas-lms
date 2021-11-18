@@ -985,7 +985,7 @@ describe AssignmentsApiController, type: :request do
         scores = [10] + ([14] * (count - 2)) + [18]
 
         @students.take(count).each do |student|
-          score = scores.pop().to_s
+          score = scores.pop.to_s
           @assignment.grade_student student, grade: score, grader: @teacher
         end
 

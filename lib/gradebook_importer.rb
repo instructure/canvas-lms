@@ -96,7 +96,7 @@ class GradebookImporter
       if number_parts.empty?
         last_number_part
       else
-        [number_parts.join(), last_number_part].join('.')
+        [number_parts.join, last_number_part].join('.')
       end
     else
       field

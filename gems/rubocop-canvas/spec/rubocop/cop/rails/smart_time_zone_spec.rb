@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe RuboCop::Cop::Rails::SmartTimeZone do
-  subject(:cop) { described_class.new() }
+  subject(:cop) { described_class.new }
 
   described_class::TIMECLASS.each do |klass|
     it "registers an offense for #{klass}.now" do

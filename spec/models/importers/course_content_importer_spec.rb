@@ -23,7 +23,7 @@ require_relative '../../import_helper'
 describe Course do
   describe "import_content" do
     before(:once) do
-      @course = course_factory()
+      @course = course_factory
     end
 
     it "imports a whole json file" do

@@ -231,7 +231,7 @@ describe Login::CasController do
     Setting.set('cas_timelimit', 0.01)
     account_with_cas(account: Account.default)
 
-    cas_client = double()
+    cas_client = double
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
     expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }

@@ -40,7 +40,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
           "syllabus_body" => "oh, hi there."
         }
       }
-      @migration = double()
+      @migration = double
       allow(@migration).to receive(:migration_type).and_return('common_cartridge_importer')
       allow(@migration).to receive(:overview_attachment).and_return(@migration)
       allow(@migration).to receive(:open).and_return(@migration)
@@ -244,7 +244,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @category = @course.group_categories.create(:name => "other category")
       @group = Group.create!(:name => "group1", :group_category => @category, :context => @course)
       @announcement = announcement_model
-      @migration = double()
+      @migration = double
       allow(@migration).to receive(:migration_type).and_return('course_copy_importer')
       allow(@migration).to receive(:source_course).and_return(@course)
       export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)

@@ -300,7 +300,7 @@ describe CanvadocSessionsController do
       allow(Attachment).to receive(:find).and_return(group_attachment)
       expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
-        expect(arg2[:submission_user_ids].length()).to eq 2
+        expect(arg2[:submission_user_ids].length).to eq 2
         expect(arg2[:submission_user_ids]).to match_array [@student.id, student2.id]
       end
 

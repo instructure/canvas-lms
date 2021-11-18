@@ -565,7 +565,7 @@ module AttachmentFu # :nodoc:
         end
 
         if Rails.env.test?
-          save_and_callbacks.call()
+          save_and_callbacks.call
         else
           self.class.connection.after_transaction_commit(&save_and_callbacks)
         end

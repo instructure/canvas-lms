@@ -262,7 +262,7 @@ describe ContextModule do
     it "does not allow adding invalid prerequisites" do
       course_module
       @module2 = @course.context_modules.build(:name => "next module")
-      invalid = course_factory().context_modules.build(:name => "nope")
+      invalid = course_factory.context_modules.build(:name => "nope")
       @module2.prerequisites = "module_#{@module.id},module_#{invalid.id}"
 
       expect(@module2.prerequisites).to be_is_a(Array)

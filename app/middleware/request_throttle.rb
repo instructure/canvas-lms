@@ -42,8 +42,8 @@ class RequestThrottle
   end
 
   def call(env)
-    starting_mem = Canvas.sample_memory()
-    starting_cpu = Process.times()
+    starting_mem = Canvas.sample_memory
+    starting_cpu = Process.times
 
     request = ActionDispatch::Request.new(env)
 
@@ -66,8 +66,8 @@ class RequestThrottle
                                     @app.call(env)
                                   end
 
-      ending_cpu = Process.times()
-      ending_mem = Canvas.sample_memory()
+      ending_cpu = Process.times
+      ending_mem = Canvas.sample_memory
 
       user_cpu = ending_cpu.utime - starting_cpu.utime
       system_cpu = ending_cpu.stime - starting_cpu.stime

@@ -1000,7 +1000,7 @@ class Submission < ActiveRecord::Base
       if recheck_score || data[:similarity_score].blank?
         if attempt < VERICITE_STATUS_RETRY
           data[:similarity_score_check_time] = Time.now.to_i
-          vericite ||= VeriCite::Client.new()
+          vericite ||= VeriCite::Client.new
           res = vericite.generateReport(self, asset_string)
           if res[:similarity_score]
             # keep track of when we updated the score so that we can ask VC again once it is stale (i.e. cache for 20 mins)
@@ -1053,7 +1053,7 @@ class Submission < ActiveRecord::Base
 
   def vericite_report_url(asset_string, user, session)
     if self.vericite_data_hash && self.vericite_data_hash[asset_string] && self.vericite_data_hash[asset_string][:similarity_score]
-      vericite = VeriCite::Client.new()
+      vericite = VeriCite::Client.new
       if self.grants_right?(user, :grade)
         vericite.submissionReportUrl(self, user, asset_string)
       elsif can_view_plagiarism_report('vericite', user, session)
@@ -1074,7 +1074,7 @@ class Submission < ActiveRecord::Base
     end
     return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
 
-    vericite = VeriCite::Client.new()
+    vericite = VeriCite::Client.new
     reset_vericite_assets
 
     # Make sure the assignment exists and user is enrolled

@@ -22,7 +22,7 @@ require_dependency "canvas/plugins/ticketing_system/email_plugin"
 module Canvas::Plugins::TicketingSystem
   describe EmailPlugin do
     describe "#export_error" do
-      let(:ticketing) { double() }
+      let(:ticketing) { double }
       let(:plugin) { EmailPlugin.new(ticketing) }
       let(:email_address) { "to-address@example.com" }
       let(:config) { { email_address: email_address } }
@@ -30,7 +30,7 @@ module Canvas::Plugins::TicketingSystem
         double(
           email: "from-address@example.com",
           to_document: {},
-          raw_report: double(),
+          raw_report: double,
           account_id: nil
         )
       }

@@ -59,7 +59,7 @@ module Qti
         get_all_answers_from_body
       end
 
-      get_feedback()
+      get_feedback
       ensure_correct_format
 
       @question

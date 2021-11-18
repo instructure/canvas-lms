@@ -29,14 +29,14 @@ describe IncomingMail::ReplyToAddress do
 
   describe 'address' do
     it 'returns nil for SMS messages' do
-      message = double()
+      message = double
       expect(message).to receive(:path_type).and_return('sms')
 
       expect(IncomingMail::ReplyToAddress.new(message).address).to be_nil
     end
 
     it 'returns the message from address for error reports' do
-      message = double()
+      message = double
       expect(message).to receive(:path_type).and_return('email')
       expect(message).to receive(:context_type).and_return('ErrorReport')
       expect(message).to receive(:from).and_return('user@example.com')
@@ -48,7 +48,7 @@ describe IncomingMail::ReplyToAddress do
       specs_require_sharding
 
       it 'generates a reply-to address for email messages' do
-        message = double()
+        message = double
 
         expect(message).to receive(:path_type).and_return('email')
         expect(message).to receive(:context_type).and_return('Course')
@@ -64,7 +64,7 @@ describe IncomingMail::ReplyToAddress do
       end
 
       it 'limits a reply-to address to 64 chars before @' do
-        message = double()
+        message = double
 
         expect(message).to receive(:path_type).and_return('email')
         expect(message).to receive(:context_type).and_return('Course')
@@ -80,7 +80,7 @@ describe IncomingMail::ReplyToAddress do
       end
 
       it 'is a valid hmac in the reply address' do
-        message = double()
+        message = double
         expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
         secure_id = IncomingMail::ReplyToAddress.new(message).secure_id
         expect(secure_id.length).to eq 16
@@ -94,7 +94,7 @@ describe IncomingMail::ReplyToAddress do
     specs_require_sharding
 
     it 'generates a unique hash for the message' do
-      message = double()
+      message = double
       expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
 
       expect(IncomingMail::ReplyToAddress.new(message).secure_id).to eq expect_secure_id[0, 16]
@@ -112,7 +112,7 @@ describe IncomingMail::ReplyToAddress do
 
   describe 'self.address_from_pool' do
     it 'returns an address from the pool in a deterministic way' do
-      message, message2 = [double(), double()]
+      message, message2 = [double, double]
 
       expect(message).to receive(:id).twice.and_return(14)
       expect(message2).to receive(:id).twice.and_return(15)
@@ -123,7 +123,7 @@ describe IncomingMail::ReplyToAddress do
     end
 
     it 'raises EmptyReplyAddressPool if pool is empty' do
-      message = double()
+      message = double
       IncomingMail::ReplyToAddress.address_pool = []
 
       expect {
@@ -132,7 +132,7 @@ describe IncomingMail::ReplyToAddress do
     end
 
     it 'randomly selects a pool address if the message has no id' do
-      message = double()
+      message = double
 
       expect(message).to receive(:id).and_return(nil)
       IncomingMail::ReplyToAddress.address_pool = %w[canvas@example.com]

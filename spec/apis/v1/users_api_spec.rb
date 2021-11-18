@@ -375,12 +375,12 @@ describe Api::V1::User do
     end
 
     it 'supports manually passing the context' do
-      mock_context = double()
+      mock_context = double
       test_context(mock_context, mock_context)
     end
 
     it 'supports loading the context as a member var' do
-      @test_api.context = double()
+      @test_api.context = double
       test_context(@test_api.context, nil)
     end
 
@@ -653,7 +653,7 @@ describe Api::V1::User do
 
   context 'user_json_is_admin?' do
     it 'supports manually passing the current user' do
-      @test_api.context = double()
+      @test_api.context = double
       expect(@test_api.context).to receive(:global_id).and_return(42)
       expect(@test_api.context).to receive(:account).and_return(@test_api.context)
       expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
@@ -662,7 +662,7 @@ describe Api::V1::User do
     end
 
     it 'supports loading the current user as a member var' do
-      mock_context = double()
+      mock_context = double
       expect(mock_context).to receive(:global_id).and_return(42)
       expect(mock_context).to receive(:account).and_return(mock_context)
       expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)

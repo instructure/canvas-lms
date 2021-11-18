@@ -219,7 +219,7 @@ describe "threaded discussions" do
       entry_text = 'new entry'
       Discussion.visit(@course, @topic)
 
-      fj('label[for="showDeleted"]').click()
+      fj('label[for="showDeleted"]').click
       add_reply(entry_text)
       entry = DiscussionEntry.last
       delete_entry(entry)

@@ -20,7 +20,7 @@
 describe AuthenticationProvidersPresenter do
   describe "initialization" do
     it "wraps an account" do
-      account = double()
+      account = double
       presenter = described_class.new(account)
       expect(presenter.account).to eq(account)
     end
@@ -45,7 +45,7 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "only pulls from the db connection one time" do
-      account = double()
+      account = double
       expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
       presenter = described_class.new(account)
       5.times { presenter.configs }

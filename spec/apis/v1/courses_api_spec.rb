@@ -395,7 +395,7 @@ describe Api::V1::Course do
   describe '#add_helper_dependant_entries' do
     let(:hash) { Hash.new }
     let(:course) { double(:feed_code => 573, :id => 42, :syllabus_body => 'syllabus text').as_null_object }
-    let(:course_json) { double.as_null_object() }
+    let(:course_json) { double.as_null_object }
     let(:api) { TestCourseApi.new }
 
     let(:result) do
@@ -2997,7 +2997,7 @@ describe CoursesController, type: :request do
     end
 
     it "is not paginated (for legacy reasons)" do
-      controller = double()
+      controller = double
       allow(controller).to receive(:params).and_return({})
       course_with_teacher(:active_all => true)
       num = Api.per_page_for(controller) + 1 # get the default api per page value

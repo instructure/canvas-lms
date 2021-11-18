@@ -62,7 +62,7 @@ class CalendarsController < ApplicationController
         :url => named_context_url(context, :context_url),
         :create_calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : '',
         :create_assignment_url => context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : '',
-        :create_appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url() : '',
+        :create_appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url : '',
         :new_calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :new_context_calendar_event_url) : '',
         :new_assignment_url => context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : '',
         :calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, '{{ id }}') : '',

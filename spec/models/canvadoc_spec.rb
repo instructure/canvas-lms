@@ -35,7 +35,7 @@ describe 'Canvadoc' do
                                                                           "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
-    @doc = @attachment.create_canvadoc()
+    @doc = @attachment.create_canvadoc
   end
 
   def disable_canvadocs

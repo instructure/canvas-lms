@@ -118,7 +118,7 @@ describe PageView do
       4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
       pager = @user.page_views
       expect(pager).to be_a PaginatedCollection::Proxy
-      expect { pager.paginate() }.to raise_exception(ArgumentError)
+      expect { pager.paginate }.to raise_exception(ArgumentError)
       full = pager.paginate(:per_page => 4)
       expect(full.size).to eq 4
       expect(full.next_page).to be_nil

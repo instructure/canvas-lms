@@ -236,7 +236,7 @@ describe 'CommunicationChannels API', type: :request do
       context 'push' do
         before { @post_params.merge!(communication_channel: { token: +'registration_token', type: 'push' }) }
 
-        let(:client) { double() }
+        let(:client) { double }
         let(:dk) do
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'

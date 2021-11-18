@@ -80,14 +80,14 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment by migration id" do
-      att = make_test_att()
+      att = make_test_att
 
       test_string = %{<p>This is an image: <br /><img src="%24CANVAS_OBJECT_REFERENCE%24/attachments/1768525836051" alt=":(" /></p>}
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}files/#{att.id}/preview" alt=":("></p>}
     end
 
     it "finds an attachment by path" do
-      att = make_test_att()
+      att = make_test_att
 
       test_string = %{<p>This is an image: <br /><img src="%24IMS_CC_FILEBASE%24/test.png" alt=":(" /></p>}
 
@@ -99,7 +99,7 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment by a path with a space" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/with a space/test.png" => att.migration_id }
 
       test_string = %(<img src="subfolder/with%20a%20space/test.png" alt="nope" />)
@@ -110,7 +110,7 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment even if the link has an extraneous folder" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/test.png" => att.migration_id }
 
       test_string = %(<img src="anotherfolder/subfolder/test.png" alt="nope" />)
@@ -118,7 +118,7 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment by path if capitalization is different" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/withCapital/test.png" => "wrong!" }
       @migration.attachment_path_id_lookup_lower = { "subfolder/withcapital/test.png" => att.migration_id }
 
@@ -127,7 +127,7 @@ describe ImportedHtmlConverter do
     end
 
     it "finds an attachment with query params" do
-      att = make_test_att()
+      att = make_test_att
       @migration.attachment_path_id_lookup = { "test.png" => att.migration_id }
 
       test_string = %(<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />)

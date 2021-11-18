@@ -97,7 +97,7 @@ describe "calendar2" do
 
         # verify it shows up right when set from the datepicker
         f('#calendar_event_date + .ui-datepicker-trigger').click
-        fj('.ui-datepicker-current-day a:contains(2)').click()
+        fj('.ui-datepicker-current-day a:contains(2)').click
         expect(f('.ui-dialog #calendar_event_date').attribute(:value)).to eq('ven 2 Mars 2018')
         expect(fj('.date_field_container:has(#calendar_event_date) .datetime_suggest').text).to eq 'ven. 2 Mar 2018'
 
@@ -332,7 +332,7 @@ describe "calendar2" do
         f('.edit_event_link').click
         replace_content(f('input[name=title]'), 'new to-do edited')
         datetime = @todo_date
-        datetime = if datetime.to_date().mday() == '15'
+        datetime = if datetime.to_date.mday == '15'
                      datetime.change({ day: 20 })
                    else
                      datetime.change({ day: 15 })

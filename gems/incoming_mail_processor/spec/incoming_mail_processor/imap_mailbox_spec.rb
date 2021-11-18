@@ -32,7 +32,7 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   def mock_net_imap
-    @imap_mock = double()
+    @imap_mock = double
     IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
       allow(@imap_mock).to receive(method_name)
     end
@@ -104,7 +104,7 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     def mock_fetch_response(body)
-      result = double()
+      result = double
       expect(result).to receive(:attr).and_return({ "RFC822" => body })
       [result]
     end

@@ -327,7 +327,7 @@ describe Attachment do
 
       it "downgrades Canvadoc upload timeouts to WARN" do
         canvadocable = canvadocable_attachment_model content_type: "application/pdf"
-        cd_double = double()
+        cd_double = double
         allow(canvadocable).to receive(:canvadoc).and_return(cd_double)
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
@@ -2029,7 +2029,7 @@ describe Attachment do
         expect(tempfile).to receive(:path)
 
         expect(Tempfile).to receive(:new).and_return(tempfile)
-        actual_file = double()
+        actual_file = double
         expect(actual_file).to(receive(:read).twice { data.shift })
         expect(File).to receive(:open).and_yield(actual_file)
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))

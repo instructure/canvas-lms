@@ -24,7 +24,7 @@ describe NotificationEndpoint do
   end
 
   before do
-    @sns_client = double()
+    @sns_client = double
     allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
   end
 

@@ -1671,7 +1671,7 @@ describe DiscussionTopic do
     end
 
     it "fixes submission date after deleting the oldest entry" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @student)
       @entry2.created_at = 1.day.ago
       @entry2.save!
@@ -1685,7 +1685,7 @@ describe DiscussionTopic do
     end
 
     it "marks submission as unsubmitted after deletion" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -1697,7 +1697,7 @@ describe DiscussionTopic do
     end
 
     it "has new submission date after deletion and re-submission" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -2675,7 +2675,7 @@ describe DiscussionTopic do
     end
 
     it "without custom opts" do
-      group_discussion_assignment() # Discussion has title "topic"
+      group_discussion_assignment # Discussion has title "topic"
       @topic.podcast_has_student_posts = true
       new_topic = @topic.duplicate({ :user => @teacher })
       expect(new_topic.title).to eql "topic Copy"
@@ -2698,7 +2698,7 @@ describe DiscussionTopic do
     end
 
     it "respect provided user" do
-      discussion_topic_model()
+      discussion_topic_model
       @topic.save!
       new_topic = @topic.duplicate({ :user => @student })
       expect(new_topic.user_id).to eq @student.id

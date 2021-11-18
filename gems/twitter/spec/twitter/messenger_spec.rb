@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe Twitter::Messenger do
-  let(:message) { double() }
+  let(:message) { double }
   let(:twitter_service) {
     double({
              token: "twitter_token",
@@ -35,7 +35,7 @@ describe Twitter::Messenger do
   describe '#deliver' do
     let(:user) { double(:user_services) }
     let(:message) { double(:body => 'body', :url => 'url', :user => user, :id => 0, :main_link => '') }
-    let(:connection_mock) { double() }
+    let(:connection_mock) { double }
 
     context "with a twitter service" do
       before do
