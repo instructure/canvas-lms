@@ -758,8 +758,7 @@ describe BasicLTI::BasicOutcomes do
       expect(Attachment.last.file_state).to eq 'errored'
     end
 
-    it 'submits after successful retry' do
-      skip 'FSC fails after 15 seconds, the first run_jobs gets to over 45 seconds not sure why. INTEROP-7163'
+    it 'submits after successful retry', custom_timeout: 60 do
       xml.css('resultScore').remove
       xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
       BasicLTI::BasicOutcomes.process_request(tool, xml)
