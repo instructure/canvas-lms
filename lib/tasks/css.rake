@@ -25,7 +25,7 @@ namespace :css do
 
     puts "--> creating styleguide"
     system('bin/dress_code config/styleguide.yml')
-    fail "error running dress_code" unless $?.success?
+    raise "error running dress_code" unless $?.success?
   end
 
   task :compile do
@@ -46,7 +46,7 @@ namespace :css do
       end
       BrandableCSS.save_default_files!
       system('yarn run build:css')
-      fail "error running brandable_css" unless $?.success?
+      raise "error running brandable_css" unless $?.success?
     end
     puts "--> Finished: 'css:compile' in #{time}"
   end

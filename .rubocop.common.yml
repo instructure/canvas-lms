@@ -301,6 +301,8 @@ Style/SelfAssignment:
   Severity: error
 Style/Semicolon:
   Severity: error
+Style/SignalException:
+  Severity: error
 Style/SingleArgumentDig:
   Severity: error
 Style/SingleLineMethods:
@@ -388,8 +390,6 @@ Style/RescueModifier: # TODO
   Severity: warning
   AutoCorrect: false
 Style/ReturnNil: # TODO: autocorrect (investigate violations)
-  Enabled: false
-Style/SignalException: # TODO: autocorrect
   Enabled: false
 Style/StderrPuts: # TODO: autocorrect
   Enabled: false

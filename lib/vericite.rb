@@ -240,7 +240,7 @@ module VeriCite
           unless is_response_success?(response)
             response[:return_message] = "An error has occurred while creating the VeriCite assignment."
             response[:public_error_message] = response[:return_message]
-            fail "Failed to create assignment: #{assignment_id}, site #{context_id}"
+            raise "Failed to create assignment: #{assignment_id}, site #{context_id}"
           end
           # this is a flag to signal success
           response[:assignment_id] = assignment.id
@@ -272,7 +272,7 @@ module VeriCite
           unless is_response_success?(response)
             response[:return_message] = "An error has occurred while submitting the paper to VeriCite."
             response[:public_error_message] = response[:return_message]
-            fail "Failed to submit paper: #{external_content_data.external_content_id}"
+            raise "Failed to submit paper: #{external_content_data.external_content_id}"
           end
           data.each do |externalContentUploadInfo|
             # API will return an upload URL to store the submission (throws an exception if it fails)
@@ -301,7 +301,7 @@ module VeriCite
             unless is_response_success?(response)
               response[:return_message] = "An error has occurred while getting scores from VeriCite."
               response[:public_error_message] = response[:return_message]
-              fail "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
+              raise "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
             end
             # create the user scores map and cache it
             data.each do |reportScoreReponse|
@@ -345,7 +345,7 @@ module VeriCite
           unless is_response_success?(response)
             response[:return_message] = "An error has occurred while getting the report URL from VeriCite."
             response[:public_error_message] = response[:return_message]
-            fail "Failed to get the report url for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}, token_user: #{token_user}, token_user_role: #{token_user_role}"
+            raise "Failed to get the report url for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}, token_user: #{token_user}, token_user_role: #{token_user_role}"
           end
           data.each do |reportURLLinkReponse|
             # should only be 1 url
