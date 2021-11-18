@@ -877,8 +877,7 @@ class EnrollmentsApiController < ApplicationController
     if params[:user_id]
       # if you pass in your own id, you can see if you are enrolled in the
       # course, regardless of whether you have read_roster
-      scope = user_index_enrollments
-      return scope&.where(course_id: @context.id)
+      return user_index_enrollments(course: @context)
     end
 
     if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
@@ -907,7 +906,7 @@ class EnrollmentsApiController < ApplicationController
   # read.
   #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def user_index_enrollments
+  def user_index_enrollments(course: nil)
     user = api_find(User, params[:user_id])
 
     if user == @current_user
@@ -920,20 +919,27 @@ class EnrollmentsApiController < ApplicationController
                       user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
                     end
+      enrollments = enrollments.where(course_id: course) if course
     else
-      is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
-      # otherwise check for read_roster rights on all of the requested
-      # user's accounts
-      approved_accounts = user.associated_root_accounts.filter_map do |ra|
-        ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
+      if course
+        render_unauthorized_action and return false unless course.user_has_been_observer?(@current_user)
+
+        enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
+      else
+        is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
+        # otherwise check for read_roster rights on all of the requested
+        # user's accounts
+        approved_accounts = user.associated_root_accounts.filter_map do |ra|
+          ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
+        end
+
+        # if there aren't any ids in approved_accounts, then the user doesn't have
+        # permissions.
+        render_unauthorized_action and return false if approved_accounts.empty?
+
+        enrollments = user.enrollments.where(enrollment_index_conditions)
+                          .where(root_account_id: approved_accounts)
       end
-
-      # if there aren't any ids in approved_accounts, then the user doesn't have
-      # permissions.
-      render_unauthorized_action and return false if approved_accounts.empty?
-
-      enrollments = user.enrollments.where(enrollment_index_conditions)
-                        .where(root_account_id: approved_accounts)
 
       # by default, return active and invited courses. don't use the existing
       # current_and_invited_enrollments scope because it won't return enrollments
