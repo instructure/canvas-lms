@@ -292,6 +292,9 @@ Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/SymbolProc:
   Severity: error
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhileUntilModifier:
