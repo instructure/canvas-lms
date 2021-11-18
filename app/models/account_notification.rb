@@ -103,7 +103,7 @@ class AccountNotification < ActiveRecord::Base
       current.select! do |announcement|
         # need to have these variables to be able to access them outside of the
         # announcement.shard.activate block
-        enrollments, account_users = nil
+        enrollments = nil
         # use role.id instead of role_id to trigger Role#id magic for built in
         # roles. try(:id) because the AccountNotificationRole may have an
         # explicitly nil role_id to indicate the announcement's intended for
@@ -127,7 +127,6 @@ class AccountNotification < ActiveRecord::Base
           # choose enrollments and account users to inspect
           if announcement.account.site_admin?
             enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
-            account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
           else
             announcement.shard.activate do
               if announcement.account.root_account?
@@ -138,9 +137,10 @@ class AccountNotification < ActiveRecord::Base
                 enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course)
                                         .where(:courses => { :account_id => sub_account_ids_map[global_account_id] }).select(:role_id).to_a
               end
-              account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
           end
+
+          account_users = announcement.account_user_roles(user)
 
           # preload role objects for those enrollments and account users
           ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
@@ -189,6 +189,15 @@ class AccountNotification < ActiveRecord::Base
       end
 
       current.sort_by { |item| item[:end_at] }.reverse
+    end
+  end
+
+  def account_user_roles(user)
+    if account.site_admin?
+      user.account_users.shard(user.in_region_associated_shards)
+          .distinct.select(:role_id).to_a
+    else
+      account.root_account.cached_all_account_users_for(user)
     end
   end
 
