@@ -28,7 +28,7 @@ module CC
     def add_course_files
       return if for_course_copy
 
-      @html_exporter.referenced_files.keys.each do |att_id|
+      @html_exporter.referenced_files.each_key do |att_id|
         add_item_to_export("attachment_#{att_id}", "attachments")
       end
 

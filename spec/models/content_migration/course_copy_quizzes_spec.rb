@@ -456,7 +456,7 @@ describe ContentMigration do
 
       new_quiz = @copy_to.quizzes.first
 
-      attributes.keys.each do |prop|
+      attributes.each_key do |prop|
         expect(new_quiz.send(prop)).to eq(q.send(prop)), "#{prop}: expected #{q.send(prop).inspect}, got #{new_quiz.send(prop).inspect}"
       end
     end

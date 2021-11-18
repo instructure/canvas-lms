@@ -80,7 +80,7 @@ module CC
             set_progress(60)
 
             zipper = ContentZipper.new(:check_user => false)
-            @html_exporter.referenced_files.keys.each do |file_id|
+            @html_exporter.referenced_files.each_key do |file_id|
               att = course.attachments.find_by(id: file_id)
               next unless att
 

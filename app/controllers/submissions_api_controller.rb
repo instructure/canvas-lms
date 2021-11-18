@@ -886,8 +886,8 @@ class SubmissionsApiController < ApplicationController
 
         # prepend each key with "criterion_", which is required by the current
         # RubricAssociation#assess code.
-        assessment.keys.each do |crit_name|
-          assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+        assessment.transform_keys! do |crit_name|
+          "criterion_#{crit_name}"
         end
 
         @rubric_assessment = @assignment.rubric_association.assess(

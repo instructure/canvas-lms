@@ -691,7 +691,7 @@ class Submission < ActiveRecord::Base
     # check all assets in the turnitin_data (self.turnitin_assets is only the
     # current assets) so that we get the status for assets of previous versions
     # of the submission as well
-    self.turnitin_data.keys.each do |asset_string|
+    self.turnitin_data.each_key do |asset_string|
       data = self.turnitin_data[asset_string]
       next unless data.is_a?(Hash) && data[:object_id]
 
@@ -2739,8 +2739,8 @@ class Submission < ActiveRecord::Base
             if assessment.is_a?(Hash) && assignment.active_rubric_association?
               # prepend each key with "criterion_", which is required by
               # the current RubricAssociation#assess code.
-              assessment.keys.each do |crit_name|
-                assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+              assessment.transform_keys! do |crit_name|
+                "criterion_#{crit_name}"
               end
               assignment.rubric_association.assess(
                 :assessor => grader, :user => user, :artifact => submission,

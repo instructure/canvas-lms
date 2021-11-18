@@ -2065,7 +2065,7 @@ module UserContentSerialization
     if result.present?
       result = result.with_indifferent_access
       user_content_fields = options[:user_content] || []
-      result.keys.each do |name|
+      result.each_key do |name|
         if user_content_fields.include?(name.to_s)
           result[name] = UserContent.escape(result[name])
         end

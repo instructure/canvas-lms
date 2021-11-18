@@ -170,7 +170,7 @@ namespace :i18n do
         processed = strings_processed
 
         hash = Hash.new
-        val.keys.each { |key| hash[key] = process_lolz.call(val[key]) }
+        val.each_key { |key| hash[key] = process_lolz.call(val[key]) }
 
         print '.' if strings_processed > processed
         hash

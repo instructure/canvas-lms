@@ -204,7 +204,7 @@ module Api
       columns[column] ||= []
       columns[column] << sis_id
     end
-    columns.keys.each { |key| columns[key].uniq! }
+    columns.each_key { |key| columns[key].uniq! }
     columns
   end
 

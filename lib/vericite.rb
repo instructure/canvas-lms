@@ -313,7 +313,7 @@ module VeriCite
               end
             end
             # cache the user score map for a short period of time
-            users_score_map.keys.each do |key|
+            users_score_map.each_key do |key|
               Rails.cache.write("#{user_score_cache_key_prefix}#{key}", users_score_map[key], :expires_in => 5.minutes)
             end
           else
