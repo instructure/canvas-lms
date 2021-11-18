@@ -33,10 +33,6 @@ describe PacePlanPresenter do
       @ct2 = @mod2.add_item id: @a2.id, type: "assignment"
       @a3 = @course.assignments.create! name: "A3", workflow_state: "active"
       @ct3 = @mod2.add_item id: @a3.id, type: "assignment"
-
-      @course.context_module_tags.each do |tag|
-        @pace_plan.pace_plan_module_items.create! module_item: tag
-      end
     end
 
     it "returns all necessary data for the pace plan" do

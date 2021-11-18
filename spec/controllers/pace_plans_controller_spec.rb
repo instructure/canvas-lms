@@ -55,10 +55,8 @@ describe PacePlansController, type: :controller do
     @mod2.add_item id: @a3.id, type: "assignment"
     @mod2.add_item type: "external_url", title: "External URL", url: "http://localhost"
 
-    @course.context_module_tags.each_with_index do |tag, i|
-      next unless tag.assignment
-
-      @pace_plan.pace_plan_module_items.create! module_item: tag, duration: i * 2
+    @pace_plan.pace_plan_module_items.each_with_index do |ppmi, i|
+      ppmi.update! duration: i * 2
     end
 
     @course.enable_pace_plans = true
@@ -482,8 +480,7 @@ describe PacePlansController, type: :controller do
       @mod3 = @course.context_modules.create! name: "M3"
       2.times do |i|
         assignment = @course.assignments.create! name: i, workflow_state: "published"
-        tag = @mod3.add_item id: assignment.id, type: "assignment"
-        @pace_plan.pace_plan_module_items.create! module_item: tag
+        @mod3.add_item id: assignment.id, type: "assignment"
       end
 
       pace_plan_module_items_attributes = @pace_plan.pace_plan_module_items.order(:id).map do |ppmi|
