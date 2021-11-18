@@ -115,7 +115,7 @@ describe Types::MutationLogType do
     result = audit_log_query({ assetString: @asset_string, after: cursor }, current_user: @admin)
              .dig("data", "auditLogs", "mutationLogs")
     expect(result.dig("pageInfo", "hasNextPage")).to eq false
-    expect(result.dig("nodes").size).to eq 1
+    expect(result["nodes"].size).to eq 1
   end
 
   it "supports date ranges" do

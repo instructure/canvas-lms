@@ -948,7 +948,7 @@ module Api::V1::Assignment
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
-    external_tool_tag_attributes = assignment_params.dig(:external_tool_tag_attributes)
+    external_tool_tag_attributes = assignment_params[:external_tool_tag_attributes]
     if external_tool_tag_attributes&.include?(:custom_params)
       custom_params = external_tool_tag_attributes[:custom_params]
       unless custom_params_valid?(custom_params)

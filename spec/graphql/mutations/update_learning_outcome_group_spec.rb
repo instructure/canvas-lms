@@ -80,7 +80,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Updated Outcome Group'
@@ -97,7 +97,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Updated Outcome Group'
@@ -114,7 +114,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Outcome Group'
@@ -131,7 +131,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Outcome Group'
@@ -148,7 +148,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Outcome Group'
@@ -170,7 +170,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
           ),
           { current_user: site_admin_user }
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'updateLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq 'Updated Global Outcome Group'
@@ -183,7 +183,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
 
   context 'Errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateLearningOutcomeGroup', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateLearningOutcomeGroup', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end

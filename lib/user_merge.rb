@@ -205,7 +205,7 @@ class UserMerge
     %i{custom_colors course_nicknames}.each do |pref|
       preferences.delete(pref)
       new_pref = {}
-      from_user.preferences.dig(pref)&.each do |key, value|
+      from_user.preferences[pref]&.each do |key, value|
         new_key = translate_course_id_or_asset_string(key)
         new_pref[new_key] = value
       end

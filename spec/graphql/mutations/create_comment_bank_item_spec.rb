@@ -59,13 +59,13 @@ describe Mutations::CreateCommentBankItem do
 
   it "creates a comment bank item for the current_user" do
     result = execute_with_input(valid_query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createCommentBankItem', 'errors')).to be_nil
     result = result.dig('data', 'createCommentBankItem', 'commentBankItem')
-    record = CommentBankItem.find(result.dig('_id'))
-    expect(result.dig('courseId')).to eq @course.id.to_s
-    expect(result.dig('userId')).to eq @admin.id.to_s
-    expect(result.dig('comment')).to eq record.comment
+    record = CommentBankItem.find(result['_id'])
+    expect(result['courseId']).to eq @course.id.to_s
+    expect(result['userId']).to eq @admin.id.to_s
+    expect(result['comment']).to eq record.comment
   end
 
   it "allows relay id for course_id" do
@@ -79,7 +79,7 @@ describe Mutations::CreateCommentBankItem do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createCommentBankItem', 'errors')
+      errors = result['errors'] || result.dig('data', 'createCommentBankItem', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

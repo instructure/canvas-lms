@@ -54,7 +54,7 @@ describe Mutations::DeleteOutcomeProficiency do
       id: #{original_record.id}
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
   end
@@ -64,14 +64,14 @@ describe Mutations::DeleteOutcomeProficiency do
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('OutcomeProficiency').call(original_record.id.to_s)}
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeProficiency', 'errors')
+      errors = result['errors'] || result.dig('data', 'deleteOutcomeProficiency', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
