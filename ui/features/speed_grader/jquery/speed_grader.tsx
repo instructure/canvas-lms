@@ -3304,6 +3304,7 @@ EG = {
         }
         return historySubmission.attempt === submission.attempt
       }) || 0
+    const foundMatchingSubmission = historyIndex !== -1
     historyIndex = historyIndex === -1 ? 0 : historyIndex
 
     if (typeof submission.submission_history === 'undefined') {
@@ -3311,8 +3312,14 @@ EG = {
       submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
     }
 
-    // update the nested submission in submission_history if needed
-    if (student.submission?.submission_history?.[historyIndex]?.submission) {
+    // update the nested submission in submission_history if needed, assuming we
+    // could map the submission we got to a specific attempt (notably, with
+    // Quizzes.Next submissions and possibly other LTIs we don't get an
+    // "attempt" field)
+    if (
+      foundMatchingSubmission &&
+      student.submission?.submission_history?.[historyIndex]?.submission
+    ) {
       const versionedAttachments =
         submission.submission_history[historyIndex].submission?.versioned_attachments || []
       submission.submission_history[historyIndex].submission = $.extend(
