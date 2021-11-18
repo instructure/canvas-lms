@@ -939,7 +939,7 @@ describe 'Submissions API', type: :request do
                       :assignment_id => quiz.assignment.id.to_s },
                     { :include => %w[submission_history] })
     expect(json.first['submission_history'].count).to eq 2
-    expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+    expect(json.first['submission_history'].first.include?("submission_data")).to be_truthy
     expect(json.first['submission_history'][0]['preview_url']).to include '&version=2'
     expect(json.first['submission_history'][1]['preview_url']).to include '&version=1'
   end

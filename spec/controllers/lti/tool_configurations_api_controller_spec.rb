@@ -415,7 +415,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:dev_key_params) { super().merge(redirect_uris: nil) }
 
       it 'returns a 400' do
-        expect(post :create, params: params).to have_http_status :bad_request
+        expect(post(:create, params: params)).to have_http_status :bad_request
       end
     end
   end

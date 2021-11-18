@@ -432,7 +432,7 @@ describe "calendar2" do
         get '/calendar2'
 
         # go to the same month as the date_due
-        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        quick_jump_to_date(date_due.strftime('%Y-%m-%d'))
 
         # verify assignment has line-through
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
@@ -446,7 +446,7 @@ describe "calendar2" do
         get '/calendar2'
 
         # go to the same month as the date_due
-        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        quick_jump_to_date(date_due.strftime('%Y-%m-%d'))
 
         # verify discussion has line-through
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
@@ -461,7 +461,7 @@ describe "calendar2" do
         child.save!
 
         get '/calendar2'
-        quick_jump_to_date(child.start_at.strftime '%Y-%m-%d')
+        quick_jump_to_date(child.start_at.strftime('%Y-%m-%d'))
         f('.fc-event').click
 
         hover_and_click '.edit_event_link'
@@ -503,7 +503,7 @@ describe "calendar2" do
         get '/calendar2'
 
         # go to the same month as the date_due
-        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        quick_jump_to_date(date_due.strftime('%Y-%m-%d'))
 
         # verify assignment has line-through
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
@@ -525,7 +525,7 @@ describe "calendar2" do
         get '/calendar2'
 
         # go to the same month as the date_due
-        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        quick_jump_to_date(date_due.strftime('%Y-%m-%d'))
 
         # verify discussion has line-through
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')

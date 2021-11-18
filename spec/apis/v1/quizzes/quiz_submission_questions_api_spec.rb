@@ -439,7 +439,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
                             }]
                           })
 
-        expect(json['quiz_submission_questions'][0]["answers"].map(&:keys).uniq.include? "weight").to be_falsey
+        expect(json['quiz_submission_questions'][0]["answers"].map(&:keys).uniq.include?("weight")).to be_falsey
         expect(json['quiz_submission_questions'][1]["answers"]).to equal(nil)
       end
 

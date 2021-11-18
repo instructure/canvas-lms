@@ -324,7 +324,7 @@ describe "Screenreader Gradebook" do
 
       ui_options = Selenium::WebDriver::Support::Select.new(f("#section_select")).options.map(&:text)
       sections.each do |section|
-        expect(ui_options.include? section[:name]).to be_truthy
+        expect(ui_options.include?(section[:name])).to be_truthy
       end
     end
 
