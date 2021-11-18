@@ -424,7 +424,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def self.sp_metadata_for_account(account, current_host = nil, include_all_encryption_certificates: true)
     aps = account.authentication_providers.active.where(auth_type: 'saml').to_a
-    entity = sp_metadata(saml_default_entity_id_for_account(account, persist: aps.length != 0),
+    entity = sp_metadata(saml_default_entity_id_for_account(account, persist: !aps.empty?),
                          HostUrl.context_hosts(account, current_host),
                          include_all_encryption_certificates: include_all_encryption_certificates)
     prior_configs = Set.new

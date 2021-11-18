@@ -1260,7 +1260,7 @@ class CalendarEventsApiController < ApplicationController
 
   def apply_assignment_overrides(events, user)
     ActiveRecord::Associations::Preloader.new.preload(events, [:context, :assignment_overrides])
-    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.size == 0 }
+    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.empty? }
 
     if AssignmentOverrideApplicator.should_preload_override_students?(events, user, "calendar_events_api")
       AssignmentOverrideApplicator.preload_assignment_override_students(events, user)
@@ -1442,7 +1442,7 @@ class CalendarEventsApiController < ApplicationController
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them
-    if codes && codes.length > 0
+    if codes && !codes.empty?
       selected_context_codes = Set.new(@context_codes)
       codes.each do |c|
         unless selected_context_codes.include?(c)

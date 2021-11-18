@@ -278,7 +278,7 @@ class CourseSection < ActiveRecord::Base
     end
 
     CourseSection.unique_constraint_retry do
-      self.default_section = (course.course_sections.active.size == 0)
+      self.default_section = (course.course_sections.active.empty?)
       self.save!
     end
 

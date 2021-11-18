@@ -80,7 +80,7 @@ module DataFixup
     end
 
     def write_in_batches(batch)
-      while batch.size > 0
+      until batch.empty?
         write_batch(batch.shift(write_batch_size))
       end
     end

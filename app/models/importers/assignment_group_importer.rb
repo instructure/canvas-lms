@@ -43,7 +43,7 @@ module Importers
     def self.add_groups_for_imported_assignments(data, migration)
       return unless migration.migration_settings[:migration_ids_to_import] &&
                     migration.migration_settings[:migration_ids_to_import][:copy] &&
-                    migration.migration_settings[:migration_ids_to_import][:copy].length > 0
+                    !migration.migration_settings[:migration_ids_to_import][:copy].empty?
 
       migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'] ||= {}
       data['assignments']&.each do |assignment_hash|
@@ -89,7 +89,7 @@ module Importers
       item.group_weight = hash[:group_weight] if hash[:group_weight]
 
       rules = ""
-      if hash[:rules] && hash[:rules].length > 0
+      if hash[:rules] && !hash[:rules].empty?
         hash[:rules].each do |rule|
           case rule[:drop_type]
           when "drop_lowest", "drop_highest"

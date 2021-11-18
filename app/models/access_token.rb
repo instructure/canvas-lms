@@ -225,7 +225,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.scopes_match?(scopes, req_scopes)
-    return req_scopes.size == 0 if scopes.nil?
+    return req_scopes.empty? if scopes.nil?
 
     scopes.size == req_scopes.size &&
       scopes.all? do |scope|

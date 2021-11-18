@@ -2312,7 +2312,7 @@ class Assignment < ActiveRecord::Base
                 when "online_url", "basic_lti_launch"
                   opts[:url].present?
                 when "online_upload"
-                  opts[:attachments].size > 0
+                  !opts[:attachments].empty?
                 else
                   true
                 end

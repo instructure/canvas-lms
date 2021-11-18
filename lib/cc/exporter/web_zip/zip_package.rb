@@ -442,7 +442,7 @@ module CC::Exporter::WebZip
     def file_path(item_content)
       folder = item_content&.folder&.full_name || ''
       local_folder = folder.sub(%r{/?course files/?}, '')
-      local_folder.length > 0 ? "/#{local_folder}/" : '/'
+      !local_folder.empty? ? "/#{local_folder}/" : '/'
     end
 
     def dist_package_path

@@ -38,7 +38,7 @@ module DifferentiatedAssignments
 
       HomeworkAssignee::ASSIGNEE_TYPES.each do |type|
         types_list = organize_by_type(type)
-        organized_assignees << types_list if types_list.size > 0
+        organized_assignees << types_list unless types_list.empty?
       end
 
       organized_assignees.sort!

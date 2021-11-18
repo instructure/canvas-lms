@@ -78,7 +78,7 @@ class Linter
       return true
     end
 
-    if !skip_file_size_check && files.size == 0
+    if !skip_file_size_check && files.empty?
       puts "No #{file_regex} file changes found, skipping #{linter_name} check!"
       return true
     end

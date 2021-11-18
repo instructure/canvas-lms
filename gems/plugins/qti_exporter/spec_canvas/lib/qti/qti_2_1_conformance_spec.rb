@@ -158,7 +158,7 @@ if Qti.migration_executable
       q = @course.assessment_questions.first
 
       expect(q.name).to eq "QTI v2.1 Core Profile Single Pattern Match Item Test Instance"
-      expect(q.question_data['question_text'].split("\n").map(&:strip).select { |s| s.length > 0 }).to eq [
+      expect(q.question_data['question_text'].split("\n").map(&:strip).reject(&:empty?)).to eq [
         "Match the following characters to the Shakespeare play they appeared in:",
         "Capulet", "Demetrius", "Lysander", "Prospero",
         "A Midsummer-Night's Dream", "Romeo and Juliet", "The Tempest"

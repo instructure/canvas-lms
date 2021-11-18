@@ -500,7 +500,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_everything?
-    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy].length > 0
+    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && !migration_settings[:migration_ids_to_import][:copy].empty?
     return true if is_set?(to_import(:everything))
     return true if copy_options && is_set?(copy_options[:everything])
 

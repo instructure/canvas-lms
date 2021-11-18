@@ -306,6 +306,8 @@ Style/UnpackFirst:
   Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
+Style/ZeroLengthPredicate:
+  Severity: error
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
@@ -395,6 +397,4 @@ Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
   Enabled: false
 Style/WordArray: # TODO: autocorrect
-  Enabled: false
-Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
   Enabled: false

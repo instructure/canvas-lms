@@ -696,7 +696,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def save_entry
-    has_attachment = params[:attachment].present? && params[:attachment].size > 0 &&
+    has_attachment = params[:attachment].present? && !params[:attachment].empty? &&
                      @entry.grants_right?(@current_user, session, :attach)
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))

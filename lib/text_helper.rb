@@ -126,7 +126,7 @@ module TextHelper
         previous = current
       end
 
-      if current.children.length > 0
+      if !current.children.empty?
         # this node has children, can't be a text node,
         # lets descend and look for text nodes
         current = current.children.first

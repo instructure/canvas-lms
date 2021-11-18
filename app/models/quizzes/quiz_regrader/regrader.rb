@@ -30,7 +30,7 @@ module Quizzes::QuizRegrader
 
     def regrade!
       regrade = quiz.current_regrade
-      return true unless regrade && question_regrades.size > 0
+      return true unless regrade && !question_regrades.empty?
 
       Quizzes::QuizRegradeRun.perform(regrade) do
         submissions.each do |submission|

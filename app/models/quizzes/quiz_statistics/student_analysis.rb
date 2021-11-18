@@ -117,7 +117,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_score_stdev] = score_counter.standard_deviation
-    if submissions.size > 0
+    if !submissions.empty?
       stats[:submission_correct_count_average] = correct_cnt.to_f / submissions.size
       stats[:submission_incorrect_count_average] = incorrect_cnt.to_f / submissions.size
       stats[:submission_duration_average] = total_duration.to_f / submissions.size

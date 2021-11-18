@@ -92,7 +92,7 @@ module CanvasCache
     end
 
     def get_node_pos(key)
-      return [nil, nil] if @ring.size == 0
+      return [nil, nil] if @ring.empty?
 
       crc = @digest[key]
       idx = HashRing.binary_search(@sorted_keys, crc)
@@ -100,7 +100,7 @@ module CanvasCache
     end
 
     def iter_nodes(key)
-      return [nil, nil] if @ring.size == 0
+      return [nil, nil] if @ring.empty?
 
       _, pos = get_node_pos(key)
       @ring.size.times do |n|

@@ -127,7 +127,7 @@ module DataFixup
     end
 
     def write_updates_in_batches(updates)
-      while updates.size > 0
+      until updates.empty?
         write_batch_updates(updates.shift(write_batch_size))
       end
     end
@@ -139,7 +139,7 @@ module DataFixup
     end
 
     def write_inserts_in_batches(inserts)
-      while inserts.size > 0
+      until inserts.empty?
         write_batch_inserts(inserts.shift(write_batch_size))
       end
     end

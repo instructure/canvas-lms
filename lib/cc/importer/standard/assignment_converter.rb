@@ -56,7 +56,7 @@ module CC::Importer::Standard
         asmnt[:grading_type] = 'points'
         asmnt[:points_possible] = points_possible.to_f
       end
-      if doc.css('submission_formats format').length > 0
+      unless doc.css('submission_formats format').empty?
         asmnt[:submission_types] = []
         doc.css('submission_formats format').each do |format|
           type = format['type']

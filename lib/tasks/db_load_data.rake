@@ -102,7 +102,7 @@ namespace :db do
       # set the password later.
       pseudonym.password = pseudonym.password_confirmation = password
       unless pseudonym.save
-        raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
+        raise pseudonym.errors.full_messages.first unless pseudonym.errors.empty?
 
         raise "unknown error saving password"
       end

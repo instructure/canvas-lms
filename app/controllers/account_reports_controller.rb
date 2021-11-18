@@ -249,7 +249,7 @@ class AccountReportsController < ApplicationController
           }
         end
 
-        report[:parameters] = parameters unless parameters.length == 0
+        report[:parameters] = parameters unless parameters.empty?
         results << report
       end
       render :json => results

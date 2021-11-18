@@ -188,7 +188,7 @@ module Lti
     end
 
     def concluded_lis_roles
-      concluded_course_enrollments.size > 0 ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
+      !concluded_course_enrollments.empty? ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
     end
 
     def granted_permissions(permissions_to_check)
@@ -209,7 +209,7 @@ module Lti
 
     def enrollment_state
       enrollments = @user ? @context.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
-      return '' if enrollments.size == 0
+      return '' if enrollments.empty?
 
       enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end

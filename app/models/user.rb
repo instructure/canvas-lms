@@ -2602,7 +2602,7 @@ class User < ActiveRecord::Base
 
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
-    accounts.size == 0 || accounts.any? { |a| a.settings[:enable_eportfolios] != false }
+    accounts.empty? || accounts.any? { |a| a.settings[:enable_eportfolios] != false }
   end
 
   def initiate_conversation(users, private = nil, options = {})
@@ -2731,7 +2731,7 @@ class User < ActiveRecord::Base
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                     .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if favorites.length > 0
+    @menu_courses = if !favorites.empty?
                       favorites + courses.reject { |c| can_favorite.call(c) }
                     else
                       courses
