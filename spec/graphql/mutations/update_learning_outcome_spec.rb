@@ -68,7 +68,7 @@ describe Mutations::UpdateLearningOutcome do
 
   it "updates a learning outcome" do
     result = execute_with_input(variables)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateLearningOutcome', 'errors')).to be_nil
     result = result.dig('data', 'updateLearningOutcome', 'learningOutcome')
     expect(result['title']).to eq 'Outcome 1 edited'
@@ -79,7 +79,7 @@ describe Mutations::UpdateLearningOutcome do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateLearningOutcome', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateLearningOutcome', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end

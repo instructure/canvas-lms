@@ -71,7 +71,7 @@ describe Mutations::SetFriendlyDescription do
   end
 
   def expect_error(result, message)
-    errors = result.dig('errors')
+    errors = result['errors']
     expect(errors).not_to be_nil
     expect(errors[0]['message']).to match(/#{message}/)
   end
@@ -176,12 +176,12 @@ describe Mutations::SetFriendlyDescription do
         }
       GQL
       result = execute_query(mutation_str, ctx)
-      expect(result.dig("errors").map { |err| err["message"] }).to eql([
-                                                                         "Argument 'description' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!",
-                                                                         "Argument 'outcomeId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
-                                                                         "Argument 'contextId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
-                                                                         "Argument 'contextType' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!"
-                                                                       ])
+      expect(result["errors"].map { |err| err["message"] }).to eql([
+                                                                     "Argument 'description' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!",
+                                                                     "Argument 'outcomeId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
+                                                                     "Argument 'contextId' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type ID!",
+                                                                     "Argument 'contextType' on InputObject 'SetFriendlyDescriptionInput' is required. Expected type String!"
+                                                                   ])
     end
 
     it "returns error when pass invalid context type" do

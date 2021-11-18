@@ -179,7 +179,7 @@ describe Mutations::ImportOutcomes do
     end
 
     def expect_error(result, message)
-      errors = result.dig('errors')
+      errors = result['errors']
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
@@ -199,7 +199,7 @@ describe Mutations::ImportOutcomes do
         }
       GQL
       result = execute_query(query, ctx)
-      errors = result.dig('errors')
+      errors = result['errors']
       expect(errors).not_to be_nil
       expect(errors.length).to eq 1
       expect(

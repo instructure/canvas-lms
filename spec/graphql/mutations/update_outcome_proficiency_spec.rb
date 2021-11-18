@@ -78,7 +78,7 @@ describe Mutations::UpdateOutcomeProficiency do
 
   it "updates an outcome proficiency" do
     result = execute_with_input(good_query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateOutcomeProficiency', 'errors')).to be_nil
     result = result.dig('data', 'updateOutcomeProficiency', 'outcomeProficiency')
     ratings = result.dig('proficiencyRatingsConnection', 'nodes')
@@ -93,13 +93,13 @@ describe Mutations::UpdateOutcomeProficiency do
     original_record.destroy
     result = execute_with_input(good_query)
     result = result.dig('data', 'updateOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result.dig('_id'))
+    record = OutcomeProficiency.find(result['_id'])
     expect(record.id).to eq original_record.id
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

@@ -318,7 +318,7 @@ class MediaObject < ActiveRecord::Base
                                     "folder_id" => Folder.media_folder(context).id
                                   })
 
-    url = self.data.dig(:download_url)
+    url = self.data[:download_url]
     url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
     url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
 

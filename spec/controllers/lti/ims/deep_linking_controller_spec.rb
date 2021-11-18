@@ -556,7 +556,7 @@ module Lti
 
             it 'uses title for assignment title' do
               subject
-              expect(Assignment.last.title).to eq content_items.first.dig(:title)
+              expect(Assignment.last.title).to eq content_items.first[:title]
             end
           end
 

@@ -45,7 +45,7 @@ describe Mutations::DeleteConversationMessages do
   end
 
   def expect_error(result, message)
-    errors = result.dig('errors') || result.dig('data', 'deleteConversationMessages', 'errors')
+    errors = result['errors'] || result.dig('data', 'deleteConversationMessages', 'errors')
     expect(errors).not_to be_nil
     expect(errors[0]['message']).to match(/#{message}/)
   end
@@ -57,7 +57,7 @@ describe Mutations::DeleteConversationMessages do
     GQL
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
     expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W(#{message.id})
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0
@@ -93,7 +93,7 @@ describe Mutations::DeleteConversationMessages do
         GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 2
         result = execute_with_input(query)
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
         expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W(#{message.id} #{message2.id})
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0

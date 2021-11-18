@@ -608,8 +608,8 @@ describe ContentExportsApiController, type: :request do
             quiz_id: quiz.id
           }
         )
-        expect(json.dig('migrated_quiz').count).to be 1
-        expect(json.dig('migrated_quiz')[0].dig('quiz_type')).to eq 'quizzes.next'
+        expect(json['migrated_quiz'].count).to be 1
+        expect(json['migrated_quiz'][0]['quiz_type']).to eq 'quizzes.next'
       end
 
       it "output migrated assignment in json" do
@@ -627,8 +627,8 @@ describe ContentExportsApiController, type: :request do
             quiz_id: quiz.id
           }
         )
-        expect(json.dig('migrated_assignment').count).to be 1
-        expect(json.dig('migrated_assignment')[0].dig('new_positions')).not_to be_nil
+        expect(json['migrated_assignment'].count).to be 1
+        expect(json['migrated_assignment'][0]['new_positions']).not_to be_nil
       end
     end
   end

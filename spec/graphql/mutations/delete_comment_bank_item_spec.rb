@@ -50,7 +50,7 @@ describe Mutations::DeleteCommentBankItem do
       id: #{@comment_bank_item.id}
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'commentBankItemId')).to eq @comment_bank_item.id.to_s
   end
@@ -60,14 +60,14 @@ describe Mutations::DeleteCommentBankItem do
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment_bank_item.id.to_s)}
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'commentBankItemId')).to eq @comment_bank_item.id.to_s
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteCommentBankItem', 'errors')
+      errors = result['errors'] || result.dig('data', 'deleteCommentBankItem', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

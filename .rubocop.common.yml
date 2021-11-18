@@ -274,6 +274,8 @@ Style/SelfAssignment:
   Severity: error
 Style/Semicolon:
   Severity: error
+Style/SingleArgumentDig:
+  Severity: error
 Style/SingleLineMethods:
   Severity: error
 Style/SlicingWithRange:

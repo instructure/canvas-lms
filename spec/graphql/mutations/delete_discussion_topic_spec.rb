@@ -51,7 +51,7 @@ describe Mutations::DeleteDiscussionTopic do
     GQL
     expect(DiscussionTopic.where("user_id = #{sender.id} and deleted_at is null").length).to eq 1
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'discussionTopicId', 'errors')).to be_nil
     expect(result.dig('data', 'deleteDiscussionTopic', 'discussionTopicId')).to eq discussion_topic.id.to_s
     expect(DiscussionTopic.where("user_id = #{sender.id} and deleted_at is null").count).to eq 0
@@ -59,7 +59,7 @@ describe Mutations::DeleteDiscussionTopic do
 
   context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteDiscussionTopic', 'errors')
+      errors = result['errors'] || result.dig('data', 'deleteDiscussionTopic', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

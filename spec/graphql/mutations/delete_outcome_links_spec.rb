@@ -88,7 +88,7 @@ describe Mutations::DeleteOutcomeLinks do
 
   context 'Error' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeLinks', 'errors')
+      errors = result['errors'] || result.dig('data', 'deleteOutcomeLinks', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end
