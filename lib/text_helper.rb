@@ -188,8 +188,8 @@ module TextHelper
       end
 
       # remove everything else
-      while !current.is_a?(Nokogiri::HTML::Document)
-        while !current.next.nil?
+      until current.is_a?(Nokogiri::HTML::Document)
+        until current.next.nil?
           current.next.remove
         end
         current = current.parent

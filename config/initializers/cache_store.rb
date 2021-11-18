@@ -23,7 +23,7 @@ load_cache_config = -> do
 
   searched = Set.new
   clusters_to_search = Switchman::DatabaseServer.all.map(&:id)
-  while !clusters_to_search.empty?
+  until clusters_to_search.empty?
     cluster = clusters_to_search.shift
     next if searched.include?(cluster)
 

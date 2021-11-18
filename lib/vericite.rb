@@ -383,7 +383,7 @@ module VeriCite
     end
 
     def response_error_hash(response)
-      return {} unless !is_response_success?(response)
+      return {} if is_response_success?(response)
 
       {
         error_code: response[:return_code],

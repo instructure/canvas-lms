@@ -46,7 +46,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     lock_key = "lock:#{key}"
 
     unless entry
-      while !entry
+      until entry
         unless (lock_nonce = lock(lock_key, options))
           # someone else is already generating it; wait for them
           sleep 0.1

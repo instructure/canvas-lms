@@ -130,7 +130,7 @@ module SIS
         return unless any_left_to_process?
 
         enrollment_info = nil
-        while !@enrollment_batch.empty?
+        until @enrollment_batch.empty?
           enrollment_info = @enrollment_batch.shift
 
           @last_section = @section if @section

@@ -124,7 +124,7 @@ namespace :db do
     unless user
       require 'highline/import'
 
-      while !Rails.env.test? do
+      until Rails.env.test? do
 
         if telemetry_enabled?
           print "\e[33mInput fields will be hidden to ensure that entered data will not be sent to the telemetry service.\nWe do not recommend using sensitive data for development environments.\e[0m\n"
