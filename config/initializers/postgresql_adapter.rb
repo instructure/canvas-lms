@@ -139,7 +139,7 @@ module PostgreSQLAdapterExtensions
     result.map do |row|
       index_name = row[0]
       unique = row[1] == 't'
-      indkey = row[2].split(" ")
+      indkey = row[2].split
       inddef = row[3]
       oid = row[4]
 

@@ -32,7 +32,7 @@ class OAuth2ProviderController < ApplicationController
       return render()
     end
 
-    scopes = (params[:scope] || params[:scopes] || '').split(' ')
+    scopes = (params[:scope] || params[:scopes] || '').split
 
     provider = Canvas::OAuth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
     unless provider.has_valid_key?

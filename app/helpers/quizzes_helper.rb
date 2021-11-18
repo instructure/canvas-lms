@@ -415,7 +415,7 @@ module QuizzesHelper
     if text.empty?
       ''
     else
-      content_tag(:div, text.join('').html_safe, { :class => 'quiz_comment' })
+      content_tag(:div, text.join.html_safe, { :class => 'quiz_comment' })
     end
   end
 
@@ -539,7 +539,7 @@ module QuizzesHelper
 
   def link_to_take_quiz(link_body, opts = {})
     opts = opts.with_indifferent_access
-    class_array = (opts['class'] || "").split(" ")
+    class_array = (opts['class'] || "").split
     class_array << 'element_toggler' if @quiz.cant_go_back?
     opts['class'] = class_array.compact.join(" ")
     opts['aria-controls'] = 'js-sequential-warning-dialogue' if @quiz.cant_go_back?
