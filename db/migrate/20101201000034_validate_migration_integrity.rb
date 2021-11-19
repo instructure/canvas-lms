@@ -43,7 +43,4 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
       TEXT
     end
   end
-
-  def self.down
-  end
 end

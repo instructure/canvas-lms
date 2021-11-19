@@ -303,8 +303,7 @@ module CanvasRails
     end
 
     class DummyKeyGenerator
-      def self.generate_key(*)
-      end
+      def self.generate_key(*); end
     end
 
     def key_generator

@@ -286,8 +286,7 @@ class WebConference < ActiveRecord::Base
     read_attribute(:context_code) || "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
-  def infer_conference_settings
-  end
+  def infer_conference_settings; end
 
   def conference_type=(val)
     conf_type = if val == 'LtiConference'

@@ -28,11 +28,11 @@ describe EventStream::Stream do
       yield
     end
 
-    def database.update_record(*args); end
+    def database.update_record(*); end
 
-    def database.insert_record(*args); end
+    def database.insert_record(*); end
 
-    def database.update(*args); end
+    def database.update(*); end
 
     def database.available?
       true

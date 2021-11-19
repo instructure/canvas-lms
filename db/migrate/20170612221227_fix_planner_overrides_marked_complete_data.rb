@@ -24,7 +24,4 @@ class FixPlannerOverridesMarkedCompleteData < ActiveRecord::Migration[4.2]
   def self.up
     DataFixup::FixPlannerOverridesMarkedCompleteData.delay_if_production(priority: Delayed::LOWER_PRIORITY).run
   end
-
-  def self.down
-  end
 end
