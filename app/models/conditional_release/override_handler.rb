@@ -82,7 +82,7 @@ module ConditionalRelease
           overrides = existing_overrides_map[to_assign.id]
           if overrides
             unless overrides.any? { |o| o.assignment_override_students.map(&:user_id).include?(student_id) }
-              override = overrides.sort_by(&:id).first # kind of arbitrary but may as well be consistent and always pick the earliest
+              override = overrides.min_by(&:id) # kind of arbitrary but may as well be consistent and always pick the earliest
               # we can pass in :no_enrollment to skip some queries - i assume they have an enrollment since they have a submission
               override.assignment_override_students.create!(:user_id => student_id, :no_enrollment => false)
             end

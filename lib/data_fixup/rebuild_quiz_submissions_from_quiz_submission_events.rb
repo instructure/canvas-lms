@@ -226,7 +226,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       end
 
       # Assume final attempt
-      attempt = attempts.sort.last
+      attempt = attempts.max
       events.select!(&:attempt)
 
       times = events.map(&:created_at).sort
@@ -247,7 +247,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       qs.attempt = attempt
 
       # This is sad because assumptions
-      qs.quiz_version = qs.versions.map { |v| v.model.quiz_version }.sort.last
+      qs.quiz_version = qs.versions.map { |v| v.model.quiz_version }.max
       qs.quiz_data = aggregate_quiz_data_from_events(qs, events)
 
       # Set reasonable timestamps

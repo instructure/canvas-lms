@@ -74,7 +74,7 @@ class Quizzes::QuizzesController < ApplicationController
         [
           'quiz_user_permissions', @context.id, @current_user,
           scoped_quizzes_index.map(&:id), # invalidate on add/delete of quizzes
-          scoped_quizzes_index.map(&:updated_at).sort.last # invalidate on modifications
+          scoped_quizzes_index.map(&:updated_at).max # invalidate on modifications
         ].cache_key
       ) do
         if can_manage

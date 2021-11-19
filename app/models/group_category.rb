@@ -643,7 +643,7 @@ class GroupCategory < ActiveRecord::Base
           # more likely will we have some extra groups now because of remainder students from our first pass
           # so at least one section will have to have some smaller groups now
           # best thing to do now is to find the group that can take the hit the easiest
-          leftover_sec_id = group_counts.sort_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.last.first
+          leftover_sec_id = group_counts.max_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.first
           group_counts[leftover_sec_id] += 1
           extra_groups[leftover_sec_id] ||= 0
           extra_groups[leftover_sec_id] += 1

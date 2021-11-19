@@ -76,7 +76,7 @@ class GradingPeriod < ActiveRecord::Base
     periods ||= self.for(course)
 
     if date.nil?
-      periods.sort_by(&:end_date).last
+      periods.max_by(&:end_date)
     else
       periods.detect { |p| p.in_date_range?(date) }
     end

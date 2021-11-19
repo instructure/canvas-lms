@@ -320,7 +320,7 @@ class MediaObject < ActiveRecord::Base
 
     url = self.data[:download_url]
     url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
-    url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
+    url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
     attachment.file_state = "hidden" # in case teachers don't mean for this to be visible to students in the files section

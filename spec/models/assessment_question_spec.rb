@@ -232,7 +232,7 @@ describe AssessmentQuestion do
       # consistent ordering is good for preventing deadlocks
       questions = []
       3.times { questions << assessment_question.create_quiz_question(quiz.id) }
-      smallest_id_question = questions.sort_by(&:id).first
+      smallest_id_question = questions.min_by(&:id)
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.id).to eq(smallest_id_question.id)
     end
