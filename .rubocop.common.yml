@@ -340,6 +340,8 @@ Lint/UriEscapeUnescape: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
+Rails/Date: # TODO: autocorrect (unsafe)
+  Enabled: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
