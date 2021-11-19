@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// TODO:
-// Need to fix No results text
-
 import PropTypes from 'prop-types'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
@@ -72,6 +69,7 @@ export const AddressBook = ({
   const [isLimitReached, setLimitReached] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState('200px')
   const [inputValue, setInputValue] = useState('')
+  const menuRef = useRef(null)
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
   const backButtonArray = isSubMenu ? [{id: 'backButton', name: I18n.t('Back')}] : []
   const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
@@ -134,6 +132,8 @@ export const AddressBook = ({
           }
           setSelectedItem(user)
         }}
+        menuRef={menuRef}
+        isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
       >
         {user.name}
       </AddressBookItem>
@@ -309,7 +309,7 @@ export const AddressBook = ({
       addTag(user)
       onSelect(user.id)
     } else {
-      onSelect(user.id)
+      onSelect(user.id, isCourse, isBackButton)
     }
   }
 
@@ -355,7 +355,11 @@ export const AddressBook = ({
                       setIsMenuOpen(true)
                     }
                   }}
-                  onBlur={() => setIsMenuOpen(false)}
+                  onBlur={() => {
+                    if (focusType === KEYBOARD_FOCUS_TYPE) {
+                      setIsMenuOpen(false)
+                    }
+                  }}
                   onKeyDown={inputKeyHandler}
                   aria-expanded={isMenuOpen}
                   aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
@@ -375,7 +379,15 @@ export const AddressBook = ({
                 />
               }
             >
-              <View as="div" width={popoverWidth} maxHeight="80vh" overflowY="auto">
+              <View
+                elementRef={el => {
+                  menuRef.current = el
+                }}
+                as="div"
+                width={popoverWidth}
+                maxHeight="80vh"
+                overflowY="auto"
+              >
                 {isLoading && renderLoading()}
                 {!isLoading && (
                   <ul
