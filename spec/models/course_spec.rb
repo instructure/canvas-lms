@@ -532,6 +532,18 @@ describe Course do
     end
   end
 
+  describe 'allow_student_anonymous_discussion_topics' do
+    it 'defaults to false' do
+      expect(@course.allow_student_anonymous_discussion_topics).to eq false
+    end
+
+    it 'allows setting and getting' do
+      @course.allow_student_anonymous_discussion_topics = true
+      @course.save!
+      expect(@course.allow_student_anonymous_discussion_topics).to eq true
+    end
+  end
+
   describe "allow_student_discussion_topics" do
     it "defaults true" do
       expect(@course.allow_student_discussion_topics).to eq true
