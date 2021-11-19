@@ -59,7 +59,7 @@ describe Lti::PrivacyLevelExpander do
         'context_label' => course.course_code
       }
 
-      expect(helper.expanded_variables!(Hash.new)).to include expected_params
+      expect(helper.expanded_variables!({})).to include expected_params
     end
   end
 

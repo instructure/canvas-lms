@@ -149,7 +149,7 @@ describe AssetUserAccess do
   end
 
   describe '#log_action' do
-    let(:scores) { Hash.new }
+    let(:scores) { {} }
     let(:asset) { AssetUserAccess.new(scores) }
 
     subject { asset }

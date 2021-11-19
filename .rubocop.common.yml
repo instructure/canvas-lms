@@ -244,6 +244,8 @@ Style/EachWithObject:
   Severity: error
 Style/EmptyCaseCondition:
   Severity: error
+Style/EmptyLiteral:
+  Severity: error
 Style/EmptyMethod:
   Severity: error
 Style/Encoding:

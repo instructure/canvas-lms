@@ -30,7 +30,7 @@ module Lti
 
     def errors
       @errors ||= begin
-        hash = Hash.new
+        hash = {}
         hash.merge!(invalid_capability_errors)
         hash.merge!(invalid_service_errors)
         hash.merge!(invalid_security_contract_errors)

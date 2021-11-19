@@ -33,7 +33,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
     end
 
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::Essay }
-    let(:question_params) { Hash.new }
+    let(:question_params) { {} }
 
     it "seeds a question with comments" do
       essay = Quizzes::QuizQuestion::AnswerParsers::Essay.new(raw_answers)
