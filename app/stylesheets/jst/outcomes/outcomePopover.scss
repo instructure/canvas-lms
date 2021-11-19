@@ -25,8 +25,9 @@
   background-color: #fff;
   border: 1px solid #b0afaf;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  width: calc(100% - 26px);
   max-width: 500px;
-  min-width: 250px;
+  min-width: 320px;
   padding: 18px 12px;
   border-radius: 8px;
   font-weight: bold;
@@ -40,7 +41,8 @@
   .chart {
     @include fontSize(11px);
     text-align: center;
-    height: 150px
+    height: 150px;
+    padding-bottom: 12px
   }
   .line-graph {
     @include fontSize(10px);
