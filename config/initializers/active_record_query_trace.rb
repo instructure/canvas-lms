@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_record_query_trace'
-
 module ARQueryTraceInitializer
   VALID_QUERY_TYPES = %i[all read write].freeze
   VALID_LEVELS = %i[app rails full].freeze
@@ -26,6 +24,8 @@ module ARQueryTraceInitializer
   def self.configure!
     return if Rails.env.production?
     return unless Canvas::Plugin.value_to_boolean(ENV['AR_QUERY_TRACE'])
+
+    require 'active_record_query_trace'
 
     lines_in_trace = ENV['AR_QUERY_TRACE_LINES'].to_i
     query_types = ENV['AR_QUERY_TRACE_TYPE']&.to_sym
