@@ -76,9 +76,8 @@ class Profile < ActiveRecord::Base
     return nil unless value.present?
 
     case options[:type]
-    when :decimal,
-           :float; value.to_f
-    when :int; value.to_i
+    when :decimal, :float then value.to_f
+    when :int then value.to_i
     else value
     end
   end

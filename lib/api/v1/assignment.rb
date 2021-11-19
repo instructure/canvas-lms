@@ -435,9 +435,9 @@ module Api::V1::Assignment
 
     ex_type = settings.delete(:exclude_type)
     settings[:exclude_small_matches_type] = case ex_type
-                                            when '0'; nil
-                                            when '1'; 'words'
-                                            when '2'; 'percent'
+                                            when '0' then nil
+                                            when '1' then 'words'
+                                            when '2' then 'percent'
                                             end
 
     ex_value = settings.delete(:exclude_value)
@@ -844,9 +844,9 @@ module Api::V1::Assignment
   def turnitin_settings_hash(assignment_params)
     turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
-                                        when nil; '0'
-                                        when 'words'; '1'
-                                        when 'percent'; '2'
+                                        when nil then '0'
+                                        when 'words' then '1'
+                                        when 'percent' then '2'
                                         end
     turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
     turnitin_settings.to_unsafe_h

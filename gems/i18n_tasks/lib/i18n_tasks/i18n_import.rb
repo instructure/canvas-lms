@@ -63,13 +63,13 @@ module I18nTasks
       ].each do |mismatches, description|
         unless mismatches.empty?
           case (action = yield(mismatches, description))
-          when :abort then
+          when :abort
             throw(:abort)
-          when :discard then
+          when :discard
             @new_translations.delete_if do |k, _v|
               mismatches.any? { |m| m.key == k }
             end
-          when :accept then
+          when :accept
             :ok
           else
             raise "don't know how to handle #{action}"

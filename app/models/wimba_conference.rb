@@ -146,8 +146,8 @@ class WimbaConference < WebConference
                      'target' => wimba_id,
                      'user_id' => wimba_id(user.uuid),
                      'role_id' => case role
-                                  when :presenter; 'Instructor'
-                                  when :admin; 'ClassAdmin'
+                                  when :presenter then 'Instructor'
+                                  when :admin then 'ClassAdmin'
                                   else 'Student'
                                   end
                    })

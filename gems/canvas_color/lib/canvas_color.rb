@@ -258,10 +258,10 @@ module CanvasColor
     def self.parse(*args)
       case args.size
 
-      when 0 then
+      when 0
         return nil
 
-      when 1 then
+      when 1
         val = args[0]
 
         # Trivial parse... :-)
@@ -279,9 +279,9 @@ module CanvasColor
 
         str = str[/[0-9A-F]{3,8}/] || ''
         case str.size
-        when 3, 4 then
+        when 3, 4
           r, g, b, a = str.scan(/[0-9A-F]/)
-        when 6, 8 then
+        when 6, 8
           r, g, b, a = str.scan(/[0-9A-F]{2}/)
         else
           return nil
@@ -289,7 +289,7 @@ module CanvasColor
 
         return Color.new(r, g, b, a || 255)
 
-      when 3, 4 then
+      when 3, 4
         return Color.new(*args)
 
       end

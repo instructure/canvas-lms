@@ -240,6 +240,8 @@ Style/IfWithBooleanLiteralBranches:
   Severity: error
 Style/MethodCallWithoutArgsParentheses:
   Severity: error
+Style/MultilineWhenThen:
+  Severity: error
 Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
@@ -331,6 +333,8 @@ Style/TernaryParentheses:
 Style/TrailingCommaInArguments:
   Severity: error
 Style/UnpackFirst:
+  Severity: error
+Style/WhenThen:
   Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
