@@ -256,7 +256,7 @@ describe LiveEvents::Client do
       LiveEvents.set_context({ user_id: 123 })
       LiveEvents.clear_context!
 
-      now = Time.now # rubocop:disable Rails/SmartTimeZone
+      now = Time.now
 
       LiveEvents.post_event(
         event_name: 'event',
@@ -285,7 +285,7 @@ describe LiveEvents::Client do
       let(:test_stream_name) { 'custom_stream_name' }
 
       it "uses custom stream client when defined" do
-        now = Time.now # rubocop:disable Rails/SmartTimeZone
+        now = Time.now
 
         LiveEvents.post_event(
           event_name: 'event',

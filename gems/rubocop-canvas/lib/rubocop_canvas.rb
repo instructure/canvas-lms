@@ -38,8 +38,6 @@ require 'rubocop_canvas/cops/migration/non_transactional'
 require 'rubocop_canvas/cops/migration/primary_key'
 require 'rubocop_canvas/cops/migration/remove_column'
 require 'rubocop_canvas/cops/migration/delay'
-## rails
-require 'rubocop_canvas/cops/rails/smart_time_zone'
 ## specs
 require 'rubocop_canvas/cops/specs/no_before_once_stubs'
 require 'rubocop_canvas/cops/specs/no_disable_implicit_wait'
