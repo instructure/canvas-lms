@@ -91,7 +91,7 @@ describe DiscussionTopicSectionVisibility do
       :message => "I announce that i am lying",
       :user => @teacher,
       :context => course,
-      :workflow_state => "published",
+      :workflow_state => "published"
     )
   end
 

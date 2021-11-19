@@ -191,6 +191,8 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/AndOr:
+  Severity: error
 Style/BarePercentLiterals:
   Severity: error
 Style/CaseLikeIf:
@@ -208,6 +210,8 @@ Style/Documentation:
 Style/EachWithObject:
   Severity: error
 Style/EmptyCaseCondition:
+  Severity: error
+Style/EmptyMethod:
   Severity: error
 Style/Encoding:
   Severity: error
@@ -242,6 +246,8 @@ Style/NegatedWhile:
   Severity: error
 Style/NestedParenthesizedCalls:
   Severity: error
+Style/Not:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/OrAssignment:
@@ -261,6 +267,8 @@ Style/QuotedSymbols:
   EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
   Severity: error
 Style/RedundantArgument:
+  Severity: error
+Style/RaiseArgs:
   Severity: error
 Style/RedundantAssignment:
   Severity: error
@@ -284,6 +292,8 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RedundantSort:
+  Severity: error
 Style/RegexpLiteral:
   Severity: error
 Style/RescueStandardError:
@@ -294,6 +304,8 @@ Style/SafeNavigation:
 Style/SelfAssignment:
   Severity: error
 Style/Semicolon:
+  Severity: error
+Style/SignalException:
   Severity: error
 Style/SingleArgumentDig:
   Severity: error
@@ -307,6 +319,8 @@ Style/SymbolProc:
   Severity: error
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+  Severity: error
+Style/TrailingCommaInArguments:
   Severity: error
 Style/UnpackFirst:
   Severity: error
@@ -381,8 +395,6 @@ Style/RescueModifier: # TODO
   AutoCorrect: false
 Style/ReturnNil: # TODO: autocorrect (investigate violations)
   Enabled: false
-Style/SignalException: # TODO: autocorrect
-  Enabled: false
 Style/StderrPuts: # TODO: autocorrect
   Enabled: false
 Style/StringConcatenation: # TODO: autocorrect (maybe)
@@ -391,8 +403,6 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
   Enabled: false # TODO: autocorrect
 Style/SymbolArray: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false

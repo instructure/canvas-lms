@@ -97,8 +97,8 @@ class Eportfolio < ActiveRecord::Base
     given { |user| self.active? && self.user == user && user.eportfolios_enabled? && !self.spam? }
     can :update and can :manage
 
-    # The eportfolio is public and it hasn't been flagged or marked as spam.
-    given { |_| self.active? && self.public && !self.spam? }
+    # The eportfolio is public, eportfolios are enabled, and it hasn't been flagged or marked as spam.
+    given { |_| self.active? && self.public && !self.spam? && self.user.eportfolios_enabled? }
     can :read
 
     # The eportfolio is private and the user has access to the private link

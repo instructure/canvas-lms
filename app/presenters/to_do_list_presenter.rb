@@ -262,8 +262,7 @@ class ToDoListPresenter
       I18n.t('Ignore %{assignment}', :assignment => @assignment.title)
     end
 
-    def ignore_flash_message
-    end
+    def ignore_flash_message; end
 
     def submission_author_name
       @view.submission_author_name_for(@assessment_request, "#{I18n.t('user')}: ")

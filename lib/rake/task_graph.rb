@@ -112,7 +112,7 @@ module Rake
       end
 
       if undefined.any?
-        fail <<~TEXT
+        raise <<~TEXT
 
           The following nodes are listed as dependents but were not defined:
 
@@ -124,7 +124,7 @@ module Rake
 
     def take_or_resolve(node, batch, to_take, visited = [])
       if visited.include?(node)
-        fail "node \"#{node}\" has a self or circular dependency"
+        raise "node \"#{node}\" has a self or circular dependency"
       end
 
       # don't dupe if we already took it this pass (e.g. as a dep):

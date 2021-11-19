@@ -1110,7 +1110,7 @@ describe GradebookImporter do
         it "excludes entire assignments if no submissions for the assignment are being uploaded" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,5,5",
+            ",#{@student.id},,5,5"
           )
           assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).to_not include @closed_assignment.id
@@ -1119,7 +1119,7 @@ describe GradebookImporter do
         it "includes assignments if there is at least one submission in the assignment being uploaded" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,5,5",
+            ",#{@student.id},,5,5"
           )
           assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).to include @open_assignment.id
@@ -1136,7 +1136,7 @@ describe GradebookImporter do
           it "does not include submissions that fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5",
+              ",#{@student.id},,5,5"
             )
             assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to_not include @closed_assignment.id
@@ -1145,7 +1145,7 @@ describe GradebookImporter do
           it "includes submissions that do not fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5",
+              ",#{@student.id},,5,5"
             )
             assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to include @open_assignment.id
@@ -1156,7 +1156,7 @@ describe GradebookImporter do
           it "does not include submissions that will fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5",
+              ",#{@student.id},,5,5"
             )
             expect(student_submissions.map { |s| s['assignment_id'] }).to_not include @closed_assignment.id
           end
@@ -1164,7 +1164,7 @@ describe GradebookImporter do
           it "includes submissions that will not fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5",
+              ",#{@student.id},,5,5"
             )
             expect(student_submissions.map { |s| s['assignment_id'] }).to include @open_assignment.id
           end
@@ -1173,7 +1173,7 @@ describe GradebookImporter do
         it "marks excused submission as 'EX' even if 'ex' is not capitalized" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,,eX",
+            ",#{@student.id},,,eX"
           )
           expect(student_submissions.first.fetch('grade')).to eq 'EX'
         end
@@ -1279,7 +1279,7 @@ describe GradebookImporter do
         @active_period.destroy!
         importer_with_rows(
           "Student,ID,Section,Some new assignment",
-          ",#{@student.id},,5",
+          ",#{@student.id},,5"
         )
         expect(assignments.count).to eq(0)
       end
@@ -1287,7 +1287,7 @@ describe GradebookImporter do
       it "creates a new assignment if the last grading period is not closed" do
         importer_with_rows(
           "Student,ID,Section,Some new assignment",
-          ",#{@student.id},,5",
+          ",#{@student.id},,5"
         )
         expect(assignments.count).to eq(1)
       end
@@ -1462,7 +1462,7 @@ describe GradebookImporter do
       importer = new_gradebook_importer(
         attachment_with_rows(
           'Student;ID;Section;Assignment 3',
-          "A Student;#{student.id};Section 13;Ex",
+          "A Student;#{student.id};Section 13;Ex"
         ),
         upload,
         teacher,

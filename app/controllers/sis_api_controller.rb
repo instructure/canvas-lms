@@ -368,7 +368,7 @@ class SisApiController < ApplicationController
       elsif params[:course_id]
         api_find(Course, params[:course_id])
       else
-        fail ActiveRecord::RecordNotFound, 'unknown context type'
+        raise ActiveRecord::RecordNotFound, 'unknown context type'
       end
   end
 

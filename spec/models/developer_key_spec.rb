@@ -38,7 +38,7 @@ describe DeveloperKey do
     DeveloperKey.new(
       name: 'test',
       email: 'test@test.com',
-      redirect_uri: 'http://test.com',
+      redirect_uri: 'http://test.com'
     )
   end
 

@@ -328,7 +328,7 @@ describe "Exporters::ZipExporter" do
             context: course,
             file_state: "hidden",
             folder: folder,
-            uploaded_data: stub_file_data("file.txt", "some text", "text/plain"),
+            uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
 

@@ -108,7 +108,7 @@ describe "Outcome Results API", type: :request do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 
@@ -544,7 +544,7 @@ describe "Outcome Results API", type: :request do
                    user_ids: student_id_str, include: ['users'])
           json = JSON.parse(response.body)
           expect(json['linked']['users'].size).to eq 3
-          expect(json['linked']['users'].map { |h| h['id'].to_i }.sort.last).to eq sis_id_student.id
+          expect(json['linked']['users'].map { |h| h['id'].to_i }.max).to eq sis_id_student.id
         end
       end
 

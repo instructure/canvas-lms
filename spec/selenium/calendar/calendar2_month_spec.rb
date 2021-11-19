@@ -283,7 +283,7 @@ describe "calendar2" do
         frozen_assignment = @course.assignments.build(
           name: "frozen assignment",
           due_at: Time.zone.now,
-          freeze_on_copy: true,
+          freeze_on_copy: true
         )
         frozen_assignment.copied = true
         frozen_assignment.save!

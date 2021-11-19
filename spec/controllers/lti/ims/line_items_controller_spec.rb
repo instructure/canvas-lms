@@ -499,7 +499,7 @@ module Lti
           line_item_model(
             assignment: assignment,
             resource_link: resource_link,
-            tag: tag,
+            tag: tag
           )
         end
         let(:line_item_id) { line_item.id }

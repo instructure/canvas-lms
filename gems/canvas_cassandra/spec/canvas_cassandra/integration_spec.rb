@@ -21,8 +21,7 @@
 require "spec_helper"
 
 class TestLogger
-  def debug(*args)
-  end
+  def debug(*); end
 end
 
 # TODO: this spec that interacts directly with the parent app should probably go

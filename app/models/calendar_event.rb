@@ -684,8 +684,7 @@ class CalendarEvent < ActiveRecord::Base
       @event = event
     end
 
-    def location
-    end
+    def location; end
 
     def to_ics(in_own_calendar:, preloaded_attachments: {}, include_description: false, user_events: [])
       cal = Icalendar::Calendar.new

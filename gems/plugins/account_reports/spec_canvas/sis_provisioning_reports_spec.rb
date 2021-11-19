@@ -104,11 +104,11 @@ describe "Default Account Reports" do
     create_some_courses
     @group_category1 = GroupCategory.create(
       name: 'Test Group Category',
-      account: @account,
+      account: @account
     )
     @group_category2 = GroupCategory.create(
       name: 'Test Group Category2',
-      account: @account,
+      account: @account
     )
     @group_category1.save!
     @group_category2.auto_leader = 'first'
@@ -116,11 +116,11 @@ describe "Default Account Reports" do
     @group_category2.save!
     @group_category3 = GroupCategory.create(
       name: 'Test Group Category Deleted',
-      course: @course3,
+      course: @course3
     )
     @group_category4 = GroupCategory.create(
       name: 'Test Group Category Course',
-      course: @course3,
+      course: @course3
     )
     @account.group_categories << @group_category1
     @account.group_categories << @group_category2

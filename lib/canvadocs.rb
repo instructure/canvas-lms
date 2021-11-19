@@ -337,7 +337,7 @@ module Canvadocs
           user,
           submission,
           role: canvadocs_user_role(submission.assignment.course, user, enrollments),
-          anonymize: anonymize_user_for_moderated_assignment?(user, current_user, submission),
+          anonymize: anonymize_user_for_moderated_assignment?(user, current_user, submission)
         )
       end
     end

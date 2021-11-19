@@ -1244,7 +1244,7 @@ describe FilesController do
         file_state: 'deleted',
         workflow_state: 'unattached',
         filename: 'profile.png',
-        content_type: 'image/png',
+        content_type: 'image/png'
       )
 
       local_storage!

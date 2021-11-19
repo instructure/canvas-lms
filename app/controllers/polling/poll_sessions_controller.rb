@@ -140,7 +140,7 @@ module Polling
         @course = Course.find(course_id)
       end
 
-      raise ActiveRecord::RecordNotFound.new(I18n.t("polling.poll_sessions.errors.course_required", "Course is required.")) unless @course
+      raise ActiveRecord::RecordNotFound, I18n.t("polling.poll_sessions.errors.course_required", "Course is required.") unless @course
 
       if (course_section_id = poll_session_params.delete(:course_section_id))
         @course_section = @course.course_sections.find(course_section_id)

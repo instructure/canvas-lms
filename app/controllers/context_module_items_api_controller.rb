@@ -725,7 +725,7 @@ class ContextModuleItemsApiController < ApplicationController
           graded: new_tag.graded?,
           content_details: content_details(new_tag, @current_user),
           assignment_id: new_tag.assignment.try(:id),
-          is_duplicate_able: new_tag.duplicate_able?,
+          is_duplicate_able: new_tag.duplicate_able?
         )
         render json: json
       else

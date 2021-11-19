@@ -56,7 +56,7 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def self.for(account)
-    raise ArgumentError.new("argument is not an Account") unless account.is_a?(Account)
+    raise ArgumentError, "argument is not an Account" unless account.is_a?(Account)
 
     root_account = account.root_account? ? account : account.root_account
     root_account.grading_period_groups.active

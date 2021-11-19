@@ -75,7 +75,7 @@ module Lti::IMS
       :verify_valid_score_maximum,
       :verify_valid_submitted_at,
       :verify_valid_content_item_submission_type,
-      :verify_attempts_for_online_upload,
+      :verify_attempts_for_online_upload
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'

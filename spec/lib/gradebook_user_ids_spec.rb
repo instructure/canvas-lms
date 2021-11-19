@@ -56,7 +56,7 @@ describe GradebookUserIds do
       account: @student2.account,
       sis_user_id: "Ernie_sis",
       integration_id: "Ernie_int",
-      unique_id: "Ernie",
+      unique_id: "Ernie"
     )
 
     @student3 = student_in_course(

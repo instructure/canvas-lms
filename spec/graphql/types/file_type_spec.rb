@@ -135,7 +135,7 @@ describe Types::FileType do
       other_submission = other_assignment.submit_homework(
         @student,
         body: 'Attempt 1',
-        submitted_at: 2.hours.ago,
+        submitted_at: 2.hours.ago
       )
       resp = @resolver.resolve('submissionPreviewUrl(submissionId: "' + other_submission.id.to_s + '")')
       expect(resp).to be_nil

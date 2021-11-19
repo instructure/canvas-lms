@@ -36,7 +36,7 @@ describe SIS::CSV::GroupImporter do
       "G003,A001,,available,",
       "G004,A004,Group 4,available,",
       ",A001,G1,available,",
-      "G006,A001,Group 6,available,invalid",
+      "G006,A001,Group 6,available,invalid"
     )
     err = ["Course with sis id invalid didn't exist for group G001.",
            "Only one context is allowed and both course_id and account_id where provided for group G001.",

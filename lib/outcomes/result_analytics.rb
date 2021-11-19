@@ -40,7 +40,7 @@ module Outcomes
       results = LearningOutcomeResult.active.with_active_link.where(
         context_code: context.asset_string,
         user_id: users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id),
+        learning_outcome_id: outcomes.map(&:id)
       )
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
         results = results.exclude_muted_associations

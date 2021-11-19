@@ -122,7 +122,7 @@ class DiscussionTopicPresenter
     if topic.context.is_a?(Course)
       student_enrollment = topic.user.enrollments.active.where(
         course_id: topic.context.id,
-        type: "StudentEnrollment",
+        type: "StudentEnrollment"
       ).first
 
       if student_enrollment

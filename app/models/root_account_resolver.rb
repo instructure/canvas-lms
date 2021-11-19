@@ -46,7 +46,7 @@ module RootAccountResolver
                when Proc
                  through
                else
-                 raise ArgumentError.new("Expected resolver to be a Symbol or a Proc, got #{through}")
+                 raise ArgumentError, "Expected resolver to be a Symbol or a Proc, got #{through}"
                end
 
     belongs_to :root_account, class_name: 'Account'

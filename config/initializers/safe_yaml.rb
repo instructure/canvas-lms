@@ -47,7 +47,7 @@ module SafeYAML
     Symbol,
     Time,
     URI::HTTP,
-    URI::HTTPS,
+    URI::HTTPS
   )
 
   module Psych

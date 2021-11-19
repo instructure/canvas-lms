@@ -730,10 +730,9 @@ class DiscussionTopic < ActiveRecord::Base
   scope :in_sections, ->(course_sections) do
     course_ids = course_sections.pluck(:course_id).uniq
     if course_ids.length != 1
-      raise QueryError.new(
-        I18n.t("Searching for announcements in sections must span exactly one course")
-      )
+      raise QueryError, I18n.t("Searching for announcements in sections must span exactly one course")
     end
+
     course_id = course_ids.first
     joins("LEFT OUTER JOIN #{DiscussionTopicSectionVisibility.quoted_table_name}
            AS discussion_section_visibilities ON discussion_topics.is_section_specific = true AND

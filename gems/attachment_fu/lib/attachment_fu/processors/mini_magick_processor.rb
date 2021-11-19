@@ -50,7 +50,7 @@ module AttachmentFu # :nodoc:
         if image? && !@resized
           with_image do |img|
             max_image_size = attachment_options[:thumbnail_max_image_size_pixels]
-            raise ThumbnailError.new("source image too large") if max_image_size && img[:width] * img[:height] > max_image_size
+            raise ThumbnailError, "source image too large" if max_image_size && img[:width] * img[:height] > max_image_size
 
             resize_image_or_thumbnail! img
             self.width = img[:width] if respond_to?(:width)
@@ -82,14 +82,14 @@ module AttachmentFu # :nodoc:
               commands.resize(size.join('x') + '!')
             end
           # extend to thumbnail size
-          elsif size.is_a?(String) and size =~ /e$/
+          elsif size.is_a?(String) && size =~ /e$/
             size = size.delete('e')
             commands.resize(size.to_s + '>')
             commands.background('#ffffff')
             commands.gravity('center')
             commands.extent(size)
           # crop thumbnail, the smart way
-          elsif size.is_a?(String) and size =~ /c$/
+          elsif size.is_a?(String) && size =~ /c$/
             size = size.delete('c')
 
             # calculate sizes and aspect ratio
@@ -102,7 +102,7 @@ module AttachmentFu # :nodoc:
             image_aspect = image_width / image_height
 
             # only crop if image is not smaller in both dimensions
-            unless image_width < thumb_width and image_height < thumb_height
+            unless image_width < thumb_width && image_height < thumb_height
               command = calculate_offset(image_width, image_height, image_aspect, thumb_width, thumb_height, thumb_aspect)
 
               # crop image
@@ -110,7 +110,7 @@ module AttachmentFu # :nodoc:
             end
 
             # don not resize if image is not as height or width then thumbnail
-            if image_width < thumb_width or image_height < thumb_height
+            if image_width < thumb_width || image_height < thumb_height
               commands.background('#ffffff')
               commands.gravity('center')
               commands.extent(size)
@@ -139,7 +139,7 @@ module AttachmentFu # :nodoc:
 
         # normal thumbnail generation
         # calculate height and offset y, width is fixed
-        elsif (image_aspect <= thumb_aspect or image_width < thumb_width) and image_height > thumb_height
+        elsif (image_aspect <= thumb_aspect || image_width < thumb_width) && image_height > thumb_height
           height = image_width / thumb_aspect
           offset = (image_height / 2) - (height / 2)
           command = "#{image_width}x#{height}+0+#{offset}"

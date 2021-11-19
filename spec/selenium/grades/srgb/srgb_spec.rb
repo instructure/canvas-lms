@@ -185,7 +185,7 @@ describe "Screenreader Gradebook" do
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(
       title: 'Test 2',
-      points_possible: 20,
+      points_possible: 20
     )
 
     a1.grade_student(@students[0], grade: 14, grader: @teacher)

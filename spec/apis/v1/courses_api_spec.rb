@@ -258,7 +258,7 @@ describe Api::V1::Course do
         future_assignment = @course.assignments.create!(
           title: "Future",
           due_at: 4.months.from_now,
-          points_possible: 10,
+          points_possible: 10
         )
         future_assignment.grade_student(@student, grader: @teacher, score: 7)
         future_assignment.unmute!
@@ -2226,7 +2226,7 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
-      'workflow_state' => 'active',
+      'workflow_state' => 'active'
     )
 
     # course2
@@ -2236,7 +2236,7 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
-      'workflow_state' => 'active',
+      'workflow_state' => 'active'
     )
   end
 
@@ -2639,11 +2639,11 @@ describe CoursesController, type: :request do
     expect(json.length).to eq 1
     expect(json[0]).to include(
       'enrollments',
-      'id' => @course1.id,
+      'id' => @course1.id
     )
     expect(json[0]['enrollments'].length).to eq 1
     expect(json[0]['enrollments'][0]).to include(
-      'type' => 'teacher',
+      'type' => 'teacher'
     )
   end
 
@@ -3745,7 +3745,7 @@ describe CoursesController, type: :request do
     expect(json.length).to eq 1
     expect(json[0]).to include(
       'id' => @course1.id,
-      'needs_grading_count' => 1,
+      'needs_grading_count' => 1
     )
   end
 

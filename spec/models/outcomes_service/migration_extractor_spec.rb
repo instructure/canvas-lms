@@ -113,7 +113,7 @@ describe OutcomesService::MigrationExtractor do
         expect(links[0]).to eq(
           "$canvas_learning_outcome_link_id": @course.root_outcome_group.child_outcome_links.first.id,
           "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
-          "$canvas_learning_outcome_id": course_outcome.id,
+          "$canvas_learning_outcome_id": course_outcome.id
         )
       end
 

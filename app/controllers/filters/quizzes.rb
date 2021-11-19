@@ -25,7 +25,7 @@ module Filters::Quizzes
     id = params.key?(:quiz_id) ? params[:quiz_id] : params[:id]
 
     unless (@quiz = @context.quizzes.find(id))
-      raise ActiveRecord::RecordNotFound.new('Quiz not found')
+      raise ActiveRecord::RecordNotFound, 'Quiz not found'
     end
 
     @quiz

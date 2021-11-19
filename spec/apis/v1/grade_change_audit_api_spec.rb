@@ -270,7 +270,7 @@ describe "GradeChangeAudit API", type: :request do
       before do
         record = Auditors::GradeChange::Record.new(
           'created_at' => 1.day.ago,
-          'submission' => @submission,
+          'submission' => @submission
         )
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end

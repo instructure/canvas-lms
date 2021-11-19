@@ -473,7 +473,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         LearningOutcomeResult.create!(
           context: course2, association_type: 'RubricAssociation',
           association_id: rubric_association.id,
-          learning_outcome: outcome, user: @user, alignment: alignment,
+          learning_outcome: outcome, user: @user, alignment: alignment
         )
       end
       let(:course2) { course_model(account: account_model(root_account_id: nil)) }

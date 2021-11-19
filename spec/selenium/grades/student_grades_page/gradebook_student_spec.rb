@@ -261,7 +261,7 @@ describe 'Student Gradebook' do
       @assignment0 = @course.assignments.create!(
         name: "Physics Alpha Assign",
         due_at: Time.now.utc + 3.days,
-        assignment_group: group0,
+        assignment_group: group0
       )
 
       @quiz = @course.quizzes.create!(

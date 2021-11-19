@@ -76,7 +76,7 @@ class GradingPeriod < ActiveRecord::Base
     periods ||= self.for(course)
 
     if date.nil?
-      periods.sort_by(&:end_date).last
+      periods.max_by(&:end_date)
     else
       periods.detect { |p| p.in_date_range?(date) }
     end
@@ -169,7 +169,7 @@ class GradingPeriod < ActiveRecord::Base
     as_json(
       only: [:id, :title, :start_date, :end_date, :close_date, :weight],
       permissions: { user: user },
-      methods: [:is_last, :is_closed],
+      methods: [:is_last, :is_closed]
     ).fetch(:grading_period)
   end
 

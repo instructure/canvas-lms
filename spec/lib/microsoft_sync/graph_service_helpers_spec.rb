@@ -57,7 +57,7 @@ describe MicrosoftSync::GraphServiceHelpers do
         externalId: @course.uuid,
         externalName: 'math 101',
         externalSource: 'manual',
-        mailNickname: "Course_math_101-#{@course.uuid.first(13)}",
+        mailNickname: "Course_math_101-#{@course.uuid.first(13)}"
       ).and_return('foo')
 
       expect(subject.create_education_class(@course)).to eq('foo')
@@ -89,7 +89,7 @@ describe MicrosoftSync::GraphServiceHelpers do
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math_241-#{course.uuid.first(13)}",
+          mailNickname: "Course_math_241-#{course.uuid.first(13)}"
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -110,7 +110,7 @@ describe MicrosoftSync::GraphServiceHelpers do
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math-#{course.uuid.first(13)}",
+          mailNickname: "Course_math-#{course.uuid.first(13)}"
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -131,7 +131,7 @@ describe MicrosoftSync::GraphServiceHelpers do
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math_101-#{course.uuid.first(13)}",
+          mailNickname: "Course_math_101-#{course.uuid.first(13)}"
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -206,7 +206,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       expect(graph_service.groups).to receive(:update).with(
         'msgroupid',
         hash_including(
-          microsoft_EducationClassLmsExt: hash_including(props),
+          microsoft_EducationClassLmsExt: hash_including(props)
         )
       )
     end

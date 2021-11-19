@@ -981,7 +981,7 @@ class User < ActiveRecord::Base
   end
 
   def email=(e)
-    if e.is_a?(CommunicationChannel) and e.user_id == self.id
+    if e.is_a?(CommunicationChannel) && e.user_id == self.id
       cc = e
     else
       cc = self.communication_channels.email.by_path(e).first ||
@@ -1116,8 +1116,7 @@ class User < ActiveRecord::Base
     self.reload
   end
 
-  def associate_with_shard(shard, strength = :strong)
-  end
+  def associate_with_shard(shard, strength = :strong); end
 
   def self.clone_communication_channel(cc, new_user, max_position)
     new_cc = cc.clone
@@ -1529,7 +1528,7 @@ class User < ActiveRecord::Base
   end
 
   def self.avatar_fallback_url(fallback = nil, request = nil)
-    if fallback and (uri = URI.parse(fallback) rescue nil)
+    if fallback && (uri = URI.parse(fallback) rescue nil)
       # something got built without request context, so we want to inherit that
       # context now that we have a request
       if uri.host == 'localhost'
@@ -2535,11 +2534,11 @@ class User < ActiveRecord::Base
   end
 
   def last_completed_module
-    self.context_module_progressions.select(&:completed?).sort_by { |p| p.completed_at || p.created_at }.last.context_module rescue nil
+    self.context_module_progressions.select(&:completed?).max_by { |p| p.completed_at || p.created_at }.context_module rescue nil
   end
 
   def last_completed_course
-    self.enrollments.select(&:completed?).sort_by { |e| e.completed_at || e.created_at }.last.course rescue nil
+    self.enrollments.select(&:completed?).max_by { |e| e.completed_at || e.created_at }.course rescue nil
   end
 
   def last_mastered_assignment
@@ -2827,7 +2826,7 @@ class User < ActiveRecord::Base
   end
 
   def private?
-    not public?
+    !public?
   end
 
   def profile
@@ -2996,8 +2995,7 @@ class User < ActiveRecord::Base
     %w[student teacher ta observer].include?(type) ? type : nil
   end
 
-  def self.preload_shard_associations(users)
-  end
+  def self.preload_shard_associations(users); end
 
   def associated_shards(strength = :strong)
     strength == :strong ? [Shard.default] : []

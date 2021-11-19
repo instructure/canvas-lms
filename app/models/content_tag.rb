@@ -378,7 +378,7 @@ class ContentTag < ActiveRecord::Base
   def destroy
     unless can_destroy?
       aligned_outcome = @active_alignment_tags.map(&:learning_outcome).first.short_description
-      raise LastLinkToOutcomeNotDestroyed.new "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
+      raise LastLinkToOutcomeNotDestroyed, "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
     end
 
     context_module&.remove_completion_requirement(id)

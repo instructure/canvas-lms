@@ -2279,7 +2279,7 @@ describe DiscussionTopic do
         :message => opts[:message],
         :user => @teacher,
         :context => opts[:course],
-        :workflow_state => "published",
+        :workflow_state => "published"
       )
       announcement.is_section_specific = opts[:is_section_specific]
       announcement
@@ -2365,7 +2365,7 @@ describe DiscussionTopic do
     it "does not include deleted sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2406,7 +2406,7 @@ describe DiscussionTopic do
     it "scope allows section-specific announcements if in right section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       announcement.save!
@@ -2417,7 +2417,7 @@ describe DiscussionTopic do
     it "scope forbids section-specific announcements if in wrong section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.second)
       announcement.save!
@@ -2437,7 +2437,7 @@ describe DiscussionTopic do
     it "don't return duplicates if matched multiple sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)

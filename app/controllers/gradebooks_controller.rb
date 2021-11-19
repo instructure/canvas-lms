@@ -323,7 +323,7 @@ class GradebooksController < ApplicationController
       [@context, :external_tool],
       id: launch_definition[:definition_id],
       display: 'borderless',
-      launch_type: 'post_grades',
+      launch_type: 'post_grades'
     )
   end
 
@@ -331,7 +331,7 @@ class GradebooksController < ApplicationController
     polymorphic_url(
       [@context, :basic_lti_launch_request],
       message_handler_id: launch_definition[:definition_id],
-      display: 'borderless',
+      display: 'borderless'
     )
   end
 

@@ -162,7 +162,7 @@ module Canvas::LiveEventsCallbacks
           singleton: singleton_key,
           run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now,
           on_conflict: :overwrite,
-          priority: 15,
+          priority: 15
         ).dispatch_live_event(obj)
       end
     when ContentTag

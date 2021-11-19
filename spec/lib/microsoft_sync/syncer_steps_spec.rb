@@ -605,7 +605,7 @@ describe MicrosoftSync::SyncerSteps do
         total_unsuccessful: total_unsuccessful,
         blank?: total_unsuccessful == 0,
         present?: total_unsuccessful != 0,
-        nonexistent_user_ids: nonexistent_users,
+        nonexistent_user_ids: nonexistent_users
       )
     end
 

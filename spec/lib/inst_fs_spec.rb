@@ -552,7 +552,7 @@ describe InstFS do
         instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:delete).with(%r{/files/#{instfs_uuid}}).and_return(double(
                                                                                            class: Net::HTTPOK,
-                                                                                           code: 200,
+                                                                                           code: 200
                                                                                          ))
         expect(InstFS.delete_file(instfs_uuid)).to eq true
       end

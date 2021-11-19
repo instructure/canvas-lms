@@ -111,12 +111,12 @@ module Reporting
     def create_progressive_hashes(cumulative, totals)
       year = { :year => @yesterday.year }
       copy_counts(year, totals)
-      cumulative[:yearly].pop if cumulative[:yearly].last and cumulative[:yearly].last[:year] == year[:year]
+      cumulative[:yearly].pop if cumulative[:yearly].last && cumulative[:yearly].last[:year] == year[:year]
       cumulative[:yearly] << year
 
       month = { :year => @yesterday.year, :month => @yesterday.month }
       copy_counts(month, totals)
-      if cumulative[:monthly].last and cumulative[:monthly].last[:year] == month[:year] and cumulative[:monthly].last[:month] == month[:month]
+      if cumulative[:monthly].last && (cumulative[:monthly].last[:year] == month[:year]) && cumulative[:monthly].last[:month] == month[:month]
         cumulative[:monthly].pop
       end
       cumulative[:monthly] << month
@@ -126,7 +126,7 @@ module Reporting
 
       week = { :year => @yesterday.year, :month => @yesterday.month, :week => @week }
       copy_counts(week, totals)
-      if cumulative[:weekly].last and cumulative[:weekly].last[:year] == week[:year] and cumulative[:weekly].last[:week] == week[:week]
+      if cumulative[:weekly].last && (cumulative[:weekly].last[:year] == week[:year]) && cumulative[:weekly].last[:week] == week[:week]
         cumulative[:weekly].pop
       end
       cumulative[:weekly] << week

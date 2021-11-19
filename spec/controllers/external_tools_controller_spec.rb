@@ -1460,7 +1460,7 @@ describe ExternalToolsController do
             name: 'first tool',
             url: launch_url,
             consumer_key: consumer_key,
-            shared_secret: shared_secret,
+            shared_secret: shared_secret
           )
         end
 

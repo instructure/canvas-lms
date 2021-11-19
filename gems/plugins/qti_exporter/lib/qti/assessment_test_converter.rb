@@ -197,7 +197,7 @@ module Qti
         group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
         questions_list = group[:questions]
       end
-      if section['visible'] and section['visible'] =~ /true/i
+      if section['visible'] && section['visible'] =~ /true/i
         if (title = section['title'])
           # Create an empty question with a title in it
           @quiz[:questions] << { :question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id }

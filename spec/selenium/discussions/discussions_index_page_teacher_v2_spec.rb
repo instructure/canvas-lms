@@ -101,7 +101,7 @@ describe "discussions index" do
       # Cannot use @discussion[12] here because unpublish requires there to be no posts
       course, discussion = create_course_and_discussion(
         title: 'foo',
-        message: 'foo',
+        message: 'foo'
       )
       expect(discussion.published?).to be true
       login_and_visit_course(@teacher, course)

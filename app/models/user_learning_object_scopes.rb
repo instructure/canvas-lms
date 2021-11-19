@@ -128,7 +128,7 @@ module UserLearningObjectScopes
             return yield(*arguments_for_objects_needing(
               object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
               include_ignored: include_ignored,
-              include_ungraded: include_ungraded,
+              include_ungraded: include_ungraded
             ))
           end
           return object_type.constantize.none # fallback

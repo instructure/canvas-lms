@@ -208,7 +208,7 @@ module CanvasRails
           break
         rescue ::PG::Error => e
           if e.message.include?("does not exist")
-            raise ActiveRecord::NoDatabaseError.new(e.message)
+            raise ActiveRecord::NoDatabaseError, e.message
           elsif index == hosts.length - 1
             raise
           end
@@ -303,8 +303,7 @@ module CanvasRails
     end
 
     class DummyKeyGenerator
-      def self.generate_key(*)
-      end
+      def self.generate_key(*); end
     end
 
     def key_generator

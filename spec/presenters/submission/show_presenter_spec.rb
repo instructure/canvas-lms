@@ -215,7 +215,7 @@ describe Submission::ShowPresenter do
       Submission::ShowPresenter.new(
         submission: reviewee_submission,
         current_user: teacher,
-        current_host: current_host,
+        current_host: current_host
       )
     end
 

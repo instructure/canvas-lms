@@ -72,7 +72,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
                 run_at: 10.minutes.from_now)
             .start_new_migration!(master_template, user, opts)
         else
-          raise MigrationRunningError.new("cannot start new migration while another one is running")
+          raise MigrationRunningError, "cannot start new migration while another one is running"
         end
       else
         new_migration = master_template.master_migrations.create!({ :user => user }.merge(opts.except(:retry_later)))
