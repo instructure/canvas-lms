@@ -28,6 +28,7 @@ describe FeatureFlags do
   let(:t_user) { user_with_pseudonym account: t_root_account }
   let(:t_sub_account) { account_model parent_account: t_root_account }
   let(:t_course) { course_with_teacher(user: t_user, account: t_sub_account, active_all: true).course }
+  let(:analytics_service) { class_double(Services::FeatureAnalyticsService).as_stubbed_const }
 
   before do
     silence_undefined_feature_flag_errors
@@ -46,6 +47,11 @@ describe FeatureFlags do
                                                          "hidden_user_feature" => Feature.new(feature: "hidden_user_feature", applies_to: "User", state: "hidden"),
                                                          "disabled_feature" => Feature::DISABLED_FEATURE
                                                        })
+    allow(analytics_service).to receive(:persist_feature_evaluation)
+  end
+
+  after do
+    LocalCache.cache.clear(force: true)
   end
 
   describe "#feature_enabled?" do
@@ -420,6 +426,94 @@ describe FeatureFlags do
         flag.update_attribute(:state, "on") # update in db
         expect(t_root_account.feature_flag("course_feature").state).to eq "allowed" # still pulls from cache
         expect(t_root_account.feature_flag("course_feature", skip_cache: true).state).to eq "on" # skips it
+      end
+    end
+  end
+
+  describe "analytics" do
+    it "sends nothing without a sampling_rate configured in DynamicSettings" do
+      expect(analytics_service).not_to receive(:persist_feature_evaluation)
+      t_sub_account.feature_enabled?(:account_feature)
+    end
+
+    it "send nothing if below the sampling rate" do
+      allow(t_sub_account).to receive(:rand).and_return(0.8)
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 0.5 } } }) do
+        expect(analytics_service).not_to receive(:persist_feature_evaluation)
+        t_sub_account.feature_enabled?(:account_feature)
+      end
+    end
+
+    it "send feature context if above the sampling rate" do
+      allow(t_sub_account).to receive(:rand).and_return(0.2)
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 0.5 } } }) do
+        expect(analytics_service).to receive(:persist_feature_evaluation)
+        t_sub_account.feature_enabled?(:account_feature)
+      end
+    end
+
+    it "caches redundant feature evaluations" do
+      cache_key = t_sub_account.feature_analytics_cache_key("account_feature", true)
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 1 } } }) do
+        expect(analytics_service).to receive(:persist_feature_evaluation).once
+        t_sub_account.feature_enabled?(:account_feature)
+        t_sub_account.feature_enabled?(:account_feature)
+        t_sub_account.feature_enabled?(:account_feature)
+        expect(LocalCache.read(cache_key)).to be_truthy
+      end
+    end
+
+    it "rescues and captures any unexpected exceptions" do
+      err = StandardError.new("oh no!")
+      expect(analytics_service).to receive(:persist_feature_evaluation).and_raise(err)
+      expect(Canvas::Errors).to receive(:capture_exception).with(:feature_analytics, err)
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 1 } } }) do
+        t_sub_account.feature_enabled?(:account_feature)
+      end
+    end
+
+    it "correctly sends context for root account-level flags" do
+      expected_fields = {
+        feature: :root_account_feature,
+        context: "Account",
+        root_account_id: t_root_account.global_id,
+        account_id: t_root_account.global_id,
+        course_id: nil,
+        state: false
+      }
+      expect(analytics_service).to receive(:persist_feature_evaluation).with(hash_including(expected_fields))
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 1 } } }) do
+        t_root_account.feature_enabled?(:root_account_feature)
+      end
+    end
+
+    it "correctly sends context for account-level flags" do
+      expected_fields = {
+        feature: :account_feature,
+        context: "Account",
+        root_account_id: t_root_account.global_id,
+        account_id: t_sub_account.global_id,
+        course_id: nil,
+        state: true
+      }
+      expect(analytics_service).to receive(:persist_feature_evaluation).with(hash_including(expected_fields))
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 1 } } }) do
+        t_sub_account.feature_enabled?(:account_feature)
+      end
+    end
+
+    it "correctly sends context for course-level flags" do
+      expected_fields = {
+        feature: :course_feature,
+        context: "Course",
+        root_account_id: t_root_account.global_id,
+        account_id: t_sub_account.global_id,
+        course_id: t_course.global_id,
+        state: false
+      }
+      expect(analytics_service).to receive(:persist_feature_evaluation).with(hash_including(expected_fields))
+      override_dynamic_settings(private: { canvas: { feature_analytics: { sampling_rate: 1 } } }) do
+        t_course.feature_enabled?(:course_feature)
       end
     end
   end
