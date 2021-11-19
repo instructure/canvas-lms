@@ -180,11 +180,12 @@ module Reporting
     end
 
     def start_progressive_hash
-      {
+      hash = {
         :generated_at => @timestamp,
         :totals => new_progressive_hash,
         :detailed => {}
       }
+      hash
     end
   end
 end

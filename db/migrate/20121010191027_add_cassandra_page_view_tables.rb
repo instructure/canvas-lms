@@ -31,7 +31,7 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
         "WITH compression_parameters:sstable_compression='DeflateCompressor'"
 
-    cassandra.execute <<~SQL.squish
+    cassandra.execute %{
       CREATE TABLE page_views (
         request_id            text PRIMARY KEY,
         session_id            text,
@@ -57,19 +57,17 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         real_user_id          bigint,
         http_method           text,
         remote_ip             text
-      ) #{compression_params}
-    SQL
+      ) #{compression_params}}
 
-    cassandra.execute <<~SQL.squish
+    cassandra.execute %{
       CREATE TABLE page_views_history_by_context (
         context_and_time_bucket text,
         ordered_id text,
         request_id text,
         PRIMARY KEY (context_and_time_bucket, ordered_id)
-      ) #{compression_params}
-    SQL
+      ) #{compression_params}}
 
-    cassandra.execute <<~SQL.squish
+    cassandra.execute %{
       CREATE TABLE page_views_migration_metadata_per_account (
         shard_id         text,
         account_id       bigint,
@@ -77,18 +75,18 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         last_request_id  text,
         PRIMARY KEY      (shard_id, account_id)
       )
-    SQL
+    }
   end
 
   def self.down
-    cassandra.execute <<~SQL.squish
+    cassandra.execute %{
       DROP TABLE page_views_history_by_context;
-    SQL
-    cassandra.execute <<~SQL.squish
+    }
+    cassandra.execute %{
       DROP TABLE page_views;
-    SQL
-    cassandra.execute <<~SQL.squish
+    }
+    cassandra.execute %{
       DROP TABLE page_views_migration_metadata_per_account;
-    SQL
+    }
   end
 end

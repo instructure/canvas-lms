@@ -18,7 +18,9 @@
 
 import {difference} from 'lodash'
 
+import {RequestDispatch} from '@canvas/network'
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
+import ContextModulesLoader from './ContextModulesLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import CustomColumnsLoader from './CustomColumnsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
@@ -27,8 +29,12 @@ import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({dispatch, gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
+  constructor({gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
     this._gradebook = gradebook
+
+    const dispatch = new RequestDispatch({
+      activeRequestLimit: performanceControls.activeRequestLimit
+    })
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
@@ -39,6 +45,7 @@ export default class DataLoader {
     }
     this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
+    this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
     this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
@@ -114,8 +121,7 @@ export default class DataLoader {
 
     let gotGradingPeriodAssignments
     if (options.getGradingPeriodAssignments) {
-      gotGradingPeriodAssignments =
-        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+      gotGradingPeriodAssignments = dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
     }
 
     if (options.getAssignmentGroups) {
@@ -135,6 +141,10 @@ export default class DataLoader {
 
     if (options.getCustomColumns) {
       dataLoader.customColumnsLoader.loadCustomColumns()
+    }
+
+    if (options.getModules) {
+      dataLoader.contextModulesLoader.loadContextModules()
     }
 
     await gotStudentIds

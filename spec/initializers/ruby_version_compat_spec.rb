@@ -22,7 +22,7 @@ describe 'ruby_version_compat' do
     orig_stdout, orig_stderr = $stdout, $stderr
     $stdout, $stderr = StringIO.new, StringIO.new
     yield
-    [$stdout.string, $stderr.string]
+    return $stdout.string, $stderr.string
   ensure
     $stdout, $stderr = orig_stdout, orig_stderr
   end
@@ -53,7 +53,7 @@ describe 'ruby_version_compat' do
       controller = ApplicationController.new
       allow(controller).to receive(:params).and_return({ :upload => { :file1 => testfile } })
       allow(controller).to receive(:request).and_return(double(:path => "/upload"))
-      expect { controller.force_utf8_params }.to_not raise_error
+      expect { controller.force_utf8_params() }.to_not raise_error
       expect(testfile.original_filename).to be_nil
     end
   end

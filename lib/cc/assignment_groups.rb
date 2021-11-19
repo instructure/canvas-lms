@@ -75,7 +75,7 @@ module CC
         end
       end
 
-      group_file&.close
+      group_file.close if group_file
       rel_path
     end
   end

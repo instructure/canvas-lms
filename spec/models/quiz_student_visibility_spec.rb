@@ -49,7 +49,7 @@ describe "differentiated_assignments" do
   def student_in_course_with_adhoc_override(quiz, opts = {})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course)
-    ao = AssignmentOverride.new
+    ao = AssignmentOverride.new()
     ao.quiz = quiz
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
@@ -79,12 +79,12 @@ describe "differentiated_assignments" do
     @section_bar = @course.course_sections.create!(:name => 'bar')
   end
 
-  def create_override_for_quiz(quiz)
-    ao = AssignmentOverride.new
+  def create_override_for_quiz(quiz, &block)
+    ao = AssignmentOverride.new()
     ao.quiz = quiz
     ao.title = "Lorem"
     ao.workflow_state = "active"
-    yield(ao)
+    block.call(ao)
     ao.save!
     quiz.reload
   end
@@ -220,7 +220,6 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
-
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -242,7 +241,6 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
-
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -250,7 +248,6 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
-
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections
@@ -261,7 +258,6 @@ describe "differentiated_assignments" do
         end
       end
     end
-
     context "quiz with false only_visible_to_overrides" do
       before do
         quiz_with_false_only_visible_to_overrides
@@ -273,7 +269,6 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
-
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -281,7 +276,6 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
-
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -289,7 +283,6 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
-
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections

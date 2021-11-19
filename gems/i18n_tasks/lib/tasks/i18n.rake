@@ -44,8 +44,9 @@ namespace :i18n do
       sort = ->(node) do
         case node
         when Hash
-          node.keys.sort.index_with do |key|
-            sort[node[key]]
+          node.keys.sort.reduce({}) do |acc, key|
+            acc[key] = sort[node[key]]
+            acc
           end
         else
           node
@@ -58,16 +59,16 @@ namespace :i18n do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
-    special_keys = %w[
+    special_keys = %w{
       locales
       crowdsourced
       custom
       bigeasy_locale
       fullcalendar_locale
       moment_locale
-    ].freeze
+    }.freeze
 
-    Rails.root.join(yaml_file).open("w") do |file|
+    File.open(Rails.root.join(yaml_file), "w") do |file|
       file.write(
         {
           'en' => deep_sort_hash_by_keys(
@@ -99,10 +100,10 @@ namespace :i18n do
     require 'active_record'
     require 'will_paginate'
     I18n.load_path.unshift(*WillPaginate::I18n.load_path)
-    I18n.load_path += Dir[Rails.root.join('gems/plugins/*/config/locales/*.{rb,yml}')]
-    I18n.load_path += Dir[Rails.root.join('config/locales/*.{rb,yml}')]
-    I18n.load_path += Dir[Rails.root.join('config/locales/locales.yml')]
-    I18n.load_path += Dir[Rails.root.join('config/locales/community.csv')]
+    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
 
     I18n::Backend::Simple.include I18nTasks::CsvBackend
     I18n::Backend::Simple.include I18n::Backend::Fallbacks
@@ -154,8 +155,9 @@ namespace :i18n do
 
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
     # formats and stuff for all languages (en included) into the common scope_file
-    core_translations = I18n.available_locales.each_with_object({}) { |locale, h1|
+    core_translations = I18n.available_locales.inject({}) { |h1, locale|
       h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
+      h1
     }
     dump_translations.call('_core_en', { 'en' => core_translations.delete('en') })
     dump_translations.call('_core', core_translations)
@@ -165,8 +167,7 @@ namespace :i18n do
   task :generate_lolz => [:generate, :environment] do
     strings_processed = 0
     process_lolz = Proc.new do |val|
-      case val
-      when Hash
+      if val.is_a?(Hash)
         processed = strings_processed
 
         hash = Hash.new
@@ -174,9 +175,9 @@ namespace :i18n do
 
         print '.' if strings_processed > processed
         hash
-      when Array
+      elsif val.is_a?(Array)
         val.each.map { |v| process_lolz.call(v) }
-      when String
+      elsif val.is_a?(String)
         strings_processed += 1
         I18n.let_there_be_lols(val)
       else
@@ -237,7 +238,7 @@ namespace :i18n do
         arg = $stdin.gets.strip
         if arg.blank?
           last_export = { :type => :none }
-        elsif /\A[a-f0-9]{7,}\z/.match?(arg)
+        elsif arg =~ /\A[a-f0-9]{7,}\z/
           puts "Fetching previous export..."
           ret = `git show --name-only --oneline #{arg}`
           if $?.exitstatus == 0
@@ -284,8 +285,9 @@ namespace :i18n do
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
       new_strings = last_export[:data] ?
-        current_strings.each_with_object({}) { |(k, v), h|
+        current_strings.inject({}) { |h, (k, v)|
           h[k] = v unless last_export[:data][k] == v
+          h
         } :
         current_strings
       File.open(export_filename, "w") { |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
@@ -373,11 +375,11 @@ namespace :i18n do
   task :autoimport, [:translated_file, :source_file] => :environment do |_t, args|
     require 'open-uri'
 
-    source_translations = if args[:source_file].present?
-                            YAML.safe_load(open(args[:source_file]))
-                          else
-                            YAML.safe_load(open("config/locales/generated/en.yml"))
-                          end
+    if args[:source_file].present?
+      source_translations = YAML.safe_load(open(args[:source_file]))
+    else
+      source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
+    end
     new_translations = YAML.safe_load(open(args[:translated_file]))
     autoimport(source_translations, new_translations)
   end
@@ -424,10 +426,10 @@ namespace :i18n do
     raise "got no translations" if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write <<~YAML
+      f.write <<~HEADER
         # This YAML file is auto-generated from a Transifex import.
         # Do not edit it by hand, your changes will be overwritten.
-      YAML
+      HEADER
       f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
     }
 
@@ -440,12 +442,12 @@ namespace :i18n do
   def parsed_languages(languages)
     if languages.present?
       if languages.include?('>')
-        languages.split(',').map { |lang| lang.split('>') }.to_h
+        Hash[languages.split(',').map { |lang| lang.split('>') }]
       else
         languages.split(',')
       end
     else
-      %w[ar zh fr ja pt es ru]
+      %w(ar zh fr ja pt es ru)
     end
   end
 
@@ -541,7 +543,7 @@ namespace :i18n do
       exit
     end
 
-    Dir.chdir(Rails.root.join("config/locales"))
+    Dir.chdir(Rails.root.join("config", "locales"))
     locales_data = YAML.safe_load(open("locales.yml"))
 
     Dir.each_child(".") do |filename|

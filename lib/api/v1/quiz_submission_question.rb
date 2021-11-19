@@ -21,7 +21,7 @@
 module Api::V1::QuizSubmissionQuestion
   include Api::V1::QuizQuestion
 
-  INCLUDABLES = %w[quiz_question].freeze
+  INCLUDABLES = %w[quiz_question]
 
   # @param [Array<QuizQuestion>] quiz_questions
   # @param [Hash] submission_data

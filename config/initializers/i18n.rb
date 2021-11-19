@@ -27,7 +27,7 @@ module CanvasI18nFallbacks
   # definition that led to this pattern match. It is not 100%
   # strictly implemented but this will be more than sufficient
   # for Canvas
-  LANG_PAT = /
+  LANG_PAT = %r{
     ^
     ([a-z]{2,3})                               # language
     (-[a-z]{4})?                               # optional script
@@ -36,7 +36,7 @@ module CanvasI18nFallbacks
     ((?:-[a-wy-z](?:-[a-z0-9]{2,8})*)*)        # optional extensions
     (-x(?:-[a-z0-9]{1,8})+)*                   # optional private use
     $
-  /ix.freeze
+  }ix.freeze
 
   # This fallback order is more intelligent than simply lopping off
   # elements from the end. For instance, in Canvas we use the private
@@ -61,7 +61,7 @@ module CanvasI18nFallbacks
 
     return [] unless result
 
-    existing_elements = result.captures.map { |e| !!e && !e.empty? }
+    existing_elements = result.captures.map { |e| !!e && e.length > 0 }
 
     order = []
     FALLBACK_ORDER.each do |a|
@@ -131,7 +131,7 @@ module I18nliner
     def infer_pluralization_hash(default, *args)
       if default.is_a?(Array) && default.all? { |a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol) }
         # this was a pluralization hash but rails 4 made it an array in the view helpers
-        return default.to_h
+        return Hash[default]
       end
 
       super
@@ -148,7 +148,7 @@ end
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
-      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?('#')
+      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s =~ /\A#/
       text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
     end
     I18n.t("#before_label_wrapper", "%{text}:", :text => text_or_key)
@@ -161,11 +161,11 @@ module I18nUtilities
     end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
-      text = "labels.#{text}" unless text.to_s.start_with?('#')
+      text = "labels.#{text}" unless text.to_s =~ /\A#/
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options.delete(:before)
-    [text, options]
+    return text, options
   end
 
   def n(*args)
@@ -242,7 +242,7 @@ module NumberLocalizer
   end
 
   def form_proper_noun_singular_genitive(noun)
-    if I18n.locale.to_s.start_with?('de') && %(s ß x z).include?(noun.last)
+    if I18n.locale.to_s.start_with?('de') && %{s ß x z}.include?(noun.last)
       "#{noun}'"
     else
       I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun: noun)
@@ -313,7 +313,7 @@ module I18nTemplate
   def render(view, *args)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
-      view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(%r{/_?}, '.'))
+      view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(/\/_?/, '.'))
     end
     super
   ensure
@@ -346,12 +346,10 @@ ActiveRecord::Base.class_eval do
 
   class << self
     # so that we don't load up the locales until we need them
-    class LocalesProxy
-      def include?(item)
-        I18n.available_locales.map(&:to_s).include?(item)
-      end
+    LOCALE_LIST = []
+    def LOCALE_LIST.include?(item)
+      I18n.available_locales.map(&:to_s).include?(item)
     end
-    LOCALE_LIST = LocalesProxy.new
 
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}

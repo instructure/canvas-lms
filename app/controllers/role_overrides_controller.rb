@@ -133,8 +133,8 @@ class RoleOverridesController < ApplicationController
   def api_index
     if authorized_action(@context, @current_user, :manage_role_overrides)
       route = polymorphic_url([:api, :v1, @context, :roles])
-      states = params[:state].to_a.reject { |s| %w[active inactive].exclude?(s) }
-      states = %w[active] if states.empty?
+      states = params[:state].to_a.reject { |s| %w(active inactive).exclude?(s) }
+      states = %w(active) if states.empty?
 
       roles = []
       roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?('active')
@@ -242,7 +242,7 @@ class RoleOverridesController < ApplicationController
   #     manage_courses_add               -- Courses - add
   #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
-  #     manage_feature_flags             -- Feature Options - enable / disable
+  #     manage_feature_flags             -- Feature Previews - enable / disable
   #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
   #     manage_role_overrides            -- Permissions - manage
   #     manage_storage_quotas            -- Storage Quotas - manage
@@ -253,7 +253,7 @@ class RoleOverridesController < ApplicationController
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list
   #     view_course_changes              -- Courses - view change logs
-  #     view_feature_flags               -- Feature Options - view
+  #     view_feature_flags               -- Feature Previews - view
   #     view_grade_changes               -- Grades - view change logs
   #     view_notifications               -- Notifications - view
   #     view_quiz_answer_audits          -- Quizzes - view submission log
@@ -396,7 +396,7 @@ class RoleOverridesController < ApplicationController
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
     role.deleted_at = nil
-    unless role.save
+    if !role.save
       if api_request?
         render :json => role.errors, :status => :bad_request
       else
@@ -542,17 +542,17 @@ class RoleOverridesController < ApplicationController
       set_permissions_for(@role, @context, params[:permissions])
       render :json => role_json(@context, @role, @current_user, session)
     rescue BadPermissionSettingError => e
-      render json: { message: e }, status: :bad_request
+      return render json: { message: e }, status: :bad_request
     end
   end
 
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      roles = if params[:account_roles] || @context == Account.site_admin
-                @context.available_account_roles(true)
-              else
-                @context.available_course_roles(true)
-              end
+      if params[:account_roles] || @context == Account.site_admin
+        roles = @context.available_account_roles(true)
+      else
+        roles = @context.available_course_roles(true)
+      end
       if params[:permissions]
         RoleOverride.permissions.keys.each do |key|
           if params[:permissions][key]
@@ -576,7 +576,7 @@ class RoleOverridesController < ApplicationController
   # Could be generalized for other use cases by adding to the whitelist
 
   def check_account_permission
-    whitelist = %w[manage_catalog]
+    whitelist = %w(manage_catalog)
     permission = params[:permission]
 
     if whitelist.include?(permission)
@@ -607,7 +607,7 @@ class RoleOverridesController < ApplicationController
         render :json => {
           :message => "role not found"
         },
-               :status => :not_found
+               :status => 404
       else
         redirect_to named_context_url(@context, :context_permissions_url,
                                       :account_roles => params[:account_roles])

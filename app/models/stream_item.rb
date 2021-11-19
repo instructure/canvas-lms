@@ -31,7 +31,7 @@ class StreamItem < ActiveRecord::Base
     :collaboration, :conversation, :discussion_entry,
     :discussion_topic, :message, :submission, :web_conference, :assessment_request
   ]
-  validates :asset_type, :data, presence: true
+  validates_presence_of :asset_type, :data
 
   after_destroy :destroy_stream_item_instances
   attr_accessor :unread, :participant, :invalidate_immediately
@@ -68,19 +68,19 @@ class StreamItem < ActiveRecord::Base
     when 'Submission'
       data['body'] = nil
     end
-    if data.key?('users')
+    if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.association(:users).target = users
     end
-    if data.key?('participants')
+    if data.has_key?('participants')
       users = data.delete('participants')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.instance_variable_set(:@participants, users)
     end
 
     # unnecessary after old stream items have expired
-    if res.is_a?(Conversation) && !data.key?('updated_at')
+    if res.is_a?(Conversation) && !data.has_key?('updated_at')
       data['updated_at'] = Time.now.utc
     end
 
@@ -313,7 +313,7 @@ class StreamItem < ActiveRecord::Base
       end
     end
 
-    [res]
+    return [res]
   end
 
   def self.root_object(object)
@@ -460,7 +460,9 @@ class StreamItem < ActiveRecord::Base
         end
       end
     when Conversation
-      res.latest_messages_from_stream_item&.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
+      if res.latest_messages_from_stream_item
+        res.latest_messages_from_stream_item.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
+      end
     end
 
     res

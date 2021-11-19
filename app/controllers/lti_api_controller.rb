@@ -85,7 +85,7 @@ class LtiApiController < ApplicationController
     verify_oauth(token.tool)
 
     if request.content_type != "application/json"
-      return head :unsupported_media_type
+      return head 415
     end
 
     Lti::XapiService.log_page_view(token, params)
@@ -144,7 +144,7 @@ class LtiApiController < ApplicationController
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
     turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
                              priority: Delayed::LOW_PRIORITY).process
-    render json: {}, status: :ok
+    render json: {}, status: 200
   end
 
   protected
@@ -172,7 +172,7 @@ class LtiApiController < ApplicationController
     end
 
     cache_key = "nonce:#{@tool.asset_string}:#{@signature.request.nonce}"
-    unless Lti::Security.check_and_store_nonce(cache_key, timestamp, allowed_delta.seconds)
+    unless Lti::Security::check_and_store_nonce(cache_key, timestamp, allowed_delta.seconds)
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected", oauth_error_info)
     end
   end

@@ -203,7 +203,7 @@ class Quizzes::QuizzesController < ApplicationController
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session.delete(:quiz_id)
       end
-      is_observer = @context_enrollment&.observer?
+      is_observer = @context_enrollment && @context_enrollment.observer?
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true, :is_observer => is_observer)
       @locked = @locked_reason && !can_preview?
 
@@ -218,7 +218,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
 
       @just_graded = false
-      if @submission&.needs_grading?(!!params[:take])
+      if @submission && @submission.needs_grading?(!!params[:take])
         GuardRail.activate(:primary) do
           Quizzes::SubmissionGrader.new(@submission).grade_submission(
             finished_at: @submission.finished_at_fallback
@@ -242,7 +242,7 @@ class Quizzes::QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
-        ATTACHMENTS: @attachments.map { |_, a| [a.id, attachment_hash(a)] }.to_h,
+        ATTACHMENTS: Hash[@attachments.map { |_, a| [a.id, attachment_hash(a)] }],
         CONTEXT_ACTION_SOURCE: :quizzes,
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
@@ -322,9 +322,9 @@ class Quizzes::QuizzesController < ApplicationController
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
 
-      regrade_options = @quiz.current_quiz_question_regrades.map do |qqr|
+      regrade_options = Hash[@quiz.current_quiz_question_regrades.map do |qqr|
         [qqr.quiz_question_id, qqr.regrade_option]
-      end.to_h
+      end]
       sections = @context.course_sections.active
 
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
@@ -594,7 +594,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def unpublish
     if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
-      @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select(&:available?)
+      @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select { |q| q.available? }
       @quizzes.each(&:unpublish!)
 
       flash[:notice] = t('notices.quizzes_unpublished',
@@ -641,7 +641,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.to_a
 
-      @submissions_from_users = @submissions_from_users.index_by(&:user_id)
+      @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id, s] }]
 
       # include logged out submissions
       @submissions_from_logged_out = @quiz.quiz_submissions.logged_out.not_settings_only
@@ -688,9 +688,9 @@ class Quizzes::QuizzesController < ApplicationController
       if @submission && !@submission.user_id && (logged_out_index = params[:u_index])
         @logged_out_user_index = logged_out_index
       end
-      @submission = nil if @submission&.settings_only?
-      @user = @submission&.user
-      if @submission&.needs_grading?
+      @submission = nil if @submission && @submission.settings_only?
+      @user = @submission && @submission.user
+      if @submission && @submission.needs_grading?
         Quizzes::SubmissionGrader.new(@submission).grade_submission(
           finished_at: @submission.finished_at_fallback
         )
@@ -702,7 +702,7 @@ class Quizzes::QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quizzes_url)
         return
       end
-      unless @submission
+      if !@submission
         flash[:notice] = t('notices.no_submission_for_user', "There is no submission available for that user")
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
@@ -727,7 +727,7 @@ class Quizzes::QuizzesController < ApplicationController
           @body_classes << 'quizzes-speedgrader'
         end
         @current_submission = @submission
-        @version_instances = @submission.submitted_attempts.sort_by(&:version_number)
+        @version_instances = @submission.submitted_attempts.sort_by { |v| v.version_number }
         @versions = get_versions
         params[:version] ||= @version_instances[0].version_number if @submission.untaken? && !@version_instances.empty?
         @current_version = true
@@ -783,7 +783,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
       @versions   = @submission ? get_versions : []
 
-      if !@versions.empty? && !hide_quiz?
+      if @versions.size > 0 && !hide_quiz?
         render :layout => false
       else
         head :ok
@@ -805,7 +805,7 @@ class Quizzes::QuizzesController < ApplicationController
   def submission_html
     @submission = get_submission
     setup_attachments
-    if @submission&.completed?
+    if @submission && @submission.completed?
       @lock_results_if_needed = true
       render layout: false
     else
@@ -848,12 +848,14 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def setup_attachments
-    @attachments = if @submission
-                     @submission.attachments.index_by(&:id)
-
-                   else
-                     {}
-                   end
+    if @submission
+      @attachments = Hash[@submission.attachments.map do |attachment|
+        [attachment.id, attachment]
+      end
+      ]
+    else
+      @attachments = {}
+    end
   end
 
   def attachment_hash(attachment)
@@ -872,7 +874,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def force_user
-    unless @current_user
+    if !@current_user
       session[:return_to] = course_quiz_path(@context, @quiz)
       redirect_to login_path
     end
@@ -980,7 +982,7 @@ class Quizzes::QuizzesController < ApplicationController
   def can_take_quiz?
     return true if params[:preview] && can_preview?
     return false if params[:take] && !@quiz.grants_right?(@current_user, :submit)
-    return false if @submission&.completed? && @submission.attempts_left == 0
+    return false if @submission && @submission.completed? && @submission.attempts_left == 0
 
     @quiz_eligibility = Quizzes::QuizEligibility.new(course: @context,
                                                      quiz: @quiz,

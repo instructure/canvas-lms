@@ -39,9 +39,9 @@ require_dependency 'microsoft_sync'
 class MicrosoftSync::UserMapping < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
   belongs_to :user
-  validates :root_account, presence: true
-  validates :user_id, presence: true
-  validates :user_id, uniqueness: { scope: :root_account }
+  validates_presence_of :root_account
+  validates_presence_of :user_id
+  validates_uniqueness_of :user_id, scope: :root_account
   MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
   DEPENDED_ON_ACCOUNT_SETTINGS = %i[
@@ -60,23 +60,23 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
-  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:)
+  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
     user_ids = GuardRail.activate(:secondary) do
       Enrollment
         .microsoft_sync_relevant
         .where(course_id: course.id)
-        .joins(<<~SQL.squish)
+        .joins(%{
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
-        SQL
-        .where(mappings: { id: nil })
+        })
+        .where('mappings.id IS NULL')
         .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
         .pluck(:user_id)
     end
 
     user_ids.in_groups_of(batch_size) do |batch|
-      yield(batch.compact)
+      blk.call(batch.compact)
     end
   end
 
@@ -131,11 +131,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     Enrollment
       .microsoft_sync_relevant
       .where(course_id: course.id)
-      .joins(<<~SQL.squish)
+      .joins(%{
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id
         AND mappings.root_account_id=#{course.root_account_id.to_i}
-      SQL
+      })
       .select(:id, :type, 'mappings.aad_id as aad_id')
   end
 

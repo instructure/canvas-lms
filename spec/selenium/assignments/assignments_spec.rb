@@ -112,7 +112,7 @@ describe "assignments" do
 
         it "shows the moderate button when the assignment is published", priority: "1", test_id: 609412 do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          f('#assignment_publish_button').click
+          f('#assignment_publish_button').click()
           wait_for_ajaximations
           expect(f('#moderated_grading_button')).to be_displayed
         end
@@ -120,7 +120,7 @@ describe "assignments" do
         it "removes the moderate button when the assignment is unpublished", priority: "1", test_id: 609413 do
           @assignment.publish
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          f('#assignment_publish_button').click
+          f('#assignment_publish_button').click()
           wait_for_ajaximations
           expect(f('#moderated_grading_button')).not_to be_displayed
         end
@@ -489,7 +489,7 @@ describe "assignments" do
 
     context "frozen assignment" do
       before do
-        stub_freezer_plugin(Assignment::FREEZABLE_ATTRIBUTES.index_with { "true" })
+        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
         default_group = @course.assignment_groups.create!(:name => "default")
         @frozen_assign = frozen_assignment(default_group)
       end
@@ -558,7 +558,7 @@ describe "assignments" do
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
-      as.each(&:reload)
+      as.each { |a| a.reload }
       expect(as.collect(&:position)).to eq [2, 1, 3, 4]
     end
 
@@ -582,7 +582,7 @@ describe "assignments" do
         drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
         wait_for_ajaximations
 
-        as.each(&:reload)
+        as.each { |a| a.reload }
         expect(as.collect(&:position)).to eq [2, 1, 3, 4]
       end
     end
@@ -824,7 +824,7 @@ describe "assignments" do
       expect(f('#unauthorized_message')).to be_displayed
     end
 
-    it "does not show the moderation page if it is not a moderated assignment", priority: "2", test_id: 609653 do
+    it "does not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#content h1').text).to eql "Whoops... Looks like nothing is here!"

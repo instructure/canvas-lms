@@ -20,12 +20,12 @@
 
 module Api::V1::Conferences
   API_CONFERENCE_JSON_OPTS = {
-    :only => %w[
+    :only => %w(
       id title conference_type description
       duration ended_at started_at user_ids long_running
       recordings join_url has_advanced_settings conference_key
       context_type context_id
-    ].freeze
+    ).freeze
   }.freeze
 
   def api_conferences_json(conferences, user, session)
@@ -103,11 +103,11 @@ module Api::V1::Conferences
   end
 
   def translate_strings(object)
-    object.transform_values do |v|
+    object.each_with_object({}) do |(k, v), h|
       if v.is_a? Array
-        v.map { |a| translate_strings(a) }
+        h[k] = v.map { |a| translate_strings(a) }
       else
-        v.respond_to?(:call) ? v.call : v
+        h[k] = v.respond_to?(:call) ? v.call() : v
       end
     end
   end

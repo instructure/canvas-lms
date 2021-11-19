@@ -41,8 +41,7 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position,
-                :skipped_master_course_items, :copied_external_outcome_map
+  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
   attr_writer :imported_migration_items
 
   has_a_broadcast_policy
@@ -63,7 +62,7 @@ class ContentMigration < ActiveRecord::Base
 
   def self.migration_plugins(exclude_hidden = false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
-    exclude_hidden ? plugins.reject { |p| p.meta[:hide_from_users] } : plugins
+    exclude_hidden ? plugins.select { |p| !p.meta[:hide_from_users] } : plugins
   end
 
   set_policy do
@@ -283,7 +282,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_warning(user_message, opts = {})
     Rails.logger.warn("Migration warning: #{user_message}: #{opts.inspect}")
-    unless opts.is_a? Hash
+    if !opts.is_a? Hash
       # convert deprecated behavior to new
       exception_or_info = opts
       opts = {}
@@ -425,7 +424,7 @@ class ContentMigration < ActiveRecord::Base
     running_cutoff = Setting.get('content_migration_job_block_hours', '4').to_i.hours.ago # at some point just let the jobs keep going
 
     if self.context && self.context.content_migrations
-                           .where(:workflow_state => %w[created queued pre_processing pre_processed exporting importing]).where("id < ?", self.id)
+                           .where(:workflow_state => %w{created queued pre_processing pre_processed exporting importing}).where("id < ?", self.id)
                            .where("started_at > ?", running_cutoff).exists?
 
       # there's another job already going so punt
@@ -449,20 +448,20 @@ class ContentMigration < ActiveRecord::Base
         end
       end
 
-      true
+      return true
     else
-      false
+      return false
     end
   end
 
   def set_default_settings
-    if self.context.respond_to?(:root_account) &&
+    if self.context && self.context.respond_to?(:root_account) &&
        (account = self.context.root_account) &&
        (default_ms = account.settings[:default_migration_settings])
       self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
     end
 
-    unless self.migration_settings.key?(:overwrite_quizzes)
+    if !self.migration_settings.has_key?(:overwrite_quizzes)
       self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
     self.migration_settings.reverse_merge!(:prefer_existing_tools => true) if self.migration_type == 'common_cartridge_importer' # default to true
@@ -500,7 +499,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_everything?
-    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && !migration_settings[:migration_ids_to_import][:copy].empty?
+    return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy].length > 0
     return true if is_set?(to_import(:everything))
     return true if copy_options && is_set?(copy_options[:everything])
 
@@ -513,7 +512,7 @@ class ContentMigration < ActiveRecord::Base
     prefix = "#{migration_settings[:id_prepender]}_"
     return nil unless mig_id.start_with? prefix
 
-    mig_id[prefix.length..]
+    mig_id[prefix.length..-1]
   end
 
   def import_object?(asset_type, mig_id)
@@ -538,7 +537,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def is_set?(option)
-    Canvas::Plugin.value_to_boolean option
+    Canvas::Plugin::value_to_boolean option
   end
 
   def capture_job_id
@@ -553,7 +552,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_content
-    reset_job_progress(:running) unless import_immediately?
+    reset_job_progress(:running) if !import_immediately?
     self.workflow_state = :importing
     capture_job_id
     self.save
@@ -615,7 +614,7 @@ class ContentMigration < ActiveRecord::Base
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
 
-      unless self.import_immediately?
+      if !self.import_immediately?
         update_import_progress(100)
       end
       if self.for_master_course_import?
@@ -798,7 +797,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def clear_migration_data
-    @zip_file&.close
+    @zip_file.close if @zip_file
     @zip_file = nil
   end
 
@@ -832,7 +831,7 @@ class ContentMigration < ActiveRecord::Base
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%
-      mig_prog *= 0.6
+      mig_prog = mig_prog * 0.6
 
       if self.content_export
         export_prog = self.content_export.progress || 0
@@ -1041,16 +1040,16 @@ class ContentMigration < ActiveRecord::Base
   def handle_import_in_progress_notice
     return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
 
-    if (just_created || (saved_change_to_workflow_state? && %w[created queued].include?(workflow_state_before_last_save))) &&
-       %w[pre_processing pre_processed exporting importing].include?(workflow_state)
+    if (just_created || (saved_change_to_workflow_state? && %w{created queued}.include?(workflow_state_before_last_save))) &&
+       %w(pre_processing pre_processed exporting importing).include?(workflow_state)
       context.add_content_notice(:import_in_progress, 4.hours)
-    elsif saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
+    elsif saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       context.remove_content_notice(:import_in_progress)
     end
   end
 
   def check_for_blocked_migration
-    if self.saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
+    if self.saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
         job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)

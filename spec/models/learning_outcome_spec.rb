@@ -636,11 +636,11 @@ describe LearningOutcome do
       @outcome.save!
 
       rubric.reload
-      expect(rubric.data.first[:ratings].pluck(:description)).to match_array([
-                                                                               "Exceeds Expectations",
-                                                                               "Meets Expectations",
-                                                                               "Does Not Meet Expectations"
-                                                                             ])
+      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to match_array([
+                                                                                       "Exceeds Expectations",
+                                                                                       "Meets Expectations",
+                                                                                       "Does Not Meet Expectations"
+                                                                                     ])
     end
   end
 
@@ -1018,14 +1018,8 @@ describe LearningOutcome do
       )
     end
 
-    let(:c1) {
-      course_with_teacher
-      @course
-    }
-    let(:c2) {
-      course_with_teacher
-      @course
-    }
+    let(:c1) { course_with_teacher; @course }
+    let(:c2) { course_with_teacher; @course }
 
     let(:add_student) do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }

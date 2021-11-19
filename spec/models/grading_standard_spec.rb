@@ -392,7 +392,6 @@ describe GradingStandard do
         end
       end
     end
-
     context "course belonging to sub-account" do
       before(:once) do
         @root_account = Account.default

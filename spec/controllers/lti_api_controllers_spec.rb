@@ -49,11 +49,11 @@ describe LtiApiController, type: :request do
       expect(json["error_report_id"]).to be > 0
       data = error_data(json)
 
-      expect(data).to have_key('oauth_signature')
-      expect(data).to have_key('oauth_signature_method')
-      expect(data).to have_key('oauth_nonce')
-      expect(data).to have_key('oauth_timestamp')
-      expect(data).to have_key('generated_signature') if check_generated_sig
+      expect(data.key?('oauth_signature')).to be true
+      expect(data.key?('oauth_signature_method')).to be true
+      expect(data.key?('oauth_nonce')).to be true
+      expect(data.key?('oauth_timestamp')).to be true
+      expect(data.key?('generated_signature')).to be true if check_generated_sig
 
       expect(data['oauth_signature']).to_not be_empty
       expect(data['oauth_signature_method']).to_not be_empty
@@ -96,17 +96,14 @@ describe LtiApiController, type: :request do
   end
 
   it "responds 'unsupported' for any unknown xml body" do
-    body = %(<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
+    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
     check_failure
   end
 
   it "adds xml to an error report if the xml is invalid according to spec" do
-    body = %(<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
-    expect(Canvas::Errors).to receive(:capture) { |_, opts|
-                                expect(opts[:extra][:xml]).to be_present
-                                {}
-                              }
+    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    expect(Canvas::Errors).to receive(:capture) { |_, opts| expect(opts[:extra][:xml]).to be_present; {} }
     make_call('body' => body)
   end
 
@@ -116,7 +113,7 @@ describe LtiApiController, type: :request do
   end
 
   it "fail when the XML encoding is invalid" do
-    body = %(<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
+    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
     check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
   end
@@ -165,25 +162,25 @@ describe LtiApiController, type: :request do
     result_data = opts[:result_data]
     raw_score = opts[:raw_score]
 
-    sourceid ||= source_id
+    sourceid ||= source_id()
 
     score_xml = ''
     if score
-      score_xml = <<~XML
-        <resultScore>
-          <language>en</language>
-          <textString>#{score}</textString>
-        </resultScore>
+      score_xml = <<-XML
+          <resultScore>
+            <language>en</language>
+            <textString>#{score}</textString>
+          </resultScore>
       XML
     end
 
     raw_score_xml = ''
     if raw_score
-      raw_score_xml = <<~XML
-        <resultTotalScore>
-          <language>en</language>
-          <textString>#{raw_score}</textString>
-        </resultTotalScore>
+      raw_score_xml = <<-XML
+          <resultTotalScore>
+            <language>en</language>
+            <textString>#{raw_score}</textString>
+          </resultTotalScore>
       XML
     end
 
@@ -224,7 +221,7 @@ describe LtiApiController, type: :request do
   end
 
   def read_result(sourceid = nil)
-    sourceid ||= source_id
+    sourceid ||= source_id()
     <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -248,7 +245,7 @@ describe LtiApiController, type: :request do
   end
 
   def delete_result(sourceid = nil)
-    sourceid ||= source_id
+    sourceid ||= source_id()
     <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -323,7 +320,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets complex submission text" do
-      text = CGI.escapeHTML("<p>stuff</p>")
+      text = CGI::escapeHTML("<p>stuff</p>")
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "<![CDATA[#{text}]]>" }))
       check_success
 
@@ -404,10 +401,10 @@ describe LtiApiController, type: :request do
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
       expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<~TEXT.strip
+      expect(comments.first.comment).to eq <<~NO_POINTS.strip
         An external tool attempted to grade this assignment as 75%, but was unable
         to because the assignment has no points possible.
-      TEXT
+      NO_POINTS
     end
 
     it "rejects out of bound scores" do
@@ -660,7 +657,7 @@ describe LtiApiController, type: :request do
     end
 
     def update_result(score, sourcedid = nil)
-      sourcedid ||= source_id
+      sourcedid ||= source_id()
       {
         'lti_message_type' => 'basic-lis-updateresult',
         'sourcedid' => sourcedid,
@@ -669,7 +666,7 @@ describe LtiApiController, type: :request do
     end
 
     def read_result(sourcedid = nil)
-      sourcedid ||= source_id
+      sourcedid ||= source_id()
       {
         'lti_message_type' => 'basic-lis-readresult',
         'sourcedid' => sourcedid,
@@ -677,7 +674,7 @@ describe LtiApiController, type: :request do
     end
 
     def delete_result(sourcedid = nil)
-      sourcedid ||= source_id
+      sourcedid ||= source_id()
       {
         'lti_message_type' => 'basic-lis-deleteresult',
         'sourcedid' => sourcedid,
@@ -708,7 +705,7 @@ describe LtiApiController, type: :request do
         make_call('body' => update_result('0.6'))
         xml = check_success
 
-        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id
+        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id()
         expect(xml.at_css('message_response > result > resultscore > resultvaluesourcedid').content).to eq 'decimal'
         expect(xml.at_css('message_response > result > resultscore > textstring').content).to eq '0.6'
         submission = @assignment.submissions.where(user_id: @student).first
@@ -764,7 +761,7 @@ describe LtiApiController, type: :request do
 
         make_call('body' => read_result)
         xml = check_success
-        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id
+        expect(xml.at_css('message_response > result > sourcedid').content).to eq source_id()
         expect(xml.at_css('message_response > result > resultscore > textstring').content).to eq '0.4'
       end
     end

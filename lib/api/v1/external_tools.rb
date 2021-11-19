@@ -30,7 +30,7 @@ module Api::V1::ExternalTools
   def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     methods = %w[privacy_level custom_fields workflow_state vendor_help_link]
     methods += extension_types
-    only = %w[id name description url domain consumer_key created_at updated_at description]
+    only = %w(id name description url domain consumer_key created_at updated_at description)
     only << 'allow_membership_service_access' if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     json = api_json(tool, user, session,
                     :only => only,
@@ -59,10 +59,9 @@ module Api::V1::ExternalTools
   end
 
   def tool_pagination_url
-    case @context
-    when Course
+    if @context.is_a? Course
       api_v1_course_external_tools_url(@context)
-    when Group
+    elsif @context.is_a? Group
       api_v1_group_external_tools_url(@context)
     else
       api_v1_account_external_tools_url(@context)

@@ -13,18 +13,18 @@ def create_notification(values = {})
 end
 
 def telemetry_enabled?
-  (ENV['TELEMETRY_OPT_IN'] || "").present?
+  return (ENV['TELEMETRY_OPT_IN'] || "").present?
 end
 
 def obfuscate_input_or_echo(password = false)
   echo = password ? "*" : true
-  telemetry_enabled? ? false : echo
+  return telemetry_enabled? ? false : echo
 end
 
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
-    security_conf_path = Rails.root.join('config/security.yml')
+    security_conf_path = Rails.root.join('config', 'security.yml')
     security_conf = YAML.load_file(security_conf_path)
     if security_conf[Rails.env]["encryption_key"].to_s.length < 20
       security_conf[Rails.env]["encryption_key"] = SecureRandom.hex(64)
@@ -45,7 +45,7 @@ namespace :db do
 
   desc "Make sure all message templates have notifications in the db"
   task :evaluate_notification_templates => :load_environment do
-    Dir.glob(Rails.root.join('app/messages/*.erb')) do |filename|
+    Dir.glob(Rails.root.join('app', 'messages', '*.erb')) do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0, 1] == "_"
@@ -102,7 +102,7 @@ namespace :db do
       # set the password later.
       pseudonym.password = pseudonym.password_confirmation = password
       unless pseudonym.save
-        raise pseudonym.errors.full_messages.first unless pseudonym.errors.empty?
+        raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
 
         raise "unknown error saving password"
       end
@@ -124,7 +124,7 @@ namespace :db do
     unless user
       require 'highline/import'
 
-      until Rails.env.test? do
+      while !Rails.env.test? do
 
         if telemetry_enabled?
           print "\e[33mInput fields will be hidden to ensure that entered data will not be sent to the telemetry service.\nWe do not recommend using sensitive data for development environments.\e[0m\n"
@@ -193,10 +193,10 @@ namespace :db do
     if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
       require 'highline/import'
 
-      unless Rails.env.test?
+      if !Rails.env.test?
         while true do
           name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = obfuscate_input_or_echo }
-          break unless telemetry_enabled?
+          break if !telemetry_enabled?
 
           name_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo }
           break if name == name_confirm

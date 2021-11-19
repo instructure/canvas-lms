@@ -5,11 +5,11 @@ module Interfaces::AssignmentsConnectionInterface
 
   class AssignmentFilterInputType < Types::BaseInputObject
     graphql_name "AssignmentFilter"
-    argument :grading_period_id, ID, <<~MD, required: false
+    argument :grading_period_id, ID, <<~DESC, required: false
       only return assignments for the given grading period. Defaults to
       the current grading period. Pass `null` to return all assignments
       (irrespective of the assignment's grading period)
-    MD
+    DESC
   end
 
   def assignments_scope(course, grading_period_id, has_grading_periods = nil)
@@ -29,14 +29,14 @@ module Interfaces::AssignmentsConnectionInterface
   end
 
   field :assignments_connection, ::Types::AssignmentType.connection_type,
-        <<~MD,
+        <<~DOC,
           returns a list of assignments.
 
           **NOTE**: for courses with grading periods, this will only return grading
           periods in the current course; see `AssignmentFilter` for more info.
           In courses with grading periods that don't have students, it is necessary
           to *not* filter by grading period to list assignments.
-        MD
+        DOC
         null: true do
     argument :filter, AssignmentFilterInputType, required: false
   end

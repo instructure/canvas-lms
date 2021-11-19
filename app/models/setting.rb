@@ -58,7 +58,7 @@ class Setting < Switchman::UnshardedRecord
     end
   rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
     # the db may not exist yet
-    Rails.logger&.warn("Unable to read setting: #{e}")
+    Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
     default&.to_s
   end
 

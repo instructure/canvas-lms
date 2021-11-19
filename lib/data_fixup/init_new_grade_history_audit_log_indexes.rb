@@ -76,11 +76,11 @@ module DataFixup
       end
       write_in_batches(index_entries)
       save_last_id(last_id)
-      [false, last_id]
+      return false, last_id
     end
 
     def write_in_batches(batch)
-      until batch.empty?
+      while batch.size > 0
         write_batch(batch.shift(write_batch_size))
       end
     end

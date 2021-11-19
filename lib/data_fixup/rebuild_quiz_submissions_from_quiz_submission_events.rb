@@ -20,7 +20,7 @@
 module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
   LOG_PREFIX = "RebuildingQuizSubmissions - "
 
-  SQL_SEARCH_STRING = <<~SQL.squish
+  SQL_SEARCH_STRING = <<-SQL
     select
       distinct submissions.id
     from
@@ -38,7 +38,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       users
     on submissions.user_id = users.id
       and users.workflow_state<>'deleted'
-    /* inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id */
+    -- inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id
     left outer join
       quiz_submissions
     on quiz_submissions.id = submissions.quiz_submission_id
@@ -80,7 +80,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       quiz_submission = build_new_submission_from_quiz_submission_events(submission)
 
       # save the result
-      quiz_submission&.save_with_versioning!
+      quiz_submission.save_with_versioning! if quiz_submission
     end
 
     def find_missing_submissions_on_current_shard
@@ -175,11 +175,11 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       question_events = events.select { |e| ["question_answered", "question_viewed", "question_flagged"].include?(e.event_type) }
       seen_question_ids = []
       question_events.each do |event|
-        seen_question_ids << if event.event_type == "question_viewed"
-                               event.answers
-                             else
-                               event.answers.flatten.map { |h| h["quiz_question_id"] }
-                             end
+        if event.event_type == "question_viewed"
+          seen_question_ids << event.answers
+        else
+          seen_question_ids << event.answers.flatten.map { |h| h["quiz_question_id"] }
+        end
       end
       seen_question_ids = seen_question_ids.flatten.uniq
 
@@ -214,7 +214,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: qs_id)
 
       # Check if there are any events in the QLA
-      if events.empty?
+      if events.size == 0
         Rails.logger.warn LOG_PREFIX + "Skipping because there are no QLA events\tsubmission_id: #{submission.id}"
         return false
       end

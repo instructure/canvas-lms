@@ -47,7 +47,7 @@ module CC::Importer
       tools = []
 
       blti_resources.each do |res|
-        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
+        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
         if File.exist?(path)
@@ -108,7 +108,7 @@ module CC::Importer
 
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
-      unless doc.namespaces.to_s.downcase.include? 'imsglobal'
+      if !doc.namespaces.to_s.downcase.include? 'imsglobal'
         raise CCImportError.new(I18n.t("Invalid XML Configuration"))
       end
 
@@ -134,7 +134,7 @@ module CC::Importer
     end
 
     def check_for_unescaped_url(url)
-      if /(.*[^=]*\?*=)[^&;]*=/.match?(url)
+      if url =~ /(.*[^=]*\?*=)[^&;]*=/
         raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
       end
     end
@@ -152,12 +152,11 @@ module CC::Importer
       node.children.each do |property|
         next if property.name == 'text'
 
-        case property.name
-        when 'property'
+        if property.name == 'property'
           props[property['name']] = property.text.strip
-        when 'options'
+        elsif property.name == 'options'
           props[property['name']] = get_custom_properties(property)
-        when 'custom'
+        elsif property.name == 'custom'
           props[:custom_fields] = get_custom_properties(property)
         end
       end

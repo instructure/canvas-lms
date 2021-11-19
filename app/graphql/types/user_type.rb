@@ -246,9 +246,9 @@ module Types
     #
     # alternatively, figure out what kind of permissions a person needs to view
     # another user's groups?
-    field :groups, [GroupType], <<~MD, null: true
+    field :groups, [GroupType], <<~DESC, null: true
       **NOTE**: this only returns groups for the currently logged-in user.
-    MD
+    DESC
     def groups
       if object == current_user
         # FIXME: this only returns groups on the current shard.  it should
@@ -301,24 +301,15 @@ module Types
     def submission_comments_connection
       return unless object == current_user
 
-      submission_comments = []
-      stream_item_instances = current_user.visible_stream_item_instances(only_active_courses: true)
-
-      Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
-        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
-                                          asset_type: 'Submission')
-                                   .select('asset_id')
-        submission_comments += SubmissionComment.preload(submission: { assignment: :context })
-                                                .where(submission_id: submission_ids)
+      load_association(:all_courses).then do |courses|
+        Submission.where('submission_comments_count > 0').where(course: courses).flat_map { |submission| submission.visible_submission_comments_for(current_user) }
       end
-
-      submission_comments
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
-      argument :query, String, <<~MD, required: false
+      argument :query, String, <<~DOC, required: false
         Only include comments that match the query string.
-      MD
+      DOC
       argument :limit, Integer, required: false
     end
     def comment_bank_items_connection(query: nil, limit: nil)

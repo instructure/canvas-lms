@@ -88,9 +88,9 @@ describe "Gradebook editing grades" do
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4', 'A-')
 
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b4')).to include_text('A-')
-    expect(@assignment.submissions.where.not(grade: nil).count).to eq 1
+    expect(@assignment.submissions.where('grade is not null').count).to eq 1
 
-    sub = @assignment.submissions.where.not(grade: nil).first
+    sub = @assignment.submissions.where('grade is not null').first
 
     expect(sub.grade).to eq 'A-'
     expect(sub.score).to eq 0.0
@@ -300,7 +300,7 @@ describe "Gradebook editing grades" do
       expect(class_attribute_fetched).to include "Grid__ReadOnlyCell"
     end
 
-    it "is allowed if grades are posted", priority: "1" do # test_id: 3503489
+    it "is allowed if grades are posted ", priority: "1" do # test_id: 3503489
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
       @moderated_assignment.unmute!
       refresh_page

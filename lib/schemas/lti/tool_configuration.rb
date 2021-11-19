@@ -120,7 +120,6 @@ module Schemas::Lti
                             "migration_selection",
                             "module_group_menu",
                             "module_index_menu",
-                            "module_index_menu_modal",
                             "module_menu",
                             "post_grades",
                             "quiz_index_menu",

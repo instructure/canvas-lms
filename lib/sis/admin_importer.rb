@@ -64,7 +64,7 @@ module SIS
         raise ImportError, "No role_id or role given for admin" if role.blank? && role_id.blank?
 
         state = status.downcase.strip
-        raise ImportError, "Invalid status #{status} for admin" unless %w[active deleted].include? state
+        raise ImportError, "Invalid status #{status} for admin" unless %w(active deleted).include? state
         return if @batch.skip_deletes? && state == 'deleted'
 
         get_account(account_id)
@@ -91,11 +91,10 @@ module SIS
       end
 
       def create_or_find_admin(user, state)
-        case state
-        when 'active'
+        if state == 'active'
           admin = @account.account_users.where(user: user, role: @role).first_or_initialize
           admin.workflow_state = state
-        when 'deleted'
+        elsif state == 'deleted'
           admin = @account.account_users.where(user: user, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
 

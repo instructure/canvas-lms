@@ -323,15 +323,15 @@ describe "Canvas Cartridge importing" do
   end
 
   it "imports v1 grading standards" do
-    doc = Nokogiri::XML(<<~XML)
-      <?xml version="1.0" encoding="UTF-8"?>
-      <gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
-        <gradingStandard identifier="i293372c956d13a7d48d913a7d971e35d" version="1">
-          <title>Standard eh</title>
-          <data>[["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]</data>
-        </gradingStandard>
-      </gradingStandards>
-    XML
+    doc = Nokogiri::XML(%{
+<?xml version="1.0" encoding="UTF-8"?>
+<gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+  <gradingStandard identifier="i293372c956d13a7d48d913a7d971e35d" version="1">
+    <title>Standard eh</title>
+    <data>[["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]</data>
+  </gradingStandard>
+</gradingStandards>
+    })
     hash = @converter.convert_grading_standards(doc)
     # import json into new course
     Importers::GradingStandardImporter.process_migration({ 'grading_standards' => hash }, @migration)
@@ -362,7 +362,7 @@ describe "Canvas Cartridge importing" do
     # convert to json
     doc = Nokogiri::XML(builder.target!)
     data = @converter.convert_learning_outcomes(doc)
-    data = data.map(&:with_indifferent_access)
+    data = data.map { |h| h.with_indifferent_access }
 
     # import json into new course
     Importers::LearningOutcomeImporter.process_migration({ 'learning_outcomes' => data }, @migration)
@@ -555,7 +555,7 @@ describe "Canvas Cartridge importing" do
       expect(mod3_2.content_tags.length).to eq 2
       expect(mod3_2.content_tags[0].url).to eq "http://a.example.com/"
       expect(mod3_2.content_tags[1].url).to eq "http://b.example.com/"
-      expect(@migration.old_warnings_format.first.first).to eq %(Import Error: Module Item - "Example 3")
+      expect(@migration.old_warnings_format.first.first).to eq %{Import Error: Module Item - "Example 3"}
 
       mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
       expect(mod4_2.content_tags.first.title).to eq att_tag.title
@@ -671,12 +671,10 @@ describe "Canvas Cartridge importing" do
     allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
 
     path = CGI.escape(att.full_path)
-    body_with_links = <<~HTML
-      <p>Watup? <strong>eh?</strong>
+    body_with_links = %{<p>Watup? <strong>eh?</strong>
       <a href="%24IMS-CC-FILEBASE%24/#{path}" class="instructure_inline_media_comment">wroks</a>
       <a href="%24IMS-CC-FILEBASE%24/#{path}">no wroks</a>
-      </p>
-    HTML
+      </p>}
 
     hash = {
       :migration_id => 'mig',
@@ -707,7 +705,7 @@ describe "Canvas Cartridge importing" do
     allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
 
     path = CGI.escape(att.full_path)
-    body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
+    body = %{<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>}
 
     hash = {
       :migration_id => 'mig',
@@ -746,7 +744,7 @@ describe "Canvas Cartridge importing" do
     path = to_att.full_display_path.gsub('course files/', '')
     @migration.attachment_path_id_lookup = { path => to_att.migration_id }
 
-    body_with_link = %(<p>Watup? <strong>eh?</strong>
+    body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
       <a href=\"/courses/%s/#{@copy_to.wiki.path}/assignments\">Assignments wiki link</a>
@@ -756,7 +754,7 @@ describe "Canvas Cartridge importing" do
       <div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-      </div>)
+      </div>}
     page = @copy_from.wiki_pages.create!(:title => "some page", :body => body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id], :editing_roles => "teachers", :notify_of_update => true)
     page.workflow_state = 'unpublished'
     @copy_from.save!
@@ -783,7 +781,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
     expect(page_2.notify_of_update).to eq page.notify_of_update
-    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(%r{png" />}, 'png">')
+    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(/png" \/>/, 'png">')
     expect(page_2.unpublished?).to eq true
   end
 
@@ -805,7 +803,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
-    expect(page_2.body).to match(%r{/courses/#{@copy_to.id}/external_tools/retrieve})
+    expect(page_2.body).to match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
   end
 
   it "imports assignments" do
@@ -818,11 +816,11 @@ describe "Canvas Cartridge importing" do
                                                                        "description" => "yes",
                                                                        "grading_type" => "yes" })
 
-    body_with_link = %(<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
 <div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-</div>)
+</div>}
     asmnt = @copy_from.assignments.new
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id
@@ -1182,7 +1180,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "converts media tracks" do
-    doc = Nokogiri::XML(<<~XML)
+    doc = Nokogiri::XML(<<-XML)
       <?xml version="1.0" encoding="UTF-8"?>
       <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
         <media identifierref="xyz">
@@ -1198,7 +1196,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "imports media tracks" do
-    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder.root_folders(@course).first
+    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder::root_folders(@course).first
     media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
     media_file.migration_id = 'xyz'
     media_file.save!
@@ -1412,7 +1410,7 @@ describe "Canvas Cartridge importing" do
 
       expect(migration.migration_issues.count).to eq 2
 
-      warnings = migration.migration_issues.sort_by(&:fix_issue_html_url)
+      warnings = migration.migration_issues.sort_by { |i| i.fix_issue_html_url }
       warning1 = warnings[0]
       expect(warning1.issue_type).to eq "warning"
       expect(warning1.description.start_with?("Missing links found in imported content")).to eq true

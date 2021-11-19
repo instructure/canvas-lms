@@ -86,7 +86,7 @@ describe ContentMigration do
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to eq topic.message
-      expect(@copy_to.syllabus_body).to match(%r{/courses/#{@copy_to.id}/discussion_topics/#{new_topic.id}})
+      expect(@copy_to.syllabus_body).to match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
     end
 
     it "copies course syllabus when the everything option is selected" do
@@ -175,7 +175,7 @@ describe ContentMigration do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
-      body = %(<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>)
+      body = %{<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>}
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
 
       run_course_copy
@@ -190,7 +190,7 @@ describe ContentMigration do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
-      body = %(<p>Link to module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>)
+      body = %{<p>Link to module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>}
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, asmnt1.id, tag.id])
 
       run_course_copy
@@ -206,7 +206,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       mod1 = @copy_from.context_modules.create!(:name => "some module")
-      body = %(<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>)
+      body = %{<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>}
       quiz = @copy_from.quizzes.create!(:title => "some page", :description => body % [@copy_from.id, mod1.id])
 
       run_course_copy
@@ -625,13 +625,13 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       @copy_from.media_objects.create!(:media_id => '0_12345678')
-      @copy_from.syllabus_body = <<~HTML.strip
-        <p>
-          Hello, students.<br>
-          With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
-          Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
-          another type: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@copy_from.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
-        </p>
+      @copy_from.syllabus_body = <<-HTML.strip
+      <p>
+        Hello, students.<br>
+        With associated media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        Without associated media object: <a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">this is a media comment</a>
+        another type: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@copy_from.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
+      </p>
       HTML
 
       run_course_copy
@@ -824,8 +824,8 @@ describe ContentMigration do
     end
 
     it "does not try to translate links to similarishly looking urls" do
-      body = %(<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>
-        <p>another link to external thing <a href="https://someotherexampledomain2.com/files">so sad</a></p>)
+      body = %{<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>
+        <p>another link to external thing <a href="https://someotherexampledomain2.com/files">so sad</a></p>}
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body)
 
       run_course_copy
@@ -835,20 +835,12 @@ describe ContentMigration do
     end
 
     it "still translates links to /course/X/files" do
-      body = %(<p>link to course files <a href="/courses/%s/files">files</a></p>)
+      body = %{<p>link to course files <a href="/courses/%s/files">files</a></p>}
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % @copy_from.id.to_s)
       run_course_copy
 
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to.body).to eq(body % @copy_to.id.to_s)
-    end
-
-    it "copies over late policy" do
-      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: 'day')
-      run_course_copy
-
-      new_late_policy = @copy_to.late_policy
-      expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
     end
   end
 end

@@ -22,16 +22,16 @@ require_dependency 'importers'
 module Importers
   class AssignmentImporter < Importer
     # Used to avoid adding duplicate line items when doing a re-import
-    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag].freeze
+    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag]
 
     self.item_class = Assignment
 
     def self.process_migration(data, migration)
-      assignments = data['assignments'] || []
+      assignments = data['assignments'] ? data['assignments'] : []
 
       create_assignments(assignments, migration)
 
-      migration_ids = assignments.filter_map { |m| m['assignment_id'] }
+      migration_ids = assignments.map { |m| m['assignment_id'] }.compact
       conn = Assignment.connection
       cases = []
       max = migration.context.assignments.pluck(:position).compact.max || 0
@@ -76,10 +76,10 @@ module Importers
     def self.create_tool_settings(tool_setting_hash, tool_proxy, assignment)
       return if tool_proxy.blank? || tool_setting_hash.blank?
 
-      ts_vendor_code = tool_setting_hash['vendor_code']
-      ts_product_code = tool_setting_hash['product_code']
-      ts_custom = tool_setting_hash['custom']
-      ts_custom_params = tool_setting_hash['custom_parameters']
+      ts_vendor_code = tool_setting_hash.dig('vendor_code')
+      ts_product_code = tool_setting_hash.dig('product_code')
+      ts_custom = tool_setting_hash.dig('custom')
+      ts_custom_params = tool_setting_hash.dig('custom_parameters')
 
       return unless tool_proxy.product_family.vendor_code == ts_vendor_code &&
                     tool_proxy.product_family.product_code == ts_product_code
@@ -122,11 +122,11 @@ module Importers
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
-        item.workflow_state = if item.can_unpublish?
-                                (hash[:workflow_state] || 'published')
-                              else
-                                'published'
-                              end
+        if item.can_unpublish?
+          item.workflow_state = (hash[:workflow_state] || 'published')
+        else
+          item.workflow_state = 'published'
+        end
       end
       if hash[:instructions_in_html] == false
         self.extend TextHelper
@@ -178,15 +178,14 @@ module Importers
       elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-        case grading[:grade_type]
-        when /numeric|points/i
+        if grading[:grade_type] =~ /numeric|points/i
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-        when /alphanumeric|letter_grade/i
+        elsif grading[:grade_type] =~ /alphanumeric|letter_grade/i
           item.grading_type = "letter_grade"
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
-        when 'rubric'
+        elsif grading[:grade_type] == 'rubric'
           hash[:rubric_migration_id] ||= grading[:rubric_id]
-        when 'not_graded'
+        elsif grading[:grade_type] == 'not_graded'
           item.submission_types = 'not_graded'
         end
       end
@@ -259,7 +258,7 @@ module Importers
                                       key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
         can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
-        if hash.key?(:only_visible_to_overrides) && can_restrict
+        if hash.has_key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
@@ -272,7 +271,7 @@ module Importers
         if gs
           item.grading_standard = gs if gs
         else
-          migration.add_warning(t('errors.import.grading_standard_not_found', %(The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.), :title => hash[:title]))
+          migration.add_warning(t('errors.import.grading_standard_not_found', %{The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.}, :title => hash[:title]))
         end
       end
       if quiz
@@ -291,9 +290,9 @@ module Importers
         item.saved_by = :quiz
       end
 
-      hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
+      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
-        if hash.key?(key) && (master_migration || hash[key].present?)
+        if hash.has_key?(key) && (master_migration || hash[key].present?)
           item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
       end
@@ -303,10 +302,10 @@ module Importers
         item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
       end
 
-      if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
+      if hash.has_key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
         item.moderated_grading = hash[:moderated_grading]
       end
-      if hash.key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
+      if hash.has_key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
         item.anonymous_grading = hash[:anonymous_grading]
       end
 
@@ -460,7 +459,7 @@ module Importers
             tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
           tag.content_type = 'ContextExternalTool'
-          unless tag.save
+          if !tag.save
             if tag.errors["url"]
               migration.add_warning(t('errors.import.external_tool_url',
                                       "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",

@@ -26,13 +26,9 @@ class TestUserApi
   include Api::V1::UserProfile
   attr_accessor :services_enabled, :context, :current_user
 
-  def service_enabled?(service)
-    @services_enabled.include? service
-  end
+  def service_enabled?(service); @services_enabled.include? service; end
 
-  def avatar_image_url(user_id)
-    "avatar_image_url(#{user_id})"
-  end
+  def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
 
   def initialize
     @domain_root_account = Account.default
@@ -216,7 +212,7 @@ describe "User Profile API", type: :request do
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
                       :controller => "profile", :action => "settings",
                       :user_id => @student.to_param, :format => "json",
-                      :include => %w[user_services])
+                      :include => %w(user_services))
       expect(json["user_services"]).to eq [
         { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" },
       ]
@@ -230,7 +226,7 @@ describe "User Profile API", type: :request do
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=links",
                       :controller => "profile", :action => "settings",
                       :user_id => @student.to_param, :format => "json",
-                      :include => %w[links])
+                      :include => %w(links))
       expect(json["links"]).to eq [
         { "url" => "http://instructure.com", "title" => "Instructure" }
       ]

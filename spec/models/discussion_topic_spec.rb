@@ -29,7 +29,7 @@ describe DiscussionTopic do
     user = user_factory(opts)
     user.save!
     course.enroll_user(user, opts[:enrollment_type], opts)
-    user
+    return user
   end
 
   def add_section_to_topic(topic, section, opts = {})
@@ -1671,7 +1671,7 @@ describe DiscussionTopic do
     end
 
     it "fixes submission date after deleting the oldest entry" do
-      build_submitted_assignment
+      build_submitted_assignment()
       @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @student)
       @entry2.created_at = 1.day.ago
       @entry2.save!
@@ -1685,7 +1685,7 @@ describe DiscussionTopic do
     end
 
     it "marks submission as unsubmitted after deletion" do
-      build_submitted_assignment
+      build_submitted_assignment()
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -1697,7 +1697,7 @@ describe DiscussionTopic do
     end
 
     it "has new submission date after deletion and re-submission" do
-      build_submitted_assignment
+      build_submitted_assignment()
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -2213,10 +2213,7 @@ describe DiscussionTopic do
     it "reflects account setting for when lock_all_announcements is enabled" do
       announcement = @course.announcements.create!(message: "Lock this")
       expect(announcement.comments_disabled?).to be_falsey
-      @course.account.tap { |a|
-        a.settings[:lock_all_announcements] = { :value => true, :locked => true }
-        a.save!
-      }
+      @course.account.tap { |a| a.settings[:lock_all_announcements] = { :value => true, :locked => true }; a.save! }
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
@@ -2234,10 +2231,7 @@ describe DiscussionTopic do
   describe "update_order" do
     it "handles existing null positions" do
       topics = (1..4).map { discussion_topic_model(pinned: true) }
-      topics.each { |x|
-        x.position = nil
-        x.save
-      }
+      topics.each { |x| x.position = nil; x.save }
 
       new_order = [2, 3, 4, 1]
       ids = new_order.map { |x| topics[x - 1].id }
@@ -2585,7 +2579,7 @@ describe DiscussionTopic do
       @attachment.podcast_associated_asset = @topic
 
       rss = DiscussionTopic.to_podcast([@attachment])
-      expect(rss.first.enclosure.url).to match(/download.mp4/)
+      expect(rss.first.enclosure.url).to match(%r{download.mp4})
     end
   end
 
@@ -2603,7 +2597,7 @@ describe DiscussionTopic do
         end
 
         it "properly sorts collections by delayed_post_at and posted_at" do
-          anns = Array.new(10) do |i|
+          anns = 10.times.map do |i|
             ann = new_ann.call
             setter = [:delayed_post_at=, :posted_at=][i % 2]
             ann.send(setter, i.days.ago)
@@ -2675,7 +2669,7 @@ describe DiscussionTopic do
     end
 
     it "without custom opts" do
-      group_discussion_assignment # Discussion has title "topic"
+      group_discussion_assignment() # Discussion has title "topic"
       @topic.podcast_has_student_posts = true
       new_topic = @topic.duplicate({ :user => @teacher })
       expect(new_topic.title).to eql "topic Copy"
@@ -2698,7 +2692,7 @@ describe DiscussionTopic do
     end
 
     it "respect provided user" do
-      discussion_topic_model
+      discussion_topic_model()
       @topic.save!
       new_topic = @topic.duplicate({ :user => @student })
       expect(new_topic.user_id).to eq @student.id

@@ -56,8 +56,6 @@ module MicrosoftSync
     STATSD_NAME = 'microsoft_sync.syncer_steps'
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
-    STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS = \
-      "#{STATSD_NAME}.deleted_mappings_for_missing_users"
 
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
@@ -164,7 +162,9 @@ module MicrosoftSync
       # data in case it was never done.
       new_group_id = remote_ids.first
 
-      new_group_id ||= graph_service_helpers.create_education_class(course)['id']
+      unless new_group_id
+        new_group_id = graph_service_helpers.create_education_class(course)['id']
+      end
 
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id
@@ -209,7 +209,7 @@ module MicrosoftSync
       # looking up the same ULUV multiple times; but this should be very rare
       users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
         uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(remote_attr, slice.map(&:last))
-        user_id_to_aad = slice.to_h.transform_values { |uluv| uluv_to_aad[uluv] }.compact
+        user_id_to_aad = slice.map { |user_id, uluv| [user_id, uluv_to_aad[uluv]] }.to_h.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
         # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.
@@ -234,12 +234,12 @@ module MicrosoftSync
       retry_object_for_error(e)
     end
 
-    def log_batch_skipped(type, change_result)
-      return if change_result.blank?
+    def log_batch_skipped(type, users)
+      return unless users # GraphService batch functions return nil if all succesful
 
-      n_total = change_result.total_unsuccessful
+      n_total = users.values.map(&:length).sum
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
-                        "Skipping #{type} for #{n_total}: #{change_result.to_json}")
+                        "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
                                    tags: { sync_type: sync_type })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
@@ -292,22 +292,12 @@ module MicrosoftSync
       raise
     end
 
-    def delete_mappings_if_users_missing(change_result)
-      bad_aads = change_result&.nonexistent_user_ids
-      if bad_aads.present?
-        Rails.logger.warn "Deleting mappings for AADs: #{bad_aads}"
-        InstStatsd::Statsd.count(STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS, bad_aads.count)
-        UserMapping.where(root_account_id: course.root_account_id, aad_id: bad_aads).delete_all
-      end
-    end
-
     def execute_diff_add_users(diff)
-      diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        change_result = graph_service.groups.add_users_ignore_duplicates(
+      diff.additions_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+        skipped = graph_service.add_users_to_group_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:add, change_result)
-        delete_mappings_if_users_missing(change_result)
+        log_batch_skipped(:add, skipped)
       end
     rescue Errors::MembersQuotaExceeded
       raise_and_disable_group(MaxMemberEnrollmentsReached)
@@ -316,17 +306,17 @@ module MicrosoftSync
     end
 
     def execute_diff_remove_users(diff)
-      diff.removals_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        change_result = graph_service.groups.remove_users_ignore_missing(
+      diff.removals_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+        skipped = graph_service.remove_group_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:remove, change_result)
+        log_batch_skipped(:remove, skipped)
       end
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)
       if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
-          && !graph_service.teams.team_exists?(group.ms_group_id)
+        && !graph_service.team_exists?(group.ms_group_id)
         StateMachineJob::DelayedNextStep.new(:step_create_team, DELAY_BEFORE_CREATE_TEAM)
       else
         StateMachineJob::COMPLETE
@@ -336,7 +326,7 @@ module MicrosoftSync
     end
 
     def step_create_team(_mem_data, _job_state_data)
-      graph_service.teams.create_for_education_class(group.ms_group_id)
+      graph_service.create_education_class_team(group.ms_group_id)
       StateMachineJob::COMPLETE
     rescue MicrosoftSync::Errors::TeamAlreadyExists
       StateMachineJob::COMPLETE

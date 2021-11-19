@@ -34,7 +34,7 @@ class ContentExport < ActiveRecord::Base
 
   attr_writer :master_migration
 
-  validates :context_id, :workflow_state, presence: true
+  validates_presence_of :context_id, :workflow_state
 
   has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 
@@ -197,11 +197,11 @@ class ContentExport < ActiveRecord::Base
       if @cc_exporter.export
         self.progress = 100
         self.job_progress.try :complete!
-        self.workflow_state = if for_course_copy?
-                                'exported_for_course_copy'
-                              else
-                                'exported'
-                              end
+        if for_course_copy?
+          self.workflow_state = 'exported_for_course_copy'
+        else
+          self.workflow_state = 'exported'
+        end
       else
         mark_failed
       end
@@ -328,7 +328,7 @@ class ContentExport < ActiveRecord::Base
         @cc_exporter = CC::CCExporter.new(self)
       end
 
-      if @cc_exporter&.export
+      if @cc_exporter && @cc_exporter.export
         self.update(
           export_type: QUIZZES2
         )
@@ -481,11 +481,11 @@ class ContentExport < ActiveRecord::Base
 
   def selective_export?
     if @selective_export.nil?
-      @selective_export = if for_master_migration?
-                            (settings[:master_migration_type] == :selective)
-                          else
-                            !(selected_content.empty? || is_set?(selected_content[:everything]))
-                          end
+      if for_master_migration?
+        @selective_export = (settings[:master_migration_type] == :selective)
+      else
+        @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      end
     end
     @selective_export
   end
@@ -521,7 +521,9 @@ class ContentExport < ActiveRecord::Base
     else
       self.settings[:errors] << [user_message, exception_or_info]
     end
-    self.content_migration&.add_issue(user_message, :error, error_report_id: er)
+    if self.content_migration
+      self.content_migration.add_issue(user_message, :error, error_report_id: er)
+    end
   end
 
   def root_account
@@ -544,10 +546,10 @@ class ContentExport < ActiveRecord::Base
   end
 
   def fast_update_progress(val)
-    content_migration&.update_conversion_progress(val)
+    content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress => val)
-    if EpubExport.where(content_export_id: self.id).exists?
+    if EpubExport.exists?(content_export_id: self.id)
       self.epub_export.update_progress_from_content_export!(val)
     end
     self.job_progress.try(:update_completion!, val)
@@ -571,7 +573,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
-  scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
+  scope :not_for_copy, -> { where("content_exports.export_type NOT IN (?)", [COURSE_COPY, MASTER_COURSE_COPY]) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
   scope :qti, -> { where(export_type: QTI) }
   scope :quizzes2, -> { where(export_type: QUIZZES2) }
@@ -599,6 +601,6 @@ class ContentExport < ActiveRecord::Base
   private
 
   def is_set?(option)
-    Canvas::Plugin.value_to_boolean option
+    Canvas::Plugin::value_to_boolean option
   end
 end

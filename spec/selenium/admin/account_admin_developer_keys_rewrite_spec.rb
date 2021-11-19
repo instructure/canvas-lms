@@ -263,7 +263,7 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      unless Rails.root.join('lib/api_scope_mapper.rb').file?
+      unless File.exist?(Rails.root.join('lib/api_scope_mapper.rb'))
         before do
           stub_const("ApiScopeMapper", Class.new do
             def self.lookup_resource(controller, _action)

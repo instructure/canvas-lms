@@ -124,7 +124,7 @@ class GradeSummaryPresenter
   end
 
   def student
-    @student ||= student_enrollment&.user
+    @student ||= (student_enrollment && student_enrollment.user)
   end
 
   def student_name
@@ -152,7 +152,7 @@ class GradeSummaryPresenter
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup
       .visible_assignments(student, @context, all_groups, includes: includes)
-      .where.not(submission_types: %w[not_graded wiki_page])
+      .where.not(submission_types: %w(not_graded wiki_page))
       .except(:order)
   end
 
