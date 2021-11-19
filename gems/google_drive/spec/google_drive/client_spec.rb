@@ -47,6 +47,12 @@ describe GoogleDrive::Client do
     expect(client.authorization.access_token).to eq 'access_token'
   end
 
+  it 'creates a new Google API client with the proper scopes' do
+    expect(described_class.create(client_secrets).authorization.scope).to match_array(
+      ['https://www.googleapis.com/auth/drive.appdata', 'https://www.googleapis.com/auth/drive.file']
+    )
+  end
+
   it 'auth_uri handles all params being passed in' do
     client = described_class.create(client_secrets, nil, 'access_token')
 
