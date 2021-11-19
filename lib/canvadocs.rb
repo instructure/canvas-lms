@@ -368,9 +368,10 @@ module Canvadocs
         type = 'anonymous'
         name = submission.anonymous_identities.dig(user.id, :name)
       else
-        id = user.global_id.to_s
+        filter_user = submission.observer?(user) ? submission.user : user
+        id = filter_user.global_id.to_s
         type = 'real'
-        name = canvadocs_user_name(user)
+        name = canvadocs_user_name(filter_user)
       end
 
       { id: id, type: type, role: role, name: name }

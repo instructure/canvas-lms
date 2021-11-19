@@ -181,6 +181,26 @@ describe Canvadocs do
             end
           end
 
+          context "when an observer is viewing" do
+            before do
+              course_with_observer(
+                course: @course,
+                associated_user_id: student.id,
+                active_all: true,
+                active_cc: true
+              )
+              user_session(@observer)
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the observed student in the user_filter" do
+              expect(user_filter).to match [student_real_data]
+            end
+          end
+
           context "when a peer reviewer is viewing" do
             before do
               @current_user = peer_reviewer

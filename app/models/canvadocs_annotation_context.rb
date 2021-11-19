@@ -46,6 +46,11 @@ class CanvadocsAnnotationContext < ApplicationRecord
     given { |user| user && !draft? && submission.peer_reviewer?(user) }
     can :read
 
+    # observers can see non-draft attempts of their observed student, but
+    # cannot make annotations.
+    given { |user| user && !draft? && submission.observer?(user) }
+    can :read
+
     # users with permission to grade the submission OR provisional graders for a moderated
     # assignment can see and make annotations on non-draft attempts.
     given do |user|

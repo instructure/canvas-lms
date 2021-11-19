@@ -505,6 +505,14 @@ class Submission < ActiveRecord::Base
     can :view_vericite_report
   end
 
+  def observer?(user)
+    self.assignment.context.observer_enrollments.where(
+      user_id: user.id,
+      associated_user_id: self.user.id,
+      workflow_state: 'active'
+    ).exists?
+  end
+
   def peer_reviewer?(user)
     self.assignment.published? &&
       self.assignment.peer_reviews &&
