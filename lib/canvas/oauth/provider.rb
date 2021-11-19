@@ -52,9 +52,7 @@ module Canvas::OAuth
       self.class.is_oob?(redirect_uri) || key.redirect_domain_matches?(redirect_uri)
     end
 
-    def icon_url
-      key.icon_url
-    end
+    delegate :icon_url, to: :key
 
     def key
       return nil unless client_id_is_valid?

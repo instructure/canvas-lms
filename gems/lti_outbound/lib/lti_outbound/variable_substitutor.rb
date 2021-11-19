@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "active_support/core_ext/module/delegation"
+
 module LtiOutbound
   class VariableSubstitutor
     attr_accessor :substitutions
@@ -41,9 +43,7 @@ module LtiOutbound
       data_hash
     end
 
-    def key?(key)
-      substitutions.key? key
-    end
+    delegate :key?, to: :substitutions
     alias_method :has_key?, :key?
 
     private

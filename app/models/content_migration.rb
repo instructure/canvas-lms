@@ -871,9 +871,7 @@ class ContentMigration < ActiveRecord::Base
     html_converter.convert_text(*args)
   end
 
-  def resolve_content_links!
-    html_converter.resolve_content_links!
-  end
+  delegate :resolve_content_links!, to: :html_converter
 
   def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
     add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",

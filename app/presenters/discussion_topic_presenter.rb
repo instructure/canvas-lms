@@ -91,9 +91,7 @@ class DiscussionTopicPresenter
   # Public: Determine if comment feature is disabled for the context/announcement.
   #
   # Returns a boolean.
-  def comments_disabled?
-    topic.comments_disabled?
-  end
+  delegate :comments_disabled?, to: :topic
 
   # Public: Determine if the discussion's context has a large roster flag set.
   #

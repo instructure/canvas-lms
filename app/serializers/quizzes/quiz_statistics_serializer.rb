@@ -143,9 +143,7 @@ module Quizzes
       object[:student_analysis].includes_sis_ids
     end
 
-    def points_possible
-      quiz.points_possible
-    end
+    delegate points_possible: :quiz
 
     def anonymous_survey
       quiz.anonymous_survey?

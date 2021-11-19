@@ -58,9 +58,7 @@ class CourseSection < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
-  def account
-    course.account
-  end
+  delegate :account, to: :course
 
   def validate_section_dates
     if start_at.present? && end_at.present? && end_at < start_at
@@ -123,9 +121,7 @@ class CourseSection < ActiveRecord::Base
     ps
   end
 
-  def available?
-    course.available?
-  end
+  delegate :available?, to: :course
 
   def concluded?
     now = Time.now

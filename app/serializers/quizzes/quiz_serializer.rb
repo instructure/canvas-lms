@@ -59,9 +59,7 @@ module Quizzes
                    :course_quiz_quiz_submissions_url,
                    :course_quiz_submission_versions_url
 
-    def context
-      quiz.context
-    end
+    delegate context: :quiz
 
     def_delegators :@quiz, :quiz_questions
 
@@ -270,9 +268,7 @@ module Quizzes
       quiz.require_lockdown_browser_monitor?
     end
 
-    def lockdown_browser_monitor_data
-      quiz.lockdown_browser_monitor_data
-    end
+    delegate lockdown_browser_monitor_data: :quiz
 
     def serializable_object(**)
       hash = super

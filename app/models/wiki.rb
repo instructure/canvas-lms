@@ -141,9 +141,7 @@ class Wiki < ActiveRecord::Base
     context.class.to_s
   end
 
-  def context_id
-    context.id
-  end
+  delegate :id, to: :context, prefix: true
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :read) }

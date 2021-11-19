@@ -2439,11 +2439,7 @@ class Course < ActiveRecord::Base
     User.file_structure_for(self, user)
   end
 
-  def turnitin_settings
-    # check if somewhere up the account chain turnitin is enabled and
-    # has valid settings
-    account.turnitin_settings
-  end
+  delegate :turnitin_settings, to: :account
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge

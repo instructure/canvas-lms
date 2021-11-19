@@ -1398,9 +1398,7 @@ class Assignment < ActiveRecord::Base
   end
   protected :process_if_quiz
 
-  def grading_scheme
-    grading_standard_or_default.grading_scheme
-  end
+  delegate :grading_scheme, to: :grading_standard_or_default
 
   def infer_grading_type
     self.grading_type = nil if self.grading_type.blank?

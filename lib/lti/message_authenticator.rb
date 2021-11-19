@@ -38,9 +38,7 @@ module Lti
       end
     end
 
-    def message
-      lti_message_authenticator.message
-    end
+    delegate :message, to: :lti_message_authenticator
 
     private
 
