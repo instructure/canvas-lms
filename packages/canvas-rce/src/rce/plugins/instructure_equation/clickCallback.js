@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function (ed, document) {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import formatMessage from '../../../format-message'
+
+export default function (ed, document, _trayProps) {
+  return import('./EquationEditorModal').then(module => {
+    const EquationEditorModal = module.default
+    let container = document.querySelector('.canvas-rce-equation-container')
+    if (!container) {
+      container = document.createElement('div')
+      container.className = 'canvas-rce-equation-container'
+      document.body.appendChild(container)
+    }
+
+    const handleDismiss = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus(false)
+    }
+
+    ReactDOM.render(
+      <EquationEditorModal
+        editor={ed}
+        label={formatMessage('Equation Editor')}
+        onModalDismiss={handleDismiss}
+        onModalClose={handleDismiss}
+      />,
+      container
+    )
+  })
+}
+
+export function oldClickCallback(ed, document) {
   const ev = document.createEvent('CustomEvent')
   ev.initCustomEvent('tinyRCE/initEquation', true, true, {ed})
   document.dispatchEvent(ev)
