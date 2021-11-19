@@ -806,16 +806,16 @@ describe User do
         observer_enrollment2.save!
 
         @teacher_course = course_factory(:course_name => "English ", :active_course => true)
-        teacher_entollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
-        teacher_entollment.save!
+        teacher_enrollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+        teacher_enrollment.save!
 
         @student_course = course_factory(:course_name => "Leadership", :active_course => true)
-        teacher_entollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-        teacher_entollment.save!
+        student_enrollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+        student_enrollment.save!
       end
 
       it "returns observed courses related to the associated_user" do
-        expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student.id)
+        expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student)
         .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
           [@observer_course2.id, 'ObserverEnrollment'],
           [@observer_course.id, 'ObserverEnrollment']
@@ -824,11 +824,38 @@ describe User do
 
       it "returns only own courses if the associated_user is the current user" do
         expect(@observer
-        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer.id)
+        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer)
         .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
           [@teacher_course.id, 'TeacherEnrollment'],
           [@student_course.id, 'StudentEnrollment']
         ]
+      end
+
+      describe "with cross sharding" do
+        specs_require_sharding
+
+        before(:once) do
+          @shard2.activate do
+            account = Account.create!
+            course_with_teacher(account: account, active_all: true)
+
+            observer_enrollment = @observer_course.enroll_user(@teacher, 'ObserverEnrollment', :enrollment_state => 'active')
+            observer_enrollment.associated_user_id = @student.id
+            observer_enrollment.save!
+          end
+        end
+
+        it "returns the user's courses across shards when they are the observee" do
+          own_courses = @teacher.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @teacher)
+          expect(own_courses.count).to be 1
+          expect(own_courses.first.id).to be @course.id
+        end
+
+        it "returns the observer's courses across shards when observing someone else" do
+          observed_courses = @teacher.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student)
+          expect(observed_courses.count).to be 1
+          expect(observed_courses.first.id).to be @observer_course.id
+        end
       end
     end
 
