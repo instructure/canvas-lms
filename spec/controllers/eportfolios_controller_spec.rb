@@ -116,21 +116,33 @@ describe EportfoliosController do
   describe "GET 'show'" do
     before(:once) { eportfolio }
 
-    it "requires authorization if the eportfolio is not public" do
-      get 'show', params: { :id => @portfolio.id }
-      assert_unauthorized
+    describe "without being logged in" do
+      it "complains if the eportfolio is not public" do
+        get 'show', params: { :id => @portfolio.id }
+        assert_unauthorized
+      end
+
+      it "complains if portfolio is public but eportfolios are disabled" do
+        a = Account.default
+        a.settings[:enable_eportfolios] = false
+        a.save
+        @portfolio.public = true
+        @portfolio.save!
+        get "show", params: { id: @portfolio.id }
+        assert_unauthorized
+      end
+
+      it "complains if portfolio is not public and eportfolios are disabled" do
+        a = Account.default
+        a.settings[:enable_eportfolios] = false
+        a.save
+        course_with_student_logged_in(:active_all => true, :user => @user)
+        get 'show', params: { :id => @portfolio.id }
+        assert_unauthorized
+      end
     end
 
-    it "complains if eportfolios are disabled" do
-      a = Account.default
-      a.settings[:enable_eportfolios] = false
-      a.save
-      course_with_student_logged_in(:active_all => true, :user => @user)
-      get 'show', params: { :id => @portfolio.id }
-      assert_unauthorized
-    end
-
-    describe "with authorized user" do
+    describe "with an authorized user" do
       before { user_session(@user) }
 
       it "shows portfolio" do
