@@ -156,10 +156,10 @@ module Lti
       end
 
       def payload
-        @payload ||= (
+        @payload ||= begin
           request.body.rewind
           request.body.read
-        )
+        end
       end
 
       def tp_validator(tcp_uuid: nil)

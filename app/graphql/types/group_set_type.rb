@@ -69,9 +69,11 @@ module Types
         # this permission matches the REST api, but is probably too strict.
         # students are able to see groups in the canvas ui, so probably should
         # be able to see them here too
-        set.context.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS) ?
-          set.groups.active.by_name :
+        if set.context.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+          set.groups.active.by_name
+        else
           nil
+        end
       }
     end
 

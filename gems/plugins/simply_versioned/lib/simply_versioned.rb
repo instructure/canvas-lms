@@ -217,9 +217,11 @@ module SimplyVersioned
     # on the before_save to see if the changes are worth
     # creating a new version for
     def check_if_changes_are_worth_versioning
-      @changes_are_worth_versioning = simply_versioned_options[:when] ?
-        simply_versioned_options[:when].call(self) :
-        (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
+      @changes_are_worth_versioning = if simply_versioned_options[:when]
+                                        simply_versioned_options[:when].call(self)
+                                      else
+                                        (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
+                                      end
       true
     end
 

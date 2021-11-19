@@ -137,7 +137,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     data
   end
 
-  def assessment_question= aq
+  def assessment_question=(aq)
     self.assessment_question_version = aq.version_number
     super aq
   end

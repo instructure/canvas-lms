@@ -238,11 +238,11 @@ class SubmissionsController < SubmissionsBaseController
 
     return unless valid_text_entry?
 
-    return unless process_api_submission_params if api_request?
+    return if api_request? && !process_api_submission_params
 
     lookup_existing_attachments
 
-    return unless verify_api_call_has_attachment if api_request?
+    return if api_request? && !verify_api_call_has_attachment
 
     unless api_request?
       if online_upload?

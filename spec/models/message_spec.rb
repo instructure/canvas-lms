@@ -759,7 +759,7 @@ describe Message do
       queued = Message.new(id: -1, created_at: Time.zone.now).for_queue
       begin
         queued.deliver
-        raise RuntimeError, "#deliver should have failed because this message does not exist"
+        raise "#deliver should have failed because this message does not exist"
       rescue Delayed::RetriableError => e
         expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
       end

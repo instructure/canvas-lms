@@ -20,7 +20,7 @@
 
 class StudentEnrollment < Enrollment
   belongs_to :student, :foreign_key => :user_id, :class_name => 'User'
-  after_save :evaluate_modules, if: Proc.new { |e|
+  after_save :evaluate_modules, if: proc { |e|
     # if enrollment switches sections or is created
     e.saved_change_to_course_section_id? || e.saved_change_to_course_id? ||
       # or if an enrollment is deleted and they are in another section of the course

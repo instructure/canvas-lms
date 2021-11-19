@@ -97,12 +97,16 @@ class ContentParticipationCount < ActiveRecord::Base
                                        SQL
         (subs_with_grades + subs_with_comments).uniq
       end
-      already_read_count = potential_ids.any? ? ContentParticipation.where(
-        :content_type => "Submission",
-        :content_id => potential_ids,
-        :user_id => user,
-        :workflow_state => "read"
-      ).count : 0
+      already_read_count = if potential_ids.any?
+                             ContentParticipation.where(
+                               :content_type => "Submission",
+                               :content_id => potential_ids,
+                               :user_id => user,
+                               :workflow_state => "read"
+                             ).count
+                           else
+                             0
+                           end
       potential_ids.size - already_read_count
     end
   end

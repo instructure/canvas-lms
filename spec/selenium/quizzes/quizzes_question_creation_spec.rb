@@ -468,7 +468,7 @@ describe 'quizzes question creation' do
       @quiz = @course.quizzes.create!(title: 'new quiz')
     end
 
-    def create_quiz_question question_data
+    def create_quiz_question(question_data)
       @quiz.quiz_questions.create!(question_data: question_data)
 
       @quiz.generate_quiz_data

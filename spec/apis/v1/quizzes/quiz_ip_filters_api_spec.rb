@@ -80,7 +80,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       it 'paginates' do
         account_filters = {}
 
-        for i in 1..40 do
+        (1..40).each do |i|
           account_filters["Filter #{i}"] = "192.168.1.#{i}"
         end
 

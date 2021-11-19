@@ -53,8 +53,11 @@ module Api::V1::AssignmentGroup
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
 
-      needs_grading_course_proxy = group.context.grants_right?(user, session, :manage_grades) ?
-        Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user) : nil
+      needs_grading_course_proxy = if group.context.grants_right?(user, session, :manage_grades)
+                                     Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user)
+                                   else
+                                     nil
+                                   end
 
       unless includes.include?('module_ids') || group.context.grants_right?(user, session, :read_as_admin)
         Assignment.preload_context_module_tags(assignments) # running this again is fine

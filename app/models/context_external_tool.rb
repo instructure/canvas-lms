@@ -1009,8 +1009,12 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   scope :having_setting, lambda { |setting|
-                           setting ? joins(:context_external_tool_placements)
-                             .where(context_external_tool_placements: { placement_type: setting }) : all
+                           if setting
+                             joins(:context_external_tool_placements)
+                               .where(context_external_tool_placements: { placement_type: setting })
+                           else
+                             all
+                           end
                          }
 
   scope :placements, lambda { |*placements|

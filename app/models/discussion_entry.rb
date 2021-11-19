@@ -626,9 +626,11 @@ class DiscussionEntry < ActiveRecord::Base
   # instead.
   def find_existing_participant(user)
     user_id = user.is_a?(User) ? user.id : user
-    participant = discussion_entry_participants.loaded? ?
-      discussion_entry_participants.detect { |dep| dep.user_id == user_id } :
-      discussion_entry_participants.where(:user_id => user_id).first
+    participant = if discussion_entry_participants.loaded?
+                    discussion_entry_participants.detect { |dep| dep.user_id == user_id }
+                  else
+                    discussion_entry_participants.where(:user_id => user_id).first
+                  end
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({

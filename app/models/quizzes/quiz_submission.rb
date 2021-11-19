@@ -907,9 +907,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # @return [Relation]
   #   The QS Relation, for the participant.
   def self.for_participant(participant)
-    participant.anonymous? ?
-        where(temporary_user_code: participant.user_code) :
-        where(user_id: participant.user.id)
+    if participant.anonymous?
+      where(temporary_user_code: participant.user_code)
+    else
+      where(user_id: participant.user.id)
+    end
   end
 
   def ensure_question_reference_integrity!

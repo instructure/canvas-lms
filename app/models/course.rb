@@ -859,14 +859,18 @@ class Course < ActiveRecord::Base
           (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)", Time.now.utc, Time.now.utc)
   }
   scope :by_teachers, lambda { |teacher_ids|
-    teacher_ids.empty? ?
-      none :
+    if teacher_ids.empty?
+      none
+    else
       where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
+    end
   }
   scope :by_associated_accounts, lambda { |account_ids|
-    account_ids.empty? ?
-      none :
+    if account_ids.empty?
+      none
+    else
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
+    end
   }
   scope :published, -> { where(workflow_state: %w[available completed]) }
   scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
@@ -3703,7 +3707,7 @@ class Course < ActiveRecord::Base
   end
 
   %w[student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation].each do |method|
-    class_eval <<~RUBY
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{method}
         read_attribute(:#{method}) || @#{method}
       end

@@ -81,7 +81,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
 
   def all_guards
     guards = []
-    for i in 3..8
+    (3..8).each do |i|
       param = statement.parameters[i]
       next unless param
 
@@ -145,9 +145,9 @@ module DocWriter
   end
 
   def self.markdown_file
-    @markdown_file ||= (
+    @markdown_file ||= begin
       IO.copy_stream('doc/api/tools_variable_substitutions.head.md', 'doc/api/tools_variable_substitutions.md')
       true
-    )
+    end
   end
 end

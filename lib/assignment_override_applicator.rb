@@ -64,9 +64,11 @@ module AssignmentOverrideApplicator
             result_assignment_or_quiz.without_overrides.due_at,
             result_assignment_or_quiz.due_at
           ]
-          potential_due_dates.include?(nil) ?
-            nil :
+          if potential_due_dates.include?(nil)
+            nil
+          else
             potential_due_dates.max
+          end
         end
     end
 

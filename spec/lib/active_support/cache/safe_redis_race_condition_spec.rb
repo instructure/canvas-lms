@@ -19,6 +19,7 @@
 
 require_relative "../../../spec_helper"
 
+# rubocop:disable Style/RedundantFetchBlock it's a cachestore, not a Hash
 describe ActiveSupport::Cache::SafeRedisRaceCondition do
   before do
     skip unless Canvas.redis_enabled?
@@ -104,3 +105,4 @@ describe ActiveSupport::Cache::SafeRedisRaceCondition do
     end
   end
 end
+# rubocop:enable Style/RedundantFetchBlock

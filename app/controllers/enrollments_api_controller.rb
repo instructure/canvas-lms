@@ -422,11 +422,17 @@ class EnrollmentsApiController < ApplicationController
   # @returns [Enrollment]
   def index
     GuardRail.activate(:secondary) do
-      endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
+      endpoint_scope = if @context.is_a?(Course)
+                         @section.present? ? "section" : "course"
+                       else
+                         "user"
+                       end
 
-      return unless (enrollments = @context.is_a?(Course) ?
-                                    course_index_enrollments :
-                                    user_index_enrollments)
+      return unless (enrollments = if @context.is_a?(Course)
+                                     course_index_enrollments
+                                   else
+                                     user_index_enrollments
+                                   end)
 
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
@@ -678,9 +684,11 @@ class EnrollmentsApiController < ApplicationController
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     end
 
-    @enrollment.valid? ?
-      render(:json => enrollment_json(@enrollment, @current_user, session)) :
+    if @enrollment.valid?
+      render(:json => enrollment_json(@enrollment, @current_user, session))
+    else
       render(:json => @enrollment.errors, :status => :bad_request)
+    end
   end
 
   def create_self_enrollment

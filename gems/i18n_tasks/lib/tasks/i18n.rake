@@ -164,7 +164,7 @@ namespace :i18n do
   desc "Generate the pseudo-translation file lolz"
   task :generate_lolz => [:generate, :environment] do
     strings_processed = 0
-    process_lolz = Proc.new do |val|
+    process_lolz = proc do |val|
       case val
       when Hash
         processed = strings_processed
@@ -283,11 +283,13 @@ namespace :i18n do
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
-      new_strings = last_export[:data] ?
-        current_strings.each_with_object({}) { |(k, v), h|
-          h[k] = v unless last_export[:data][k] == v
-        } :
-        current_strings
+      new_strings = if last_export[:data]
+                      current_strings.each_with_object({}) { |(k, v), h|
+                        h[k] = v unless last_export[:data][k] == v
+                      }
+                    else
+                      current_strings
+                    end
       File.open(export_filename, "w") { |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
 
       push = 'n'

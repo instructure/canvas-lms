@@ -74,7 +74,7 @@ module Canvas
           @raised_error = nil
           begin
             begin
-              raise RuntimeError, "FOO"
+              raise "FOO"
             rescue RuntimeError
               raise ArgumentError, "Test Message"
             end

@@ -30,9 +30,11 @@ describe Api::V1::QuizSubmissionQuestion do
     factory = method(:"#{type}_question_data")
 
     # can't test for #arity directly since it might be an optional parameter
-    data = factory.parameters.include?([:opt, :options]) ?
-    factory.call(factory_options) :
-    factory.call
+    data = if factory.parameters.include?([:opt, :options])
+             factory.call(factory_options)
+           else
+             factory.call
+           end
 
     data = data.except('id', 'assessment_question_id')
 

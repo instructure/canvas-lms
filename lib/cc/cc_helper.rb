@@ -263,7 +263,7 @@ module CC
             end
           end
         end
-        wiki_handler = Proc.new do |match|
+        wiki_handler = proc do |match|
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id

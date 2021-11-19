@@ -153,7 +153,7 @@ module ActiveSupport::Callbacks
           env = Filters::Environment.new(self, false, nil)
           next_sequence = callbacks.compile
 
-          invoke_sequence = Proc.new do
+          invoke_sequence = proc do
             skipped = nil
             while true
               current = next_sequence

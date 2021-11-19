@@ -1855,9 +1855,11 @@ class ApplicationController < ActionController::Base
         @assignment = @tag.context
 
         @resource_title = @assignment.title
-        @module_tag = params[:module_item_id] ?
-          @context.context_module_tags.not_deleted.find(params[:module_item_id]) :
-          @assignment.context_module_tags.first
+        @module_tag = if params[:module_item_id]
+                        @context.context_module_tags.not_deleted.find(params[:module_item_id])
+                      else
+                        @assignment.context_module_tags.first
+                      end
       else
         @module_tag = @tag
         @resource_title = @tag.title
@@ -2058,9 +2060,13 @@ class ApplicationController < ActionController::Base
       options[:query].merge({
         :controller => 'files',
         :action => "full_index",
-      }.merge(options[:anchor].empty? ? {} : {
-                :anchor => options[:anchor]
-              }))
+      }.merge(if options[:anchor].empty?
+                {}
+              else
+                {
+                  :anchor => options[:anchor]
+                }
+              end))
     )
   end
   helper_method :calendar_url_for, :files_url_for
@@ -2280,13 +2286,17 @@ class ApplicationController < ActionController::Base
   def find_bank(id, check_context_chain = true)
     bank = @context.assessment_question_banks.active.where(id: id).first || @current_user.assessment_question_banks.active.where(id: id).first
     if bank
-      (block_given? ?
-        authorized_action(bank, @current_user, :read) :
-        bank.grants_right?(@current_user, session, :read)) or return nil
+      (if block_given?
+         authorized_action(bank, @current_user, :read)
+       else
+         bank.grants_right?(@current_user, session, :read)
+       end) or return nil
     elsif check_context_chain
-      (block_given? ?
-        authorized_action(@context, @current_user, :read_question_banks) :
-        @context.grants_right?(@current_user, session, :read_question_banks)) or return nil
+      (if block_given?
+         authorized_action(@context, @current_user, :read_question_banks)
+       else
+         @context.grants_right?(@current_user, session, :read_question_banks)
+       end) or return nil
       bank = @context.inherited_assessment_question_banks.where(id: id).first
     end
 
@@ -2681,10 +2691,16 @@ class ApplicationController < ActionController::Base
              :HAS_GRADING_PERIODS => @context.grading_periods?,
              :VALID_DATE_RANGE => CourseDateRange.new(@context),
              :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
-             :assignment_index_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
-        external_tools_display_hashes(:assignment_index_menu) : []),
-             :assignment_group_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
-        external_tools_display_hashes(:assignment_group_menu) : []),
+             :assignment_index_menu_tools => (if @domain_root_account&.feature_enabled?(:commons_favorites)
+                                                external_tools_display_hashes(:assignment_index_menu)
+                                              else
+                                                []
+                                              end),
+             :assignment_group_menu_tools => (if @domain_root_account&.feature_enabled?(:commons_favorites)
+                                                external_tools_display_hashes(:assignment_group_menu)
+                                              else
+                                                []
+                                              end),
              :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
              :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
              :current_user_has_been_observer_in_this_course => current_user_has_been_observer_in_this_course,

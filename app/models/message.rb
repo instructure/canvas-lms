@@ -566,7 +566,7 @@ class Message < ActiveRecord::Base
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = ActionView::OutputBuffer.new
     inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, :bufvar => '@output_buffer').src, binding, template_path)
-    setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding
+    setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding, __FILE__, __LINE__
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')

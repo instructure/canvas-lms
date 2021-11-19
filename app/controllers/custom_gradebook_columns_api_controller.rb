@@ -77,9 +77,11 @@ class CustomGradebookColumnsApiController < ApplicationController
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
-      scope = value_to_boolean(params[:include_hidden]) ?
-        @context.custom_gradebook_columns.not_deleted :
-        @context.custom_gradebook_columns.active
+      scope = if value_to_boolean(params[:include_hidden])
+                @context.custom_gradebook_columns.not_deleted
+              else
+                @context.custom_gradebook_columns.active
+              end
       columns = Api.paginate(scope, self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 

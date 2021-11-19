@@ -155,9 +155,11 @@ class OutcomeGroupsApiController < ApplicationController
   def redirect
     return unless can_read_outcomes
 
-    @outcome_group = @context ?
-      @context.root_outcome_group :
-      LearningOutcomeGroup.global_root_outcome_group
+    @outcome_group = if @context
+                       @context.root_outcome_group
+                     else
+                       LearningOutcomeGroup.global_root_outcome_group
+                     end
     redirect_to polymorphic_path [:api_v1, @context || :global, :outcome_group], :id => @outcome_group.id
   end
 

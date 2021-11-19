@@ -167,9 +167,13 @@ module AccountReports::ReportHelper
   end
 
   def term_name
-    term ? term.name : I18n.t(
-      'account_reports.default.all_terms', "All Terms"
-    )
+    if term
+      term.name
+    else
+      I18n.t(
+        'account_reports.default.all_terms', "All Terms"
+      )
+    end
   end
 
   def extra_text_term(account_report = @account_report)

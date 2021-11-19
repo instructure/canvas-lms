@@ -50,9 +50,11 @@ module Types
     field :avatar_url, UrlType, null: true
 
     def avatar_url
-      object.account.service_enabled?(:avatars) ?
-        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false) :
+      if object.account.service_enabled?(:avatars)
+        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+      else
         nil
+      end
     end
 
     field :email, String, null: true

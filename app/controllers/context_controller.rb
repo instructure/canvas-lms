@@ -146,9 +146,11 @@ class ContextController < ApplicationController
   end
 
   def prior_users
-    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
-      :allow_course_admin_actions :
-      :manage_admin_users
+    manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
+                      :allow_course_admin_actions
+                    else
+                      :manage_admin_users
+                    end
     if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
       @prior_users = @context.prior_users
                              .by_top_enrollment.merge(Enrollment.not_fake)

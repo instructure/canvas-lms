@@ -39,7 +39,7 @@ describe "admin settings tab" do
     default_services
   end
 
-  def state_checker checker, check_state
+  def state_checker(checker, check_state)
     if checker
       expect(check_state).to be_truthy
     else
@@ -185,7 +185,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
     end
 
-    def add_quiz_filter name = "www.canvas.instructure.com", value = "192.168.217.1/24"
+    def add_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
       fj("#ip_filters .name[value='']:visible").send_keys name
       fj("#ip_filters .value[value='']:visible").send_keys value
       click_submit

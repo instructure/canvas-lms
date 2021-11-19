@@ -107,7 +107,7 @@ describe UnzipAttachment do
 
     it "updates progress as it goes" do
       progress = nil
-      unzipper.progress_proc = Proc.new { |pct| progress = pct }
+      unzipper.progress_proc = proc { |pct| progress = pct }
       unzipper.process
       expect(progress).not_to be_nil
     end

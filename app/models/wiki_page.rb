@@ -193,7 +193,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   has_a_broadcast_policy
-  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => Proc.new { |wp|
+  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => proc { |wp|
     # always create a version when restoring a deleted page
     next true if wp.workflow_state_changed? && wp.workflow_state_was == 'deleted'
 

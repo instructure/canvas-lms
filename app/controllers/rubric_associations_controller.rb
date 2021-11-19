@@ -79,8 +79,11 @@ class RubricAssociationsController < ApplicationController
   #
   # @returns RubricAssociation
   def update
-    association_params = params[:rubric_association] ?
-      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id) : {}
+    association_params = if params[:rubric_association]
+                           params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id)
+                         else
+                           {}
+                         end
 
     @association = @context.rubric_associations.find(params[:id]) rescue nil
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])

@@ -330,7 +330,7 @@ describe CanvasKaltura::ClientV3 do
     end
 
     it "defaults to video" do
-      expect(@kaltura.mediaTypeToSymbol(rand(10) + 6)).to eq :video
+      expect(@kaltura.mediaTypeToSymbol(rand(6..15))).to eq :video
     end
   end
 

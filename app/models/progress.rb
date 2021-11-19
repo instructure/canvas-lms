@@ -94,7 +94,7 @@ class Progress < ActiveRecord::Base
   # so that you can update the completion percentage on it as the job runs.
   def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
-    method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
+    method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
     work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do

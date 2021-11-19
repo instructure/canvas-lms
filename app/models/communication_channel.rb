@@ -556,7 +556,13 @@ class CommunicationChannel < ActiveRecord::Base
       # or the ones that have NOT been bounced in the last hour, to make sure
       # we aren't doing un-helpful overwork.
       debounce_window = Setting.get("comm_channel_bounce_debounce_window_in_min", "60").to_i
-      bounce_field = suppression_bounce ? "last_suppression_bounce_at" : (permanent_bounce ? "last_bounce_at" : "last_transient_bounce_at")
+      bounce_field = if suppression_bounce
+                       "last_suppression_bounce_at"
+                     elsif permanent_bounce
+                       "last_bounce_at"
+                     else
+                       "last_transient_bounce_at"
+                     end
       bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.minutes.ago)
       bouncable_scope.find_in_batches do |batch|
         update = if suppression_bounce

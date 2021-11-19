@@ -204,16 +204,23 @@ RSpec/StubbedMock:
 Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
+
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
 Style/AndOr:
   Severity: error
+Style/ArrayJoin:
+  Severity: error
 Style/BarePercentLiterals:
+  Severity: error
+Style/BlockComments:
   Severity: error
 Style/CaseEquality:
   Severity: error
 Style/CaseLikeIf:
+  Severity: error
+Style/CharacterLiteral:
   Severity: error
 Style/ClassCheck:
   Severity: error
@@ -229,6 +236,10 @@ Style/Dir:
   Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/EmptyLambdaParameter:
+  Severity: error
+Style/EachForSimpleLoop:
+  Severity: error
 Style/EachWithObject:
   Severity: error
 Style/EmptyCaseCondition:
@@ -241,11 +252,19 @@ Style/ExpandPathArguments:
   Severity: error
 Style/ExplicitBlockArgument:
   Severity: error
+Style/EvalWithLocation:
+  Severity: error
+Style/EvenOdd:
+  Severity: error
+Style/For:
+  Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/HashConversion:
   Severity: error
 Style/HashEachMethods:
+  Severity: error
+Style/HashLikeCase:
   Severity: error
 Style/HashTransformKeys:
   Severity: error
@@ -260,7 +279,17 @@ Style/IfUnlessModifier:
   Enabled: false # can obscure important decisions or put too much code in a line
 Style/IfWithBooleanLiteralBranches:
   Severity: error
+Style/IfUnlessModifierOfIfUnless:
+  Severity: error
+Style/LambdaCall:
+  Severity: error
 Style/MethodCallWithoutArgsParentheses:
+  Severity: error
+Style/MethodDefParentheses:
+  Severity: error
+Style/MultilineMemoization:
+  Severity: error
+Style/MultilineTernaryOperator:
   Severity: error
 Style/MultilineWhenThen:
   Severity: error
@@ -272,16 +301,26 @@ Style/NegatedUnless:
   Severity: error
 Style/NegatedWhile:
   Severity: error
+Style/NestedModifier:
+  Severity: error
 Style/NestedParenthesizedCalls:
   Severity: error
+Style/NestedTernaryOperator:
+  Severity: error
 Style/NilComparison:
+  Severity: error
+Style/NilLambda:
   Severity: error
 Style/NonNilCheck:
   Severity: error
 Style/Not:
   Severity: error
+Style/NumericLiteralPrefix:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
+Style/OneLineConditional:
+  Severity: error
 Style/OrAssignment:
   Severity: error
 Style/ParenthesesAroundCondition:
@@ -295,12 +334,16 @@ Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/PreferredHashMethods:
   Severity: error
+Style/Proc:
+  Severity: error
 Style/QuotedSymbols:
   EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
   Severity: error
-Style/RedundantArgument:
-  Severity: error
 Style/RaiseArgs:
+  Severity: error
+Style/RandomWithOffset:
+  Severity: error
+Style/RedundantArgument:
   Severity: error
 Style/RedundantAssignment:
   Severity: error
@@ -308,11 +351,15 @@ Style/RedundantBegin:
   Severity: error
 Style/RedundantCondition:
   Severity: error
-Style/RedundantInterpolation:
+Style/RedundantException:
+  Severity: error
+Style/RedundantFetchBlock:
   Severity: error
 Style/RedundantFileExtensionInRequire:
   Severity: error
 Style/RedundantFreeze:
+  Severity: error
+Style/RedundantInterpolation:
   Severity: error
 Style/RedundantParentheses:
   Severity: error
@@ -324,6 +371,10 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RedundantSelfAssignment:
+  Severity: error
+Style/RedundantSelfAssignmentBranch:
+  Severity: error
 Style/RedundantSort:
   Severity: error
 Style/RegexpLiteral:
@@ -332,6 +383,8 @@ Style/RescueStandardError:
   EnforcedStyle: implicit
   Severity: error
 Style/SafeNavigation:
+  Severity: error
+Style/SelectByRegexp:
   Severity: error
 Style/SelfAssignment:
   Severity: error
@@ -347,6 +400,8 @@ Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/StringChars:
+  Severity: error
 Style/StructInheritance:
   Severity: error
 Style/SymbolProc:

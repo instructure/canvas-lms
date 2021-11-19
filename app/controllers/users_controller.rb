@@ -817,9 +817,11 @@ class UsersController < ApplicationController
     @query = params[:course].try(:[], :name) || params[:term]
     @courses = []
     Shard.with_each_shard(@context.in_region_associated_shards) do
-      scope = @query.present? ?
-        @context.manageable_courses_by_query(@query, include_concluded) :
-        @context.manageable_courses(include_concluded).limit(limit)
+      scope = if @query.present?
+                @context.manageable_courses_by_query(@query, include_concluded)
+              else
+                @context.manageable_courses(include_concluded).limit(limit)
+              end
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
     end
 
@@ -1974,9 +1976,11 @@ class UsersController < ApplicationController
   def update
     params[:user] ||= {}
     user_params = params[:user]
-    @user = api_request? ?
-      api_find(User, params[:id]) :
-      params[:id] ? api_find(User, params[:id]) : @current_user
+    @user = if api_request?
+              api_find(User, params[:id])
+            else
+              params[:id] ? api_find(User, params[:id]) : @current_user
+            end
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
@@ -3021,8 +3025,11 @@ class UsersController < ApplicationController
     # pre-populate the reverse association
     @pseudonym.user = @user
 
-    pseudonym_params = params[:pseudonym] ?
-      params[:pseudonym].permit(:password, :password_confirmation, :unique_id) : {}
+    pseudonym_params = if params[:pseudonym]
+                         params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
+                       else
+                         {}
+                       end
     # don't require password_confirmation on api calls
     pseudonym_params[:password_confirmation] = pseudonym_params[:password] if api_request?
     # don't allow password setting for new users that are not self-enrolling

@@ -21,7 +21,7 @@ require 'spec_helper'
 
 class MarshalTesting
   def self.const_missing(class_name)
-    class_eval "class #{class_name}; end; #{class_name}"
+    class_eval "class #{class_name}; end; #{class_name}", __FILE__, __LINE__
   end
 end
 

@@ -38,7 +38,7 @@ module I18nTasks
         else
           s = +''
           token.chars.each_with_index do |c, i|
-            s << (i % 2 == 1 ? c.upcase : c.downcase)
+            s << (i.odd? ? c.upcase : c.downcase)
           end
           s.gsub!(/\.( |\z)/, '!!?! ')
           s.sub!(/\A(\w+)\z/, '\1!')

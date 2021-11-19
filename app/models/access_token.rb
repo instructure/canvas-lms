@@ -208,7 +208,7 @@ class AccessToken < ActiveRecord::Base
 
   def url_scopes_for_method(method)
     re = /^url:#{method}\|/
-    scopes.select { |scope| re =~ scope }.map do |scope|
+    scopes.grep(re).map do |scope|
       path = scope.split('|').last
       # build up the scope matching regexp from the route path
       path = path.gsub(%r{:[^/)]+}, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+

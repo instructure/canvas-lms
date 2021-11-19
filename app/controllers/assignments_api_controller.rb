@@ -882,8 +882,11 @@ class AssignmentsApiController < ApplicationController
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
-          Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
+        needs_grading_course_proxy = if @context.grants_right?(user, session, :manage_grades)
+                                       Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user)
+                                     else
+                                       nil
+                                     end
 
         assignment_json(assignment, user, session,
                         submission: submission, override_dates: override_dates,

@@ -50,9 +50,11 @@ module Api::V1::Group
 
     if includes.include?('users')
       group_member_json_limit = Setting.get("group_json_user_cap", "1000").to_i
-      users = group.grants_right?(@current_user, :read_as_admin) ?
-        group.users.order_by_sortable_name.limit(group_member_json_limit).distinct :
-        group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).limit(group_member_json_limit).distinct
+      users = if group.grants_right?(@current_user, :read_as_admin)
+                group.users.order_by_sortable_name.limit(group_member_json_limit).distinct
+              else
+                group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).limit(group_member_json_limit).distinct
+              end
       active_user_ids = nil
       if options[:include_inactive_users]
         active_user_ids = group.participating_users_in_context.pluck('id').to_set

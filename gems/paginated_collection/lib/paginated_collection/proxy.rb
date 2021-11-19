@@ -37,7 +37,7 @@ module PaginatedCollection
     def configure_pager(pager, options)
       raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
 
-      current_page = options.fetch(:page) { nil }
+      current_page = options.fetch(:page, nil)
       current_page = pager.first_page if current_page.nil?
       pager.current_page = current_page
       pager.per_page = options[:per_page]

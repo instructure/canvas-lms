@@ -137,7 +137,11 @@ class ContentImportsController < ApplicationController
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
                                     :migration_type => 'course_copy_importer',
-                                    :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual)
+                                    :initiated_source => if api_request?
+                                                           in_app? ? :api_in_app : :api
+                                                         else
+                                                           :manual
+                                                         end)
       cm.queue_migration
       cm.workflow_state = 'created'
       render :json => copy_status_json(cm, @context, @current_user, session)

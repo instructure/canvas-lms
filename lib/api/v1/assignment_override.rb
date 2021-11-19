@@ -290,9 +290,11 @@ module Api::V1::AssignmentOverride
       override.set = nil
       override.set_type = 'ADHOC'
 
-      defunct_student_ids = override.new_record? ?
-        Set.new :
-        override.assignment_override_students.map(&:user_id).to_set
+      defunct_student_ids = if override.new_record?
+                              Set.new
+                            else
+                              override.assignment_override_students.map(&:user_id).to_set
+                            end
 
       override.changed_student_ids = Set.new
 

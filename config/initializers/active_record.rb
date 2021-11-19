@@ -1460,11 +1460,13 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
 
   def infer_group_by_columns(columns)
     columns.map { |col|
-      col.respond_to?(:columns) ?
-          col.columns.map { |c|
-            "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
-          } :
-          col
+      if col.respond_to?(:columns)
+        col.columns.map { |c|
+          "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
+        }
+      else
+        col
+      end
     }
   end
 end

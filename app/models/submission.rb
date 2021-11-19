@@ -1455,9 +1455,11 @@ class Submission < ActiveRecord::Base
     end
     @just_submitted = (self.submitted? || self.pending_review?) && self.submission_type && (self.new_record? || self.workflow_state_changed? || self.attempt_changed?)
     if score_changed? || grade_changed?
-      self.grade = assignment ?
-        assignment.score_to_grade(score, grade) :
-        score.to_s
+      self.grade = if assignment
+                     assignment.score_to_grade(score, grade)
+                   else
+                     score.to_s
+                   end
     end
 
     self.grade = nil unless self.score
@@ -2413,9 +2415,11 @@ class Submission < ActiveRecord::Base
   # include the versioned_attachments in as_json if this was loaded from a
   # specific version
   def serialization_methods
-    !@without_versioned_attachments && simply_versioned_version_model ?
-      [:versioned_attachments] :
+    if !@without_versioned_attachments && simply_versioned_version_model
+      [:versioned_attachments]
+    else
       []
+    end
   end
 
   # mechanism to turn off the above behavior for the duration of a

@@ -162,9 +162,11 @@ describe ContextModule do
         @quiz_submission.save!
 
         # navigate to the second item (forcing update to progression)
-        next_link = progress_by_item_link ?
-          "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
-          "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
+        next_link = if progress_by_item_link
+                      "/courses/#{@course.id}/modules/items/#{@tag2.id}"
+                    else
+                      "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
+                    end
         get next_link
         expect(response).to be_redirect
         expect(response.location.ends_with?("module_item_id=#{@tag2.id}")).to be_truthy

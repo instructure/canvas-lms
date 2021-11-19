@@ -1434,10 +1434,11 @@ class AccountsController < ApplicationController
   end
 
   def avatars
-    # multi-line ternary is not ideal, but is a clean solution for temp granular check
-    is_authorized = @domain_root_account.feature_enabled?(:granular_permissions_manage_users) ?
-      authorized_action(@account, @current_user, :allow_course_admin_actions) :
-      authorized_action(@account, @current_user, :manage_admin_users)
+    is_authorized = if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
+                      authorized_action(@account, @current_user, :allow_course_admin_actions)
+                    else
+                      authorized_action(@account, @current_user, :manage_admin_users)
+                    end
 
     if is_authorized
       @users = @account.all_users(nil)

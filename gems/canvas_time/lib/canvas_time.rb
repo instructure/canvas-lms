@@ -21,7 +21,7 @@ require 'active_support/all'
 
 module CanvasTime
   module ClassMethods
-    def _load args
+    def _load(args)
       return super unless args.starts_with?("pre1900:")
 
       # 8 puts us after the colon in "pre1900:"

@@ -40,9 +40,11 @@ module SimpleTags
                    tags.map { |tag|
                      wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
                    }
-      conditions.empty? ?
-          none :
-          where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
+      if conditions.empty?
+        none
+      else
+        where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
+      end
     end
 
     def tagged_scope_handler(pattern, &block)

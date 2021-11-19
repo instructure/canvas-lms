@@ -157,7 +157,7 @@ class ExternalContentController < ApplicationController
   end
 
   def lti_response_messages
-    @lti_response_messages ||= (
+    @lti_response_messages ||= begin
       response_messages = {}
 
       lti_msg = param_if_set "lti_msg"
@@ -170,7 +170,7 @@ class ExternalContentController < ApplicationController
       response_messages[:lti_errormsg] = lti_errormsg if lti_errormsg
       response_messages[:lti_errorlog] = lti_errorlog if lti_errorlog
       response_messages
-    )
+    end
   end
 
   def param_if_set(param_key)

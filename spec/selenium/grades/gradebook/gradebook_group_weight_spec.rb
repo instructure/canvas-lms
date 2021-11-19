@@ -27,7 +27,7 @@ describe "Gradebook - group weights" do
   def student_totals
     totals = ff('.total-cell')
     points = []
-    for i in totals do
+    totals.each do |i|
       points.push(i.text)
     end
     points

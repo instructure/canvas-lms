@@ -239,8 +239,11 @@ class AccountNotification < ActiveRecord::Base
         end
 
         # all root accounts; do them one by one, and MultiCache them
-        this_shard_root_account_ids = Shard.current == base_shard ? root_account_ids :
-          root_account_ids.map { |id| Shard.relative_id_for(id, base_shard, Shard.current) }
+        this_shard_root_account_ids = if Shard.current == base_shard
+                                        root_account_ids
+                                      else
+                                        root_account_ids.map { |id| Shard.relative_id_for(id, base_shard, Shard.current) }
+                                      end
         if (sharded_account_ids - this_shard_root_account_ids).empty? && !include_past
           sharded_account_ids.map do |single_root_account_id|
             MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at)) do

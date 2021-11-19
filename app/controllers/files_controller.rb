@@ -387,8 +387,11 @@ class FilesController < ApplicationController
         has_external_tools = !context.is_a?(Group) && tool_context
 
         file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
-        file_index_menu_tools = (has_external_tools && @domain_root_account&.feature_enabled?(:commons_favorites)) ?
-          external_tools_display_hashes(:file_index_menu, tool_context) : []
+        file_index_menu_tools = if has_external_tools && @domain_root_account&.feature_enabled?(:commons_favorites)
+                                  external_tools_display_hashes(:file_index_menu, tool_context)
+                                else
+                                  []
+                                end
 
         {
           asset_string: context.asset_string,
@@ -1054,7 +1057,7 @@ class FilesController < ApplicationController
   def update
     @attachment = @context.attachments.find(params[:id])
     @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
-    return unless authorized_action(@folder, @current_user, :manage_contents) if @folder
+    return if @folder && !authorized_action(@folder, @current_user, :manage_contents)
 
     @folder ||= @attachment.folder
     @folder ||= Folder.unfiled_folder(@context)

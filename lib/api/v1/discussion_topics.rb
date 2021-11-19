@@ -274,10 +274,10 @@ module Api::V1::DiscussionTopics
     return {} unless entry.attachment
 
     url_options = {}
-    if respond_to?(:use_placeholder_host?) && use_placeholder_host?
+    if !respond_to?(:request) && respond_to?(:use_placeholder_host?) && use_placeholder_host?
       url_options[:host] = Api::PLACEHOLDER_HOST
       url_options[:protocol] = Api::PLACEHOLDER_PROTOCOL
-    end unless respond_to?(:request)
+    end
     json = { attachment: attachment_json(entry.attachment, user, url_options) }
     json[:attachments] = [json[:attachment]]
 

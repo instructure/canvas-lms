@@ -71,8 +71,8 @@ module CsvDiff
         @db.execute("insert or replace into #{table} (key, data) values (?, ?)", [key, data])
       }
 
-      add.(row1)
-      csv.each { |row| add.(row) }
+      add.call(row1)
+      csv.each { |row| add.call(row) }
     end
 
     def find_updates
@@ -96,7 +96,7 @@ module CsvDiff
       SQL
         row = CSV::Row.new(headers, Marshal.load(data))
         # Allow the caller to munge the row to indicate deletion.
-        cb.(row)
+        cb.call(row)
         @row_count += 1
         @output << row
       end
