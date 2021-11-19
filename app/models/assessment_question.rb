@@ -32,8 +32,8 @@ class AssessmentQuestion < ActiveRecord::Base
   acts_as_list :scope => :assessment_question_bank
   before_validation :infer_defaults
   after_save :translate_links_if_changed
-  validates :name, length: { :maximum => maximum_string_length, :allow_nil => true }
-  validates :workflow_state, :assessment_question_bank_id, presence: true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_presence_of :workflow_state, :assessment_question_bank_id
   resolves_root_account through: :context
 
   ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",
@@ -41,7 +41,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_choice_question", "numerical_question",
                         "text_only_question", "short_answer_question",
                         "multiple_dropdowns_question", "calculated_question",
-                        "essay_question", "true_false_question", "file_upload_question"].freeze
+                        "essay_question", "true_false_question", "file_upload_question"]
 
   serialize :question_data
 
@@ -123,14 +123,14 @@ class AssessmentQuestion < ActiveRecord::Base
     path = match_data[2]
     id_or_path = id || path
 
-    unless file_substitutions[id_or_path]
+    if !file_substitutions[id_or_path]
       if id
         file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
       elsif path
         path = URI.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
-      if file&.replacement_attachment_id
+      if file && file.replacement_attachment_id
         file = file.replacement_attachment
       end
       begin
@@ -142,7 +142,7 @@ class AssessmentQuestion < ActiveRecord::Base
                      " AssessmentQuestion#translate_links: "\
                      "id: #{self.id} error_report: #{er_id}")
       end
-      new_file&.save
+      new_file.save if new_file
       file_substitutions[id_or_path] = new_file
     end
     if (sub = file_substitutions[id_or_path])
@@ -155,20 +155,17 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def translate_links
     # we can't translate links unless this question has a context (through a bank)
-    return unless assessment_question_bank&.context
+    return unless assessment_question_bank && assessment_question_bank.context
 
     # This either matches the id from a url like: /courses/15395/files/11454/download
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
 
     deep_translate = lambda do |obj|
-      case obj
-      when Hash
-        obj.each_with_object(HashWithIndifferentAccess.new) { |(k, v), h|
-          h[k] = deep_translate.call(v)
-        }
-      when Array
+      if obj.is_a?(Hash)
+        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)| h[k] = deep_translate.call(v); h }
+      elsif obj.is_a?(Array)
         obj.map { |v| deep_translate.call(v) }
-      when String
+      elsif obj.is_a?(String)
         obj.gsub(translate_link_regex) do |match|
           translate_file_link(match, $~)
         end
@@ -211,12 +208,12 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def question_data=(data)
-    data = if data.is_a?(String)
-             ActiveSupport::JSON.decode(data) rescue nil
-           else
-             # we may be modifying this data (translate_links), and only want to work on a copy
-             data.try(:dup)
-           end
+    if data.is_a?(String)
+      data = ActiveSupport::JSON.decode(data) rescue nil
+    else
+      # we may be modifying this data (translate_links), and only want to work on a copy
+      data = data.try(:dup)
+    end
     write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
 
@@ -344,7 +341,7 @@ class AssessmentQuestion < ActiveRecord::Base
       [:incorrect_comments_html, :incorrect_comments],
       [:neutral_comments_html, :neutral_comments],
     ].each do |html_key, non_html_key|
-      if qdata.key?(html_key) && qdata[html_key].blank? && qdata[non_html_key].blank?
+      if qdata.has_key?(html_key) && qdata[html_key].blank? && qdata[non_html_key].blank?
         data.delete(non_html_key)
       end
     end

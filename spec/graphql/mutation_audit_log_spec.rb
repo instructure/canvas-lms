@@ -23,7 +23,7 @@ require_relative "./graphql_spec_helper"
 
 describe AuditLogFieldExtension do
   before do
-    unless AuditLogFieldExtension.enabled?
+    if !AuditLogFieldExtension.enabled?
       skip("AuditLog needs to be enabled by configuring dynamodb.yml")
     end
   end
@@ -35,13 +35,13 @@ describe AuditLogFieldExtension do
   end
 
   let(:mutation) do
-    <<~GQL
+    <<~GRAPHQL
       mutation {
         updateAssignment(input: {id: "#{@assignment.id}"}) {
           assignment { name }
         }
       }
-    GQL
+    GRAPHQL
   end
 
   it "logs" do
@@ -52,13 +52,13 @@ describe AuditLogFieldExtension do
   it "creates a log for every item" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).twice
 
-    CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
+    CanvasSchema.execute(<<~GRAPHQL, context: { current_user: @teacher })
       mutation {
         hideAssignmentGrades(input: {assignmentId: "#{@assignment.id}"}) {
           assignment { _id }
         }
       }
-    GQL
+    GRAPHQL
   end
 
   it "doesn't log failed mutations" do

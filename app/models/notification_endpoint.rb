@@ -27,7 +27,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   belongs_to :access_token
 
-  validates :token, :access_token, presence: true
+  validates_presence_of :token, :access_token
 
   before_create :create_platform_endpoint
   after_destroy :delete_platform_endpoint
@@ -40,7 +40,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   private
 
-  DIFFERENT_ATTRIBUTES_ERROR_REGEX = /^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$/.freeze
+  DIFFERENT_ATTRIBUTES_ERROR_REGEX = %r{^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$}
 
   def sns_client
     DeveloperKey.sns

@@ -36,7 +36,7 @@ module Importers
           item ||= LearningOutcomeGroup.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
           item ||= LearningOutcomeGroup.new
         else
-          migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), :title => hash[:title]))
+          migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
           return
         end
       else
@@ -110,19 +110,21 @@ module Importers
     end
 
     def self.process_children(hash, item, migration, skip_import = false)
-      hash[:outcomes]&.each do |child|
-        if child[:type] == 'learning_outcome_group'
-          child[:parent_group] = item
-          Importers::LearningOutcomeGroupImporter.import_from_migration(
-            child,
-            migration,
-            nil,
-            skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
-          )
-        else
-          child[:learning_outcome_group] = item
-          if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
-            Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+      if hash[:outcomes]
+        hash[:outcomes].each do |child|
+          if child[:type] == 'learning_outcome_group'
+            child[:parent_group] = item
+            Importers::LearningOutcomeGroupImporter.import_from_migration(
+              child,
+              migration,
+              nil,
+              skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+            )
+          else
+            child[:learning_outcome_group] = item
+            if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+              Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            end
           end
         end
       end

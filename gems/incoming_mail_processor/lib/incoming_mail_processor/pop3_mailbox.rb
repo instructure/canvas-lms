@@ -19,15 +19,14 @@
 #
 
 require 'net/pop'
+require File.expand_path('../configurable_timeout', __FILE__)
 require 'zlib'
-
-require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class Pop3Mailbox
     include ConfigurableTimeout
 
-    UsedPopMethods = [:start, :mails, :finish].freeze
+    UsedPopMethods = [:start, :mails, :finish]
 
     attr_accessor :server, :port, :ssl, :username, :password
 

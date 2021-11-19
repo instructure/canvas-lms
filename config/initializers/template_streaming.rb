@@ -51,7 +51,7 @@ module StreamingViewExtensions
   end
 
   def provide(name, content = nil, &block)
-    if block
+    if block_given?
       content = capture(&block) || '' # still carry on even if the block doesn't return anything
       provide(name, content)
     else
@@ -100,7 +100,7 @@ ActionView::StreamingFlow.prepend(StreamingContentChecks) unless ::Rails.env.pro
 
 module SkipEmptyTemplateConcats
   def initialize(original_block)
-    new_block = ->(value) { original_block.call(value) unless value.empty? }
+    new_block = ->(value) { original_block.call(value) if value.size > 0 }
     super(new_block)
   end
 end

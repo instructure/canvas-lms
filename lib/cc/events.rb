@@ -56,7 +56,7 @@ module CC
         end
       end
 
-      events_file&.close
+      events_file.close if events_file
       rel_path
     end
   end

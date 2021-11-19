@@ -400,15 +400,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def guard_against_big_fields
     yield
-  rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => e
-    raise e unless request.xhr?
+  rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
+    raise ex unless request.xhr?
 
-    render_xhr_exception(e, e.message)
+    render_xhr_exception(ex, ex.message)
   end
 
   def require_question
     unless (@question = @quiz.quiz_questions.active.find(params[:id]))
-      raise ActiveRecord::RecordNotFound, 'Quiz Question not found'
+      raise ActiveRecord::RecordNotFound.new('Quiz Question not found')
     end
   end
 

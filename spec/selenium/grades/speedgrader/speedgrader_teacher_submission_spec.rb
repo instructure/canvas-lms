@@ -200,7 +200,7 @@ describe "speed grader submissions" do
       end
       expect(f('#submission_not_newest_notice')).to be_displayed
 
-      f(%(#students_selectmenu option[value="#{submission2.user.id}"])).click
+      f(%Q{#students_selectmenu option[value="#{submission2.user.id}"]}).click
 
       in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations
@@ -219,8 +219,8 @@ describe "speed grader submissions" do
       wait_for_ajaximations
       rubric = f('#rubric_full')
       expect(rubric).to be_displayed
-      ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Rockin'" }.click
-      ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Rockin'" }[0].click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
       expect(f("span[data-selenium='rubric_total']")).to include_text('8')
       f('#rubric_full .save_rubric_button').click
       wait_for_ajaximations
@@ -382,7 +382,7 @@ describe "speed grader submissions" do
         wait_for_ajaximations
         expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click }
         wait_for_ajaximations
-        expect(Delayed::Job.find_by(tag: 'Submission#submit_to_turnitin')).not_to be_nil
+        expect(Delayed::Job.find_by_tag('Submission#submit_to_turnitin')).not_to be_nil
         expect(f('#grade_container .submission_pending')).not_to be_nil
       end
     end

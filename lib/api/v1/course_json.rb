@@ -19,27 +19,27 @@
 
 module Api::V1
   class CourseJson
-    BASE_ATTRIBUTES = %w[id name course_code account_id created_at start_at default_view enrollment_term_id is_public
-                         grading_standard_id root_account_id uuid license grade_passback_setting].freeze
+    BASE_ATTRIBUTES = %w(id name course_code account_id created_at start_at default_view enrollment_term_id is_public
+                         grading_standard_id root_account_id uuid license grade_passback_setting).freeze
 
     INCLUDE_CHECKERS = { grading: 'needs_grading_count', syllabus: 'syllabus_body',
                          url: 'html_url', description: 'public_description', permissions: 'permissions' }.freeze
 
-    OPTIONAL_FIELDS = %w[needs_grading_count public_description enrollments].freeze
+    OPTIONAL_FIELDS = %w(needs_grading_count public_description enrollments).freeze
 
     attr_reader :course, :user, :includes, :enrollments, :hash
 
     def initialize(course, user, includes, enrollments, precalculated_permissions: nil)
       @course = course
       @user = user
-      @includes = includes.map(&:to_sym)
+      @includes = includes.map { |include_key| include_key.to_sym }
       @enrollments = enrollments
       @precalculated_permissions = precalculated_permissions
-      @hash = if block_given?
-                yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
-              else
-                {}
-              end
+      if block_given?
+        @hash = yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
+      else
+        @hash = {}
+      end
     end
 
     def allowed_attributes
@@ -89,7 +89,7 @@ module Api::V1
 
     def has_permission?(*permissions)
       permissions.any? do |permission|
-        if @precalculated_permissions&.key?(permission)
+        if @precalculated_permissions&.has_key?(permission)
           @precalculated_permissions[permission]
         else
           @course.grants_right?(@user, permission)
@@ -113,7 +113,7 @@ module Api::V1
     end
 
     def needs_grading_count(enrollments, course)
-      if include_grading && enrollments && enrollments.any?(&:participating_instructor?)
+      if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
         proxy = Assignments::NeedsGradingCountQuery::CourseProxy.new(course, user)
         course.assignments.active.to_a.sum { |a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
       end

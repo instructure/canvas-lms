@@ -23,13 +23,13 @@ module Api::V1::ContentMigration
   include Api::V1::Attachment
 
   def content_migrations_json(migrations, current_user, session)
-    migrations.reject { |m| m.migration_settings['hide_from_index'] }.map do |migration|
+    migrations.reject { |m| !!m.migration_settings['hide_from_index'] }.map do |migration|
       content_migration_json(migration, current_user, session)
     end
   end
 
   def content_migration_json(migration, current_user, session, attachment_preflight = nil, includes = [])
-    json = api_json(migration, current_user, session, :only => %w[id user_id workflow_state started_at finished_at migration_type])
+    json = api_json(migration, current_user, session, :only => %w(id user_id workflow_state started_at finished_at migration_type))
     json[:created_at] = migration.created_at
     if json[:workflow_state] == 'created'
       json[:workflow_state] = 'pre_processing'
@@ -64,9 +64,9 @@ module Api::V1::ContentMigration
       json['progress_url'] = polymorphic_url([:api_v1, migration.job_progress])
     end
     if (plugin = Canvas::Plugin.find(migration.migration_type))
-      if plugin.meta[:display_name].respond_to?(:call)
+      if plugin.meta[:display_name] && plugin.meta[:display_name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:display_name].call
-      elsif plugin.meta[:name].respond_to?(:call)
+      elsif plugin.meta[:name] && plugin.meta[:name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:name].call
       end
     end
@@ -97,7 +97,7 @@ module Api::V1::ContentMigration
   end
 
   def migration_issue_json(issue, migration, current_user, session)
-    json = api_json(issue, current_user, session, :only => %w[id description workflow_state fix_issue_html_url issue_type created_at updated_at])
+    json = api_json(issue, current_user, session, :only => %w(id description workflow_state fix_issue_html_url issue_type created_at updated_at))
     json[:content_migration_url] = api_v1_course_content_migration_url(migration.context_id, issue.content_migration_id)
     if issue.grants_right?(current_user, :read_errors)
       json[:error_message] = issue.error_message

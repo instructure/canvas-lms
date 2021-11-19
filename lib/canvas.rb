@@ -24,11 +24,11 @@ module Canvas
   mattr_accessor :protected_attribute_error
 
   def self.active_record_foreign_key_check(name, type, options)
-    if name.to_s.end_with?('_id') && type.to_s == 'integer' && options[:limit].to_i < 8
-      raise ArgumentError, <<~TEXT
+    if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
+      raise ArgumentError, <<-EOS
         All foreign keys need to be at least 8-byte integers. #{name}
         looks like a foreign key, please add this option: `:limit => 8`
-      TEXT
+      EOS
     end
   end
 
@@ -89,8 +89,7 @@ module Canvas
   # `sample` reports KB, not B
   if File.directory?("/proc")
     # linux w/ proc fs
-    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i
-                       size > 0 ? size : 4096)
+    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i; size > 0 ? size : 4096)
     def self.sample_memory
       s = File.read("/proc/#{Process.pid}/statm").to_i rescue 0
       s * LINUX_PAGE_SIZE / 1024
@@ -126,8 +125,8 @@ module Canvas
   def self.revision
     return @revision if defined?(@revision)
 
-    @revision = if Rails.root.join("VERSION").file?
-                  Rails.root.join("VERSION").readlines.first.try(:strip)
+    @revision = if File.file?(Rails.root + "VERSION")
+                  File.readlines(Rails.root + "VERSION").first.try(:strip)
                 else
                   nil
                 end
@@ -212,7 +211,7 @@ module Canvas
     Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
 
-    nil
+    return nil
   end
 
   def self.timeout_protection_cutoff(service_name)
@@ -226,7 +225,7 @@ module Canvas
 
     error_count = redis.get(redis_key)
     if error_count.to_i >= cutoff
-      raise TimeoutCutoff, error_count
+      raise TimeoutCutoff.new(error_count)
     end
 
     begin
@@ -260,7 +259,7 @@ module Canvas
 
     protection_activated_key = "#{redis_key}:protection_activated"
     protection_activated = redis.get(protection_activated_key)
-    raise TimeoutCutoff, cutoff if protection_activated
+    raise TimeoutCutoff.new(cutoff) if protection_activated
 
     counter_window = timeout_protection_failure_counter_window(service_name)
     min_samples = timeout_protection_failure_min_samples(service_name)
@@ -276,7 +275,7 @@ module Canvas
       error_ttl = timeout_protection_error_ttl(service_name)
       redis.set(protection_activated_key, "true")
       redis.expire(protection_activated_key, error_ttl)
-      raise TimeoutCutoff, failure_rate
+      raise TimeoutCutoff.new(failure_rate)
     end
 
     begin

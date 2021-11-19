@@ -16,34 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 
 import {View} from '@instructure/ui-view'
 import ImageList from '../../../../instructure_image/Images'
 import {useStoreProps} from '../../../../shared/StoreContext'
 import useDataUrl from '../../../../shared/useDataUrl'
-import {actions} from '../../../reducers/imageSection'
 
-const Course = ({dispatch}) => {
+const Course = () => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
 
-  // Handle image selection
-  useEffect(() => {
-    // Don't clear the current image on re-render
-    if (!dataUrl) return
-
-    dispatch({...actions.SET_IMAGE, payload: dataUrl})
-  }, [dataUrl])
-
-
-  // Handle loading states
-  useEffect(() => {
-    dispatch(
-      dataLoading ? actions.START_LOADING : actions.STOP_LOADING
-    )
-  }, [dataLoading])
+  // TODO Next: Set the image in the preview icon and remove log
+  //            Also, properly handle data loading + error state
+  console.log(dataUrl)
 
   return (
     <View>
@@ -65,7 +52,6 @@ const Course = ({dispatch}) => {
         }}
         onImageEmbed={file => {
           setUrl(file.download_url)
-          dispatch({...actions.SET_IMAGE_NAME, payload: file.filename})
         }}
       />
     </View>

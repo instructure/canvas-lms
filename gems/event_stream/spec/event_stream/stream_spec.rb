@@ -24,23 +24,17 @@ require 'spec_helper'
 describe EventStream::Stream do
   let(:database) do
     database = double('database')
-    def database.batch
-      yield
-    end
+    def database.batch; yield; end
 
-    def database.update_record(*); end
+    def database.update_record(*args); end
 
-    def database.insert_record(*); end
+    def database.insert_record(*args); end
 
-    def database.update(*); end
+    def database.update(*args); end
 
-    def database.available?
-      true
-    end
+    def database.available?; true end
 
-    def database.keyspace
-      'test_db'
-    end
+    def database.keyspace; 'test_db' end
     database
   end
 
@@ -494,9 +488,7 @@ describe EventStream::Stream do
     describe "failure" do
       before do
         @database = double('database')
-        def @database.available?
-          true
-        end
+        def @database.available?; true end
         allow(@stream).to receive(:database).and_return(@database)
         @record = double(
           :id => 'id',

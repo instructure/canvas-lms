@@ -11,4 +11,7 @@ class PopulateCourseIdOnSubmissions < ActiveRecord::Migration[5.2]
         .run(start_at, end_at)
     end
   end
+
+  def down
+  end
 end

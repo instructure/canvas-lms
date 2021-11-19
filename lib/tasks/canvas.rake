@@ -53,7 +53,7 @@ unless $canvas_tasks_loaded
 
         task 'i18n:generate_js' => [
           ('js:yarn_install' if npm_install)
-        ].compact if build_i18n
+        ].compact if build_i18n && build_js
 
         task 'js:webpack_development' => [
           'js:gulp_rev',
@@ -81,7 +81,7 @@ unless $canvas_tasks_loaded
         end
       end
 
-      combined_time = batch_times.sum
+      combined_time = batch_times.reduce(:+)
 
       puts(
         "Finished compiling assets in #{real_time.round(2)}s. " +
@@ -206,7 +206,7 @@ unless $canvas_tasks_loaded
       method = :select!
       if region[0] == '-'
         method = :reject!
-        region = region[1..]
+        region = region[1..-1]
       end
       if region == 'self'
         servers.send(method, &:in_current_region?)
@@ -217,7 +217,7 @@ unless $canvas_tasks_loaded
     block.call(servers)
   end
 
-  %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
+  %w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
     Switchman::Rake.shardify_task(task_name, categories: -> { Shard.categories })
   end
 

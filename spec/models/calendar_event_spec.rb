@@ -227,12 +227,12 @@ describe CalendarEvent do
       end
 
       it "returns a plain-text description" do
-        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<~HTML)
-          <p>
-            This assignment is due December 16th. <b>Please</b> do the reading.
-            <br/>
-            <a href="www.example.com">link!</a>
-          </p>
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
+      <p>
+        This assignment is due December 16th. <b>Please</b> do the reading.
+        <br/>
+        <a href="www.example.com">link!</a>
+      </p>
         HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
@@ -241,7 +241,7 @@ describe CalendarEvent do
 
       it "does not add verifiers to files unless course or attachment is public" do
         attachment_model(:context => course_factory)
-        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
+        html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to_not include("verifier")
@@ -271,7 +271,7 @@ describe CalendarEvent do
 
         @course.media_objects.create!(:media_id => '0_12345678')
         event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
-                                                                :description => %(<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>))
+                                                                :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
         event.effective_context_code = @course.asset_string
         event.save!
 
@@ -658,10 +658,10 @@ describe CalendarEvent do
       appointment.participants_per_appointment = 3
       appointment.save!
 
-      s1, s2, s3 = Array.new(3) do
+      s1, s2, s3 = 3.times.map {
         student_in_course(:course => @course, :active_all => true)
         @user
-      end
+      }
 
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(s1, s1)).not_to be_nil
@@ -1168,7 +1168,7 @@ describe CalendarEvent do
         expect(event.web_conference.reload.title).to eq 'updated title'
       end
 
-      it "keeps date of conference in sync with event" do
+      it "keeps date  of conference in sync with event" do
         event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
         start_at = Time.zone.now + 3.days
         event.reload.update! start_at: start_at

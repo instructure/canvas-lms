@@ -87,8 +87,9 @@ class TokenScopes
 
     named_scopes = detailed_scopes.each_with_object([]) do |frozen_scope, arr|
       scope = frozen_scope.dup
-      scope[:resource] ||= ApiScopeMapper.lookup_resource(scope[:controller], scope[:action])
-      scope[:resource_name] = ApiScopeMapper.name_for_resource(scope[:resource])
+      api_scope_mapper_class = ApiScopeMapperLoader.load
+      scope[:resource] ||= api_scope_mapper_class.lookup_resource(scope[:controller], scope[:action])
+      scope[:resource_name] = api_scope_mapper_class.name_for_resource(scope[:resource])
       arr << scope if scope[:resource_name]
       scope
     end
@@ -96,7 +97,7 @@ class TokenScopes
   end
 
   def self.all_scopes
-    @_all_scopes ||= [USER_INFO_SCOPE[:scope], CD2_SCOPE[:scope], *api_routes.pluck(:scope), *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
+    @_all_scopes ||= [USER_INFO_SCOPE[:scope], CD2_SCOPE[:scope], *api_routes.map { |route| route[:scope] }, *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
   end
 
   def self.detailed_scopes
@@ -107,7 +108,7 @@ class TokenScopes
   def self.api_routes
     return @_api_routes if @_api_routes
 
-    routes = Rails.application.routes.routes.select { |route| %r{^/api/(v1|sis)} =~ route.path.spec.to_s }.map do |route|
+    routes = Rails.application.routes.routes.select { |route| /^\/api\/(v1|sis)/ =~ route.path.spec.to_s }.map do |route|
       {
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,

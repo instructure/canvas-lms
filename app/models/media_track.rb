@@ -22,11 +22,11 @@ class MediaTrack < ActiveRecord::Base
   belongs_to :media_object, :touch => true
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
-  validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
+  validates :kind, inclusion: { in: %w(subtitles captions descriptions chapters metadata) }
   validates :locale, format: { with: /\A[A-Za-z\-]+\z/ }
   validates :content, presence: true
 
-  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
+  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
     message: 'TTML tracks are not allowed because they are susceptible to xss attacks'
@@ -40,7 +40,7 @@ class MediaTrack < ActiveRecord::Base
     if self.content.exclude?('WEBVTT') && (self.content_changed? || self.read_attribute(:webvtt_content).nil?)
       srt_content = self.content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
-      srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})(,)([0-9]{3})/, '\1.\3')
+      srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})([,])([0-9]{3})/, '\1.\3')
       srt_content.gsub!("\r\n", "\n")
       self.webvtt_content = "WEBVTT\n\n#{srt_content}".strip
     end

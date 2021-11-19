@@ -30,7 +30,7 @@ module Lti::IMS::AccessTokenHelper
     raise Lti::OAuth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
   rescue Lti::OAuth2::InvalidTokenError
     raise
-  rescue => e
+  rescue StandardError => e
     raise Lti::OAuth2::InvalidTokenError, e
   end
 
@@ -47,7 +47,7 @@ module Lti::IMS::AccessTokenHelper
   def oauth2_request?
     pattern = /^Bearer /
     header = request.headers["Authorization"]
-    header&.match?(pattern)
+    header && header.match?(pattern)
   end
 
   def tool_proxy

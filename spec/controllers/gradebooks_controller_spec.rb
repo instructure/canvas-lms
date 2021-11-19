@@ -247,14 +247,14 @@ describe GradebooksController do
           @student_enrollment.scores.find_by(course_score: true).update!(override_score: nil)
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: @student.id }
-          expect(assigns[:js_env]).not_to have_key(:effective_final_score)
+          expect(assigns[:js_env].key?(:effective_final_score)).to be false
         end
 
         it "does not include the effective final score in the ENV if there is no score" do
           invited_student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited").user
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: invited_student.id }
-          expect(assigns[:js_env]).not_to have_key(:effective_final_score)
+          expect(assigns[:js_env].key?(:effective_final_score)).to be false
         end
 
         it "takes the effective final score for the grading period, if present" do
@@ -281,7 +281,7 @@ describe GradebooksController do
         @course.disable_feature!(:final_grades_override)
         user_session(@teacher)
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
-        expect(assigns[:js_env]).not_to have_key(:effective_final_score)
+        expect(assigns[:js_env].key?(:effective_final_score)).to be false
       end
     end
 
@@ -851,31 +851,6 @@ describe GradebooksController do
             get :show, params: { course_id: @course.id }
             expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
           end
-        end
-      end
-
-      describe "show_message_students_with_observers_dialog" do
-        shared_examples_for "environment variable" do
-          it "is true when the feature is enabled" do
-            Account.site_admin.enable_feature!(:message_observers_of_students_who)
-            get :show, params: { course_id: @course.id }
-            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be true
-          end
-
-          it "is false when the feature is not enabled" do
-            get :show, params: { course_id: @course.id }
-            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be false
-          end
-        end
-
-        context "when individual gradebook is enabled" do
-          before { @teacher.set_preference(:gradebook_version, "srgb") }
-
-          include_examples "environment variable"
-        end
-
-        context "when default gradebook is enabled" do
-          include_examples "environment variable"
         end
       end
 

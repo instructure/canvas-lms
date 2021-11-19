@@ -912,13 +912,13 @@ describe GradebookImporter do
 
     describe "simplified json output" do
       let(:top_level_keys) do
-        %i[
+        %i{
           assignments custom_columns missing_objects original_submissions
           students unchanged_assignments warning_messages
-        ]
+        }
       end
 
-      let(:student_keys) { %i[custom_column_data id last_name_first name previous_id submissions] }
+      let(:student_keys) { %i{custom_column_data id last_name_first name previous_id submissions} }
 
       it "has only the specified keys" do
         expect(hash.keys).to match_array(top_level_keys)
@@ -1110,18 +1110,18 @@ describe GradebookImporter do
         it "excludes entire assignments if no submissions for the assignment are being uploaded" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,5,5"
+            ",#{@student.id},,5,5",
           )
-          assignment_ids = assignments.pluck(:id)
+          assignment_ids = assignments.map { |a| a[:id] }
           expect(assignment_ids).to_not include @closed_assignment.id
         end
 
         it "includes assignments if there is at least one submission in the assignment being uploaded" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,5,5"
+            ",#{@student.id},,5,5",
           )
-          assignment_ids = assignments.pluck(:id)
+          assignment_ids = assignments.map { |a| a[:id] }
           expect(assignment_ids).to include @open_assignment.id
         end
 
@@ -1136,7 +1136,7 @@ describe GradebookImporter do
           it "does not include submissions that fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5"
+              ",#{@student.id},,5,5",
             )
             assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to_not include @closed_assignment.id
@@ -1145,7 +1145,7 @@ describe GradebookImporter do
           it "includes submissions that do not fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5"
+              ",#{@student.id},,5,5",
             )
             assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to include @open_assignment.id
@@ -1156,7 +1156,7 @@ describe GradebookImporter do
           it "does not include submissions that will fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5"
+              ",#{@student.id},,5,5",
             )
             expect(student_submissions.map { |s| s['assignment_id'] }).to_not include @closed_assignment.id
           end
@@ -1164,7 +1164,7 @@ describe GradebookImporter do
           it "includes submissions that will not fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
-              ",#{@student.id},,5,5"
+              ",#{@student.id},,5,5",
             )
             expect(student_submissions.map { |s| s['assignment_id'] }).to include @open_assignment.id
           end
@@ -1173,7 +1173,7 @@ describe GradebookImporter do
         it "marks excused submission as 'EX' even if 'ex' is not capitalized" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
-            ",#{@student.id},,,eX"
+            ",#{@student.id},,,eX",
           )
           expect(student_submissions.first.fetch('grade')).to eq 'EX'
         end
@@ -1206,7 +1206,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5"
           )
-          assignment_ids = assignments.pluck(:id)
+          assignment_ids = assignments.map { |a| a[:id] }
           expect(assignment_ids).not_to include @closed_assignment.id
         end
 
@@ -1216,7 +1216,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5"
           )
-          assignment_ids = assignments.pluck(:id)
+          assignment_ids = assignments.map { |a| a[:id] }
           expect(assignment_ids).to include @closed_assignment.id
         end
 
@@ -1279,7 +1279,7 @@ describe GradebookImporter do
         @active_period.destroy!
         importer_with_rows(
           "Student,ID,Section,Some new assignment",
-          ",#{@student.id},,5"
+          ",#{@student.id},,5",
         )
         expect(assignments.count).to eq(0)
       end
@@ -1287,7 +1287,7 @@ describe GradebookImporter do
       it "creates a new assignment if the last grading period is not closed" do
         importer_with_rows(
           "Student,ID,Section,Some new assignment",
-          ",#{@student.id},,5"
+          ",#{@student.id},,5",
         )
         expect(assignments.count).to eq(1)
       end
@@ -1462,7 +1462,7 @@ describe GradebookImporter do
       importer = new_gradebook_importer(
         attachment_with_rows(
           'Student;ID;Section;Assignment 3',
-          "A Student;#{student.id};Section 13;Ex"
+          "A Student;#{student.id};Section 13;Ex",
         ),
         upload,
         teacher,
@@ -1470,90 +1470,6 @@ describe GradebookImporter do
       )
       json = importer.as_json
       expect(json[:students][0][:submissions][0]["grade"]).to eq "EX"
-    end
-  end
-
-  describe "student last and first names" do
-    it "does not import when not allowed" do
-      course = course_model
-      user = user_model
-      progress = Progress.create!(tag: "test", context: @user)
-      upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
-      importer = GradebookImporter.new(
-        upload, valid_gradebook_contents_with_last_and_first_names, user, progress
-      )
-
-      expect { importer.parse! }.not_to raise_error
-      expect(progress.message).to eq("Invalid header row")
-      expect(progress.workflow_state).to eq("failed")
-    end
-
-    context "when allowed" do
-      before(:once) do
-        Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
-        course_model
-        @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
-        @course.root_account.save!
-      end
-
-      it "handles students which do not already exist" do
-        importer_with_rows(
-          'LastName,FirstName,ID,Section,Assignment 1,Final Score',
-          '"Blend","Bill",6,My Course,-,',
-          'Points Possible,,,,10,',
-          '"","Todd",4,My Course,-,',
-          '"Cooper","",4,My Course,-,'
-        )
-        expect(@gi.assignments.length).to eq 1
-        expect(@gi.assignments.first.points_possible).to eq 10
-        expect(@gi.students.length).to eq 3
-        expect(@gi.students[0].name).to eq "Bill Blend"
-        expect(@gi.students[1].name).to eq "Todd"
-        expect(@gi.students[2].name).to eq "Cooper"
-      end
-
-      context "enrolled students" do
-        let(:student0) { User.create!(name: "Victor McDade") }
-        let(:student1) { User.create!(name: "Jack Jarvis") }
-        let(:student2) { User.create!(name: "Winston") }
-        let(:student3) { User.create!(name: "Isa") }
-
-        before do
-          @course.enroll_student(student0, enrollment_state: "active")
-          @course.enroll_student(student1, enrollment_state: "active")
-          @course.enroll_student(student2, enrollment_state: "active")
-          @course.enroll_student(student3, enrollment_state: "active")
-        end
-
-        it "recognizes last and first name columns" do
-          importer = importer_with_rows(
-            'LastName,FirstName,ID,Section,Assignment 1,Final Score',
-            'Points Possible,,,,10,',
-            "'McDade','Victor;,#{student0.id},My Course,-,60",
-            "'Jarvis','Jack',#{student1.id},My Course,-,70",
-            "'','Winston',#{student2.id},My Course,-,80",
-            "'Isa','',#{student3.id},My Course,-,90"
-          )
-
-          output = importer.as_json
-
-          aggregate_failures do
-            expect(output[:students].length).to eq 4
-            expect(output[:students][0][:name]).to eq "Victor McDade"
-            expect(output[:students][0][:id]).to eq student0.id
-            expect(output[:students][1][:name]).to eq "Jack Jarvis"
-            expect(output[:students][1][:id]).to eq student1.id
-            expect(output[:students][2][:name]).to eq "Winston"
-            expect(output[:students][2][:id]).to eq student2.id
-            expect(output[:students][3][:name]).to eq "Isa"
-            expect(output[:students][3][:id]).to eq student3.id
-
-            expect(output[:assignments].length).to eq 1
-            expect(output[:assignments].first[:points_possible]).to eq 10
-            expect(output[:assignments].first[:title]).to eq "Assignment 1"
-          end
-        end
-      end
     end
   end
 
@@ -2010,7 +1926,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].pluck(:override_scores)
+          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
           expect(override_scores_by_student).to all(be_empty)
         end
 
@@ -2046,7 +1962,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].pluck(:override_scores)
+          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
           expect(override_scores_by_student).to all(be_empty)
         end
 
@@ -2059,7 +1975,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].pluck(:override_scores)
+          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
           aggregate_failures do
             expect(override_scores_by_student.length).to eq 3
             expect(override_scores_by_student.map(&:length)).to all(eq(1))
@@ -2092,19 +2008,15 @@ describe GradebookImporter do
   end
 
   def valid_gradebook_contents
-    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks basic_course.csv]))
-  end
-
-  def valid_gradebook_contents_with_last_and_first_names
-    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks valid_gradebook_contents_with_last_and_first_names.csv]))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
   end
 
   def valid_gradebook_contents_with_sis_login_id
-    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks basic_course_with_sis_login_id.csv]))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
   end
 
   def invalid_gradebook_contents
-    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks wat.csv]))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks wat.csv)))
   end
 
   def attachment_with

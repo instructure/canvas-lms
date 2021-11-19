@@ -33,7 +33,7 @@ module I18nTasks
       # don't want to mangle placeholders, wrappers, etc.
       pattern = /(\s*%h?\{[^}]+\}\s*|\s*[\n\\`*_{}\[\]()\#+\-!]+\s*|^\s+)/
       result = str.split(pattern).map do |token|
-        if token&.match?(pattern)
+        if token =~ pattern
           token
         else
           s = +''
@@ -46,7 +46,7 @@ module I18nTasks
           s
         end
       end
-      result.join
+      result.join('')
     end
 
     def i18n_lolcalize(default_thing)

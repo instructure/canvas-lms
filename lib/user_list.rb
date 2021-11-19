@@ -71,10 +71,10 @@ class UserList
   def users
     existing = @addresses.select { |a| a[:user_id] }
     existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] }) do |shard_existing|
-      User.where(id: shard_existing.pluck(:user_id))
+      User.where(id: shard_existing.map { |a| a[:user_id] })
     end
 
-    non_existing = @addresses.reject { |a| a[:user_id] }
+    non_existing = @addresses.select { |a| !a[:user_id] }
     non_existing_users = non_existing.map do |a|
       user = User.new(:name => a[:name] || a[:address])
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
@@ -99,12 +99,12 @@ class UserList
                                  .options[:with]
       # look for phone numbers by searching for 10 digits, allowing
       # any non-word characters
-      if /^([^\d\w]*\d[^\d\w]*){10}$/.match?(path)
+      if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
         type = :sms
       elsif path.include?('@') && (email = parse_email(path))
         type = :email
         name, path = email
-      elsif path&.match?(unique_id_regex)
+      elsif path =~ unique_id_regex
         type = :pseudonym
       else
         @errors << { :address => path, :details => :unparseable }
@@ -132,7 +132,7 @@ class UserList
 
     def quote_ends(chars, i)
       loop do
-        i += 1
+        i = i + 1
         return false if i >= chars.size
         return false if chars[i] == '@'
         return true if chars[i] == '"'
@@ -144,12 +144,12 @@ class UserList
         list = list_in.map(&:strip)
         list.each { |path| parse_single_user(path) }
       else
-        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").tr(';', ",") + ","
+        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
         chars = str.split("")
         user_start = 0
         in_quotes = false
         chars.each_with_index do |char, i|
-          if !in_quotes
+          if not in_quotes
             case char
             when ','
               user_line = str[user_start, i - user_start].strip
@@ -182,10 +182,10 @@ class UserList
 
       Pseudonym.active
                .select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id")
-               .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.pluck(:address), account_ids)
+               .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.map { |x| x[:address] }, account_ids)
                .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a|
-          a[:address].casecmp?(login[:address]) ||
+          a[:address].downcase == login[:address].downcase ||
             (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))
         }
         addresses.each do |address|
@@ -212,7 +212,7 @@ class UserList
           address[:shard] = Shard.current
         end
       end
-    end unless @addresses.empty?
+    end if !@addresses.empty?
 
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)
@@ -233,7 +233,7 @@ class UserList
                 end
 
       pseudos.map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-        addresses = emails.select { |a| a[:address].casecmp?(login[:address]) }
+        addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
         addresses.each do |address|
           # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
           if address[:workflow_state] == 'unconfirmed' && login[:workflow_state] == 'active'
@@ -247,7 +247,7 @@ class UserList
           # ccs are not unique; just error out on duplicates
           # we're in a bit of a pickle if open registration is disabled, and there are conflicting
           # e-mails, but none of them are from a pseudonym
-          if address.key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
+          if address.has_key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
             address[:user_id] = false
             address[:details] = :non_unique
             address.delete(:name)
@@ -305,11 +305,11 @@ class UserList
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
       elsif address[:type] == :email && @search_method == :open
-        (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
+        (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
       else
         if @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
           address.delete :user_id
-          (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
+          (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
         else
           @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
         end

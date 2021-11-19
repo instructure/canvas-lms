@@ -760,7 +760,7 @@ describe ContentMigration do
         assign.save!
         @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
         run_course_copy
-        expect(@copy_to.grading_standards.map(&:title)).to eql %w[Two]
+        expect(@copy_to.grading_standards.map(&:title)).to eql %w(Two)
         expect(@copy_to.assignments.first.grading_standard.title).to eql 'Two'
       end
 
@@ -985,7 +985,7 @@ describe ContentMigration do
         let(:assignment) do
           @course.assignments.create!(
             name: 'test assignment',
-            submission_types: 'none'
+            submission_types: 'none',
           )
         end
 

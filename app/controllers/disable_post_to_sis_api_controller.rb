@@ -69,7 +69,7 @@ class DisablePostToSisApiController < ApplicationController
       if params[:course_id]
         api_find(Course, params[:course_id])
       else
-        raise ActiveRecord::RecordNotFound, 'unknown context type'
+        fail ActiveRecord::RecordNotFound, 'unknown context type'
       end
   end
 
@@ -89,7 +89,7 @@ class DisablePostToSisApiController < ApplicationController
   end
 
   def grading_period_exists?
-    params.key?(:grading_period_id) && !params[:grading_period_id].blank?
+    params.has_key?(:grading_period_id) && !params[:grading_period_id].blank?
   end
 
   def require_authorized_user

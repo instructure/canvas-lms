@@ -191,15 +191,16 @@ module Workflow
 
     def process_event!(name, *args)
       event = current_state.events[name.to_sym]
-      raise NoTransitionAllowed, "There is no event #{name.to_sym} defined for the #{current_state} state" if event.nil?
-
+      raise NoTransitionAllowed.new(
+        "There is no event #{name.to_sym} defined for the #{current_state} state"
+      ) if event.nil?
       @halted_because = nil
       @halted = false
       @raise_exception_on_halt = false
       return_value = run_action(event.action, *args) || run_action_callback("do_#{event.name}", *args)
       if @halted
         if @raise_exception_on_halt
-          raise TransitionHalted, @halted_because
+          raise TransitionHalted.new(@halted_because)
         else
           false
         end
@@ -251,7 +252,7 @@ module Workflow
     end
 
     def run_on_exit(state, new_state, triggering_event, *args)
-      instance_exec(new_state.name, triggering_event, *args, &state.on_exit) if state&.on_exit
+      instance_exec(new_state.name, triggering_event, *args, &state.on_exit) if state and state.on_exit
     end
 
     # load_workflow_state and persist_workflow_state

@@ -30,12 +30,12 @@ class WebConference < ActiveRecord::Base
   has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
-  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
+  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 
   MAX_DURATION = 99999999
-  validates :duration, numericality: { :less_than_or_equal_to => MAX_DURATION, :allow_nil => true }
+  validates_numericality_of :duration, :less_than_or_equal_to => MAX_DURATION, :allow_nil => true
 
   before_validation :infer_conference_details
 
@@ -80,8 +80,9 @@ class WebConference < ActiveRecord::Base
 
   def user_settings
     @user_settings ||=
-      self.class.user_setting_fields.keys.index_with { |key|
-        settings[key]
+      self.class.user_setting_fields.keys.inject({}) { |hash, key|
+        hash[key] = settings[key]
+        hash
       }
   end
 
@@ -141,8 +142,9 @@ class WebConference < ActiveRecord::Base
 
   def default_settings
     @default_settings ||=
-      self.class.user_setting_fields.each_with_object({}) { |(name, data), hash|
+      self.class.user_setting_fields.inject({}) { |hash, (name, data)|
         hash[name] = data[:default] if data[:default]
+        hash
       }
   end
 
@@ -286,7 +288,8 @@ class WebConference < ActiveRecord::Base
     read_attribute(:context_code) || "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
-  def infer_conference_settings; end
+  def infer_conference_settings
+  end
 
   def conference_type=(val)
     conf_type = if val == 'LtiConference'
@@ -369,7 +372,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def active?(force_check = false, allow_check = true)
-    unless force_check
+    if !force_check
       return false if self.ended_at && Time.now > self.ended_at
       return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.now > self.start_at && Time.now < self.end_at))
       return true if self.ended_at && Time.now < self.ended_at
@@ -498,7 +501,7 @@ class WebConference < ActiveRecord::Base
   def as_json(options = {})
     url = options.delete(:url)
     join_url = options.delete(:join_url)
-    options.reverse_merge!(:only => %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code])
+    options.reverse_merge!(:only => %w(id title description conference_type duration started_at ended_at user_ids context_id context_type context_code))
     result = super(options.merge(:include_root => false, :methods => [:has_advanced_settings, :long_running, :user_settings, :recordings]))
     result['url'] = url
     result['join_url'] = join_url
@@ -548,7 +551,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.plugin_types
-    plugins.filter_map { |plugin|
+    plugins.map { |plugin|
       next unless plugin.enabled? &&
                   (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
                   klass < self.base_class
@@ -560,7 +563,7 @@ class WebConference < ActiveRecord::Base
         :name => plugin.name,
         :plugin => plugin
       ).with_indifferent_access
-    }
+    }.compact
   end
 
   def self.config(context: nil, class_name: nil)
@@ -571,9 +574,7 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   def set_root_account_id
     case self.context

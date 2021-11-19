@@ -60,7 +60,7 @@ module Api::V1::Attachment
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
-    return hash if options[:only]&.include?('names')
+    return hash if options[:only] && options[:only].include?('names')
 
     options.reverse_merge!(skip_permission_checks: false)
     includes = options[:include] || []
@@ -76,7 +76,7 @@ module Api::V1::Attachment
     hidden_for_user = if skip_permission_checks ||
                          !attachment.hidden?
                         false
-                      elsif options.key?(:can_view_hidden_files)
+                      elsif options.has_key?(:can_view_hidden_files)
                         options[:can_view_hidden_files]
                       else
                         !can_view_hidden_files?(attachment.context, user)
@@ -96,7 +96,7 @@ module Api::V1::Attachment
         url = thumbnail_url
       else
         h = { :download => '1', :download_frd => '1' }
-        h[:verifier] = attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+        h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
@@ -120,7 +120,7 @@ module Api::V1::Attachment
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_url,
-      'modified_at' => attachment.modified_at || attachment.updated_at,
+      'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at,
       'mime_class' => attachment.mime_class,
       'media_entry_id' => attachment.media_entry_id
     )
@@ -232,7 +232,7 @@ module Api::V1::Attachment
   end
 
   def filenames(params)
-    [:name, :filename, :url].filter_map { |param| params[param] }
+    [:name, :filename, :url].map { |param| params[param] }.compact
   end
 
   def valid_mime_type?(mime_type)
@@ -240,14 +240,14 @@ module Api::V1::Attachment
   end
 
   def valid_mime_types(params)
-    filenames(params).filter_map do |filename|
+    filenames(params).map do |filename|
       mime_type = Attachment.mimetype(filename)
       mime_type if valid_mime_type?(mime_type)
-    end
+    end.compact
   end
 
   def validate_on_duplicate(params)
-    if params[:on_duplicate] && !%w[rename overwrite].include?(params[:on_duplicate])
+    if params[:on_duplicate] && !%w(rename overwrite).include?(params[:on_duplicate])
       render status: :bad_request, json: {
         message: 'invalid on_duplicate option'
       }
@@ -384,7 +384,7 @@ module Api::V1::Attachment
         json = { progress: progress_json(progress, current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
-        quota_exemption = @attachment.quota_exemption_key unless opts[:check_quota]
+        quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]
         json = @attachment.ajax_upload_params(
           api_v1_files_create_url(
             on_duplicate: on_duplicate,

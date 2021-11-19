@@ -121,7 +121,8 @@ module Quizzes
         end
 
         result.possible = cached_questions_and_answers.map(&:first)
-                                                      .sum { |h| h['points_possible'] }
+                                                      .map { |h| h['points_possible'] }
+                                                      .inject(:+)
 
         # do not create a result if no points are possible.
         if result.possible == 0
@@ -131,7 +132,8 @@ module Quizzes
         end
 
         result.score = cached_questions_and_answers.map(&:last)
-                                                   .sum { |h| h[:points] }
+                                                   .map { |h| h[:points] }
+                                                   .inject(:+)
 
         result.calculate_percent!
         result.mastery = determine_mastery(result, alignment)

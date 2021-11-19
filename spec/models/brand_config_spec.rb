@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'db/migrate/20150709205405_create_k12_theme'
+require 'db/migrate/20150709205405_create_k12_theme.rb'
 
 describe BrandConfig do
   it "creates an instance with a parent_md5" do
@@ -48,8 +48,8 @@ describe BrandConfig do
     end
 
     it "inherits effective_variables from its parent" do
-      expect(@subaccount_bc.variables.key?("ic-brand-global-nav-bgd")).to be_truthy
-      expect(@subaccount_bc.variables.key?("ic-brand-primary")).to be_falsey
+      expect(@subaccount_bc.variables.keys.include?("ic-brand-global-nav-bgd")).to be_truthy
+      expect(@subaccount_bc.variables.keys.include?("ic-brand-primary")).to be_falsey
 
       expect(@subaccount_bc.effective_variables["ic-brand-global-nav-bgd"]).to eq "#123"
       expect(@subaccount_bc.effective_variables["ic-brand-primary"]).to eq "#321"
@@ -203,11 +203,11 @@ describe BrandConfig do
       it 'uploads json, css & js file to s3' do
         @upload_expectation.with(eq(
           @subaccount_bc.public_json_path
-        ).or(eq(
+        ).or eq(
           @subaccount_bc.public_css_path
-        ).or(eq(
-               @subaccount_bc.public_js_path
-             ))))
+        ).or eq(
+          @subaccount_bc.public_js_path
+        ))
         @subaccount_bc.save_all_files!
       end
     end

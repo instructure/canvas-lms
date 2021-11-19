@@ -146,12 +146,14 @@ class Group < ActiveRecord::Base
   end
 
   def auto_accept?
-    self.group_category&.allows_multiple_memberships? &&
+    self.group_category &&
+      self.group_category.allows_multiple_memberships? &&
       self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?
-    self.group_category&.allows_multiple_memberships? &&
+    self.group_category &&
+      self.group_category.allows_multiple_memberships? &&
       ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
 
@@ -166,7 +168,7 @@ class Group < ActiveRecord::Base
   end
 
   def group_category_limit_met?
-    group_category&.group_limit && participating_users.size >= group_category.group_limit
+    group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
   end
 
   def context_external_tools
@@ -176,7 +178,7 @@ class Group < ActiveRecord::Base
   private :group_category_limit_met?
 
   def student_organized?
-    group_category&.student_organized?
+    group_category && group_category.student_organized?
   end
 
   def update_max_membership_from_group_category
@@ -231,9 +233,8 @@ class Group < ActiveRecord::Base
 
   def has_member?(user)
     return nil unless user.present?
-
     if self.group_memberships.loaded?
-      self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
     else
       self.participating_group_memberships.where(user_id: user).first
     end
@@ -266,14 +267,14 @@ class Group < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }
+    ids = codes.map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }.compact
     Group.find(ids)
   end
 
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
 
-    sanitize_sql([<<~SQL.squish, groups])
+    sanitize_sql([<<~SQL, groups])
       NOT EXISTS (SELECT * FROM #{GroupMembership.quoted_table_name} gm
       WHERE gm.user_id = users.id AND
       gm.workflow_state != 'deleted' AND
@@ -307,7 +308,7 @@ class Group < ActiveRecord::Base
 
   scope :active, -> { where("groups.workflow_state<>'deleted'") }
   scope :by_name, -> { order(Bookmarker.order_by) }
-  scope :uncategorized, -> { where(groups: { group_category_id: nil }) }
+  scope :uncategorized, -> { where("groups.group_category_id IS NULL") }
 
   def potential_collaborators
     if context.is_a?(Course)
@@ -336,7 +337,7 @@ class Group < ActiveRecord::Base
 
   # this method is idempotent
   def add_user(user, new_record_state = nil, moderator = nil)
-    return nil unless user
+    return nil if !user
 
     attrs = { :user => user, :moderator => !!moderator }
     new_record_state ||= case self.join_level
@@ -359,14 +360,14 @@ class Group < ActiveRecord::Base
     end
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
-    member
+    return member
   end
 
   def set_users(users)
     user_ids = users.map(&:id)
     memberships = []
     transaction do
-      self.group_memberships.where.not(user_id: user_ids).destroy_all
+      self.group_memberships.where("user_id NOT IN (?)", user_ids).destroy_all
       users.each do |user|
         memberships << invite_user(user)
       end
@@ -386,9 +387,9 @@ class Group < ActiveRecord::Base
     return if users.empty?
 
     user_ids = users.map(&:id)
-    old_group_memberships = self.group_memberships.where(user_id: user_ids).to_a
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
     bulk_insert_group_memberships(users, options)
-    all_group_memberships = self.group_memberships.where(user_id: user_ids)
+    all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
     users.sort_by!(&:id)
@@ -445,7 +446,7 @@ class Group < ActiveRecord::Base
         invitees << User.where(id: key.to_i).first if val != '0'
       end
     end
-    invitees.compact.filter_map { |i| self.invite_user(i) }
+    invitees.compact.map { |i| self.invite_user(i) }.compact
   end
 
   def peer_groups
@@ -466,10 +467,9 @@ class Group < ActiveRecord::Base
   private :ensure_defaults
 
   def set_default_account
-    case self.context
-    when Course
+    if self.context && self.context.is_a?(Course)
       self.account = self.context.account
-    when Account
+    elsif self.context && self.context.is_a?(Account)
       self.account = self.context
     end
   end
@@ -544,7 +544,7 @@ class Group < ActiveRecord::Base
       given { group_category.try(:communities?) }
       can :create
 
-      given { |user, session| self.context&.grants_right?(user, session, :participate_as_student) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
       can :participate_as_student
 
       given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
@@ -593,13 +593,13 @@ class Group < ActiveRecord::Base
       end
       can :read and can :delete
 
-      given { |user, session| self.context&.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
+      given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
       can :post_to_forum
 
-      given { |user, session| self.context&.grants_all_rights?(user, session, :read_as_admin, :create_forum) }
+      given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :create_forum) }
       can :create_forum
 
-      given { |user, session| self.context&.grants_right?(user, session, :view_group_pages) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
       can :read and can :read_forum and can :read_announcements and can :read_roster
 
       # Join is participate + the group being in a state that allows joining directly (free_association)
@@ -612,16 +612,16 @@ class Group < ActiveRecord::Base
       given { |user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences) }
       can :create_conferences
 
-      given { |user, session| self.context&.grants_right?(user, session, :read_as_admin) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_as_admin) }
       can :read_as_admin
 
-      given { |user, session| self.context&.grants_right?(user, session, :read_sis) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_sis) }
       can :read_sis
 
-      given { |user, session| self.context&.grants_right?(user, session, :view_user_logins) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :view_user_logins) }
       can :view_user_logins
 
-      given { |user, session| self.context&.grants_right?(user, session, :read_email_addresses) }
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_email_addresses) }
       can :read_email_addresses
     end
   end
@@ -637,15 +637,13 @@ class Group < ActiveRecord::Base
     return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
-
-    case self.context
-    when Course
+    if self.context.is_a?(Course)
       return self.context.enrollments.not_fake.where(:user_id => user.id).active_by_date.exists?
-    when Account
+    elsif self.context.is_a?(Account)
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
 
-    false
+    return false
   end
 
   def can_join?(user)
@@ -683,7 +681,7 @@ class Group < ActiveRecord::Base
   end
 
   def quota
-    self.storage_quota || self.account.default_group_storage_quota || self.class.default_storage_quota
+    return self.storage_quota || self.account.default_group_storage_quota || self.class.default_storage_quota
   end
 
   def self.default_storage_quota
@@ -720,9 +718,7 @@ class Group < ActiveRecord::Base
     available_tabs
   end
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   def allow_media_comments?
     true
@@ -737,7 +733,7 @@ class Group < ActiveRecord::Base
     # exists solely for the migration that introduces the GroupCategory model).
     # this way group_category_name is correct if someone mistakenly uses it
     # (modulo category renaming in the GroupCategory model).
-    self.write_attribute(:category, self.group_category&.name)
+    self.write_attribute(:category, self.group_category && self.group_category.name)
   end
 
   def as_json(options = nil)
@@ -754,12 +750,12 @@ class Group < ActiveRecord::Base
   end
 
   def has_common_section?
-    self.context.is_a?(Course) &&
+    self.context && self.context.is_a?(Course) &&
       self.context.course_sections.active.any? { |section| section.common_to_users?(self.users) }
   end
 
   def has_common_section_with_user?(user)
-    return false unless self.context.is_a?(Course)
+    return false unless self.context && self.context.is_a?(Course)
 
     users = self.users.where(id: self.context.enrollments.active_or_pending.select(:user_id)) + [user]
     self.context.course_sections.active.any? { |section| section.common_to_users?(users) }

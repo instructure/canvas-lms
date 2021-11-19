@@ -83,16 +83,16 @@ module LiveEvents
 
     def run_thread
       loop do
-        return unless @running || !@queue.empty?
+        return unless @running || @queue.size > 0
 
         # pause thread so it will allow main thread to run
-        r = @queue.pop if @queue.empty?
+        r = @queue.pop if @queue.size == 0
 
         begin
           # r will be nil on first pass
           records = [r].compact
           total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
-          while !@queue.empty? && total_bytes < MAX_BYTE_THRESHOLD
+          while @queue.size > 0 && total_bytes < MAX_BYTE_THRESHOLD
             r = @queue.pop
             break if r == :stop || (records.size == 1 && records.first == :stop)
 
@@ -106,7 +106,7 @@ module LiveEvents
           end
           send_events(records)
         rescue => e
-          logger.error("Exception making LiveEvents async call: #{e}\n#{e.backtrace.first}")
+          logger.error("Exception making LiveEvents async call: #{e}")
         end
         LiveEvents.on_work_unit_end&.call
       end
@@ -127,7 +127,6 @@ module LiveEvents
 
     def send_events(records)
       return if records.empty?
-      return if records.include? :stop
 
       res = time_block do
         @stream_client.put_records(

@@ -25,7 +25,7 @@ class FilePreviewsController < ApplicationController
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
   def show
-    @file = @context.attachments.not_deleted.find_by(id: params[:file_id])
+    @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
     css_bundle :react_files
     unless @file
       @headers = false
@@ -53,10 +53,10 @@ class FilePreviewsController < ApplicationController
         url = GoogleDocsPreview.url_for(@file)
         redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query)
       # images
-      elsif @file.content_type&.start_with?('image/')
+      elsif @file.content_type =~ %r{\Aimage/}
         render template: 'file_previews/img_preview', layout: false
       # media files
-      elsif %r{\A(audio|video)/}.match?(@file.content_type)
+      elsif @file.content_type =~ %r{\A(audio|video)/}
         js_env NEW_FILES_PREVIEW: 1
         js_bundle :file_preview
         render template: 'file_previews/media_preview', layout: false

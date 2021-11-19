@@ -38,12 +38,11 @@ module DumpHelper
         if val.is_a?(Hash)
           find_dump_error(val.keys, "#{key}.keys", visited_dump_vars)
         end
-        case val
-        when Hash, Struct
+        if val.is_a?(Hash) || val.is_a?(Struct)
           val.each_pair do |k, v|
             find_dump_error(v, "#{key}[#{k.inspect}]", visited_dump_vars)
           end
-        when Array
+        elsif val.is_a?(Array)
           val.each_with_index do |v, i|
             find_dump_error(v, "#{key}[#{i}]", visited_dump_vars)
           end

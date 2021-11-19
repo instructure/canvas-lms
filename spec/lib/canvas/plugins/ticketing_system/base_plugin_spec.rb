@@ -21,13 +21,9 @@ require_dependency "canvas/plugins/ticketing_system/base_plugin"
 
 module Canvas::Plugins::TicketingSystem
   class FakePlugin < BasePlugin
-    def plugin_id
-      "fake_plugin"
-    end
+    def plugin_id; "fake_plugin"; end
 
-    def settings
-      { setting1: 1, setting2: 2 }
-    end
+    def settings; { setting1: 1, setting2: 2 }; end
 
     def export_error(report, conf)
       reports << [report, conf]
@@ -49,7 +45,7 @@ module Canvas::Plugins::TicketingSystem
   describe BasePlugin do
     describe "#register!" do
       it "interacts with the ticketing system to get this plugin registered" do
-        ticketing = double
+        ticketing = double()
         plugin = FakePlugin.new(ticketing)
         expect(ticketing).to receive(:register_plugin).with("fake_plugin", plugin.settings)
         plugin.register!
@@ -69,7 +65,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#enabled?" do
-      let(:ticketing) { double }
+      let(:ticketing) { double() }
       let(:plugin) { FakePlugin.new(ticketing) }
 
       it "is true if the plugin is selected and the config has values" do

@@ -172,7 +172,7 @@ module CanvasHttp
   end
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
-  def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w[http https], check_host: false)
+  def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w{http https}, check_host: false)
     value = value.strip
     raise ArgumentError if value.empty?
 
@@ -202,7 +202,7 @@ module CanvasHttp
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
     raise InsecureUriError if check_host && self.insecure_host?(uri.host)
 
-    [value, uri]
+    return value, uri
   end
 
   def self.insecure_host?(host)
@@ -215,14 +215,14 @@ module CanvasHttp
       raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
 
-    ip_addrs = resolved_addrs.filter_map do |ip|
+    ip_addrs = resolved_addrs.map do |ip|
       ::IPAddr.new(ip)
     rescue IPAddr::InvalidAddressError
       # this should never happen, Resolv should only be passing back IPs, but
       # let's make sure we can see if the impossible occurs
       logger.warn("CANVAS_HTTP WARNING | host: #{host} | invalid_ip: #{ip}")
       nil
-    end
+    end.compact
     unless ip_addrs.any?
       raise UnresolvableUriError, "#{host} resolves to only unparseable IPs..."
     end
@@ -245,7 +245,7 @@ module CanvasHttp
     http.use_ssl = (uri.scheme == 'https')
     http.ssl_timeout = http.open_timeout = open_timeout
     http.read_timeout = read_timeout
-    http
+    return http
   end
 
   def self.open_timeout

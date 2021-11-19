@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper"
+require_relative "../../spec_helper.rb"
 require_dependency "assignments/scoped_to_user"
 
 module Assignments
@@ -36,7 +36,9 @@ module Assignments
     let_once(:unpublished) do
       @course.assignments.create({
                                    title: 'unpublished assignment'
-                                 }).tap(&:unpublish)
+                                 }).tap do |assignment|
+        assignment.unpublish
+      end
     end
     let_once(:inactive) do
       @course.assignments.create({

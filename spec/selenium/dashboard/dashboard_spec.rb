@@ -76,7 +76,7 @@ describe "dashboard" do
 
     # so we can click the link w/o a page load
     def disable_recent_activity_header_course_link
-      driver.execute_script <<~JS
+      driver.execute_script <<-JS
         $('.stream-announcement .links a').attr('href', '#');
       JS
     end
@@ -189,7 +189,7 @@ describe "dashboard" do
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
       # appointment group update notification
-      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hours, Time.now.utc + 3.hours]])
+      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
       expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
@@ -208,7 +208,7 @@ describe "dashboard" do
 
       it "displays course name in course menu", priority: "1", test_id: 215586 do
         f('#global_nav_courses_link').click
-        expect(driver.current_url).not_to match(%r{/courses$})
+        expect(driver.current_url).not_to match(/\/courses$/)
         expect(fj("[aria-label='Courses tray'] h2:contains('Courses')")).to be_displayed
         wait_for_ajax_requests
         expect(fj("[aria-label='Courses tray'] a:contains('#{@course.name}')")).to be_displayed
@@ -330,7 +330,7 @@ describe "dashboard" do
       get "/"
       wait_for_ajaximations
 
-      expect(f('.recent_feedback a')).to have_attribute("href", %r{courses/#{@course.id}/assignments/#{assign.id}/submissions/#{@student.id}})
+      expect(f('.recent_feedback a')).to have_attribute("href", /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/)
       f('.recent_feedback a').click
       wait_for_ajaximations
 

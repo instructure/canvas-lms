@@ -69,10 +69,7 @@ describe Types::AssignmentType do
   end
 
   context "sis field" do
-    let_once(:sis_assignment) {
-      assignment.update!(sis_source_id: "sisAssignment")
-      assignment
-    }
+    let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -188,7 +185,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
+      assignment.update description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
     end
 
     it "includes description when lock settings allow" do
@@ -368,15 +365,15 @@ describe Types::AssignmentType do
 
   describe 'groupSubmissionConnection' do
     before(:once) do
-      course_with_teacher
+      course_with_teacher()
       assignment_model(group_category: 'GROUPS!')
       @group_category.create_groups(2)
       2.times {
-        student_in_course
+        student_in_course()
         @group_category.groups.first.add_user(@user)
       }
       2.times {
-        student_in_course
+        student_in_course()
         @group_category.groups.last.add_user(@user)
       }
       @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')
@@ -445,7 +442,7 @@ describe Types::AssignmentType do
         }
       }
     GQL
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'assignment')).to be_nil
   end
 

@@ -64,7 +64,7 @@ class ConversationMessage < ActiveRecord::Base
       # crunch in ruby (generally none, unless a conversation has multiple
       # most-recent messages, i.e. same created_at)
       unless connection.adapter_name == 'PostgreSQL'
-        base_conditions += <<~SQL.squish
+        base_conditions += <<~SQL
           AND conversation_messages.created_at = (
             SELECT MAX(created_at)
             FROM conversation_messages cm2
@@ -81,8 +81,8 @@ class ConversationMessage < ActiveRecord::Base
               .select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags")
               .order('conversation_id DESC, user_id DESC, created_at DESC')
               .distinct_on(:conversation_id, :user_id).to_a
-        map = ret.index_by { |m| [m.conversation_id, m.user_id] }
-        backmap = ret.index_by(&:conversation_participant_id)
+        map = Hash[ret.map { |m| [[m.conversation_id, m.user_id], m] }]
+        backmap = Hash[ret.map { |m| [m.conversation_participant_id, m] }]
         if author
           shard_participants.each { |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
         else
@@ -92,7 +92,7 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  validates :body, length: { :maximum => maximum_text_length }
+  validates_length_of :body, :maximum => maximum_text_length
 
   has_a_broadcast_policy
   set_broadcast_policy do |p|
@@ -159,7 +159,9 @@ class ConversationMessage < ActiveRecord::Base
     previous_attachment_ids = self.attachment_associations.pluck(:attachment_id)
     deleted_attachment_ids = previous_attachment_ids - attachment_ids
     new_attachment_ids = attachment_ids - previous_attachment_ids
-    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each(&:destroy)
+    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each do |association|
+      association.destroy
+    end
     if new_attachment_ids.any?
       author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
         self.attachment_associations.create!(attachment: attachment)
@@ -197,7 +199,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def new_recipients
     return [] unless conversation
-    return [] unless generated? && event_data[:event_type] == :users_added
+    return [] unless generated? and event_data[:event_type] == :users_added
 
     recipients.select { |u| event_data[:user_ids].include?(u.id) }
   end
@@ -237,7 +239,7 @@ class ConversationMessage < ActiveRecord::Base
     return if skip_broadcasts
     return unless @generate_user_note
 
-    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?(&:enable_user_notes) }
+    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any? { |a| a.enable_user_notes } }
     return unless valid_recipients.any?
 
     valid_recipients = User.where(:id => valid_recipients) # need to reload to get all the attributes needed for User#save
@@ -333,7 +335,7 @@ class ConversationMessage < ActiveRecord::Base
     # -----
     # context
     content = "<div>#{ERB::Util.h(self.body)}</div>"
-    unless self.attachments.empty?
+    if !self.attachments.empty?
       content += "<ul>"
       self.attachments.each do |attachment|
         href = file_download_url(attachment, :verifier => attachment.uuid,

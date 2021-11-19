@@ -40,7 +40,7 @@ class EnrollmentState < ActiveRecord::Base
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
 
-  validates :enrollment_id, presence: true
+  validates_presence_of :enrollment_id
 
   resolves_root_account through: :enrollment
 
@@ -105,7 +105,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def pending?
-    %w[pending_active pending_invited creation_pending].include?(self.state)
+    %w{pending_active pending_invited creation_pending}.include?(self.state)
   end
 
   def recalculate_state
@@ -113,7 +113,7 @@ class EnrollmentState < ActiveRecord::Base
     self.state_started_at = nil
 
     wf_state = self.enrollment.workflow_state
-    invited_or_active = %w[invited active].include?(wf_state)
+    invited_or_active = %w{invited active}.include?(wf_state)
 
     if invited_or_active
       if self.enrollment.course.completed?
@@ -158,14 +158,14 @@ class EnrollmentState < ActiveRecord::Base
       self.state_started_at = start_at
       self.state_valid_until = end_at # stores the next date trigger
     else
-      global_start_at = ranges.map(&:compact).filter_map(&:min).min
+      global_start_at = ranges.map(&:compact).map(&:min).compact.min
 
       if !global_start_at
         # Not strictly within any range so no translation needed
         self.state = wf_state
       elsif global_start_at < now
         # we've past the end date so no matter what the state was, we're "completed" now
-        self.state_started_at = ranges.filter_map(&:last).min
+        self.state_started_at = ranges.map(&:last).compact.min
         self.state = 'completed'
       elsif self.enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts
@@ -173,18 +173,18 @@ class EnrollmentState < ActiveRecord::Base
       else
         # the course has yet to begin for the enrollment
         self.state_valid_until = global_start_at # store the date when that will change
-        self.state = if self.enrollment.view_restrictable?
-                       # these enrollment states mean they still can't participate yet even if they've accepted it,
-                       # but should be able to view just like an invited enrollment
-                       if wf_state == 'active'
-                         'pending_active'
-                       else
-                         'pending_invited'
-                       end
-                     else
-                       # admin user restricted by term dates
-                       'inactive'
-                     end
+        if self.enrollment.view_restrictable?
+          # these enrollment states mean they still can't participate yet even if they've accepted it,
+          # but should be able to view just like an invited enrollment
+          if wf_state == 'active'
+            self.state = 'pending_active'
+          else
+            self.state = 'pending_invited'
+          end
+        else
+          # admin user restricted by term dates
+          self.state = 'inactive'
+        end
       end
     end
   end
@@ -193,17 +193,18 @@ class EnrollmentState < ActiveRecord::Base
   # you can still access the course in a "view-only" mode
   # but courses/accounts can disable this
   def recalculate_access
-    self.restricted_access = if self.enrollment.view_restrictable?
-                               if self.pending?
-                                 self.enrollment.restrict_future_view?
-                               elsif self.state == 'completed'
-                                 self.enrollment.restrict_past_view?
-                               else
-                                 false
-                               end
-                             else
-                               false
-                             end
+    if self.enrollment.view_restrictable?
+      self.restricted_access =
+        if self.pending?
+          self.enrollment.restrict_future_view?
+        elsif self.state == 'completed'
+          self.enrollment.restrict_past_view?
+        else
+          false
+        end
+    else
+      self.restricted_access = false
+    end
     self.access_is_current = true
   end
 
@@ -254,7 +255,7 @@ class EnrollmentState < ActiveRecord::Base
     enrollment.enrollment_state.ensure_current_state
   end
 
-  INVALIDATEABLE_STATES = %w[pending_invited pending_active invited active completed inactive].freeze # don't worry about creation_pending or rejected, etc
+  INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
     EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES)
                    .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
@@ -280,7 +281,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def self.enrollments_for_account_ids(account_ids)
-    Enrollment.joins(:course).where(:courses => { :account_id => account_ids }).where(:type => %w[StudentEnrollment ObserverEnrollment])
+    Enrollment.joins(:course).where(:courses => { :account_id => account_ids }).where(:type => %w{StudentEnrollment ObserverEnrollment})
   end
 
   ENROLLMENT_BATCH_SIZE = 1_000
@@ -327,7 +328,7 @@ class EnrollmentState < ActiveRecord::Base
 
   def self.invalidate_access_for_course(course, changed_keys)
     states_to_update = access_states_to_update(changed_keys)
-    scope = course.enrollments.where(:type => %w[StudentEnrollment ObserverEnrollment])
+    scope = course.enrollments.where(:type => %w{StudentEnrollment ObserverEnrollment})
     if invalidate_access(scope, states_to_update) > 0
       process_states_for(enrollments_needing_calculation(scope))
     end

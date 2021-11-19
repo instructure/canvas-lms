@@ -17,7 +17,6 @@
  */
 
 import NumberInputDriver from './NumberInputDriver'
-import {queryByLabelText, getByTestId} from '@testing-library/react'
 
 export default class DimensionsInputDriver {
   static find($parent) {
@@ -37,28 +36,11 @@ export default class DimensionsInputDriver {
   }
 
   get width() {
-    const $container = getByTestId(this.$element, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Width', $container)
+    return NumberInputDriver.findByLabelText('Width', this.$element)
   }
 
   get height() {
-    const $container = getByTestId(this.$element, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Height', $container)
-  }
-
-  get percentage() {
-    const $container = getByTestId(this.$element, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Percentage', $container)
-  }
-
-  get pixelsRadioButton() {
-    const $parent = getByTestId(this.$element, 'dimension-type')
-    return queryByLabelText($parent, 'Pixels', {exact: false})
-  }
-
-  get percentageRadioButton() {
-    const $parent = getByTestId(this.$element, 'dimension-type')
-    return queryByLabelText($parent, 'Percentage', {exact: false})
+    return NumberInputDriver.findByLabelText('Height', this.$element)
   }
 
   get messageTexts() {

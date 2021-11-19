@@ -75,7 +75,7 @@ module Lti::IMS
       :verify_valid_score_maximum,
       :verify_valid_submitted_at,
       :verify_valid_content_item_submission_type,
-      :verify_attempts_for_online_upload
+      :verify_attempts_for_online_upload,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'
@@ -195,9 +195,9 @@ module Lti::IMS
           json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
         rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
           return render_error('failed to communicate with file service', :gateway_timeout)
-        rescue CanvasHttp::InvalidResponseCodeError => e
-          err_message = "uploading to file service failed with #{e.code}: #{e.body}"
-          return render_error(err_message, :bad_request) if e.code == 400
+        rescue CanvasHttp::InvalidResponseCodeError => err
+          err_message = "uploading to file service failed with #{err.code}: #{err.body}"
+          return render_error(err_message, :bad_request) if err.code == 400
 
           # 5xx and other unexpected errors
           return render_error(err_message, :internal_server_error)
@@ -260,7 +260,7 @@ module Lti::IMS
 
     def verify_valid_submitted_at
       submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at_date = submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
+      submitted_at_date = submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
       future_buffer = Setting.get('ags_submitted_at_future_buffer', 1.minute.to_s).to_i.seconds
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -412,7 +412,7 @@ module Lti::IMS
     end
 
     def timestamp
-      @_timestamp = Time.zone.iso8601(params[:timestamp]) rescue nil
+      @_timestamp = Time.zone.parse(params[:timestamp]) rescue nil
     end
 
     def result_url
@@ -439,7 +439,7 @@ module Lti::IMS
 
     def submitted_at
       submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
+      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
     end
 
     def file_content_items

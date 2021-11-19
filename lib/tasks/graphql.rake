@@ -5,11 +5,11 @@ namespace :graphql do
   task schema: :environment do
     GraphQLPostgresTimeout.do_not_wrap = true
 
-    Rails.root.join("schema.graphql").open("w") do |f|
+    File.open("#{Rails.root}/schema.graphql", "w") { |f|
       f.puts CanvasSchema.to_definition
-    end
+    }
 
-    Rails.root.join("ui/shared/apollo/fragmentTypes.json").open("w") do |f|
+    File.open("#{Rails.root}/ui/shared/apollo/fragmentTypes.json", "w") { |f|
       types = CanvasSchema.execute(<<~GQL)
         {
           __schema {
@@ -25,7 +25,7 @@ namespace :graphql do
       GQL
       types["data"]["__schema"]["types"].reject! { |t| t["possibleTypes"].nil? }
       f.puts JSON.pretty_generate(types["data"])
-    end
+    }
   end
 
   namespace :subgraph do

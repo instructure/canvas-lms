@@ -19,7 +19,7 @@
 
 module CustomWaitMethods
   def wait_for_dom_ready
-    result = driver.execute_async_script(<<~JS)
+    result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       if (document.readyState === "complete") {
         callback(0);
@@ -40,7 +40,7 @@ module CustomWaitMethods
   # If we're looking for the loading image, we can't just do a normal assertion, because the image
   # could end up getting loaded too quickly.
   def wait_for_transient_element(selector)
-    driver.execute_script(<<~JS)
+    driver.execute_script(<<-JS)
       window.__WAIT_FOR_LOADING_IMAGE = 0
       window.__WAIT_FOR_LOADING_IMAGE_CALLBACK = null
 
@@ -79,7 +79,7 @@ module CustomWaitMethods
 
     yield
 
-    result = driver.execute_async_script(<<~JS)
+    result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1]
       if (window.__WAIT_FOR_LOADING_IMAGE == 2) {
         callback(0)
@@ -94,7 +94,7 @@ module CustomWaitMethods
   def wait_for_ajax_requests(bridge = nil)
     bridge = driver if bridge.nil?
 
-    result = bridge.execute_async_script(<<~JS)
+    result = bridge.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       // see code in ui/boot/index.js for where
       // __CANVAS_IN_FLIGHT_XHR_REQUESTS__ and 'canvasXHRComplete' come from
@@ -132,7 +132,7 @@ module CustomWaitMethods
   def wait_for_animations(bridge = nil)
     bridge = driver if bridge.nil?
 
-    bridge.execute_async_script(<<~JS)
+    bridge.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       if (typeof($) == 'undefined') {
         callback(-1);
@@ -200,8 +200,8 @@ module CustomWaitMethods
     end
   end
 
-  def pause_ajax(&block)
-    SeleniumDriverSetup.request_mutex.synchronize(&block)
+  def pause_ajax
+    SeleniumDriverSetup.request_mutex.synchronize { yield }
   end
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
@@ -246,8 +246,10 @@ module CustomWaitMethods
     tiny_frame
   end
 
-  def disable_implicit_wait(&block)
-    ::SeleniumExtensions::FinderWaiting.disable(&block)
+  def disable_implicit_wait
+    ::SeleniumExtensions::FinderWaiting.disable do
+      yield
+    end
   end
 
   # little wrapper around Selenium::WebDriver::Wait, notably it:

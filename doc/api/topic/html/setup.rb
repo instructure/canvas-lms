@@ -36,7 +36,7 @@ def method_details_list
 end
 
 def topic_doc
-  @docstring = options[:controllers].map(&:docstring).join("\n\n")
+  @docstring = options[:controllers].map { |c| c.docstring }.join("\n\n")
   @object = @object.dup
   def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition rubocop bug?
   @json_objects = options[:json_objects][@resource] || []
@@ -88,9 +88,9 @@ def render_value(prop)
   when 'object'
     JSON.generate(value)
   when 'integer', 'number', 'boolean' then value.to_s
-  when 'string', 'datetime' then %("#{value}")
+  when 'string', 'datetime' then %{"#{value}"}
   else
-    raise ArgumentError, %(invalid or missing "type" in API property: #{prop.inspect})
+    raise ArgumentError, %{invalid or missing "type" in API property: #{prop.inspect}}
   end
 end
 
@@ -103,7 +103,7 @@ def render_properties(json)
     result << ("{\n" + indent(
       properties.map do |name, prop|
         render_comment(prop) +
-        %("#{name}": ) + render_value(prop)
+        %{"#{name}": } + render_value(prop)
       end.join(",\n")
     ) + "\n}")
   end

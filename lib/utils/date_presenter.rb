@@ -41,7 +41,7 @@ module Utils
         return i18n_date(:short) if date.this_year? || style == :short
       end
 
-      i18n_date(:medium)
+      return i18n_date(:medium)
     end
 
     private

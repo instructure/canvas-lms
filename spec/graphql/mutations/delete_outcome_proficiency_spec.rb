@@ -50,53 +50,53 @@ describe Mutations::DeleteOutcomeProficiency do
   end
 
   it "deletes an outcome proficency with legacy id" do
-    query = <<~GQL
+    query = <<~QUERY
       id: #{original_record.id}
-    GQL
+    QUERY
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
   end
 
   it "deletes an outcome proficency with relay id" do
-    query = <<~GQL
+    query = <<~QUERY
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('OutcomeProficiency').call(original_record.id.to_s)}
-    GQL
+    QUERY
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'deleteOutcomeProficiency', 'errors')
+      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeProficiency', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_scales permission" do
-      query = <<~GQL
+      query = <<~QUERY
         id: #{original_record.id}
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid id" do
-      query = <<~GQL
+      query = <<~QUERY
         id: 0
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'Unable to find OutcomeProficiency')
     end
 
     it "does not delete a record twice" do
       original_record.destroy
-      query = <<~GQL
+      query = <<~QUERY
         id: #{original_record.id}
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'Unable to find OutcomeProficiency')
     end

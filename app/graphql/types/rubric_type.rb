@@ -25,9 +25,9 @@ module Types
 
     global_id_field :id
 
-    field :criteria, [RubricCriterionType], <<~MD, null: false
+    field :criteria, [RubricCriterionType], <<~DESC, null: false
       The different criteria that makes up this rubric
-    MD
+    DESC
 
     field :free_form_criterion_comments, Boolean, null: false
     def free_form_criterion_comments

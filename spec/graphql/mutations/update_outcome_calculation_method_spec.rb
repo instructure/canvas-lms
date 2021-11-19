@@ -56,20 +56,20 @@ describe Mutations::UpdateOutcomeCalculationMethod do
   end
 
   it "updates an outcome calculation method" do
-    query = <<~GQL
+    query = <<~QUERY
       id: #{original_record.id}
       calculationMethod: "highest"
       calculationInt: null
-    GQL
+    QUERY
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'updateOutcomeCalculationMethod', 'errors')).to be_nil
     result = result.dig('data', 'updateOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result['_id'])
-    expect(result['contextType']).to eq 'Course'
-    expect(result['contextId']).to eq @course.id.to_s
-    expect(result['calculationMethod']).to eq 'highest'
-    expect(result['calculationInt']).to be_nil
+    record = OutcomeCalculationMethod.find(result.dig('_id'))
+    expect(result.dig('contextType')).to eq 'Course'
+    expect(result.dig('contextId')).to eq @course.id.to_s
+    expect(result.dig('calculationMethod')).to eq 'highest'
+    expect(result.dig('calculationInt')).to be_nil
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
     expect(record.context).to eq @course
@@ -77,14 +77,14 @@ describe Mutations::UpdateOutcomeCalculationMethod do
 
   it "restores previously soft-deleted record" do
     original_record.destroy
-    query = <<~GQL
+    query = <<~QUERY
       id: #{original_record.id}
       calculationMethod: "highest"
       calculationInt: null
-    GQL
+    QUERY
     result = execute_with_input(query)
     result = result.dig('data', 'updateOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result['_id'])
+    record = OutcomeCalculationMethod.find(result.dig('_id'))
     expect(record.id).to eq original_record.id
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
@@ -92,35 +92,35 @@ describe Mutations::UpdateOutcomeCalculationMethod do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
+      errors = result.dig('errors') || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_calculations permission" do
-      query = <<~GQL
+      query = <<~QUERY
         id: #{original_record.id}
         calculationMethod: "highest"
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid calculation method" do
-      query = <<~GQL
+      query = <<~QUERY
         id: #{original_record.id}
         calculationMethod: "foobaz"
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'calculation_method must be one of')
     end
 
     it "invalid calculation int" do
-      query = <<~GQL
+      query = <<~QUERY
         id: #{original_record.id}
         calculationMethod: "highest"
         calculationInt: 100
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid calculation_int for this calculation_method')
     end

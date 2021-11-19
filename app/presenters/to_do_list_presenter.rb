@@ -36,9 +36,9 @@ class ToDoListPresenter
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
-      @needs_reviewing = assessment_requests.filter_map do |ar|
+      @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
-      end
+      end.compact
 
       # we need a complete list of courses first because we only care about the courses
       # from the assignments involved. not just the contexts handed in.
@@ -262,7 +262,8 @@ class ToDoListPresenter
       I18n.t('Ignore %{assignment}', :assignment => @assignment.title)
     end
 
-    def ignore_flash_message; end
+    def ignore_flash_message
+    end
 
     def submission_author_name
       @view.submission_author_name_for(@assessment_request, "#{I18n.t('user')}: ")

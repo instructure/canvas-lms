@@ -34,7 +34,7 @@ class Conversation < ActiveRecord::Base
 
   before_save :update_root_account_ids
 
-  validates :subject, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   attr_accessor :latest_messages_from_stream_item
 
@@ -61,11 +61,11 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.private_hash_for(users_or_user_ids, context_code = nil)
-    user_ids = if users_or_user_ids.first.is_a?(User)
-                 Shard.birth.activate { users_or_user_ids.map(&:id) }
-               else
-                 users_or_user_ids
-               end
+    if users_or_user_ids.first.is_a?(User)
+      user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
+    else
+      user_ids = users_or_user_ids
+    end
     str = user_ids.uniq.sort.join(',')
     str += "|#{context_code}" if context_code
     Digest::SHA1.hexdigest(str)
@@ -189,7 +189,7 @@ class Conversation < ActiveRecord::Base
         unless options[:no_messages]
           # give them all messages
           # NOTE: individual messages in group conversations don't have tags
-          self.class.connection.execute(sanitize_sql([<<~SQL.squish, self.id, current_user.id, user_ids]))
+          self.class.connection.execute(sanitize_sql([<<~SQL, self.id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state)
             SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
@@ -242,10 +242,10 @@ class Conversation < ActiveRecord::Base
       options = { :generated => false,
                   :update_for_sender => true,
                   :only_existing => false }.update(options)
-      options[:update_participants] = !options[:generated]         unless options.key?(:update_participants)
-      options[:update_for_skips]    = options[:update_for_sender]  unless options.key?(:update_for_skips)
+      options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
+      options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
-      options[:reset_unread_counts] = options[:update_participants] unless options.key?(:reset_unread_counts)
+      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
 
       message = body_or_obj.is_a?(ConversationMessage) ?
         body_or_obj :
@@ -365,7 +365,7 @@ class Conversation < ActiveRecord::Base
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
-        cps = cps.where.not(user_id: skip_participants.map(&:user_id)) if skip_participants.present?
+        cps = cps.where("user_id NOT IN (?)", skip_participants.map(&:user_id)) if skip_participants.present?
       end
 
       cps = cps.where(:user_id => (options[:only_users] + [message.author]).map(&:id)) if options[:only_users]
@@ -412,7 +412,7 @@ class Conversation < ActiveRecord::Base
         # some of the participants we're about to insert may have been soft-deleted,
         # so we'll hard-delete them before reinserting. It would probably be better
         # to update them instead, but meh.
-        inserting_user_ids = message_participant_data.pluck(:user_id)
+        inserting_user_ids = message_participant_data.map { |d| d[:user_id] }
         ConversationMessageParticipant.unique_constraint_retry do
           ConversationMessageParticipant.where(
             :conversation_message_id => message.id, :user_id => inserting_user_ids
@@ -451,17 +451,21 @@ class Conversation < ActiveRecord::Base
 
   def infer_new_tags_for(participant, all_new_tags)
     active_tags   = participant.user.conversation_context_codes(false)
-    context_codes = active_tags.presence || participant.user.conversation_context_codes
+    context_codes = active_tags.present? ? active_tags : participant.user.conversation_context_codes
     visible_codes = all_new_tags & context_codes
 
-    # limit available codes to codes the user can see
-    # otherwise, use all of the available tags
-    new_tags = visible_codes.presence || (current_context_strings & context_codes)
+    new_tags = if visible_codes.present?
+                 # limit available codes to codes the user can see
+                 visible_codes
+               else
+                 # otherwise, use all of the available tags.
+                 current_context_strings & context_codes
+               end
 
     message_tags = if self.private?
                      if new_tags.present?
                        new_tags
-                     elsif participant.message_count > 0 && (last_message = participant.last_message)
+                     elsif participant.message_count > 0 and (last_message = participant.last_message)
                        last_message.tags
                      end
                    end
@@ -491,7 +495,7 @@ class Conversation < ActiveRecord::Base
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
-      conversation_participants.where(user_id: skip_ids).update_all(updates.join(", "))
+      conversation_participants.where("user_id IN (?)", skip_ids).update_all(updates.join(", "))
 
       if message.has_attachments?
         self.has_attachments = true
@@ -509,7 +513,7 @@ class Conversation < ActiveRecord::Base
 
   def subscribed_participants
     ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
-    conversation_participants.select(&:subscribed?).filter_map(&:user)
+    conversation_participants.select(&:subscribed?).map(&:user).compact
   end
 
   def reply_from(opts)
@@ -759,7 +763,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def replies_locked_for?(user)
-    return false unless %w[Course Group].include?(self.context_type)
+    return false unless %w{Course Group}.include?(self.context_type)
 
     course = self.context.is_a?(Course) ? self.context : self.context.context
 
