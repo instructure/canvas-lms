@@ -30,11 +30,17 @@ describe '#configure!' do
     ActiveRecordQueryTrace
   end
 
+  before do
+    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LINES').and_return(nil)
+    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_TYPE').and_return(nil)
+    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LEVEL').and_return(nil)
+  end
+
   context 'when Rails ENV is test' do
     before { allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('true') }
 
-    it 'does not enable AR query trace' do
-      expect(subject.enabled).to eq false
+    it 'enables AR query trace' do
+      expect(subject.enabled).to eq true
     end
   end
 
@@ -50,15 +56,23 @@ describe '#configure!' do
   end
 
   context 'when Rails ENV is development' do
-    before { allow(Rails).to receive(:env) { 'development'.inquiry } }
+    before do
+      allow(Rails).to receive(:env) { 'development'.inquiry }
+    end
+
+    context 'and AR_QUERY_TRACE is falsy' do
+      before do
+        allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('0')
+      end
+
+      it 'disables AR query trace' do
+        expect(subject.enabled).to eq false
+      end
+    end
 
     context 'and AR_QUERY_TRACE is set' do
-      let(:env) { { 'AR_QUERY_TRACE' => 'true' } }
-
       before do
         allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('true')
-        allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LINES').and_return(nil)
-        allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_TYPE').and_return(nil)
       end
 
       it 'enables AR query trace' do
@@ -100,6 +114,16 @@ describe '#configure!' do
           it 'sets "query_type" to :all' do
             expect(subject.query_type).to eq :all
           end
+        end
+      end
+
+      context 'and AR_QUERY_TRACE_LEVEL is set' do
+        before do
+          allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LEVEL').and_return('full')
+        end
+
+        it 'sets "level" to the provided value' do
+          expect(subject.level).to eq :full
         end
       end
     end
