@@ -1868,6 +1868,7 @@ en-AU:
   add_items_to_score_range_297d413b: "Add Items to Score Range"
   add_link_5c01c1e8: "Add Link"
   add_link_fc336ed6: "Add link"
+  add_manage_conclude_delete_publish_reset_8a5aa902: "add / manage / conclude / delete / publish / reset"
   add_mastery_level_76469d98: "Add Mastery Level"
   add_media_cfa37b54: "Add Media"
   add_moderator_review_copy_1st_a484c813: "Add Moderator Review (Copy 1st)"
@@ -1890,8 +1891,11 @@ en-AU:
   add_observers_to_courses_6f494a29: "Add Observers to courses"
   add_old_quiz_f4c546a: "Add Old Quiz"
   add_outcome_597054ad: "Add outcome"
+  add_outcome_title_ce9dff87: "Add outcome %{title}"
+  add_outcomes_36272787: "Add Outcomes"
   add_outcomes_to_account_4647776f: "Add Outcomes to Account"
   add_outcomes_to_course_88ba09be: "Add Outcomes to Course"
+  add_outcomes_to_groupname_8c33d118: "Add Outcomes to \"%{groupName}\""
   add_override_da70f198: "Add Override"
   add_people_7948b7da: "Add people"
   add_people_7ee4b2ec: "Add People"
@@ -1938,12 +1942,14 @@ en-AU:
   add_user_s_by_b2549f89: "Add user(s) by"
   add_users_b10c7fb1: "Add Users"
   add_users_to_name_b8109bbb: "Add Users to %{name}"
+  add_word_count_to_speedgrader_d04dd417: "Add word count to SpeedGrader"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Add your assignments.  You can just make a long list, or break them up into groups - and even specify weights for each assignment group."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Add your Zendesk instance's custom field ID for each of the following (fields that do not have ID's will not be logged):"
   added_caption_1895db92: "Added caption"
   added_e8a39b2: Added
   added_mastery_level_dd4792d1: "Added mastery level"
   added_new_proficiency_rating_e30cab8a: "Added new proficiency rating"
+  added_outcome_title_3c258a9: "Added outcome %{title}"
   adding_rss_feed_f1202567: "Adding RSS Feed"
   adding_to_library_b552868: "Adding to Library"
   additional_comments_9aed10bb: "Additional Comments"
@@ -2078,6 +2084,7 @@ en-AU:
   all_accounts_3bafc860: "All Accounts"
   all_assignment_groups_a65e9e46: "All Assignment Groups"
   all_assignments_b79a4d6a: "All Assignments"
+  all_changes_published_27a53ffd: "All changes published"
   all_changes_were_saved_f6f3ddcc: "All changes were saved"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "All close dates must be on or after the end date"
   all_comments_are_sent_to_the_whole_group_284591e7: "All comments are sent to the whole group"
@@ -2107,6 +2114,7 @@ en-AU:
   all_my_files_a0213441: "All My Files"
   all_my_sections_375248b3: "All my sections"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "All outcomes from %{groupTitle} have been successfully added to this course."
+  all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "All outcomes from %{groupTitle} have been successfully added to %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "All outcomes from %{groupTitle} have been successfully added to this account."
   all_roles_f3bba14d: "All Roles"
   all_rubrics_5114c466: "All Rubrics"
@@ -2144,6 +2152,7 @@ en-AU:
   allow_final_grade_override_8cf4336b: "Allow final grade override"
   allow_final_grade_override_a21a79ee: "Allow Final Grade Override"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Allow for Apollo to cache graphQL queries on a users’ browser to speed up their experience"
+  allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Allow gradebook users to view and export student first and last names in separate columns"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Allow importing of QTI and Common Cartridge into New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Allow importing of QTI and Common Cartridge into Quizzes.Next."
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Allow importing of third party packages into New Quizzes"
@@ -2830,6 +2839,7 @@ en-AU:
       their name when it is shown in the user interface.
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Allows users with international phone numbers to receive text messages from Canvas."
+  also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Also note that Microsoft Teams is unable to support courses with greater than %{max_enrollments} enrolments or greater than %{max_owners} owners. If you have a large course, you may experience sync issues if these thresholds are met."
   alternate_description_for_parent_student_display_93fa6ce6: "Alternate description (for parent/student display)"
   alternative_description_for_parent_student_display_c6350ae3: "Alternative description (for parent/student display)"
   alumno_88c80e37: Alumno
@@ -3225,6 +3235,7 @@ en-AU:
   application_not_authorized_for_tenant_please_make__4d5e2607: "Application not authorised for tenant. Please make sure your admin has granted access for us to access your Microsoft tenant."
   application_secret_e6803c7e: "Application Secret"
   applied_cc7be774: Applied
+  applied_filters_63a90ccd: "Applied Filters:"
   apply_781a2546: Apply
   apply_changes_b1dffc70: "Apply Changes"
   apply_date_range_selection_cc4351ed: "Apply date range selection"
@@ -4891,6 +4902,7 @@ en-AU:
       groups, deselect the Let students organise their own groups checkbox in Course Settings.
   by_default_students_are_able_to_create_groups_to_r_d4901649: "By default students are able to create groups; to restrict students from creating groups, deselect the Let students organise their own groups checkbox in Course Settings."
   by_default_students_can_always_create_groups_in_a__149d08b7: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - add / edit / delete must be enabled and the Let students organise their own groups checkbox in Course Settings must be deselected."
+  by_default_students_can_always_create_groups_in_a__5727f4cf: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organise their own groups checkbox in Course Settings must not be selected."
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "By default, students can always create groups in a course."
   by_default_students_can_always_create_groups_in_a__af000dd: "By default, students can always create groups in a course. To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled and the Let students organise their own groups checkbox in Course Settings must be deselected."
   by_default_students_can_always_create_groups_in_a__dac761d3: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organise their own groups checkbox in Course Settings must not be selected."
@@ -5888,6 +5900,7 @@ en-AU:
   collaborations_tutorial_tray_9219d9d: "Collaborations Tutorial Tray"
   collapse_all_50275533: "Collapse All"
   collapse_all_modules_e092807c: "Collapse All Modules"
+  collapse_description_for_outcome_title_bcd9b8c9: "Collapse description for outcome %{title}"
   collapse_discussion_thread_52bab65a: "Collapse discussion thread"
   collapse_group_c2af7cad: "Collapse Group"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Collapse list of group members for %{groupName}"
@@ -7234,6 +7247,9 @@ en-AU:
   count_criteria_22927713: 
     one: "1 criterion"
     other: "%{count} criteria"
+  count_days_de0c6a32: 
+    one: "1 day"
+    other: "%{count} days"
   count_discussions_found_fc326362: "%{count} discussions found."
   count_errors_5cde7fdc: 
     one: "1 error"
@@ -7406,6 +7422,9 @@ en-AU:
     one: "1 submission needs marking"
     other: "%{count} submissions need marking"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%"
+  count_unpublished_changes_a366ed45: 
+    one: "%{count} unpublished changes"
+    other: "%{count} unpublished changes"
   count_unread_cff5855: "%{count} unread."
   count_unread_messages_99d6bf17: 
     one: "1 unread message"
@@ -7423,6 +7442,9 @@ en-AU:
   count_weeks_11fbd2dc: 
     one: "1 week"
     other: "%{count} weeks"
+  count_words_e0b79b82: 
+    one: "1 word"
+    other: "%{count} words"
   country_is_required_b0afbf52: "Country is required"
   country_or_region_26ea046c: "Country or Region"
   country_or_region_is_required_86917b39: "Country or Region is required"
@@ -8186,7 +8208,7 @@ en-AU:
         sis_source_id: "SIS ID"
         start_at: Starts
         storage_quota: "File Storage"
-        sync_enrollments_from_homeroom: "Sync enrolments and course start/end dates from homeroom"
+        sync_enrollments_from_homeroom: "Sync enrolments and subject start/end dates from homeroom"
         template: "Enable course as a Course Template"
         time_zone: "Time Zone"
         turnitin_comments: "Turnitin Comments"
@@ -8392,6 +8414,7 @@ en-AU:
   courses_course_templates_5a3fbafd: "Courses - Course Templates"
   courses_delete_20c9beb2: "Courses - delete"
   courses_edit_cbace938: "Courses - edit"
+  courses_manage_3ea9687f: "Courses - manage"
   courses_manage_update_d3e9263e: "Courses - manage / update"
   courses_navigation_menu_b3638384: "Courses Navigation Menu"
   courses_over_time_41dc0428: "courses over time"
@@ -8472,6 +8495,7 @@ en-AU:
   create_new_course_e3ef9cd0: "Create new course"
   create_new_discussions_6ab69da2: "Create new discussions"
   create_new_e0946c49: "Create new"
+  create_new_filter_c244aa92: "Create New Filter"
   create_new_group_bf9561d4: "Create New Group"
   create_new_group_fca5cc73: "Create new group"
   create_new_group_set_13b1f62a: "Create New Group Set"
@@ -8636,6 +8660,7 @@ en-AU:
   current_score_6c81792: "Current Score"
   current_score_74777363: "current score"
   current_slack_api_key_9eba6a5: "Current Slack Api Key:"
+  current_state_baac9c8: "current state:"
   current_theme_62e5e8cf: "Current theme"
   current_total_67bf5f72: "Current Total:"
   current_volume_level_c55ab825: "Current Volume Level"
@@ -9089,6 +9114,10 @@ en-AU:
   description_61f4296: "* Description"
   description_for_mastery_level_position_description_cc17114b: "Description for mastery level %{position}: %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Description for proficiency rating %{position}: %{description}"
+  descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} was changed from %{formattedOldValue} to %{formattedNewValue}."
+  descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} was set to %{formattedNewValue}."
+  descriptivename_was_turned_off_38771a19: "%{descriptiveName} was turned off."
+  descriptivename_was_turned_on_132583bb: "%{descriptiveName} was turned on."
   designer_c458392: Designer
   designers_add_c6335849: "Designers - add"
   designers_add_fe7e1ea9: "Designers - Add"
@@ -9630,6 +9659,7 @@ en-AU:
   discussions_post_62f64091: "Discussions - post"
   discussions_redesign_b505952d: "Discussions Redesign"
   discussions_redesign_isolated_view_78626c74: "Discussions Redesign - Isolated View"
+  discussions_redesign_reporting_f4abcc37: "Discussions Redesign - Reporting"
   discussions_tutorial_tray_4ef79bcc: "Discussions Tutorial Tray"
   discussions_view_c6818792: "Discussions - view"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Discussions with groups cannot be section-specific"
@@ -10736,6 +10766,7 @@ en-AU:
   expand_collapse_lang_73edc33c: "Expand/collapse %{lang}"
   expand_collapse_title_outcome_group_239f0a9d: "expand/collapse %{title} Outcome Group"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Expand/collapse %{title} Outcome Group, student meets mastery of %{mastery_count} of %{count} outcomes"
+  expand_description_for_outcome_title_abc8f30: "Expand description for outcome %{title}"
   expand_discussion_thread_fcbb2bcc: "Expand discussion thread"
   expand_global_navigation_2c28d5d4: "Expand global navigation"
   expand_group_53765272: "Expand Group"
@@ -11104,6 +11135,7 @@ en-AU:
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "File %{filename} could not be included in the ePub document. Please see separate zip file for access."
   file_has_no_data_213a4540: "File has no data"
   file_has_no_outcomes_data_1517801f: "File has no outcomes data"
+  file_has_not_finished_uploading_cfba3b2f: "File has not finished uploading"
   file_list_350d08df: "File List"
   file_list_updated_38e2a5ad: "File list updated"
   file_menu_cc0ca54: "File Menu"
@@ -11834,6 +11866,7 @@ en-AU:
   gradebook_export_failed_reason_2b0f6c53: "Gradebook Export Failed: %{reason}"
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Gradebook Export Sort Order Bugfix (Tally-219)"
   gradebook_export_started_723461b9: "Gradebook export started"
+  gradebook_filters_fc25f772: "Gradebook Filters"
   gradebook_history_a3e8e0b4: "Mark book History"
   gradebook_history_b03f8524: "Gradebook History…"
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: "Gradebook Import Reserved Names Bugfix (APG-122)"
@@ -13276,6 +13309,7 @@ en-AU:
       If an LTI tool configured with the placement is installed, will show a new entry in the
       assignment submission type dropdown to quickly configure the assignment for the tool
   if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page."
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "If both Grades - edit​ and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "If both Marks - edit and Marks - view all marks are disabled, Gradebook will be hidden from Course Navigation."
@@ -13285,6 +13319,8 @@ en-AU:
   if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "If Courses - add / edit / delete and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "If Courses - add is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings."
+  if_courses_manage_and_courses_undelete_are_also_en_9047d4b3: "If Courses - manage and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools."
+  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "If Courses - manage is enabled, but Blueprint Courses - add / edit / associate / delete is not enabled, users can still sync Blueprint Courses and view Sync history."
   if_courses_manage_update_and_courses_undelete_are__670ab844: "If Courses - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "If disabled, the Outcomes page becomes read-only and hides the Manage Rubrics button. User can still access individual assignment rubrics through Assignments."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "If disabled, user can still view and download files into a zip file."
@@ -13622,6 +13658,7 @@ en-AU:
   inactive_cd40317f: inactive
   inactive_enrollments_3b84be3d: "Inactive enrolments"
   inactive_enrollments_bd1831ea: "Inactive Enrolments"
+  inappropriate_1930c574: Inappropriate
   inbox_bb245a60: Inbox
   include_a_download_link_next_to_each_file_link_in__481761de: "Include a download link next to each file link in the RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Include a link to a screencast/screenshot using something like *Jing*."
@@ -14732,6 +14769,7 @@ en-AU:
   lti_launch_error_41eac9a: "LTI Launch Error"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI Multiple Assignment Deep Linking"
   lti_report_2b6193ab: "LTI Report"
+  lti_submissions_require_a_url_to_submit_85ca9988: "LTI submissions require a URL to submit"
   luxembourg_352_85f4124d: "Luxembourg (+352)"
   luxembourg_3bc645af: Luxembourg
   m2c_file_description: "Moodle 1.9/2.x"
@@ -14977,6 +15015,8 @@ en-AU:
     messages: 
       submitting: "Submitting Media File..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion; please try again in a short time."
+  media_objects: 
+    media_objects_not_configured: "Media Objects not configured"
   media_objects_c2fa37cd: "Media Objects"
   media_over_time_d9332e25: "media over time"
   media_record_not_available_f78c16dd: "Media record not available"
@@ -15001,6 +15041,8 @@ en-AU:
     managed_accounts: "Managed Accounts"
     my_courses: "My Courses"
   menu_39cb0e8e: Menu
+  menu_for_group_title_fbf60567: "Menu for group %{title}"
+  menu_for_outcome_title_1d93378d: "Menu for outcome %{title}"
   menu_of_options_for_this_permission_77f50c31: "Menu of options for this permission"
   menu_options_9b6b0b5c: "Menu options"
   message: 
@@ -15039,6 +15081,7 @@ en-AU:
     recipients: "Recipients:"
   message_students_for_context_ee62ff92: "Message students for %{context}"
   message_students_for_course_name_e55f8077: "Message students for %{course_name}"
+  message_students_for_groupcategoryname_cf245ca4: "Message students for %{groupCategoryName}"
   message_students_who_369b8488: "Message Students Who..."
   message_students_who_57f07a41: "Message Students Who"
   message_students_who_778ce759: "Message students who"
@@ -15859,6 +15902,16 @@ en-AU:
         course_starts_next_week: "Your course starts next week"
     dialog: 
       title: "Send a reply message"
+    discussion_entry_reported: 
+      email: 
+        body: "Reported as {report_type}: %{user}, %{course}"
+        html: 
+          body: "Reported as %{report_type}: %{user}, %{course}"
+          link: "Click to view the discussion"
+          subject: "Reported reply in %{discussion_topic}, %{course}"
+        subject: "Reported reply in %{discussion_topic}, %{course}"
+      summary: 
+        subject: "Reported reply in %{discussion_topic}, %{course}"
     email: 
       footer: |-
           You received this email because you are participating in one or more classes using Canvas.  To change or turn off email notifications, visit: 
@@ -16852,6 +16905,9 @@ en-AU:
   messages_send_to_entire_class_b8c5c704: "Messages - send to entire class"
   messages_send_to_individual_course_members_50ac20e1: "Messages - send to individual course members"
   messages_sent_b851d0dd: "Messages sent"
+  messages_unarchived_df1a4b97: 
+    one: "Message Unarchived!"
+    other: "Messages Unarchived!"
   method_c2a4e17a: Method
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
@@ -17174,6 +17230,7 @@ en-AU:
   more_options_e89670cf: "More options"
   more_people_options_730e9686: "More people options"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "More results were added at the bottom of the page."
+  more_submission_options_c8d50818: "More submission options"
   more_than_999_submissions_need_grading_bc087dd0: "More than 999 submissions need marking"
   more_than_9_submissions_need_grading_30157d49: "More than 9 submissions need grading."
   more_than_a19b440: "%{more_than}+"
@@ -17464,6 +17521,8 @@ en-AU:
   new_gradebook_plagiarism_indicator_8dd22971: "New Gradebook Plagiarism Indicator"
   new_group_category_66be9cbd: "New Group Category"
   new_group_set_7241a581: "New Group Set"
+  new_mention_ad04b872: "New Mention"
+  new_mention_in_a_discussion_efceb170: "New Mention in a Discussion"
   new_mention_in_a_discussion_post_235706f7: "New mention in a discussion post."
   new_module_4e9287e4: "New Module"
   new_note_5f05cb20: "New Note"
@@ -17479,6 +17538,7 @@ en-AU:
   new_quizzes_banks_migrations_9ab4de4a: "New Quizzes Banks Migrations"
   new_quizzes_build_button_in_module_items_10f651fb: "New Quizzes Build Button In Module Items"
   new_quizzes_dbda7e0a: "New Quizzes"
+  new_quizzes_description: "This feature enhances the Canvas experience for quizzing. When this flag is enabled, the New Quizzes tool will be available. For full details, please see the *New Quizzes user group* in the Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "New Quizzes Embedded Module Progression"
   new_quizzes_importing_c167dce0: "New Quizzes Importing"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes migration during course import/copy"
@@ -17491,6 +17551,7 @@ en-AU:
   new_rating_canceled_eed3c4ff: "New Rating Canceled"
   new_rating_created_54125331: "New Rating Created"
   new_release_note_37ec0ea7: "New Release Note"
+  new_reported_reply_in_a_discussion_45e25709: "New reported reply in a Discussion"
   new_sis_integrations: |-
       This feature applies to institutions with an existing SIS Canvas integration.
       Any customers that are currently using mark passback solutions in Canvas or
@@ -17602,6 +17663,7 @@ en-AU:
   no_ltis_configured_f4b9bc6b: "No LTIs Configured"
   no_marks_5e7d2b59: "No Marks"
   no_matches_to_your_search_16d3d3b1: "No matches to your search"
+  no_matching_external_tool_found_ffc3abc3: "no matching external tool found"
   no_matching_users_found_83889c10: "No matching users found."
   no_message_present_e3af6358: "No message present"
   no_migration_file: "File required for content migration."
@@ -17666,6 +17728,7 @@ en-AU:
   norwegian_bokmal_ad5843fa: "Norwegian Bokmål"
   norwegian_nynorsk_c785f8a6: "Norwegian Nynorsk"
   not_a_number: "must be a positive number"
+  not_a_participant_3d723cfb: "not a participant"
   not_a_valid_date_d3ac20ba: "Not a valid date"
   not_a_valid_utf_8_string_string_7f6819c: "Not a valid utf-8 string: %{string}"
   not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
@@ -17687,6 +17750,7 @@ en-AU:
   not_completed_55fb4c00: "Not Completed"
   not_completed_d70acea3: "Not completed"
   not_factored_into_grading_455dcf6a: "Not factored into grading"
+  not_for_this_conversation_f5271cf5: "not for this conversation"
   not_graded_e027c866: "Not Marked"
   not_graded_e78bcd50: "Not marked"
   not_graded_yet_82f63c67: "Not Marked Yet"
@@ -17818,10 +17882,10 @@ en-AU:
               * Quiz content
               * Assignment content
     course_content_display: "Course Content"
-    discussion_description: "New discussion topic in your course"
-    discussion_display: Discussion
-    discussion_post_description: "New discussion post in a topic you're subscribed to"
-    discussion_post_display: "Discussion Post"
+    discussion_description: "New Discussion topic in your course"
+    discussion_display: "New Topic"
+    discussion_post_description: "New reply on a topic you're subscribed to"
+    discussion_post_display: "New Reply"
     due_date_description: "Assignment due date change"
     due_date_display: "Due Date"
     files_description: "New file added to your course"
@@ -18141,6 +18205,7 @@ en-AU:
   of_students_5d1af0d2: "# of students"
   off_5385ef3f: "Off"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Off - Policy will not apply to this sub-account"
+  offensive_abusive_c41dcb08: "Offensive, abusive"
   offline_score_8d7b4779: "Offline Score:"
   offline_web_export_dca67174: "Offline Web Export"
   ok_c47544a2: OK
@@ -18813,6 +18878,7 @@ en-AU:
   please_provide_a_pairing_code_530d1e9d: "Please provide a pairing code."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Please provide a valid tenant domain. Check your Azure Active Directory settings to find it."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Please select a group set for this assignment"
+  please_select_a_reason_for_reporting_this_reply_51719e8d: "Please select a reason for reporting this reply"
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
   please_select_an_item_30c287ef: "Please select an item"
   please_select_one_f931e883: "Please select one."
@@ -19193,6 +19259,7 @@ en-AU:
       name: Sessions
     sessions_timeout: 
       labels: 
+        mobile_timeout: "Time before session expires in minutes (20 minimum) for mobile applications"
         session_timeout: "Time before session expires in minutes (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "This changes the settings for ALL ACCOUNTS!"
@@ -21578,8 +21645,10 @@ en-AU:
   read_comments_3fcc7590: "Read comments"
   read_context_membership_8068f3dd: "Read Context Membership"
   read_dc99757a: Read
+  read_less_ae7bd04f: "Read Less"
   read_line_item_results_6472a120: "Read Line Item Results"
   read_line_items_ea6f7fa4: "Read Line Items"
+  read_more_f69fb6ec: "Read More"
   read_only_3d26d8fe: "Read only"
   read_state_change_failed_859eeaa1: "Read state change failed"
   read_state_change_operation_failed_86710e1: "Read state change operation failed"
@@ -21622,6 +21691,7 @@ en-AU:
       other: "%{count} sections"
   recipients_a69b5e55: "Recipients:"
   recipients_restricted_by_role_22c4c843: "Recipients restricted by role"
+  recipients_students_who_have_not_joined_a_group_a0c6a3c: "Recipients: Students who have not joined a group"
   record_7c9448b: Record
   record_an_audio_or_video_comment_88425add: "Record an audio or video comment"
   record_audio_14666880: "Record Audio"
@@ -21751,6 +21821,7 @@ en-AU:
   remove_file_cbf3f40f: "Remove file"
   remove_filename_87f3781e: "remove %{filename}"
   remove_filename_dab5c02e: "Remove %{filename}"
+  remove_filter_6f7204e2: "Remove filter"
   remove_grading_scheme_title_d3942a08: "Remove Grading Scheme %{title}"
   remove_group_5d2f2f2d: "Remove Group"
   remove_group_981d6a02: "Remove Group?"
@@ -21854,9 +21925,16 @@ en-AU:
   replycount_replies_unreadcount_unread_a85c0bc8: 
     one: "%{replyCount} reply, %{unreadCount} unread"
     other: "%{replyCount} replies, %{unreadCount} unread"
+  report_58d2ac9e: Report
   report_has_been_aborted_2b5763ed: "Report has been aborted"
   report_issue_b5f1db0e: "Report Issue"
+  report_replies_500cdcd3: "Report replies"
+  report_reply_5af43ed0: "Report Reply"
+  report_reply_options_44e47591: "Report Reply Options"
   reported_3de7086a: Reported
+  reported_replies_will_be_sent_to_your_teacher_for__e7c814ec: "Reported replies will be sent to your teacher for review. You will not be able to undo this action."
+  reported_reply_8e03db37: "Reported Reply"
+  reportedreply_56f61a42: ReportedReply
   reports_1b9ab7a7: Reports
   reports_account_settings_78f5336a: "Reports (Account Settings)"
   reports_course_f09b7d9e: "Reports (Course)"
@@ -21869,6 +21947,8 @@ en-AU:
   require_authentication_provider_on_logins_2aeb580e: "Require Authentication Provider on Logins"
   require_authenticion_provider_on_logins_1dba5ef7: "Require Authenticion Provider on Logins"
   require_captcha_for_self_registration_b3b2ea02: "Require Captcha for Self Registration"
+  require_completion_by_end_date_bd154e32: "Require Completion by End Date"
+  require_completion_by_end_date_was_turned_on_and_s_756fc89c: "Require Completion by End Date was turned on and set to %{date}."
   require_completion_by_specified_end_date_ed742ecb: "Require Completion by Specified End Date"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Require group members to be in the same section"
   require_respondus_lockdown_browser_31425b3a: "Require Respondus LockDown Browser"
@@ -21877,6 +21957,7 @@ en-AU:
   required_access_code_592902d7: "Required access code"
   required_email_address_379b2392: "Required Email Address"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Required fields include key name, owner email, tool ID, redirect URL, and icon URL."
+  required_input_message_all_unassigned_students_1e721442: "Required input. Message all unassigned students."
   required_to_view_quiz_results_dba7368b: "Required to view quiz results"
   required_values_1eb5841f: "Required Values"
   requirement_f5b75da1: Requirement
@@ -22669,6 +22750,7 @@ en-AU:
   select_one_b647b384: "Select one"
   select_one_of_the_options_c8b0c6e4: "Select one of the options:"
   select_outcome_7e6e2562: "Select outcome"
+  select_outcome_title_b99b3ca0: "Select outcome %{title}"
   select_page_e93fc123: "Select page"
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "Select Placements. Type or use arrow keys to navigate. Multiple selections are allowed."
   select_prerequisite_module_57894963: "Select prerequisite module"
@@ -22806,6 +22888,7 @@ en-AU:
   sends_international_text_messages_from_a_phone_num_10afbad6: "Sends international text messages from a phone number in the recipient's country, if possible."
   sent_f4ee89ec: Sent!
   sent_fe0a1eb4: Sent
+  separate_columns_for_first_last_names_in_gradebook_419126c3: "Separate columns for first/last names in Gradebook"
   separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three."
   sequence_footer: 
     next_module: "Next Module:"
@@ -23672,6 +23755,7 @@ en-AU:
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Show a list of recently visited pages in the Canvas global navigation"
   show_accessibility_checker_notifications_while_edi_a7cb6449: "Show accessibility checker notifications while editing."
   show_account_navigation_menu_d97270a9: "Show Account Navigation Menu"
+  show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Show account setting to allow viewing and exporting of student first and last names in separate columns in the gradebook."
   show_admin_navigation_menu_92fb579f: "Show Admin Navigation Menu"
   show_all_artifacts_34b91a83: "Show All Artifacts"
   show_all_details_9879980c: "Show All Details"
@@ -23927,6 +24011,8 @@ en-AU:
   something_went_wrong_d238c551: "Something went wrong"
   something_went_wrong_downloading_submissions_pleas_6d069a09: "Something went wrong downloading submissions. Please try again later."
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Something went wrong inactivating the user. Please try again later."
+  something_went_wrong_loading_equella_f7e3907c: "Something went wrong loading Equella"
+  something_went_wrong_loading_the_equation_editor_62bca61c: "Something went wrong loading the equation editor"
   something_went_wrong_loading_the_file_previewer_3fb369e8: "Something went wrong loading the file previewer."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Something went wrong loading the violations, try reloading the page."
   something_went_wrong_loading_the_violations_try_re_9461d057: "Something went wrong loading the violations. Try reloading the page."
@@ -24042,6 +24128,7 @@ en-AU:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Split
   split_merged_users_6b81c595: "Split Merged Users"
+  split_student_names_df0ef806: "Split Student Names"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Splitting disabled: reached maximum of three assignment groups in a scoring range"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Splitting disabled: there can only be a maximum of three assignment groups in a scoring range."
   spreadsheet_6d622119: Spreadsheet
@@ -24180,6 +24267,7 @@ en-AU:
   student_context_card_ad59967e: "Student Context Card"
   student_context_cards_376d2072: "Student Context Cards"
   student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: "Student context cards must be enabled for an account by an admin. If Courses - manage / update is not enabled, users can still view context cards through the Gradebook."
+  student_context_cards_must_be_enabled_for_an_accou_8e1dc261: "Student context cards must be enabled for an account by an admin. If Courses - manage is not enabled, users can still view context cards through the Gradebook."
   student_context_cards_must_be_enabled_for_an_accou_9b5c635: "Student context cards must be enabled for an account by an admin. If this permission is not enabled, users can still view context cards through the Gradebook."
   student_context_cards_must_be_enabled_for_an_accou_d996afdc: "Student context cards must be enabled for an account by an admin. If Manage Courses: Admin - manage / update is not enabled, users can still view context cards through the Gradebook."
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Student context cards must be enabled for an account by an admin. If this permission is not enabled, users can still view student context cards through the Gradebook."
@@ -24656,6 +24744,7 @@ en-AU:
   sync_completed_successfully_8f68b542: "Sync completed successfully"
   sync_currently_running_2cd5114a: "Sync currently running"
   sync_enrollments_and_course_start_end_dates_from_h_b2f9c3fc: "Sync enrolments and course start/end dates from homeroom"
+  sync_enrollments_and_subject_start_end_dates_from__b36ecf3: "Sync enrolments and subject start/end dates from homeroom"
   sync_enrollments_from_homeroom_c75285f4: "Sync enrolments from homeroom"
   sync_grades_a16622ca: "Sync Marks"
   sync_grades_to_sis_4e7fbc08: "Sync marks to SIS"
@@ -24927,6 +25016,7 @@ en-AU:
   the_courses_reset_permission_allows_users_to_reset_29dbc267: "The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission."
   the_courses_reset_permission_resets_course_content_921321c3: "The Courses - Reset permission resets course content for both manually created and SIS-managed courses. (For SIS-managed courses, the SIS Data - manage permission does not apply.)"
   the_csv_header_row_is_invalid_a8ec1787: "The CSV header row is invalid."
+  the_date_entered_is_invalid_4503a477: "The date entered is invalid."
   the_date_is_not_valid_b6285fb5: "The date is not valid."
   the_discussion_entry_was_successfully_created_7cddf67b: "The discussion entry was successfully created."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "The discussion topic was successfully deleted."
@@ -24935,6 +25025,7 @@ en-AU:
                 can take awhile for large courses. You can leave the
                 page and you'll get a notification when the download
                 is complete.
+  the_end_date_for_the_pace_plan_must_be_after_the_s_d999dade: "The end date for the pace plan must be after the start date."
   the_end_date_must_be_after_the_start_date_2a273107: "The end date must be after the start date"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: |-
       The engine that processes SIS imports has been refactored to better handle the
@@ -25064,6 +25155,10 @@ en-AU:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "The scheduler tool lets you set up time slots that students (or student groups) can sign up for. To get started, click the button below."
   the_search_returned_no_results_c2e4d13c: "The search returned no results."
   the_search_returned_no_results_cd9eee1e: "The search returned no results"
+  the_selected_date_is_on_a_blackout_day_bedcc1b8: "The selected date is on a blackout day."
+  the_selected_date_is_on_a_weekend_this_pace_plan_s_ff81e003: "The selected date is on a weekend. This pace plan skips weekends."
+  the_selected_date_is_too_early_6173fe43: "The selected date is too early."
+  the_selected_date_is_too_late_cbe184a1: "The selected date is too late."
   the_selected_group_was_cleared_because_the_student_656e4f1c: "The selected group was cleared because the student you requested is not part of any groups. You can select a group in the Gradebook."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "The severity of the issue, as selected by the user from a dropdown menu."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "The shortcut icon for iOS/Android devices. 180x180 png"
@@ -25072,6 +25167,7 @@ en-AU:
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "the specified file with file_id already has an originality report"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course."
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course."
+  the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "The start date for the pace plan must be after the end date."
   the_state_parameter_is_required_ffadf213: "The state parameter is required"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available."
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
@@ -25128,6 +25224,7 @@ en-AU:
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "There are no user accounts to split from this user."
   there_are_unread_rubric_comments_337270ca: "There are unread rubric comments."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE."
+  there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "There is a 2 app limit for placement within the RCE toolbar."
   there_is_currently_1_available_grader_758e4a21: "There is currently 1 available grader"
   there_was_a_failure_logging_out_at_your_idp_30070527: "There was a failure logging out at your IdP."
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "There was a problem creating the teacher notes column."
@@ -25282,6 +25379,8 @@ en-AU:
   this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "This course cannot be added to the courses menu unless the course is active."
   this_course_does_not_allow_score_uploads_4b35fe07: "This course does not allow score uploads."
   this_course_has_concluded_7995a84c: "This course has concluded"
+  this_course_has_too_many_enrolled_users_to_be_sync_d3446749: "This course has too many enrolled users to be synced. Microsoft 365 allows a maximum of %{max_allowed} members in a team."
+  this_course_has_too_many_teachers_or_other_owner_t_cb25b6d8: "This course has too many teachers or other owner-type enrolments to be synced. Microsoft 365 allows a maximum of %{max_allowed} owners in a team."
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "This course hasn’t started yet. You will not be able to participate in this course until %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "This course is claimed and ready, but you'll need to finish the registration process before you can publish the course.  You should have received an email from Canvas with a link to finish the process.  Be sure to check your spam box."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "This course is visible only to teachers until it is published."
@@ -25323,6 +25422,9 @@ en-AU:
       will be displayed automatically with every release.
       For full details, please see the Discussions Redesign user group
       in the Canvas Community.
+  this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
+      This feature flag enables Discussions Reporting inside the new
+      Discussions Redesign work.
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
       This feature flag enables Isolated View inside the new
       Discussions Redesign work.
@@ -25793,6 +25895,7 @@ en-AU:
       To access the Courses link in Account Navigation, Courses - view list must be enabled.
               If Courses - add is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings.
               To restore a deleted course, Courses - delete, Courses - undelete, and Course Content - view must also be enabled.
+  to_access_the_courses_link_in_account_navigation_c_a2c556e6: "To access the Courses link in Account Navigation, Courses - manage and Courses - view list must be enabled."
   to_access_the_courses_link_in_account_navigation_c_eee259fa: "To access the Courses link in Account Navigation, Courses - manage / update and Courses - view list must be enabled."
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "To access the Courses link in Account Navigation, Manage Courses: Admin - manage / update and Courses - view list must be enabled."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - add / edit / delete must also be enabled."
@@ -25915,11 +26018,13 @@ en-AU:
   to_create_announcements_discussions_moderate_must__8a8278f2: "To create announcements, Discussions - moderate must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course Sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "To cross-list a section, Course Sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course State - manage​ must also be enabled."
+  to_cross_list_a_section_courses_manage_and_manage__3af8bad7: "To cross-list a section, Courses - manage and Manage Course Sections - edit must also be enabled."
   to_cross_list_a_section_courses_manage_update_and__40dfb8f8: "To cross-list a section, Courses - manage / update and Manage Course Sections - edit must also be enabled."
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "To cross-list a section, Manage Course Sections - edit must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled."
   to_cross_list_a_section_manage_course_sections_edi_ac3d2abb: "To cross-list a section, Manage Course Sections - edit must also be enabled."
   to_cross_list_a_section_manage_courses_admin_manag_7992434e: "To cross-list a section, Manage Courses: Admin - manage / update and Manage Course Sections - edit must also be enabled."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "To cross-list sections, Course - add / edit / delete must also be enabled."
+  to_cross_list_sections_course_sections_edit_and_co_59598c07: "To cross-list sections, Course Sections - edit and Courses - manage must also be enabled."
   to_cross_list_sections_course_sections_edit_and_co_6db155a6: "To cross-list sections, Course Sections - edit and Courses - manage / update must also be enabled."
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "To cross-list sections, Course Sections - edit and Manage Courses: Admin - manage / update must also be enabled."
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "To cross-list sections, Course Sections - edit must be enabled. The user must also be enrolled as an instructor in the courses being cross-listed."
@@ -25972,35 +26077,46 @@ en-AU:
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings can be edited on individual pages."
   to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "To edit blueprint lock settings on the Pages index page, Courses - add / edit / delete must also be enabled. However, if Courses - add / edit / delete is enabled, but the Pages - Update permission is not enabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "To edit course grading schemes, Courses - add / edit / delete must also be enabled."
+  to_edit_course_grading_schemes_courses_manage_must_b6de9dbc: "To edit course grading schemes, Courses - manage must also be enabled."
   to_edit_course_grading_schemes_courses_manage_upda_f34b25b3: "To edit course grading schemes, Courses - manage / update must also be enabled."
   to_edit_course_grading_schemes_manage_courses_admi_3059cde2: "To edit course grading schemes, Manage Courses: Admin - manage / update must also be enabled."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "To edit course settings, Courses - add / edit / delete​ must be enabled."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "To edit course settings, Courses - add / edit / delete must be enabled."
+  to_edit_course_settings_courses_manage_must_be_ena_813e1588: "To edit course settings, Courses - manage must be enabled."
   to_edit_course_settings_courses_manage_update_must_172a4fe5: "To edit course settings, Courses - manage / update must be enabled."
   to_edit_course_settings_manage_courses_admin_manag_fe44d1fe: "To edit course settings, Manage Courses: Admin - manage / update must be enabled."
   to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "To edit groups, Groups - manage must also be enabled."
   to_edit_lock_settings_for_course_files_course_file_392f6f70: "To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update must also be enabled."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update must also be enabled."
+  to_edit_lock_settings_for_course_files_course_file_92273739: "To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled."
+  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled."
   to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled."
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled. If these additional permissions are enabled, but Assignments and Quizzes - add / edit / delete is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.
               To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.
   to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled."
   to_edit_lock_settings_from_the_discussions_index_p_d344c544: "To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled."
+  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled."
   to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled."
   to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled."
+  to_edit_lock_settings_on_files_courses_manage_and__f4718695: "To edit lock settings on files, Courses - manage and Course Files - edit must also be enabled."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "To edit lock settings on files, Courses - manage / update and Course Files - edit must also be enabled."
   to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "To edit lock settings on files, Manage Courses: Admin - manage / update and Course Files - edit must also be enabled."
+  to_edit_lock_settings_on_quizzes_courses_manage_an_eb629aa9: "To edit lock settings on quizzes, Courses - manage and Assignments and Quizzes - manage / edit must also be enabled."
   to_edit_lock_settings_on_quizzes_courses_manage_up_6366321f: "To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - manage / edit must also be enabled."
   to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: "To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "To edit lock settings on quizzes, Manage Courses: Admin - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "To edit lock settings on the Discussions index page, Manage Courses: Admin - manage / update and Discussions - view must also be enabled. If the additional permissions are enabled, but this permission is not enabled, lock settings can be edited on individual discussions."
   to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "To edit lock settings on the Discussions index page, Manage Courses: Admin - manage / update and Discussions - view must also be enabled."
   to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "To edit lock settings on the Discussions index page, Courses - manage / update and Discussions - view must also be enabled."
+  to_edit_lock_settings_on_the_discussions_index_pag_9488110a: "To edit lock settings on the Discussions index page, Courses - manage and Discussions - view must also be enabled."
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update."
+  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update."
   to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled."
+  to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "To edit the course SIS ID, Courses - manage and SIS Data - manage must also be enabled."
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "To edit the course SIS ID, Courses - manage / update and SIS Data - manage must also be enabled."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "To edit the course SIS ID, Manage Courses: Admin - manage / update and SIS Data - manage must also be enabled."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "To edit the course SIS ID, SIS Data - manage must also be enabled."
@@ -26056,6 +26172,7 @@ en-AU:
   to_manage_course_announcements_discussions_moderat_5f02f46e: "To manage course announcements, Discussions - moderate ​must also be enabled."
   to_manage_course_content_course_content_add_edit_d_10b420f7: "To manage course content, Course Content - add / edit / delete must also be enabled."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "To manage course content, Course Content - add / edit / delete must be enabled."
+  to_manage_course_content_courses_manage_and_course_c7a49f42: "To manage course content, Courses - manage and Course Content - add / edit / delete must be enabled."
   to_manage_course_content_courses_manage_update_and_843edf8a: "To manage course content, Courses - manage / update and Course Content - add / edit / delete must be enabled."
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "To manage course content, Manage Courses: Admin - manage / update and Course Content - add / edit / delete must be enabled. To view Choose Home Page and Course Setup Checklist buttons, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
   to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "To manage course content, Manage Courses: Admin - manage / update and Course Content - add / edit / delete must be enabled."
@@ -26071,6 +26188,7 @@ en-AU:
   to_manage_feature_options_for_an_account_feature_o_6327c2da: "To manage Feature Options for an account, Feature Options - enable / disable must also be enabled."
   to_manage_feature_previews_for_an_account_feature__185e63eb: "To manage Feature Previews for an account, Feature Previews - enable / disable must also be enabled."
   to_manage_lock_settings_for_object_types_courses_m_839a7753: "To manage lock settings for object types, Courses - manage / update must also be enabled."
+  to_manage_lock_settings_for_object_types_courses_m_c3373154: "To manage lock settings for object types, Courses - manage must also be enabled."
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "To manage lock settings for object types, Manage Courses: Admin - manage / update must also be enabled."
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "To manage moderated grading, Grades - moderate ​must also be enabled."
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -26119,6 +26237,7 @@ en-AU:
               Module items cannot be unpublished if there are student submissions.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "To publish and unpublish module content, Courses - add / edit / delete and Course Content - view must also be enabled."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "To publish and unpublish module content, Courses - add / edit / delete and Course Content - view​ must also be enabled."
+  to_publish_and_unpublish_module_content_courses_ma_4a203bea: "To publish and unpublish module content, Courses - manage and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions."
   to_publish_and_unpublish_module_content_courses_ma_8a591b77: "To publish and unpublish module content, Courses - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions."
   to_publish_and_unpublish_module_content_manage_cou_33c20e31: "To publish and unpublish module content, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions."
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "To publish final grades for a moderated assignment, Grades - edit must also be enabled. To post or hide grades for a moderated assignment, Grades - edit must also be enabled."
@@ -26162,6 +26281,7 @@ en-AU:
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "To see the Course Setup Checklist option on the Course Home Page, Manage - add / edit / delete courses must also be enabled."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "To send a message to an individual user, Conversations - send messages to individual course members must also be enabled."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "To share a discussion to Commons, Course Content - add / edit / delete must also be enabled."
+  to_share_a_discussion_to_commons_courses_manage_mu_addad8ba: "To share a discussion to Commons, Courses - manage must also be enabled."
   to_share_a_discussion_to_commons_courses_manage_up_232a8707: "To share a discussion to Commons, Courses - manage / update must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "To share a Discussion to Commons, Discussions - view​ must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "To share a Discussion to Commons, Discussions - view must also be enabled."
@@ -26182,6 +26302,7 @@ en-AU:
   to_view_all_student_groups_in_a_course_groups_view_7a16b659: "To view all student groups in a course, Groups - view all student groups must also be enabled."
   to_view_announcements_announcements_view_must_also_75f652df: "To view announcements, Announcements - view must also be enabled."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "To view assignments, make sure the *Agenda* view is active."
+  to_view_choose_home_page_and_course_setup_checklis_402b2311: "To view Choose Home Page and Course Setup Checklist buttons, Courses - manage and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
   to_view_choose_home_page_and_course_setup_checklis_84797b4f: "To view Choose Home Page and Course Setup Checklist buttons, Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "To view Choose Home Page and Course Setup Checklist buttons, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
   to_view_choose_home_page_and_course_setup_checklis_ff2436d4: "To view Choose Home Page and Course Setup Checklist buttons, Courses - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
@@ -26211,6 +26332,7 @@ en-AU:
   to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "To view discussions in a course, Discussions - view must also be enabled."
   to_view_feature_options_for_an_account_feature_opt_14b0cea0: "To view Feature Options for an account, Feature Options - enable / disable must also be enabled."
   to_view_feature_previews_for_an_account_feature_pr_805e5c46: "To view Feature Previews for an account, Feature Previews - enable / disable must also be enabled."
+  to_view_grades_in_a_course_courses_manage_and_grad_c1ab5515: "To view grades in a course, Courses - manage and Grades - view all grades must also be enabled."
   to_view_grades_in_a_course_courses_manage_update_a_91a2448: "To view grades in a course, Courses - manage / update and Grades - view all grades must also be enabled."
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "To view grades in a course, Grades - view all grades​ must also be enabled."
   to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: "To view grades in a course, Grades - view all grades must also be enabled."
@@ -26476,6 +26598,7 @@ en-AU:
   type_file_14f017c9: "type: file"
   type_folder_115f3b07: "type: folder"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is not a valid image type (try jpg, png or gif)"
+  type_message_here_e15e30a7: "Type message here..."
   type_of_change_1cb24a0e: "Type of Change"
   type_of_item_8a37f69d: "Type of Item"
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: "Type or use arrow keys to navigate. Multiple selections are allowed."
@@ -26490,6 +26613,7 @@ en-AU:
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Unable to align some outcomes to a page"
   unable_to_align_some_outcomes_to_title_53467231: "Unable to align some outcomes to \"%{title}\""
   unable_to_connect_to_google_drive_34886e7a: "Unable to connect to Google Drive."
+  unable_to_create_message_without_a_body_b62274be: "Unable to create message without a body"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Unable to curve marks because this assignment is due in a closed grading period for at least one student"
   unable_to_delete_assignment_abcf8d62: "Unable to delete assignment"
   unable_to_delete_commentbankitem_3a23dc24: "Unable to delete CommentBankItem"
@@ -26525,6 +26649,7 @@ en-AU:
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support."
   unaccepted_students_aa68ea98: "Unaccepted Students"
   unarchive_f245e2d6: Unarchive
+  unarchive_operation_failed_22c42032: "Unarchive operation failed"
   unarchive_selected_e0c4bd3d: "Unarchive Selected"
   unassessed_a0264e97: Unassessed
   unassessed_students_3809ac5e: "Unassessed students"
@@ -26556,6 +26681,7 @@ en-AU:
   unenrolled_users_e7632d24: "Unenrolled users"
   unexpected_error_while_performing_export_1e6b4207: "Unexpected error while performing export"
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Unexpected response from Microsoft API: got %{status_code} status code"
+  unexpected_response_from_microsoft_api_got_status__86f7a95e: "Unexpected response from Microsoft API: got %{status_code} status code"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Unexpected response from Microsoft API. This is likely a bug. Please contact support."
   unfavorite_cd0c113e: Unfavorite
   unfavorite_coursename_32f77231: "Unfavourite %{courseName}"
@@ -26637,6 +26763,8 @@ en-AU:
   unpublish_title_26ae9667: "Unpublish %{title}"
   unpublished_8b6107d6: Unpublished
   unpublished_assignments_9cdbcc87: "Unpublished Assignments"
+  unpublished_changes_cb1cf6ff: "Unpublished Changes"
+  unpublished_changes_tray_9e9b2ac2: "Unpublished Changes tray"
   unpublished_click_to_modify_60f9051: "Unpublished - Click to modify"
   unpublished_click_to_publish_6a6d12e1: "Unpublished.  Click to publish."
   unpublished_click_to_publish_c073631a: "Unpublished. Click to publish."
@@ -27461,6 +27589,7 @@ en-AU:
   view_student_submission_5beaf78: "View Student Submission"
   view_submission_ff3da5d: "View Submission"
   view_the_assignment_e61ca4fc: "View the assignment"
+  view_the_discussion_link_c4dbdef: "View the discussion: %{link}."
   view_this_message_in_conversations_5a16bc9f: "View this message in Conversations"
   view_toolname_placements_4a5724d1: "View %{toolName} Placements"
   view_ungraded_as_0_1a9631a1: "View Ungraded as 0"
@@ -27568,6 +27697,7 @@ en-AU:
   website_url_177fc1dc: "Website URL"
   website_url_b995c5b6: "Website Url"
   website_url_input_1a3eab25: "Website url input"
+  website_url_url_bd07233d: "Website URL: %{url}"
   week_s_cb1492ee: Week(s)
   weekly_summary_56cd0c95: "Weekly summary"
   weight_9b308e5b: Weight
@@ -27614,6 +27744,9 @@ en-AU:
   when_disabled_students_can_still_send_individual_m_567a911c: "When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "When enabled, global JavaScript and CSS files can be uploaded in the *%{t_theme_editor}*."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "When enabled it deprecates the Short Message Service (SMS)."
+  when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
+      When enabled, this flag displays a word count in the speed grader for text
+      based submissions.
   when_enabled_this_flag_shows_a_join_button_on_canv_c6f162ea: |-
       When enabled, this flag shows a "Join" button on Canvas calendar
       events in the student planner
@@ -27853,6 +27986,7 @@ en-AU:
   withdrawn_4c838347: Withdrawn
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Woops... Looks like nothing is here!"
+  word_count_c77fe3a6: "Word Count"
   work_and_create_together_c65f358b: "Work and create together"
   workflow_state_3a5c99d2: workflow_state
   working_b1f63edf: working...
