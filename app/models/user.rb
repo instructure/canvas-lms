@@ -425,12 +425,12 @@ class User < ActiveRecord::Base
   after_save :self_enroll_if_necessary
 
   def courses_for_enrollments(enrollment_scope, associated_user = nil)
-    if associated_user && associated_user != id
+    if associated_user && associated_user != self
       Course.active.joins(:observer_enrollments)
             .merge(enrollment_scope.except(:joins))
-            .where(enrollments: { associated_user_id: associated_user })
+            .where(enrollments: { associated_user_id: associated_user.id })
     else
-      enrollments_to_include = associated_user == id ? :non_observer_enrollments : :all_enrollments
+      enrollments_to_include = associated_user == self ? :non_observer_enrollments : :all_enrollments
       Course.active.joins(enrollments_to_include).merge(enrollment_scope.except(:joins)).distinct
     end
   end
