@@ -305,11 +305,10 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def unlink!(type)
     @saved_by = type
+    self.assignment = nil
     if self.root_entries.empty? && !self.available?
-      self.assignment = nil
       self.destroy
     else
-      self.assignment = nil
       self.save
     end
   end

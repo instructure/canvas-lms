@@ -102,42 +102,37 @@ module IncomingMail
     end
 
     def bounce_message_strings(subject, error)
-      ndr_subject = ""
-      ndr_body = ""
-      case error
-      when IncomingMail::Errors::ReplyToDeletedDiscussion
-        ndr_subject = I18n.t("Undelivered message")
-        ndr_body = I18n.t(<<~TEXT, :subject => subject).gsub(/^ +/, '')
-          The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+      ndr_subject = I18n.t("Undelivered message")
+      ndr_body = case error
+                 when IncomingMail::Errors::ReplyToDeletedDiscussion
+                   I18n.t(<<~TEXT, :subject => subject).gsub(/^ +/, '')
+                     The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-          Thank you,
-          Canvas Support
-        TEXT
-      when IncomingMail::Errors::ReplyToLockedTopic
-        ndr_subject = I18n.t("Undelivered message")
-        ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
-          The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+                     Thank you,
+                     Canvas Support
+                   TEXT
+                 when IncomingMail::Errors::ReplyToLockedTopic
+                   I18n.t('lib.incoming_message_processor.locked_topic.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
+                     The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-          Thank you,
-          Canvas Support
-        TEXT
-      when IncomingMail::Errors::UnknownSender
-        ndr_subject = I18n.t("Undelivered message")
-        ndr_body = I18n.t(<<~TEXT, :subject => subject, :link => I18n.t(:"community.guides_home")).gsub(/^ +/, '')
-          The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
+                     Thank you,
+                     Canvas Support
+                   TEXT
+                 when IncomingMail::Errors::UnknownSender
+                   I18n.t(<<~TEXT, :subject => subject, :link => I18n.t(:"community.guides_home")).gsub(/^ +/, '')
+                     The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
 
-          Thank you,
-          Canvas Support
-        TEXT
-      else # including IncomingMessageProcessor::UnknownAddressError
-        ndr_subject = I18n.t("Undelivered message")
-        ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
-          The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+                     Thank you,
+                     Canvas Support
+                   TEXT
+                 else # including IncomingMessageProcessor::UnknownAddressError
+                   I18n.t('lib.incoming_message_processor.failure_message.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
+                     The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-          Thank you,
-          Canvas Support
-        TEXT
-      end
+                     Thank you,
+                     Canvas Support
+                   TEXT
+                 end
 
       [ndr_subject, ndr_body]
     end

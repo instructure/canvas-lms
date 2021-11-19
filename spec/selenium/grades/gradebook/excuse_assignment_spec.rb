@@ -184,13 +184,12 @@ describe 'Excuse an Assignment' do
             wait_for_ajaximations
             score_values << f('#student_and_assignment_grade').attribute('value')
           end
-          expect(score_values).to eq ['15', 'Excused', '15', '15']
         else
           get "/courses/#{@course.id}/gradebook/"
           wait_for_ajaximations
           score_values = ff('.canvas_1 .slick-row .slick-cell:first-child').map(& :text)
-          expect(score_values).to eq ['15', "Excused", '15', '15']
         end
+        expect(score_values).to eq ['15', 'Excused', '15', '15']
       end
 
       it 'excuses assignments on individual basis', priority: "1", test_id: view == 'srgb' ? 209405 : 209384 do

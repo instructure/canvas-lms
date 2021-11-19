@@ -74,12 +74,10 @@ module AttachmentFu # :nodoc:
 
       def filename=(value)
         value = sanitize_filename(value)
-        if self.new_record?
-          write_attribute :filename, value
-        else
-          @old_filename = full_filename unless filename.nil? || @old_filename
-          write_attribute :filename, value
+        if !new_record? && !(filename.nil? || @old_filename)
+          @old_filename = full_filename
         end
+        write_attribute :filename, value
       end
 
       def sanitize_filename(filename)

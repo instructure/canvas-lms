@@ -483,12 +483,11 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
-          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => @request }
         else
-          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => { :errors => { :base => t('errors.reminder_failed', "Reminder failed") } }, :status => :bad_request }
         end
+        format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
     end
   end
@@ -499,12 +498,11 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
-          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => @request }
         else
-          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => { :errors => { :base => t('errors.delete_reminder_failed', "Delete failed") } }, :status => :bad_request }
         end
+        format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
     end
   end

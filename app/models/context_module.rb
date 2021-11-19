@@ -665,8 +665,6 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
-      added_item.save
-      added_item
     when 'context_external_tool', 'external_tool', 'lti/message_handler'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
@@ -704,8 +702,6 @@ class ContextModule < ActiveRecord::Base
             context_external_tool: content
           )
       end
-      added_item.save
-      added_item
     when 'context_module_sub_header', 'sub_header'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
@@ -720,8 +716,6 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
-      added_item.save
-      added_item
     else
       return nil unless item
 
@@ -737,9 +731,9 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = workflow_state if added_item.new_record?
-      added_item.save
-      added_item
     end
+    added_item.save
+    added_item
   end
 
   # specify a 1-based position to insert the items at; leave nil to append to the end of the module

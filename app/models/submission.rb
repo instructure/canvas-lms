@@ -399,13 +399,10 @@ class Submission < ActiveRecord::Base
     if self.submission_type == "online_quiz" && self.workflow_state == "graded"
       # unless it's an auto-graded quiz
       return unless self.workflow_state_before_last_save == "unsubmitted"
-
-      PlannerHelper.complete_planner_override_for_submission(self)
     else
       return unless self.workflow_state == "submitted"
-
-      PlannerHelper.complete_planner_override_for_submission(self)
     end
+    PlannerHelper.complete_planner_override_for_submission(self)
   end
 
   attr_reader :group_broadcast_submission

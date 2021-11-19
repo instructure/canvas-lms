@@ -57,7 +57,6 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
           break
         end
       end
-      entry
     else
       if entry.expired? && (lock_nonce = lock(lock_key, options))
         @safe_redis_internal_options[:lock_nonce] = lock_nonce
@@ -66,8 +65,8 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
       end
       # just return the stale value; someone else is busy
       # regenerating it
-      entry
     end
+    entry
   end
 
   # this is originally defined in ActiveSupport::Cache::Store,
