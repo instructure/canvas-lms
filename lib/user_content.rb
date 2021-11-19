@@ -87,8 +87,7 @@ module UserContent
     Latex.to_math_ml(latex: latex)
   end
 
-  class Node < Struct.new(:width, :height, :node_string, :node_hmac)
-  end
+  Node = Struct.new(:width, :height, :node_string, :node_hmac)
 
   # for each user content in the nokogiri document, yields |nokogiri_node, UserContent::Node|
   def self.find_user_content(html)
@@ -183,7 +182,7 @@ module UserContent
 
     attr_reader :user, :context
 
-    class UriMatch < Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix)
+    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix) do
       def query
         rest && rest[/\?.*/]
       end

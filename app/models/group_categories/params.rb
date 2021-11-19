@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GroupCategories
-  class Params < Struct.new(:name, :group_limit)
+  Params = Struct.new(:name, :group_limit) do
     attr_reader :raw_params
 
     def initialize(args, opts = {})

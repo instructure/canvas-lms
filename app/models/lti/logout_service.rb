@@ -36,7 +36,7 @@ module Lti
       Rails.cache.delete(cache_key(pseudonym))
     end
 
-    class Token < Struct.new(:tool, :pseudonym, :timestamp, :nonce)
+    Token = Struct.new(:tool, :pseudonym, :timestamp, :nonce) do
       def self.create(tool, pseudonym)
         Token.new(tool, pseudonym, Time.now, SecureRandom.hex(8))
       end
@@ -66,7 +66,7 @@ module Lti
       end
     end
 
-    class Runner < Struct.new(:callbacks)
+    Runner = Struct.new(:callbacks) do
       def perform
         callbacks.each_value do |callback|
           CanvasHttp.get(URI.parse(callback).to_s)

@@ -21,7 +21,7 @@ module I18nTasks
   class I18nImport
     attr_reader :source_translations, :new_translations, :language
 
-    class MisMatch < Struct.new(:key, :expected, :actual)
+    MisMatch = Struct.new(:key, :expected, :actual) do
       def to_s
         "#{key}: expected #{expected.inspect}, got #{actual.inspect}"
       end

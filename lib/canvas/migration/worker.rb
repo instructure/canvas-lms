@@ -19,7 +19,7 @@
 #
 
 module Canvas::Migration::Worker
-  class Base < Struct.new(:migration_id)
+  Base = Struct.new(:migration_id) do
     def on_permanent_failure(error)
       if migration_id
         cm = ContentMigration.where(id: migration_id).first
