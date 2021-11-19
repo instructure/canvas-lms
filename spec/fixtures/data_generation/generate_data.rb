@@ -194,6 +194,9 @@ end
 def generate_course_with_students
   puts "Generate Course with Students"
   course_with_enrollments
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_fully_loaded_course(number_of_items = 2)
@@ -206,9 +209,12 @@ def generate_fully_loaded_course(number_of_items = 2)
     create_announcement(@course, 'new announcement', 'new message')
     create_wiki_page(@course)
     course_module1 = create_module(@course)
-    assignment = create_assignment(course, "Module Assignment")
+    assignment = create_assignment(@course, "Module Assignment")
     course_module1.add_item(:id => assignment.id, :type => 'assignment')
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_k5_dashboard
@@ -227,6 +233,9 @@ def generate_k5_dashboard
       student_in_course(student, @course)
     end
   end
+
+  puts "Homeroom Course ID is #{homeroom.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_bp_course_and_associations
@@ -236,6 +245,10 @@ def generate_bp_course_and_associations
   @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
   @minion = @template.add_child_course!(course_factory(account: @root_account, course_name: "Minion", active_all: true)).child_course
   @minion.enroll_teacher(@main_teacher).accept!
+
+  puts "Blueprint Course ID is #{@course.id}"
+  puts "Associated Course ID is #{@minion.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_course_and_submissions
@@ -246,6 +259,10 @@ def generate_course_and_submissions
     assignment.submit_homework(student, { submission_type: "online_text_entry", body: "Here it is" })
     assignment.grade_student(student, grader: @teacher, score: 75, points_deducted: 0)
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment ID is #{assignment.id}"
 end
 
 def generate_mastery_path_course
@@ -298,6 +315,10 @@ def generate_mastery_path_course
                                          ])
   ]
   @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assignment, :scoring_ranges => ranges)
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Trigger Assignment ID is #{@trigger_assignment.id}"
 end
 
 def generate_sections(number_of_sections = 2)
@@ -311,6 +332,8 @@ def generate_sections(number_of_sections = 2)
       student_enrollment.save!
     end
   end
+
+  puts "Course ID is #{@course.id}"
 end
 
 def generate_course_with_outcome_rubric
@@ -320,6 +343,11 @@ def generate_course_with_outcome_rubric
   rubric = outcome_with_rubric(course: @course)
   assignment = create_assignment(@course, "Rubric Assignment")
   rubric.associate_with(assignment, @course, purpose: 'grading', use_for_grading: true)
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment ID is #{assignment.id}"
+  puts "Rubric ID is #{rubric.id}"
 end
 
 def generate_course_assignment_groups
@@ -336,6 +364,13 @@ def generate_course_assignment_groups
   assignment1.save!
   assignment2.assignment_group = assignment_group2
   assignment2.save!
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment 1 ID is #{assignment1.id}"
+  puts "Assignment 2 ID is #{assignment2.id}"
+  puts "Assignment Group 1 ID is #{assignment_group1.id}"
+  puts "Assignment Group 2 ID is #{assignment_group2.id}"
 end
 
 def generate_course_with_dated_assignments
@@ -346,6 +381,9 @@ def generate_course_with_dated_assignments
     assignment.due_at = (iteration + 1).day.from_now(Time.zone.now)
     assignment.save!
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_pace_plan_course
@@ -365,6 +403,13 @@ def generate_pace_plan_course
   module1.add_item(:id => assignment2.id, :type => 'assignment')
   module1.add_item(:id => discussion1.id, :type => 'discussion_topic')
   module1.add_item(:id => quiz1.id, :type => 'quiz')
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment 1 ID is #{assignment1.id}"
+  puts "Assignment 2 ID is #{assignment2.id}"
+  puts "Discussion ID is #{discussion1.id}"
+  puts "Module ID is #{module1.id}"
 end
 
 def create_all_the_available_data
@@ -389,6 +434,8 @@ def create_all_the_available_data
   generate_course_with_outcome_rubric
   @course_name = save_course_name + " (course with assignment groups)"
   generate_course_assignment_groups
+  @course_name = save_course_name + " (pace plan course)"
+  generate_pace_plan_course
 end
 # rubocop:enable Specs/ScopeHelperModules
 
