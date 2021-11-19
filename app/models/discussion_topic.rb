@@ -1105,11 +1105,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def unlink!(type)
     @saved_by = type
+    self.assignment = nil
     if self.discussion_entries.empty?
-      self.assignment = nil
       self.destroy
     else
-      self.assignment = nil
       self.save
     end
     self.child_topics.each { |t| t.unlink!(:assignment) }

@@ -1754,8 +1754,8 @@ class Account < ActiveRecord::Base
 
   def tabs_available(user = nil, opts = {})
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
+    tabs = []
     if root_account.site_admin?
-      tabs = []
       tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
@@ -1764,7 +1764,6 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_RELEASE_NOTES, :label => t("Release Notes"), :css_class => "release_notes", :href => :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && self.grants_right?(user, :manage_release_notes)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && self.grants_right?(user, :view_jobs)
     else
-      tabs = []
       tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
       tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, :view_statistics)
@@ -1860,9 +1859,10 @@ class Account < ActiveRecord::Base
     raise "Invalid Service" unless AccountServices.allowable_services[service]
 
     allowed_service_names = (self.allowed_services || "").split(",").compact
+    # rubocop:disable Style/IdenticalConditionalBranches common line needs to happen after the conditional
     if allowed_service_names.count > 0 && !['+', '-'].include?(allowed_service_names[0][0, 1])
-      # This account has a hard-coded list of services, so handle accordingly
       allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
+      # This account has a hard-coded list of services, so handle accordingly
       allowed_service_names << service if enable
     else
       allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
@@ -1874,6 +1874,7 @@ class Account < ActiveRecord::Base
         allowed_service_names << "-#{service}" if AccountServices.default_allowable_services[service]
       end
     end
+    # rubocop:enable Style/IdenticalConditionalBranches
 
     @allowed_services_hash = nil
     self.allowed_services = allowed_service_names.empty? ? nil : allowed_service_names.join(",")

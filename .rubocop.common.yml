@@ -229,6 +229,8 @@ Style/HashTransformKeys:
   Severity: error
 Style/HashTransformValues:
   Severity: error
+Style/IdenticalConditionalBranches:
+  Severity: error
 Style/InverseMethods:
   Severity: error
 Style/IfUnlessModifier:

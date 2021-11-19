@@ -177,14 +177,13 @@ module TextHelper
           current.add_previous_sibling(truncate_elem)
           new_node = Nokogiri::XML::Text.new(new_content.join(' '), doc)
           truncate_elem.add_previous_sibling(new_node)
-          current = truncate_elem
         else
           current = previous
           # why would we do this next line? it just ends up xml escaping stuff
           # current.content = current.content
           current.add_next_sibling(truncate_elem)
-          current = truncate_elem
         end
+        current = truncate_elem
       end
 
       # remove everything else
