@@ -103,7 +103,7 @@ unless $canvas_tasks_loaded
       def load_tree(root, tree)
         tree.each do |node, subtree|
           key = [root, node].compact.join('/')
-          if Hash === subtree
+          if subtree.is_a?(Hash)
             load_tree(key, subtree)
           else
             Diplomat::Kv.put(key, subtree.to_s, { cas: 0 })

@@ -203,7 +203,7 @@ class AssignmentOverride < ActiveRecord::Base
             .joins(:assignment_override_students)
             .distinct
 
-    if ActiveRecord::Relation === visible_ids
+    if visible_ids.is_a?(ActiveRecord::Relation)
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
       scope = scope.primary_shard.activate {
         scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")

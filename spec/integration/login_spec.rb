@@ -24,7 +24,7 @@ describe 'login' do
     loop do
       expect(response).to be_redirect
       # === to support literal strings or regex
-      return if uri === response.location
+      return if uri === response.location # rubocop:disable Style/CaseEquality
 
       count += 1
       expect(count).to be < 5

@@ -249,7 +249,7 @@ class CourseLinkValidator
     path = URI.parse(url).path
     path = path.chomp("/")
 
-    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb === "GET" }
+    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb == "GET" }
     @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && Rails.root.join("public", path[1..]).file?)
   end
 
