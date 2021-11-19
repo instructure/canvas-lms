@@ -551,7 +551,7 @@ class Submission < ActiveRecord::Base
         when 'immediate' then true
         when 'after_grading' then current_submission_graded?
         when 'after_due_date'
-           then assignment.due_at && assignment.due_at < Time.now.utc
+          assignment.due_at && assignment.due_at < Time.now.utc
         when 'never' then false
         end
       )

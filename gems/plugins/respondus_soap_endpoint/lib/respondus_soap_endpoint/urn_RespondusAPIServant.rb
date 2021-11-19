@@ -518,8 +518,8 @@ Implemented for: Canvas LMS)]
       raise(OtherError, 'Item type incompatible with selection state') unless course
 
       case itemType
-      when "quiz"; course.quizzes.active
-      when "qdb"; course.assessment_question_banks.active
+      when "quiz" then course.quizzes.active
+      when "qdb" then course.assessment_question_banks.active
       end
     end
 

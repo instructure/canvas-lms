@@ -328,9 +328,12 @@ class AppointmentGroup < ActiveRecord::Base
     registered = participants.select { |p| participant_ids.include?(p.id) }
 
     participants = case registration_status
-                   when 'registered';     registered
-                   when 'unregistered';   participants - registered
-                   else                   participants
+                   when 'registered'
+                     registered
+                   when 'unregistered'
+                     participants - registered
+                   else
+                     participants
                    end
 
     if participant_type == 'User'

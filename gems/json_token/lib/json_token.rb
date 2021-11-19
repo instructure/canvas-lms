@@ -43,8 +43,8 @@ module JSONToken
   def self.walk_json(value, method)
     value = method.call(value)
     keys = case value
-           when Hash; value.keys
-           when Array; 0...value.length
+           when Hash then value.keys
+           when Array then 0...value.length
            else; []
            end
     keys.each do |key|

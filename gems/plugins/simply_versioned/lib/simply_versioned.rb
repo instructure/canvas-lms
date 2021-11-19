@@ -252,9 +252,9 @@ module SimplyVersioned
     # ActiveRecord doesn't have a polymorphic :inverse_of option.
     def method_missing(method, *a, &b)
       case method
-      when :minimum, :maximum, :exists?, :all, :find_all, :each then
+      when :minimum, :maximum, :exists?, :all, :find_all, :each
         populate_versionables(super)
-      when :find then
+      when :find
         case a.first
         when :all          then populate_versionables(super)
         when :first, :last then populate_versionable(super)
