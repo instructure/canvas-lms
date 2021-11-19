@@ -572,7 +572,7 @@ class ActiveRecord::Base
       table_name = self.table_name
       belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
                  foreign_key: reflection.foreign_key,
-                 class_name: class_name
+                 class_name: class_name # rubocop:disable Rails/ReflectionClassName
 
       correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
 

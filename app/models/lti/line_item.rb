@@ -36,8 +36,7 @@ class Lti::LineItem < ApplicationRecord
   belongs_to :assignment,
              inverse_of: :line_items
   belongs_to :root_account,
-             class_name: 'Account',
-             foreign_key: :root_account_id
+             class_name: 'Account'
   has_many :results,
            inverse_of: :line_item,
            class_name: 'Lti::Result',

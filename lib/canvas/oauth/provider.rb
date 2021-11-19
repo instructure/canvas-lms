@@ -144,7 +144,7 @@ module Canvas::OAuth
     private
 
     def default_app_name
-      I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
+      I18n.t('pseudonym_sessions.default_app_name', 'Third-Party Application')
     end
   end
 end

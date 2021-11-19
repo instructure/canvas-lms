@@ -108,17 +108,23 @@ Rails/DynamicFindBy:
     - find_by_pseudonym_credentials # SessionPersistenceToken
     - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
   Severity: error
+Rails/ExpandedDateRange:
+  Severity: error
 Rails/FilePath:
   Severity: error
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
+Rails/HttpPositionalArguments:
+  Severity: error
 Rails/HttpStatus:
   Severity: error
 Rails/IndexBy:
   Severity: error
 Rails/IndexWith:
+  Severity: error
+Rails/MatchRoute:
   Severity: error
 Rails/Pluck:
   Severity: error
@@ -127,6 +133,14 @@ Rails/PluralizationGrammar:
 Rails/Presence:
   Severity: error
 Rails/RedundantAllowNil:
+  Severity: error
+Rails/RedundantForeignKey:
+  Severity: error
+Rails/ReflectionClassName:
+  Severity: error
+Rails/RequestReferer:
+  Severity: error
+Rails/ShortI18n:
   Severity: error
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons

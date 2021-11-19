@@ -43,7 +43,7 @@ module FilesCommon
     file_name_textbox_el.send_keys(:return)
   end
 
-  def delete(row_selected = 0, delete_using = :cog_icon)
+  def delete_file(row_selected = 0, delete_using = :cog_icon)
     case delete_using
     when :cog_icon
       ff('.al-trigger')[row_selected].click

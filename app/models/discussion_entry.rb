@@ -39,7 +39,7 @@ class DiscussionEntry < ActiveRecord::Base
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   # also null if a root entry
-  belongs_to :root_entry, :class_name => 'DiscussionEntry', :foreign_key => :root_entry_id
+  belongs_to :root_entry, :class_name => 'DiscussionEntry'
   belongs_to :user
   has_many :mentions, inverse_of: :discussion_entry
   belongs_to :attachment

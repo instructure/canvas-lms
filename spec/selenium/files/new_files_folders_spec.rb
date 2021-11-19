@@ -79,7 +79,7 @@ describe "better_file_browsing, folders" do
 
     it "deletes a folder from cog icon", priority: "1", test_id: 223502 do
       skip_if_safari(:alert)
-      delete(0, :cog_icon)
+      delete_file(0, :cog_icon)
       expect(f("#content")).not_to contain_link("new test folder")
     end
 
@@ -102,7 +102,7 @@ describe "better_file_browsing, folders" do
 
     it "deletes folder from toolbar", priority: "1", test_id: 133105 do
       skip_if_safari(:alert)
-      delete(0, :toolbar_menu)
+      delete_file(0, :toolbar_menu)
       expect(f("body")).not_to contain_css('.ef-item-row')
     end
 
