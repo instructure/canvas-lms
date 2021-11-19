@@ -91,8 +91,8 @@
   },
   "dismissed_8b0b1fc9": { "message": "Demitido" },
   "dismissed_opportunities_f0826640": { "message": "Oportunidades demitidas" },
-  "due_5d7267be": { "message": "Vencimento:" },
-  "due_date_124fdd99": { "message": "Vencimento: { date }" },
+  "due_5d7267be": { "message": "Data limite:" },
+  "due_date_124fdd99": { "message": "Data limite: { date }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_title_72e5a21e": { "message": "Editar { title }" },
   "error_loading_grades_e0b38f4d": {
@@ -181,7 +181,7 @@
   "new_opportunities_7d349c4d": { "message": "Novas oportunidades" },
   "next_month_749b1778": { "message": "Próximo mês" },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Nenhuma data de vencimento atribuída"
+    "message": "Nenhuma data limite atribuída"
   },
   "no_grade_3b4d7f3e": { "message": "Sem classificação" },
   "nothing_due_this_week_d45c9ef9": { "message": "Nada de devido esta semana" },
