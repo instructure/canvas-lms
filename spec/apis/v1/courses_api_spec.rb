@@ -393,7 +393,7 @@ describe Api::V1::Course do
   end
 
   describe '#add_helper_dependant_entries' do
-    let(:hash) { Hash.new }
+    let(:hash) { {} }
     let(:course) { double(:feed_code => 573, :id => 42, :syllabus_body => 'syllabus text').as_null_object }
     let(:course_json) { double.as_null_object }
     let(:api) { TestCourseApi.new }

@@ -482,7 +482,7 @@ module Api
 
       describe '#include_total_scores?' do
         let(:predicate) { course_json.include_total_scores? }
-        let(:course_settings) { Hash.new }
+        let(:course_settings) { {} }
         let(:course) { double(course_settings) }
 
         describe 'when total scores key is set' do
@@ -550,7 +550,7 @@ module Api
       end
 
       describe '#clear_unneeded_fields' do
-        let(:hash) { Hash.new }
+        let(:hash) { {} }
 
         describe 'with an optional field' do
           before { hash['enrollments'] = [] }
@@ -640,7 +640,7 @@ module Api
         let(:sis_course) { double(grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
         let(:sis_course_json) { CourseJson.new(sis_course, user, includes, []) }
         let(:root_account) { double(grants_right?: @has_right) }
-        let(:hash) { Hash.new }
+        let(:hash) { {} }
 
         before do
           @sis_id = 1357

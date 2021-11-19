@@ -46,7 +46,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns do
       ]
     end
 
-    let(:question_params) { Hash.new }
+    let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns }
 
     include_examples "All answer parsers"
