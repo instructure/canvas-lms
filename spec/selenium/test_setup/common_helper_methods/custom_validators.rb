@@ -20,7 +20,7 @@
 module CustomValidators
   def validate_breadcrumb_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
-    if breadcrumb_text != nil
+    unless breadcrumb_text.nil?
       breadcrumb = f('#breadcrumbs')
       expect(breadcrumb).to include_text(breadcrumb_text)
     end

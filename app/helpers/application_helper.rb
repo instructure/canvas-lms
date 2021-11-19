@@ -537,9 +537,9 @@ module ApplicationHelper
 
   def hash_get(hash, key, default = nil)
     if hash
-      if hash[key.to_s] != nil
+      if !hash[key.to_s].nil?
         hash[key.to_s]
-      elsif hash[key.to_sym] != nil
+      elsif !hash[key.to_sym].nil?
         hash[key.to_sym]
       else
         default

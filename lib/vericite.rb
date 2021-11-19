@@ -135,7 +135,7 @@ module VeriCite
             paper_title = File.basename(a.display_name, ".*")
             paper_ext = a.extension
             paper_type = a.content_type
-            if paper_ext == nil
+            if paper_ext.nil?
               paper_ext = ""
             end
             paper_size = 100 # File.size(
@@ -182,7 +182,7 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       response = sendRequest(:generate_report, :oid => object_id, :utp => '2', :current_user => current_user, :user => user, :course => course, :assignment => assignment)
-      if response != nil
+      if !response.nil?
         response[:report_url]
       else
         nil
@@ -195,7 +195,7 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       response = sendRequest(:generate_report, :oid => object_id, :utp => '1', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :tem => email(course))
-      if response != nil
+      if !response.nil?
         response[:report_url]
       else
         nil
@@ -223,17 +223,17 @@ module VeriCite
           context_id = course.id
           assignment_id = assignment.id
           assignment_data = VeriCiteClient::AssignmentData.new
-          assignment_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
-          assignment_data.assignment_instructions = assignment.description != nil ? assignment.description : ""
+          assignment_data.assignment_title = assignment.title || assignment_id
+          assignment_data.assignment_instructions = assignment.description || ""
           assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
           assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == '1'
           assignment_data.assignment_store_in_index = args["store_in_index"] == '1'
           assignment_data.assignment_due_date = 0
-          if assignment.due_at != nil
+          unless assignment.due_at.nil?
             # convert to epoch time in milli
             assignment_data.assignment_due_date = assignment.due_at.to_time.utc.to_i * 1000
           end
-          assignment_data.assignment_grade = assignment.points_possible != nil ? assignment.points_possible : -1
+          assignment_data.assignment_grade = assignment.points_possible || -1
           _data, status_code, _headers = vericite_client.assignments_context_id_assignment_id_post(context_id, assignment_id, consumer, consumer_secret, assignment_data)
           # check status code
           response[:return_code] = status_code
@@ -254,10 +254,10 @@ module VeriCite
           report_meta_data.user_email = email(user)
           report_meta_data.user_role = args[:role]
           if assignment
-            report_meta_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
+            report_meta_data.assignment_title = assignment.title || assignment_id
           end
           if course
-            report_meta_data.context_title = course.name != nil ? course.name : context_id
+            report_meta_data.context_title = course.name || context_id
           end
           external_content_data = VeriCiteClient::ExternalContentData.new
           external_content_data.external_content_id = "#{consumer}/#{context_id}/#{assignment_id}/#{user_id}/#{args[:pid]}"
@@ -288,7 +288,7 @@ module VeriCite
           users_score_map = {}
           # first check if the cache already has the user's score and if we haven't looked up this assignment lately:
           users_score_map[user_id.to_s] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
-          if users_score_map[user_id.to_s].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
+          if users_score_map[user_id.to_s].nil? && Rails.cache.read(user_score_cache_key_prefix).nil?
             # we already looked up this user in Redis, don't bother again (by setting {})
             users_score_map[user_id.to_s] ||= {}
             # we need to look up the user scores in VeriCite for this course

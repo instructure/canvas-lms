@@ -49,12 +49,12 @@ class SortsAssignments
 
     def dated(assignments)
       assignments ||= []
-      assignments.reject { |assignment| assignment.due_at == nil }
+      assignments.reject { |assignment| assignment.due_at.nil? }
     end
 
     def undated(assignments)
       assignments ||= []
-      assignments.select { |assignment| assignment.due_at == nil }
+      assignments.select { |assignment| assignment.due_at.nil? }
     end
 
     def unsubmitted_for_user_and_session(course, assignments, user, current_user, session)

@@ -147,7 +147,7 @@ module Canvas::Migration::Helpers
         content_list << process_group(group, outcomes)
       end
       content_list.concat(
-        outcomes.select { |outcome| outcome['parent_migration_id'] == nil }.map { |outcome| item_hash('learning_outcomes', outcome) }
+        outcomes.select { |outcome| outcome['parent_migration_id'].nil? }.map { |outcome| item_hash('learning_outcomes', outcome) }
       )
     end
 

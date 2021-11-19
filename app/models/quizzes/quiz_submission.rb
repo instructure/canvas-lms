@@ -255,7 +255,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
 
   def end_date_needs_recalculated?
-    self.end_at == nil && !!quiz.time_limit
+    self.end_at.nil? && !!quiz.time_limit
   end
 
   def end_date_is_valid?

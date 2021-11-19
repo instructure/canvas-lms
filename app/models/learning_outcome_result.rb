@@ -162,7 +162,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.original_score ||= self.score
     self.original_possible ||= self.possible
-    self.original_mastery = self.mastery if self.original_mastery == nil
+    self.original_mastery = self.mastery if self.original_mastery.nil?
     calculate_percent!
     true
   end

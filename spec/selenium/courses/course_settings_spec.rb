@@ -205,7 +205,7 @@ describe "course settings" do
       wait.until do
         el = f('.self_enrollment_message')
         el.present? &&
-          el.text != nil &&
+          !el.text.nil? &&
           el.text != ""
       end
       message = f('.self_enrollment_message')

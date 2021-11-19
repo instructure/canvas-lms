@@ -250,6 +250,10 @@ Style/NegatedWhile:
   Severity: error
 Style/NestedParenthesizedCalls:
   Severity: error
+Style/NilComparison:
+  Severity: error
+Style/NonNilCheck:
+  Severity: error
 Style/Not:
   Severity: error
 Style/NumericPredicate:

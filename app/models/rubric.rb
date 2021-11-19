@@ -259,7 +259,7 @@ class Rubric < ActiveRecord::Base
   def update_criteria(params)
     self.without_versioning(&:save) if self.new_record?
     data = generate_criteria(params)
-    self.hide_score_total = params[:hide_score_total] if self.hide_score_total == nil || (self.association_count || 0) < 2
+    self.hide_score_total = params[:hide_score_total] if self.hide_score_total.nil? || (self.association_count || 0) < 2
     self.data = data.criteria
     self.title = data.title
     self.points_possible = data.points_possible
