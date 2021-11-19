@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "active_support/core_ext/module/delegation"
 require 'zip'
 require 'fileutils'
 require 'canvas_mimetype_fu'
@@ -182,13 +183,7 @@ class CanvasUnzip
       end
     end
 
-    def directory?
-      entry.directory?
-    end
-
-    def file?
-      entry.file?
-    end
+    delegate :directory?, :file?, to: :entry
 
     def name
       @name ||= case type

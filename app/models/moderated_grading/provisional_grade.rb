@@ -66,9 +66,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     end
   end
 
-  def touch_graders
-    submission.touch_graders
-  end
+  delegate :touch_graders, to: :submission
 
   def touch_submission
     submission.touch

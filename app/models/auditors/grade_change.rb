@@ -154,17 +154,9 @@ class Auditors::GradeChange
     end
     private :id_or_placeholder
 
-    def root_account
-      account.root_account
-    end
-
-    def account
-      context.account
-    end
-
-    def assignment
-      submission.assignment
-    end
+    delegate :root_account, to: :account
+    delegate :account, to: :context
+    delegate :assignment, to: :submission
 
     def course
       context if context_type == 'Course'

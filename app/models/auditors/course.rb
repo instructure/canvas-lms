@@ -106,9 +106,7 @@ class Auditors::Course
       attributes['data'] = @event_data.to_json
     end
 
-    def account
-      course.account
-    end
+    delegate :account, to: :course
   end
 
   Stream = Audits.stream do

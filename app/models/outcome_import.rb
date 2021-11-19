@@ -85,9 +85,7 @@ class OutcomeImport < ApplicationRecord
     data
   end
 
-  def root_account
-    context.root_account
-  end
+  delegate :root_account, to: :context
 
   def schedule
     delay(strand: "OutcomeImport::run::#{root_account.global_id}").run

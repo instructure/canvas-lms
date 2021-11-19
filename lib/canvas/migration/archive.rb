@@ -101,9 +101,7 @@ module Canvas::Migration
       end
     end
 
-    def path
-      file.path
-    end
+    delegate :path, to: :file
 
     def unzipped_file_path
       unless @unzipped_file_path

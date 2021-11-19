@@ -58,9 +58,7 @@ module Polling
       can :read
     end
 
-    def associated_shards
-      user.associated_shards
-    end
+    delegate :associated_shards, to: :user
 
     def closed_and_viewable_for?(user)
       poll_sessions.shard(self).activate do |scope|

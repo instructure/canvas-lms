@@ -2618,57 +2618,20 @@ class User < ActiveRecord::Base
     @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
   end
 
-  def load_messageable_user(user, options = {})
-    messageable_user_calculator.load_messageable_user(user, options)
-  end
-
-  def load_messageable_users(users, options = {})
-    messageable_user_calculator.load_messageable_users(users, options)
-  end
-
-  def messageable_users_in_context(asset_string)
-    messageable_user_calculator.messageable_users_in_context(asset_string)
-  end
-
-  def count_messageable_users_in_context(asset_string, options = {})
-    messageable_user_calculator.count_messageable_users_in_context(asset_string, options)
-  end
-
-  def messageable_users_in_course(course_or_id)
-    messageable_user_calculator.messageable_users_in_course(course_or_id)
-  end
-
-  def count_messageable_users_in_course(course_or_id)
-    messageable_user_calculator.count_messageable_users_in_course(course_or_id)
-  end
-
-  def messageable_users_in_section(section_or_id)
-    messageable_user_calculator.messageable_users_in_section(section_or_id)
-  end
-
-  def count_messageable_users_in_section(section_or_id)
-    messageable_user_calculator.count_messageable_users_in_section(section_or_id)
-  end
-
-  def messageable_users_in_group(group_or_id)
-    messageable_user_calculator.messageable_users_in_group(group_or_id)
-  end
-
-  def count_messageable_users_in_group(group_or_id)
-    messageable_user_calculator.count_messageable_users_in_group(group_or_id)
-  end
-
-  def search_messageable_users(options = {})
-    messageable_user_calculator.search_messageable_users(options)
-  end
-
-  def messageable_sections
-    messageable_user_calculator.messageable_sections
-  end
-
-  def messageable_groups
-    messageable_user_calculator.messageable_groups
-  end
+  delegate :load_messageable_user,
+           :load_messageable_users,
+           :messageable_users_in_context,
+           :count_messageable_users_in_context,
+           :messageable_users_in_course,
+           :count_messageable_users_in_course,
+           :messageable_users_in_section,
+           :count_messageable_users_in_section,
+           :messageable_users_in_group,
+           :count_messageable_users_in_group,
+           :search_messageable_users,
+           :messageable_sections,
+           :messageable_groups,
+           to: :messageable_user_calculator
 
   def mark_all_conversations_as_read!
     updated = conversations.unread.update_all(:workflow_state => 'read')

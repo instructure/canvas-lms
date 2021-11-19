@@ -46,9 +46,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
     state :deleted
   end
 
-  def conversation
-    conversation_message.conversation
-  end
+  delegate :conversation, to: :conversation_message
 
   def self.query_deleted(user_id, options = {})
     query = self.deleted.eager_load(:conversation_message).where(user_id: user_id).order(deleted_at: :desc)

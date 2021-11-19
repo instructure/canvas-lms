@@ -28,9 +28,7 @@ class Attachments::S3Storage
     @attachment = attachment
   end
 
-  def bucket
-    attachment.bucket
-  end
+  delegate :bucket, to: :attachment
 
   def exists?
     attachment.s3object.exists?

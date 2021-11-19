@@ -46,9 +46,7 @@ class EnrollmentState < ActiveRecord::Base
 
   self.primary_key = 'enrollment_id'
 
-  def hash
-    global_enrollment_id.hash
-  end
+  delegate :hash, to: :global_enrollment_id
 
   # check if we've manually marked the enrollment state as potentially out of date (or if the stored date trigger has past)
   def state_needs_recalculation?

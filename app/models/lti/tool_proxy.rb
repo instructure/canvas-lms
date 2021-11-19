@@ -136,9 +136,7 @@ module Lti
       ims_tool_proxy.tool_profile.security_profiles
     end
 
-    def enabled_capabilities
-      ims_tool_proxy.enabled_capabilities
-    end
+    delegate :enabled_capabilities, to: :ims_tool_proxy
 
     def matching_tool_profile?(other_profile)
       profile = raw_data['tool_profile']

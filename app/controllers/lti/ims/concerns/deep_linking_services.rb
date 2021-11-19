@@ -73,9 +73,7 @@ module Lti::IMS::Concerns
         @context = context
       end
 
-      def [](key)
-        verified_jwt[key]
-      end
+      delegate :[], to: :verified_jwt
 
       def developer_key
         @developer_key ||= DeveloperKey.find_cached(client_id)

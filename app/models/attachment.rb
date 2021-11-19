@@ -855,9 +855,7 @@ class Attachment < ActiveRecord::Base
     "local_storage" + Canvas::Security.encryption_key
   end
 
-  def shared_secret(datetime)
-    store.shared_secret(datetime)
-  end
+  delegate :shared_secret, to: :store
 
   def instfs_hosted?
     !!instfs_uuid

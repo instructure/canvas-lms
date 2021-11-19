@@ -47,13 +47,7 @@ class Auditors::Authentication
       attributes['user_id'] = Shard.global_id_for(@pseudonym.user_id)
     end
 
-    def user
-      pseudonym.user
-    end
-
-    def account
-      pseudonym.account
-    end
+    delegate :user, :account, to: :pseudonym
   end
 
   Stream = Audits.stream do

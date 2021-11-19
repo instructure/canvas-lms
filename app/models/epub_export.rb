@@ -56,9 +56,7 @@ class EpubExport < ActiveRecord::Base
     state :deleted
   end
 
-  def course_broadcast_data
-    course.broadcast_data
-  end
+  delegate :broadcast_data, to: :course, prefix: true
 
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished

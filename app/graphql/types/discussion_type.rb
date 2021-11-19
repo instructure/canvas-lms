@@ -62,9 +62,7 @@ module Types
     field :require_initial_post, Boolean, null: true
 
     field :message, String, null: true
-    def message
-      object.message
-    end
+    delegate :message, to: :object
 
     field :locked_for_user, Boolean, null: false
     def locked_for_user
