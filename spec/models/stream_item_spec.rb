@@ -128,14 +128,16 @@ describe StreamItem do
 
       dt = @course.discussion_topics.create!(:title => 'title')
       enable_cache do
+        expect(@user2).to receive(:recent_stream_items).once.and_call_original
         items = @user2.cached_recent_stream_items
         items2 = @shard1.activate { @user2.cached_recent_stream_items }
         expect(items).to eq [dt.stream_item]
-        expect(items).to be === items2 # same object, because same cache key
+        expect(items).to eq items2
 
         item = @user2.visible_stream_item_instances.last
         item.update_attribute(:hidden, true)
 
+        expect(@user2).to receive(:recent_stream_items).once.and_call_original
         # after dismissing an item, the old items should no longer be cached
         items = @user2.cached_recent_stream_items
         items2 = @shard1.activate { @user2.cached_recent_stream_items }

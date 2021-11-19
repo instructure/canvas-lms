@@ -127,7 +127,7 @@ module Api::V1::CalendarEvent
       if context.grants_right?(user, session, :reserve)
         participant = context.participant_for(user)
         participant_child_events = event.child_events_for(participant)
-        hash['reserved'] = (Array === participant_child_events ? participant_child_events.present? : participant_child_events.exists?)
+        hash['reserved'] = (participant_child_events.is_a?(Array) ? participant_child_events.present? : participant_child_events.exists?)
         hash['reserve_comments'] = participant_child_events.filter_map(&:comments).join(", ")
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, participant)
       else

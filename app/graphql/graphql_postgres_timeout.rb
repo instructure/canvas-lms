@@ -32,7 +32,7 @@ module GraphQLPostgresTimeout
         ActiveRecord::Base.connection.execute "SET statement_timeout = #{statement_timeout}"
         yield
       rescue ActiveRecord::StatementInvalid => e
-        if PG::QueryCanceled === e.cause
+        if e.cause.is_a?(PG::QueryCanceled)
           Rails.logger.warn {
             "GraphQL Operation failed due to postgres statement_timeout:\n#{query.query_string}"
           }

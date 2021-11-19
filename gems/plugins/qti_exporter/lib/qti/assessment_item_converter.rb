@@ -165,15 +165,6 @@ module Qti
       @question
     end
 
-    QUESTION_TYPE_MAPPING = {
-      /matching/i => 'matching_question',
-      /text\s?information/i => 'text_only_question',
-      /image/i => 'text_only_question',
-      'trueFalse' => 'true_false_question',
-      %r{true/false}i => 'true_false_question',
-      'multiple_dropdowns' => 'multiple_dropdowns_question'
-    }.freeze
-
     def parse_instructure_metadata
       if (meta = @doc.at_css('instructureMetadata'))
         if (bank = get_node_att(meta, 'instructureField[name=question_bank]', 'value'))
@@ -221,10 +212,13 @@ module Qti
             @question[:question_type] = 'multiple_dropdowns_question'
           end
         elsif (type = get_node_att(meta, 'instructureField[name=question_type]', 'value'))
-          @migration_type = type
-          QUESTION_TYPE_MAPPING.each do |k, v|
-            @migration_type = v if k === @migration_type
-          end
+          @migration_type = case type
+                            when /matching/i then 'matching_question'
+                            when /text\s?information/i, /image/i then 'text_only_question'
+                            when 'trueFalse', %r{true/false}i then 'true_false_question'
+                            when 'multiple_dropdowns' then 'multiple_dropdowns_question'
+                            else type
+                            end
           if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
             @question[:question_type] = @migration_type
           end

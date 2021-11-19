@@ -156,7 +156,7 @@ module AssignmentOverrideApplicator
     if adhoc_overrides.any?
       override_ids_to_student_ids = {}
       scope = AssignmentOverrideStudent.where(assignment_override_id: adhoc_overrides).active
-      scope = if ActiveRecord::Relation === visible_user_ids
+      scope = if visible_user_ids.is_a?(ActiveRecord::Relation)
                 return adhoc_overrides if visible_user_ids.is_a?(ActiveRecord::NullRelation)
 
                 scope

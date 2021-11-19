@@ -1173,7 +1173,7 @@ module ApplicationHelper
   # Returns true if the current_path starts with the given value
   def active_path?(to_test)
     # Make sure to not include account external tools
-    if controller.controller_name == 'external_tools' && Account === @context
+    if controller.controller_name == 'external_tools' && @context.is_a?(Account)
       false
     else
       request.fullpath.start_with?(to_test)
