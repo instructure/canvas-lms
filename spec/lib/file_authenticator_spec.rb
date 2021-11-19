@@ -173,7 +173,7 @@ describe FileAuthenticator do
 
     it "delegates to attachment.thumbnail_url" do
       geometry = "640>"
-      thumbnail = double()
+      thumbnail = double
       expect(@attachment).to receive(:thumbnail_url)
         .with(include(size: geometry))
         .and_return(thumbnail)

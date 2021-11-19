@@ -272,11 +272,11 @@ class GradingPeriodsController < ApplicationController
 
   def find_or_build_periods(periods_params, grading_period_group)
     periods_params.map do |period_params|
-      if period_params[:id].present?
-        period = grading_period_group.grading_periods.active.find(period_params[:id])
-      else
-        period = grading_period_group.grading_periods.build
-      end
+      period = if period_params[:id].present?
+                 grading_period_group.grading_periods.active.find(period_params[:id])
+               else
+                 grading_period_group.grading_periods.build
+               end
       period.assign_attributes(period_params.permit(:weight, :start_date, :end_date, :close_date, :title))
       period
     end

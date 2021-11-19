@@ -126,7 +126,7 @@ module TextHelper
         previous = current
       end
 
-      if current.children.length > 0
+      if !current.children.empty?
         # this node has children, can't be a text node,
         # lets descend and look for text nodes
         current = current.children.first
@@ -143,7 +143,7 @@ module TextHelper
 
         # we've reached the top and found no more text nodes, break
         if n.is_a?(Nokogiri::HTML::Document)
-          break;
+          break
         else
           current = n.parent.next
         end
@@ -188,8 +188,8 @@ module TextHelper
       end
 
       # remove everything else
-      while !current.is_a?(Nokogiri::HTML::Document)
-        while !current.next.nil?
+      until current.is_a?(Nokogiri::HTML::Document)
+        until current.next.nil?
           current.next.remove
         end
         current = current.parent
@@ -201,7 +201,7 @@ module TextHelper
     # which we don't want
     res = doc.at_css('body').inner_html rescue nil
     res ||= doc.root.children.first.inner_html rescue ""
-    res && res.html_safe
+    res&.html_safe
   end
 
   def self.make_subject_reply_to(subject)
@@ -231,7 +231,7 @@ module TextHelper
     inlinify = :auto
     if args.last.is_a?(Hash)
       options = args.last
-      inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
+      inlinify = options.delete(:inlinify) if options.key?(:inlinify)
       options.each_pair do |key, value|
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper
@@ -247,7 +247,7 @@ module TextHelper
     string = ERB::Util.h(string) unless string.html_safe?
     result = Redcarpet::Markdown.new(Redcarpet::Render::XHTML.new).render(string).strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
-    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
+    result.gsub!(%r{</?p>}, '') if inlinify == :auto && result =~ %r{\A<p>.*</p>\z}m && result !~ /.*<p>.*<p>.*/m
     result.strip.html_safe
   end
 

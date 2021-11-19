@@ -27,13 +27,15 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconSettingsLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 import propTypes from '../propTypes'
 
 const STUDENT_SETTINGS = [
   'allow_student_forum_attachments',
   'allow_student_discussion_editing',
   'allow_student_discussion_topics',
-  'allow_student_discussion_reporting'
+  'allow_student_discussion_reporting',
+  'allow_student_anonymous_discussion_topics'
 ]
 
 export default class DiscussionSettings extends Component {
@@ -119,6 +121,19 @@ export default class DiscussionSettings extends Component {
               label={I18n.t('Create discussion topics')}
               value="allow_student_discussion_topics"
             />
+            {ENV.discussion_anonymity_enabled && (
+              <View as="div" padding="0 0 0 medium">
+                <Checkbox
+                  id="allow_student_anonymous_discussion_topics"
+                  disabled={
+                    this.props.isSavingSettings ||
+                    !this.state.studentSettings.includes('allow_student_discussion_topics')
+                  }
+                  label={I18n.t('Create anonymous discussion topics')}
+                  value="allow_student_anonymous_discussion_topics"
+                />
+              </View>
+            )}
             <Checkbox
               id="allow_student_discussion_editing"
               disabled={this.props.isSavingSettings}

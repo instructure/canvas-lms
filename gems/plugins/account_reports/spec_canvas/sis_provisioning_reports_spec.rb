@@ -320,11 +320,11 @@ describe "Default Account Reports" do
 
     header = case format
              when 'sis'
-               %w(user_id integration_id authentication_provider_id login_id password first_name last_name
-                  full_name sortable_name short_name email status)
+               %w[user_id integration_id authentication_provider_id login_id password first_name last_name
+                  full_name sortable_name short_name email status]
              when 'provisioning'
-               %w(canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
-                  full_name sortable_name short_name email status created_by_sis)
+               %w[canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
+                  full_name sortable_name short_name email status created_by_sis]
              end
     header << 'pronouns' if @report.should_add_pronouns?
     header
@@ -1530,12 +1530,12 @@ describe "Default Account Reports" do
       parameters["courses"] = true
       parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 'skip' })
 
-      accounts_report = parsed["accounts.csv"][1..-1].sort_by { |r| r[0] }
+      accounts_report = parsed["accounts.csv"][1..].sort_by { |r| r[0] }
       expect(accounts_report[0]).to eq ["sub1", nil, "English", "active"]
       expect(accounts_report[1]).to eq ["sub3", nil, "math", "active"]
       expect(accounts_report[2]).to eq ["subsub1", "sub1", "sESL", "active"]
 
-      users_report = parsed["users.csv"][1..-1].sort_by { |r| r[0] }
+      users_report = parsed["users.csv"][1..].sort_by { |r| r[0] }
       expect(users_report.length).to eq 4
       expect(users_report).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
     end

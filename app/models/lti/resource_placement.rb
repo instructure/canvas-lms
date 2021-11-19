@@ -62,6 +62,7 @@ module Lti
                   :module_menu,
                   :module_group_menu,
                   :module_index_menu,
+                  :module_index_menu_modal,
                   :post_grades,
                   :quiz_menu,
                   :quiz_index_menu,
@@ -86,9 +87,9 @@ module Lti
 
     belongs_to :message_handler, class_name: 'Lti::MessageHandler'
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
-    validates_presence_of :message_handler, :placement
+    validates :message_handler, :placement, presence: true
 
-    validates_inclusion_of :placement, :in => PLACEMENT_LOOKUP.values
+    validates :placement, inclusion: { :in => PLACEMENT_LOOKUP.values }
 
     def self.valid_placements(_root_account)
       PLACEMENTS.dup.tap do |p|

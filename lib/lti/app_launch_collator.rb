@@ -19,11 +19,11 @@
 #
 module Lti
   class AppLaunchCollator
-    CONTENT_MESSAGE_TYPES = %w(
+    CONTENT_MESSAGE_TYPES = %w[
       ContentItemSelection
       ContentItemSelectionRequest
       LtiDeepLinkingRequest
-    ).freeze
+    ].freeze
 
     class << self
       def external_tools_for(context, placements, options = {})

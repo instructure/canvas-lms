@@ -64,12 +64,9 @@ module Submittable
                                 end
 
       # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
-      opts[:user_id].reduce({}) do |vis_hash, student_id|
-        vis_hash[student_id] = begin
-          ids_from_pluck = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
-          ids_from_pluck.concat(ids_visible_to_all).concat(ids_visible_to_sections)
-        end
-        vis_hash
+      opts[:user_id].index_with do |student_id|
+        ids_from_pluck = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
+        ids_from_pluck.concat(ids_visible_to_all).concat(ids_visible_to_sections)
       end
     end
 
@@ -112,7 +109,7 @@ module Submittable
   end
 
   def restore_old_assignment
-    return nil unless self.old_assignment && self.old_assignment.deleted?
+    return nil unless self.old_assignment&.deleted?
 
     self.old_assignment.workflow_state = 'published'
     name = self.class.name.underscore

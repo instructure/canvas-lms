@@ -100,7 +100,7 @@ describe Quizzes::QuizSerializer do
 
   describe "description for locked quiz" do
     it "returns an empty string for students" do
-      serializer = quiz_serializer()
+      serializer = quiz_serializer
       allow(serializer).to receive('quiz_locked_for_user?').and_return true
       allow(serializer).to receive('user_is_student?').and_return true
       json = serializer.as_json[:quiz]

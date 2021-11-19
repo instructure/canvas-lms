@@ -19,7 +19,7 @@
 
 require 'lti_advantage'
 
-require File.expand_path(File.dirname(__FILE__) + '/message_claims_examples')
+require_relative 'message_claims_examples'
 
 module LtiAdvantage::Messages
   RSpec.describe DeepLinkingRequest do

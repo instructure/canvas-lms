@@ -555,8 +555,10 @@ describe "people" do
     end
 
     it "removes students linked to an observer" do
-      @student1 = user_factory; @course.enroll_student(@student1, enrollment_state: :active)
-      @student2 = user_factory; @course.enroll_student(@student2, enrollment_state: :active)
+      @student1 = user_factory
+      @course.enroll_student(@student1, enrollment_state: :active)
+      @student2 = user_factory
+      @course.enroll_student(@student2, enrollment_state: :active)
       @observer = user_factory
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student1.id, allow_multiple_enrollments: true)
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student2.id, allow_multiple_enrollments: true)

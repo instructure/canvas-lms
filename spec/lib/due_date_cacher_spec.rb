@@ -252,7 +252,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      @instance = double()
+      @instance = double
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
@@ -265,7 +265,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      @instance = double()
+      @instance = double
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "what:up:dog", max_attempts: 10)

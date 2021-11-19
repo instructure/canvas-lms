@@ -22,18 +22,18 @@ class ObserverAlertThreshold < ActiveRecord::Base
   belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alert_thresholds
   has_many :observer_alerts, :inverse_of => :observer_alert_threshold
 
-  ALERT_TYPES_WITH_THRESHOLD = %w(
+  ALERT_TYPES_WITH_THRESHOLD = %w[
     assignment_grade_high
     assignment_grade_low
     course_grade_high
     course_grade_low
-  ).freeze
+  ].freeze
 
-  ALERT_TYPES_WITHOUT_THRESHOLD = %w(
+  ALERT_TYPES_WITHOUT_THRESHOLD = %w[
     assignment_missing
     course_announcement
     institution_announcement
-  ).freeze
+  ].freeze
 
   ALERT_TYPES = (ALERT_TYPES_WITH_THRESHOLD | ALERT_TYPES_WITHOUT_THRESHOLD).freeze
 
@@ -106,9 +106,9 @@ class ObserverAlertThreshold < ActiveRecord::Base
   def did_pass_threshold(previous_value, new_value)
     t = self.threshold.to_i
     if self.alert_type.include? 'high'
-      return (previous_value.nil? || previous_value < t) && (!new_value.nil? && new_value > t)
+      (previous_value.nil? || previous_value < t) && (!new_value.nil? && new_value > t)
     elsif self.alert_type.include? 'low'
-      return (previous_value.nil? || previous_value > t) && (!new_value.nil? && new_value < t)
+      (previous_value.nil? || previous_value > t) && (!new_value.nil? && new_value < t)
     end
   end
 end

@@ -28,7 +28,7 @@ describe EventStream::AttrConfig do
       def initialize(opts = {})
         # assumes the class has had attr_config :field declared. but that
         # declaration will happen during specs since it varies
-        field(opts[:field]) if opts.has_key?(:field)
+        field(opts[:field]) if opts.key?(:field)
         attr_config_validate
       end
     end

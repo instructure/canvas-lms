@@ -95,7 +95,7 @@ module Quizzes::QuizQuestion::AnswerParsers
     end
 
     def trim_padding(n)
-      n.to_s[9..-1].to_i
+      n.to_s[9..].to_i
     end
   end
 end

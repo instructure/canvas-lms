@@ -108,17 +108,17 @@ module Rake
 
     def ensure_all_nodes_are_defined!
       undefined = nodes.reduce([]) do |errors, (_node, deps)|
-        errors + deps.select { |dep| !nodes.key?(dep) }
+        errors + deps.reject { |dep| nodes.key?(dep) }
       end
 
       if undefined.any?
-        fail <<~ERR
+        fail <<~TEXT
 
           The following nodes are listed as dependents but were not defined:
 
             - #{undefined.uniq.join("\n  - ")}
 
-        ERR
+        TEXT
       end
     end
 

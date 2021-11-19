@@ -200,7 +200,7 @@ describe Quizzes::QuizRegrader::Answer do
       end
 
       it 'works with multiple_answer_questions' do
-        question.question_data.merge!(:question_type => 'multiple_answers_question')
+        question.question_data[:question_type] = 'multiple_answers_question'
         answer.merge!(:answer_1 => "0", :answer_2 => "1")
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)

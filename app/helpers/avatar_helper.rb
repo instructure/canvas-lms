@@ -24,7 +24,7 @@ module AvatarHelper
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
     account = @account || @domain_root_account
-    is_admin = account && account.grants_right?(@current_user, session, :manage)
+    is_admin = account&.grants_right?(@current_user, session, :manage)
     if session["reported_#{user_id}"] && !is_admin && !(user && user.avatar_state == :approved)
       ["/images/messages/avatar-50.png", '']
     else
@@ -36,11 +36,11 @@ module AvatarHelper
           if !user && user_id.to_i > 0
             user ||= User.find(user_id)
           end
-          if user
-            url = avatar_url_for_user(user)
-          else
-            url = "/images/messages/avatar-50.png"
-          end
+          url = if user
+                  avatar_url_for_user(user)
+                else
+                  "/images/messages/avatar-50.png"
+                end
           alt = user ? user.short_name : ''
           [url, alt]
         end
@@ -55,14 +55,14 @@ module AvatarHelper
     avatar_url, display_name = avatar_image_attrs(user_or_id)
     context_code = opts[:context_code] if opts[:context_code]
     url = nil
-    if opts.has_key? :url
+    if opts.key? :url
       url = opts[:url]
     elsif user_or_id
-      if context_code
-        url = context_prefix(context_code) + user_path(user_or_id)
-      else
-        url = user_url(user_or_id)
-      end
+      url = if context_code
+              context_prefix(context_code) + user_path(user_or_id)
+            else
+              user_url(user_or_id)
+            end
     end
     link_opts = {}
     link_opts[:class] = 'fs-exclude avatar ' + opts[:class].to_s
@@ -77,9 +77,10 @@ module AvatarHelper
   end
 
   def avatar_url_for(conversation, participants = conversation.participants)
-    if participants.size == 1
+    case participants.size
+    when 1
       avatar_url_for_user(participants.first)
-    elsif participants.size == 2
+    when 2
       avatar_url_for_user(participants.find { |u| u.id != conversation.user_id })
     else
       avatar_url_for_group

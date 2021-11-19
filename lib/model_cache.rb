@@ -88,7 +88,9 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.inject({}) { |h, (k, v)| h[k] = prepare_lookups(v); h }
+    @cache = lookups.transform_values { |v|
+      prepare_lookups(v)
+    }
     yield
   ensure
     @cache = nil
@@ -108,9 +110,8 @@ module ModelCache
     return records if records.is_a?(Hash)
     return {} if records.empty?
 
-    keys[records.first.class.name].inject({}) do |h, k|
-      h[k] = records.index_by(&k)
-      h
+    keys[records.first.class.name].index_with do |k|
+      records.index_by(&k)
     end
   end
 
@@ -128,7 +129,7 @@ module ModelCache
     expected_args = options[:key_method] ? 0 : 1
     maybe_reset = "cache[#{key_value}] = #{orig_method} if args.size > #{expected_args}"
 
-    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE, __FILE__, __LINE__ + 1)
+    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<~RUBY, __FILE__, __LINE__ + 1)
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}
@@ -138,7 +139,7 @@ module ModelCache
         end
       end
       #{alias_method}
-    CODE
+    RUBY
   end
 
   def self.included(klass)

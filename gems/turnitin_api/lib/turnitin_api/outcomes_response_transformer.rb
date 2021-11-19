@@ -49,7 +49,7 @@ module TurnitinApi
     end
 
     def originality_data
-      response.body['outcome_originalityreport'].select { |k, _| %w(breakdown numeric).include?(k) }
+      response.body['outcome_originalityreport'].select { |k, _| %w[breakdown numeric].include?(k) }
     end
 
     def uploaded_at

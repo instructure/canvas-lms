@@ -25,7 +25,7 @@ class ConfigurationMissingError < StandardError; end
 class NotificationFailureProcessor
   attr_reader :config
 
-  POLL_PARAMS = %i(idle_timeout wait_time_seconds visibility_timeout).freeze
+  POLL_PARAMS = %i[idle_timeout wait_time_seconds visibility_timeout].freeze
   DEFAULT_CONFIG = {
     notification_failure_queue_name: 'notification-service-failures',
     # stop the loop if no message received for 10s

@@ -42,11 +42,11 @@ require 'rubocop_canvas/cops/migration/delay'
 require 'rubocop_canvas/cops/rails/smart_time_zone'
 ## specs
 require 'rubocop_canvas/cops/specs/no_before_once_stubs'
-require 'rubocop_canvas/cops/specs/no_disable_implicit_wait.rb'
+require 'rubocop_canvas/cops/specs/no_disable_implicit_wait'
 require 'rubocop_canvas/cops/specs/ensure_spec_extension'
 require 'rubocop_canvas/cops/specs/no_execute_script'
 require 'rubocop_canvas/cops/specs/no_no_such_element_error'
-require 'rubocop_canvas/cops/specs/no_selenium_web_driver_wait.rb'
+require 'rubocop_canvas/cops/specs/no_selenium_web_driver_wait'
 require 'rubocop_canvas/cops/specs/no_skip_without_ticket'
 require 'rubocop_canvas/cops/specs/no_strftime'
 require 'rubocop_canvas/cops/specs/no_wait_for_no_such_element'
@@ -57,7 +57,7 @@ require 'rubocop_canvas/cops/specs/scope_includes'
 module RuboCop
   module Canvas
     module Inject
-      DEFAULT_FILE = File.expand_path("../../config/default.yml", __FILE__)
+      DEFAULT_FILE = File.expand_path('../config/default.yml', __dir__)
 
       def self.defaults!
         path = File.absolute_path(DEFAULT_FILE)

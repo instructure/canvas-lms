@@ -235,7 +235,7 @@ describe "Alerts" do
       wait_for_ajaximations
 
       alert.reload
-      expect(alert.recipients.map { |r| r[:role_id] }.sort).to eq [role1.id, role2.id].sort
+      expect(alert.recipients.pluck(:role_id).sort).to eq [role1.id, role2.id].sort
     end
   end
 end

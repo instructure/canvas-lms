@@ -45,10 +45,10 @@ module Qti
       get_calculated_property('partial_credit_tolerance')
       @question[:partial_credit_tolerance] = @question[:partial_credit_tolerance].to_f if @question[:partial_credit_tolerance]
 
-      get_variables()
-      get_answer_sets()
-      get_feedback()
-      get_formulas()
+      get_variables
+      get_answer_sets
+      get_feedback
+      get_formulas
 
       if !@question[:answer_tolerance] &&
          (tolerance = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_tolerance]', 'value'))
@@ -70,7 +70,7 @@ module Qti
     def get_calculated_property(prop_name, is_true_false = false)
       @question[:"#{prop_name}"] = @doc.at_css("calculated #{prop_name}").text if @doc.at_css("calculated #{prop_name}")
       if is_true_false and @question[:"#{prop_name}"]
-        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true' ? true : false
+        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true'
       end
     end
 
@@ -118,9 +118,9 @@ module Qti
       @question[:variables].each do |v|
         v_name = v[:name]
         # substitute {var} for [var]
-        @question[:question_text].gsub!("{#{v_name}}", "[#{v_name}]") if @question[:question_text]
+        @question[:question_text]&.gsub!("{#{v_name}}", "[#{v_name}]")
         # substitute {var} for var
-        @question[:imported_formula].gsub!("{#{v_name}}", v_name.to_s) if @question[:imported_formula]
+        @question[:imported_formula]&.gsub!("{#{v_name}}", v_name.to_s)
       end
       if @question[:imported_formula]
         method_substitutions = { "sqr" => "sqrt", "Factorial" => "fact", "exp" => "e" }

@@ -45,7 +45,7 @@ module SIS
         group_id = group_id.to_s
         raise ImportError, "No group_id given for a group user" if group_id.blank?
         raise ImportError, "No user_id given for a group user" if user_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for a group user" unless status =~ /\A(accepted|deleted)/i
+        raise ImportError, "Improper status \"#{status}\" for a group user" unless /\A(accepted|deleted)/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         pseudo = @root_account.pseudonyms.where(sis_user_id: user_id).take

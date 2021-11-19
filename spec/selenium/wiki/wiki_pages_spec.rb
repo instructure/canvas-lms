@@ -143,7 +143,7 @@ describe "Wiki Pages" do
       f('tbody .al-trigger').click
       f('.edit-menu-item').click
       expect(f('.edit-control-text').attribute(:value)).to include('B-Team')
-      f('.edit-control-text').clear()
+      f('.edit-control-text').clear
       f('.edit-control-text').send_keys('A-Team')
       fj('button:contains("Save")').click
       expect(f('.collectionViewItems')).to include_text('A-Team')
@@ -310,7 +310,7 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages/Page1/edit"
       switch_editor_views
       switch_to_raw_html_editor
-      html_contents = %q(
+      html_contents = <<~HTML
         <p>
           <iframe style="width: 640px; height: 480px;"
                   title="Instructure - About Us"
@@ -322,7 +322,7 @@ describe "Wiki Pages" do
                   mozallowfullscreen="mozallowfullscreen">
           </iframe>
         </p>
-      )
+      HTML
       element = f('#wiki_page_body')
       element.send_keys(html_contents)
       wait_for_new_page_load { f(".btn-primary").click }

@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path("../lib", __FILE__)
-
-# Maintain your gem's version:
-require "moodle_importer/version"
+require_relative "lib/moodle_importer/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|

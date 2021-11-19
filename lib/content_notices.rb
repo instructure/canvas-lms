@@ -19,7 +19,7 @@
 #
 
 module ContentNotices
-  NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show]
+  NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show].freeze
 
   class ContentNotice
     attr_accessor(*NOTICE_ATTRIBUTES)

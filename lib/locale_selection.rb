@@ -29,14 +29,14 @@ module LocaleSelection
     # groups cheat and set the context to be the group after get_context runs
     # but before set_locale runs, but we want to do locale lookup based on the
     # actual context.
-    if context && context.is_a?(Group) && context.context
+    if context.is_a?(Group) && context.context
       context = context.context
     end
 
     sources = [
       -> { context.locale if context.try(:is_a?, Course) },
-      -> { user.locale if user && user.locale },
-      -> { session_locale if session_locale },
+      -> { user.locale if user&.locale },
+      -> { session_locale },
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
@@ -60,13 +60,13 @@ module LocaleSelection
     nil
   end
 
-  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/
-  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/
-  SEPARATOR = /\s*,\s*/
-  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
+  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/.freeze
+  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/.freeze
+  SEPARATOR = /\s*,\s*/.freeze
+  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/.freeze
 
   def infer_browser_locale(accept_language, locales_with_aliases)
-    return nil unless accept_language =~ ACCEPT_LANGUAGE
+    return nil unless ACCEPT_LANGUAGE.match?(accept_language)
 
     supported_locales = locales_with_aliases.keys
 

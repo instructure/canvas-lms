@@ -50,7 +50,7 @@ class Enrollment
 
         it "does not record anything within the time threshold" do
           recent_activity.record!(now)
-          recent_activity.record!(now + 1.minutes)
+          recent_activity.record!(now + 1.minute)
           expect(@enrollment.last_activity_at.to_s).to eq now.to_s
         end
 
@@ -63,7 +63,7 @@ class Enrollment
         it "updates total_activity_time within the time threshold" do
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)
-          recent_activity.record!(now + 1.minutes)
+          recent_activity.record!(now + 1.minute)
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now + 3.minutes)
           expect(@enrollment.total_activity_time).to eq 3.minutes.to_i

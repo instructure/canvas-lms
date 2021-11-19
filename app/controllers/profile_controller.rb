@@ -206,11 +206,11 @@ class ProfileController < ApplicationController
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select { |c| c.path_type == "email" }
     @sms_channels = @channels.select { |c| c.path_type == 'sms' }
-    @other_channels = @channels.select { |c| c.path_type != "email" }
+    @other_channels = @channels.reject { |c| c.path_type == "email" }
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active_only
-    @password_pseudonyms = @pseudonyms.select { |p| !p.managed_password? }
+    @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
     js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
@@ -334,7 +334,7 @@ class ProfileController < ApplicationController
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save
 
-      return head 208
+      return head :already_reported
     end
 
     respond_to do |format|
@@ -342,7 +342,7 @@ class ProfileController < ApplicationController
         .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
                 :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
         : {}
-      if !@user.user_can_edit_name?
+      unless @user.user_can_edit_name?
         user_params.delete(:name)
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
@@ -500,7 +500,7 @@ class ProfileController < ApplicationController
 
   def qr_mobile_login
     unless instructure_misc_plugin_available? && !!@domain_root_account&.mobile_qr_login_is_enabled?
-      head 404
+      head :not_found
       return
     end
 

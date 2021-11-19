@@ -54,8 +54,8 @@ module Services
         raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
 
         progress.complete! unless progress.failed?
-      rescue => error
-        mark_as_failure(error)
+      rescue => e
+        mark_as_failure(e)
       end
 
       def on_permanent_failure(error)
@@ -95,8 +95,8 @@ module Services
 
         homework_service.submit(eula_agreement_timestamp, comment)
         homework_service.success!
-      rescue => error
-        mark_as_failure(error)
+      rescue => e
+        mark_as_failure(e)
       end
 
       def on_permanent_failure(error)

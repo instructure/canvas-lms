@@ -113,7 +113,7 @@ class RubricAssociationsController < ApplicationController
       :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => { :user => @current_user,
                                                                                                   :session => session }),
       :rubric_association => @association.as_json(:include_root => false,
-                                                  :include => %i{rubric_assessments assessment_requests},
+                                                  :include => %i[rubric_assessments assessment_requests],
                                                   :permissions => { :user => @current_user, :session => session })
     }
     render :json => json_res
@@ -146,7 +146,7 @@ class RubricAssociationsController < ApplicationController
   def can_manage_rubrics_or_association_object?(association, association_object)
     return true if association ||
                    @context.grants_right?(@current_user, session, :manage_rubrics) ||
-                   (association_object && association_object.grants_right?(@current_user, session, :update))
+                   association_object&.grants_right?(@current_user, session, :update)
 
     render_unauthorized_action
     false

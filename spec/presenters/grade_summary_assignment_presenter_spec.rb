@@ -126,7 +126,7 @@ describe GradeSummaryAssignmentPresenter do
     context "when a summary's assignment_stats is empty" do
       before { allow(summary).to receive(:assignment_stats).and_return({}) }
 
-      it "does not raise an error " do
+      it "does not raise an error" do
         expect { presenter.grade_distribution }.to_not raise_error
       end
 
@@ -216,7 +216,7 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#show_submission_details?" do
     before do
-      @submission_stub = double()
+      @submission_stub = double
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end
 

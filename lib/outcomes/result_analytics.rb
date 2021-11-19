@@ -118,7 +118,7 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results, context = nil)
-      filtered_results = user_results.select { |r| !r.score.nil? }
+      filtered_results = user_results.reject { |r| r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
         RollupScore.new(outcome_results: outcome_results, opts: opts)

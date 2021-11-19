@@ -24,7 +24,7 @@ NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
-  validates :auth_filter, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
   workflow do
     state :active
@@ -235,7 +235,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w[
     admin_roles
     display_name
     email
@@ -247,7 +247,7 @@ class AuthenticationProvider < ActiveRecord::Base
     sortable_name
     surname
     time_zone
-  }.freeze
+  ].freeze
 
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
@@ -290,9 +290,9 @@ class AuthenticationProvider < ActiveRecord::Base
         role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
         account = pseudonym.account
         existing_account_users = account.account_users.merge(user.account_users).preload(:role).to_a
-        roles = role_names.map do |role_name|
+        roles = role_names.filter_map do |role_name|
           account.get_account_role_by_name(role_name)
-        end.compact
+        end
         roles_to_add = roles - existing_account_users.map(&:role)
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }

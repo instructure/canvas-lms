@@ -38,16 +38,18 @@ describe 'pace plans edit tray' do
     enable_pace_plans_in_course
   end
 
-  before :each do
+  before do
     user_session @teacher
   end
 
   context 'edit tray contents' do
     let(:pace_module_title) { "Pace Module" }
     let(:module_assignment_title) { "Module Assignment 1" }
+
     before :once do
       create_published_pace_plan(pace_module_title, module_assignment_title)
     end
+
     it 'shows tray link not available when updates have not been made' do
       visit_pace_plans_page
 

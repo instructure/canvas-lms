@@ -65,7 +65,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
   end
 
   def request_xml(source_id, launch_url, grade)
-    Nokogiri::XML.parse %{
+    Nokogiri::XML.parse <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -97,7 +97,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   describe "#handle_replace_result" do
@@ -122,7 +122,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
-    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission " do
+    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission" do
       xml.css('resultData').remove
       assignment.points_possible = nil
       assignment.save!

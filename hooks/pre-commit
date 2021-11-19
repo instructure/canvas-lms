@@ -13,6 +13,6 @@ if [ `pwd -P` = $CANVAS ]; then
   fi
 fi
 
-$CANVAS/script/rlint ${RLINT_ARGUMENTS:- --auto-correct}
+$CANVAS/script/rlint ${RLINT_ARGUMENTS:- --auto-correct-all}
 
 exit 0

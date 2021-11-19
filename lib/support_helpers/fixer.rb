@@ -35,9 +35,9 @@ module SupportHelpers
       fix # actually do it
 
       notify "Success", success_message
-    rescue => error
-      notify "Error", error_message(error)
-      raise error
+    rescue => e
+      notify "Error", error_message(e)
+      raise e
     end
 
     def fix

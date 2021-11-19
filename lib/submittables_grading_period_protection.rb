@@ -126,7 +126,7 @@ module SubmittablesGradingPeriodProtection
   end
 
   def can_update_overrides?(submittable, overrides, flash_message: false)
-    changed_overrides = overrides.select { |override| override.due_at_was.to_i != override.due_at.to_i }
+    changed_overrides = overrides.reject { |override| override.due_at_was.to_i == override.due_at.to_i }
     return true if changed_overrides.empty?
 
     if changed_overrides.any? { |override| date_in_closed_grading_period?(override.due_at_was) }

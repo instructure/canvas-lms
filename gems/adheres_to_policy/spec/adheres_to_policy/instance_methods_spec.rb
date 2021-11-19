@@ -36,7 +36,7 @@ describe AdheresToPolicy::InstanceMethods do
   let(:user_class) { Class.new }
 
   it "has setup a series of methods on the instance" do
-    %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
+    %w[rights_status granted_rights grants_right? grants_any_right? grants_all_rights?].each do |method|
       expect(some_class.new).to respond_to(method)
     end
   end
@@ -125,13 +125,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -152,13 +152,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read, :write
 
         given { |_| raise "don't execute me" }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -179,7 +179,7 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
         given { |_| raise "don't execute me" }
@@ -206,10 +206,10 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
         given { |_| raise "me either" }
@@ -238,8 +238,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     it "clear the permissions cache" do
-      expect(Rails.cache).to receive(:delete).with(/\/read$/)
-      expect(Rails.cache).to receive(:delete).with(/\/write$/)
+      expect(Rails.cache).to receive(:delete).with(%r{/read$})
+      expect(Rails.cache).to receive(:delete).with(%r{/write$})
 
       sample = sample_class.new
       expect(sample.grants_right?(1, :read)).to eq true
@@ -314,7 +314,7 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         set_policy do
-          given { |arg1| @total = @total + arg1 }
+          given { |arg1| @total += arg1 }
           can :read
 
           given { |arg1, arg2| @total = @total + arg1 + arg2[:count] }
@@ -419,12 +419,12 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         actor = actor_class.new
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/permissions_key\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/permissions_key/read$})
 
         session.delete(:permissions_key)
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/default\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/default/read$})
 
-        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/>\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(%r{>/read$})
       end
 
       it 'must not use the rails cache for permissions included in the configured blacklist' do

@@ -35,7 +35,7 @@ module DataFixup
     def self.run(klass, fields, default_value: false, batch_size: 1000)
       case fields
       when Array
-        fields = fields.map { |f| [f, default_value] }.to_h
+        fields = fields.index_with { default_value }
       when Hash
         # already correct type
       else

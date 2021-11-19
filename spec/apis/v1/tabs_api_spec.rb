@@ -192,12 +192,10 @@ describe TabsController, type: :request do
                                                    :consumer_key => 'key',
                                                    :shared_secret => 'secret',
                                                  })
-      @tool.settings.merge!({
-                              :course_navigation => {
-                                :enabled => 'true',
-                                :url => 'http://www.example.com',
-                              },
-                            })
+      @tool.settings[:course_navigation] = {
+        :enabled => 'true',
+        :url => 'http://www.example.com',
+      }
       @tool.save!
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
@@ -219,7 +217,7 @@ describe TabsController, type: :request do
       account_admin_user(:active_all => true)
       @account = @user.account
       @tool = @account.context_external_tools.new(name: "Ex", url: "http://example.com", consumer_key: "k", shared_secret: "s")
-      @tool.settings.merge!(account_navigation: { enabled: 'true', url: 'http://example.com' })
+      @tool.settings[:account_navigation] = { enabled: 'true', url: 'http://example.com' }
       @tool.save!
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/tabs",
                       controller: 'tabs', action: 'index', account_id: @account.to_param, format: 'json')
@@ -718,7 +716,7 @@ describe TabsController, type: :request do
       end
 
       it 'correctly labels navigation items as unused' do
-        unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
+        unused_tabs = %w[announcements assignments pages files outcomes quizzes modules]
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
         json.each do |t|
@@ -751,8 +749,8 @@ describe TabsController, type: :request do
 
       it 'correctly sets visibility' do
         hidden_tabs = [3, 8, 5]
-        public_visibility = %w{home people syllabus}
-        admins_visibility = %w{announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades}
+        public_visibility = %w[home people syllabus]
+        admins_visibility = %w[announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades]
         @course.tab_configuration = @tab_ids.map do |n|
           hash = { 'id' => n }
           hash['hidden'] = true if hidden_tabs.include?(n)
@@ -762,9 +760,10 @@ describe TabsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
         json.each do |t|
-          if t['visibility'] == 'public'
+          case t['visibility']
+          when 'public'
             expect(public_visibility).to include(t['id'])
-          elsif t['visibility'] == 'admins'
+          when 'admins'
             expect(admins_visibility).to include(t['id'])
           else
             expect(true).to be_falsey
@@ -870,12 +869,10 @@ describe TabsController, type: :request do
                                                     :consumer_key => 'key',
                                                     :shared_secret => 'secret'
                                                   })
-        tool.settings.merge!({
-                               :course_navigation => {
-                                 :default => 'disabled',
-                                 :url => 'http://www.example.com',
-                               },
-                             })
+        tool.settings[:course_navigation] = {
+          :default => 'disabled',
+          :url => 'http://www.example.com',
+        }
         tool.save!
         tools << tool.reload
       end
@@ -886,7 +883,7 @@ describe TabsController, type: :request do
                                                                               :format => 'json', :hidden => false })
       expect(json['hidden']).to be_nil
       expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to be_nil
-      expect(@course.reload.tab_configuration.select { |t| t['hidden'] }.count).to eql(tools.count - 1)
+      expect(@course.reload.tab_configuration.count { |t| t['hidden'] }).to eql(tools.count - 1)
     end
 
     it 'allows updating new tabs not in the configuration yet' do
@@ -901,12 +898,10 @@ describe TabsController, type: :request do
                                                    :consumer_key => 'key',
                                                    :shared_secret => 'secret',
                                                  })
-      @tool.settings.merge!({
-                              :course_navigation => {
-                                :enabled => 'true',
-                                :url => 'http://www.example.com',
-                              },
-                            })
+      @tool.settings[:course_navigation] = {
+        :enabled => 'true',
+        :url => 'http://www.example.com',
+      }
       @tool.save!
       tab_id = "context_external_tool_#{@tool.id}"
 

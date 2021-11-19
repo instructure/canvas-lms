@@ -23,7 +23,7 @@ module Api::V1::PageView
 
   API_PAGE_VIEW_JSON_OPTS = {
     :methods => ::PageView::EXPORTED_COLUMNS,
-  }
+  }.freeze
 
   def page_views_json(page_views, current_user, session)
     page_views.map { |pv| page_view_json(pv, current_user, session) }

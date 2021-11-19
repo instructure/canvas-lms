@@ -278,7 +278,7 @@ describe "Screenreader Gradebook" do
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
   end
 
-  it 'can message students who... ', priority: '1', test_id: 164002 do
+  it 'can message students who...', priority: '1', test_id: 164002 do
     basic_percent_setup
     SRGB.visit(@course.id)
 
@@ -322,9 +322,9 @@ describe "Screenreader Gradebook" do
 
       SRGB.visit(@course.id)
 
-      ui_options = Selenium::WebDriver::Support::Select.new(f("#section_select")).options().map(&:text)
+      ui_options = Selenium::WebDriver::Support::Select.new(f("#section_select")).options.map(&:text)
       sections.each do |section|
-        expect(ui_options.include? section[:name]).to be_truthy
+        expect(ui_options.include?(section[:name])).to be_truthy
       end
     end
 
@@ -345,7 +345,7 @@ describe "Screenreader Gradebook" do
     it 'keeps the assignment arrangement choice between reloads' do
       SRGB.visit(@course.id)
 
-      %w/assignment_group alpha due_date/.each do |assignment_order|
+      %w[assignment_group alpha due_date].each do |assignment_order|
         SRGB.sort_assignments_by(assignment_order)
         refresh_page
 
@@ -440,7 +440,7 @@ describe "Screenreader Gradebook" do
       curve_form.curve_grade_submit
       accept_alert
 
-      assignment_score = SRGB.assignment_scores.text.split(' ')
+      assignment_score = SRGB.assignment_scores.text.split
       # assignment avg score, high score, low score
       scores_as_string = ['13', '20', '8']
       (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }

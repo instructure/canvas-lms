@@ -81,9 +81,13 @@ describe MicrosoftSync::MembershipDiff do
   end
 
   describe('TeacherEnrollment') { it_behaves_like 'an owner enrollment type', 'TeacherEnrollment' }
+
   describe('TaEnrollment') { it_behaves_like 'an owner enrollment type', 'TaEnrollment' }
+
   describe('DesignerEnrollment') { it_behaves_like 'an owner enrollment type', 'DesignerEnrollment' }
+
   describe('ObserverEnrollment') { it_behaves_like 'a member enrollment type', 'ObserverEnrollment' }
+
   describe('StudentEnrollment') { it_behaves_like 'a member enrollment type', 'StudentEnrollment' }
 
   describe '#additions_in_slices_of' do

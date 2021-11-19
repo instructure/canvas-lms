@@ -17,6 +17,7 @@
  */
 
 import ACTION_NAMES from '../actions/developerKeysActions'
+import _ from 'lodash'
 
 const initialState = {
   listDeveloperKeysPending: false,
@@ -75,6 +76,30 @@ const developerKeysHandlers = {
     )
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
+    const developerKeyId = action.payload.developerKeyId
+    const accountBinding = action.payload.newAccountBinding
+
+    const newList = state.list.map(developerKey => {
+      if (developerKey.id !== developerKeyId.toString()) {
+        return developerKey
+      }
+      return {...developerKey, developer_key_account_binding: accountBinding}
+    })
+
+    const newInheritedList = state.inheritedList.map(developerKey => {
+      if (developerKey.id !== developerKeyId.toString()) {
+        return developerKey
+      }
+      return {...developerKey, developer_key_account_binding: accountBinding}
+    })
+
+    return {
+      ...state,
+      list: newList,
+      inheritedList: newInheritedList
+    }
+  },
+  [ACTION_NAMES.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL]: (state, action) => {
     const newList = state.list.map(developerKey => {
       if (developerKey.id !== action.payload.developer_key_id.toString()) {
         return developerKey
@@ -87,6 +112,38 @@ const developerKeysHandlers = {
         return developerKey
       }
       return {...developerKey, developer_key_account_binding: action.payload}
+    })
+
+    return {
+      ...state,
+      list: newList,
+      inheritedList: newInheritedList
+    }
+  },
+  [ACTION_NAMES.SET_BINDING_WORKFLOW_STATE_FAILED]: (state, action) => {
+    // This is the same code as the function above it. Will DRY this up
+    // in a separate commit to keep this one more coherent.
+    const developerKeyId = action.payload.developerKeyId
+    const previousAccountBinding = action.payload.previousAccountBinding
+
+    const newList = state.list.map(developerKey => {
+      if (developerKey.id !== developerKeyId.toString()) {
+        return developerKey
+      }
+      if (Object.keys(previousAccountBinding).length === 0) {
+        return _.omit(developerKey, 'developer_key_account_binding')
+      }
+      return {...developerKey, developer_key_account_binding: previousAccountBinding}
+    })
+
+    const newInheritedList = state.inheritedList.map(developerKey => {
+      if (developerKey.id !== developerKeyId.toString()) {
+        return developerKey
+      }
+      if (Object.keys(previousAccountBinding).length === 0) {
+        return _.omit(developerKey, 'developer_key_account_binding')
+      }
+      return {...developerKey, developer_key_account_binding: previousAccountBinding}
     })
 
     return {

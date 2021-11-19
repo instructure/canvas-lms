@@ -58,7 +58,7 @@ module SimpleTags
       @tagged_scope_handlers.inject([]) do |result, (pattern, handler)|
         handler_tags = []
         tags.delete_if do |tag|
-          handler_tags << tag and true if tag =~ pattern
+          handler_tags << tag and true if tag&.match?(pattern)
         end
         result.concat handler_tags.present? ? [handler.call(handler_tags, options)].flatten : []
       end
@@ -91,15 +91,15 @@ module SimpleTags
   end
 
   def self.normalize_tags(tags)
-    tags.inject([]) { |ary, tag|
-      if tag =~ /\A((course|group)_\d+).*/
+    tags.each_with_object([]) { |tag, ary|
+      case tag
+      when /\A((course|group)_\d+).*/
         ary << $1
-      elsif tag =~ /\Asection_(\d+).*/
+      when /\Asection_(\d+).*/
         section = CourseSection.where(id: $1).first
         ary << section.course.asset_string if section
         # TODO: allow user-defined tags, e.g. #foo
       end
-      ary
     }.uniq
   end
 

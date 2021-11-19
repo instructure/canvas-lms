@@ -73,7 +73,7 @@ module AdminSettingsCommon
   end
 
   def name_length_sis(length = 255)
-    label_val = NAME_LENGTH_VALUE_ID[1..-1]
+    label_val = NAME_LENGTH_VALUE_ID[1..]
     label = f("label[for=\"#{label_val}\"]")
     set_value(label, length)
     f("#account_settings button[type=submit]").click
@@ -82,7 +82,7 @@ module AdminSettingsCommon
   def set_checkbox_via_label(id, checked)
     # Use this method for checkboxes that are hidden by their label (ic-Checkbox)
     checkbox = f(id)
-    label = f("label[for=\"#{id[1..-1]}\"]")
+    label = f("label[for=\"#{id[1..]}\"]")
     label.click if is_checked(checkbox) != checked
     f("#account_settings button[type=submit]").click
   end

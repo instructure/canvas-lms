@@ -108,7 +108,7 @@ describe 'Student Gradebook' do
     means = []
     [0, 3, 6].each do |i|
       # the format below ensures that 18.0 is displayed as 18.
-      mean = format('%g' % (('%.2f' % (grades[i, 3].inject { |a, e| a + e }.to_f / 3))))
+      mean = format('%g' % (('%.2f' % (grades[i, 3].sum.to_f / 3))))
       means.push mean
     end
 
@@ -136,7 +136,7 @@ describe 'Student Gradebook' do
     f('#show_all_details_button').click
     details = ff('[id^="grade_info"]')
     details.each do |detail|
-      expect(detail.css_value 'display').to eq 'none'
+      expect(detail.css_value('display')).to eq 'none'
     end
   end
 
@@ -182,7 +182,7 @@ describe 'Student Gradebook' do
 
   context 'Comments' do
     # create a course, publish and enroll teacher and student
-    let_once(:test_course) { course_factory() }
+    let_once(:test_course) { course_factory }
     let_once(:teacher) { user_factory(active_all: true) }
     let_once(:student) { user_factory(active_all: true) }
     let_once(:published_course) do

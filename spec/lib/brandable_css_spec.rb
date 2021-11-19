@@ -147,7 +147,7 @@ describe BrandableCSS do
 
   describe 'font_path_cache' do
     it 'creates the cache' do
-      BrandableCSS.font_path_cache()
+      BrandableCSS.font_path_cache
       expect(BrandableCSS.instance_variable_get(:@decorated_font_paths)).not_to be_nil
     end
 

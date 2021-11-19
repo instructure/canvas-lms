@@ -39,7 +39,7 @@ describe Submissions::AttachmentForSubmissionDownload do
 
   describe '#attachment' do
     it 'raises ActiveRecord::RecordNotFound when download_id is not present' do
-      expect(@options.key?(:download_id)).to be_falsey, 'precondition'
+      expect(@options).not_to have_key(:download_id)
       expect {
         subject.attachment
       }.to raise_error(ActiveRecord::RecordNotFound)

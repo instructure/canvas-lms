@@ -198,7 +198,7 @@ if Qti.migration_executable
                         :question_name => "Oi!",
                         :points_possible => 10.3,
                         :migration_id => "if87ef626591c52375b6a4f16cdab8bd0",
-                        :question_text => "Ole\n<br/>\n<a>Test Page</a>\n<br/>\nWhy would you link to a wiki page from a quiz question? That doesn't seem right." }
+                        :question_text => "Ole\n<br/>\n<a>Test Page</a>\n<br/>\nWhy would you link to a wiki page from a quiz question? That doesn't seem right." }.freeze
 
     TRUE_FALSE = { :points_possible => 10,
                    :question_text => "Generating QTI is \n<strong>super</strong> awesome!\n<br/>\noh, and &amp;amp;",
@@ -209,7 +209,7 @@ if Qti.migration_executable
                    :incorrect_comments => "",
                    :question_type => "true_false_question",
                    :correct_comments => "",
-                   :question_name => "true false" }
+                   :question_name => "true false" }.freeze
 
     MULTIPLE_ANSWERS = { :correct_comments => "",
                          :question_name => "Multiple Answers",
@@ -230,7 +230,7 @@ if Qti.migration_executable
                          :question_text => "this question isn't even worth a whole point. Just skip it.",
                          :migration_id => "iba79d2c5133c7e82f451eee0fda14079",
                          :incorrect_comments => "",
-                         :question_type => "multiple_answers_question" }
+                         :question_type => "multiple_answers_question" }.freeze
 
     ESSAY = { :neutral_comments => "You're wrong.",
               :question_type => "essay_question",
@@ -240,7 +240,7 @@ if Qti.migration_executable
               :points_possible => 6,
               :question_text => "Why do we have so many types now‽ &lt;-- unicode character, you're screwed!",
               :migration_id => "id79fb07bfd06d28f0c92a599116244f1",
-              :incorrect_comments => "" }
+              :incorrect_comments => "" }.freeze
 
     SHORT_ANSWER = { :incorrect_comments => "Incorrect overall feedback",
                      :question_type => "short_answer_question",
@@ -251,7 +251,7 @@ if Qti.migration_executable
                      :question_name => "FIB",
                      :points_possible => 19,
                      :question_text => "By fill in the blank I of course mean...",
-                     :migration_id => "i8f5b9eafaa4800498f65343bba531038" }
+                     :migration_id => "i8f5b9eafaa4800498f65343bba531038" }.freeze
 
     TEXT_ONLY = { :question_text => "This is just a text area for stuff.",
                   :migration_id => "if47b767d37e06559ff801f2d253307ba",
@@ -260,7 +260,7 @@ if Qti.migration_executable
                   :question_type => "text_only_question",
                   :correct_comments => "",
                   :question_name => "Intermission",
-                  :points_possible => 0 }
+                  :points_possible => 0 }.freeze
 
     FIMB = { :points_possible => 10.23,
              :question_text =>
@@ -284,7 +284,7 @@ if Qti.migration_executable
              :incorrect_comments => "Hoyt!",
              :question_type => "fill_in_multiple_blanks_question",
              :question_name => "FIMB",
-             :correct_comments => "Oi!" }
+             :correct_comments => "Oi!" }.freeze
 
     MATCHING = { :question_name => "Match",
                  :matches =>
@@ -314,7 +314,7 @@ if Qti.migration_executable
                  :migration_id => "i27a2844e09afc2eb6e4a6bf0599bf010",
                  :assessment_question_migration_id => "i7ee7c77592c6cd4ac58509c3e41dace8",
                  :question_type => "matching_question",
-                 :incorrect_comments => "How could you get this wrong?" }
+                 :incorrect_comments => "How could you get this wrong?" }.freeze
 
     MULTIPLE_DROP_DOWNS = { :question_type => "multiple_dropdowns_question",
                             :migration_id => "i36799979e4e9ad1be11a85889095e11c",
@@ -336,7 +336,7 @@ if Qti.migration_executable
                                       :text => "2" }],
                             :points_possible => 1,
                             :question_text =>
-                                   "Select 1 from [number1tobemean], and 2 from [number2], and 72394 from [thisone]." }
+                                   "Select 1 from [number1tobemean], and 2 from [number2], and 72394 from [thisone]." }.freeze
 
     CALCULATED_SIMPLE = { :answer_tolerance => 0.01,
                           :correct_comments => "",
@@ -360,7 +360,7 @@ if Qti.migration_executable
                                   { :answer => 2.44, :weight => 100, :variables => [{ :value => 1.44, :name => "x" }] }],
                           :incorrect_comments => "",
                           :formulas => [{ :formula => "1 + x" }],
-                          :question_name => "Formula question" }
+                          :question_name => "Formula question" }.freeze
 
     CALCULATED_WITHOUT_FORMULA = { :variables => [],
                                    :incorrect_comments => "",
@@ -373,7 +373,7 @@ if Qti.migration_executable
                                    :formulas => [],
                                    :migration_id => "if0e253c3d288b8033db6673a656539df",
                                    :question_type => "calculated_question",
-                                   :points_possible => 10 }
+                                   :points_possible => 10 }.freeze
 
     CALCULATED_COMPLEX = { :migration_id => "i0ee13510954fd805d707623ee2c46729",
                            :question_type => "calculated_question",
@@ -450,7 +450,7 @@ if Qti.migration_executable
                        :weight => 100 }],
                            :formula_decimal_places => 2,
                            :question_text => "1 + [x] + [x] + [y] + [brian]",
-                           :imported_formula => "temp = 1   x" }
+                           :imported_formula => "temp = 1   x" }.freeze
 
     NUMERICAL = { :question_type => "numerical_question",
                   :incorrect_comments => "So wrong!",
@@ -471,6 +471,6 @@ if Qti.migration_executable
                             :numerical_answer_type => "range_answer",
                             :weight => 100,
                             :text => "answer_text" }],
-                  :migration_id => "ic7e7f06a79092f0672f0ee014b709e27" }
+                  :migration_id => "ic7e7f06a79092f0672f0ee014b709e27" }.freeze
   end
 end

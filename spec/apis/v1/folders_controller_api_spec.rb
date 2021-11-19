@@ -42,14 +42,14 @@ describe "Folders API", type: :request do
       it "lists folders in alphabetical order" do
         json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{11folder aafolder folder1 folder2 zzfolder}
+        expect(res).to eq %w[11folder aafolder folder1 folder2 zzfolder]
       end
 
       it "lists folders in saved order if flag set" do
         json = api_call(:get, @folders_path + "/#{@root.id}/folders?sort_by=position", @folders_path_options.merge(:action => "api_index", :sort_by => 'position'), {})
 
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{folder1 folder2 11folder zzfolder aafolder}
+        expect(res).to eq %w[folder1 folder2 11folder zzfolder aafolder]
       end
 
       it "allows getting locked folder if authed" do
@@ -84,7 +84,7 @@ describe "Folders API", type: :request do
       json = api_call(:get, @folders_path + "/#{@root.id}/folders?per_page=3", @folders_path_options.merge(:per_page => '3'), {})
       expect(json.length).to eq 3
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/folders/#{@root.id}/folders} }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -92,7 +92,7 @@ describe "Folders API", type: :request do
       json = api_call(:get, @folders_path + "/#{@root.id}/folders?per_page=3&page=3", @folders_path_options.merge(:per_page => '3', :page => '3'), {})
       expect(json.length).to eq 1
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/folders/#{@root.id}/folders} }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -953,7 +953,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
+        expect(res).to eq %w[course\ files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked]
       end
 
       it "does not show hidden and locked files to unauthorized users" do
@@ -961,7 +961,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1}
+        expect(res).to eq %w[course\ files folder1 folder2 folder2.1 folder2.1.1]
       end
 
       it "returns a 401 for unauthorized users" do
@@ -978,7 +978,7 @@ describe "Folders API", type: :request do
 
         expect(json.length).to eq 3
         links = response.headers['Link'].split(",")
-        expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
+        expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/folders} }).to be_truthy
         expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
         expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
         expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -987,7 +987,7 @@ describe "Folders API", type: :request do
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param, :per_page => 3, :page => 3 })
         expect(json.length).to eq 1
         links = response.headers['Link'].split(",")
-        expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
+        expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/folders} }).to be_truthy
         expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
         expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
         expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -1001,7 +1001,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :group_id => @group.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
+        expect(res).to eq %w[files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked]
       end
     end
 
@@ -1012,7 +1012,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :user_id => @user.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w{folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked my\ files}
+        expect(res).to eq %w[folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked my\ files]
       end
     end
   end

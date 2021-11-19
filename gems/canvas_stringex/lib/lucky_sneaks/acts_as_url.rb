@@ -102,7 +102,7 @@ module LuckySneaks
         conditions << send(self.class.scope_for_url)
       end
       url_owners = self.class.where(conditions).to_a
-      if url_owners.size > 0
+      if !url_owners.empty?
         n = 1
         while url_owners.detect { |u| u.send(url_attribute) == "#{base_url}-#{n}" }
           n = n.succ

@@ -70,7 +70,7 @@ module SpecComponents
     end
 
     def create_assignment_override(opts)
-      assignment_override = AssignmentOverride.new()
+      assignment_override = AssignmentOverride.new
       assignment_override.workflow_state = 'active'
       set_override_dates(assignment_override, opts)
       assignment_override

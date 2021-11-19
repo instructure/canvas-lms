@@ -27,8 +27,8 @@ describe Mutations::MoveOutcomeLinks do
     @site_admin = site_admin_user
     course_with_teacher
     @context = @course
-    @source_group = outcome_group_model()
-    @destination_group = outcome_group_model()
+    @source_group = outcome_group_model
+    @destination_group = outcome_group_model
 
     # belonging to other account
     @other_account = account_model
@@ -152,24 +152,24 @@ describe Mutations::MoveOutcomeLinks do
     it "validates required attributes" do
       response = execute_query(mutation_str, {})
 
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Argument 'outcomeLinkIds' on InputObject 'MoveOutcomeLinksInput' is required. Expected type [ID!]!"
       )
-      expect(response.dig("errors")[1]["message"]).to eql(
+      expect(response["errors"][1]["message"]).to eql(
         "Argument 'groupId' on InputObject 'MoveOutcomeLinksInput' is required. Expected type ID!"
       )
     end
 
     it "validates group not exist" do
       response = execute_query(mutation_str(group_id: 123123, outcome_link_ids: []), {})
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Group not found"
       )
     end
 
     it "validates when user doesn't have permission to manage the group" do
       response = execute_query(mutation_str(group_id: @group_without_permission.id, outcome_link_ids: []), {})
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Insufficient permission"
       )
     end
@@ -184,7 +184,7 @@ describe Mutations::MoveOutcomeLinks do
           current_user: @teacher
         }
       )
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Insufficient permission"
       )
     end

@@ -22,7 +22,7 @@ require 'nokogiri'
 
 module Turnitin
   class Response
-    SUCCESSFUL_RETURN_CODES = (1..99)
+    SUCCESSFUL_RETURN_CODES = (1..99).freeze
 
     def initialize(http_response)
       @http_response = http_response

@@ -8,8 +8,8 @@ namespace :css do
       python_version = `#{Pygments::Popen.new.find_python_binary} --version 2>&1` rescue nil
       python_version ||= '???'
 
-      unless python_version.strip =~ /^Python 2/
-        next warn <<~MESSAGE
+      unless /^Python 2/.match?(python_version.strip)
+        next warn <<~TEXT
           Generating the CSS styleguide requires Python 2, but you have #{python_version}.
 
           If you already have a Python 2 installation, make sure it is available
@@ -19,7 +19,7 @@ namespace :css do
 
               PYGMENTS_RB_PYTHON=custom-python-interpreter
 
-        MESSAGE
+        TEXT
       end
     end
 

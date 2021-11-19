@@ -123,7 +123,7 @@ it('responds to listDeveloperKeysReplace', () => {
   expect(newState.list).toEqual([{id: 11, name: 'a'}, {id: 22, name: 'zz'}, {id: 33, name: 'c'}])
 })
 
-it('istDeveloperKeysReplaceBindingState replaces state in list', () => {
+it('listDeveloperKeysReplaceBindingState replaces state in list', () => {
   const state = {
     list: [{id: '11', name: 'a'}],
     inheritedList: []
@@ -135,7 +135,10 @@ it('istDeveloperKeysReplaceBindingState replaces state in list', () => {
     account_id: 1
   }
 
-  const action = actions.listDeveloperKeysReplaceBindingState(payload)
+  const action = actions.listDeveloperKeysReplaceBindingState({
+    developerKeyId: 11,
+    newAccountBinding: payload
+  })
   const newState = reducer(state, action)
 
   expect(newState.list[0].developer_key_account_binding.workflow_state).toBe('active')
@@ -153,10 +156,71 @@ it('listDeveloperKeysReplaceBindingState in inherited list', () => {
     account_id: 1
   }
 
-  const action = actions.listDeveloperKeysReplaceBindingState(payload)
+  const action = actions.listDeveloperKeysReplaceBindingState({
+    developerKeyId: 11,
+    newAccountBinding: payload
+  })
   const newState = reducer(state, action)
 
   expect(newState.inheritedList[0].developer_key_account_binding.workflow_state).toBe('active')
+})
+
+it('resets key state in SET_BINDING_WORKFLOW_STATE_FAILED', () => {
+  const accountBinding = {
+    id: '1',
+    account_id: '2',
+    developer_key_id: '11',
+    workflow_state: 'off',
+    account_owns_binding: true
+  }
+  const previousAccountBinding = Object.assign(accountBinding, {workflow_state: 'on'})
+
+  const state = {
+    list: [
+      {
+        id: '11',
+        name: 'a',
+        developer_key_account_binding: accountBinding
+      }
+    ],
+    inheritedList: []
+  }
+  const action = actions.setBindingWorkflowStateFailed({
+    developerKeyId: 11,
+    previousAccountBinding
+  })
+  const newState = reducer(state, action)
+
+  expect(newState.list[0].developer_key_account_binding.workflow_state).toBe('on')
+})
+
+it('resets key state in SET_BINDING_WORKFLOW_STATE_FAILED if it had no account binding', () => {
+  const accountBinding = {
+    id: '1',
+    account_id: '2',
+    developer_key_id: '11',
+    workflow_state: 'off',
+    account_owns_binding: true
+  }
+  const previousAccountBinding = {}
+
+  const state = {
+    list: [
+      {
+        id: '11',
+        name: 'a',
+        developer_key_account_binding: accountBinding
+      }
+    ],
+    inheritedList: []
+  }
+  const action = actions.setBindingWorkflowStateFailed({
+    developerKeyId: 11,
+    previousAccountBinding
+  })
+  const newState = reducer(state, action)
+
+  expect(newState.list[0].developer_key_account_binding).toBeUndefined()
 })
 
 it('responds to listDeveloperKeysDelete', () => {

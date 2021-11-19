@@ -24,7 +24,7 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_reader :password
 
-  validates_presence_of :user_id, :service, :service_user_id, :workflow_state
+  validates :user_id, :service, :service_user_id, :workflow_state, presence: true
 
   before_save :infer_defaults
   after_save :assert_relations
@@ -228,16 +228,19 @@ class UserService < ActiveRecord::Base
   end
 
   def self.service_type(type)
-    if type == 'google_docs' || type == 'google_drive'
+    case type
+    when 'google_docs', 'google_drive'
       'DocumentService'
-    elsif type == 'delicious' || type == 'diigo'
+    when 'delicious', 'diigo'
       'BookmarkService'
     else
       'UserService'
     end
   end
 
-  def self.serialization_excludes; [:crypted_password, :password_salt, :token, :secret]; end
+  def self.serialization_excludes
+    [:crypted_password, :password_salt, :token, :secret]
+  end
 
   def self.associated_shards(_service, _service_user_id)
     [Shard.default]

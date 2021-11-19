@@ -43,7 +43,7 @@ module Importers
       existing_questions = migration.context.assessment_questions
                                     .except(:select)
                                     .select("assessment_questions.id, assessment_questions.migration_id")
-                                    .where("assessment_questions.migration_id IS NOT NULL").reorder(nil)
+                                    .where.not(assessment_questions: { migration_id: nil }).reorder(nil)
                                     .index_by(&:migration_id)
       questions.each do |q|
         existing_question = existing_questions[q['migration_id']]
@@ -66,7 +66,7 @@ module Importers
           bank.mark_as_importing!(migration)
           next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
-          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.map { |aq| aq["assessment_question_id"] }.compact
+          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.filter_map { |aq| aq["assessment_question_id"] }
           bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
         end
       end
@@ -127,7 +127,7 @@ module Importers
       end
 
       if migration.context.is_a?(Course)
-        imported_aq_ids = question_data[:aq_data].values.map { |aq| aq['assessment_question_id'] }.compact
+        imported_aq_ids = question_data[:aq_data].values.filter_map { |aq| aq['assessment_question_id'] }
         imported_aq_ids.each_slice(100) do |sliced_aq_ids|
           migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
         end
@@ -138,7 +138,7 @@ module Importers
 
     def self.import_from_migration(hash, context, migration, bank, **)
       hash = hash.with_indifferent_access
-      hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
+      hash.delete(:question_bank_migration_id) if hash.key?(:question_bank_migration_id)
 
       self.prep_for_import(hash, migration, :assessment_question)
 
@@ -155,7 +155,7 @@ module Importers
                                                     workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
                                                     assessment_question_bank_id: bank.id)
       else
-        sql = <<~SQL
+        sql = <<~SQL.squish
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)
           VALUES (?,?,'active',?,?,?,?,?)
         SQL
@@ -170,12 +170,10 @@ module Importers
         end
       end
 
-      if import_warnings
-        import_warnings.each do |warning|
-          migration.add_warning(warning, {
-                                  :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
-                                })
-        end
+      import_warnings&.each do |warning|
+        migration.add_warning(warning, {
+                                :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+                              })
       end
       hash
     end
@@ -209,7 +207,7 @@ module Importers
         end
       end
 
-      hash[:answers].each_with_index do |answer, i|
+      hash[:answers]&.each_with_index do |answer, i|
         [:html, :comments_html, :left_html].each do |field|
           key = "answer #{i} #{field}"
 
@@ -222,7 +220,7 @@ module Importers
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)
         end
-      end if hash[:answers]
+      end
 
       hash[:prepped_for_import] = true
       hash

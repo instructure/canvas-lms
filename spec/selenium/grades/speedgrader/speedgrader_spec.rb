@@ -104,7 +104,7 @@ describe 'Speedgrader' do
         Speedgrader.visit(@course.id, @quiz.assignment_id)
       end
 
-      it "page should load in acceptable time ", priority: "1" do
+      it "page should load in acceptable time", priority: "1" do
         page_load_time = Benchmark.measure do
           Speedgrader.visit(@course.id, @quiz.assignment_id)
           Speedgrader.wait_for_grade_input
@@ -217,7 +217,7 @@ describe 'Speedgrader' do
           end
         end
 
-        it 'assignment page ', priority: "1", test_id: 217611 do
+        it 'assignment page', priority: "1", test_id: 217611 do
           StudentGradesPage.visit_as_teacher(@course, @students.first)
 
           f("#submission_#{@assignment.id}  i.icon-rubric").click
@@ -477,7 +477,7 @@ describe 'Speedgrader' do
           Speedgrader.click_reassignment_btn
           wait_for_ajax_requests
 
-          expect(Speedgrader.reassignment_btn.text()).to eq 'Reassigned'
+          expect(Speedgrader.reassignment_btn.text).to eq 'Reassigned'
         end
 
         it 'displays alert after reassigning' do
@@ -549,7 +549,7 @@ describe 'Speedgrader' do
             expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
             wrapper = ff('#reassign_assignment_wrapper')
             expect(wrapper[0].attribute('title')).to eq 'Assignment is reassigned.'
-            expect(Speedgrader.reassignment_btn.text()).to eq 'Reassigned'
+            expect(Speedgrader.reassignment_btn.text).to eq 'Reassigned'
           end
         end
       end
@@ -898,7 +898,7 @@ describe 'Speedgrader' do
       expect(Speedgrader.selected_student).to include_text(@students[0].name)
     end
 
-    it 'has working next and previous arrows ', priority: "1", test_id: 164018 do
+    it 'has working next and previous arrows', priority: "1", test_id: 164018 do
       # click next to second student
       Speedgrader.click_next_student_btn
       expect(Speedgrader.selected_student).to include_text(@students[1].name)

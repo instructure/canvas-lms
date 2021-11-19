@@ -249,7 +249,7 @@ module CanvasCache
         response
       end
 
-      SET_COMMANDS = %i{set setex}.freeze
+      SET_COMMANDS = %i[set setex].freeze
       def log_request_response(request, response, start_time)
         return if request.nil? # redis client does internal keepalives and connection commands
         return if CanvasCache::Redis.log_style == 'off'
@@ -265,10 +265,11 @@ module CanvasCache
           host: location,
         }
         unless NON_KEY_COMMANDS.include?(command)
-          message[:key] = if command == :mset
+          message[:key] = case command
+                          when :mset
                             # This is an array with a single element: an array alternating key/values
-                            request.first { |v| v.first }.select.with_index { |_, i| i % 2 == 0 }
-                          elsif command == :mget
+                            request.first(&:first).select.with_index { |_, i| i % 2 == 0 }
+                          when :mget
                             request
                           else
                             request.first
@@ -360,7 +361,6 @@ module CanvasCache
       # one-off in script/console if you aren't using twemproxy, or in specs:
       ALLOWED_UNSUPPORTED = %w[
         keys
-        auth
         quit
         flushall
         flushdb

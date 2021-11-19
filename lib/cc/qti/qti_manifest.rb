@@ -47,7 +47,7 @@ module CC
       end
 
       def close
-        @file.close if @file
+        @file&.close
         @document = nil
         @file
       end
@@ -81,7 +81,7 @@ module CC
 
             zipper = ContentZipper.new(:check_user => false)
             @html_exporter.referenced_files.keys.each do |file_id|
-              att = course.attachments.find_by_id(file_id)
+              att = course.attachments.find_by(id: file_id)
               next unless att
 
               path = att.full_display_path.sub("course files/", '')
@@ -105,7 +105,7 @@ module CC
         end # manifest
 
         # write any errors to the manifest file
-        if @exporter.errors.length > 0
+        unless @exporter.errors.empty?
           @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
           @exporter.errors.each do |error|
             @document.comment! error.first
@@ -119,7 +119,7 @@ module CC
         md.imsmd :lom do |lom|
           lom.imsmd :general do |general|
             general.imsmd :title do |title|
-              title.imsmd :string, %{QTI Quiz Export for course "#{course.name}"}
+              title.imsmd :string, %(QTI Quiz Export for course "#{course.name}")
             end
           end
           lom.imsmd :lifeCycle do |general|

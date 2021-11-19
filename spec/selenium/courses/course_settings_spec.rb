@@ -532,12 +532,12 @@ describe "course settings" do
 
       bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
       bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
-      html = %{
-      <a href="#{bad_url}">Bad absolute link</a>
-      <img src="#{bad_url2}">Bad file link</a>
-      <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
-      <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
-    }
+      html = <<~HTML
+        <a href="#{bad_url}">Bad absolute link</a>
+        <img src="#{bad_url2}">Bad file link</a>
+        <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
+        <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
+      HTML
 
       @course.syllabus_body = html
       @course.save!
@@ -596,13 +596,13 @@ describe "course settings" do
       unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
       deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
 
-      @course.syllabus_body = %{
+      @course.syllabus_body = <<~HTML
         <a href='#{active_link}'>link</a>
         <a href='#{unpublished_link}'>unpublished link</a>
         <a href='#{deleted_link}'>deleted link</a>
-      }
+      HTML
       @course.save!
-      page = @course.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>unpublished link</a>})
+      page = @course.wiki_pages.create!(:title => "wikiii", :body => %(<a href='#{unpublished_link}'>unpublished link</a>))
 
       get "/courses/#{@course.id}/link_validator"
       wait_for_ajaximations

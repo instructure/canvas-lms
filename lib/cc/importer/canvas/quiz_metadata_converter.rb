@@ -54,7 +54,7 @@ module CC::Importer::Canvas
       quiz['hide_correct_answers_at'] = get_time_val(doc, 'hide_correct_answers_at')
       quiz['time_limit'] = get_int_val(doc, 'time_limit')
       quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
-      %w(
+      %w[
         could_be_locked
         anonymous_submissions
         show_correct_answers
@@ -69,7 +69,7 @@ module CC::Importer::Canvas
         one_time_results
         show_correct_answers_last_attempt
         only_visible_to_overrides
-      ).each do |bool_val|
+      ].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         quiz[bool_val] = val unless val.nil?
       end

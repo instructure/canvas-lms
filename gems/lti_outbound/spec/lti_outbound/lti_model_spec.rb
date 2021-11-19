@@ -47,7 +47,7 @@ describe LtiOutbound::LTIModel do
     it 'caches the result of the executed proc' do
       model = dummy.new
       obj = double(:message => 'message')
-      model.attribute = -> { obj.message() }
+      model.attribute = -> { obj.message }
       2.times { model.attribute }
 
       expect(obj).to have_received(:message).once

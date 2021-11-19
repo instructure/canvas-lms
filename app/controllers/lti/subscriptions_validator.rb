@@ -48,7 +48,7 @@ module Lti
       return if tool_proxy.enabled_capabilities.include?(ToolConsumerProfile.webhook_grant_all_capability)
 
       subscription[:EventTypes].each do |event_type|
-        raise MissingCapability, "EventType #{event_type} is invalid" unless capabilities_hash.keys.include?(event_type.to_sym)
+        raise MissingCapability, "EventType #{event_type} is invalid" unless capabilities_hash.key?(event_type.to_sym)
         if (tool_proxy.enabled_capabilities & capabilities_hash[event_type.to_sym]).blank?
           raise MissingCapability, 'Missing required capability'
         end

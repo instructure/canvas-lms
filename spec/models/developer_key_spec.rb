@@ -455,8 +455,8 @@ describe DeveloperKey do
 
     context 'when api token scoping FF is enabled' do
       let(:valid_scopes) do
-        %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+        %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
       end
 
       describe 'before_save' do
@@ -1079,6 +1079,7 @@ describe DeveloperKey do
 
   describe "issue_token" do
     subject { DeveloperKey.create! }
+
     let(:claims) { { "key" => "value" } }
     let(:asymmetric_keypair) { CanvasSecurity::RSAKeyPair.new.to_jwk }
     let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }

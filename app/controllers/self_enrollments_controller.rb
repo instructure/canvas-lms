@@ -34,7 +34,7 @@ class SelfEnrollmentsController < ApplicationController
 
     if !@current_user && (
       (@domain_root_account.auth_discovery_url && !params[:authentication_provider]) ||
-      (@domain_root_account.delegated_authentication? && !(params[:authentication_provider] == 'canvas'))
+      (@domain_root_account.delegated_authentication? && params[:authentication_provider] != 'canvas')
     )
       store_location
       return redirect_to login_url(params.permit(:authentication_provider))

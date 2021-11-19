@@ -1156,6 +1156,10 @@ describe Canvas::LiveEvents do
           @context = context
         end
 
+        def global_id
+          123_456_789
+        end
+
         def settings
           {
             quizzes2: {
@@ -1169,7 +1173,7 @@ describe Canvas::LiveEvents do
     let(:content_export) { export_class.new(course_model) }
 
     it 'triggers a live event with content export settings and amended context details' do
-      fake_export_context = { key1: 'val1', key2: 'val2' }
+      fake_export_context = { key1: 'val1', key2: 'val2', content_export_id: "content-export-123456789" }
 
       expect_event(
         'quiz_export_complete',
@@ -1188,8 +1192,8 @@ describe Canvas::LiveEvents do
   end
 
   describe '.content_migration_completed' do
-    let(:course) { course_factory() }
-    let(:source_course) { course_factory() }
+    let(:course) { course_factory }
+    let(:source_course) { course_factory }
     let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do
@@ -1973,6 +1977,30 @@ describe Canvas::LiveEvents do
                      }).once
 
         Canvas::LiveEvents.outcome_friendly_description_updated(@friendlyDescription)
+      end
+    end
+  end
+
+  describe 'heartbeat' do
+    context 'when database region is not set (local/open source)' do
+      it 'sets region to not_configured' do
+        expect_event('heartbeat', { region: 'not_configured', environment: 'test', region_code: 'not_configured' })
+        Canvas::LiveEvents.heartbeat
+      end
+    end
+
+    context 'when Canvas.region is set' do
+      let(:region) { 'us-east-1' }
+      let(:region_code) { 'prod-iad' }
+
+      before do
+        allow(Canvas).to receive(:region).and_return(region)
+        allow(Canvas).to receive(:region_code).and_return(region_code)
+      end
+
+      it 'sets region to Canvas.region' do
+        expect_event('heartbeat', { region: region, environment: 'test', region_code: region_code })
+        Canvas::LiveEvents.heartbeat
       end
     end
   end

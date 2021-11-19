@@ -217,8 +217,8 @@ class CustomDataController < ApplicationController
       saved = cd.lock_and_save do
         overwrite = cd.set_data(@scope, data)
       end
-    rescue CustomData::WriteConflict => wc
-      render(json: wc.as_json.merge(message: wc.message), status: :conflict) and return
+    rescue CustomData::WriteConflict => e
+      render(json: e.as_json.merge(message: e.message), status: :conflict) and return
     end
 
     if saved

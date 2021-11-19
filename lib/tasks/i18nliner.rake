@@ -19,10 +19,11 @@ module I18nliner
             @translation_count += 1
             @translations.line = name.to_s
             value = definition[field]
-            if value.is_a?(String)
+            case value
+            when String
               key = I18nliner::CallHelpers.infer_key(value)
               @translations[key] = value
-            elsif value.is_a?(Hash)
+            when Hash
               value.delete(:wrapper)
               key = value.keys[0]
               @translations[key.to_s] = value[key]

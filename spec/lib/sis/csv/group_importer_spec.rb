@@ -60,9 +60,9 @@ describe SIS::CSV::GroupImporter do
     )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id, sub.id]
-    expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
+    expect(groups.map(&:sis_source_id)).to eq %w[G001 G002]
     expect(groups.map(&:name)).to eq ["Group 1", "Group 2"]
-    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
+    expect(groups.map(&:workflow_state)).to eq %w[available deleted]
   end
 
   it "creates groups with no account id column" do
@@ -73,9 +73,9 @@ describe SIS::CSV::GroupImporter do
     )
     groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id]
-    expect(groups.map(&:sis_source_id)).to eq %w(G001)
+    expect(groups.map(&:sis_source_id)).to eq %w[G001]
     expect(groups.map(&:name)).to eq ["Group 1"]
-    expect(groups.map(&:workflow_state)).to eq %w(available)
+    expect(groups.map(&:workflow_state)).to eq %w[available]
   end
 
   it 'creates rollback data' do
@@ -126,7 +126,7 @@ describe SIS::CSV::GroupImporter do
     groups = Group.order(:id).to_a
     expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
     expect(groups.map(&:root_account)).to eq [@account, @account]
-    expect(groups.map(&:workflow_state)).to eq %w(available deleted)
+    expect(groups.map(&:workflow_state)).to eq %w[available deleted]
     expect(groups.map(&:account)).to eq [@account, sub]
   end
 

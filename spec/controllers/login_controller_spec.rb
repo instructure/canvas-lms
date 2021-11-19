@@ -130,7 +130,7 @@ describe LoginController do
       before { get :new, format: :html }
 
       it 'response with an html content type' do
-        expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/)
+        expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html})
       end
     end
 
@@ -138,7 +138,7 @@ describe LoginController do
       before { get :new, format: :pdf }
 
       it 'response with an html content type' do
-        expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/)
+        expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html})
       end
     end
   end

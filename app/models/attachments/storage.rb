@@ -47,7 +47,7 @@ class Attachments::Storage
   end
 
   def self.detect_mimetype(data)
-    if data && data.respond_to?(:content_type) && (data.content_type.blank? || data.content_type.strip == "application/octet-stream")
+    if data.respond_to?(:content_type) && (data.content_type.blank? || data.content_type.strip == "application/octet-stream")
       res = nil
       res ||= File.mime_type?(data.original_filename) if data.respond_to?(:original_filename)
       res ||= File.mime_type?(data)

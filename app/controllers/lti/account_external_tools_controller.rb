@@ -44,7 +44,7 @@ module Lti
 
     def create
       tool = target_developer_key.tool_configuration.new_external_tool(context)
-      tool.check_for_duplication(params.dig(:verify_uniqueness).present?)
+      tool.check_for_duplication(params[:verify_uniqueness].present?)
 
       if tool.errors.blank? && tool.save
         invalidate_nav_tabs_cache(tool)

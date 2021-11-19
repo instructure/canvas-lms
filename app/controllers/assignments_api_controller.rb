@@ -808,7 +808,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
-          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: :bad_request
         end
 
         scope = scope.where(id: params[:assignment_ids])
@@ -817,11 +817,11 @@ class AssignmentsApiController < ApplicationController
       when 'name'
         scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
       when 'due_at'
-        if @context.grants_right?(user, :read_as_admin)
-          scope = scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
-        else
-          scope = scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
-        end
+        scope = if @context.grants_right?(user, :read_as_admin)
+                  scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+                else
+                  scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+                end
       end
 
       assignments = if params[:assignment_group_id].present?
@@ -834,7 +834,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
-        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: 400
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: :bad_request
       end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
@@ -846,7 +846,7 @@ class AssignmentsApiController < ApplicationController
       override_dates = value_to_boolean(override_param)
       if override_dates || include_all_dates || include_override_objects
         ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
-        assignments.select { |a| a.assignment_overrides.size == 0 }
+        assignments.select { |a| a.assignment_overrides.empty? }
                    .each { |a| a.has_no_overrides = true }
 
         if AssignmentOverrideApplicator.should_preload_override_students?(assignments, user, "assignments_api")
@@ -877,6 +877,8 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
+      mc_status = setup_master_course_restrictions(assignments, context)
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
@@ -894,7 +896,8 @@ class AssignmentsApiController < ApplicationController
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
                         include_can_edit: include_params.include?('can_edit'),
-                        include_score_statistics: include_params.include?('score_statistics'))
+                        include_score_statistics: include_params.include?('score_statistics'),
+                        master_course_status: mc_status)
       end
     end
   end
@@ -1433,7 +1436,7 @@ class AssignmentsApiController < ApplicationController
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
     @context.errors.add('bucket', err_msg, :att_name => 'bucket')
-    return render :json => @context.errors, :status => :bad_request
+    render :json => @context.errors, :status => :bad_request
   end
 
   def require_user_visibility
@@ -1445,7 +1448,7 @@ class AssignmentsApiController < ApplicationController
       return if @context.students_visible_to(@current_user).include?(@user)
     end
     # self, observer
-    authorized_action(@user, @current_user, %i(read_as_parent read))
+    authorized_action(@user, @current_user, %i[read_as_parent read])
   end
 
   def needs_grading_permission?

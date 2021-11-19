@@ -266,8 +266,8 @@ class RubricsApiController < ApplicationController
   before_action :require_context
   before_action :validate_args
 
-  VALID_ASSESSMENT_SCOPES = %w(assessments graded_assessments peer_assessments).freeze
-  VALID_ASSOCIATION_SCOPES = %w(associations assignment_associations course_associations account_associations).freeze
+  VALID_ASSESSMENT_SCOPES = %w[assessments graded_assessments peer_assessments].freeze
+  VALID_ASSOCIATION_SCOPES = %w[associations assignment_associations course_associations account_associations].freeze
 
   VALID_INCLUDE_PARAMS = (VALID_ASSESSMENT_SCOPES + VALID_ASSOCIATION_SCOPES).freeze
 

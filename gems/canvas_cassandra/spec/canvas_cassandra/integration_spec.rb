@@ -29,7 +29,7 @@ end
 # live in the parent app, not here in the gem...
 describe "execute and update" do
   before do
-    target_location = Pathname.new(File.expand_path("../../../../..", __FILE__))
+    target_location = Pathname.new(File.expand_path('../../../..', __dir__))
     allow(Rails).to receive(:root).and_return(target_location)
   end
 

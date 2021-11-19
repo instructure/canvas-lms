@@ -54,7 +54,7 @@ class CustomGradebookColumn < ActiveRecord::Base
   end
 
   def hidden=(hidden)
-    self.workflow_state = Canvas::Plugin::value_to_boolean(hidden) ?
+    self.workflow_state = Canvas::Plugin.value_to_boolean(hidden) ?
                             "hidden" :
                             "active"
   end

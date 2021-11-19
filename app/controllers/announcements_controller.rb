@@ -77,10 +77,11 @@ class AnnouncementsController < ApplicationController
           feed_key = @context.asset_string
         end
         if feed_key
-          if @context.is_a?(Course)
+          case @context
+          when Course
             content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_course, "Course Announcements Atom Feed") })
             content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_course, "Course Announcements Podcast Feed") })
-          elsif @context.is_a?(Group)
+          when Group
             content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_group, "Group Announcements Atom Feed") })
             content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_group, "Group Announcements Podcast Feed") })
           end
@@ -119,9 +120,10 @@ class AnnouncementsController < ApplicationController
         rss = RSS::Rss.new("2.0")
         channel = RSS::Rss::Channel.new
         channel.title = t(:podcast_feed_name, "%{course} Announcements Podcast Feed", :course => @context.name)
-        if @context.is_a?(Course)
+        case @context
+        when Course
           channel.description = t(:podcast_feed_description_course, "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed.", :course => @context.name)
-        elsif @context.is_a?(Group)
+        when Group
           channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", :group => @context.name)
         end
         channel.link = polymorphic_url([@context, :announcements])

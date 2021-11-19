@@ -232,7 +232,7 @@ describe CollaborationsController do
       collab.context = @course
       collab.save!
       get 'show', params: { :course_id => @course.id, :id => collab.id }
-      url = CGI::escape(collab[:url])
+      url = CGI.escape(collab[:url])
       expect(response).to redirect_to "/courses/#{@course.id}/external_tools/retrieve?display=borderless&url=#{url}"
     end
 
@@ -420,7 +420,7 @@ describe CollaborationsController do
 
       it "adds users if sent" do
         user_session(@teacher)
-        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user }
+        users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
         lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
         content_items.first['ext_canvas_visibility'] = { users: lti_user_ids }
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
@@ -435,7 +435,7 @@ describe CollaborationsController do
         content_items.first['ext_canvas_visibility'] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
     end
   end
@@ -517,7 +517,7 @@ describe CollaborationsController do
 
       it "adds users if sent" do
         user_session(@teacher)
-        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user }
+        users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
         lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
         content_items.first['ext_canvas_visibility'] = { users: lti_user_ids }
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
@@ -532,7 +532,7 @@ describe CollaborationsController do
         content_items.first['ext_canvas_visibility'] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
 
       it "adds each group only once on multiple requests" do
@@ -548,7 +548,7 @@ describe CollaborationsController do
         }
         collaboration = Collaboration.find(assigns[:collaboration].id)
 
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
     end
   end

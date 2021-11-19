@@ -28,16 +28,16 @@ describe AdheresToPolicy::Configuration do
     end
 
     it 'must return the literal value set' do
-      config.blacklist = %w{foo bar}
-      expect(config.blacklist).to eq %w{foo bar}
+      config.blacklist = %w[foo bar]
+      expect(config.blacklist).to eq %w[foo bar]
     end
 
     it 'must evaluate the supplied block and return the result' do
       config.blacklist = -> {
-        %w{baz qux}
+        %w[baz qux]
       }
 
-      expect(config.blacklist).to eq %w{baz qux}
+      expect(config.blacklist).to eq %w[baz qux]
     end
   end
 

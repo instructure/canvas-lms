@@ -113,7 +113,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      f('.context_module_item .al-trigger').click()
+      f('.context_module_item .al-trigger').click
       f('.delete_item_link').click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept

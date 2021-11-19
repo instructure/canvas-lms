@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper.rb'
+require 'spec_helper'
 
 describe Multipart::Post do
   def parse_params(query, header)

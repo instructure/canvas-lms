@@ -38,7 +38,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#sub_account_tag" do
-      let(:asset_manager) { double() }
+      let(:asset_manager) { double }
 
       it "prefixes the account_id with subaccount" do
         report.data['context_asset_string'] = "42"
@@ -154,7 +154,7 @@ module Canvas::Plugins::TicketingSystem
 
       it "maps an env hash to a json string" do
         report.http_env = { one: "two", three: "four" }
-        expect(delegate.pretty_http_env).to eq(%Q{one: "two"\nthree: "four"})
+        expect(delegate.pretty_http_env).to eq(%(one: "two"\nthree: "four"))
       end
     end
   end

@@ -98,7 +98,7 @@ describe "student groups" do
       end
 
       it "by default, created student group only contains the student creator", priority: "2", test_id: 180682 do
-        create_default_student_group()
+        create_default_student_group
 
         # expand the group
         fj(".student-group-title").click
@@ -268,9 +268,7 @@ describe "student groups" do
         wait_for_ajaximations
 
         students = ffj(".checkbox")
-        students.each do |student|
-          student.click
-        end
+        students.each(&:click)
 
         fj('button.confirm-dialog-confirm-btn').click
         wait_for_ajaximations

@@ -21,7 +21,7 @@
 module PermissionsHelper
   def manageable_enrollments_by_permission(permission, enrollments = nil)
     permission = permission.to_sym
-    raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission)
+    raise "invalid permission" unless RoleOverride.permissions.key?(permission)
 
     enrollments ||= participating_enrollments
     ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
@@ -147,7 +147,7 @@ module PermissionsHelper
     account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = courses.map(&:root_account_id).uniq
-    query = <<~SQL
+    query = <<~SQL.squish
       WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
           ro.applies_to_self, ro.applies_to_descendants, ro.permission

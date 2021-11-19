@@ -61,7 +61,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
                   else
                     ''
                   end
-    DocWriter.append_md <<~HEREDOC
+    DocWriter.append_md <<~MD
       ## #{variable_substitution}#{deprecated_str}#{duplicates_text}
       #{description.strip}
 
@@ -69,7 +69,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       #{launch_param_text}
 
       #{example_text}
-    HEREDOC
+    MD
   end
 
   private
@@ -86,15 +86,15 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       next unless param
 
       text = param.jump(:tstring_content, :ident).source.to_s
-      guards.push(text) if /_GUARD$/.match text
+      guards.push(text) if /_GUARD$/.match? text
     end
 
-    guards.push('ALWAYS') if guards.size == 0
+    guards.push('ALWAYS') if guards.empty?
     guards
   end
 
   def availability
-    all_availabilities = all_guards.map do |guard|
+    all_availabilities = all_guards.filter_map do |guard|
       case guard
       when 'ALWAYS', 'CONTROLLER_GUARD'
         "always"
@@ -133,7 +133,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       when 'FILE_UPLOAD_GUARD'
         "when the tool is used to upload a file as an assignment submission"
       end
-    end.compact
+    end
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
   end
 end

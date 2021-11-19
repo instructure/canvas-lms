@@ -28,6 +28,6 @@ class Quizzes::QuizQuestion::FileUploadAnswer < Quizzes::QuizQuestion::UserAnswe
     return nil unless (data = @answer_data["question_#{question_id}".to_sym])
 
     ids = data.select(&:present?)
-    ids.present? ? ids : nil
+    ids.presence
   end
 end

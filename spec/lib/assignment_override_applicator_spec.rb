@@ -307,12 +307,12 @@ describe AssignmentOverrideApplicator do
         end
 
         it "finds the overrides for the correct student" do
-          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
           expect(result.assignment_override_id).to eq @override.id
         end
 
         it "returns AssignmentOverrideStudent" do
-          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
           expect(result).to be_an_instance_of(AssignmentOverrideStudent)
         end
       end
@@ -455,14 +455,14 @@ describe AssignmentOverrideApplicator do
 
       describe 'for students' do
         it "returns section overrides" do
-          result = AssignmentOverrideApplicator::section_overrides(@assignment, @student2)
+          result = AssignmentOverrideApplicator.section_overrides(@assignment, @student2)
           expect(result.length).to eq 1
         end
 
         it "enforces lenient date" do
           adhoc_due_at = 10.days.from_now
 
-          ao = AssignmentOverride.new()
+          ao = AssignmentOverride.new
           ao.assignment = @assignment
           ao.title = "ADHOC OVERRIDE"
           ao.workflow_state = "active"
@@ -587,19 +587,19 @@ describe AssignmentOverrideApplicator do
         @override2_student.user = @student2
         @override2_student.save!
         @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
-        result = AssignmentOverrideApplicator::observer_overrides(@assignment, @observer)
+        result = AssignmentOverrideApplicator.observer_overrides(@assignment, @observer)
         expect(result.length).to eq 2
       end
     end
 
     context '#has_invalid_args?' do
       it "returns true with nil user" do
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, nil)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, nil)
         expect(result).to be_truthy
       end
 
       it "returns true for assignments with no overrides" do
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
         expect(result).to be_truthy
       end
 
@@ -609,7 +609,7 @@ describe AssignmentOverrideApplicator do
         @override_student.user = @student
         @override_student.save!
 
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
         expect(result).to be_falsey
       end
     end
@@ -945,22 +945,22 @@ describe AssignmentOverrideApplicator do
 
   describe "overrides_hash" do
     it "is consistent for the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides)
       expect(hash1).to eq hash2
     end
 
     it "is unique for different overrides" do
-      overrides1 = 5.times.map { assignment_override_model }
-      overrides2 = 5.times.map { assignment_override_model }
+      overrides1 = Array.new(5) { assignment_override_model }
+      overrides2 = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides1)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides2)
       expect(hash1).not_to eq hash2
     end
 
     it "is unique for different versions of the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       overrides.first.override_due_at(5.days.from_now)
       overrides.first.save!
@@ -969,7 +969,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "is unique for different orders of the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides.reverse)
       expect(hash1).not_to eq hash2

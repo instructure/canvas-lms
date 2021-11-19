@@ -39,8 +39,8 @@ class Mutations::MarkSubmissionCommentsRead < Mutations::BaseMutation
       ViewedSubmissionComment.create!(submission_comment_id: sc_id, user: current_user)
     end
     { submission_comments: SubmissionComment.where(id: input_sc_ids) }
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   end

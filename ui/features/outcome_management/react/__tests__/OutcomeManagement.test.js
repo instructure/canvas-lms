@@ -293,7 +293,7 @@ describe('OutcomeManagement', () => {
     sharedExamples()
   })
 
-  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
+  it.skip('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
     window.ENV = {
       context_asset_string: 'course_2',
       CONTEXT_URL_ROOT: '/course/2',
@@ -367,7 +367,7 @@ describe('OutcomePanel', () => {
     document.body.innerHTML = ''
   })
 
-  it('sets style on mount', () => {
+  it.skip('sets style on mount', () => {
     render(<OutcomePanel />)
     expect(document.getElementById('outcomes').style.display).toBe('block')
   })

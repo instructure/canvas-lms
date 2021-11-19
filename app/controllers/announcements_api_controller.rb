@@ -146,9 +146,9 @@ class AnnouncementsApiController < ApplicationController
 
   def get_dates
     if params[:start_date].present?
-      if params[:start_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date]).beginning_of_day
-      elsif params[:start_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date])
       else
         render :json => { :message => 'Invalid start_date' }, :status => :bad_request
@@ -157,9 +157,9 @@ class AnnouncementsApiController < ApplicationController
     end
 
     if params[:end_date].present?
-      if params[:end_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date]).end_of_day
-      elsif params[:end_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date])
       else
         render :json => { :message => 'Invalid end_date' }, :status => :bad_request

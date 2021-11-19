@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::ExternalUrlType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) {
+    course_with_teacher(active_all: true)
+    @course
+  }
   let_once(:context_module) { course.context_modules.create! name: 'Module 1' }
   let_once(:module_item) {
     context_module.content_tags.create!(

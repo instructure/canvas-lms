@@ -29,7 +29,7 @@ module Lti
     let(:tool_proxy_service) { ToolProxyService.new }
 
     describe '#process_tool_proxy_json' do
-      let(:tool_proxy_fixture) { File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')) }
+      let(:tool_proxy_fixture) { Rails.root.join('spec/fixtures/lti/tool_proxy.json').read }
       let(:tool_proxy_guid) { 'guid' }
       let(:account) { Account.new }
 
@@ -166,7 +166,7 @@ module Lti
         }.to change { tool_proxy.reload.tool_settings.first.custom }.from({ "customerId" => "394892759526" }).to({ "customerId" => "bar" })
       end
 
-      it 'updates a tool setting  by merging' do
+      it 'updates a tool setting by merging' do
         tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.custom = { "foo" => "bar" }
@@ -200,7 +200,7 @@ module Lti
       context 'placements' do
         RSpec::Matchers.define :include_placement do |placement|
           match do |resource_placements|
-            (resource_placements.select { |p| p.placement == placement }).size > 0
+            !(resource_placements.select { |p| p.placement == placement }).empty?
           end
         end
 
@@ -219,7 +219,7 @@ module Lti
         it 'creates default placements when none are specified' do
           tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
           rh = tool_proxy.resources.first
-          expect(rh.message_handlers.first.placements).to include_placements %w(assignment_selection link_selection)
+          expect(rh.message_handlers.first.placements).to include_placements %w[assignment_selection link_selection]
         end
 
         it "doesn't include defaults placements when one is provided" do
@@ -244,8 +244,8 @@ module Lti
           tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.invalid']
           begin
             tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp_json.to_json, context: account, guid: tool_proxy_guid)
-          rescue Lti::Errors::InvalidToolProxyError => proxy_error
-            puts proxy_error.message
+          rescue Lti::Errors::InvalidToolProxyError => e
+            puts e.message
           end
           expect(tool_proxy).to eq nil
         end

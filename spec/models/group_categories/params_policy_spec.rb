@@ -41,7 +41,7 @@ module GroupCategories
     end
 
     describe '#populate_with' do
-      let(:category) { MockGroupCategory.new() }
+      let(:category) { MockGroupCategory.new }
       let(:context) { double('course') }
       let(:policy) { ParamsPolicy.new(category, context) }
 

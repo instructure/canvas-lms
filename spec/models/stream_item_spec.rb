@@ -73,7 +73,10 @@ describe StreamItem do
   describe "destroy_stream_items_using_setting" do
     it "has a default ttl" do
       StreamItem.create!(asset_type: 'Message', data: { notification_id: nil })
-      si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
+      si2 = StreamItem.create! { |si|
+        si.asset_type = 'Message'
+        si.data = { notification_id: nil }
+      }
       StreamItem.where(:id => si2).update_all(:updated_at => 1.year.ago)
       # stub this out so that the vacuum is skipped (can't run in specs in a transaction)
       allow(Shard.current.database_server).to receive(:unguard)

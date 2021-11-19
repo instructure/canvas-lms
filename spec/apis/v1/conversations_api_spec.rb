@@ -481,7 +481,7 @@ describe ConversationsController, type: :request do
       json = api_call(:get, "/api/v1/conversations.json?scope=starred",
                       { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'starred' })
       expect(json.size).to eq 3
-      expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map { |c| c.conversation_id }.sort
+      expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map(&:conversation_id).sort
     end
 
     it "does not include unstarred conversations in starred scope regardless of if read or archived" do
@@ -1804,7 +1804,7 @@ describe ConversationsController, type: :request do
       real_conversation.context = @course
       real_conversation.save!
 
-      @joe.enrollments.each { |e| e.destroy }
+      @joe.enrollments.each(&:destroy)
       @user = @billy
       api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
                { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
@@ -2156,7 +2156,7 @@ describe ConversationsController, type: :request do
     # it "should mark conversations as subscribed"
     # it "should mark conversations as unsubscribed"
     it "archives conversations" do
-      conversations = %w(archived read unread).map do |state|
+      conversations = %w[archived read unread].map do |state|
         conversation(@me, @bob, :workflow_state => state)
       end
       expect(@me.reload.unread_conversations_count).to eql(1)
@@ -2501,7 +2501,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the conversation_message_id is not provided' do
-      @c1.all_messages.first()
+      @c1.all_messages.first
 
       raw_api_call(:put, "/api/v1/conversations/restore",
                    { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2511,7 +2511,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the user_id is not provided' do
-      message = @c1.all_messages.first()
+      message = @c1.all_messages.first
 
       raw_api_call(:put, "/api/v1/conversations/restore",
                    { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2521,7 +2521,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the conversation_id is not provided' do
-      message = @c1.all_messages.first()
+      message = @c1.all_messages.first
 
       raw_api_call(:put, "/api/v1/conversations/restore",
                    { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2531,7 +2531,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'restores the message' do
-      message = @c1.all_messages.first()
+      message = @c1.all_messages.first
 
       api_call(:put, "/api/v1/conversations/restore",
                { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2539,7 +2539,7 @@ describe ConversationsController, type: :request do
 
       expect(response.status).to eql 200
 
-      cmp = ConversationMessageParticipant.where(:user_id => @bob.id).where(:conversation_message_id => message.id).first()
+      cmp = ConversationMessageParticipant.where(:user_id => @bob.id).where(:conversation_message_id => message.id).first
       expect(cmp.workflow_state).to eql "active"
       expect(cmp.deleted_at).to eql nil
     end
@@ -2548,7 +2548,7 @@ describe ConversationsController, type: :request do
       expect(@c1.message_count).to eql 0
       expect(@c1.last_message_at).to eql nil
 
-      message = @c1.all_messages.first()
+      message = @c1.all_messages.first
 
       api_call(:put, "/api/v1/conversations/restore",
                { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2556,7 +2556,7 @@ describe ConversationsController, type: :request do
 
       expect(response.status).to eql 200
 
-      @c1.reload()
+      @c1.reload
       expect(@c1.message_count).to eql 1
       expect(@c1.last_message_at).to eql message.created_at
     end

@@ -72,7 +72,7 @@ module RollupScoreAggregatorHelper
   end
 
   def get_aggregates(result)
-    @outcome_results.reduce({ total: 0.0, weighted: 0.0 }) do |aggregate, lor|
+    @outcome_results.each_with_object({ total: 0.0, weighted: 0.0 }) do |lor, aggregate|
       if is_match?(result, lor) && lor.possible
         aggregate[:total] += lor.possible
         begin
@@ -82,7 +82,6 @@ module RollupScoreAggregatorHelper
           raise e
         end
       end
-      aggregate
     end
   end
 

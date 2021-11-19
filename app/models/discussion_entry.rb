@@ -55,8 +55,8 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :create_participants
   after_create :clear_planner_cache_for_participants
   after_create :update_topic
-  validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :discussion_topic_id
+  validates :message, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :discussion_topic_id, presence: true
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
@@ -140,7 +140,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def self.rating_sums(entry_ids)
     sums = self.where(:id => entry_ids).where('COALESCE(rating_sum, 0) != 0')
-    Hash[sums.map { |x| [x.id, x.rating_sum] }]
+    sums.map { |x| [x.id, x.rating_sum] }.to_h
   end
 
   def set_depth
@@ -219,7 +219,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_discussion
-    if %w(workflow_state message attachment_id editor_id).any? { |a| self.saved_change_to_attribute?(a) }
+    if %w[workflow_state message attachment_id editor_id].any? { |a| self.saved_change_to_attribute?(a) }
       dt = self.discussion_topic
       loop do
         dt.touch
@@ -256,7 +256,7 @@ class DiscussionEntry < ActiveRecord::Base
     transaction do
       # get a list of users who have not read the entry yet
       users = discussion_topic.discussion_topic_participants
-                              .where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
+                              .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
       # decrement unread_entry_count for topic participants
       if users.present?
         DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users)
@@ -341,10 +341,10 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked_for?(user, :check_policies => true) }
+    given { |user, session| self.discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked_for?(user, :check_policies => true) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }
+    given { |user, session| self.discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
     given { |user, session| self.discussion_topic.grants_right?(user, session, :rate) }
@@ -372,11 +372,11 @@ class DiscussionEntry < ActiveRecord::Base
     Atom::Entry.new do |entry|
       subject = [self.discussion_topic.title]
       subject << self.discussion_topic.context.name if opts[:include_context]
-      if parent_id
-        entry.title = t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
-      else
-        entry.title = subject.to_sentence
-      end
+      entry.title = if parent_id
+                      t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
+                    else
+                      subject.to_sentence
+                    end
       entry.authors << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at

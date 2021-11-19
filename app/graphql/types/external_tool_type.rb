@@ -59,7 +59,7 @@ module Types
 
     field :url, Types::UrlType, null: true
     def url
-      object.login_or_launch_url()
+      object.login_or_launch_url
     end
 
     field :name, String, null: true
@@ -77,9 +77,7 @@ module Types
 
     def modules
       load_association(:content_tags).then do |tags|
-        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then do |modules|
-          modules.uniq
-        end
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then(&:uniq)
       end
     end
   end

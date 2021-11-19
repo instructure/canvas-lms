@@ -35,7 +35,7 @@ class ControllerListView < HashView
   end
 
   def config_domain_yaml
-    YAML.load(File.read(File.join(Rails.root, 'config', 'domain.yml'))) if File.exist?(File.join(Rails.root, 'config', 'domain.yml'))
+    YAML.load(Rails.root.join('config/domain.yml').read) if Rails.root.join('config/domain.yml').file?
   end
 
   def canvas_url

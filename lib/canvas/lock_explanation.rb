@@ -26,32 +26,32 @@ module Canvas
       if hash[:lock_at]
         case type
         when "quiz"
-          return I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         when "assignment"
-          return I18n.t('messages.assignment_locked_at', "This assignment was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.assignment_locked_at', "This assignment was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         when "topic"
-          return I18n.t('messages.topic_locked_at', "This topic was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.topic_locked_at', "This topic was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         when "file"
-          return I18n.t('messages.file_locked_at', "This file was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.file_locked_at', "This file was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         when "page"
-          return I18n.t('messages.page_locked_at', "This page was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.page_locked_at', "This page was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         else
-          return I18n.t('messages.content_locked_at', "This content was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+          I18n.t('messages.content_locked_at', "This content was locked %{at}.", :at => datetime_string(hash[:lock_at]))
         end
       elsif hash[:unlock_at]
         case type
         when "quiz"
-          return I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         when "assignment"
-          return I18n.t('messages.assignment_locked_until', "This assignment is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.assignment_locked_until', "This assignment is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         when "topic"
-          return I18n.t('messages.topic_locked_until', "This topic is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.topic_locked_until', "This topic is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         when "file"
-          return I18n.t('messages.file_locked_until', "This file is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.file_locked_until', "This file is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         when "page"
-          return I18n.t('messages.page_locked_until', "This page is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.page_locked_until', "This page is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         else
-          return I18n.t('messages.content_locked_until', "This content is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+          I18n.t('messages.content_locked_until', "This content is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
         end
       elsif hash[:context_module]
         obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : OpenObject.new(hash[:context_module])
@@ -128,21 +128,21 @@ module Canvas
           html << "<a x-canvaslms-trusted-url='#{course_context_module_prerequisites_needing_finishing_path((context || obj.context).id, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>".html_safe
           js_bundle :prerequisites_lookup if include_js
         end
-        return html
+        html
       else
         case type
         when "quiz"
-          return I18n.t('messages.quiz_locked', "This quiz is currently locked.")
+          I18n.t('messages.quiz_locked', "This quiz is currently locked.")
         when "assignment"
-          return I18n.t('messages.assignment_locked', "This assignment is currently locked.")
+          I18n.t('messages.assignment_locked', "This assignment is currently locked.")
         when "topic"
-          return I18n.t("This topic is closed for comments.")
+          I18n.t("This topic is closed for comments.")
         when "file"
-          return I18n.t('messages.file_locked', "This file is currently locked.")
+          I18n.t('messages.file_locked', "This file is currently locked.")
         when "page"
-          return I18n.t('messages.page_locked', "This page is currently locked.")
+          I18n.t('messages.page_locked', "This page is currently locked.")
         else
-          return I18n.t('messages.content_locked', "This quiz is currently locked.")
+          I18n.t('messages.content_locked', "This quiz is currently locked.")
         end
       end
     end

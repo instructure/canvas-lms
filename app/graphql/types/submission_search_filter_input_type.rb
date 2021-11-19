@@ -27,12 +27,12 @@ module Types
 
     argument :enrollment_types, [EnrollmentTypeType], required: false
 
-    argument :user_search, String, <<~DESC, required: false
+    argument :user_search, String, <<~MD, required: false
       The partial name or full ID of the users to match and return in the
       results list. Must be at least 3 characters.
       Queries by administrative users will search on SIS ID, login ID, name, or email
       address; non-administrative queries will only be compared against name.
-    DESC
+    MD
 
     argument :scored_less_than, Float, "Limit results to submissions that scored below the specified value", required: false
     argument :scored_more_than, Float, "Limit results to submissions that scored above the specified value", required: false

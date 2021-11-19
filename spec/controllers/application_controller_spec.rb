@@ -41,14 +41,14 @@ RSpec.describe ApplicationController do
 
   describe "#google_drive_connection" do
     before do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
     end
 
     it "uses @real_current_user first" do
-      mock_real_current_user = double()
-      mock_current_user = double()
+      mock_real_current_user = double
+      mock_current_user = double
       controller.instance_variable_set(:@real_current_user, mock_real_current_user)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
@@ -64,7 +64,7 @@ RSpec.describe ApplicationController do
     end
 
     it "uses @current_user second" do
-      mock_current_user = double()
+      mock_current_user = double
       controller.instance_variable_set(:@real_current_user, nil)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
@@ -79,7 +79,7 @@ RSpec.describe ApplicationController do
     end
 
     it "queries user services if token isn't in the cache" do
-      mock_current_user = double()
+      mock_current_user = double
       controller.instance_variable_set(:@real_current_user, nil)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
@@ -460,6 +460,7 @@ RSpec.describe ApplicationController do
       expect(controller.send(:response_code_for_rescue, e)).to eq(502)
     end
   end
+
   describe "#reject!" do
     it "sets the message and status in the error json" do
       expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|
@@ -738,7 +739,7 @@ RSpec.describe ApplicationController do
         allow(ErrorReport).to receive(:find).and_return(report)
         allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).and_return({})
 
-        req = double()
+        req = double
         allow(req).to receive(:url).and_return('url')
         allow(req).to receive(:headers).and_return({})
         allow(req).to receive(:authorization).and_return(nil)
@@ -2354,7 +2355,7 @@ describe WikiPagesController do
       get 'index', params: { :course_id => @course.id }
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
-      expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
+      expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq(@course.wiki.check_policy(@teacher).index_with { true })
     end
   end
 end
@@ -2439,7 +2440,7 @@ describe CoursesController do
   end
 
   context 'validate_scopes' do
-    let(:account) { double() }
+    let(:account) { double }
 
     before do
       controller.instance_variable_set(:@domain_root_account, account)
@@ -2558,7 +2559,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'pdf format' do
     let(:format) { :pdf }
 
-    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(response).to render_template('shared/unauthorized') }
   end
@@ -2566,7 +2567,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'html format' do
     let(:format) { :html }
 
-    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(response).to render_template('shared/unauthorized') }
   end
@@ -2574,7 +2575,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'json format' do
     let(:format) { :json }
 
-    specify { expect(response.headers['Content-Type']).to match(/\Aapplication\/json/) }
+    specify { expect(response.headers['Content-Type']).to match(%r{\Aapplication/json}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(json_parse.fetch('status')).to eq 'unauthorized' }
   end

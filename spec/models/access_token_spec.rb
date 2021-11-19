@@ -173,7 +173,7 @@ describe AccessToken do
       trustedkey = DeveloperKey.create!(internal_service: true)
       user.access_tokens.create!({ developer_key: trustedkey })
 
-      untrustedkey = DeveloperKey.create!()
+      untrustedkey = DeveloperKey.create!
       third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
 
       expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
@@ -182,7 +182,7 @@ describe AccessToken do
 
     it "access token and developer key scoping work cross-shard" do
       trustedkey = DeveloperKey.new(internal_service: true)
-      untrustedkey = DeveloperKey.new()
+      untrustedkey = DeveloperKey.new
 
       @shard1.activate do
         trustedkey.save!
@@ -204,7 +204,7 @@ describe AccessToken do
   describe "token scopes" do
     let_once(:token) do
       token = AccessToken.new
-      token.scopes = %w{https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts}
+      token.scopes = %w[https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts]
       token
     end
 
@@ -237,38 +237,38 @@ describe AccessToken do
   context "url scopes" do
     let(:token) do
       token = AccessToken.new
-      token.scopes = %w{
+      token.scopes = %w[
         blah/scope
         url:GET|/api/v1/accounts
         url:POST|/api/v1/courses
         url:PUT|/api/v1/courses/:id
         url:DELETE|/api/v1/courses/:course_id/assignments/:id
-      }
+      ]
       token
     end
 
     it "returns regexes that correspond to the http method" do
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/api\/v1\/accounts(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/api/v1/accounts(?:\.[^/]+|)$}]
     end
 
     it "accounts for format segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/blah})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/blah(?:\.[^\/]+|)$/]
+      token = AccessToken.new(scopes: %w[url:GET|/blah])
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/blah(?:\.[^/]+|)$}]
     end
 
     it "accounts for glob segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/*blah})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/.+(?:\.[^\/]+|)$/]
+      token = AccessToken.new(scopes: %w[url:GET|/*blah])
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/.+(?:\.[^/]+|)$}]
     end
 
     it "accounts for dynamic segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/courses/:id})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses\/[^\/]+(?:\.[^\/]+|)$/]
+      token = AccessToken.new(scopes: %w[url:GET|/courses/:id])
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses/[^/]+(?:\.[^/]+|)$}]
     end
 
     it "accounts for optional segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/courses(/:course_id)(/*blah)})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses(?:\/[^\/]+|)(?:\/.+|)(?:\.[^\/]+|)$/]
+      token = AccessToken.new(scopes: %w[url:GET|/courses(/:course_id)(/*blah)])
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses(?:/[^/]+|)(?:/.+|)(?:\.[^/]+|)$}]
     end
   end
 

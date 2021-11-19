@@ -154,8 +154,8 @@ module Lti
         return resource_link_request.generate_post_payload
       end
 
-      if resource_type&.to_sym == :module_index_menu &&
-         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+      if resource_type&.to_sym == :module_index_menu_modal &&
+         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
         return resource_link_request.generate_post_payload
       end
 

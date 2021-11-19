@@ -317,8 +317,8 @@ describe WikiPage do
 
       it 'does not change the URL in a wiki page link' do
         allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
-        course = course_factory()
-        some_other_course = course_factory()
+        course = course_factory
+        some_other_course = course_factory
 
         file_url = "/courses/#{some_other_course.id}/files/1"
         link_string = "<a href='#{file_url}'>link</a>"

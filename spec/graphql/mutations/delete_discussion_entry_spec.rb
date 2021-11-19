@@ -63,7 +63,7 @@ describe Mutations::DeleteDiscussionEntry do
   it 'marks a discussion entry as deleted' do
     expect(@discussion_entry.workflow_state).to eq 'active'
     result = run_mutation(id: @discussion_entry.id)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteDiscussionEntry', 'errors')).to be_nil
     expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', '_id')).to eq @discussion_entry.id.to_s
     expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'deleted')).to be true
@@ -73,7 +73,7 @@ describe Mutations::DeleteDiscussionEntry do
   it 'sets the editor when deleting' do
     expect(@discussion_entry.editor_id).to be_nil
     result = run_mutation(id: @discussion_entry.id)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteDiscussionEntry', 'errors')).to be_nil
     expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'editor', '_id')).to eq @teacher.id.to_s
     expect(@discussion_entry.reload.editor_id).to eq @teacher.id
@@ -93,7 +93,7 @@ describe Mutations::DeleteDiscussionEntry do
 
     it 'if the user does not have delete permissions' do
       result = run_mutation({ id: @discussion_entry.id }, @student)
-      expect(result.dig('errors')).to be_nil
+      expect(result['errors']).to be_nil
       expect(result.dig('data', 'deleteDiscussionEntry', 'errors', 0, 'message')).to eq 'Insufficient permissions'
     end
   end

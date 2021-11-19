@@ -29,7 +29,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
   validate :discussion_topic_is_section_specific
   validate :course_and_topic_share_context
 
-  validates_uniqueness_of :course_section_id, scope: :discussion_topic_id, conditions: -> { where(:workflow_state => 'active') }
+  validates :course_section_id, uniqueness: { scope: :discussion_topic_id, conditions: -> { where(:workflow_state => 'active') } }
 
   before_validation :set_discussion_topic_id
 

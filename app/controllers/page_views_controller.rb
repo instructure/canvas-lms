@@ -193,8 +193,8 @@ class PageViewsController < ApplicationController
     end
     if start_time && end_time && end_time < start_time
       return respond_to do |format|
-        format.json { render json: { error: t('end_time must be after start_time') }, status: 400 }
-        format.any { render plain: t('end_time must be after start_time'), status: 400 }
+        format.json { render json: { error: t('end_time must be after start_time') }, status: :bad_request }
+        format.any { render plain: t('end_time must be after start_time'), status: :bad_request }
       end
     end
 
@@ -215,7 +215,7 @@ class PageViewsController < ApplicationController
         options = {
           type: 'text/csv',
           filename: t(:download_filename, 'Pageviews For %{user}',
-                      user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
+                      user: @user.name.to_s.tr(' ', '_')) + '.csv', disposition: 'attachment'
         }
         send_data(csv, options)
       end
