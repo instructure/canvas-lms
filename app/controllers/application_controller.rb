@@ -930,7 +930,7 @@ class ApplicationController < ActionController::Base
         raise ActiveRecord::RecordNotFound, "Context is required, but none found"
       end
     end
-    @context != nil
+    !@context.nil?
   end
 
   def require_context_and_read_access
@@ -2137,7 +2137,7 @@ class ApplicationController < ActionController::Base
   def feature_enabled?(feature)
     @features_enabled ||= {}
     feature = feature.to_sym
-    return @features_enabled[feature] if @features_enabled[feature] != nil
+    return @features_enabled[feature] unless @features_enabled[feature].nil?
 
     @features_enabled[feature] ||= if [:question_banks].include?(feature)
                                      true

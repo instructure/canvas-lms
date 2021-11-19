@@ -126,11 +126,11 @@ class Quizzes::Quiz < ActiveRecord::Base
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
     end
-    self.allowed_attempts = 1 if self.allowed_attempts == nil
+    self.allowed_attempts = 1 if self.allowed_attempts.nil?
     if self.allowed_attempts <= 1
       self.show_correct_answers_last_attempt = false
     end
-    self.scoring_policy = "keep_highest" if self.scoring_policy == nil
+    self.scoring_policy = "keep_highest" if self.scoring_policy.nil?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
     if !self.available? && !self.survey?
       self.points_possible = self.current_points_possible

@@ -16,7 +16,7 @@ def bad_to_json_in_render?(expr)
   # look for that structure, but skip if the value is a literal. known not to catch
   # "render status: 200, json: value.to_json(args)"
   # but that's ok for now
-  expr[0] == :call && expr[1] == nil && expr[2] == :render &&
+  expr[0] == :call && expr[1].nil? && expr[2] == :render &&
     expr[3].is_a?(Sexp) && expr[3].first == :hash &&
     expr[3][1].is_a?(Sexp) && expr[3][1].first == :lit && expr[3][1].last == :json &&
     expr[3][2].is_a?(Sexp) && expr[3][2].first == :call && expr[3][2][2] == :to_json &&

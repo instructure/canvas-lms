@@ -296,7 +296,7 @@ class User < ActiveRecord::Base
     active_observer_scope = joins(:enrollments).where(enrollments: { type: 'ObserverEnrollment', course_id: course_ids, workflow_state: 'active' })
     users_observing_students = active_observer_scope.where.not(enrollments: { associated_user_id: nil }).pluck(:id)
 
-    if users_observing_students == [] || users_observing_students == nil
+    if users_observing_students == [] || users_observing_students.nil?
       active_observer_scope
     else
       active_observer_scope.where.not(users: { id: users_observing_students })
@@ -885,7 +885,7 @@ class User < ActiveRecord::Base
   end
 
   def preserve_lti_id
-    errors.add(:lti_id, 'Cannot change lti_id!') if lti_id_changed? && lti_id_was != nil
+    errors.add(:lti_id, 'Cannot change lti_id!') if lti_id_changed? && !lti_id_was.nil?
   end
 
   def ensure_lti_id
