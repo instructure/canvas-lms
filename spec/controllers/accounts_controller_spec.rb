@@ -1433,7 +1433,7 @@ describe AccountsController do
     end
 
     context "sorting by term" do
-      let(:letters_in_random_order) { 'daqwds'.split('') }
+      let(:letters_in_random_order) { 'daqwds'.chars }
 
       before do
         @account = Account.create!

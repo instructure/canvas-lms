@@ -51,7 +51,7 @@ module Importers
       if valid_paths != [0]
         current = 0
         last = current
-        callback = Proc.new do
+        callback = proc do
           current += 1
           if (current - last) > 10
             last = current
@@ -419,9 +419,11 @@ module Importers
         settings[:tab_configuration].each do |tab|
           if tab['id'].is_a?(String) && tab['id'].start_with?('context_external_tool_')
             tool_mig_id = tab['id'].sub('context_external_tool_', '')
-            all_tools ||= migration.cross_institution? ?
-                course.context_external_tools.having_setting('course_navigation') :
-                ContextExternalTool.find_all_for(course, :course_navigation)
+            all_tools ||= if migration.cross_institution?
+                            course.context_external_tools.having_setting('course_navigation')
+                          else
+                            ContextExternalTool.find_all_for(course, :course_navigation)
+                          end
             if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
                 all_tools.detect { |t|
                   CC::CCHelper.create_key(t) == tool_mig_id ||

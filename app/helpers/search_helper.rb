@@ -49,7 +49,13 @@ module SearchHelper
             :name => course.name,
             :type => :course,
             :term => term_for_course.call(course),
-            :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
+            :state => if type == :current
+                        :active
+                      elsif course.recently_ended?
+                        :recently_active
+                      else
+                        :inactive
+                      end,
             :available => type == :current && course.available?,
             :default_section_id => course.default_section(no_create: true).try(:id)
           }.tap do |hash|

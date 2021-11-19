@@ -350,7 +350,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   def strip_html_answers(question)
     return if !question || !question[:answers] || !(%w[multiple_choice_question multiple_answers_question].include? question[:question_type])
 
-    for answer in question[:answers] do
+    question[:answers].each do |answer|
       answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
     end
   end

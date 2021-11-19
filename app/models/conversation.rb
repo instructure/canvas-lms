@@ -247,9 +247,11 @@ class Conversation < ActiveRecord::Base
       options[:skip_users]        ||= [current_user]
       options[:reset_unread_counts] = options[:update_participants] unless options.key?(:reset_unread_counts)
 
-      message = body_or_obj.is_a?(ConversationMessage) ?
-        body_or_obj :
-        Conversation.build_message(current_user, body_or_obj, options)
+      message = if body_or_obj.is_a?(ConversationMessage)
+                  body_or_obj
+                else
+                  Conversation.build_message(current_user, body_or_obj, options)
+                end
       message.conversation = self
       message.relativize_attachment_ids(from_shard: message.shard, to_shard: self.shard)
       message.shard = self.shard

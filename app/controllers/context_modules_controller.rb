@@ -406,9 +406,11 @@ class ContextModulesController < ApplicationController
         end
         restriction_info = {}
         if tag_ids.any?
-          restriction_info = is_child_course ?
-            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids) :
-            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
+          restriction_info = if is_child_course
+                               MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids)
+                             else
+                               MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
+                             end
         end
         info[:tag_restrictions] = restriction_info
       end

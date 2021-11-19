@@ -114,9 +114,11 @@ class Group < ActiveRecord::Base
   alias_method :participating_users_association, :participating_users
 
   def participating_users(user_ids = nil)
-    user_ids ?
-      participating_users_association.where(:id => user_ids) :
+    if user_ids
+      participating_users_association.where(:id => user_ids)
+    else
       participating_users_association
+    end
   end
 
   def participating_users_in_context(user_ids = nil, sort: false, include_inactive_users: false)
@@ -339,11 +341,9 @@ class Group < ActiveRecord::Base
     return nil unless user
 
     attrs = { :user => user, :moderator => !!moderator }
-    new_record_state ||= case self.join_level
-                         when 'invitation_only'          then 'invited'
-                         when 'parent_context_request'   then 'requested'
-                         when 'parent_context_auto_join' then 'accepted'
-                         end
+    new_record_state ||= { 'invitation_only' => 'invited',
+                           'parent_context_request' => 'requested',
+                           'parent_context_auto_join' => 'accepted' }[join_level]
     attrs[:workflow_state] = new_record_state if new_record_state
 
     member = nil

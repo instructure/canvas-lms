@@ -27,7 +27,7 @@ module LtiSpecHelper
       product_family: find_or_create_product_family,
       workflow_state: 'active',
       raw_data: 'some raw data',
-      name: (0...8).map { (65 + rand(26)).chr }.join,
+      name: (0...8).map { rand(65..90).chr }.join,
     }
     combined_opts = default_opts.merge(opts)
     combined_opts[:context] = Account.create!(name: 'Test Account') unless combined_opts.key?(:context)
@@ -42,7 +42,7 @@ module LtiSpecHelper
   end
 
   def create_resource_handler(tool_proxy, opts = {})
-    default_opts = { resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy }
+    default_opts = { resource_type_code: 'code', name: (0...8).map { rand(65..90).chr }.join, tool_proxy: tool_proxy }
     Lti::ResourceHandler.create(default_opts.merge(opts))
   end
 
@@ -56,7 +56,7 @@ module LtiSpecHelper
   end
 
   def new_valid_external_tool(context, resource_selection = false)
-    tool = context.context_external_tools.new(:name => (0...8).map { (65 + rand(26)).chr }.join,
+    tool = context.context_external_tools.new(:name => (0...8).map { rand(65..90).chr }.join,
                                               :consumer_key => "key",
                                               :shared_secret => "secret")
     tool.url = "http://www.example.com/basic_lti"

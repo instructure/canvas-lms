@@ -50,9 +50,11 @@ class AttachmentUploadStatus < ApplicationRecord
       return status if status
     end
 
-    failed = attachment.attachment_upload_statuses.loaded? ?
-      attachment.attachment_upload_statuses.any? :
-      attachment.attachment_upload_statuses.exists?
+    failed = if attachment.attachment_upload_statuses.loaded?
+               attachment.attachment_upload_statuses.any?
+             else
+               attachment.attachment_upload_statuses.exists?
+             end
     return 'failed' if failed
 
     'success'

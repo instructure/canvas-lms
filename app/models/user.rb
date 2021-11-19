@@ -2564,9 +2564,11 @@ class User < ActiveRecord::Base
     return read_attribute(:storage_quota) if read_attribute(:storage_quota)
 
     accounts = associated_root_accounts.reject(&:site_admin?)
-    accounts.empty? ?
-      self.class.default_storage_quota :
+    if accounts.empty?
+      self.class.default_storage_quota
+    else
       accounts.sum(&:default_user_storage_quota)
+    end
   end
 
   def self.default_storage_quota

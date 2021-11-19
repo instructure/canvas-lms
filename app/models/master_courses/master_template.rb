@@ -112,9 +112,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def touch_all_content_for_tags(only_content_type = nil)
-    content_types = only_content_type ?
-      [only_content_type] :
-      self.master_content_tags.where(:use_default_restrictions => true).distinct.pluck(:content_type)
+    content_types = if only_content_type
+                      [only_content_type]
+                    else
+                      self.master_content_tags.where(:use_default_restrictions => true).distinct.pluck(:content_type)
+                    end
     content_types.each do |content_type|
       klass = content_type.constantize
       klass.where(klass.primary_key => self.master_content_tags.where(:use_default_restrictions => true,

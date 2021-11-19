@@ -40,9 +40,11 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
   end
 
   def self.up
-    compression_params = cassandra.db.use_cql3? ?
-        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
-        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+    compression_params = if cassandra.db.use_cql3?
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
     cassandra.execute %{
       CREATE TABLE authentications (

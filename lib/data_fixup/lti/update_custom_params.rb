@@ -72,7 +72,7 @@ module DataFixup::Lti::UpdateCustomParams
     end
 
     def validate_domains!(domains)
-      domains.select { |domain| domain =~ /\A[\w.-]*\z/ }
+      domains.grep(/\A[\w.-]*\z/)
     end
 
     def select_by_domains(domains, subdomain_matching)

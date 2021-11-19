@@ -36,7 +36,7 @@ class Setting < Switchman::UnshardedRecord
         next obj ? obj.value&.to_s : default&.to_s
       end
 
-      fetch = Proc.new { Setting.pluck(:name, :value).to_h }
+      fetch = proc { Setting.pluck(:name, :value).to_h }
       all_settings = if @skip_cache
                        # we want to skip talking to redis, but it's okay to use the in-proc cache
                        @all_settings ||= fetch.call

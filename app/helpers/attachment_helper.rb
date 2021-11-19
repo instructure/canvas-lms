@@ -77,9 +77,11 @@ module AttachmentHelper
 
     # up here to preempt files domain redirect
     if attachment.instfs_hosted? && file_location_mode? && !direct
-      url = inline ?
-        authenticated_inline_url(attachment) :
-        authenticated_download_url(attachment)
+      url = if inline
+              authenticated_inline_url(attachment)
+            else
+              authenticated_download_url(attachment)
+            end
       render_file_location(url)
       return
     end

@@ -73,7 +73,7 @@ unless $canvas_tasks_loaded
             name, runner = if task.is_a?(Hash)
                              task.values_at(:name, :runner)
                            else
-                             [task, ->() { Rake::Task[task].invoke }]
+                             [task, -> { Rake::Task[task].invoke }]
                            end
 
             log_time(name, &runner)

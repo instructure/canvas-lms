@@ -834,7 +834,7 @@ class Assignment < ActiveRecord::Base
     self.turnitin_settings[:current]
   end
 
-  def turnitin_settings settings = nil
+  def turnitin_settings(settings = nil)
     if super().empty?
       # turnitin settings are overloaded for all plagiarism services as requested, so
       # alternative services can send in their own default settings, otherwise,

@@ -585,21 +585,27 @@ module QuizzesHelper
   end
 
   def take_poll_message(quiz = @quiz)
-    quiz.survey? ?
-      I18n.t('Take the Survey') :
+    if quiz.survey?
+      I18n.t('Take the Survey')
+    else
       I18n.t('Take the Quiz')
+    end
   end
 
   def retake_poll_message(quiz = @quiz)
-    quiz.survey? ?
-      I18n.t('Take the Survey Again') :
+    if quiz.survey?
+      I18n.t('Take the Survey Again')
+    else
       I18n.t('Take the Quiz Again')
+    end
   end
 
   def resume_poll_message(quiz = @quiz)
-    quiz.survey? ?
-      I18n.t('Resume Survey') :
+    if quiz.survey?
+      I18n.t('Resume Survey')
+    else
       I18n.t('Resume Quiz')
+    end
   end
 
   def attachment_id_for(question)

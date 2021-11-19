@@ -97,9 +97,11 @@ module Api::V1::Submission
     end
 
     if includes.include?("html_url")
-      hash['html_url'] = assignment.anonymize_students? ?
-        speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id, anonymous_id: submission.anonymous_id) :
-        course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
+      hash['html_url'] = if assignment.anonymize_students?
+                           speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id, anonymous_id: submission.anonymous_id)
+                         else
+                           course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
+                         end
     end
 
     if includes.include?("user") && submission.can_read_submission_user_name?(current_user, session)
@@ -311,9 +313,10 @@ module Api::V1::Submission
       stale = (attachment.locked != anonymous)
       stale ||= (attachment.created_at < Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago)
       stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at) || attachment.created_at))
-      stale ||= (@current_user &&
-        (enrollment_updated_at = assignment.context.enrollments.for_user(@current_user).maximum(:updated_at)) &&
-        (attachment.created_at < enrollment_updated_at))
+      stale ||= @current_user &&
+                (enrollment_updated_at = assignment.context.enrollments.for_user(@current_user).maximum(:updated_at)) &&
+                (attachment.created_at < enrollment_updated_at)
+
       if stale
         attachment.destroy_permanently_plus
         attachment = nil

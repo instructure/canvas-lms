@@ -183,10 +183,8 @@ class OAuth2ProviderController < ApplicationController
   end
 
   def grant_type
-    @grant_type ||= (
-      params[:grant_type] || (
+    @grant_type ||= params[:grant_type] || (
         !params[:grant_type] && params[:code] ? "authorization_code" : "__UNSUPPORTED_PLACEHOLDER__"
       )
-    )
   end
 end

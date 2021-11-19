@@ -422,9 +422,11 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def create_group_count=(num)
-    @create_group_count = num && num > 0 ?
-      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
-      nil
+    @create_group_count = if num && num > 0
+                            [num, Setting.get('max_groups_in_new_category', '200').to_i].min
+                          else
+                            nil
+                          end
   end
 
   def create_group_member_count=(num)

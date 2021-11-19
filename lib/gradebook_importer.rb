@@ -451,7 +451,7 @@ class GradebookImporter
     # This regexp will also include columns for unposted scores, which
     # will be one of these values with "Unposted" prepended.
     non_assignment_regex = Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join('|'))
-    stripped_row.reject { |header_name| non_assignment_regex.match?(header_name) }
+    stripped_row.grep_v(non_assignment_regex)
   end
 
   def drop_student_information_columns(row)

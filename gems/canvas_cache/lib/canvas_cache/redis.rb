@@ -268,7 +268,7 @@ module CanvasCache
           message[:key] = case command
                           when :mset
                             # This is an array with a single element: an array alternating key/values
-                            request.first(&:first).select.with_index { |_, i| i % 2 == 0 }
+                            request.first(&:first).select.with_index { |_, i| i.even? }
                           when :mget
                             request
                           else

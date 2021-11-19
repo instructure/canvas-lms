@@ -26,7 +26,7 @@ module FileSplitter
   end
 
   # Send it a block, expects @txt to be set in the parser.
-  def each_entry &block
+  def each_entry(&block)
     self.send format, &block
   end
 

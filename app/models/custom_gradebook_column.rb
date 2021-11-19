@@ -54,9 +54,11 @@ class CustomGradebookColumn < ActiveRecord::Base
   end
 
   def hidden=(hidden)
-    self.workflow_state = Canvas::Plugin.value_to_boolean(hidden) ?
-                            "hidden" :
+    self.workflow_state = if Canvas::Plugin.value_to_boolean(hidden)
+                            "hidden"
+                          else
                             "active"
+                          end
   end
 
   alias_method :destroy_permanently!, :destroy

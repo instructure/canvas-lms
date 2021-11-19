@@ -306,7 +306,7 @@ module AttachmentFu # :nodoc:
 
     # Returns the width/height in a suitable format for the image_tag helper: (100x100)
     def image_size
-      [width.to_s, height.to_s] * 'x'
+      [width.to_s, height.to_s].join('x')
     end
 
     # Returns true if the attachment data will be written to the storage system on the next save
@@ -443,8 +443,11 @@ module AttachmentFu # :nodoc:
     # Gets an array of the currently used temp paths.  Defaults to a copy of #full_filename.
     def temp_paths
       # INSTRUCTURE: was "@temp_paths ||= (new_record? || !respond_to?(:full_filename) || !File.exist?(full_filename) ?"
-      @temp_paths ||= (new_record? || !respond_to?(:full_filename) || !full_filename || !File.exist?(full_filename) ?
-        [] : [copy_to_temp_file(full_filename)])
+      @temp_paths ||= if new_record? || !respond_to?(:full_filename) || !full_filename || !File.exist?(full_filename)
+                        []
+                      else
+                        [copy_to_temp_file(full_filename)]
+                      end
     end
 
     # Adds a new temp_path to the array.  This should take a string or a Tempfile.  This class makes no

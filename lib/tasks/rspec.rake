@@ -173,7 +173,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
           $stderr.puts "spec_server is already running."
         else
           $stderr.puts "Starting up spec_server ..."
-          FileUtils.mkdir_p('tmp/pids') unless test ?d, 'tmp/pids'
+          FileUtils.mkdir_p('tmp/pids') unless test 'd', 'tmp/pids'
           system("ruby", "script/spec_server", "--daemon", "--pid", daemonized_server_pid)
         end
       end

@@ -261,9 +261,11 @@ class UserObserveesController < ApplicationController
   #
   # @returns User
   def destroy
-    scope = observer == @current_user ?
-      observer.as_observer_observation_links.where(student: student) :
-      observer.as_observer_observation_links.where(student: student).for_root_accounts(@accounts_with_observer_permissions)
+    scope = if observer == @current_user
+              observer.as_observer_observation_links.where(student: student)
+            else
+              observer.as_observer_observation_links.where(student: student).for_root_accounts(@accounts_with_observer_permissions)
+            end
     raise ActiveRecord::RecordNotFound unless scope.exists?
 
     scope.destroy_all

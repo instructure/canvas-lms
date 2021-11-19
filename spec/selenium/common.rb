@@ -256,7 +256,7 @@ shared_context "in-process server selenium tests" do
       end
 
       if javascript_errors.present?
-        raise RuntimeError, javascript_errors.map(&:message).join("\n\n")
+        raise javascript_errors.map(&:message).join("\n\n")
       end
     end
   end

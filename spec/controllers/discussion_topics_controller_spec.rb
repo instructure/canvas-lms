@@ -1874,7 +1874,7 @@ describe DiscussionTopicsController do
       @topic.delayed_post_at = nil
       @topic.locked = false
       @topic.save!
-      delayed_post_time = Time.new(2018, 04, 15)
+      delayed_post_time = Time.new(2018, 4, 15)
       put('update', params: { course_id: @course.id, topic_id: @topic.id,
                               title: 'Updated Topic',
                               locked: true,

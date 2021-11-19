@@ -2594,7 +2594,11 @@ class CoursesController < ApplicationController
       @content_migration = @course.content_migrations.build(
         :user => @current_user, :source_course => @context,
         :context => @course, :migration_type => 'course_copy_importer',
-        :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual
+        :initiated_source => if api_request?
+                               in_app? ? :api_in_app : :api
+                             else
+                               :manual
+                             end
       )
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.migration_settings[:import_quizzes_next] = true if params.dig(:settings, :import_quizzes_next)
@@ -3849,9 +3853,11 @@ class CoursesController < ApplicationController
   end
 
   def manage_admin_users_perm
-    @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
-      :allow_course_admin_actions :
+    if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
+      :allow_course_admin_actions
+    else
       :manage_admin_users
+    end
   end
 
   def course_params

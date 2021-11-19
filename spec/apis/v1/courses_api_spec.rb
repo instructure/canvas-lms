@@ -1009,9 +1009,11 @@ describe CoursesController, type: :request do
          :open_enrollment, :self_enrollment, :license, :sis_course_id,
          :allow_student_forum_attachments, :public_description,
          :restrict_enrollments_to_course_dates].each do |attr|
-          expect(new_course.send(attr)).to eq([:start_at, :end_at].include?(attr) ?
-            Time.parse(post_params['course'][attr.to_s]) :
-            post_params['course'][attr.to_s])
+          expect(new_course.send(attr)).to eq(if [:start_at, :end_at].include?(attr)
+                                                Time.parse(post_params['course'][attr.to_s])
+                                              else
+                                                post_params['course'][attr.to_s]
+                                              end)
         end
         expect(new_course.account_id).to eql @account.id
         expect(new_course.enrollment_term_id).to eql term.id

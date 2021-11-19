@@ -129,7 +129,7 @@ module AttachmentFu # :nodoc:
           # TODO: This overwrites the file if it exists, maybe have an allow_overwrite option?
           FileUtils.mkdir_p(File.dirname(full_filename))
           FileUtils.cp(temp_path, full_filename)
-          File.chmod(attachment_options[:chmod] || 0644, full_filename)
+          File.chmod(attachment_options[:chmod] || 0o644, full_filename)
         end
         @old_filename = nil
         true

@@ -31,8 +31,11 @@ module Api::V1::Collaborator
                                 collaborator.group.id
 
       if includes.include?('collaborator_lti_id')
-        hash['collaborator_lti_id'] = collaborator.user ? Lti::Asset.opaque_identifier_for(collaborator.user, context: context) :
-          Lti::Asset.opaque_identifier_for(collaborator.group)
+        hash['collaborator_lti_id'] = if collaborator.user
+                                        Lti::Asset.opaque_identifier_for(collaborator.user, context: context)
+                                      else
+                                        Lti::Asset.opaque_identifier_for(collaborator.group)
+                                      end
       end
 
       if includes.include?('avatar_image_url')

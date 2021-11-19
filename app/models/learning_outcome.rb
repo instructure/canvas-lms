@@ -89,12 +89,15 @@ class LearningOutcome < ActiveRecord::Base
     context_root_account_id = context.try(:resolved_root_account_id)
 
     # find linked contexts
-    links = self.new_record? ? [] :
-            ContentTag.learning_outcome_links
-                      .preload(:context)
-                      .where(content_id: self, context_type: ['Account', 'Course'])
-                      .select(:context_type, :context_id)
-                      .distinct
+    links = if self.new_record?
+              []
+            else
+              ContentTag.learning_outcome_links
+                        .preload(:context)
+                        .where(content_id: self, context_type: ['Account', 'Course'])
+                        .select(:context_type, :context_id)
+                        .distinct
+            end
     link_root_account_ids = links.map { |link| link.context.resolved_root_account_id }
 
     self.root_account_ids = ([context_root_account_id] + link_root_account_ids).uniq.compact

@@ -2696,7 +2696,7 @@ describe Course, "tabs_available" do
       expected_tabs  = (custom_tabs + default_tab_ids).uniq
       # Home tab always comes first
       home_tab = default_tab_ids[0]
-      expected_tabs = expected_tabs.insert(0, expected_tabs.delete(home_tab))
+      expected_tabs.insert(0, expected_tabs.delete(home_tab))
 
       expect(available_tabs).to        eq expected_tabs
       expect(available_tabs.length).to eq default_tab_ids.length

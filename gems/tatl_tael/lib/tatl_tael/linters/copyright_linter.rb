@@ -106,7 +106,7 @@ module TatlTael
       end
 
       def remove_blank_lines(lines)
-        lines.reject { |line| line =~ /^\s+$/ }
+        lines.grep_v(/^\s+$/)
       end
 
       def valid_title?(title)

@@ -297,9 +297,11 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def possible_users
-    participant_type == 'User' ?
-      possible_participants(include_observers: true).uniq :
+    if participant_type == 'User'
+      possible_participants(include_observers: true).uniq
+    else
       possible_participants.flatten.map(&:participants).flatten.uniq
+    end
   end
 
   def instructors
@@ -317,9 +319,11 @@ class AppointmentGroup < ActiveRecord::Base
                                         else
                                           ->(c) { c.participating_students_by_date }
                                         end
-                     sub_contexts.empty? ?
-                       contexts.map(&participant_func).flatten :
+                     if sub_contexts.empty?
+                       contexts.map(&participant_func).flatten
+                     else
                        sub_contexts.map(&participant_func).flatten
+                     end
                    else
                      # FIXME?
                      sub_contexts.map(&:groups).flatten

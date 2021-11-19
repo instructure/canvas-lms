@@ -218,9 +218,11 @@ class Wiki < ActiveRecord::Base
       return self.wiki_pages.where(id: match[1].to_i).first
     end
 
-    scope = include_deleted ?
-      self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
-      self.wiki_pages.not_deleted
+    scope = if include_deleted
+              self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END"))
+            else
+              self.wiki_pages.not_deleted
+            end
     scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 

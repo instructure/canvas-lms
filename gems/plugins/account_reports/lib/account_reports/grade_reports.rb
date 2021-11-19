@@ -130,9 +130,11 @@ module AccountReports
     end
 
     def mgp_grade_export
-      terms = @account_report.parameters[:enrollment_term_id].blank? ?
-        root_account.enrollment_terms.active :
-        root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
+      terms = if @account_report.parameters[:enrollment_term_id].blank?
+                root_account.enrollment_terms.active
+              else
+                root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
+              end
 
       courses = root_account.all_courses.order(:id)
       courses = courses.where(enrollment_term_id: terms)

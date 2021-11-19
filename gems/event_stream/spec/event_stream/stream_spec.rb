@@ -153,7 +153,7 @@ describe EventStream::Stream do
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
-        self.database -> { nil }
+        self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
@@ -188,7 +188,7 @@ describe EventStream::Stream do
 
       stream = EventStream::Stream.new do
         self.backend_strategy -> { :active_record }
-        self.database -> { nil }
+        self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
@@ -466,7 +466,7 @@ describe EventStream::Stream do
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc lambda { |_record| nil }
+          @index.entry_proc lambda { |_record| }
           expect(@index_strategy).not_to receive(:insert)
           @stream.insert(@record)
         end

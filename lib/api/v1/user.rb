@@ -238,7 +238,7 @@ module Api::V1::User
     return false if context.nil? || current_user.nil?
 
     @user_json_is_admin ||= {}
-    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= (
+    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= begin
       if context.is_a?(::UserProfile)
         permissions_context = permissions_account = @domain_root_account
       else
@@ -250,7 +250,7 @@ module Api::V1::User
         permissions_account.membership_for_user(current_user) ||
         permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )
-    )
+    end
   end
 
   API_ENROLLMENT_JSON_OPTS = [:id,
@@ -378,9 +378,11 @@ module Api::V1::User
 
   def get_context_groups(context)
     # make sure to preload groups if using this
-    context.is_a?(Group) ?
-      [context.id] :
+    if context.is_a?(Group)
+      [context.id]
+    else
       context.groups.map(&:id)
+    end
   end
 
   def sis_id_context(context)

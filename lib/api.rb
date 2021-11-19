@@ -212,7 +212,7 @@ module Api
   # return in integer format if possible
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
-    ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
+    ids.map { |id| id.to_s.strip }.grep(ID_REGEX).map do |id|
       /\A\d+\z/.match?(id) ? id.to_i : id
     end
   end

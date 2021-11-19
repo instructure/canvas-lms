@@ -98,7 +98,7 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
         Loaders::AssociationLoader.for(ContextModule, :context)
                                   .load(mod)
-                                  .then { check_read_permission.(mod) }
+                                  .then { check_read_permission.call(mod) }
       end
     when "ModuleItem"
       Loaders::IDLoader.for(ContentTag).load(id).then do |tag|
@@ -118,7 +118,7 @@ module GraphQLNodeLoader
           Promise.all([
                         Loaders::AssociationLoader.for(Wiki, :course).load(wiki),
                         Loaders::AssociationLoader.for(Wiki, :group).load(wiki),
-                      ]).then { check_read_permission.(page) }
+                      ]).then { check_read_permission.call(page) }
         end
       end
     when "PostPolicy"

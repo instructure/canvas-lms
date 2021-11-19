@@ -137,7 +137,7 @@ module BookmarkedCollection
         columns.each.with_index.all? do |col, i|
           type = TYPE_MAP[column_definitions[col][:type]]
           nullable = column_definitions[col][:null]
-          type && ((nullable && bookmark[i].nil?) || type.(bookmark[i]))
+          type && ((nullable && bookmark[i].nil?) || type.call(bookmark[i]))
         end
     end
 

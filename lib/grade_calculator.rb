@@ -850,9 +850,11 @@ class GradeCalculator
     # assignment groups that have no points possible have to be dropped
     # differently (it's a simpler case, but not one that fits in with our
     # usual bisection approach)
-    kept = (cant_drop + submissions).any? { |s| s[:total] > 0 } ?
-      drop_pointed(submissions, cant_drop, keep_highest, keep_lowest) :
-      drop_unpointed(submissions, keep_highest, keep_lowest)
+    kept = if (cant_drop + submissions).any? { |s| s[:total] > 0 }
+             drop_pointed(submissions, cant_drop, keep_highest, keep_lowest)
+           else
+             drop_unpointed(submissions, keep_highest, keep_lowest)
+           end
 
     (kept + cant_drop).tap do |all_kept|
       loggable_kept = all_kept.map { |s| loggable_submission(s) }
@@ -921,9 +923,11 @@ class GradeCalculator
       x, kept = yield(q_mid, submissions, cant_drop, keep)
       threshold = 1 / (2 * keep * (max_total**2))
       until q_high - q_low < threshold
-        x < 0 ?
-          q_high = q_mid :
-          q_low  = q_mid
+        if x < 0
+          q_high = q_mid
+        else
+          q_low = q_mid
+        end
         q_mid = (q_low + q_high) / 2
 
         # bail if we can't can't ever satisfy the threshold (floats!)

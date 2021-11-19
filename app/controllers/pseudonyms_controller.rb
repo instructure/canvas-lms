@@ -413,9 +413,11 @@ class PseudonymsController < ApplicationController
       @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors, :status => :bad_request
     elsif @pseudonym.destroy
-      api_request? ?
-        render(:json => pseudonym_json(@pseudonym, @current_user, session)) :
+      if api_request?
+        render(:json => pseudonym_json(@pseudonym, @current_user, session))
+      else
         render(:json => @pseudonym)
+      end
     else
       render :json => @pseudonym.errors, :status => :bad_request
     end

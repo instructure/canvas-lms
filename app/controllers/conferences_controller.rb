@@ -177,9 +177,11 @@ class ConferencesController < ApplicationController
     return unless @current_user
 
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = @context.grants_right?(@current_user, :manage_content) ?
-      @context.web_conferences.active :
-      @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+    conferences = if @context.grants_right?(@current_user, :manage_content)
+                    @context.web_conferences.active
+                  else
+                    @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+                  end
     conferences = conferences.with_config_for(context: @context).order("created_at DESC, id DESC")
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
   end

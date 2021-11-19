@@ -44,8 +44,11 @@ module ConditionalRelease
                                                            .each_with_object({}) { |action, acc| acc[action.student_id] = action.assignment_set.assignment_set_associations.map(&:assignment_id) }
           student_ids.each do |student_id|
             previous_assignment_ids = all_previous_assignment_ids[student_id]
-            follow_on_submissions_hash[student_id] = previous_assignment_ids ?
-              all_submission_data.select { |s| s[:user_id] == student_id && previous_assignment_ids.include?(s[:assignment_id]) } : []
+            follow_on_submissions_hash[student_id] = if previous_assignment_ids
+                                                       all_submission_data.select { |s| s[:user_id] == student_id && previous_assignment_ids.include?(s[:assignment_id]) }
+                                                     else
+                                                       []
+                                                     end
           end
         end
 
@@ -63,13 +66,15 @@ module ConditionalRelease
           user_details = nil
           ranges.each do |b|
             if b[:scoring_range].contains_score score
-              user_details ||= assignment.anonymize_students? ?
-                { :name => t('Anonymous User') } :
-                {
-                  :id => user.id,
-                  :name => user.short_name,
-                  :avatar_image_url => AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
-                }
+              user_details ||= if assignment.anonymize_students?
+                                 { :name => t('Anonymous User') }
+                               else
+                                 {
+                                   :id => user.id,
+                                   :name => user.short_name,
+                                   :avatar_image_url => AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
+                                 }
+                               end
               student_record = {
                 score: score,
                 submission_id: submission[:id],
@@ -91,9 +96,11 @@ module ConditionalRelease
 
       def student_details(rule, student_id)
         previous_assignment = AssignmentSetAction.current_assignments(student_id, rule.assignment_sets).take
-        follow_on_assignment_ids = previous_assignment ?
-          previous_assignment.assignment_set.assignment_set_associations.pluck(:assignment_id) :
-          []
+        follow_on_assignment_ids = if previous_assignment
+                                     previous_assignment.assignment_set.assignment_set_associations.pluck(:assignment_id)
+                                   else
+                                     []
+                                   end
         possible_assignment_ids = follow_on_assignment_ids + [rule.trigger_assignment_id]
 
         submissions_by_assignment_id = rule.course.submissions.where(:assignment_id => possible_assignment_ids, :user_id => student_id).to_a.index_by(&:assignment_id)

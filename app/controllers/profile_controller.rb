@@ -303,7 +303,7 @@ class ProfileController < ApplicationController
   #   ]
   # @returns [Avatar]
   def profile_pics
-    @user = if api_request? then api_find(User, params[:user_id]) else @current_user end
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     if authorized_action(@user, @current_user, :update_avatar)
       render :json => avatars_json_for_user(@user)
     end
@@ -338,10 +338,13 @@ class ProfileController < ApplicationController
     end
 
     respond_to do |format|
-      user_params = params[:user] ? params[:user]
-        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
-        : {}
+      user_params = if params[:user]
+                      params[:user]
+                        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+                                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
+                    else
+                      {}
+                    end
       unless @user.user_can_edit_name?
         user_params.delete(:name)
         user_params.delete(:short_name)

@@ -200,11 +200,11 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
       # create
       json = update(@student1, "blarg")
-      check.("blarg")
+      check.call("blarg")
 
       # update
       json = update(@student1, "shmarg")
-      check.("shmarg")
+      check.call("shmarg")
     end
   end
 

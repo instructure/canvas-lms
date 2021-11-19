@@ -663,7 +663,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.reject { |m| m =~ /(^__|^\W|^binding$|^untaint$)/ })
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/))
 
       def initialize(subject, ancestor)
         @subject = subject

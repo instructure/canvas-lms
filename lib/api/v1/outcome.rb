@@ -58,9 +58,11 @@ module Api::V1::Outcome
   # (if any).
   def outcome_json(outcome, user, session, opts = {})
     can_edit = lambda do
-      outcome.context_id ?
-          outcome.context.grants_right?(user, session, :manage_outcomes) :
-          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+      if outcome.context_id
+        outcome.context.grants_right?(user, session, :manage_outcomes)
+      else
+        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+      end
     end
 
     json_attributes = %w[id context_type context_id vendor_guid display_name]
@@ -107,9 +109,11 @@ module Api::V1::Outcome
       hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
       hash['subgroups_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_subgroups], :id => outcome_group.id
       hash['outcomes_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_outcomes], :id => outcome_group.id
-      hash['can_edit'] = outcome_group.context_id ?
-        outcome_group.context.grants_right?(user, session, :manage_outcomes) :
-        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+      hash['can_edit'] = if outcome_group.context_id
+                           outcome_group.context.grants_right?(user, session, :manage_outcomes)
+                         else
+                           Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                         end
 
       unless style == :abbrev
         hash['import_url'] = polymorphic_path [:api_v1, path_context, :outcome_group_import], :id => outcome_group.id
@@ -162,8 +166,11 @@ module Api::V1::Outcome
       )
 
       unless outcome_link.deleted?
-        can_manage = outcome_link.context ? outcome_link.context.grants_right?(user, session, :manage_outcomes) :
-          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+        can_manage = if outcome_link.context
+                       outcome_link.context.grants_right?(user, session, :manage_outcomes)
+                     else
+                       Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                     end
         hash['can_unlink'] = can_manage && outcome_link.can_destroy?
       end
 
