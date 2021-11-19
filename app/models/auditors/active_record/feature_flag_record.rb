@@ -30,8 +30,7 @@ module Auditors::ActiveRecord
     belongs_to :user
     belongs_to :root_account,
                class_name: 'Account',
-               inverse_of: :auditor_feature_flag_records,
-               foreign_key: 'root_account_id'
+               inverse_of: :auditor_feature_flag_records
 
     class << self
       include Auditors::ActiveRecord::Model

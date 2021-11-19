@@ -305,7 +305,7 @@ describe "groups" do
         skip_if_safari(:alert)
         get files_page
         add_folder
-        delete(0, :toolbar_menu)
+        delete_file(0, :toolbar_menu)
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
@@ -313,7 +313,7 @@ describe "groups" do
         skip_if_safari(:alert)
         add_test_files
         get files_page
-        delete(0, :toolbar_menu)
+        delete_file(0, :toolbar_menu)
         wait_for_ajaximations
         expect(f("body")).not_to contain_css('.ef-item-row')
       end

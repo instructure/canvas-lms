@@ -21,7 +21,7 @@
 class ParallelImporter < ActiveRecord::Base
   belongs_to :sis_batch
   belongs_to :attachment
-  has_many :sis_batch_errors, foreign_key: :parallel_importer_id, inverse_of: :parallel_importer
+  has_many :sis_batch_errors, inverse_of: :parallel_importer
 
   scope :running, -> { where(workflow_state: 'running') }
   scope :completed, -> { where(workflow_state: 'completed') }

@@ -411,6 +411,7 @@ describe GradeSummaryPresenter do
       expect(I18n).to receive(:t).with('Name')
       expect(I18n).to receive(:t).with('Assignment Group')
       expect(I18n).to receive(:t).with('Module')
+      allow(I18n).to receive(:t).with(any_args)
 
       presenter.sort_options
     end

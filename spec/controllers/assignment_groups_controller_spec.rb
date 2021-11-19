@@ -109,7 +109,7 @@ describe AssignmentGroupsController do
             only_visible_to_overrides: true,
             workflow_state: 'published'
           )
-          get :index, index_params
+          get :index, **index_params
           assignment_group_response = json_parse(response.body).first
           expect(assignment_group_response['integration_data']).to eq({})
         end
@@ -123,7 +123,7 @@ describe AssignmentGroupsController do
             only_visible_to_overrides: true,
             workflow_state: 'published'
           )
-          get 'index', index_params
+          get 'index', **index_params
           assignment_group_response = json_parse(response.body).last
           expect(assignment_group_response['integration_data']).to eq({ 'something' => 'else' })
         end
