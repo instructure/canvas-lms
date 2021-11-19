@@ -25,13 +25,10 @@ module Lti
     include ApiServiceHelper
 
     attr_accessor :request
+    attr_reader :tool_proxy
 
     def initialize(request)
       @request = request
-    end
-
-    def tool_proxy
-      @tool_proxy
     end
   end
 

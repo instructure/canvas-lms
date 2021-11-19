@@ -154,8 +154,8 @@ class WebConference < ActiveRecord::Base
     @user_setting_fields ||= {}
   end
 
-  def self.user_setting_fields=(val)
-    @user_setting_fields = val
+  class << self
+    attr_writer :user_setting_fields
   end
 
   def self.user_setting_field_name(key)
@@ -184,8 +184,8 @@ class WebConference < ActiveRecord::Base
     @external_urls ||= {}
   end
 
-  def self.external_urls=(val)
-    @external_urls = val
+  class << self
+    attr_writer :external_urls
   end
 
   def self.external_url(name, options)

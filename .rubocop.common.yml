@@ -334,6 +334,8 @@ Style/TernaryParentheses:
   Severity: error
 Style/TrailingCommaInArguments:
   Severity: error
+Style/TrivialAccessors:
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhenThen:

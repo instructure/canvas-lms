@@ -23,25 +23,14 @@ require 'canvas_http'
 module CanvasPandaPub
   class << self
     attr_accessor :logger, :cache, :on_work_unit_end
-
-    def plugin_settings=(settings)
-      @plugin_settings = settings
-    end
+    attr_writer :plugin_settings, :max_queue_size, :process_interval
 
     def plugin_settings
       @plugin_settings.call
     end
 
-    def max_queue_size=(size)
-      @max_queue_size = size
-    end
-
     def max_queue_size
       @max_queue_size.call
-    end
-
-    def process_interval=(interval)
-      @process_interval = interval
     end
 
     def process_interval
