@@ -46,7 +46,7 @@ def init
   end
 end
 
-def contents
+def contents # rubocop:disable Style/TrivialAccessors not a Class
   @contents
 end
 

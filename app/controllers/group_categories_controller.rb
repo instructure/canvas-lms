@@ -696,6 +696,7 @@ class GroupCategoriesController < ApplicationController
   def body_file
     file_obj = request.body
 
+    # rubocop:disable Style/TrivialAccessors not a Class
     file_obj.instance_exec do
       def set_file_attributes(filename, content_type)
         @original_filename = filename
@@ -710,6 +711,7 @@ class GroupCategoriesController < ApplicationController
         @original_filename
       end
     end
+    # rubocop:enable Style/TrivialAccessors
 
     if params[:extension]
       file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
