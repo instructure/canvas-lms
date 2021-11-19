@@ -1718,6 +1718,7 @@ nb-x-k12:
   add_items_to_score_range_297d413b: "Legg elementer til resultatområdet"
   add_link_5c01c1e8: "Legg til lenke"
   add_link_fc336ed6: "Legg til lenke"
+  add_manage_conclude_delete_publish_reset_8a5aa902: "legg til / administrer / avslutt / slett / publiser / tilbakestill"
   add_mastery_level_76469d98: "Legg til ekspertisenivå"
   add_media_cfa37b54: "Legg til medie"
   add_moderator_review_copy_1st_a484c813: "Legg til vurdering fra moderator (1. kopi)"
@@ -1734,8 +1735,11 @@ nb-x-k12:
   add_observers_to_courses_6f494a29: "Legg til observatører til fagene"
   add_old_quiz_f4c546a: "Legg til eldre test"
   add_outcome_597054ad: "Legg til mål"
+  add_outcome_title_ce9dff87: "Legg til mål %{title}"
+  add_outcomes_36272787: "Legg til mål"
   add_outcomes_to_account_4647776f: "Legg til Mål til Konto"
   add_outcomes_to_course_88ba09be: "Legg til Mål til Fag"
+  add_outcomes_to_groupname_8c33d118: "Legg til mål til \"%{groupName}\""
   add_override_da70f198: "Legg til overskridelse"
   add_people_7948b7da: "Legg til deltakere"
   add_people_7ee4b2ec: "Legg til deltakere"
@@ -1781,12 +1785,14 @@ nb-x-k12:
   add_user_s_by_b2549f89: "Legg til bruker(e) med"
   add_users_b10c7fb1: "Legg til brukere"
   add_users_to_name_b8109bbb: "Legg brukere til %{name}"
+  add_word_count_to_speedgrader_d04dd417: "Legg til ordtelling i SpeedGrader"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til dine oppgaver. Du kan lage en lang liste, eller bryte dem opp i grupper - og til og med spesifisere vekting for hver oppgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg inn Zendesk Instances tilpassede felt-ID for hver av følgende (felt som ikke har ID-er, vil ikke bli loggført):"
   added_caption_1895db92: "La til teksting"
   added_e8a39b2: "Lagt til"
   added_mastery_level_dd4792d1: "Slett ekspertisenivå"
   added_new_proficiency_rating_e30cab8a: "La til ferdighetsvurdering"
+  added_outcome_title_3c258a9: "La til mål %{title}"
   adding_rss_feed_f1202567: "Legg til RSS-strøm"
   adding_to_library_b552868: "Legger til i Bibliotek"
   additional_comments_9aed10bb: Tilleggskommentarer
@@ -1919,6 +1925,7 @@ nb-x-k12:
   all_accounts_3bafc860: "Alle kontoer"
   all_assignment_groups_a65e9e46: "Alle oppgavegruppene"
   all_assignments_b79a4d6a: "Alle oppgaver"
+  all_changes_published_27a53ffd: "Alle endringer publisert"
   all_changes_were_saved_f6f3ddcc: "Alle endringer ble lagret"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle lukkedatoer må være på eller etter sluttdatoen"
   all_comments_are_sent_to_the_whole_group_284591e7: "Alle kommentarer sendes til hele gruppen"
@@ -1947,6 +1954,7 @@ nb-x-k12:
   all_my_files_a0213441: "Alle mine filer"
   all_my_sections_375248b3: "Alle mine seksjoner"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle mål fra %{groupTitle} ble lagt til dette faget."
+  all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle mål fra %{groupTitle} ble lagt til %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle mål fra %{groupTitle} ble lagt til denne kontoen."
   all_roles_f3bba14d: "Alle roller"
   all_rubrics_5114c466: "Samtlige vurderingskriterier"
@@ -1982,6 +1990,7 @@ nb-x-k12:
   allow_final_grade_override_8cf4336b: "Tillat oppheving av avsluttende vurdering"
   allow_final_grade_override_a21a79ee: "Tillat oppheving av avsluttende vurdering"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "La Apollo å lagre graphQL-forespørsler i en brukers nettleser for å øke hastigheten på opplevelsen"
+  allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Tillat vurderingsoversikt-brukere å vise og eksportere elev fornavn og etternavn i separate kolonner."
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillat å importere QTI og Common Cartridge inn i NY Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat import av QTI og Standardformat inn i Quizzes.Next."
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Tillat import av tredjeparts pakker inn i nye tester"
@@ -2649,6 +2658,7 @@ nb-x-k12:
       navnet deres når det vises i brukergrensesnittet.
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Tillater brukere å lagre og søke på ofte brukte tilbakemeldinger i et bibliotek med kommentarer som skal brukes i SpeedGrader."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillater brukere med internasjonale telefonnumre å motta tekstmeldinger fra Canvas."
+  also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Merk at Microsoft Teams ikke kan støtte fag med mer enn %{max_enrollments} påmeldinger eller mer enn %{max_owners} eiere. Hvis du har et stort fag, kan du oppleve synkroniseringsproblemer hvis disse grenseverdiene er nådd."
   alternate_description_for_parent_student_display_93fa6ce6: "Alternativ beskrivelse (for foreldre-/elevvisning)"
   alternative_description_for_parent_student_display_c6350ae3: "Alternativ beskrivelse (for foreldre-/elevvisning)"
   alumno_88c80e37: Alumno
@@ -3019,6 +3029,7 @@ nb-x-k12:
   application_not_authorized_for_tenant_please_make__4d5e2607: "Søknad ikke godkjent for bruker. Sørg for at administratoren din har gitt oss tilgang til å bruke din Microsoft-bruker."
   application_secret_e6803c7e: Applikasjonskode
   applied_cc7be774: Påført
+  applied_filters_63a90ccd: "Brukte filtre:"
   apply_781a2546: Søk
   apply_date_range_selection_cc4351ed: "Bruk valg av datointervall"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Bruk filtre. Merk: Ved å klikke på denne tasten vil siden bli lastet opp på nytt."
@@ -4470,6 +4481,7 @@ nb-x-k12:
       fjern merkingen fra avmerkingsboksen 'La elever organisere egne grupper' i faginnstillinger.
   by_default_students_are_able_to_create_groups_to_r_d4901649: "Som standard kan elever opprette grupper; for å forhindre at elevene oppretter grupper, fjern merkingen fra avmerkingsboksen «La elevene organisere egne grupper» i faginnstillinger."
   by_default_students_can_always_create_groups_in_a__149d08b7: "Som standard kan elever alltid opprette grupper i et fag. for å forhindre at elever oppretter grupper må «Fag - legg til / rediger / slett» være aktivert og merkingen for avmerkingsboksen «La elever organisere egne grupper» i faginnstillinger være fjernet."
+  by_default_students_can_always_create_groups_in_a__5727f4cf: "Som standard kan elever alltid opprette grupper i et fag. For å forhindre at elever oppretter grupper, må ‘Fag - administrer’ være aktivert og merkingen i avmerkingsboksen ‘La elever organisere egne grupper’ i faginnstillinger være fjernet."
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "Som standard kan elever alltid opprette grupper i et fag."
   by_default_students_can_always_create_groups_in_a__af000dd: "Som standard kan elever alltid opprette grupper i et fag. For å begrense elever fra å opprette grupper, må Administrer fag: Admin - administrer/oppdater være aktivert og avkrysningsfeltet ‘La elever organisere sine egne grupper’ i faginnstillinger ikke være valgt."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Som standard kan elever alltid opprette grupper i et fag. For å forhindre at elever oppretter grupper må ‘Fag - administrer/oppdater’ være aktivert og merkingen i avmerkingsboksen ‘La elever organisere egne grupper’ i faginnstillinger være fjernet."
@@ -5379,6 +5391,7 @@ nb-x-k12:
   collaborations_tutorial_tray_9219d9d: "Samarbeid Tutorial Tray"
   collapse_all_50275533: "Kollaps alle"
   collapse_all_modules_e092807c: "Sammenfold alle moduler"
+  collapse_description_for_outcome_title_bcd9b8c9: "Kollaps beskrivelse for mål %{title}"
   collapse_discussion_thread_52bab65a: "Skjul diskusjonstråd"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
   collapse_outcome_description_de471564: "Trekk inn målbeskrivelse"
@@ -6573,6 +6586,9 @@ nb-x-k12:
   count_criteria_22927713: 
     one: "1 kriterie"
     other: "%{count} kriterium"
+  count_days_de0c6a32: 
+    one: "1 dag"
+    other: "%{count} dager"
   count_discussions_found_fc326362: "%{count} diskusjoner oppdaget."
   count_errors_prohibited_this_note_from_being_saved_fb546efe: 
     one: "1 feil stoppet dette notatet fra å lagres:"
@@ -6737,6 +6753,9 @@ nb-x-k12:
     one: "1 innlevering trenger vurdering"
     other: "%{count}  innleveringer trenger vurdering"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} ville bli slettet og overstiger den fastsatte grensen for %{change_threshold}%"
+  count_unpublished_changes_a366ed45: 
+    one: "%{count} upubliserte endringer"
+    other: "%{count} upubliserte endringer"
   count_unread_cff5855: "%{count} ulest."
   count_unread_messages_e312aa7b: 
     one: "En ulest melding."
@@ -6750,6 +6769,9 @@ nb-x-k12:
   count_weeks_11fbd2dc: 
     one: "1 uke"
     other: "%{count} uker"
+  count_words_e0b79b82: 
+    one: "1 ord"
+    other: "%{count} ord"
   country_is_required_b0afbf52: "Land er påkrevd"
   country_or_region_26ea046c: "Land eller region"
   country_or_region_is_required_86917b39: "Land eller region kreves"
@@ -7373,7 +7395,7 @@ nb-x-k12:
         sis_source_id: SIS-ID
         start_at: Starter
         storage_quota: Lagringsplass
-        sync_enrollments_from_homeroom: "Synkroniser påmeldinger og fagets start-/sluttdatoer fra homeroom"
+        sync_enrollments_from_homeroom: "Synkroniser påmeldinger og temaets start-/sluttdatoer fra homeroom"
         template: "Aktiver fag som en fagmal"
         time_zone: Tidssone
         turnitin_comments: Turnitin-kommentarer
@@ -7544,6 +7566,7 @@ nb-x-k12:
   courses_course_templates_5a3fbafd: "Fag - fagmaler"
   courses_delete_20c9beb2: "Fag - slett"
   courses_edit_cbace938: "Fag - rediger"
+  courses_manage_3ea9687f: "Fag - administrer"
   courses_manage_update_d3e9263e: "Fag - administrer/oppdater"
   courses_navigation_menu_b3638384: Fag-navigasjonsmeny
   courses_over_time_41dc0428: "Fag over tid"
@@ -7599,6 +7622,7 @@ nb-x-k12:
   create_new_course_e3ef9cd0: "Opprett et nytt fag"
   create_new_discussions_6ab69da2: "Opprett ny diskusjon"
   create_new_e0946c49: "Opprett ny"
+  create_new_filter_c244aa92: "Opprett nytt filter"
   create_new_group_bf9561d4: "Opprett ny gruppe"
   create_new_group_fca5cc73: "Opprett ny gruppe"
   create_new_group_set_13b1f62a: "Lag nye gruppeinnstillinger"
@@ -7748,6 +7772,7 @@ nb-x-k12:
   current_score_6c81792: "Gjeldende resultat"
   current_score_74777363: "gjeldende resultat"
   current_slack_api_key_9eba6a5: "Nåværende Slack API-nøkkel"
+  current_state_baac9c8: "nåværende tilstand:"
   current_theme_62e5e8cf: "Gjeldende tema"
   current_total_67bf5f72: "Nåværende Totalt:"
   current_volume_level_c55ab825: "Gjeldende volumnivå"
@@ -8185,6 +8210,10 @@ nb-x-k12:
   description_61f4296: "* Beskrivelse"
   description_for_mastery_level_position_description_cc17114b: "Beskrivelse for ekspertisenivå %{position} %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Beskrivelse for ferdighetsvurdering %{position} %{description}"
+  descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} ble endret fra %{formattedOldValue} til %{formattedNewValue}."
+  descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} ble satt til %{formattedNewValue}."
+  descriptivename_was_turned_off_38771a19: "%{descriptiveName} ble slått av."
+  descriptivename_was_turned_on_132583bb: "%{descriptiveName} ble slått på."
   designer_c458392: Designer
   designers_add_c6335849: "Designere - legg til"
   designers_add_fe7e1ea9: "Designere - Legg til"
@@ -8660,6 +8689,7 @@ nb-x-k12:
   discussions_post_62f64091: "Diskusjoner - legg ut"
   discussions_redesign_b505952d: "Nytt design av diskusjoner"
   discussions_redesign_isolated_view_78626c74: "Nytt design av diskusjoner - Isolert visning"
+  discussions_redesign_reporting_f4abcc37: "Redesign av diskusjoner - Rapportering"
   discussions_tutorial_tray_4ef79bcc: "Diskusjoner Tutorial Tray"
   discussions_view_c6818792: "Diskusjoner - se"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskusjoner med grupper kan ikke være seksjonspesifikk"
@@ -9680,6 +9710,7 @@ nb-x-k12:
   expand_closed_caption_languages_2642db5b: "Utvid undertekst-språk"
   expand_collapse_lang_73edc33c: "Utvid/skjul %{lang}"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Utvid/minsk %{title} målgruppen, eleven har oppnådd ekspertise i %{mastery_count} av %{count} mål"
+  expand_description_for_outcome_title_abc8f30: "Utvid beskrivelse for mål %{title}"
   expand_discussion_thread_fcbb2bcc: "Vis diskusjonstråden"
   expand_global_navigation_2c28d5d4: "Utvid global navigasjon"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvid listen over gruppemedlemmer for %{groupName}"
@@ -9935,6 +9966,7 @@ nb-x-k12:
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Filen %{filename} kunne ikke inkluderes i dette ePub-dokumentet. Vennligst se egen zip-fil for tilgang."
   file_has_no_data_213a4540: "Filen har ikke data"
   file_has_no_outcomes_data_1517801f: "Filen har ikke måldata"
+  file_has_not_finished_uploading_cfba3b2f: "Filen er ikke ferdig opplastet"
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fillisten oppdatert"
   file_menu_cc0ca54: Filmeny
@@ -10462,6 +10494,7 @@ nb-x-k12:
   gradebook_export_failed_reason_2b0f6c53: "Eksport av vurderingsoversikt mislykket: %{reason}"
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Feilretting av sorteringsrekkefølge i vurderingsoversikt-eksport (Tally-219)"
   gradebook_export_started_723461b9: "Eksport av vurderingsoversikt startet"
+  gradebook_filters_fc25f772: Vurderingsoversiktfiltre
   gradebook_history_a3e8e0b4: "Historisk vurderingsoversikt"
   gradebook_history_b03f8524: "Vurderingsoversikt historie ..."
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: "Vurderingsoversikt import reserverte navn feilretting (APG-122)"
@@ -11507,6 +11540,7 @@ nb-x-k12:
       Hvis et LTI-verktøy konfigurert med plasseringen er installert, vises en ny oppføring i
       rullegardinmenyen for oppgaveinnleveringstype for raskt å konfigurere oppgaven for verktøyet
   if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "Hvis Blueprint-fag - legg til / rediger / forbinde / slett og Fag - administrer/oppdater er aktivert, men Oppgaver og tester - rediger ikke er aktivert, kan blueprint låseinnstillinger for en oppgave administreres på oppgavens detaljside."
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Hvis Blueprint-fag - legg til / rediger / forbinde / slett og Fag - administrer er aktivert, men Oppgaver og tester - rediger ikke er aktivert, kan blueprint låseinnstillinger for en oppgave administreres på oppgavens detaljside."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Hvis både 'Vurderinger - rediger' og 'Vurderinger - vis alle vurderinger' er deaktiverte vil vurderingsoversikten være skjult fra fagnavigering."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Hvis både «Vurderinger - rediger» og «Vurderinger - vis alle vurderinger» er deaktiverte vil vurderingsoversikten være skjult fra fagnavigering."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Hvis både 'Vurderinger- rediger' og 'Vurderinger - vis alle vurderinger' er deaktiverte vil Vurderingsoversikten være skjult fra Fagnavigering."
@@ -11516,6 +11550,8 @@ nb-x-k12:
   if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "Hvis fagsynlighet er begrenset til brukere som er registrert i faget vil denne tillatelsen la brukeren vise faginnhold uten å være registrert i faget."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Hvis “Fag - legg til / rediger / slett” og “Fag - angre sletting” også er aktivert, kan en bruker på kontonivå gjenopprette slettede fag i Administratorverktøy."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "Hvis ‘fag - legg til’ er aktivert og ‘fag - vis liste’ er deaktivert, kan brukere legge til et nytt fag med ‘Legg til et nytt fag’-knappen i kontoinnstillinger."
+  if_courses_manage_and_courses_undelete_are_also_en_9047d4b3: "Hvis Fag - administrer og Fag - angre sletting også er aktivert, kan en bruker på kontonivå gjenopprette slettede fag i Administratorverktøy."
+  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Hvis Fag - administrer er aktivert, men Blueprint-fag – legg til / rediger / forbinde / slett ikke er aktivert, kan brukere fremdeles synkronisere Blueprint-fag og vise Synkroniseringslogg."
   if_courses_manage_update_and_courses_undelete_are__670ab844: "Hvis Fag - administrer/oppdater og Fag - angre sletting også er aktivert, kan en bruker på kontonivå gjenopprette slettede fag i Administratorverktøy."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Hvis deaktivert blir mål-siden skrivebeskyttet og skjuler «Administrer vurderingskriterier»-knappen. Brukeren kan fortsatt gå inn i individuelle oppgavevurderingskriterier gjennom oppgaver."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Hvis deaktivert kan brukeren fortsatt vise og laste ned filer som en zip-fil."
@@ -11825,6 +11861,7 @@ nb-x-k12:
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktive innskrivninger"
   inactive_enrollments_bd1831ea: "Inaktive påmeldinger"
+  inappropriate_1930c574: Upassende
   inbox_bb245a60: Innboks
   include_a_download_link_next_to_each_file_link_in__481761de: "Inkluder en nedlastingslenke til hver fillenke i RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluder en lenke til et screeencast/skjermbilde ved å bruke noe sånt som *Jing*."
@@ -12827,6 +12864,7 @@ nb-x-k12:
   lti_launch_error_41eac9a: "Feil ved oppstart av LTI"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI flere oppgaver dyplenking"
   lti_report_2b6193ab: LTI-rapporter
+  lti_submissions_require_a_url_to_submit_85ca9988: "LTI-innleveringer krever en URL for innsendelse"
   luxembourg_352_85f4124d: "Luxembourg (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-importør
@@ -13058,6 +13096,8 @@ nb-x-k12:
     messages: 
       submitting: "Leverer mediefil..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Medier venter på konvertering, prøv igjen litt senere."
+  media_objects: 
+    media_objects_not_configured: "Medieobjekter ikke konfigurert"
   media_objects_c2fa37cd: Medieobjekter
   media_over_time_d9332e25: "media over tid"
   media_record_not_available_f78c16dd: "Ikke tilgjengelig medieinnspilling"
@@ -13076,6 +13116,8 @@ nb-x-k12:
   membership_service_configuration_d8ba5a74: "Medlems-service konfigurasjon"
   mentions_error_page_fd84c53c: "Feilside for nevninger"
   menu_39cb0e8e: Meny
+  menu_for_group_title_fbf60567: "Meny for gruppe %{title}"
+  menu_for_outcome_title_1d93378d: "Meny for mål %{title}"
   menu_options_9b6b0b5c: Menyalternativer
   message: 
     default_subject: "Canvas varsel"
@@ -13107,6 +13149,7 @@ nb-x-k12:
     recipients: "Mottakere:"
   message_students_for_context_ee62ff92: "Gi melding til elevene om %{context}"
   message_students_for_course_name_e55f8077: "Send beskjed til elever i %{course_name}"
+  message_students_for_groupcategoryname_cf245ca4: "Gi melding til elevene om %{groupCategoryName}"
   message_students_who_369b8488: "Send melding til elever som..."
   message_students_who_57f07a41: "Send melding til elever som"
   message_students_who_778ce759: "Send melding til elever som"
@@ -13883,6 +13926,16 @@ nb-x-k12:
         course_starts_next_week: "Faget ditt starter neste uke"
     dialog: 
       title: "Send et svar"
+    discussion_entry_reported: 
+      email: 
+        body: "Rapportert som {report_type}: %{user}, %{course}"
+        html: 
+          body: "Rapportert som %{report_type}: %{user}, %{course}"
+          link: "Klikk for å se diskusjonen"
+          subject: "Rapportert svar i %{discussion_topic}, %{course}"
+        subject: "Rapportert svar i %{discussion_topic}, %{course}"
+      summary: 
+        subject: "Rapportert svar i %{discussion_topic}, %{course}"
     email: 
       footer: |-
           Du mottok denne e-posten fordi du deltar i én eller flere klasser vha. Canvas. For å endre eller slå av e-postvarsler, besøk: 
@@ -14763,6 +14816,9 @@ nb-x-k12:
   messages_send_to_entire_class_b8c5c704: "Meldinger - send til hele klassen"
   messages_send_to_individual_course_members_50ac20e1: "Meldinger - send til individuelle fagdeltagere"
   messages_sent_b851d0dd: "Meldinger sent"
+  messages_unarchived_df1a4b97: 
+    one: "Melding fjernet fra arkiv!"
+    other: "Meldinger fjernet fra arkiv!"
   method_c2a4e17a: Metode
   mexico_52_60d635c7: "Mexico (+52)"
   mfa_required_ca66e177: "MFA kreves"
@@ -14953,6 +15009,7 @@ nb-x-k12:
   more_options_e89670cf: "Flere alternativer"
   more_people_options_730e9686: "Alternativer for flere deltakere"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Flere resultater ble lagt til på bunnen av siden."
+  more_submission_options_c8d50818: "Flere innsendingsalternativer"
   more_than_999_submissions_need_grading_bc087dd0: "Mer enn 999 innleveringer trenger vurdering"
   more_than_a19b440: "%{more_than}+"
   more_video_conferencing_tools_f55088d5: "Flere videokonferanseverktøy"
@@ -15209,6 +15266,8 @@ nb-x-k12:
   new_gradebook_plagiarism_indicator_8dd22971: "Ny plagiatindikator for vurderingsoversikt"
   new_group_category_66be9cbd: "Ny gruppekategori"
   new_group_set_7241a581: "Nytt gruppesett"
+  new_mention_ad04b872: "Ny benevnelse"
+  new_mention_in_a_discussion_efceb170: "Ny benevnelse i en diskusjon"
   new_mention_in_a_discussion_post_235706f7: "Ny omtale i et diskusjonsinnlegg."
   new_module_4e9287e4: "Ny modul"
   new_note_5f05cb20: "Nytt notat"
@@ -15223,6 +15282,7 @@ nb-x-k12:
   new_quizzes_banks_migrations_9ab4de4a: "Nye tester bankoverføringer"
   new_quizzes_build_button_in_module_items_10f651fb: "Bygg nye tester-knappen i modulelementer"
   new_quizzes_dbda7e0a: "Ny Quizzes"
+  new_quizzes_description: "Denne funksjonen forbedrer Canvas-opplevelsen for testing. Når dette flagget er aktivert, vil verktøyet Nye Tester være tilgjengelig. For fullstendig informasjon, se *brukergruppen nye tester* i Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "Modulprogresjon for innebygging av Nye tester"
   new_quizzes_importing_c167dce0: "Ny Quizzes importering"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av nye tester under fagimport/-kopiering"
@@ -15235,6 +15295,7 @@ nb-x-k12:
   new_rating_canceled_eed3c4ff: "Ny Vurdering Avbrutt"
   new_rating_created_54125331: "Ny vurdering opprettet"
   new_release_note_37ec0ea7: "Nytt utgivelsesnotat"
+  new_reported_reply_in_a_discussion_45e25709: "Nytt rapportert svar i en diskusjon"
   new_sis_integrations: |-
       Denne funksjonene gjelder for alle institusjoner med en eksisterende SIS Canvas-integrasjon.
       Alle kunder som for øyeblikket bruker løsningen som sender tilbake vurderinger i Canvas eller
@@ -15336,6 +15397,7 @@ nb-x-k12:
   no_longer_observing_user_efa5298a: "Observerer ikke lenger %{user}"
   no_marks_5e7d2b59: "Ingen resultater"
   no_matches_to_your_search_16d3d3b1: "Ingen funn i søket ditt"
+  no_matching_external_tool_found_ffc3abc3: "ikke noe matchende eksternt verktøy funnet"
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   no_module_assigned_ca183bd7: "Ingen modul tildelt"
   no_more_results_17c4f108: "Inge flere resultater"
@@ -15396,6 +15458,7 @@ nb-x-k12:
   norwegian_bokmal_ad5843fa: "Norsk Bokmål"
   norwegian_nynorsk_c785f8a6: "Norsk Nynorsk"
   not_a_number: "må være et positivt tall"
+  not_a_participant_3d723cfb: "ikke en deltaker"
   not_a_valid_date_d3ac20ba: "Ingen gyldig dato"
   not_a_valid_utf_8_string_string_7f6819c: "Ikke en gyldig utf-8-streng: %{string}"
   not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
@@ -15416,6 +15479,7 @@ nb-x-k12:
   not_completed_55fb4c00: "Ikke fullført"
   not_completed_d70acea3: "ikke fullført"
   not_factored_into_grading_455dcf6a: "Ikke tatt med i sensur"
+  not_for_this_conversation_f5271cf5: "ikke for denne samtalen"
   not_graded_e027c866: "Ikke vurdert"
   not_graded_e78bcd50: "Ikke vurdert"
   not_graded_yet_82f63c67: "Ikke vurdert ennå"
@@ -15541,9 +15605,9 @@ nb-x-k12:
               * Oppgaveinnhold
     course_content_display: Faginnhold
     discussion_description: "Nytt diskusjonstema i faget ditt"
-    discussion_display: Diskusjon
-    discussion_post_description: "Ny diskusjonspost i et tema du abonnerer på"
-    discussion_post_display: Diskusjonspost
+    discussion_display: "Nytt tema"
+    discussion_post_description: "Nytt svar i et tema du abonnerer på"
+    discussion_post_display: "Nytt svar"
     due_date_description: "Endring av forfallsdato på oppgaven"
     due_date_display: Forfallsdato
     files_description: "Ny fil lagt til i faget ditt"
@@ -15839,6 +15903,7 @@ nb-x-k12:
   observing_observee_d31d5fa2: "Observerer: %{observee}"
   of_students_5d1af0d2: "# Av elever"
   off_5385ef3f: Av
+  offensive_abusive_c41dcb08: "Støtende, krenkende"
   offline_score_8d7b4779: "Poengsum frakoblet modus:"
   ok_c47544a2: OK
   ok_ff1b646a: Ok
@@ -16460,6 +16525,7 @@ nb-x-k12:
   please_provide_a_pairing_code_530d1e9d: "Oppgi en paringskode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Oppgi et gyldig brukerdomene. Sjekk dine Azure Active Directory-innstillinger for å finne det."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Velg et gruppesett for denne oppgaven"
+  please_select_a_reason_for_reporting_this_reply_51719e8d: "Velg en årsak til å rapportere dette svaret"
   please_select_a_user_role_for_this_link_9fb4e655: "Velg en brukerolle for denne lenken."
   please_select_one_f931e883: "Vennligst velg én"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Spesifiser om du vil aktivere eller deaktivere Microsoft Teams synk."
@@ -16817,6 +16883,7 @@ nb-x-k12:
       name: Økter
     sessions_timeout: 
       labels: 
+        mobile_timeout: "Tid før økten utløper i minutter (minst 20) for mobilapplikasjoner"
         session_timeout: "Tid før sesjonen utløper i minutter (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "Dette endrer innstillingene for ALLE KONTOER!"
@@ -18850,8 +18917,10 @@ nb-x-k12:
   read_comments_3fcc7590: "Les kommentarer"
   read_context_membership_8068f3dd: "Les innhold for medlemskap"
   read_dc99757a: Les
+  read_less_ae7bd04f: "Les mindre"
   read_line_item_results_6472a120: "Les resultater for ordrelinje"
   read_line_items_ea6f7fa4: "Les ordrelinje"
+  read_more_f69fb6ec: "Les mer"
   read_only_3d26d8fe: "Kun til lesing"
   read_state_change_failed_859eeaa1: "Endring av lesestatus mislyktes"
   read_state_change_operation_failed_86710e1: "Endring av lesestatus mislyktes"
@@ -18894,6 +18963,7 @@ nb-x-k12:
       other: "%{count} seksjoner"
   recipients_a69b5e55: "Mottakere:"
   recipients_restricted_by_role_22c4c843: "Mottakere begrenset av rolle"
+  recipients_students_who_have_not_joined_a_group_a0c6a3c: "Mottakere: Elever som ikke har blitt med i en gruppe"
   record_7c9448b: Registrering
   record_an_audio_or_video_comment_88425add: "Spill inn en lyd- eller videokommentar"
   record_audio_video_d9993f6c: "Ta opp lyd/video"
@@ -19017,6 +19087,7 @@ nb-x-k12:
   remove_file_cbf3f40f: "Fjern fil"
   remove_filename_87f3781e: "fjerne %{filename}"
   remove_filename_dab5c02e: "Fjern %{filename}"
+  remove_filter_6f7204e2: "Fjern filter"
   remove_grading_scheme_title_d3942a08: "Fjern vurderingsskala %{title}"
   remove_group_5d2f2f2d: "Fjern gruppe"
   remove_group_981d6a02: "Fjerne gruppe?"
@@ -19115,9 +19186,16 @@ nb-x-k12:
   replycount_replies_unreadcount_unread_a85c0bc8: 
     one: "%{replyCount} svar, %{unreadCount} ulest"
     other: "%{replyCount} svar, %{unreadCount} uleste"
+  report_58d2ac9e: Rapporter
   report_has_been_aborted_2b5763ed: "Rapporten er avbrutt"
   report_issue_b5f1db0e: "Rapporter problemet"
+  report_replies_500cdcd3: "Rapporter svar"
+  report_reply_5af43ed0: "Rapporter svar"
+  report_reply_options_44e47591: "Rapporter svaralternativer"
   reported_3de7086a: Rapportert
+  reported_replies_will_be_sent_to_your_teacher_for__e7c814ec: "Rapporterte svar blir sendt til læreren din for gjennomgang. Du kan ikke angre denne handlingen."
+  reported_reply_8e03db37: "Rapporterte svar"
+  reportedreply_56f61a42: RapportertSvar
   reports_1b9ab7a7: Rapporter
   reports_account_settings_78f5336a: "Rapporter (kontoinnstillinger)"
   reports_course_f09b7d9e: "Rapporter (Fag)"
@@ -19130,6 +19208,8 @@ nb-x-k12:
   require_authentication_provider_on_logins_2aeb580e: "Krev autentiseringsleverandør for påloggingen"
   require_authenticion_provider_on_logins_1dba5ef7: "Krev autentiseringsleverandør for påloggingen"
   require_captcha_for_self_registration_b3b2ea02: "Krever Recaptcha for selvregistrering"
+  require_completion_by_end_date_bd154e32: "Krev fullføring innen sluttdato"
+  require_completion_by_end_date_was_turned_on_and_s_756fc89c: "Krev fullføring innen sluttdato ble slått på og satt til %{date}."
   require_completion_by_specified_end_date_ed742ecb: "Krev fullføring innen angitt sluttdato"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Bruk gruppemedlemmer fra samme seksjon"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
@@ -19138,6 +19218,7 @@ nb-x-k12:
   required_access_code_592902d7: "Påkrevd tilgangskode"
   required_email_address_379b2392: "Obligatorisk e-postadresse"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Obligatoriske felter inkluderer nøkkelnavn, eierens e-post, verktøy-ID, omdirigerings-URL og ikon-URL."
+  required_input_message_all_unassigned_students_1e721442: "Inndata kreves. Send melding til alle elever som ikke er påmeldt."
   required_to_view_quiz_results_dba7368b: "Kreves for å vise testresultater"
   required_values_1eb5841f: "Påkrevde verdier"
   requirement_f5b75da1: Krav
@@ -19863,6 +19944,7 @@ nb-x-k12:
   select_one_b647b384: "Velg en"
   select_one_of_the_options_c8b0c6e4: "Velg ett av alternativene:"
   select_outcome_7e6e2562: "Velg mål: "
+  select_outcome_title_b99b3ca0: "Velg mål %{title}"
   select_page_e93fc123: "Velg side"
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "Velg plasseringer. Skriv eller bruk piltastene til å navigere. Flere valg er tillatt."
   select_prerequisite_module_57894963: "Velg forutsetningsmodul"
@@ -19994,6 +20076,7 @@ nb-x-k12:
   sending_messages_f8f41998: "Sender meldinger ..."
   sent_f4ee89ec: Sendt!
   sent_fe0a1eb4: Sendt
+  separate_columns_for_first_last_names_in_gradebook_419126c3: "Separate kolonner for fornavn/etternavn i vurderingsoversikt"
   separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Skill ut tillatelser på detaljnivå for å legge til og slette oppgaver og tester fra den eksisterende administreringstillatelsen som kontrollerer alle tre."
   sequence_footer: 
     next_module: "Neste modul:"
@@ -20683,6 +20766,7 @@ nb-x-k12:
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Vis en liste over nylig besøkte sider i Canvas global navigasjon"
   show_accessibility_checker_notifications_while_edi_a7cb6449: "Vis merknader for tilgjengelighetstester mens du redigerer"
   show_account_navigation_menu_d97270a9: "Vis menyen for kontonavigering"
+  show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Vis kontoinnstilling for å tillate visning og eksport av elev fornavn og etternavn i separate kolonner i vurderingsoversikt."
   show_admin_navigation_menu_92fb579f: "Vis menyen for administratornavigering"
   show_all_artifacts_34b91a83: "Vis alle artefakter"
   show_all_details_9879980c: "Vis alle detaljer"
@@ -20891,6 +20975,8 @@ nb-x-k12:
   something_went_wrong_creating_the_course_please_tr_431adff5: "Det oppstod en feil under oppretting av faget. Vennligst prøv igjen."
   something_went_wrong_d238c551: "Noe gikk galt"
   something_went_wrong_downloading_submissions_pleas_6d069a09: "Noe gikk galt under nedlasting av innleveringer. Forsøk igjen senere."
+  something_went_wrong_loading_equella_f7e3907c: "Noe gikk galt ved lasting av Equella."
+  something_went_wrong_loading_the_equation_editor_62bca61c: "Noe gikk galt under lasting av ligningsredigerer"
   something_went_wrong_loading_the_file_previewer_3fb369e8: "Noe gikk galt under lasting av forhåndsvisning av fil."
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Det gikk noe galt ved lasting av bruddene, prøv å laste siden på nytt."
   something_went_wrong_loading_the_violations_try_re_9461d057: "Noe gikk galt ved lasting av bruddene. Prøv å laste siden på nytt."
@@ -20998,6 +21084,7 @@ nb-x-k12:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Del
   split_merged_users_6b81c595: "Splitt sammenslåtte brukere"
+  split_student_names_df0ef806: "Delt elevens navn"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Deling er deaktivert: Nådde et maksimum på tre oppgavegrupper innenfor et resultatområde"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Splitting deaktivert: det kan maksimalt være kun tre oppgavegrupper i et resultatområde."
   spreadsheet_6d622119: Regneark
@@ -21123,6 +21210,7 @@ nb-x-k12:
   student_context_card_ad59967e: Elevkontekstkort
   student_context_cards_376d2072: "Kontekstkort for elever"
   student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: "Kontekstkort for elever må være aktiverte for en konto av en administrator. Hvis Fag - administrer/oppdater ikke er aktivert, kan brukere fortsatt vise kontekstkort via vurderingsoversikten."
+  student_context_cards_must_be_enabled_for_an_accou_8e1dc261: "Kontekstkort for elever må være aktiverte for en konto av en administrator. Hvis Fag - administrer ikke er aktivert, kan brukere fortsatt vise kontekstkort via vurderingsoversikten."
   student_context_cards_must_be_enabled_for_an_accou_9b5c635: "Kontekstkort for elever må være aktiverte for en konto av en administrator. Hvis denne tillatelsen ikke er aktivert kan brukere fortsatt vise kontekstkort via Vurderingsoversikt."
   student_context_cards_must_be_enabled_for_an_accou_d996afdc: "Kontekstkort for elever må være aktiverte for en konto av en administrator. Hvis Administrer fag: Admin - administrer/oppdater er ikke aktivert, brukere kan fortsatt vise kontekstkort via vurderingsoversikten."
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Kontekstkort for elever må være aktiverte for en konto av en administrator. Hvis denne tillatelsen ikke er aktivert kan brukere fortsatt vise kontekstkort for elever via vurderingsoversikten."
@@ -21555,6 +21643,7 @@ nb-x-k12:
   sync_completed_successfully_8f68b542: "Synkronisering fullført"
   sync_currently_running_2cd5114a: "Synkronisering pågår for øyeblikket"
   sync_enrollments_and_course_start_end_dates_from_h_b2f9c3fc: "Synkroniser påmeldinger og fagets start-/sluttdatoer fra homeroom"
+  sync_enrollments_and_subject_start_end_dates_from__b36ecf3: "Synkroniser påmeldinger og temaets start-/sluttdatoer fra homeroom"
   sync_enrollments_from_homeroom_c75285f4: "Synkroniser påmeldinger fra homeroom"
   sync_grades_a16622ca: "Synkroniser vurderinger"
   sync_grades_to_sis_4e7fbc08: "Synkroniser vurderinger til SIS"
@@ -21812,6 +21901,7 @@ nb-x-k12:
   the_courses_reset_permission_allows_users_to_reset_29dbc267: "Tillatelsen Fag - tilbakestill lar brukere tilbakestille faginnhold for SIS-administrerte fag, uavhegngig av om de har SIS-data - administrer tillatelse."
   the_courses_reset_permission_resets_course_content_921321c3: "Emnene - Tilbakestill tillatelse tilbakestiller emneinnhold både for manuelt opprettede og SIS-administrerte emner. (For SIS-administrerte emner, gjelder ikke SIS Data - administrer tillatelser.)"
   the_csv_header_row_is_invalid_a8ec1787: "Tittelraden på CSV er ugyldig."
+  the_date_entered_is_invalid_4503a477: "Datoen som er angitt er ugyldig."
   the_date_is_not_valid_b6285fb5: "Ikke gyldig dato."
   the_discussion_entry_was_successfully_created_7cddf67b: "Diskusjonsoppføringen ble opprettet."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "Diskusjonstemaet ble slettet."
@@ -21820,6 +21910,7 @@ nb-x-k12:
                 kan ta en stund for store fag. Du kan forlate
                 siden, så får du en melding når nedlastingen er
                 fullført.
+  the_end_date_for_the_pace_plan_must_be_after_the_s_d999dade: "Sluttdatoen for tempoplanen må være etter startdatoen."
   the_end_date_must_be_after_the_start_date_2a273107: "Sluttdatoen må være etter startdatoen"
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: "Motoren som prosesserer SIS-importer er refraktert for å kunne håndtere stabiliteten bedre ved store SIS-importer. Funksjonaliteten ved SIS-importene er ikke endret."
   the_entry_was_successfully_deleted_3fddfb16: "Oppføringen ble slettet"
@@ -21937,6 +22028,10 @@ nb-x-k12:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet lar deg sette opp timeavtale som elever (eller elevgrupper) kan melde seg på. For å komme i gang klikk på knappen nedenfor"
   the_search_returned_no_results_c2e4d13c: "Søket ditt ga ingen resultater."
   the_search_returned_no_results_cd9eee1e: "Søket ditt ga ingen resultater"
+  the_selected_date_is_on_a_blackout_day_bedcc1b8: "Den valgte datoen er på en blokkert dag."
+  the_selected_date_is_on_a_weekend_this_pace_plan_s_ff81e003: "Den valgte datoen er i en helg. Denne tempoplanen hopper over helger."
+  the_selected_date_is_too_early_6173fe43: "Den valgte datoen er for tidlig."
+  the_selected_date_is_too_late_cbe184a1: "Den valgte datoen er for sent."
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valgte gruppen ble tømt fordi eleven du forespurte ikke er i noen gruppe. Du kan velge en gruppe i Vurderingsoversikt."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets alvorlighetsgrad, slik som valgt i en rullegardinsliste."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvei-ikonet for iOS/Android-enheter. 180x180 png"
@@ -21944,6 +22039,7 @@ nb-x-k12:
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "Kunne ikke finne den spesifiserte oppgaven (%{id})"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den angitte brukeren (%{id}) er ikke elev på dette faget"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den angitte brukeren er ikke elev på dette faget"
+  the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Startdatoen for tempoplanen må være etter sluttdatoen."
   the_state_parameter_is_required_ffadf213: "Statens parameter er nødvendig"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fanen elevmerknad inkluderer dokumentet for innlevering. Faner med flere innleveringstyper kan også være tilgjengelig."
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
@@ -21995,6 +22091,7 @@ nb-x-k12:
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Det er ingen delte brukerkontoer fra denne brukeren."
   there_are_unread_rubric_comments_337270ca: "Det er uleste vurderingskriterier kommentarer."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Det er en grense på 2 apper for plassering i RCE-verktøyslinjen. Denne innstillingen gjelder kun forbedret RCE."
+  there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Det er en grense på 2 apper for plassering i RCE-verktøyslinjen."
   there_is_currently_1_available_grader_758e4a21: "Det er for øyeblikket 1 tilgjengelig sensor"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Det var en feil med å logge ut av din IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Det oppstod et problem under opprettelse av merknadspalten for underviser."
@@ -22126,6 +22223,8 @@ nb-x-k12:
   this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Dette faget kan ikke legges til i fagmenyen med mindre faget er aktivt."
   this_course_does_not_allow_score_uploads_4b35fe07: "Dette faget tillater ikke opplasting av resultater."
   this_course_has_concluded_7995a84c: "Faget er avsluttet"
+  this_course_has_too_many_enrolled_users_to_be_sync_d3446749: "Dette faget har for mange registrerte brukere til å synkroniseres. Microsoft 365 tillater maksimalt %{max_allowed} medlemmer i et team."
+  this_course_has_too_many_teachers_or_other_owner_t_cb25b6d8: "Dette faget har for mange lærere eller eier-type-registreringer til å synkroniseres. Microsoft 365 tillater maksimalt %{max_allowed} eiere i et team."
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Dette faget er ikke begynt enda. Du vil ikke ha anledning til å delta på dette faget før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette faget er hevdet og klart, men du trenger å fullføre registreringsprosessen før du kan publisere faget. Du skal ha mottatt en e-post fra Canvas med en link for å fullføre prosessen. Husk å sjekke spam boksen."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dette faget er kun synlig for lærere før det er publisert."
@@ -22165,6 +22264,9 @@ nb-x-k12:
       vises automatisk for hver utgivelse. For mer informasjon,
       se brukergruppen Nytt design av diskusjoner
       i Canvas Community.
+  this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
+      Dette funksjonsflagget aktiverer rapportering av diskusjoner i det nye
+      designet av diskusjoner.
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
       Dette funksjonsflagget aktiverer isolert visning i det nye
       designet av diskusjoner.
@@ -22622,6 +22724,7 @@ nb-x-k12:
       For å få tilgang til Fag-fanen under Kontonavigering, må Fag - vis liste være aktivert.
               Hvis Fag - legg til er aktivert og Fag - vis liste er deaktivert, kan brukere legge til et nytt fag med knappen Legg til et nytt fag i Kontoinnstillinger.
               For å gjenopprette et slettet fag, må Fag - slett, Fag - angre sletting, og Faginnhold - vis også være aktiverte.
+  to_access_the_courses_link_in_account_navigation_c_a2c556e6: "For å få tilgang til Fag-lenken under Kontonavigering, må ‘Fag - vis administrer’ og ‘Fag - vis liste’ være aktivert."
   to_access_the_courses_link_in_account_navigation_c_eee259fa: "For å få tilgang til Fag-lenken under Kontonavigering, må ‘Fag - vis administrer/oppdater’ og ‘Fag - vis liste’ være aktivert."
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "For å få tilgang til lenken Fag i Kontonavigering, må Administrer fag: Admin - administrer/oppdater og Fag - vis liste også være aktiverte."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "For å få tilgang til administrer spørsmålsbank-lenken i innholdsfortegnelsen til tester for et fag, må ‘Faginnhold - vis’ og ‘Oppgaver og tester - legg til / rediger / slett’ også være aktiverte."
@@ -22743,11 +22846,13 @@ nb-x-k12:
   to_create_announcements_discussions_moderate_must__8a8278f2: "For å lage beskjeder, ‘diskusjoner - moderére’  må også være aktivert."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "For å kryssliste en seksjon må «Fagseksjoner - legg til / rediger / slett» også være aktivert. For å redigere fagets SIS-ID må «SIS-data - rediger» også være aktivert. For å tillate en bruker på kontonivå å slette et fag må «Fagstatus - administrer» også være aktivert."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "For å kryssliste en seksjon må «Fagseksjoner - legg til / rediger / slett» også være aktivert. For å redigere fagets SIS-ID må «SIS-data - rediger» også være aktivert. For å tillate en bruker på kontonivå å slette et fag må «Fagstatus - administrer» også være aktivert."
+  to_cross_list_a_section_courses_manage_and_manage__3af8bad7: "For å kryssliste en seksjon, må ‘Fag - administrer’ og ‘Administrer fagseksjoner - rediger’ også være aktivert."
   to_cross_list_a_section_courses_manage_update_and__40dfb8f8: "For å kryssliste en seksjon, må ‘Fag - administrer/oppdater’ og ‘Administrer fagseksjoner - rediger’ også være aktivert."
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "For å kryssliste en seksjon må 'Administrer fagseksjoner - rediger også være aktivert. For å redigere fagets SIS-ID må 'SIS-data - rediger' også være aktivert. For å tillate en bruker på kontonivå å slette et fag må 'Fagstatus - administrer' også være aktivert."
   to_cross_list_a_section_manage_course_sections_edi_ac3d2abb: "For å kryssliste en seksjon må 'Administrer fagseksjoner - rediger også være aktivert."
   to_cross_list_a_section_manage_courses_admin_manag_7992434e: "For å kryssliste en seksjon, må administrer fag: Admin - administrer/oppdater og Administrer fagseksjoner - rediger også være aktiverte."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "For å kryssliste avsnitt må «Fag - legg til / rediger / slett» også være aktivert."
+  to_cross_list_sections_course_sections_edit_and_co_59598c07: "For å kryssliste seksjoner, må ‘Fagseksjoner - rediger’ og ‘Fag - administrer’ også være aktivert."
   to_cross_list_sections_course_sections_edit_and_co_6db155a6: "For å kryssliste seksjoner, må ‘Fagseksjoner - rediger’ og ‘Fag - administrer/oppdater’ også være aktivert."
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "For å kryssliste seksjoner, må Fagseksjoner - rediger og Administrer fag: Admin - administrer/oppdater også være aktivert."
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "For å kryssliste seksjoner, må 'Fagseksjoner - rediger’ være aktivert. Brukeren må også registreres som en instruktør i faget som krysslistes."
@@ -22799,35 +22904,46 @@ nb-x-k12:
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "For å redigere låseinnstillinger på innholdsfortegnelsen til Sider må 'Fag - legg til / rediger / slett' også være aktivert. Hvis denne tillatelsen ikke er aktivert og 'Fag - legg til / rediger / slett' er aktivert, kan låseinnstillinger for blueprint redigeres på individuelle diskusjoner."
   to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "For å redigere låseinnstillinger på innholdsfortegnelsen til Sider må 'Fag - legg til / rediger / slett' også være aktivert. Imidlertid, hvis Fag - legg til / rediger / slett er aktivert, men Sider - Oppdater tillatelse ikke er aktivert, kan brukeren fremdeles endre innstillinger for innholdslås for individuelle sider i et Blueprint Master-fag."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "For å redigere vurderingsskalaer må «Fag - legg til / rediger / slett» også være aktivert."
+  to_edit_course_grading_schemes_courses_manage_must_b6de9dbc: "For å redigere vurderingsskalaer, må ‘Fag - administrer’ også være aktivert."
   to_edit_course_grading_schemes_courses_manage_upda_f34b25b3: "For å redigere vurderingsskalaer, må ‘Fag - administrer/oppdater’ også være aktivert."
   to_edit_course_grading_schemes_manage_courses_admi_3059cde2: "For å redigere vurderingsskalaer, må Administrer fag: Admin - administrer/oppdater også være aktivert."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "For å redigere faginnstillinger må 'Fag - legg til / rediger / slett' være aktivert."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "For å redigere faginnstillinger må «Fag - legg til / rediger / slett» være aktivert."
+  to_edit_course_settings_courses_manage_must_be_ena_813e1588: "For å redigere faginnstillinger, må ‘Fag - administrer’ være aktivert."
   to_edit_course_settings_courses_manage_update_must_172a4fe5: "For å redigere faginnstillinger, må ‘Fag - administrer/oppdater’ være aktivert."
   to_edit_course_settings_manage_courses_admin_manag_fe44d1fe: "For å redigere låseinnstillinger for tester, må Administrer fag: Admin - administrer/oppdater være aktivert."
   to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "For å redigere grupper, må Grupper - administrer også være aktivert."
   to_edit_lock_settings_for_course_files_course_file_392f6f70: "For å redigere låseinnstillinger for fagfiler, må ‘Fagfiler - rediger’, Blueprint-fag - legg til / rediger / forbinde / slett’, og ‘Fag - administrer/oppdater’ også være aktivert."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "For å redigere innstillinger for fagfiler, må Fagfiler - rediger, Blueprint-fag - legg til / rediger / forbinde / slett, og Administrer fag: Admin - administrer/oppdater også være aktivert."
+  to_edit_lock_settings_for_course_files_course_file_92273739: "For å redigere låseinnstillinger for fagfiler, må ‘Fagfiler - rediger’, Blueprint-fag - legg til / rediger / forbinde / slett’, og ‘Fag - administrer’ også være aktivert."
+  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "For å redigere låseinnstillinger fra indekssiden Oppgaver, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘Fag - administrer’ også være aktivert."
   to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "For å redigere låseinnstillinger fra indekssiden Oppgaver, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘Fag - administrer/oppdater’ også være aktivert."
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       For å redigere låseinnstillinger fra indekssiden Oppgaver, må Blueprint-fag - legg til / rediger / forbinde / slett og Administrer fag: Admin - administrer/oppdater også være aktivert. Hvis disse ytterligere tillatelsene er aktivert, men Oppgaver og Tester - legg til / rediger / slett ikke er aktivert, kan Blueprint-låseinnstillinger for en oppgave administreres fra oppgavens detaljside.
               For å redigere låseinnstillinger for en individuell test, eller på indekssiden Tester, må Blueprint-fag - legg til / rediger / forbinde / slett og Administrer fag: Admin - administrer/oppdater også være aktivert.
   to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "For å redigere låseinnstillinger fra indekssiden Oppgaver, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og Administrer fag: Admin - administrer/oppdater også være aktivert."
   to_edit_lock_settings_from_the_discussions_index_p_d344c544: "For å redigere låseinnstillinger fra innholdsfortegnelsen til Diskusjoner, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘Fag - administrer/oppdater’ også være aktivert."
+  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "For å redigere låseinnstillinger fra innholdsfortegnelsen til Diskusjoner, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘Fag - administrer’ også være aktivert."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "For å redigere låseinnstillinger fra indekssiden Diskusjoner, må Blueprint-fag - legg til / rediger / forbinde / slett og Administrer fag: Admin - administrer/oppdater også være aktivert."
   to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "For å redigere låseinnstillinger på på en individuell test, eller på innholdsfortegnelsen til Tester, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og Administrer fag: Admin - administrer/oppdater også være aktivert."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "For å redigere låseinnstillinger på en individuell test, eller på innholdsfortegnelsen til Tester, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘ Fag - administrer’ også være aktivert."
   to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "For å redigere låseinnstillinger på en individuell test, eller på innholdsfortegnelsen til Tester, må ‘Blueprint-fag - legg til / rediger / forbinde / slett’ og ‘Fag - administrer/oppdater’ også være aktivert."
+  to_edit_lock_settings_on_files_courses_manage_and__f4718695: "For å redigere låseinnstillinger på filer, må ‘Fag - administrer’ og ‘Fagfiler - rediger’ også være aktivert."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "For å redigere låseinnstillinger på filer, må ‘Fag - administrer/oppdater’ og ‘Fagfiler - rediger’ også være aktivert."
   to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "For å redigere låseinnstillinger for filer, må Administrer fag: Admin - administrer/oppdater og Fagfiler - rediger også være aktiverte."
+  to_edit_lock_settings_on_quizzes_courses_manage_an_eb629aa9: "For å redigere låseinnstillinger på tester, må Fag - administrer og Oppgaver og tester - administrer/rediger også være aktiverte."
   to_edit_lock_settings_on_quizzes_courses_manage_up_6366321f: "For å redigere låseinnstillinger på tester, må Fag - administrer/oppdater og Oppgaver og tester - administrer/rediger også være aktiverte."
   to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: "For å redigere låseinnstillinger på tester, må ‘Fag - administrer/oppdater’ og ‘Oppgaver og tester - legg til / rediger / slett’ også være aktivert."
   to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "For å redigere låseinnstillinger for tester, må Administrer fag: Admin - administrer/oppdater og Oppgaver og tester - legg til / rediger / slett også være aktiverte."
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "For å redigere låseinnstillinger på indekssiden Diskusjoner, må Administrer fag: Admin - administrer/oppdater og Diskusjoner - vis også være aktiverte. Hvis ytterligere tillatelser er aktivert, men denne tillatelsen ikke er aktivert, kan låseinnstillinger redigeres på individuelle diskusjoner."
   to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "For å redigere låseinnstillinger på indekssiden Diskusjoner, må Administrer fag: Admin - administrer/oppdater og Diskusjoner - vis også være aktiverte."
   to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "For å redigere låseinnstillinger på innholdsfortegnelsen til Diskusjoner, må ‘Fag - administrer/oppdater’ og ‘Diskusjoner - vis’ også være aktivert."
+  to_edit_lock_settings_on_the_discussions_index_pag_9488110a: "For å redigere låseinnstillinger på innholdsfortegnelsen til Diskusjoner, må ‘Fag - administrer’ og ‘Diskusjoner - vis’ også være aktivert."
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "For å redigere låseinnstillinger på innholdsfortegnelsen til Sider, ‘Sider - oppdater’, ‘Blueprint-fag - legg til / rediger / forbinde / slett’, og ‘Fag - administrer/oppdater’."
+  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "For å redigere låseinnstillinger på innholdsfortegnelsen til Sider, ‘Sider - oppdater’, ‘Blueprint-fag - legg til / rediger / forbinde / slett’, og ‘Fag - administrer’."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "For å redigere låseinnstillinger på indekssiden Sider, må Sider - oppdater, Blueprint-fag - legg til / rediger / forbinde / slett, og administrer fag: ‘Admin - administrer / oppdater’."
   to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "For å redigere tester, må Oppgaver og tester - administrer/rediger også være aktivert."
+  to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "For å redigere fagets SIS-ID, må ‘Fag - administrer’ og ‘SIS-data - administrer’ også være aktivert."
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "For å redigere fagets SIS-ID, må ‘Fag - administrer/oppdater’ og ‘SIS-data - administrer’ også være aktivert."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "For å redigere SIS-ID, må Administrer fag: Admin - administrer/oppdater og SIS-Data - administrer også være aktiverte."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "For å redigere fagets SIS-ID må 'SIS-data - rediger' også være aktivert."
@@ -22883,6 +22999,7 @@ nb-x-k12:
   to_manage_course_announcements_discussions_moderat_5f02f46e: "For å administrere beskjeder i et fag må 'Diskusjoner - moderer' også være aktivert."
   to_manage_course_content_course_content_add_edit_d_10b420f7: "For å administrere faginnhold må “Faginnhold – legg til / rediger / slett” også være aktivert."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "For å administrere faginnhold må «Faginnhold - legg til / rediger / slett» være aktivert."
+  to_manage_course_content_courses_manage_and_course_c7a49f42: "For å administrere faginnhold, må ‘Fag - administrer’ og ‘Faginnhold - legg til / rediger / slett’ være aktivert."
   to_manage_course_content_courses_manage_update_and_843edf8a: "For å administrere faginnhold, må ‘Fag - administrer/oppdater’ og ‘Faginnhold - legg til / rediger / slett’ være aktivert."
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "For å administrere faginnhold, må Administrer fag: Admin - administrer/oppdater og Faginnhold - legg til / rediger / slett være aktiverte. For å vise Velg hjemmeside og Sjekkliste for fagetablering-knappene, må Administrer fag: Admin - administrer/oppdater og Faginnhold - vis også være aktiverte. (Lærere, designere og LA-er kan angi hjemmesiden til et fag, uavhengig av deres tillatelser.)"
   to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "For å administrere faginnhold, må Administrer fag: Admin - administrer/oppdater og Faginnhold - legg til / rediger / slett være aktiverte."
@@ -22898,6 +23015,7 @@ nb-x-k12:
   to_manage_feature_options_for_an_account_feature_o_6327c2da: "For å administrere funksjonsvalg for en konto, må ‘Funksjonsvalg - aktiver/deaktiver’ også være aktivert."
   to_manage_feature_previews_for_an_account_feature__185e63eb: "For å administrere funksjonsforhåndsvisninger for en konto, må ‘Funksjonsforhåndsvisninger - aktiver/deaktiver’ også være aktivert."
   to_manage_lock_settings_for_object_types_courses_m_839a7753: "For å administrere låseinnstillinger for objekttyper, må ‘Fag - administrer/oppdater’ også være aktivert."
+  to_manage_lock_settings_for_object_types_courses_m_c3373154: "For å administrere låseinnstillinger for objekttyper, må ‘Fag - administrer’ også være aktivert."
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "For å administrer låseinnstillinger for objekttyper, må Administrer fag: Admin - administrer/oppdater også være aktivert."
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "For å administrere moderert vurdering må 'Vurderinger - moderer' også være aktivert."
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -22946,6 +23064,7 @@ nb-x-k12:
       Modulelementer kan ikke fjernes hvis det er elevinnleveringer tilstede.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "For å publisere og fjerne modulinnhold må «Fag - legg til / rediger / slett» og «Faginnhold - vis» også være aktiverte."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "for å publisere og fjerne modulinnhold må 'Fag - legg til / rediger / slett' og 'Faginnhold - vis' også være aktiverte."
+  to_publish_and_unpublish_module_content_courses_ma_4a203bea: "For å publisere og avpublisere modulinnhold, må ‘Fag - administrer’ og faginnhold - vis også være aktivert. Modulelementer kan ikke fjernes hvis det er elevinnleveringer tilstede."
   to_publish_and_unpublish_module_content_courses_ma_8a591b77: "For å publisere og avpublisere modulinnhold, må ‘Fag - administrer/oppdater’ og faginnhold - vis også være aktivert. Modulelementer kan ikke fjernes hvis det er elevinnleveringer tilstede."
   to_publish_and_unpublish_module_content_manage_cou_33c20e31: "For å publisere og fjerne publisering av modulinnhold, må Administrer fag: Admin - administrer/oppdater og Faginnhold - vis også være aktiverte. Modulelementer kan ikke fjernes hvis det er elevinnleveringer tilstede."
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "For å publisere siste vurdering for en moderert oppgave, må «Vurderinger - rediger» også være aktivert. For å publisere eller skjule vurderinger for en moderert oppgave, må «Vurderinger - rediger» også være aktivert."
@@ -22989,6 +23108,7 @@ nb-x-k12:
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "For å se valget for sjekklisten for fagetablering på fagets hjemmeside må «Administrer, legg til, rediger, slett fag» også være aktivert."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "For å sende meldinger til en individuell bruker må «Samtaler - send meldinger til individuelle fagdeltakere» også være aktivert."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "For å dele en diskusjon til Commons må «Faginnhold - legg til / rediger / slett» også være aktivert."
+  to_share_a_discussion_to_commons_courses_manage_mu_addad8ba: "For å dele en diskusjon til Commons, må Fag - administrer også være aktivert."
   to_share_a_discussion_to_commons_courses_manage_up_232a8707: "For å dele en diskusjon til Commons, må Fag - administrer/oppdater også være aktivert."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "For å dele en diskusjon til Commons må 'Diskusjoner - legg til / rediger / slett' også være aktivert."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "For å dele en diskusjon til Commons må «Diskusjoner - legg til / rediger / slett» også være aktivert."
@@ -23008,6 +23128,7 @@ nb-x-k12:
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "For å se alle varsler sendt til denne Canvas-brukeren, velg brukeren og tidsrammen for søket."
   to_view_all_student_groups_in_a_course_groups_view_7a16b659: "For å vise en elevgruppe i et fag, må Grupper - vis alle elevgrupper også være aktivert."
   to_view_announcements_announcements_view_must_also_75f652df: "For å vise beskjeder må «Kunngjøringer - moderer» også være aktivert."
+  to_view_choose_home_page_and_course_setup_checklis_402b2311: "For å vise Velg hjemmeside- og Sjekkliste for fagetablering-knappene, må ‘Fag - administrer’ og ‘Faginnhold - vis’ også være aktivert. (Lærere, designere og LA-er kan angi hjemmesiden til et fag, uavhengig av deres tillatelser.)"
   to_view_choose_home_page_and_course_setup_checklis_84797b4f: "For å vise Velg hjemmeside- og Sjekkliste for fagetablering-knappene, må “Faginnhold – vis” også være aktivert. (Lærere, designere og LA-er kan angi hjemmesiden til et fag, uavhengig av deres tillatelser.)"
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "For å vise Velg hjemmeside og Sjekkliste for fagetablering-knappene, må Administrer fag: Admin - administrer/oppdater og Faginnhold - vis også være aktiverte. (Lærere, designere og LA-er kan angi hjemmesiden til et fag, uavhengig av deres tillatelser.)"
   to_view_choose_home_page_and_course_setup_checklis_ff2436d4: "For å vise Velg hjemmeside- og Sjekkliste for fagetablering-knappene, må ‘Fag - administrer/oppdater’ og ‘Faginnhold - vis’ også være aktivert. (Lærere, designere og LA-er kan angi hjemmesiden til et fag, uavhengig av deres tillatelser.)"
@@ -23030,6 +23151,7 @@ nb-x-k12:
   to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "For å vise diskusjoner i et fag må 'Diskusjoner - vis' også være aktivert."
   to_view_feature_options_for_an_account_feature_opt_14b0cea0: "For å vise funksjonsvalg for en konto, må ‘Funksjonsvalg - aktiver/deaktiver’ også være aktivert."
   to_view_feature_previews_for_an_account_feature_pr_805e5c46: "For å vise funksjonsforhåndsvisninger for en konto, må ‘Funksjonsforhåndsvisninger - aktiver/deaktiver’ også være aktivert."
+  to_view_grades_in_a_course_courses_manage_and_grad_c1ab5515: "For å vise vurderinger i et fag, må ‘Fag - administrer’ og ‘Vurderinger - vis alle vurderinger’ også være aktivert."
   to_view_grades_in_a_course_courses_manage_update_a_91a2448: "For å vise vurderinger i et fag, må ‘Fag - administrer/oppdater’ og ‘Vurderinger - vis alle vurderinger’ også være aktivert."
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "For å vise vurderinger i et fag må «Vurderinger- vis alle vurderinger» også være aktivert."
   to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: "For å vise vurderinger i et fag må “Vurderinger – vis alle vurderinger” også være aktivert."
@@ -23286,6 +23408,7 @@ nb-x-k12:
   type_file_14f017c9: "type: fil"
   type_folder_115f3b07: "type: mappe"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikke en gyldig bildetype (forsøk jpg, png, eller gif)"
+  type_message_here_e15e30a7: "Skriv melding her …"
   type_of_change_1cb24a0e: "Type endring"
   type_of_item_8a37f69d: "Type element"
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: "Skriv eller bruk piltastene til å navigere. Flere valg er tillatt."
@@ -23300,6 +23423,7 @@ nb-x-k12:
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Kan ikke justere noen mål for en side"
   unable_to_align_some_outcomes_to_title_53467231: "Kan ikke justere noen mål for «%{title}\""
   unable_to_connect_to_google_drive_34886e7a: "Kan ikke koble til Google Drive."
+  unable_to_create_message_without_a_body_b62274be: "Kunne ikke opprette melding uten en tekst"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikke opprette resultatstatistikk fordi denne oppgaven har en forfallsdato innenfor en stengt vurderingsperiode for minst en elev."
   unable_to_delete_assignment_abcf8d62: "Kan ikke slette oppgave"
   unable_to_delete_commentbankitem_3a23dc24: "Kan ikke slette Kommentarbankelement"
@@ -23334,6 +23458,7 @@ nb-x-k12:
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Kan ikke oppdatere Microsoft Teams synk.-innstillinger. Vennligst prøv igjen. Dersom problemet vedvarer, kontakt kundestøtte."
   unaccepted_students_aa68ea98: "Ikke aksepterte elever"
   unarchive_f245e2d6: "Fjern arkivering"
+  unarchive_operation_failed_22c42032: "Fjerning fra arkiv mislyktes"
   unarchive_selected_e0c4bd3d: "Dearkiver valgt"
   unassessed_a0264e97: "Ikke vurdert"
   unassessed_students_3809ac5e: "Ikke vurderte elever"
@@ -23364,6 +23489,7 @@ nb-x-k12:
   unenrolled_users_e7632d24: "Brukere uten påmelding på fag"
   unexpected_error_while_performing_export_1e6b4207: "Det oppsto en uventet feil under eksport"
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Uventet respons fra Microsoft API: har %{status_code} statuskode"
+  unexpected_response_from_microsoft_api_got_status__86f7a95e: "Uventet respons fra Microsoft API: har %{status_code} statuskode"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Uventet respons fra Microsoft API. Dette er sannsynligvis en feil. Kontakt kundestøtte."
   unfavorite_cd0c113e: "Ta bort favoritt"
   unfavorite_coursename_32f77231: "Ta bort favoritt %{courseName}"
@@ -23439,6 +23565,8 @@ nb-x-k12:
   unpublish_title_26ae9667: "Avpubliser %{title}"
   unpublished_8b6107d6: "Ikke publisert"
   unpublished_assignments_9cdbcc87: "Upubliserte oppgaver"
+  unpublished_changes_cb1cf6ff: "Upubliserte endringer"
+  unpublished_changes_tray_9e9b2ac2: "Brett for upubliserte endringer"
   unpublished_click_to_publish_6a6d12e1: "Upublisert.  Trykk her for å publisere"
   unpublished_click_to_publish_c073631a: "Ikke publisert. Klikk for å publisere."
   unpublished_click_to_publish_title_7c57293f: "Upublisert.  Trykk her for å publisere %{title}."
@@ -24158,6 +24286,7 @@ nb-x-k12:
   view_rubric_d71cce10: "Vis vurderingskriterier"
   view_submission_ff3da5d: "Vis innlevering"
   view_the_assignment_e61ca4fc: "Vis oppgaven"
+  view_the_discussion_link_c4dbdef: "Vis diskusjonen: %{link}."
   view_this_message_in_conversations_5a16bc9f: "Vis denne meldingen i samtaler"
   view_toolname_placements_4a5724d1: "Vis %{toolName} plasseringer"
   view_ungraded_as_0_1a9631a1: "Vis ikke vurdert som 0"
@@ -24257,6 +24386,7 @@ nb-x-k12:
   website_url_177fc1dc: "Websidens URL"
   website_url_b995c5b6: "Nettsidens Url"
   website_url_input_1a3eab25: "Nettside url-input"
+  website_url_url_bd07233d: "Nettstedets URL: %{url}"
   week_s_cb1492ee: Uke(r)
   weekly_summary_56cd0c95: "Ukentlig oppsummering"
   weight_9b308e5b: Vekt
@@ -24298,6 +24428,9 @@ nb-x-k12:
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Hvis deaktivert vil elever fortsatt kunne sende individuelle meldinger til faglærere, fag-LA-er og elever som tilhører samme grupper på kontonivå."
   when_disabled_students_can_still_send_individual_m_567a911c: "Hvis deaktivert vil elever fortsatt kunne sende individuelle meldinger til faglærere, fag-LA-er og elever som tilhører samme grupper på kontonivå."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Når den er aktivert, deaktiveres SMS (Short Message Service)."
+  when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
+      Når det er aktivert, viser dette flagget en ordtelling i SpeedGrader for
+      tekstbaserte innleveringer.
   when_enabled_this_flag_shows_a_join_button_on_canv_c6f162ea: |-
       Når den er aktivert, viser dette flagget en «Bli med»-knapp i Canvas-kalenderoppførigen
       i elevplanleggeren
@@ -24526,6 +24659,7 @@ nb-x-k12:
   withdrawn_4c838347: "Trukket tilbake"
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Ops ... Ser ut som om det ikke er noe her!"
+  word_count_c77fe3a6: Ordtelling
   work_and_create_together_c65f358b: "Jobb og opprett sammen"
   workflow_state_3a5c99d2: workflow_state
   working_b1f63edf: "arbeider ..."
