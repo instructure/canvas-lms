@@ -42,7 +42,7 @@ module PacePlansPageObject
   end
 
   def module_item_unpublish_status_selector
-    "[name='IconPublish']"
+    "[name='IconUnpublished']"
   end
 
   def module_items_selector
