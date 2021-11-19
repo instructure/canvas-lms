@@ -15,7 +15,7 @@ module.exports = {
   ],
   webpackFinal: async (config) => {
     config.module.noParse = [/i18nliner\/dist\/lib\/i18nliner/]
-    config.plugins.push(new I18nPlugin())
+    config.plugins.push(I18nPlugin)
     config.resolveLoader.modules = [
       path.resolve(__dirname, '../ui-build/webpack'),
       'node_modules'
