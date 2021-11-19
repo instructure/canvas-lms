@@ -369,7 +369,7 @@ module AssignmentOverrideApplicator
     elsif (override = applicable_overrides.detect { |o| o.due_at.nil? })
       override
     else
-      applicable_overrides.sort_by(&:due_at).last
+      applicable_overrides.max_by(&:due_at)
     end
   end
 
@@ -396,7 +396,7 @@ module AssignmentOverrideApplicator
     elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
       nil
     else
-      applicable_overrides.sort_by(&:unlock_at).first.unlock_at
+      applicable_overrides.min_by(&:unlock_at).unlock_at
     end
   end
 
@@ -407,7 +407,7 @@ module AssignmentOverrideApplicator
     elsif applicable_overrides.detect { |o| o.lock_at.nil? }
       nil
     else
-      applicable_overrides.sort_by(&:lock_at).last.lock_at
+      applicable_overrides.max_by(&:lock_at).lock_at
     end
   end
 

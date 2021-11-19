@@ -290,6 +290,8 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RedundantSort:
+  Severity: error
 Style/RegexpLiteral:
   Severity: error
 Style/RescueStandardError:

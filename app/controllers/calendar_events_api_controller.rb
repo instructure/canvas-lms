@@ -423,7 +423,7 @@ class CalendarEventsApiController < ApplicationController
 
         json = events.map do |event|
           subs = submissions[event.id] if submissions
-          sub = subs.sort_by(&:submitted_at).last if subs
+          sub = subs.max_by(&:submitted_at) if subs
           event_json(event, user, session, { include: includes, excludes: params[:excludes], submission: sub })
         end
         render :json => json

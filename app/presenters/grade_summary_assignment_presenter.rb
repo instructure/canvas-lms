@@ -37,8 +37,7 @@ class GradeSummaryAssignmentPresenter
     # first one.
     submission.attachments
               .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .sort
-              .first
+              .min
   end
 
   def originality_report?

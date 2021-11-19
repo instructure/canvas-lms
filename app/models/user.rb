@@ -2535,11 +2535,11 @@ class User < ActiveRecord::Base
   end
 
   def last_completed_module
-    self.context_module_progressions.select(&:completed?).sort_by { |p| p.completed_at || p.created_at }.last.context_module rescue nil
+    self.context_module_progressions.select(&:completed?).max_by { |p| p.completed_at || p.created_at }.context_module rescue nil
   end
 
   def last_completed_course
-    self.enrollments.select(&:completed?).sort_by { |e| e.completed_at || e.created_at }.last.course rescue nil
+    self.enrollments.select(&:completed?).max_by { |e| e.completed_at || e.created_at }.course rescue nil
   end
 
   def last_mastered_assignment
