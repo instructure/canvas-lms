@@ -1116,8 +1116,7 @@ class User < ActiveRecord::Base
     self.reload
   end
 
-  def associate_with_shard(shard, strength = :strong)
-  end
+  def associate_with_shard(shard, strength = :strong); end
 
   def self.clone_communication_channel(cc, new_user, max_position)
     new_cc = cc.clone
@@ -2996,8 +2995,7 @@ class User < ActiveRecord::Base
     %w[student teacher ta observer].include?(type) ? type : nil
   end
 
-  def self.preload_shard_associations(users)
-  end
+  def self.preload_shard_associations(users); end
 
   def associated_shards(strength = :strong)
     strength == :strong ? [Shard.default] : []

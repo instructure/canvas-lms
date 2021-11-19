@@ -24,7 +24,7 @@ describe Canvas::LockExplanation do
       Class.new {
         include Rails.application.routes.url_helpers
         include Canvas::LockExplanation
-        def js_bundle(*args); end
+        def js_bundle(*); end
       }
     }
     let(:host) { klass.new }

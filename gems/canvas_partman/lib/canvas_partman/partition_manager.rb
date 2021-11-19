@@ -67,8 +67,7 @@ module CanvasPartman
     #
     # @param [Integer] number_to_keep
     #   The number of partitions to keep (excluding the current partition)
-    def prune_partitions(_number_to_keep = 6)
-    end
+    def prune_partitions(_number_to_keep = 6); end
 
     # Create a new partition table.
     #

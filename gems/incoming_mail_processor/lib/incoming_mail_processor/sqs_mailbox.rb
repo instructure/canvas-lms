@@ -44,8 +44,7 @@ module IncomingMailProcessor
       @incoming_mail_queue = Aws::SQS::QueuePoller.new(@queue_url, client: @sqs)
     end
 
-    def disconnect
-    end
+    def disconnect; end
 
     def each_message(**)
       start_time = Time.now

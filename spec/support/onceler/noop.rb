@@ -25,8 +25,7 @@ module Onceler
     end
 
     module ClassMethods
-      def onceler!
-      end
+      def onceler!; end
 
       def before(scope = nil, &block)
         scope = :each if scope == :once || scope.nil?
