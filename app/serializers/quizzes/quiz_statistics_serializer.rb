@@ -25,7 +25,7 @@ module Quizzes
     # quiz statistics.
     #
     # This is what you should pass to this serializer!!!
-    class Input < Struct.new(:quiz, :options, :student_analysis, :item_analysis)
+    Input = Struct.new(:quiz, :options, :student_analysis, :item_analysis) do
       include ActiveModel::SerializerSupport
     end
 

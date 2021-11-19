@@ -67,7 +67,7 @@ module CanvasCassandra
     end
 
     # private Struct used to store batch information
-    class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options)
+    Batch = Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options) do
       def initialize
         super([], [], [], [], {})
       end

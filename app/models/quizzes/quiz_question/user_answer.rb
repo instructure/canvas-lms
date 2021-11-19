@@ -19,7 +19,7 @@
 #
 
 # Stores the scoring information for a user's answer to a quiz question
-class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possible, :total_parts, :correct_parts, :incorrect_parts, :answer_id, :undefined, :answer_details, :incorrect_dock)
+Quizzes::QuizQuestion::UserAnswer = Struct.new(:question_id, :points_possible, :total_parts, :correct_parts, :incorrect_parts, :answer_id, :undefined, :answer_details, :incorrect_dock) do
   def initialize(question_id, points_possible, answer_data)
     super(question_id, points_possible, 1, 0, 0)
     @points = 0.0

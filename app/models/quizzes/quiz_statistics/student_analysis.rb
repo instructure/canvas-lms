@@ -36,8 +36,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     t('#quizzes.quiz_statistics.types.student_analysis', 'Student Analysis')
   end
 
-  class TemporaryUser < Struct.new(:id, :short_name)
-  end
+  TemporaryUser = Struct.new(:id, :short_name)
 
   # returns a blob of stats junk like this:
   # {
