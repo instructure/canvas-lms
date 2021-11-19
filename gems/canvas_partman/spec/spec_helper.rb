@@ -25,7 +25,7 @@ rescue LoadError
 end
 
 begin
-  require '../../spec/coverage_tool.rb'
+  require '../../spec/coverage_tool'
   CoverageTool.start('canvas-partman-gem')
 rescue LoadError => e
   puts "Error: #{e} "
