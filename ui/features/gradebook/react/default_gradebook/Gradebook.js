@@ -557,7 +557,10 @@ class Gradebook extends React.Component {
       this.toggleEnrollmentFilter('inactive', true)
     }
     this.initShowUnpublishedAssignments(this.options.settings.show_unpublished_assignments)
-    this.initShowSeparateFirstLastNames(this.options.settings.show_separate_first_last_names)
+    this.initShowSeparateFirstLastNames(
+      this.options.settings.show_separate_first_last_names === 'true' &&
+        this.options.allow_separate_first_last_names
+    )
     this.initSubmissionStateMap()
     this.gradebookColumnSizeSettings = this.options.gradebook_column_size_settings
     this.setColumnOrder({
@@ -3754,8 +3757,8 @@ class Gradebook extends React.Component {
     ) // on success, do nothing since the render happened earlier
   }
 
-  initShowSeparateFirstLastNames(showSeparateFirstLastNames = 'false') {
-    this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames === 'true'
+  initShowSeparateFirstLastNames(showSeparateFirstLastNames = false) {
+    this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames
   }
 
   toggleShowSeparateFirstLastNames() {
