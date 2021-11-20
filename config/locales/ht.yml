@@ -7045,7 +7045,7 @@ ht:
     other: "%{count} soumisyon bezwen klasman"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} t ap efase epi depase nivo ki defini pou %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} chanjman ki pa pibliye"
+    one: "1 chanjman ki pa pibliye"
     other: "%{count} chanjman ki pa pibliye"
   count_unread_cff5855: "%{count} poko li."
   count_unread_messages_99d6bf17: 
