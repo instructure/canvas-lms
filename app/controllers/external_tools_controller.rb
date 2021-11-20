@@ -1312,6 +1312,7 @@ class ExternalToolsController < ApplicationController
     launch_url = params[:url] || launch_url
     launch_type = params[:launch_type]
     module_item = options[:module_item]
+    assignment = options[:assignment]
 
     unless tool_id || launch_url || module_item
       @context.errors.add(:id, 'A tool id, tool url, or module item id must be provided')
@@ -1367,15 +1368,14 @@ class ExternalToolsController < ApplicationController
         launch_url: launch_url,
         resource_type: launch_type
       }
-
-      case launch_type
-      when 'module_item'
-        opts[:link_code] = @tool.opaque_identifier_for(module_item)
-      when 'assessment'
-        opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
+      if module_item || assignment
+        opts[:link_code] = @tool.opaque_identifier_for(module_item || assignment.external_tool_tag)
       end
 
-      opts[:overrides] = whitelisted_query_params if whitelisted_query_params.any?
+      opts[:overrides] = {
+        **whitelisted_query_params,
+        'resource_link_title' => (module_item || assignment)&.title
+      }.compact
 
       adapter = Lti::LtiOutboundAdapter.new(
         @tool,
@@ -1383,7 +1383,7 @@ class ExternalToolsController < ApplicationController
         @context
       ).prepare_tool_launch(
         url_for(@context),
-        variable_expander(assignment: options[:assignment], content_tag: module_item),
+        variable_expander(assignment: assignment, content_tag: module_item),
         opts
       )
 
@@ -1393,9 +1393,9 @@ class ExternalToolsController < ApplicationController
         'analytics_id' => @tool.tool_id
       }
 
-      launch_settings['tool_settings'] = if options[:assignment]
+      launch_settings['tool_settings'] = if assignment
                                            adapter.generate_post_payload_for_assignment(
-                                             options[:assignment],
+                                             assignment,
                                              lti_grade_passback_api_url(@tool),
                                              blti_legacy_grade_passback_api_url(@tool),
                                              lti_turnitin_outcomes_placement_url(@tool.id)
