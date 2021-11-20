@@ -28,7 +28,4 @@ class MakeEnrolllmentStateLockNotNull < ActiveRecord::Migration[4.2]
     end
     change_column_null(:enrollment_states, :lock_version, false)
   end
-
-  def down
-  end
 end

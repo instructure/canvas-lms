@@ -42,7 +42,10 @@ describe SearchController do
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:name, 'bob')
       other = User.create(:name => 'billy')
-      @course.enroll_student(other).tap { |e| e.workflow_state = 'active'; e.save! }
+      @course.enroll_student(other).tap { |e|
+        e.workflow_state = 'active'
+        e.save!
+      }
 
       group = @course.groups.create(:name => 'group')
       group.users << other
@@ -58,7 +61,10 @@ describe SearchController do
       @user.update_attribute(:name, 'billy')
       other = User.create(:name => 'bob')
       other.update_attribute(:workflow_state, 'creation_pending')
-      @course.enroll_student(other).tap { |e| e.workflow_state = 'invited'; e.save! }
+      @course.enroll_student(other).tap { |e|
+        e.workflow_state = 'invited'
+        e.save!
+      }
 
       get 'recipients', params: {
         :search => 'b', :type => 'user', :skip_visibility_checks => true,
@@ -113,7 +119,7 @@ describe SearchController do
       end
 
       it "returns sub-contexts" do
-        account_admin_user()
+        account_admin_user
         user_session(@user)
         course_factory(active_all: true).course_sections.create(:name => "other section")
 

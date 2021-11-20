@@ -40,7 +40,7 @@ class ContentShare < ActiveRecord::Base
   belongs_to :sender, class_name: "User"
   belongs_to :root_account, class_name: "Account"
 
-  validates :read_state, inclusion: { in: %w(read unread) }
+  validates :read_state, inclusion: { in: %w[read unread] }
 
   before_create :set_root_account_id
 

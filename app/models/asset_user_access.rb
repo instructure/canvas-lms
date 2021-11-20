@@ -95,9 +95,9 @@ class AssetUserAccess < ActiveRecord::Base
 
   def readable_name(include_group_name: true)
     if self.asset_code&.include?(':')
-      split = self.asset_code.split(/:/)
+      split = self.asset_code.split(":")
 
-      if split[1].match(/course_\d+/)
+      if split[1].match?(/course_\d+/)
         case split[0]
         when "announcements"
           t("Course Announcements")
@@ -157,7 +157,7 @@ class AssetUserAccess < ActiveRecord::Base
         else
           "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
         end
-      elsif split[1].match(/user_\d+/)
+      elsif split[1].match?(/user_\d+/)
         case split[0]
         when "files"
           t('User Files')
@@ -258,15 +258,15 @@ class AssetUserAccess < ActiveRecord::Base
     # write through the row update for now (by returning false from here).
     view_delta = change_hash['view_score'].compact
     # ^array with old and new value, which CAN be null, hence compact
-    return false if view_delta.size < 1
+    return false if view_delta.empty?
     return (view_delta[0] - 1.0).abs < Float::EPSILON if view_delta.size == 1
 
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end
 
   def log_action(level)
-    increment(:view_score) if %w{view participate}.include?(level)
-    increment(:participate_score) if %w{participate submit}.include?(level)
+    increment(:view_score) if %w[view participate].include?(level)
+    increment(:participate_score) if %w[participate submit].include?(level)
 
     if self.action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level

@@ -34,17 +34,17 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
-  validates_presence_of :assignment_version, :if => :assignment
-  validates_presence_of :title, :workflow_state
+  validates :assignment_version, presence: { :if => :assignment }
+  validates :title, :workflow_state, presence: true
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
-  validates_presence_of :set, :set_id, :if => concrete_set
-  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) }
-  validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) }
+  validates :set, :set_id, presence: { :if => concrete_set }
+  validates :set_id, uniqueness: { :scope => [:assignment_id, :set_type, :workflow_state],
+                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { :scope => [:quiz_id, :set_type, :workflow_state],
+                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
@@ -146,7 +146,7 @@ class AssignmentOverride < ActiveRecord::Base
         assignment.clear_cache_key(:availability)
         DueDateCacher.recompute(assignment)
       end
-      self.quiz.clear_cache_key(:availability) if self.quiz
+      self.quiz&.clear_cache_key(:availability)
     end
   end
 
@@ -171,9 +171,13 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?; !!assignment_id; end
+  def assignment?
+    !!assignment_id
+  end
 
-  def quiz?; !!quiz_id; end
+  def quiz?
+    !!quiz_id
+  end
 
   workflow do
     state :active
@@ -199,7 +203,7 @@ class AssignmentOverride < ActiveRecord::Base
             .joins(:assignment_override_students)
             .distinct
 
-    if ActiveRecord::Relation === visible_ids
+    if visible_ids.is_a?(ActiveRecord::Relation)
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
       scope = scope.primary_shard.activate {
         scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
@@ -208,7 +212,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
 
     scope.where(
-      assignment_override_students: { user_id: visible_ids },
+      assignment_override_students: { user_id: visible_ids }
     )
   end
 
@@ -241,9 +245,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set
-    if self.set_type == 'ADHOC'
+    case self.set_type
+    when 'ADHOC'
       assignment_override_students.preload(:user).map(&:user)
-    elsif self.set_type == SET_TYPE_NOOP
+    when SET_TYPE_NOOP
       nil
     else
       super
@@ -269,7 +274,7 @@ class AssignmentOverride < ActiveRecord::Base
       send("#{field}=", nil)
     end
 
-    validates_inclusion_of "#{field}_overridden", :in => [false, true]
+    validates "#{field}_overridden", inclusion: { :in => [false, true] }
     before_validation do |override|
       if override.send("#{field}_overridden").nil?
         override.send("#{field}_overridden=", false)
@@ -291,7 +296,7 @@ class AssignmentOverride < ActiveRecord::Base
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
-  OVERRIDDEN_DATES = %i(due_at unlock_at lock_at).freeze
+  OVERRIDDEN_DATES = %i[due_at unlock_at lock_at].freeze
   OVERRIDDEN_DATES.each do |field|
     override field
   end
@@ -364,8 +369,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment &&
-      self.assignment.context.available? &&
+    self.assignment&.context&.available? &&
       self.assignment.published? &&
       self.assignment.created_at < 3.hours.ago &&
       (saved_change_to_workflow_state? ||
@@ -409,7 +413,7 @@ class AssignmentOverride < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { applies_to_students }
-    p.whenever { |record| record.notify_change? }
+    p.whenever(&:notify_change?)
     p.filter_asset_by_recipient { |record, user|
       # note that our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
@@ -418,7 +422,7 @@ class AssignmentOverride < ActiveRecord::Base
 
     p.dispatch :assignment_due_date_override_changed
     p.to { applies_to_admins }
-    p.whenever { |record| record.notify_change? }
+    p.whenever(&:notify_change?)
     p.data { course_broadcast_data }
   end
 

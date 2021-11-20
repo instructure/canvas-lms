@@ -59,9 +59,7 @@ module Quizzes
                    :course_quiz_quiz_submissions_url,
                    :course_quiz_submission_versions_url
 
-    def context
-      quiz.context
-    end
+    delegate context: :quiz
 
     def_delegators :@quiz, :quiz_questions
 
@@ -270,9 +268,7 @@ module Quizzes
       quiz.require_lockdown_browser_monitor?
     end
 
-    def lockdown_browser_monitor_data
-      quiz.lockdown_browser_monitor_data
-    end
+    delegate lockdown_browser_monitor_data: :quiz
 
     def serializable_object(**)
       hash = super
@@ -351,10 +347,12 @@ module Quizzes
     #
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
-      !serializer_option(:skip_date_overrides) &&
-        context.user_has_been_student?(current_user) && due_dates.any? ?
-        due_dates[0][domain] :
+      if !serializer_option(:skip_date_overrides) &&
+         context.user_has_been_student?(current_user) && due_dates.any?
+        due_dates[0][domain]
+      else
         quiz.send(domain)
+      end
     end
 
     def due_at

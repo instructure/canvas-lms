@@ -268,13 +268,12 @@ module CustomSeleniumActions
 
   def first_selected_option(select_element)
     select = Selenium::WebDriver::Support::Select.new(select_element)
-    option = select.first_selected_option
-    option
+    select.first_selected_option
   end
 
   def dialog_for(node)
     node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
-  rescue StandardError
+  rescue
     false
   end
 
@@ -338,7 +337,7 @@ module CustomSeleniumActions
     if iframe_id
       in_frame iframe_id do
         tinymce_element = f('body')
-        while tinymce_element.text.length > 0
+        until tinymce_element.text.empty?
           tinymce_element.click
           tinymce_element.send_keys(Array.new(100, :backspace))
           tinymce_element = f('body')
@@ -720,17 +719,17 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
   end
 
-  def stale_element_protection
+  def stale_element_protection(&block)
     element = yield
-    element.finder_proc = proc { disable_implicit_wait { yield } }
+    element.finder_proc = proc { disable_implicit_wait(&block) }
     element
   end
 
-  def reloadable_collection
+  def reloadable_collection(&block)
     collection = yield
     SeleniumExtensions::ReloadableCollection.new(
       collection,
-      proc { disable_implicit_wait { yield } }
+      proc { disable_implicit_wait(&block) }
     )
   end
 end

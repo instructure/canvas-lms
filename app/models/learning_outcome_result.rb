@@ -95,7 +95,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }
       if !versions.empty?
         versions.each do |version|
-          version_data = YAML::load(version.yaml)
+          version_data = YAML.load(version.yaml)
           version_data["score"] = self.score
           version_data["mastery"] = self.mastery
           version_data["possible"] = self.possible
@@ -162,7 +162,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.original_score ||= self.score
     self.original_possible ||= self.possible
-    self.original_mastery = self.mastery if self.original_mastery == nil
+    self.original_mastery = self.mastery if self.original_mastery.nil?
     calculate_percent!
     true
   end

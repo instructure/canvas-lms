@@ -26,6 +26,7 @@ class ContextModule < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
+  restrict_columns :settings, [:prerequisites, :completion_requirements, :requirement_count, :require_sequential_progress]
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, :class_name => 'Account'
@@ -45,8 +46,8 @@ class ContextModule < ActiveRecord::Base
   after_save :relock_warning_check
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
-  validates_presence_of :workflow_state, :context_id, :context_type
-  validates_presence_of :name, :if => :require_presence_of_name
+  validates :workflow_state, :context_id, :context_type, presence: true
+  validates :name, presence: { :if => :require_presence_of_name }
   attr_accessor :require_presence_of_name
 
   def relock_warning_check
@@ -106,10 +107,8 @@ class ContextModule < ActiveRecord::Base
         # don't queue a job unless necessary
         delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
-      if @discussion_topics_to_recalculate
-        @discussion_topics_to_recalculate.each do |dt|
-          dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
-        end
+      @discussion_topics_to_recalculate&.each do |dt|
+        dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
       end
     end
   end
@@ -160,13 +159,13 @@ class ContextModule < ActiveRecord::Base
   end
 
   def infer_position
-    if !self.position
+    unless self.position
       positions = ContextModule.module_positions(self.context)
-      if (max = positions.values.max)
-        self.position = max + 1
-      else
-        self.position = 1
-      end
+      self.position = if (max = positions.values.max)
+                        max + 1
+                      else
+                        1
+                      end
     end
     self.position
   end
@@ -259,9 +258,7 @@ class ContextModule < ActiveRecord::Base
   def duplicate
     copy_title = get_copy_title(self, t("Copy"), self.name)
     new_module = duplicate_base_model(copy_title)
-    living_tags = self.content_tags.select do |content_tag|
-      !content_tag.deleted?
-    end
+    living_tags = self.content_tags.reject(&:deleted?)
     new_module.content_tags = living_tags.map do |content_tag|
       duplicate_content_tag(content_tag)
     end
@@ -326,7 +323,7 @@ class ContextModule < ActiveRecord::Base
     positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
     downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
-    downstreams.each { |m| m.save_without_touching_context }
+    downstreams.each(&:save_without_touching_context)
   end
 
   workflow do
@@ -453,12 +450,13 @@ class ContextModule < ActiveRecord::Base
 
   def prerequisites=(prereqs)
     Rails.cache.delete(['module_names', context].cache_key) # ensure the module list is up to date
-    if prereqs.is_a?(Array)
+    case prereqs
+    when Array
       # validate format, skipping invalid ones
       prereqs = prereqs.select do |pre|
-        pre.has_key?(:id) && pre.has_key?(:name) && pre[:type] == 'context_module'
+        pre.key?(:id) && pre.key?(:name) && pre[:type] == 'context_module'
       end
-    elsif prereqs.is_a?(String)
+    when String
       res = []
       module_names = ContextModule.module_names(self.context)
       pres = prereqs.split(",")
@@ -467,7 +465,7 @@ class ContextModule < ActiveRecord::Base
         next unless (match = pre_regex.match(pre))
 
         id = match[1].to_i
-        if module_names.has_key?(id)
+        if module_names.key?(id)
           res << { :id => id, :type => 'context_module', :name => module_names[id] }
         end
       end
@@ -515,9 +513,9 @@ class ContextModule < ActiveRecord::Base
     tags = self.content_tags.not_deleted.index_by(&:id)
     validated_reqs = requirements.select do |req|
       if req[:id] && (tag = tags[req[:id]])
-        if %w(must_view must_mark_done must_contribute).include?(req[:type])
+        if %w[must_view must_mark_done must_contribute].include?(req[:type])
           true
-        elsif %w(must_submit min_score).include?(req[:type])
+        elsif %w[must_submit min_score].include?(req[:type])
           true if tag.scoreable?
         end
       end
@@ -616,7 +614,7 @@ class ContextModule < ActiveRecord::Base
   def cached_active_tags
     @cached_active_tags ||= if self.content_tags.loaded?
                               # don't reload the preloaded content
-                              self.content_tags.select { |tag| tag.active? }
+                              self.content_tags.select(&:active?)
                             else
                               self.content_tags.active.to_a
                             end
@@ -625,7 +623,7 @@ class ContextModule < ActiveRecord::Base
   def cached_not_deleted_tags
     @cached_not_deleted_tags ||= if self.content_tags.loaded?
                                    # don't reload the preloaded content
-                                   self.content_tags.select { |tag| !tag.deleted? }
+                                   self.content_tags.reject(&:deleted?)
                                  else
                                    self.content_tags.not_deleted.to_a
                                  end
@@ -635,21 +633,23 @@ class ContextModule < ActiveRecord::Base
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || ((self.content_tags.not_deleted.maximum(:position) || 0) + 1)
     position = [position, params[:position].to_i].max if params[:position]
-    if params[:type] == "wiki_page" || params[:type] == "page"
+    case params[:type]
+    when "wiki_page", "page"
       item = opts[:wiki_page] || self.context.wiki_pages.where(id: params[:id]).first
-    elsif params[:type] == "attachment" || params[:type] == "file"
-      item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
-    elsif params[:type] == "assignment"
+    when "attachment", "file"
+      item = opts[:attachment] || self.context.attachments.not_deleted.find_by(id: params[:id])
+    when "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
       item = item.submittable_object if item.respond_to?(:submittable_object) && item.submittable_object
-    elsif params[:type] == "discussion_topic" || params[:type] == "discussion"
+    when "discussion_topic", "discussion"
       item = opts[:discussion_topic] || self.context.discussion_topics.active.where(id: params[:id]).first
-    elsif params[:type] == "quiz"
+    when "quiz"
       item = opts[:quiz] || self.context.quizzes.active.where(id: params[:id]).first
     end
     workflow_state = ContentTag.asset_workflow_state(item) if item
     workflow_state ||= 'active'
-    if params[:type] == 'external_url'
+    case params[:type]
+    when 'external_url'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
@@ -665,9 +665,7 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
-      added_item.save
-      added_item
-    elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool' || params[:type] == 'lti/message_handler'
+    when 'context_external_tool', 'external_tool', 'lti/message_handler'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
 
@@ -704,9 +702,7 @@ class ContextModule < ActiveRecord::Base
             context_external_tool: content
           )
       end
-      added_item.save
-      added_item
-    elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
+    when 'context_module_sub_header', 'sub_header'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
@@ -720,8 +716,6 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
-      added_item.save
-      added_item
     else
       return nil unless item
 
@@ -737,9 +731,9 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = workflow_state if added_item.new_record?
-      added_item.save
-      added_item
     end
+    added_item.save
+    added_item
   end
 
   # specify a 1-based position to insert the items at; leave nil to append to the end of the module
@@ -756,7 +750,7 @@ class ContextModule < ActiveRecord::Base
     new_tags = []
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
-      next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
+      next unless %w[Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool].include?(item.class_name)
 
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
@@ -772,7 +766,7 @@ class ContextModule < ActiveRecord::Base
 
     tag_ids_to_move = {}
     tags_before = start_pos < 2 ? [] : tags[0..start_pos - 2]
-    tags_after = start_pos > tags.length ? [] : tags[start_pos - 1..-1]
+    tags_after = start_pos > tags.length ? [] : tags[start_pos - 1..]
     (tags_before + new_tags + tags_after).each_with_index do |item, index|
       index_change = index + 1 - item.position
       if index_change != 0
@@ -849,7 +843,7 @@ class ContextModule < ActiveRecord::Base
     progressions = self.context_module_progressions.where(user_id: users)
     progressions_hash = {}
     progressions.each { |p| progressions_hash[p.user_id] = p }
-    newbies = users.select { |u| !progressions_hash[u.id] }
+    newbies = users.reject { |u| progressions_hash[u.id] }
     progressions += newbies.map { |u| find_or_create_progression(u) }
     progressions.each { |p| p.user = users_hash[p.user_id] }
     progressions.uniq
@@ -894,7 +888,7 @@ class ContextModule < ActiveRecord::Base
 
   def migration_position
     @migration_position_counter ||= 0
-    @migration_position_counter = @migration_position_counter + 1
+    @migration_position_counter += 1
   end
   attr_accessor :item_migration_position
 
@@ -914,7 +908,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   VALID_COMPLETION_EVENTS.each do |event|
-    self.class_eval <<-CODE
+    self.class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{event}=(value)
         if Canvas::Plugin.value_to_boolean(value)
           self.completion_events |= [:#{event}]
@@ -926,7 +920,7 @@ class ContextModule < ActiveRecord::Base
       def #{event}?
         completion_events.include?(:#{event})
       end
-    CODE
+    RUBY
   end
 
   def completion_event_callbacks

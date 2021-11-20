@@ -385,7 +385,7 @@ class DueDateCacher
 
   def perform_submission_upsert(batch_values)
     # Construct upsert statement to update existing Submissions or create them if needed.
-    query = <<~SQL
+    query = <<~SQL.squish
       UPDATE #{Submission.quoted_table_name}
         SET
           cached_due_date = vals.due_date::timestamptz,

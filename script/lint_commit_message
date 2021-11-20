@@ -98,7 +98,7 @@ long_lines = lines.each_with_index.select do |line, _i|
   line.size > BODY_IDEAL_LINE_LENGTH
 end
 
-if long_lines.size > 0
+unless long_lines.empty?
   comment "warn", long_lines.first[1] + 3,
           "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
           (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),

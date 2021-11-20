@@ -31,13 +31,13 @@ describe Mutations::UpdateLearningOutcome do
   let!(:record) { outcome_model(context: @course) }
 
   def variables(args = {})
-    <<~VARS
+    <<~YAML
       id: #{args[:id] || record.id},
       title: "#{args[:title] || 'Outcome 1 edited'}",
       displayName: "#{args[:display_name] || 'Outcome display name 1'}",
       description: "#{args[:description] || 'Outcome description 1'}",
       vendorGuid: "#{args[:vendor_guid] || 'vg--1'}"
-    VARS
+    YAML
   end
 
   def execute_with_input(update_input, user_executing: @admin)
@@ -68,7 +68,7 @@ describe Mutations::UpdateLearningOutcome do
 
   it "updates a learning outcome" do
     result = execute_with_input(variables)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateLearningOutcome', 'errors')).to be_nil
     result = result.dig('data', 'updateLearningOutcome', 'learningOutcome')
     expect(result['title']).to eq 'Outcome 1 edited'
@@ -79,7 +79,7 @@ describe Mutations::UpdateLearningOutcome do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateLearningOutcome', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateLearningOutcome', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end

@@ -47,7 +47,7 @@ module BrokenLinkHelper
   end
 
   def error_type(course, url)
-    course_id = url.match(/\/courses\/(\d+)/)&.[](1)&.to_i
+    course_id = url.match(%r{/courses/(\d+)})&.[](1)&.to_i
     return :course_mismatch if course_id && course_id != course.id
 
     link_obj = Context.find_asset_by_url(url)

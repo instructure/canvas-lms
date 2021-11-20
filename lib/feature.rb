@@ -29,7 +29,7 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
-      next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
+      next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
 
       instance_variable_set "@#{key}", val
     end
@@ -132,9 +132,9 @@ class Feature
   STATE_DISABLED = 'disabled'
 
   VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
-  VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
-  VALID_ENVS = %i(development ci beta test production).freeze
-  VALID_TYPES = %w(feature_option setting).freeze
+  VALID_APPLIES_TO = %w[Course Account RootAccount User SiteAdmin].freeze
+  VALID_ENVS = %i[development ci beta test production].freeze
+  VALID_TYPES = %w[feature_option setting].freeze
 
   DISABLED_FEATURE = Feature.new.freeze
 
@@ -144,11 +144,11 @@ class Feature
       apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      if attrs[:state] == STATE_DISABLED
-        @features[feature] = DISABLED_FEATURE
-      else
-        @features[feature] = Feature.new({ feature: feature }.merge(attrs))
-      end
+      @features[feature] = if attrs[:state] == STATE_DISABLED
+                             DISABLED_FEATURE
+                           else
+                             Feature.new({ feature: feature }.merge(attrs))
+                           end
     end
   end
 
@@ -208,15 +208,16 @@ class Feature
 
   def self.applicable_features(object, type: nil)
     applicable_types = []
-    if object.is_a?(Account)
+    case object
+    when Account
       applicable_types << 'Account'
       applicable_types << 'Course'
       applicable_types << 'RootAccount' if object.root_account?
       applicable_types << 'User' if object.site_admin?
       applicable_types << 'SiteAdmin' if object.site_admin?
-    elsif object.is_a?(Course)
+    when Course
       applicable_types << 'Course'
-    elsif object.is_a?(User)
+    when User
       applicable_types << 'User'
     end
     definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }
@@ -225,10 +226,9 @@ class Feature
   def default_transitions(context, orig_state)
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
-    (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
+    (valid_states - [orig_state]).index_with do |state|
+      { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
         context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
-      transitions
     end
   end
 

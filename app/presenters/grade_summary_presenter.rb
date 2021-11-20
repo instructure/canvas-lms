@@ -84,7 +84,7 @@ class GradeSummaryPresenter
 
   def observed_student
     # be consistent about which student we return by default
-    (observed_students.to_a.sort_by { |e| e[0].sortable_name }.first)[1].first
+    (observed_students.to_a.min_by { |e| e[0].sortable_name })[1].first
   end
 
   def linkable_observed_students
@@ -124,7 +124,7 @@ class GradeSummaryPresenter
   end
 
   def student
-    @student ||= (student_enrollment && student_enrollment.user)
+    @student ||= student_enrollment&.user
   end
 
   def student_name
@@ -152,7 +152,7 @@ class GradeSummaryPresenter
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup
       .visible_assignments(student, @context, all_groups, includes: includes)
-      .where.not(submission_types: %w(not_graded wiki_page))
+      .where.not(submission_types: %w[not_graded wiki_page])
       .except(:order)
   end
 

@@ -531,8 +531,8 @@ describe Quizzes::Quiz do
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
     q.quiz_questions.create!(:quiz_group => g)
     q.quiz_questions.create!(:quiz_group => g)
-    q.quiz_questions.create!()
-    q.quiz_questions.create!()
+    q.quiz_questions.create!
+    q.quiz_questions.create!
     q.quiz_questions.create!(:question_data => { :question_type => "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
@@ -1025,7 +1025,7 @@ describe Quizzes::Quiz do
     it "creates a submission" do
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 4
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       # one of the bank questions should be duplicated, since the group
       # pick count is 3 and the bank only has 2 questions:
       expect(texts.uniq.count).to eq(3)
@@ -1051,7 +1051,7 @@ describe Quizzes::Quiz do
 
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 3
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       expect(texts.member?('gq1')).to be_truthy
       expect(texts.member?('gq2')).to be_truthy
       expect(texts.member?('qq1')).to be_truthy
@@ -1954,7 +1954,7 @@ describe Quizzes::Quiz do
   describe "#grants_right?" do
     before(:once) do
       quiz_model(course: @course)
-      @admin = account_admin_user()
+      @admin = account_admin_user
       teacher_in_course(:course => @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term

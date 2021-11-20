@@ -47,6 +47,7 @@ describe LiveEventsObserver do
       @user.save!
     end
   end
+
   describe "syllabus" do
     it "doesn't post for no changes" do
       course_model

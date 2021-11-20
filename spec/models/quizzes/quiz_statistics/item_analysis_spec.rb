@@ -29,13 +29,13 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
 
   before(:once) do
     simple_quiz_with_submissions(
-      %w{T D F A},
-      %w{T B T A}, # 2 wrong
-      %w{T D F A}, # correct
-      %w{F A T C}, # 4 wrong
-      %w{T D F B}, # 1 wrong
-      %w{T D F A}, # correct
-      %w{F D}      # 3 wrong
+      %w[T D F A],
+      %w[T B T A], # 2 wrong
+      %w[T D F A], # correct
+      %w[F A T C], # 4 wrong
+      %w[T D F B], # 1 wrong
+      %w[T D F A], # correct
+      %w[F D]      # 3 wrong
     )
   end
 

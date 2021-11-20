@@ -51,9 +51,11 @@ module ActiveSupport
               yield
             else
               if batch_object # just fall back to the usual after appending to the key if needed
-                key += (Canvas::CacheRegister.enabled? ?
-                "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}" :
-                "/#{batch_object.cache_key}")
+                key += (if Canvas::CacheRegister.enabled?
+                          "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}"
+                        else
+                          "/#{batch_object.cache_key}"
+                        end)
               end
               fetch(key, opts, &block)
             end
@@ -93,7 +95,7 @@ module ActiveSupport
           if entry
             get_entry_value(entry, name, options)
           else
-            result = instrument(:generate, name, options) { block.call }
+            result = instrument(:generate, name, options, &block)
             instrument(:write, name, options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script

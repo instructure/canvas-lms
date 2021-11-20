@@ -30,7 +30,7 @@ module HasContentTags
   def check_if_associated_content_tags_need_updating
     @associated_content_tags_need_updating = false
     return if self.new_record?
-    return if self.respond_to?(:context_type) && %w{SisBatch Folder}.include?(self.context_type)
+    return if self.respond_to?(:context_type) && %w[SisBatch Folder].include?(self.context_type)
 
     @associated_content_tags_need_updating = true if self.respond_to?(:title_changed?) && self.title_changed?
     @associated_content_tags_need_updating = true if self.respond_to?(:name_changed?) && self.name_changed?

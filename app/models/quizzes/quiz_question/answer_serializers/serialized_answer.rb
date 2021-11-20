@@ -43,7 +43,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     def reject(reason, *args)
       self.error = reason.to_s
 
-      if reason.is_a?(Symbol) && ERROR_CODES.has_key?(reason)
+      if reason.is_a?(Symbol) && ERROR_CODES.key?(reason)
         actual_reason = ERROR_CODES[reason]
         actual_reason = actual_reason.call(*args) if actual_reason.is_a?(Proc)
 

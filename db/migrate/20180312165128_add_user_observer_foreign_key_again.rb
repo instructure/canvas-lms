@@ -8,7 +8,7 @@ class AddUserObserverForeignKeyAgain < ActiveRecord::Migration[5.0]
     unless foreign_key_exists?(:user_observers, :column => :observer_id)
       UserObservationLink.where("observer_id > ?", Shard::IDS_PER_SHARD).find_in_batches do |uos|
         observer_ids = uos.map(&:observer_id).uniq
-        missing_ids = observer_ids - User.where("id IN (?)", observer_ids).pluck(:id)
+        missing_ids = observer_ids - User.where(id: observer_ids).pluck(:id)
         if missing_ids.any?
           uos.select { |uo| missing_ids.include?(uo.observer_id) }.each do |uo|
             uo.observer.associate_with_shard(Shard.current, :shadow)

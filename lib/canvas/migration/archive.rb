@@ -86,7 +86,7 @@ module Canvas::Migration
       elsif @settings[:course_archive_download_url].present?
         _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url], check_host: true)
         CanvasHttp.get(@settings[:course_archive_download_url]) do |http_response|
-          raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+          raise CanvasHttp::InvalidResponseCodeError, http_response.code.to_i unless http_response.code.to_i == 200
 
           tmpfile = CanvasHttp.tempfile_for_uri(uri)
           http_response.read_body(tmpfile)
@@ -101,9 +101,7 @@ module Canvas::Migration
       end
     end
 
-    def path
-      file.path
-    end
+    delegate :path, to: :file
 
     def unzipped_file_path
       unless @unzipped_file_path
@@ -155,7 +153,7 @@ module Canvas::Migration
 
     def delete_unzipped_archive
       if @unzipped_file_path && File.directory?(@unzipped_file_path)
-        FileUtils::rm_rf(@unzipped_file_path)
+        FileUtils.rm_rf(@unzipped_file_path)
       end
     end
 
@@ -163,7 +161,7 @@ module Canvas::Migration
     # it into the directory with the given file name
     def prepare_cartridge_file(file_name = 'imsmanifest.xml')
       if self.path.ends_with?('xml')
-        FileUtils::cp(self.path, package_root.item_path(file_name))
+        FileUtils.cp(self.path, package_root.item_path(file_name))
       else
         unzip_archive
       end
@@ -171,7 +169,7 @@ module Canvas::Migration
 
     def delete_unzipped_file
       if File.exist?(self.unzipped_file_path)
-        FileUtils::rm_rf(self.unzipped_file_path)
+        FileUtils.rm_rf(self.unzipped_file_path)
       end
     end
 

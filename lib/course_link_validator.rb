@@ -30,7 +30,7 @@ class CourseLinkValidator
   # creates a new validation job
   def self.queue_course(course)
     progress = current_progress(course)
-    return progress if progress && progress.pending?
+    return progress if progress&.pending?
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!
@@ -217,15 +217,15 @@ class CourseLinkValidator
     unless (result = self.visited_urls[url])
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          if valid_route?(url)
-            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
-              result = :course_mismatch
-            else
-              result = check_object_status(url)
-            end
-          else
-            result = :unreachable
-          end
+          result = if valid_route?(url)
+                     if url.match(%r{/courses/(\d+)}) && self.course.id.to_s != $1
+                       :course_mismatch
+                     else
+                       check_object_status(url)
+                     end
+                   else
+                     :unreachable
+                   end
         else
           unless reachable_url?(url)
             result = :unreachable
@@ -249,8 +249,8 @@ class CourseLinkValidator
     path = URI.parse(url).path
     path = path.chomp("/")
 
-    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb === "GET" }
-    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && File.exist?(File.join(Rails.root, "public", path)))
+    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb == "GET" }
+    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && Rails.root.join("public", path[1..]).file?)
   end
 
   # makes sure that links to course objects exist and are in a visible state
@@ -260,7 +260,7 @@ class CourseLinkValidator
 
     object ||= Context.find_asset_by_url(url)
     unless object
-      return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return :missing_item unless [nil, 'syllabus'].include?(url.match(%r{/courses/\d+/\w+/(.+)})&.[](1))
       return :missing_item if url.include?('/media_objects_iframe/')
 
       return nil
@@ -302,12 +302,12 @@ class CourseLinkValidator
       # flickr does a redirect to this file when a photo is deleted/not found;
       # treat this as a broken image instead of following the redirect
       url = response['Location']
-      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
+      raise RuntimeError("photo unavailable") if url&.match?(@unavailable_photo_redirect_pattern)
     end
 
     begin
       response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc)
-      if %w{404 405}.include?(response.code)
+      if %w[404 405].include?(response.code)
         response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc) do
           # don't read the response body
         end

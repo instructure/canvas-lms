@@ -43,7 +43,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Numerical do
       ]
     end
 
-    let(:question_params) { Hash.new }
+    let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::Numerical }
 
     include_examples "All answer parsers"

@@ -531,7 +531,7 @@ describe GradebookExporter do
                                                        title: "past",
                                                        points_possible: 10
 
-        @current_assignment = @course.assignments.create! due_at: 1.weeks.from_now,
+        @current_assignment = @course.assignments.create! due_at: 1.week.from_now,
                                                           title: "current",
                                                           points_possible: 10
 

@@ -146,7 +146,7 @@ describe "threaded discussions" do
       @enrollment.save!
 
       # Reset discussion created_at time to two minutes ago
-      @topic.update_attribute(:posted_at, Time.zone.now - 2.minute)
+      @topic.update_attribute(:posted_at, Time.zone.now - 2.minutes)
 
       # Create reply message and reset created_at to one minute ago
       @topic.reply_from(user: @student, html: "New test reply")
@@ -219,7 +219,7 @@ describe "threaded discussions" do
       entry_text = 'new entry'
       Discussion.visit(@course, @topic)
 
-      fj('label[for="showDeleted"]').click()
+      fj('label[for="showDeleted"]').click
       add_reply(entry_text)
       entry = DiscussionEntry.last
       delete_entry(entry)
@@ -308,12 +308,10 @@ describe "threaded discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       end
 
-      it "does not allow editing for a concluded student", skip: 'VICE-1986' do
-        # TODO: complete test once concluded students can no longer edit
-      end
-
-      it "does not allow deleting for a concluded student", skip: 'VICE-1986' do
-        # TODO: complete test once concluded students can no longer delete
+      it "does not allow editing or deleting for a concluded student" do
+        f("button[data-testid='thread-actions-menu']").click
+        expect(f('body')).not_to contain_jqcss("li:contains('Edit')")
+        expect(f('body')).not_to contain_jqcss("li:contains('Delete')")
       end
     end
 

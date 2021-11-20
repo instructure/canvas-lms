@@ -95,9 +95,7 @@ class Wiki < ActiveRecord::Base
     self.set_front_page_url!(url) if self.has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
-    unless page
-      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
-    end
+    page ||= self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
     page
   end
 
@@ -143,9 +141,7 @@ class Wiki < ActiveRecord::Base
     context.class.to_s
   end
 
-  def context_id
-    context.id
-  end
+  delegate :id, to: :context, prefix: true
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :read) }
@@ -222,9 +218,11 @@ class Wiki < ActiveRecord::Base
       return self.wiki_pages.where(id: match[1].to_i).first
     end
 
-    scope = include_deleted ?
-      self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
-      self.wiki_pages.not_deleted
+    scope = if include_deleted
+              self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END"))
+            else
+              self.wiki_pages.not_deleted
+            end
     scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 

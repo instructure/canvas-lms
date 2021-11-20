@@ -62,7 +62,7 @@ module MasterCourses::CollectionRestrictor
 
   # delegate to the owner
   def is_child_content?
-    owner_for_restrictions && owner_for_restrictions.is_child_content?
+    owner_for_restrictions&.is_child_content?
   end
 
   def child_content_restrictions

@@ -75,6 +75,7 @@ export default function ViewOptionsTabPanel({
   columnSort,
   showNotes,
   showUnpublishedAssignments,
+  showSeparateFirstLastNames,
   statusColors,
   viewUngradedAsZero
 }) {
@@ -122,6 +123,12 @@ export default function ViewOptionsTabPanel({
               I18n.t('Unpublished Assignments'),
               'showUnpublishedAssignments'
             )}
+            {showSeparateFirstLastNames.allowed &&
+              renderCheckbox(
+                showSeparateFirstLastNames,
+                I18n.t('Split Student Names'),
+                'showSeparateFirstLastNames'
+              )}
             {viewUngradedAsZero.allowed &&
               renderCheckbox(
                 viewUngradedAsZero,
@@ -156,6 +163,11 @@ ViewOptionsTabPanel.propTypes = {
     onChange: func.isRequired
   }).isRequired,
   showUnpublishedAssignments: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  showSeparateFirstLastNames: shape({
+    allowed: bool.isRequired,
     checked: bool.isRequired,
     onChange: func.isRequired
   }).isRequired,

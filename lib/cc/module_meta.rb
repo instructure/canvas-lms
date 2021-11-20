@@ -60,7 +60,7 @@ module CC
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
             m_node.position cm.position
-            m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
+            m_node.unlock_at CCHelper.ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
@@ -94,7 +94,7 @@ module CC
                     if ct.content && ct.content.context != @course
                       item_node.global_identifierref ct.content.id
                     end
-                    if ct.associated_asset.class == Lti::ResourceLink
+                    if ct.associated_asset.instance_of?(Lti::ResourceLink)
                       item_node.lti_resource_link_lookup_uuid ct.associated_asset.lookup_uuid
                     end
                   end
@@ -119,7 +119,7 @@ module CC
           end
         end
       end
-      meta_file.close if meta_file
+      meta_file&.close
       rel_path
     end
   end

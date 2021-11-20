@@ -61,7 +61,7 @@ class EportfolioEntriesController < ApplicationController
       elsif params[:entry_name] && @category
         @page = @category.eportfolio_entries.where(slug: params[:entry_name]).first
       end
-      if !@page
+      unless @page
         flash[:notice] = t('notices.missing_page', "Couldn't find that page")
         redirect_to eportfolio_url(@portfolio.id)
         return
@@ -84,12 +84,11 @@ class EportfolioEntriesController < ApplicationController
       end
       respond_to do |format|
         if @entry.update!(entry_params)
-          format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
           format.json { render :json => @entry }
         else
-          format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
           format.json { render :json => @entry.errors, :status => :bad_request }
         end
+        format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
       end
     end
   end
@@ -120,7 +119,7 @@ class EportfolioEntriesController < ApplicationController
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
-      rescue StandardError => e
+      rescue => e
         Canvas::Errors.capture_exception(:eportfolios, e, :warn)
         raise EportfolioNotFound, t('errors.not_found', "Not Found")
       end

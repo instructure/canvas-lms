@@ -21,7 +21,7 @@ require_relative '../../spec_helper'
 
 RSpec.describe DataFixup::PopulateMediaTracksWebVttContent do
   def webvtt_content
-    <<-HEREDOC
+    <<~TEXT
       WEBVTT
 
       00:01.000 --> 00:04.000
@@ -31,11 +31,11 @@ RSpec.describe DataFixup::PopulateMediaTracksWebVttContent do
       - It will perforate your stomach.
       - You could die.
         end
-    HEREDOC
+    TEXT
   end
 
   def srt_content
-    <<-HEREDOC
+    <<~SRT
       1
       00:00:01,600 --> 00:00:04,200
       English (US)
@@ -47,7 +47,7 @@ RSpec.describe DataFixup::PopulateMediaTracksWebVttContent do
       3
       00:00:10,000 --> 00:00:14,000
       Adding subtitles is very easy to do
-    HEREDOC
+    SRT
   end
 
   it 'converts content of type srt to web_vtt' do

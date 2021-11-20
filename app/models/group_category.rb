@@ -150,7 +150,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     def role_category_for_context(role, context)
-      return unless context and protected_role_for_context?(role, context)
+      return unless context && protected_role_for_context?(role, context)
 
       category = context.group_categories.where(role: role).first ||
                  context.group_categories.build(name: name_for_role(role),
@@ -207,7 +207,7 @@ class GroupCategory < ActiveRecord::Base
     # condition would may any group in the category say has_common_section?
     # false, and force us true. so we special case it, and get the short
     # circuit as a bonus.
-    return false unless self.context && self.context.is_a?(Course)
+    return false unless self.context.is_a?(Course)
 
     self.groups.any? { |group| !group.has_common_section? }
   end
@@ -286,7 +286,7 @@ class GroupCategory < ActiveRecord::Base
       remaining_member_count -= allocate_members_into_watermark(
         remaining_member_count,
         next_watermark,
-        water_allocation,
+        water_allocation
       )
     end
     water_allocation
@@ -400,10 +400,12 @@ class GroupCategory < ActiveRecord::Base
   def distribute_members_among_groups_by_section
     # trying to make this work for new group sets is hard enough - i'm not even going to bother with ones with existing stuff
     if GroupMembership.active.where(:group_id => groups.active).exists?
-      self.errors.add(:group_by_section, t("Groups must be empty to assign by section")); return
+      self.errors.add(:group_by_section, t("Groups must be empty to assign by section"))
+      return
     end
     if groups.active.where.not(:max_membership => nil).exists?
-      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section")); return
+      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section"))
+      return
     end
 
     group_count = groups.active.count
@@ -411,7 +413,8 @@ class GroupCategory < ActiveRecord::Base
     return unless group_count > 0 && section_count > 0
 
     if group_count < section_count
-      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section")); return
+      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section"))
+      return
     end
 
     GroupBySectionCalculator.new(self).distribute_members
@@ -419,9 +422,11 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def create_group_count=(num)
-    @create_group_count = num && num > 0 ?
-      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
-      nil
+    @create_group_count = if num && num > 0
+                            [num, Setting.get('max_groups_in_new_category', '200').to_i].min
+                          else
+                            nil
+                          end
   end
 
   def create_group_member_count=(num)
@@ -471,7 +476,7 @@ class GroupCategory < ActiveRecord::Base
                             counts = User.joins(:not_ended_enrollments)
                                          .where(enrollments: { course_id: context, type: 'StudentEnrollment' })
                                          .distinct('user_id').group('course_section_id').count
-                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.map(&:ceil).sum
+                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.sum(&:ceil)
                           else
                             (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
                           end
@@ -640,7 +645,7 @@ class GroupCategory < ActiveRecord::Base
           # more likely will we have some extra groups now because of remainder students from our first pass
           # so at least one section will have to have some smaller groups now
           # best thing to do now is to find the group that can take the hit the easiest
-          leftover_sec_id = group_counts.sort_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.last.first
+          leftover_sec_id = group_counts.max_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.first
           group_counts[leftover_sec_id] += 1
           extra_groups[leftover_sec_id] ||= 0
           extra_groups[leftover_sec_id] += 1
@@ -657,7 +662,7 @@ class GroupCategory < ActiveRecord::Base
         end
         @group_distributions[section_id] = dist
       end
-      if @group_distributions.values.map(&:count).sum != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
+      if @group_distributions.values.sum(&:count) != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
         raise "user/group count mismatch" # we should make sure this works before going any further
       end
 

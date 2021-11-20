@@ -19,7 +19,7 @@
 
 module UntaintCacheEntries
   def value
-    @value.untaint if @value
+    @value&.untaint
     super
   end
 end

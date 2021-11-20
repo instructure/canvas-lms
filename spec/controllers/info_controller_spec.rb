@@ -70,7 +70,7 @@ describe InfoController do
         get "health_prognosis"
         expect(response).to be_server_error
         body = response.body
-        %w{messages_partition quizzes_submission_events_partition versions_partition}.each do |type|
+        %w[messages_partition quizzes_submission_events_partition versions_partition].each do |type|
           expect(body).to include(type)
         end
       end

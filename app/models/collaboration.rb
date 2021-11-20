@@ -41,9 +41,9 @@ class Collaboration < ActiveRecord::Base
   after_commit :generate_document, on: :create
 
   TITLE_MAX_LENGTH = 255
-  validates_presence_of :title, :workflow_state, :context_id, :context_type
-  validates_length_of :title, :maximum => TITLE_MAX_LENGTH
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :title, :workflow_state, :context_id, :context_type, presence: true
+  validates :title, length: { :maximum => TITLE_MAX_LENGTH }
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
 
   serialize :data
 
@@ -94,7 +94,9 @@ class Collaboration < ActiveRecord::Base
 
   # These methods should be implemented in child classes.
 
-  def service_name; 'Collaboration'; end
+  def service_name
+    'Collaboration'
+  end
 
   def delete_document; end
 
@@ -114,7 +116,9 @@ class Collaboration < ActiveRecord::Base
     raise NotImplementedError
   end
 
-  def parse_data; nil; end
+  def parse_data
+    nil
+  end
 
   # Public: Find the class of for the given type.
   #
@@ -183,7 +187,9 @@ class Collaboration < ActiveRecord::Base
   # Public: Declare excluded serialization fields.
   #
   # Returns an array.
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   # Public: Soft-delete this collaboration.
   #
@@ -311,9 +317,9 @@ class Collaboration < ActiveRecord::Base
   def update_user_collaborators(users)
     if respond_to?(:remove_users_from_document)
       # need to get everyone added to the document, cause we're going to re-add them all
-      users_to_remove = collaborators.where("user_id IS NOT NULL").pluck(:user_id)
-      group_ids = collaborators.where("group_id IS NOT NULL").pluck(:group_id)
-      if !group_ids.empty?
+      users_to_remove = collaborators.where.not(user_id: nil).pluck(:user_id)
+      group_ids = collaborators.where.not(group_id: nil).pluck(:group_id)
+      unless group_ids.empty?
         users_to_remove += GroupMembership.where(group_id: group_ids).distinct.pluck(:user_id)
         users_to_remove.uniq!
       end
@@ -365,7 +371,7 @@ class Collaboration < ActiveRecord::Base
   def add_groups_to_collaborators(group_ids)
     return unless context.respond_to?(:groups)
 
-    if group_ids.length > 0
+    unless group_ids.empty?
       existing_groups = collaborators.where(:group_id => group_ids).select(:group_id)
       context.groups.where(:id => group_ids).where.not(:id => existing_groups).each do |g|
         collaborator = collaborators.build
@@ -382,7 +388,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def add_users_to_collaborators(users)
-    if users.length > 0
+    unless users.empty?
       existing_users = collaborators.where(:user_id => users).select(:user_id)
       context.potential_collaborators.where(:id => users).where.not(:id => existing_users).each do |u|
         collaborators.create(:user => u, :authorized_service_user_id => authorized_service_user_id_for(u))

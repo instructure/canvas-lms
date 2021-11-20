@@ -41,7 +41,7 @@ module Api::V1::FeatureFlag
     hash = if feature_flag.default?
              feature_flag.as_json.slice('feature', 'state')
            else
-             keys = %w(feature context_id context_type state)
+             keys = %w[feature context_id context_type state]
              api_json(feature_flag, current_user, session, only: keys)
            end
     hash['locking_account_id'] = nil unless feature_flag.default?

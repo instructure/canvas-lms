@@ -24,17 +24,13 @@ describe EventStream::Index do
   before do
     @database = double('database')
 
-    def @database.batch;
-      yield;
+    def @database.batch
+      yield
     end
 
-    def @database.update_record(*args)
-      ;
-    end
+    def @database.update_record(*); end
 
-    def @database.update(*args)
-      ;
-    end
+    def @database.update(*); end
 
     def @database.keyspace
       'test_db'

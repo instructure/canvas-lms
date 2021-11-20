@@ -20,7 +20,11 @@
 
 describe ActionView::Helpers::FormOptionsHelper do
   describe "#time_zone_options_for_select" do
-    let(:form) { f = Object.new; f.extend(ActionView::Helpers::FormOptionsHelper); f }
+    let(:form) {
+      f = Object.new
+      f.extend(ActionView::Helpers::FormOptionsHelper)
+      f
+    }
 
     it "does not include non-Rails zones by default" do
       expect(form.time_zone_options_for_select).not_to be_include("Africa/Lagos")

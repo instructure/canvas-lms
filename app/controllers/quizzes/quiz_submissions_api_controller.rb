@@ -237,7 +237,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      if params.has_key?(:attempt)
+      if params.key?(:attempt)
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 

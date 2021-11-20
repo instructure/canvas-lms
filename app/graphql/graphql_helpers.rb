@@ -53,7 +53,7 @@ module GraphQLHelpers
   def self.parse_relay_id(relay_id, expected_type)
     type, id = GraphQL::Schema::UniqueWithinType.decode(relay_id)
     if type != expected_type || id.nil?
-      raise InvalidIDError.new("expected an id for #{expected_type}")
+      raise InvalidIDError, "expected an id for #{expected_type}"
     else
       id
     end
@@ -62,9 +62,11 @@ module GraphQLHelpers
   # TODO - move this into LockType after we switch to the class-based api
   def self.make_lock_resolver(attr)
     ->(lock, _, _) {
-      lock == false ?
-        nil :
+      if lock == false
+        nil
+      else
         lock[attr]
+      end
     }
   end
 

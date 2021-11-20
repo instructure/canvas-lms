@@ -40,7 +40,7 @@ module Api::V1::Role
     return json if skip_permissions
 
     preloaded_overrides ||= RoleOverride.preload_overrides(account, [role])
-    RoleOverride.manageable_permissions(account).keys.each do |permission|
+    RoleOverride.manageable_permissions(account).each_key do |permission|
       perm = RoleOverride.permission_for(account, permission, role, account, true, preloaded_overrides: preloaded_overrides)
       next if permission == :manage_developer_keys && !account.root_account?
 

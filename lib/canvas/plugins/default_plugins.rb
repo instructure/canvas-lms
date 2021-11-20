@@ -187,7 +187,7 @@ module Canvas::Plugins::DefaultPlugins
         :migration_partial => 'canvas_config',
         :requires_file_upload => true,
         :provides => { :canvas_cartridge => CC::Importer::Canvas::Converter },
-        :valid_contexts => %w{Account Course}
+        :valid_contexts => %w[Account Course]
       },
     }
     require_dependency 'canvas/migration/worker/course_copy_worker'
@@ -206,7 +206,7 @@ module Canvas::Plugins::DefaultPlugins
         :skip_conversion_step => true,
         :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
         :required_settings => [:source_course_id],
-        :valid_contexts => %w{Course}
+        :valid_contexts => %w[Course]
       },
     }
     require_dependency 'canvas/migration/worker/zip_file_worker'
@@ -225,7 +225,7 @@ module Canvas::Plugins::DefaultPlugins
         :no_selective_import => true,
         :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
         :required_settings => [:source_folder_id],
-        :valid_contexts => %w(Course Group User)
+        :valid_contexts => %w[Course Group User]
       },
     }
     Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
@@ -245,7 +245,7 @@ module Canvas::Plugins::DefaultPlugins
                        :common_cartridge_1_1 => CC::Importer::Standard::Converter,
                        :common_cartridge_1_2 => CC::Importer::Standard::Converter,
                        :common_cartridge_1_3 => CC::Importer::Standard::Converter },
-        :valid_contexts => %w{Account Course}
+        :valid_contexts => %w[Account Course]
       },
     }
     Canvas::Plugin.register('grade_export', :sis, {

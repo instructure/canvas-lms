@@ -118,7 +118,7 @@ module BookmarkedCollection
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
       datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!(DateTime.parse(val) rescue false)) }
-    }
+    }.freeze
 
     def existing_column_definition(col_name)
       col = @model.columns_hash[col_name]
@@ -126,7 +126,7 @@ module BookmarkedCollection
     end
 
     def validate_definition(definition)
-      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.has_key?(k) }
+      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.key?(k) }
 
       definition
     end
@@ -137,7 +137,7 @@ module BookmarkedCollection
         columns.each.with_index.all? do |col, i|
           type = TYPE_MAP[column_definitions[col][:type]]
           nullable = column_definitions[col][:null]
-          type && ((nullable && bookmark[i].nil?) || type.(bookmark[i]))
+          type && ((nullable && bookmark[i].nil?) || type.call(bookmark[i]))
         end
     end
 
@@ -230,7 +230,7 @@ module BookmarkedCollection
       index_sql, *index_args = column_comparison(columns.first, ">=", bookmark.first)
       sql = [sql, index_sql].join(" AND ")
       args.concat(index_args)
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

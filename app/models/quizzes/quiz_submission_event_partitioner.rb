@@ -44,7 +44,7 @@ class Quizzes::QuizSubmissionEventPartitioner
   end
 
   def self.log(*args)
-    logger.info(*args) if logger
+    logger&.info(*args)
   end
 
   def self.processed?

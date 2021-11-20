@@ -27,7 +27,4 @@ class PopulateLastCommentAtOnSubmissions < ActiveRecord::Migration[5.0]
                                                                         n_strand: ['DataFixup::PopulateLastCommentAtOnSubmissions', Shard.current.database_server.id]).run(start_at, end_at)
     end
   end
-
-  def down
-  end
 end

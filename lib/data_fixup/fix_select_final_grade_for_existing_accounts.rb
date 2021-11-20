@@ -38,12 +38,10 @@ module DataFixup
       all_moderate_grades_overrides.where(enabled: false).find_in_batches do |moderate_overrides|
         new_role_overrides = []
         moderate_overrides.each do |moderate_override|
-          next if all_select_final_grade_overrides.exists?(
-            role_id: moderate_override.role_id,
-            context_id: moderate_override.context_id
-          )
+          next if all_select_final_grade_overrides.where(role_id: moderate_override.role_id,
+                                                         context_id: moderate_override.context_id).exists?
           # We take care of ta roles in the Account.find_each block.
-          next if all_ta_and_related_roles.exists?(id: moderate_override.role_id)
+          next if all_ta_and_related_roles.where(id: moderate_override.role_id).exists?
 
           new_role_overrides << {
             permission: 'select_final_grade',
@@ -79,8 +77,8 @@ module DataFixup
           ta_roles.each do |ta_role|
             # Skip if a RoleOverride already exists for this role, or if a
             # moderate_grades RoleOverride exists and is enabled.
-            next if select_overrides.exists?(role_id: ta_role.id)
-            next if moderate_overrides.exists?(role_id: ta_role.id)
+            next if select_overrides.where(role_id: ta_role.id).exists?
+            next if moderate_overrides.where(role_id: ta_role.id).exists?
 
             new_role_overrides << {
               permission: 'select_final_grade',

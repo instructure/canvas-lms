@@ -78,7 +78,7 @@ module MasterCourses::Restrictor
     end
 
     def mark_as_importing!(cm)
-      @importing_migration = cm if cm && cm.master_course_subscription
+      @importing_migration = cm if cm&.master_course_subscription
     end
 
     def skip_downstream_changes!
@@ -134,11 +134,11 @@ module MasterCourses::Restrictor
       changed_columns << "manually_deleted"
     end
     if changed_columns.any?
-      if self.is_a?(Assignment) && (submittable = self.submittable_object)
-        tag_content = submittable # mark on the owner's tag
-      else
-        tag_content = self
-      end
+      tag_content = if self.is_a?(Assignment) && (submittable = self.submittable_object)
+                      submittable # mark on the owner's tag
+                    else
+                      self
+                    end
       MasterCourses::ChildContentTag.transaction do
         child_tag = MasterCourses::ChildContentTag.where(content: tag_content).lock.first
         if child_tag
@@ -219,7 +219,7 @@ module MasterCourses::Restrictor
   end
 
   def is_child_content?
-    self.migration_id && self.migration_id.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+    self.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
   end
 
   def child_content_restrictions
@@ -261,7 +261,7 @@ module MasterCourses::Restrictor
     migration_ids = objects_to_load.keys
     return unless migration_ids.any?
 
-    objects_to_load.values.each { |obj| obj.child_content_restrictions = {} } # default if restrictions are missing
+    objects_to_load.each_value { |obj| obj.child_content_restrictions = {} } # default if restrictions are missing
     all_restrictions = MasterCourses::MasterContentTag.where(:migration_id => migration_ids).pluck(:migration_id, :restrictions)
     all_restrictions.each do |migration_id, restrictions|
       objects_to_load[migration_id].child_content_restrictions = restrictions
@@ -279,7 +279,7 @@ module MasterCourses::Restrictor
       template.migration_id_for(obj) # use their future migration ids because that'll actually make partial bulk-loading easier
     end
 
-    objects_to_load.values.each { |obj| obj.current_master_template_restrictions = {} } # default if restrictions are missing
+    objects_to_load.each_value { |obj| obj.current_master_template_restrictions = {} } # default if restrictions are missing
     template.master_content_tags.where(:migration_id => objects_to_load.keys).pluck(:migration_id, :restrictions).each do |migration_id, restrictions|
       objects_to_load[migration_id].current_master_template_restrictions = restrictions
     end

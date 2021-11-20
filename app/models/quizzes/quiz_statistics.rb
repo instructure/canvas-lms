@@ -33,7 +33,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   REPORTS = %w[student_analysis item_analysis].freeze
 
-  validates_inclusion_of :report_type, :in => REPORTS
+  validates :report_type, inclusion: { :in => REPORTS }
 
   after_initialize do
     self.includes_all_versions ||= false
@@ -144,9 +144,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     end
   end
 
-  def readable_type
-    report.readable_type
-  end
+  delegate :readable_type, to: :report
 
   set_policy do
     given do |user, session|

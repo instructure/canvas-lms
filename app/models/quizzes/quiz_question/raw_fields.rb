@@ -51,7 +51,7 @@ class Quizzes::QuizQuestion::RawFields
 
   def check_length(html, type, max)
     if html && html.length > max
-      raise FieldTooLongError.new("#{type} is too long, max length is #{max} characters")
+      raise FieldTooLongError, "#{type} is too long, max length is #{max} characters"
     end
 
     html

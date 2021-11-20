@@ -27,7 +27,7 @@ class CanvadocsAnnotationContext < ApplicationRecord
   validates :root_account_id, presence: true
   validates :submission_id, presence: true
 
-  validates_uniqueness_of :submission_attempt, scope: [:attachment_id, :submission_id]
+  validates :submission_attempt, uniqueness: { scope: [:attachment_id, :submission_id] }
 
   before_validation :set_launch_id, if: :new_record?
   before_validation :set_root_account_id, if: :new_record?
@@ -44,6 +44,11 @@ class CanvadocsAnnotationContext < ApplicationRecord
     # assigned peer reviewers can see non-draft attempts of the assigned student, but
     # cannot make annotations.
     given { |user| user && !draft? && submission.peer_reviewer?(user) }
+    can :read
+
+    # observers can see non-draft attempts of their observed student, but
+    # cannot make annotations.
+    given { |user| user && !draft? && submission.observer?(user) }
     can :read
 
     # users with permission to grade the submission OR provisional graders for a moderated

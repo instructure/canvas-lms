@@ -145,16 +145,16 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   old_root_account = Attachment.current_root_account
   Attachment.current_root_account = job.account
 
-  starting_mem = Canvas.sample_memory()
-  starting_cpu = Process.times()
+  starting_mem = Canvas.sample_memory
+  starting_cpu = Process.times
 
   begin
     RequestCache.enable do
       block.call(worker, job)
     end
   ensure
-    ending_cpu = Process.times()
-    ending_mem = Canvas.sample_memory()
+    ending_cpu = Process.times
+    ending_mem = Canvas.sample_memory
     user_cpu = ending_cpu.utime - starting_cpu.utime
     system_cpu = ending_cpu.stime - starting_cpu.stime
 

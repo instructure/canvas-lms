@@ -27,19 +27,19 @@ class CassandraAddGradingPeriodIdToGradeChanges < ActiveRecord::Migration[5.2]
 
   def self.up
     unless cassandra_column_exists?('grade_changes', 'grading_period_id')
-      cassandra.execute %{
+      cassandra.execute <<~SQL.squish
         ALTER TABLE grade_changes
         ADD grading_period_id bigint;
-      }
+      SQL
     end
   end
 
   def self.down
     if cassandra_column_exists?('grade_changes', 'grading_period_id')
-      cassandra.execute %{
+      cassandra.execute <<~SQL.squish
         ALTER TABLE grade_changes
         DROP grading_period_id;
-      }
+      SQL
     end
   end
 end

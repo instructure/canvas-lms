@@ -31,14 +31,14 @@ module Lti
     after_save :manage_subscription
     before_destroy :delete_subscription
 
-    scope :active, -> { where("lti_tool_proxies.workflow_state = ?", 'active') }
+    scope :active, -> { where(lti_tool_proxies: { workflow_state: 'active' }) }
 
     serialize :raw_data
     serialize :update_payload
 
-    validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context
-    validates_uniqueness_of :guid
-    validates_inclusion_of :workflow_state, in: ['active', 'deleted', 'disabled']
+    validates :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context, presence: true
+    validates :guid, uniqueness: true
+    validates :workflow_state, inclusion: { in: ['active', 'deleted', 'disabled'] }
 
     def active_in_context?(context)
       self.class.find_active_proxies_for_context(context).include?(self)
@@ -51,15 +51,15 @@ module Lti
     end
 
     def self.find_active_proxies_for_context(context)
-      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state = ?', 'active')
+      find_all_proxies_for_context(context).where(lti_tool_proxies: { workflow_state: 'active' })
     end
 
     def self.find_installed_proxies_for_context(context)
-      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state <> ?', 'deleted')
+      find_all_proxies_for_context(context).where.not(lti_tool_proxies: { workflow_state: 'deleted' })
     end
 
     def self.find_all_proxies_for_context(context)
-      account_ids = context.account_chain.map { |a| a.id }
+      account_ids = context.account_chain.map(&:id)
 
       account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
 
@@ -71,7 +71,7 @@ module Lti
     end
 
     def self.proxies_in_order_by_codes(context:, vendor_code:, product_code:, resource_type_code:)
-      account_ids = context.account_chain.map { |a| a.id }
+      account_ids = context.account_chain.map(&:id)
 
       # Added i+1 on this to ensure that the x.ordering later doesn't have 2 0's
       account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
@@ -94,9 +94,9 @@ module Lti
               # changed the order to go from the special ordering set up (to make sure we're going from the course to the
               # root account in order of parent accounts) and then takes the most recently installed tool
               order('ordering, lti_tool_proxies.id DESC')
-                  .where('lti_tool_proxies.workflow_state = ?', 'active')
+                  .where(lti_tool_proxies: { workflow_state: 'active' })
                   .where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
-                  .where('lti_resource_handlers.resource_type_code = ?', resource_type_code)
+                  .where(lti_resource_handlers: { resource_type_code: resource_type_code })
       # You can disable a tool_binding somewhere in the account chain, and anything below that that reenables it should be
       # available, but nothing above it, so we're getting rid of anything that is disabled and above
       tools.split { |tool| !tool.binding_enabled }.first
@@ -136,9 +136,7 @@ module Lti
       ims_tool_proxy.tool_profile.security_profiles
     end
 
-    def enabled_capabilities
-      ims_tool_proxy.enabled_capabilities
-    end
+    delegate :enabled_capabilities, to: :ims_tool_proxy
 
     def matching_tool_profile?(other_profile)
       profile = raw_data['tool_profile']

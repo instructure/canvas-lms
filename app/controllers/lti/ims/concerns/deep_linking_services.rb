@@ -73,9 +73,7 @@ module Lti::IMS::Concerns
         @context = context
       end
 
-      def [](key)
-        verified_jwt[key]
-      end
+      delegate :[], to: :verified_jwt
 
       def developer_key
         @developer_key ||= DeveloperKey.find_cached(client_id)
@@ -85,11 +83,11 @@ module Lti::IMS::Concerns
 
       def verified_jwt
         @verified_jwt ||= begin
-          if developer_key&.public_jwk_url.present?
-            jwt_hash = get_jwk_from_url
-          else
-            jwt_hash = JSON::JWT.decode(@raw_jwt_str, public_key)
-          end
+          jwt_hash = if developer_key&.public_jwk_url.present?
+                       get_jwk_from_url
+                     else
+                       JSON::JWT.decode(@raw_jwt_str, public_key)
+                     end
           standard_claim_errors(jwt_hash)
           developer_key_errors
           return if @errors.present? # rubocop:disable Lint/NoReturnInBeginEndBlocks

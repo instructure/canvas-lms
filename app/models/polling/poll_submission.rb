@@ -25,15 +25,15 @@ module Polling
     belongs_to :poll_session, class_name: 'Polling::PollSession'
     belongs_to :user
 
-    validates_presence_of :poll, :poll_choice, :poll_session, :user
-    validates_uniqueness_of :user_id,
-                            scope: :poll_session_id,
+    validates :poll, :poll_choice, :poll_session, :user, presence: true
+    validates :user_id,
+              uniqueness: { scope: :poll_session_id,
                             message: -> {
                                        t(
                                          'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
                                          'can only submit one choice per poll session.'
                                        )
-                                     }
+                                     } }
 
     validate :poll_choices_belong_to_poll
     validate :poll_is_published

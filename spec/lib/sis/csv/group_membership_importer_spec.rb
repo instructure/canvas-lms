@@ -58,7 +58,7 @@ describe SIS::CSV::GroupMembershipImporter do
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
-    expect(ms.map(&:workflow_state)).to eq %w(accepted deleted)
+    expect(ms.map(&:workflow_state)).to eq %w[accepted deleted]
 
     process_csv_data_cleanly(
       "group_id,user_id,status",
@@ -68,7 +68,7 @@ describe SIS::CSV::GroupMembershipImporter do
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
-    expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)
+    expect(ms.map(&:workflow_state)).to eq %w[deleted deleted]
   end
 
   it "adds users to groups that the user cannot access" do

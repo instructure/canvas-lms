@@ -65,12 +65,12 @@ describe Attachment do
 
     it "returns http as the protocol by default" do
       attachment_with_context(@course)
-      expect(@attachment.public_url).to match(/^http:\/\//)
+      expect(@attachment.public_url).to match(%r{^http://})
     end
 
     it "returns the protocol if specified" do
       attachment_with_context(@course)
-      expect(@attachment.public_url(:secure => true)).to match(/^https:\/\//)
+      expect(@attachment.public_url(:secure => true)).to match(%r{^https://})
     end
 
     context "for a quiz submission upload" do
@@ -120,7 +120,7 @@ describe Attachment do
 
     it "gives back a signed s3 url" do
       a = attachment_model
-      expect(a.public_url(expires_in: 1.day)).to match(/^https:\/\//)
+      expect(a.public_url(expires_in: 1.day)).to match(%r{^https://})
       a.destroy_permanently!
     end
   end
@@ -327,7 +327,7 @@ describe Attachment do
 
       it "downgrades Canvadoc upload timeouts to WARN" do
         canvadocable = canvadocable_attachment_model content_type: "application/pdf"
-        cd_double = double()
+        cd_double = double
         allow(canvadocable).to receive(:canvadoc).and_return(cd_double)
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
@@ -1211,11 +1211,11 @@ describe Attachment do
 
   describe "make_unique_filename" do
     it "finds a unique name for files" do
-      existing_files = %w(a.txt b.txt c.txt)
+      existing_files = %w[a.txt b.txt c.txt]
       expect(Attachment.make_unique_filename("d.txt", existing_files)).to eq "d.txt"
       expect(existing_files).not_to be_include(Attachment.make_unique_filename("b.txt", existing_files))
 
-      existing_files = %w(/a/b/a.txt /a/b/b.txt /a/b/c.txt)
+      existing_files = %w[/a/b/a.txt /a/b/b.txt /a/b/c.txt]
       expect(Attachment.make_unique_filename("/a/b/d.txt", existing_files)).to eq "/a/b/d.txt"
       new_name = Attachment.make_unique_filename("/a/b/b.txt", existing_files)
       expect(existing_files).not_to be_include(new_name)
@@ -2029,7 +2029,7 @@ describe Attachment do
         expect(tempfile).to receive(:path)
 
         expect(Tempfile).to receive(:new).and_return(tempfile)
-        actual_file = double()
+        actual_file = double
         expect(actual_file).to(receive(:read).twice { data.shift })
         expect(File).to receive(:open).and_yield(actual_file)
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))
@@ -2233,7 +2233,7 @@ describe Attachment do
         expect { subject }.to raise_error(
           an_instance_of(
             CanvasHttp::InvalidResponseCodeError
-          ).and having_attributes(body: "#{body}...")
+          ).and(having_attributes(body: "#{body}..."))
         )
       end
 
@@ -2525,6 +2525,33 @@ describe Attachment do
       same_att = att.copy_to_student_annotation_documents_folder(@course)
 
       expect(same_att).to eq att
+    end
+  end
+
+  describe "#word_count" do
+    it "returns the word count for a PDF" do
+      attachment_model(filename: 'test.pdf', uploaded_data: fixture_file_upload('files/example.pdf', 'application/pdf'))
+      expect(@attachment.word_count).to eq 3320
+    end
+
+    it "returns the word count for a DOCX file" do
+      attachment_model(filename: 'test.docx', uploaded_data: fixture_file_upload('files/test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns the word count for an RTF file" do
+      attachment_model(filename: 'test.rtf', uploaded_data: fixture_file_upload('files/test.rtf', 'application/rtf'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns the word count for a text file" do
+      attachment_model(filename: 'test.txt', uploaded_data: fixture_file_upload('files/amazing_file.txt', 'text/plain'))
+      expect(@attachment.word_count).to eq 5
+    end
+
+    it "returns nil if the file is not supported" do
+      attachment_model(filename: 'test.png', uploaded_data: fixture_file_upload('files/instructure.png', 'image/png'))
+      expect(@attachment.word_count).to be_nil
     end
   end
 end

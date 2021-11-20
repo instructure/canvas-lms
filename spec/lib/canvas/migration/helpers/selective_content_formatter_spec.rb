@@ -40,7 +40,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
           "syllabus_body" => "oh, hi there."
         }
       }
-      @migration = double()
+      @migration = double
       allow(@migration).to receive(:migration_type).and_return('common_cartridge_importer')
       allow(@migration).to receive(:overview_attachment).and_return(@migration)
       allow(@migration).to receive(:open).and_return(@migration)
@@ -244,7 +244,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @category = @course.group_categories.create(:name => "other category")
       @group = Group.create!(:name => "group1", :group_category => @category, :context => @course)
       @announcement = announcement_model
-      @migration = double()
+      @migration = double
       allow(@migration).to receive(:migration_type).and_return('course_copy_importer')
       allow(@migration).to receive(:source_course).and_return(@course)
       export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
@@ -277,7 +277,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "lists learning outcomes" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.map { |o| o[:title] }).to match_array(
+        expect(outcomes.pluck(:title)).to match_array(
           [
             'alpaca',
             'moonshine',
@@ -302,7 +302,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "lists individual types in expected order" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.map { |o| o[:title] }).to eq [
+        expect(outcomes.pluck(:title)).to eq [
           'beta',
           'striker',
           'alpaca',
@@ -312,7 +312,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "lists outcomes in outcome group" do
         outcomes = formatter.get_content_list("learning_outcome_groups_#{@out_group1.id}")
-        expect(outcomes.map { |o| o[:title] }).to eq [
+        expect(outcomes.pluck(:title)).to eq [
           'moonshine',
           'speakeasy'
         ]
@@ -397,7 +397,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(res[0][:title]).to eq 'course files'
       expect(res[0][:sub_items][0][:title]).to eq 'a5.html'
       expect(res[1][:title]).to eq 'course files/a'
-      expect(res[1][:sub_items].map { |item| item[:title] }.sort).to eq ['a1.html', 'a2.html']
+      expect(res[1][:sub_items].pluck(:title).sort).to eq ['a1.html', 'a2.html']
       expect(res[2][:title]).to eq 'course files/a/b'
       expect(res[2][:sub_items][0][:title]).to eq 'a3.html'
       expect(res[3][:title]).to eq 'course files/a/b/c'

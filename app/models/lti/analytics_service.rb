@@ -23,7 +23,7 @@ require 'securerandom'
 
 module Lti
   class AnalyticsService
-    class Token < Struct.new(:tool, :user, :course, :timestamp, :nonce)
+    Token = Struct.new(:tool, :user, :course, :timestamp, :nonce) do
       def self.create(tool, user, course)
         Token.new(tool, user, course, Time.now, SecureRandom.hex(8))
       end

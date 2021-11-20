@@ -26,10 +26,10 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  validates_presence_of :discussion_entry_id, :user_id, :workflow_state
+  validates :discussion_entry_id, :user_id, :workflow_state, presence: true
   validate :prevent_creates
 
-  validates :report_type, inclusion: { in: %w(inappropriate offensive other),
+  validates :report_type, inclusion: { in: %w[inappropriate offensive other],
                                        message: "%{value} is not valid" }
 
   def prevent_creates
@@ -50,8 +50,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
-    Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
+    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
+    ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
@@ -81,7 +81,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
-      insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
+      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state]
       update_columns = []
       update_values = []
 
@@ -98,7 +98,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       end
 
       unless report_type.nil?
-        unless %w(inappropriate offensive other).include? report_type
+        unless %w[inappropriate offensive other].include? report_type
           raise(ArgumentError)
         end
 

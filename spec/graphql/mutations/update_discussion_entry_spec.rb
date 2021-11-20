@@ -75,7 +75,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
 
   it 'updates a discussion entry message' do
     result = run_mutation(discussion_entry_id: @entry.id, message: 'New message')
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry', 'message')).to eq 'New message'
     expect(@entry.reload.message).to eq 'New message'
@@ -96,7 +96,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
 
   it 'removes a discussion entry attachment' do
     result = run_mutation(discussion_entry_id: @entry.id, remove_attachment: true)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry', 'attachment')).to be nil
     expect(@entry.reload.attachment).to be nil
@@ -106,7 +106,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     attachment = attachment_with_context(@student)
     attachment.update!(user: @student)
     result = run_mutation(discussion_entry_id: @entry.id, file_id: attachment.id)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry', 'attachment', '_id')).to eq attachment.id.to_s
     expect(@entry.reload.attachment_id).to eq attachment.id
@@ -115,7 +115,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
   context 'include reply preview' do
     it 'cannot be true on a root entry' do
       result = run_mutation(discussion_entry_id: @entry.id, include_reply_preview: true)
-      expect(result.dig('errors')).to be nil
+      expect(result['errors']).to be nil
       expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
       expect(@entry.reload.include_reply_preview).to be false
     end
@@ -124,7 +124,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       parent_entry = @topic.discussion_entries.create!(message: 'I am the parent reply', user: @student, attachment: @attachment)
       entry = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id, include_reply_preview: false, root_entry_id: parent_entry.id)
       result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
-      expect(result.dig('errors')).to be nil
+      expect(result['errors']).to be nil
       expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
       expect(entry.reload.include_reply_preview).to be false
     end
@@ -134,7 +134,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       child_reply = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id)
       entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: false)
       result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
-      expect(result.dig('errors')).to be nil
+      expect(result['errors']).to be nil
       expect(result.dig('data', 'updateDiscussion
         Entry', 'errors')).to be nil
       expect(entry.reload.include_reply_preview).to be true

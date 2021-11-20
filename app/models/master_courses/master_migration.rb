@@ -72,7 +72,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
                 run_at: 10.minutes.from_now)
             .start_new_migration!(master_template, user, opts)
         else
-          raise MigrationRunningError.new("cannot start new migration while another one is running")
+          raise MigrationRunningError, "cannot start new migration while another one is running"
         end
       else
         new_migration = master_template.master_migrations.create!({ :user => user }.merge(opts.except(:retry_later)))
@@ -97,7 +97,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def in_running_state?
-    %w{created queued exporting imports_queued}.include?(self.workflow_state)
+    %w[created queued exporting imports_queued].include?(self.workflow_state)
   end
 
   def still_running?
@@ -159,7 +159,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     # the primary export is the one we'll use to mark the content tags as exported (i.e. the first one)
     cms = []
     cms += export_to_child_courses(:selective, up_to_date_subs, true).to_a if up_to_date_subs.any?
-    cms += export_to_child_courses(:full, new_subs, !up_to_date_subs.any?).to_a if new_subs.any?
+    cms += export_to_child_courses(:full, new_subs, up_to_date_subs.none?).to_a if new_subs.any?
 
     unless self.workflow_state == 'exports_failed'
       self.workflow_state = 'imports_queued'
@@ -192,7 +192,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       self.generate_imports(type, export, subscriptions)
     else
       self.fail_export_with_error!("#{type} content export #{export.id} failed")
-      return nil
+      nil
     end
   end
 
@@ -224,7 +224,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def selected_content(type)
     {}.tap do |h|
-      h[:all_course_settings] = if migration_settings.has_key?(:copy_settings)
+      h[:all_course_settings] = if migration_settings.key?(:copy_settings)
                                   migration_settings[:copy_settings]
                                 else
                                   type == :full
@@ -322,7 +322,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       end
     end
 
-    unless self.migration_results.where.not(:state => %w{completed failed}).exists?
+    unless self.migration_results.where.not(:state => %w[completed failed]).exists?
       self.class.transaction do
         self.lock!
         if self.workflow_state == 'imports_queued'

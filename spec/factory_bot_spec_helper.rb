@@ -29,8 +29,8 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   config.before(:suite) do
-    unless FactoryBot.definition_file_paths == %w{spec/factory_bot} # already loaded
-      FactoryBot.definition_file_paths = %w{spec/factory_bot}
+    unless FactoryBot.definition_file_paths == %w[spec/factory_bot] # already loaded
+      FactoryBot.definition_file_paths = %w[spec/factory_bot]
       FactoryBot.find_definitions
     end
   end

@@ -7393,7 +7393,7 @@ mi:
     other: "%{count} ngā tāpaetanga e hiahiatia ana te kōeke"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} ka mukua me te neke atu i te paepae kua whakatautia %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} kaore i whakaputaina ngā huringa"
+    one: "1 kaore i whakaputaina huringa"
     other: "%{count} kaore i whakaputaina ngā huringa"
   count_unread_cff5855: "%{count} kaore i pānuitia."
   count_unread_messages_99d6bf17: 

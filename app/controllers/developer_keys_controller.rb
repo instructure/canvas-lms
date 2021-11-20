@@ -126,7 +126,7 @@ class DeveloperKeysController < ApplicationController
     end
 
     # failover to what require_site_admin_with_permission uses
-    return Account.site_admin
+    Account.site_admin
   end
 
   def context_is_domain_root_account?

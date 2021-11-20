@@ -114,7 +114,7 @@ module Services
 
     def self.jwt # public only for testing, should not be used directly
       Canvas::Security.create_jwt({ iat: Time.now.to_i }, nil, jwt_secret, :HS512)
-    rescue StandardError => e
+    rescue => e
       Canvas::Errors.capture_exception(:address_book, e)
       nil
     end
@@ -139,9 +139,11 @@ module Services
         url = app_host + path
         url += '?' + params.to_query unless params.empty?
         fallback = { "records" => [] }
-        timeout_service_name = params[:ignore_result] == 1 ?
-          "address_book_performance_tap" :
-          "address_book"
+        timeout_service_name = if params[:ignore_result] == 1
+                                 "address_book_performance_tap"
+                               else
+                                 "address_book"
+                               end
         Canvas.timeout_protection(timeout_service_name) do
           response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
           if ![200, 202].include?(response.code.to_i)

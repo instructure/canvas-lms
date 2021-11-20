@@ -20,7 +20,7 @@
 describe "QuizRegrading" do
   def create_quiz_question!(data)
     question = @quiz.quiz_questions.create!
-    data.merge!(:id => question.id)
+    data[:id] = question.id
     question.write_attribute(:question_data, data.to_hash)
     question.save!
     question

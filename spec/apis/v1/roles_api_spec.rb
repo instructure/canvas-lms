@@ -48,7 +48,7 @@ describe "Roles API", type: :request do
       json = api_call(:post, "/api/v1/accounts/#{account.id}/roles",
                       { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => account.id.to_s },
                       parameters)
-      @role = Role.find_by_id(json["id"])
+      @role = Role.find_by(id: json["id"])
       json
     end
 
@@ -120,7 +120,7 @@ describe "Roles API", type: :request do
 
         it "lists inactive roles" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive) })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive] })
           expect(json.size).to eq 1
           expect(json[0]['role']).to eq 'inactive_role'
         end
@@ -134,7 +134,7 @@ describe "Roles API", type: :request do
 
         it "accepts multiple states" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive&state[]=active",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive active) })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive active] })
           expect(json.size).to eq 7
           expect(json.map { |role| role['role'] }).to be_include 'inactive_role'
         end
@@ -199,7 +199,7 @@ describe "Roles API", type: :request do
                                            'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' } } })
       @account.reload
 
-      role = Role.find_by_id(json['id'])
+      role = Role.find_by(id: json['id'])
       overrides = @account.role_overrides.where(:role_id => role.id).index_by(&:permission)
       expect(overrides['read_forum'].enabled).to be_truthy
       expect(overrides['read_forum'].locked).to be_falsey
@@ -214,7 +214,7 @@ describe "Roles API", type: :request do
       before :once do
         @role = custom_teacher_role(@role_name, :account => @account)
         course1 = Course.create!(:name => "blah", :account => @account)
-        user1 = user_factory()
+        user1 = user_factory
 
         enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment', :role => @role)
         enrollment1.invite
@@ -435,7 +435,7 @@ describe "Roles API", type: :request do
                           restricted_permission => { :explicit => '1', :enabled => '1' }
                         } })
 
-      @role = Role.find_by_id(json["id"])
+      @role = Role.find_by(id: json["id"])
 
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1 # not 2
       override = @account.role_overrides.where(:permission => restricted_permission, :role_id => @role.id).first
@@ -712,7 +712,7 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
                         { :role => role_name, :base_role_type => 'StudentEnrollment' })
 
-        role = Role.find_by_id(json["id"])
+        role = Role.find_by(id: json["id"])
         @path = "/api/v1/accounts/#{@account.id}/roles/#{role.id}"
         @path_options[:id] = role.id
         @permissions[:permissions][:read_question_banks][:enabled] = 1

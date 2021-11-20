@@ -7419,7 +7419,7 @@ pt:
     other: "%{count} as entregas precisam ser avaliadas"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} seria eliminado e excede o limite estabelecido de %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} alterações não publicadas"
+    one: "1 alteração não publicada"
     other: "%{count} alterações não publicadas"
   count_unread_cff5855: "%{count} não lido."
   count_unread_messages_99d6bf17: 

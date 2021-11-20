@@ -49,7 +49,7 @@ describe BookmarkService do
         :title => 'some title',
         :url => 'google.com',
         :comments => 'some comments',
-        :tags => %w(some tags)
+        :tags => %w[some tags]
       )
     end
 
@@ -70,7 +70,7 @@ describe BookmarkService do
         :title => 'some title',
         :url => 'google.com',
         :comments => 'some comments',
-        :tags => %w(some tags)
+        :tags => %w[some tags]
       )
     end
 
@@ -82,7 +82,7 @@ describe BookmarkService do
           :title => 'some title',
           :url => 'google.com',
           :comments => 'some comments',
-          :tags => %w(some tags)
+          :tags => %w[some tags]
         )
       }.not_to raise_error
     end

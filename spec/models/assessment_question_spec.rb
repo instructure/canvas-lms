@@ -125,7 +125,7 @@ describe AssessmentQuestion do
 
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachment_clones = Hash[@attachments.map { |k, ary| [k, ary.map { |a| @question.attachments.where(root_attachment_id: a).first }] }]
+    @attachment_clones = @attachments.transform_values { |ary| ary.map { |a| @question.attachments.where(root_attachment_id: a).first } }
 
     @attachment_clones.each do |key, ary|
       string = eval "@question.question_data#{key}"
@@ -232,7 +232,7 @@ describe AssessmentQuestion do
       # consistent ordering is good for preventing deadlocks
       questions = []
       3.times { questions << assessment_question.create_quiz_question(quiz.id) }
-      smallest_id_question = questions.sort_by(&:id).first
+      smallest_id_question = questions.min_by(&:id)
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.id).to eq(smallest_id_question.id)
     end

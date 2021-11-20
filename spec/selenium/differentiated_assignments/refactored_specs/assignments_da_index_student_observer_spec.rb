@@ -35,7 +35,7 @@ describe 'Viewing differentiated assignments' do
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
           # quizzes
-          quizzes.quiz_for_sections_a_and_b.title,
+          quizzes.quiz_for_sections_a_and_b.title
         )
 
         # hides the rest

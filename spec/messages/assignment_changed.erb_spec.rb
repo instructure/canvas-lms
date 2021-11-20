@@ -38,8 +38,8 @@ describe 'assignment_changed' do
       expect(msg.subject).to match(/Quiz 1/)
       expect(msg.body).to match(/Quiz 1/)
       expect(msg.body).to match(Regexp.new(@course.name))
-      expect(msg.body).to match(/#{HostUrl.protocol}:\/\//)
-      expect(msg.body).to match(/courses\/#{@assignment.context_id}\/assignments\/#{@assignment.id}/)
+      expect(msg.body).to match(%r{#{HostUrl.protocol}://})
+      expect(msg.body).to match(%r{courses/#{@assignment.context_id}/assignments/#{@assignment.id}})
     end
   end
 

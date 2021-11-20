@@ -196,12 +196,12 @@ RSpec.describe SubmissionComment do
 
   it "renders formatted_body correctly" do
     @comment = @submission.submission_comments.create!(valid_attributes)
-    @comment.comment = %{
-This text has a http://www.google.com link in it...
+    @comment.comment = <<~TEXT
+      This text has a http://www.google.com link in it...
 
-> and some
-> quoted text
-}
+      > and some
+      > quoted text
+    TEXT
     @comment.save!
     body = @comment.formatted_body
     expect(body).to match(/<a/)

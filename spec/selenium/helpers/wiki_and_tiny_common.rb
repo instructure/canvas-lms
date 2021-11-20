@@ -53,8 +53,8 @@ module WikiAndTinyCommon
     @image2.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
     @image2.save!
     get "/courses/#{@course.id}/pages/front-page/edit"
-    @tree1 = driver.find_element(:id, :tree1) if !skip_tree
-    @image_list = f('#editor_tabs_4 .image_list') if !skip_image_list
+    @tree1 = driver.find_element(:id, :tree1) unless skip_tree
+    @image_list = f('#editor_tabs_4 .image_list') unless skip_image_list
   end
 
   def add_text_to_tiny(text)

@@ -52,7 +52,10 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
 
     body = response.body
     if body.respond_to?(:call)
-      StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
+      StringIO.new.tap { |sio|
+        body.call(nil, sio)
+        body = sio.string
+      }
     end
     # Check that the body doesn't have any duplicate keys. this can happen if
     # you add both a string and a symbol to the hash before calling to_json on
@@ -87,9 +90,7 @@ $spec_api_tokens = {}
 def access_token_for_user(user)
   enable_developer_key_account_binding!(DeveloperKey.default)
   token = $spec_api_tokens[user]
-  unless token
-    token = $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
-  end
+  token ||= $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
   token
 end
 
@@ -114,7 +115,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
         allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
       end
     end
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.key?(:domain_root_account)
     __send__(method, path, headers: headers, params: params.except(*route_params.keys).merge(body_params))
   end
 end
@@ -154,7 +155,7 @@ def check_document(html, course, attachment, include_verifiers)
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
   expect(video['src']).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
-  expect(video['src']).to match(%r{entryId=qwerty})
+  expect(video['src']).to match(/entryId=qwerty/)
   expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
 end
@@ -163,7 +164,7 @@ end
 # response from the api for that field, which will be verified for correctness.
 def should_translate_user_content(course, include_verifiers = true)
   attachment = attachment_model(:context => course)
-  content = %{
+  content = <<~HTML
     <p>
       Hello, students.<br>
       This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
@@ -172,7 +173,7 @@ def should_translate_user_content(course, include_verifiers = true)
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>
-  }
+  HTML
   html = yield content
   check_document(html, course, attachment, include_verifiers)
 

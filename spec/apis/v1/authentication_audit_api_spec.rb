@@ -109,7 +109,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "has correct root keys" do
-        expect(@json.keys.sort).to eq %w{events linked links}
+        expect(@json.keys.sort).to eq %w[events linked links]
       end
 
       it "has a formatted links key" do
@@ -123,7 +123,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "has a formatted linked key" do
-        expect(@json['linked'].keys.sort).to eq %w{accounts logins page_views users}
+        expect(@json['linked'].keys.sort).to eq %w[accounts logins page_views users]
         expect(@json['linked']['accounts'].is_a?(Array)).to be_truthy
         expect(@json['linked']['logins'].is_a?(Array)).to be_truthy
         expect(@json['linked']['page_views'].is_a?(Array)).to be_truthy

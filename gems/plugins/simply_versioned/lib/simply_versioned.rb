@@ -44,7 +44,7 @@ module SimplyVersioned
     :on_create => nil,
     :on_update => nil,
     :on_load => nil
-  }
+  }.freeze
 
   module ClassMethods
     # Marks this ActiveRecord model as being versioned. Calls to +create+ or +save+ will,
@@ -78,7 +78,7 @@ module SimplyVersioned
 
     def simply_versioned(options = {})
       bad_keys = options.keys - SimplyVersioned::DEFAULTS.keys
-      raise SimplyVersioned::BadOptions.new(bad_keys) unless bad_keys.empty?
+      raise SimplyVersioned::BadOptions, bad_keys unless bad_keys.empty?
 
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
@@ -131,9 +131,10 @@ module SimplyVersioned
                                :except => [:created_at, :updated_at]
                              })
 
-      version = if version.kind_of?(Version)
+      version = case version
+                when Version
                   version
-                elsif version.kind_of?(Integer)
+                when Integer
                   self.versions.where(number: version).first
                 end
 
@@ -141,7 +142,7 @@ module SimplyVersioned
 
       options[:except] = options[:except].map(&:to_s)
 
-      self.update(YAML::load(version.yaml).except(*options[:except]))
+      self.update(YAML.load(version.yaml).except(*options[:except]))
     end
 
     # Invoke the supplied block passing the receiver as the sole block argument with
@@ -216,9 +217,11 @@ module SimplyVersioned
     # on the before_save to see if the changes are worth
     # creating a new version for
     def check_if_changes_are_worth_versioning
-      @changes_are_worth_versioning = simply_versioned_options[:when] ?
-        simply_versioned_options[:when].call(self) :
-        (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
+      @changes_are_worth_versioning = if simply_versioned_options[:when]
+                                        simply_versioned_options[:when].call(self)
+                                      else
+                                        (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
+                                      end
       true
     end
 
@@ -252,9 +255,9 @@ module SimplyVersioned
     # ActiveRecord doesn't have a polymorphic :inverse_of option.
     def method_missing(method, *a, &b)
       case method
-      when :minimum, :maximum, :exists?, :all, :find_all, :each then
+      when :minimum, :maximum, :exists?, :all, :find_all, :each
         populate_versionables(super)
-      when :find then
+      when :find
         case a.first
         when :all          then populate_versionables(super)
         when :first, :last then populate_versionable(super)
@@ -297,9 +300,7 @@ module SimplyVersioned
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where('number <= ?', self.maximum(:number) - versions_to_keep).each do |version|
-        version.destroy
-      end
+      where('number <= ?', self.maximum(:number) - versions_to_keep).each(&:destroy)
     end
     alias_method :purge, :clean_old_versions
 

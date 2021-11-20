@@ -28,9 +28,9 @@ describe EventStream::IndexStrategy::Cassandra do
       yield
     end
 
-    def @database.update_record(*args); end
+    def @database.update_record(*); end
 
-    def @database.update(*args); end
+    def @database.update(*); end
 
     def @database.keyspace
       'test_db'

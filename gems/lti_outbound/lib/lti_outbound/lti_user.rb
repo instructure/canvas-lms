@@ -27,12 +27,12 @@ module LtiOutbound
                   :name, :timezone, :current_observee_ids
 
     def current_role_types
-      roles = current_roles.join(',') if current_roles && current_roles.size > 0
+      roles = current_roles.join(',') if current_roles && !current_roles.empty?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_role_types
-      roles = concluded_roles.join(',') if concluded_roles && concluded_roles.size > 0
+      roles = concluded_roles.join(',') if concluded_roles && !concluded_roles.empty?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 

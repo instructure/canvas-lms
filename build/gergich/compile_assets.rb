@@ -40,11 +40,11 @@ class Gergich::CompileAssets
     cwd = Dir.pwd
     puts cwd
 
-    pattern = %r|                                       # Example:
+    pattern = %r{                                       # Example:
       ^#{cwd}/([^\n]+?):(\d+):\d+:\serror:\s([^\n]+)\n  #   /absolute/path/to/file.coffee:7:1: error: unexpected INDENT
       ([^\n]+)\n                                        #        falseList = []
       ([^\n]+)\n                                        #   ^^^^^
-    |mx
+    }mx
 
     result.concat(output.scan(pattern).map do |file, line, error, context1, context2|
       error = "#{error}\n\n #{context1}\n #{context2}"

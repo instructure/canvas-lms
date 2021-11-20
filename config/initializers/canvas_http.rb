@@ -20,7 +20,7 @@
 CanvasHttp.open_timeout = -> { Setting.get('http_open_timeout', 5).to_f }
 CanvasHttp.read_timeout = -> { Setting.get('http_read_timeout', 30).to_f }
 CanvasHttp.logger = -> { Rails.logger }
-CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.0.0.1/8').split(/,/).presence }
+CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.0.0.1/8').split(",").presence }
 
 module CanvasHttpInitializer
   def self.configure_circuit_breaker!

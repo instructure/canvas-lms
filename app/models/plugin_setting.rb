@@ -29,7 +29,7 @@
 #  updated_at :datetime
 #
 class PluginSetting < ActiveRecord::Base
-  validates_uniqueness_of :name, :if => :validate_uniqueness_of_name?
+  validates :name, uniqueness: { :if => :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
   serialize :settings
   attr_accessor :posted_settings

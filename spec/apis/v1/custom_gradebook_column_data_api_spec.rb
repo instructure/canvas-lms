@@ -26,10 +26,10 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
   before :once do
     course_with_teacher active_all: true
-    s1, s2 = 2.times.map { |i|
+    s1, s2 = Array.new(2) do |i|
       @course.course_sections.create! name: "section #{i}"
-    }
-    @student1, @student2 = 2.times.map { user_factory(active_all: true) }
+    end
+    @student1, @student2 = Array.new(2) { user_factory(active_all: true) }
     s1.enroll_user @student1, 'StudentEnrollment', 'active'
     s2.enroll_user @student2, 'StudentEnrollment', 'active'
 
@@ -200,11 +200,11 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
       # create
       json = update(@student1, "blarg")
-      check.("blarg")
+      check.call("blarg")
 
       # update
       json = update(@student1, "shmarg")
-      check.("shmarg")
+      check.call("shmarg")
     end
   end
 

@@ -30,7 +30,7 @@ module Lti
 
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
-    validate :valid_configuration?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
+    validate :valid_configuration?, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
     validate :valid_placements
 
     attr_accessor :configuration_url, :settings_url

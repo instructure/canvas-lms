@@ -33,7 +33,7 @@ module Api::V1::Assignment
               :rubric_association].freeze
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
-    :only => %w(
+    :only => %w[
       id
       position
       description
@@ -64,11 +64,11 @@ module Api::V1::Assignment
       anonymous_grading
       allowed_attempts
       annotatable_attachment_id
-    )
+    ]
   }.freeze
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
-    :only => %w(
+    :only => %w[
       graders_anonymous_to_graders
       grader_comments_visible_to_graders
       grader_names_visible_to_final_grader
@@ -77,7 +77,7 @@ module Api::V1::Assignment
       assignment_group_id
       post_to_sis
       annotatable_attachment_id
-    )
+    ]
   }.freeze
 
   EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD = %w[
@@ -162,18 +162,18 @@ module Api::V1::Assignment
       hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)
     end
 
-    if !assignment.user_submitted.nil?
+    unless assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
     end
 
     hash['omit_from_final_grade'] = assignment.omit_from_final_grade?
 
-    if assignment.context && assignment.context.turnitin_enabled?
+    if assignment.context&.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
 
-    if assignment.context && assignment.context.vericite_enabled?
+    if assignment.context&.vericite_enabled?
       hash['vericite_enabled'] = assignment.vericite_enabled
       hash['vericite_settings'] = vericite_settings_json(assignment)
     end
@@ -230,7 +230,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
-      tool_attributes.merge!('custom_params' => assignment.primary_resource_link&.custom)
+      tool_attributes['custom_params'] = assignment.primary_resource_link&.custom
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -324,8 +324,11 @@ module Api::V1::Assignment
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
-      override_count = assignment.assignment_overrides.loaded? ?
-        assignment.assignment_overrides.select(&:active?).count : assignment.assignment_overrides.active.count
+      override_count = if assignment.assignment_overrides.loaded?
+                         assignment.assignment_overrides.count(&:active?)
+                       else
+                         assignment.assignment_overrides.active.count
+                       end
       if override_count < Setting.get('assignment_all_dates_too_many_threshold', '25').to_i
         hash['all_dates'] = assignment.dates_hash_visible_to(user)
       else
@@ -373,14 +376,14 @@ module Api::V1::Assignment
       if submission.is_a?(Array)
         ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
         hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params[:include], params) }
-        should_show_statistics = should_show_statistics && submission.any? do |s|
+        should_show_statistics &&= submission.any? do |s|
           s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
           s.eligible_for_showing_score_statistics?
         end
       else
         hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params[:include], params)
         submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
-        should_show_statistics = should_show_statistics && submission.eligible_for_showing_score_statistics?
+        should_show_statistics &&= submission.eligible_for_showing_score_statistics?
       end
 
       if should_show_statistics && (stats = assignment&.score_statistic)
@@ -435,9 +438,9 @@ module Api::V1::Assignment
 
     ex_type = settings.delete(:exclude_type)
     settings[:exclude_small_matches_type] = case ex_type
-                                            when '0'; nil
-                                            when '1'; 'words'
-                                            when '2'; 'percent'
+                                            when '0' then nil
+                                            when '1' then 'words'
+                                            when '2' then 'percent'
                                             end
 
     ex_value = settings.delete(:exclude_value)
@@ -455,7 +458,7 @@ module Api::V1::Assignment
     settings.slice(*API_ALLOWED_VERICITE_SETTINGS)
   end
 
-  API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
+  API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w[
     name
     description
     position
@@ -489,9 +492,9 @@ module Api::V1::Assignment
     anonymous_instructor_annotations
     allowed_attempts
     important_dates
-  ).freeze
+  ].freeze
 
-  API_ALLOWED_TURNITIN_SETTINGS = %w(
+  API_ALLOWED_TURNITIN_SETTINGS = %w[
     originality_report_visibility
     s_paper_check
     internet_check
@@ -501,14 +504,14 @@ module Api::V1::Assignment
     exclude_small_matches_type
     exclude_small_matches_value
     submit_papers_to
-  ).freeze
+  ].freeze
 
-  API_ALLOWED_VERICITE_SETTINGS = %w(
+  API_ALLOWED_VERICITE_SETTINGS = %w[
     originality_report_visibility
     exclude_quoted
     exclude_self_plag
     store_in_index
-  ).freeze
+  ].freeze
 
   def create_api_assignment(assignment, assignment_params, user, context = assignment.context, calculate_grades: nil)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
@@ -628,7 +631,7 @@ module Api::V1::Assignment
   def assignment_group_id_valid?(assignment, assignment_params)
     ag_id = assignment_params["assignment_group_id"].presence
     # if ag_id is a non-numeric string, ag_id.to_i will == 0
-    if ag_id and ag_id.to_i <= 0
+    if ag_id && ag_id.to_i <= 0
       assignment.errors.add('assignment[assignment_group_id]', I18n.t(:not_a_number, "must be a positive number"))
       false
     else
@@ -727,12 +730,12 @@ module Api::V1::Assignment
       update_params['time_zone_edited'] = Time.zone.name
     end
 
-    if !assignment.context.try(:turnitin_enabled?)
+    unless assignment.context.try(:turnitin_enabled?)
       update_params.delete("turnitin_enabled")
       update_params.delete("turnitin_settings")
     end
 
-    if !assignment.context.try(:vericite_enabled?)
+    unless assignment.context.try(:vericite_enabled?)
       update_params.delete("vericite_enabled")
       update_params.delete("vericite_settings")
     end
@@ -844,9 +847,9 @@ module Api::V1::Assignment
   def turnitin_settings_hash(assignment_params)
     turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
-                                        when nil; '0'
-                                        when 'words'; '1'
-                                        when 'percent'; '2'
+                                        when nil then '0'
+                                        when 'words' then '1'
+                                        when 'percent' then '2'
                                         end
     turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
     turnitin_settings.to_unsafe_h
@@ -883,7 +886,7 @@ module Api::V1::Assignment
     else
       # assignment id -> specific submission. never return an array when
       # include[]=observed_users was _not_ supplied
-      hash = Hash[subs_list.map { |s| [s.assignment_id, s] }]
+      hash = subs_list.index_by(&:assignment_id)
     end
     hash
   end
@@ -923,7 +926,7 @@ module Api::V1::Assignment
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     if assignment_params[:points_possible].blank?
-      if assignment.new_record? || assignment_params.has_key?(:points_possible) # only change if they're deliberately updating to blank
+      if assignment.new_record? || assignment_params.key?(:points_possible) # only change if they're deliberately updating to blank
         assignment_params[:points_possible] = 0
       end
     end
@@ -948,7 +951,7 @@ module Api::V1::Assignment
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
-    external_tool_tag_attributes = assignment_params.dig(:external_tool_tag_attributes)
+    external_tool_tag_attributes = assignment_params[:external_tool_tag_attributes]
     if external_tool_tag_attributes&.include?(:custom_params)
       custom_params = external_tool_tag_attributes[:custom_params]
       unless custom_params_valid?(custom_params)
@@ -980,7 +983,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    return :created
+    :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)
@@ -1049,9 +1052,10 @@ module Api::V1::Assignment
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params['similarityDetectionTool'].split('_').last.to_i
     tool = nil
-    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
+    case assignment_params['configuration_tool_type']
+    when 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
+    when 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
       tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)
@@ -1063,7 +1067,7 @@ module Api::V1::Assignment
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
       (
-        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment.submission_types.split(',').none? { |t| assignment_params['submission_types'].include?(t) } ||
         assignment_params['submission_types'].blank?
       )
   end

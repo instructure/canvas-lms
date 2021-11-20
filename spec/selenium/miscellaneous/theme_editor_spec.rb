@@ -39,7 +39,7 @@ describe 'Theme Editor' do
 
   it 'theme index renders shared themes' do
     brand_config = BrandConfig.create!(variables: { "ic-brand-primary" => "#321" })
-    shared_themes = 2.times.map do |i|
+    shared_themes = Array.new(2) do |i|
       Account.default.shared_brand_configs.create!(
         name: "shared theme #{i}",
         brand_config_md5: brand_config.md5

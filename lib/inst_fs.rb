@@ -43,7 +43,7 @@ module InstFS
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
-        %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+        %(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
       end
     end
 
@@ -177,7 +177,7 @@ module InstFS
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
       end
-      if response.class == Net::HTTPCreated
+      if response.code == 201
         json_response = JSON.parse(response.body)
         return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")
 
@@ -233,7 +233,7 @@ module InstFS
       }.to_json
 
       response = CanvasHttp.post(export_references_url, body: body, content_type: "application/json")
-      raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.class == Net::HTTPOK
+      raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.code == 200
 
       json_response = JSON.parse(response.body)
       well_formed =
@@ -253,7 +253,7 @@ module InstFS
       url = "#{app_host}/files/#{instfs_uuid}/duplicate?token=#{token}"
 
       response = CanvasHttp.post(url)
-      if response.class == Net::HTTPCreated
+      if response.code == 201
         json_response = JSON.parse(response.body)
         return json_response["id"] if json_response.key?("id")
 
@@ -267,7 +267,7 @@ module InstFS
       url = "#{app_host}/files/#{instfs_uuid}?token=#{token}"
 
       response = CanvasHttp.delete(url)
-      unless response.class == Net::HTTPOK
+      unless response.code == 200
         raise InstFS::DeletionError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
       end
 
@@ -368,11 +368,11 @@ module InstFS
 
     def access_jwt(resource, options = {})
       expires_in = options[:expires_in] || Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
-      if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
-        iat = consistent_iat(resource, expires_in)
-      else
-        iat = Time.now.utc.to_i
-      end
+      iat = if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
+              consistent_iat(resource, expires_in)
+            else
+              Time.now.utc.to_i
+            end
 
       claims = {
         iat: iat,
@@ -469,9 +469,9 @@ module InstFS
           query[:redirect] = true
           query[:no_cache] = true
           uri.query_values = query
-          return uri.to_s
+          uri.to_s
         else
-          return nil
+          nil
         end
       end
     end

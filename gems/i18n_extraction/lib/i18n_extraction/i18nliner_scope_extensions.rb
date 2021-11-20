@@ -20,7 +20,7 @@
 require "i18nliner/scope"
 
 class I18nliner::Scope
-  ABSOLUTE_KEY = /\A#/
+  ABSOLUTE_KEY = /\A#/.freeze
 
   def normalize_key(key, inferred_key, explicit_scope_option)
     key = key.to_s

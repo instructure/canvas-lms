@@ -6809,7 +6809,7 @@ cy:
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} yn mynd i gael ei ddileu ac yn fwy na’r trothwy a osodwyd, sef %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
     many: "%{count} newid heb ei gyhoeddi"
-    one: "%{count} newid heb ei gyhoeddi"
+    one: "1 newid heb ei gyhoeddi"
     other: "%{count} newid heb ei gyhoeddi"
     two: "%{count} newid heb ei gyhoeddi"
   count_unread_cff5855: "%{count} heb eu darllen."

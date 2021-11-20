@@ -29,7 +29,7 @@ def appendix
     }
   end
 
-  return unless controllers && controllers.is_a?(Array)
+  return unless controllers.is_a?(Array)
 
   @appendixes = controllers.collect { |c|
     c.children.select { |o| :appendix == o.type }

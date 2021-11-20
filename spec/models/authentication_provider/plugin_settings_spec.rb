@@ -34,7 +34,7 @@ describe AuthenticationProvider::PluginSettings do
     end
   end
 
-  let(:plugin) { double() }
+  let(:plugin) { double }
 
   before do
     allow(Canvas::Plugin).to receive(:find).with(:custom_plugin).and_return(plugin)

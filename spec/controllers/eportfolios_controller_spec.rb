@@ -99,7 +99,10 @@ describe EportfoliosController do
     end
 
     it "prevents creation for unverified users if account requires it" do
-      Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
+      Account.default.tap { |a|
+        a.settings[:require_confirmed_email] = true
+        a.save!
+      }
 
       user_session(@user)
       post 'create', params: { :eportfolio => { :name => "some portfolio" } }
@@ -113,21 +116,33 @@ describe EportfoliosController do
   describe "GET 'show'" do
     before(:once) { eportfolio }
 
-    it "requires authorization if the eportfolio is not public" do
-      get 'show', params: { :id => @portfolio.id }
-      assert_unauthorized
+    describe "without being logged in" do
+      it "complains if the eportfolio is not public" do
+        get 'show', params: { :id => @portfolio.id }
+        assert_unauthorized
+      end
+
+      it "complains if portfolio is public but eportfolios are disabled" do
+        a = Account.default
+        a.settings[:enable_eportfolios] = false
+        a.save
+        @portfolio.public = true
+        @portfolio.save!
+        get "show", params: { id: @portfolio.id }
+        assert_unauthorized
+      end
+
+      it "complains if portfolio is not public and eportfolios are disabled" do
+        a = Account.default
+        a.settings[:enable_eportfolios] = false
+        a.save
+        course_with_student_logged_in(:active_all => true, :user => @user)
+        get 'show', params: { :id => @portfolio.id }
+        assert_unauthorized
+      end
     end
 
-    it "complains if eportfolios are disabled" do
-      a = Account.default
-      a.settings[:enable_eportfolios] = false
-      a.save
-      course_with_student_logged_in(:active_all => true, :user => @user)
-      get 'show', params: { :id => @portfolio.id }
-      assert_unauthorized
-    end
-
-    describe "with authorized user" do
+    describe "with an authorized user" do
       before { user_session(@user) }
 
       it "shows portfolio" do
@@ -466,7 +481,7 @@ describe EportfoliosController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "includes an author for each entry" do

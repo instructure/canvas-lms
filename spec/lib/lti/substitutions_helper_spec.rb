@@ -224,6 +224,7 @@ module Lti
 
     describe '#account_enrollments' do
       subject { SubstitutionsHelper.new(account, root_account, user) }
+
       it 'returns enrollments in an account for a user' do
         set_up_persistance!
         enrollment = account.account_users.create!(:user => user)
@@ -482,7 +483,7 @@ module Lti
       end
 
       it "returns previous lti context_ids" do
-        expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
+        expect(subject.previous_lti_context_ids.split(",")).to match_array %w[abc def]
       end
     end
 

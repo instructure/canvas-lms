@@ -22,8 +22,9 @@ module EportfolioPage
   def eportfolio_page_attributes
     @categories = @portfolio.eportfolio_categories
     if @portfolio.grants_right?(@current_user, session, :manage)
-      @recent_submissions = @current_user.submissions.in_workflow_state(['submitted', 'graded'])
-                                         .order("created_at DESC").to_a if @current_user && @current_user == @portfolio.user
+      if @current_user && @current_user == @portfolio.user
+        @recent_submissions = @current_user.submissions.in_workflow_state(['submitted', 'graded']).order("created_at DESC").to_a
+      end
       @files = @current_user.attachments.to_a
       @folders = @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
     end
@@ -54,7 +55,7 @@ module EportfolioPage
              :context_code => @current_user.asset_string
     end
 
-    js_env({ SKIP_ENHANCING_USER_CONTENT: true })
+    js_env({ SKIP_ENHANCING_USER_CONTENT: true, SECTION_COUNT_IDX: @page.content_sections.count })
     js_bundle :eportfolio, :eportfolios_wizard_box
     css_bundle :tinymce
     @no_left_side_list_view = true

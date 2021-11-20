@@ -25,18 +25,16 @@ module Lti
     include ApiServiceHelper
 
     attr_accessor :request
+    attr_reader :tool_proxy
 
     def initialize(request)
       @request = request
-    end
-
-    def tool_proxy
-      @tool_proxy
     end
   end
 
   describe ApiServiceHelper do
     subject { TestClass.new(request) }
+
     let(:request) do
       m = double('request')
       allow(m).to receive_messages(authorization: "")

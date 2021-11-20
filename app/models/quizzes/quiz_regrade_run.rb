@@ -22,7 +22,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
 
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
 
-  validates_presence_of :quiz_regrade_id
+  validates :quiz_regrade_id, presence: true
 
   def self.perform(regrade)
     run = create!(quiz_regrade_id: regrade.id, started_at: Time.now)
@@ -39,7 +39,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   set_broadcast_policy do |policy|
     policy.dispatch :quiz_regrade_finished
     policy.to { teachers }
-    policy.whenever { |run| run.send_messages? }
+    policy.whenever(&:send_messages?)
     policy.data { course_broadcast_data }
   end
 

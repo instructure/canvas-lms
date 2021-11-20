@@ -20,7 +20,7 @@
 
 class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Base
   def total_answer_parts
-    len = @question_data[:answers].select { |a| a[:weight] == 100 }.length
+    len = @question_data[:answers].count { |a| a[:weight] == 100 }
     len = 1 if len == 0
     len
   end
@@ -54,7 +54,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
     end
     return nil if total_answers == 0
 
-    return correct_answers
+    correct_answers
   end
 
   # TODO: remove once new stats is on for everybody

@@ -125,7 +125,7 @@ class TermsController < ApplicationController
     params.require(:enrollment_term)
     overrides = params[:enrollment_term][:overrides]&.to_unsafe_h
     if overrides.present?
-      unless (overrides.keys.map(&:classify) - %w(StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment)).empty?
+      unless (overrides.keys.map(&:classify) - %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
         return render :json => { :message => 'Invalid enrollment type in overrides' }, :status => :bad_request
       end
     end

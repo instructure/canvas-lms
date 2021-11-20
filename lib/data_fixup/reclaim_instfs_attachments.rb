@@ -99,7 +99,7 @@ module DataFixup::ReclaimInstfsAttachments
     ].map { |scope| scope.where("#{Account.resolved_root_account_id_sql} IN (?)", root_account_ids) }
 
     (course_queries + group_queries + account_queries)
-      .map { |q| q.where("instfs_uuid IS NOT NULL") }
+      .map { |q| q.where.not(instfs_uuid: nil) }
       .reduce { |q1, q2| q1.union(q2) }
   end
 end

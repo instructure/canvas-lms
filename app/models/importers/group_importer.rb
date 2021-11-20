@@ -46,9 +46,11 @@ module Importers
       migration.add_imported_item(item)
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
-      item.group_category = hash[:group_category].present? ?
-          context.group_categories.where(name: hash[:group_category]).first_or_initialize :
-          GroupCategory.imported_for(context)
+      item.group_category = if hash[:group_category].present?
+                              context.group_categories.where(name: hash[:group_category]).first_or_initialize
+                            else
+                              GroupCategory.imported_for(context)
+                            end
 
       item.save!
       migration.add_imported_item(item)

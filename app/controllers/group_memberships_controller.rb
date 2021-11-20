@@ -77,7 +77,7 @@ class GroupMembershipsController < ApplicationController
 
   include Api::V1::Group
 
-  ALLOWED_MEMBERSHIP_FILTER = %w(accepted invited requested).freeze
+  ALLOWED_MEMBERSHIP_FILTER = %w[accepted invited requested].freeze
 
   # @API List group memberships
   #
@@ -101,7 +101,7 @@ class GroupMembershipsController < ApplicationController
       scope = @group.group_memberships.preload(group: :root_account)
 
       only_states = ALLOWED_MEMBERSHIP_FILTER
-      only_states = only_states & params[:filter_states] if params[:filter_states]
+      only_states &= params[:filter_states] if params[:filter_states]
       scope = scope.where(:workflow_state => only_states)
       scope = scope.preload(group: :root_account)
 
@@ -162,7 +162,7 @@ class GroupMembershipsController < ApplicationController
     end
   end
 
-  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w(workflow_state moderator).freeze
+  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w[workflow_state moderator].freeze
 
   # @API Update a membership
   #

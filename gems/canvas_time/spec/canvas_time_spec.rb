@@ -34,7 +34,7 @@ describe 'Time Marshal override' do
     dumped = Marshal.dump(raw_time)
     # the last character differs between ruby 1.9 and ruby 2.1
     expect(dumped[0..-2]).to eq("\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06E")
-    expect(%w{F T}).to be_include(dumped[-1])
+    expect(%w[F T]).to be_include(dumped[-1])
     dumped[-1] = 'F'
     reloaded = Marshal.load(dumped)
     expect(reloaded).to eq(raw_time)

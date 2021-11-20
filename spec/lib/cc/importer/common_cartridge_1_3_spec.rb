@@ -44,7 +44,7 @@ describe "Standard Common Cartridge importing" do
       expect(a.title).to eq 'Cool Assignment'
       expect(a.points_possible).to eq 11
       att = @course.attachments.where(migration_id: "extensionresource1").first
-      expect(a.description.gsub("\n", '')).to eq "You should turn this in for points.<ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
+      expect(a.description.delete("\n")).to eq "You should turn this in for points.<ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"
     end
 

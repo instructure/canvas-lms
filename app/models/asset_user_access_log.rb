@@ -495,7 +495,7 @@ class AssetUserAccessLog
           # transaction ensures that aggregation results and iterator
           # state are updated in lock step, so if we fail we should re-aggregate from the same point.
           AssetUserAccess.transaction do
-            if aggregation_results.size > 0
+            unless aggregation_results.empty?
               self.log_message("message bus batch updating (sometimes these queries don't get logged)...")
               AssetUserAccess.connection.execute(self.compaction_sql(aggregation_results))
             end
@@ -542,7 +542,7 @@ class AssetUserAccessLog
       # we want to stay in "exclusive" mode so that only one job
       # can be updating the iterator state.
       begin
-        consumer.close()
+        consumer.close
       rescue ::Pulsar::Error::ConnectError => e
         # if we fail to close the connection, but we're already here
         # the job didn't really fail; we already got past all the state updating.
@@ -553,7 +553,7 @@ class AssetUserAccessLog
     # 14) return value indicating whether we should immediately re-schedule or not
     # As long as we have never flipped the "early_exit" sign, that means
     # we made it through all accounts and didn't run out of job time.
-    caught_up = !early_exit
+    !early_exit
     # you might think "Ah, here we can compact all our postgres iterators into
     # a single global state update since we finished all the root accounts!".
     # Alas, we cannot.  In the time it takes to consume messages
@@ -563,7 +563,7 @@ class AssetUserAccessLog
     # a POSTGRES backed compaction job can make global iterator state writes.
     # once we're compacting on the message bus, we need to keep the state-per-root-account
     # until and unless we switch back to postgres.
-    caught_up # implicit return
+    # implicit return
   end
 
   def self.compaction_settings
@@ -605,7 +605,7 @@ class AssetUserAccessLog
     ps = plugin_setting
     yesterday_ts = ts - 1.day
     yesterday_model = log_model(yesterday_ts)
-    if yesterday_model.take(1).size > 0
+    unless yesterday_model.take(1).empty?
       yesterday_completed = compact_partition(yesterday_ts)
       ps.reload
       compaction_state = self.metadatum_payload
@@ -631,11 +631,10 @@ class AssetUserAccessLog
       end
       return false unless yesterday_completed
     end
-    today_completed = compact_partition(ts)
+    compact_partition(ts)
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
-    today_completed
   end
 
   # TODO: We only care about truncation
@@ -714,7 +713,7 @@ class AssetUserAccessLog
           agg_sql = pulsar_ripcord_aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary, root_account_max_ids_map, ts.wday)
         end
         log_segment_aggregation = partition_model.connection.execute(agg_sql)
-        if log_segment_aggregation.to_a.size > 0
+        if !log_segment_aggregation.to_a.empty?
           # we found records in this segment, we need to both
           # compute the new iterator position (it's just the max
           # of all ids because we constrained the aggregation to a range of ids,
@@ -779,7 +778,7 @@ class AssetUserAccessLog
       compaction_state[:temp_root_account_max_log_ids] = {}
       self.update_metadatum(compaction_state)
     end
-    return true # to indicate we didn't bail
+    true # to indicate we didn't bail
   end
 
   # for a given log segment (the records between IDs A and B),
@@ -792,7 +791,7 @@ class AssetUserAccessLog
   # log inserts into update tuples.  When we're on pulsar
   # for AUA log compaction completely, this query can be removed.
   def self.aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
-    <<~SQL
+    <<~SQL.squish
       SELECT asset_user_access_id AS aua_id,
         COUNT(asset_user_access_id) AS view_count,
         MAX(created_at) AS max_updated_at,
@@ -810,7 +809,7 @@ class AssetUserAccessLog
   # in order to get the postgres process back into GLOBALLY consistent postgres iterator
   # state for the shard.
   def self.pulsar_ripcord_aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary, root_account_max_ids_map, pg_partition_index)
-    query_prefix = <<~SQL
+    query_prefix = <<~SQL.squish
       SELECT aua_log.asset_user_access_id AS aua_id,
         COUNT(aua_log.asset_user_access_id) AS view_count,
         MAX(aua_log.created_at) AS max_updated_at,
@@ -829,10 +828,10 @@ class AssetUserAccessLog
       # and don't have the opportunity to zero out the temporary ripcord
       # state, we still need to respect iterator advances in the global state.
       # That means we need to also bound each RA group by the max value seen IN THAT ROOT ACCOUNT.
-      <<~ROOT_ACCOUNT_SUBCLAUSE
+      <<~SQL.squish
         ( aua.root_account_id = #{root_account_id} AND
           aua_log.id > #{lower_ra_boundary} )
-      ROOT_ACCOUNT_SUBCLAUSE
+      SQL
     end.join(" OR ")
     <<~SQL.squish
       #{query_prefix} ( #{root_account_conditions} )

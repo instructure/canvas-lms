@@ -24,7 +24,7 @@ module Canvas
       def find_target
         target_id = owner._read_attribute(reflection.foreign_key)
         key = [::Switchman::Shard.current.id, "root_account", target_id].cache_key
-        return RequestCache.cache(key) { Account.find_cached(target_id) }
+        RequestCache.cache(key) { Account.find_cached(target_id) }
       end
     end
 
@@ -42,7 +42,7 @@ module Canvas
       end
       m = Module.new
 
-      m.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+      m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{r.name}
           return Account.current_domain_root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{r.foreign_key} == Account.current_domain_root_account&.id
           return super

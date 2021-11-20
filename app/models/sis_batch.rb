@@ -39,8 +39,8 @@ class SisBatch < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :course
 
-  validates_presence_of :account_id, :workflow_state
-  validates_length_of :diffing_data_set_identifier, maximum: 128
+  validates :account_id, :workflow_state, presence: true
+  validates :diffing_data_set_identifier, length: { maximum: 128 }
 
   attr_accessor :zip_path
 
@@ -276,7 +276,7 @@ class SisBatch < ActiveRecord::Base
     return true if val == self.progress
 
     self.progress = val
-    state = SisBatch.connection.select_value(<<~SQL)
+    state = SisBatch.connection.select_value(<<~SQL.squish)
       UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == 'aborted'
@@ -372,11 +372,11 @@ class SisBatch < ActiveRecord::Base
   end
 
   def download_zip
-    if self.data[:file_path]
-      @data_file = File.open(self.data[:file_path], 'rb')
-    else
-      @data_file = self.attachment.open(:need_local_file => true)
-    end
+    @data_file = if self.data[:file_path]
+                   File.open(self.data[:file_path], 'rb')
+                 else
+                   self.attachment.open(:need_local_file => true)
+                 end
     @data_file
   end
 
@@ -643,7 +643,7 @@ class SisBatch < ActiveRecord::Base
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
-      return self.reload
+      self.reload
     end
   end
 
@@ -742,7 +742,7 @@ class SisBatch < ActiveRecord::Base
   def write_errors_to_file
     file = temp_error_file_path
     CSV.open(file, "w") do |csv|
-      csv << %w(sis_import_id file message row)
+      csv << %w[sis_import_id file message row]
       self.sis_batch_errors.find_each do |error|
         row = []
         row << error.sis_batch_id
@@ -879,8 +879,8 @@ class SisBatch < ActiveRecord::Base
     restore_progress&.start
     self.update_attribute(:workflow_state, 'restoring')
     roll_back = self.roll_back_data
-    roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
-    roll_back = roll_back.where(updated_workflow_state: %w(completed)) if unconclude_only
+    roll_back = roll_back.where(updated_workflow_state: %w[retired deleted]) if undelete_only
+    roll_back = roll_back.where(updated_workflow_state: %w[completed]) if unconclude_only
     roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
     types = roll_back.active.distinct.order(:context_type).pluck(:context_type)
     total = roll_back.active.count if restore_progress
@@ -916,7 +916,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_sql(type, data)
-    <<~SQL
+    <<~SQL.squish
       UPDATE #{type.constantize.quoted_table_name} AS t
         SET workflow_state = x.workflow_state,
             updated_at = NOW()

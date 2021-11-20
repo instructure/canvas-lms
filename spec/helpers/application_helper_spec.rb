@@ -158,7 +158,7 @@ describe ApplicationHelper do
 
       it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
         tag = friendly_datetime(Time.now, context: context)
-        expect(tag).to match(/^<time.*<\/time>$/)
+        expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at  1:12am/)
         expect(tag).to match(/Course: Mar 13 at  3:12am/)
@@ -166,7 +166,7 @@ describe ApplicationHelper do
 
       it 'can produce an alternate tag type' do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
-        expect(tag).to match(/^<span.*<\/span>$/)
+        expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at  1:12am/)
         expect(tag).to match(/Course: Mar 13 at  3:12am/)
@@ -757,7 +757,7 @@ describe ApplicationHelper do
         course1.enroll_student(@current_user)
         groups.each { |g| g.add_user(user, 'accepted', true) }
         user_account_groups = map_groups_for_planner(groups)
-        expect(user_account_groups.map { |g| g[:id] }).to eq [group1.id, group2.id, group3.id]
+        expect(user_account_groups.pluck(:id)).to eq [group1.id, group2.id, group3.id]
       end
     end
   end

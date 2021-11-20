@@ -27,21 +27,21 @@ end
 
 def val_image_alt_tags_present
   images = find_all_elements('img')
-  if images.length > 0
+  unless images.empty?
     val_all_elements_attribute_presence(images, 'alt')
   end
 end
 
 def val_image_alt_tags_not_empty
   images = find_all_elements('img')
-  if images.length > 0
+  unless images.empty?
     val_all_elements_attribute_not_empty(images, 'alt')
   end
 end
 
 def val_image_alt_tags_max_length
   images = find_all_elements('img')
-  if images.length > 0
+  unless images.empty?
     val_text_max_length(images, 56)
   end
 end
@@ -49,7 +49,7 @@ end
 def val_link_name_uniqueness
   links_text = []
   links = find_all_elements('a')
-  if links.length > 0
+  unless links.empty?
     links.each do |link|
       links_text << link.attribute('href') if link.attribute('href') != ''
     end
@@ -59,14 +59,14 @@ end
 
 def val_input_alt_tags_present
   inputs = find_all_elements('input')
-  if inputs.length > 0
+  unless inputs.empty?
     val_all_elements_attribute_presence(inputs, 'alt')
   end
 end
 
 def val_input_alt_tags_not_empty
   inputs = find_all_elements('input')
-  if inputs.length > 0
+  unless inputs.empty?
     val_all_elements_attribute_not_empty(inputs, 'alt')
   end
 end
@@ -93,7 +93,7 @@ end
 
 def val_all_tables_have_heading
   tables = find_all_elements('table')
-  if tables.length > 0
+  unless tables.empty?
     tables.each { |t| expect(t.find_elements(:tag_name, 'th').count).to be > 0 }
   end
 end

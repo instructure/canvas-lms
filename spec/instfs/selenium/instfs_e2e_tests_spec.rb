@@ -87,9 +87,9 @@ describe "instfs file uploads" do
     if downloaded_data != false
       temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
-      return temp_md5 == original_md5
+      temp_md5 == original_md5
     else
-      return false
+      false
     end
   end
 
@@ -129,16 +129,16 @@ describe "instfs file uploads" do
 
   def check_file_link(file_link)
     downloaded_data = open(file_link)
-    downloaded_data.size > 0
+    !downloaded_data.empty?
   end
 
   def download_file(file_link)
     # if a file is less than 10K, it will return a StringIO, not a file object.
     # in that case get the string from the StringIO
     downloaded_data = open(file_link)
-    if downloaded_data.class == StringIO
+    if downloaded_data.instance_of?(StringIO)
       downloaded_data = downloaded_data.string
-    elsif downloaded_data.size > 0
+    elsif !downloaded_data.empty?
       downloaded_data = File.read(downloaded_data)
     else
       return false

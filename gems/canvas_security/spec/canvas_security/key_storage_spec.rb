@@ -114,6 +114,6 @@ describe CanvasSecurity::KeyStorage do
   end
 
   def select_public_claims(key)
-    key.select { |k, _| %w(kty e n kid alg use).include?(k) }
+    key.select { |k, _| %w[kty e n kid alg use].include?(k) }
   end
 end

@@ -44,7 +44,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
 
     it 'returns an empty list' do
       json = get_index
-      expect(json.has_key?('quiz_ip_filters')).to be_truthy
+      expect(json).to have_key('quiz_ip_filters')
       expect(json['quiz_ip_filters'].size).to eq 0
     end
 
@@ -80,7 +80,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       it 'paginates' do
         account_filters = {}
 
-        for i in 1..40 do
+        (1..40).each do |i|
           account_filters["Filter #{i}"] = "192.168.1.#{i}"
         end
 
@@ -111,7 +111,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         @quiz.save
 
         json = get_index
-        expect(json.has_key?('quiz_ip_filters')).to be_truthy
+        expect(json).to have_key('quiz_ip_filters')
         expect(json['quiz_ip_filters'][0]['name']).to eq 'Current Filter'
         expect(json['quiz_ip_filters'][0]['account']).to eq @quiz.title
         expect(json['quiz_ip_filters'][0]['filter']).to eq '192.168.1.101'

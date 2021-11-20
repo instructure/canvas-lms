@@ -90,7 +90,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
           #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id")
            .where(:content_tags => { :id => item_ids })
            .pluck('content_tags.id', :restrictions)
-    Hash[data]
+    data.to_h
   end
 
   def self.fetch_module_item_restrictions_for_master(item_ids)
@@ -100,7 +100,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
           #{self.table_name}.content_id=#{ContentTag.table_name}.content_id")
            .where(:content_tags => { :id => item_ids })
            .pluck('content_tags.id', :restrictions)
-    hash = Hash[data]
+    hash = data.to_h
     (item_ids - hash.keys).each do |missing_id| # populate blank restrictions for all items without mastercontenttags created yet
       hash[missing_id] = {}
     end

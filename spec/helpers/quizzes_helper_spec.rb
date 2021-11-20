@@ -186,11 +186,14 @@ describe QuizzesHelper do
 
   context 'fill_in_multiple_blanks_question' do
     before do
-      @question_text = %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />|
+      @question_text = %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />)
       @answer_list = []
       @answers = []
 
-      def user_content(stuff); stuff; end # double #user_content
+      # double #user_content
+      def user_content(stuff)
+        stuff
+      end
     end
 
     it 'extracts the answers by blank' do
@@ -202,13 +205,13 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />)
     end
 
     it 'sanitizes user input' do
       malicious_answer_list = [{
         blank_id: 'color',
-        answer: %q|><script>alert()</script><img|
+        answer: '><script>alert()</script><img'
       }]
 
       html = fill_in_multiple_blanks_question(
@@ -217,7 +220,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
       expect(html).to be_html_safe
     end
 
@@ -263,7 +266,10 @@ describe QuizzesHelper do
 
   context "multiple_dropdowns_question" do
     before do
-      def user_content(stuff); stuff; end # double #user_content
+      # double #user_content
+      def user_content(stuff)
+        stuff
+      end
     end
 
     it "selects the user's answer" do
@@ -391,7 +397,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at is set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -403,7 +409,7 @@ describe QuizzesHelper do
     end
 
     context "hide_correct_answers_at is set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -415,7 +421,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at and hide_correct_answers_at are set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         time2 = 1.week.from_now
 

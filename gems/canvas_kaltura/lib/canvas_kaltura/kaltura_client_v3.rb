@@ -29,8 +29,8 @@ require 'multipart'
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
   class SessionType
-    USER = 0;
-    ADMIN = 2;
+    USER = 0
+    ADMIN = 2
   end
 
   class ClientV3
@@ -67,10 +67,10 @@ module CanvasKaltura
       'mp4' => 'video/mp4',
       'mp3' => 'audio/mp3',
       'flv' => 'video/x-flv'
-    }
+    }.freeze
     # FLVs are least desirable because the mediaelementjs does not stretch them to
     # fill the screen when you enter fullscreen mode
-    PREFERENCE = ['mp4', 'mp3', 'flv', '']
+    PREFERENCE = ['mp4', 'mp3', 'flv', ''].freeze
 
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
     ASSET_STATUSES = {
@@ -85,7 +85,7 @@ module CanvasKaltura
       '5' => :TEMP,
       '8' => :VALIDATING,
       '6' => :WAIT_FOR_CONVERT
-    }
+    }.freeze
 
     def media_sources(entryId)
       cache_key = ['media_sources2', entryId, @cache_play_list_seconds].join('/')
@@ -111,7 +111,7 @@ module CanvasKaltura
               next
             end
 
-            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+            hash[:hasWarnings] = true if asset[:description]&.include?("warnings")
 
             sources << hash
           else
@@ -283,8 +283,8 @@ module CanvasKaltura
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
-        filename = (file[:name] || "Media File").gsub(/,/, "")
-        description = (file[:description] || "no description").gsub(/,/, "")
+        filename = (file[:name] || "Media File").delete(',')
+        description = (file[:description] || "no description").delete(',')
         url = file[:url]
         rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '', '', '', '', file[:partner_data] || ''] if file[:url]
       end
@@ -335,7 +335,7 @@ module CanvasKaltura
       playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
 
       res = sendRequest(Net::HTTP::Get.new(playlist_url))
-      return nil unless res.kind_of?(Net::HTTPSuccess)
+      return nil unless res.is_a?(Net::HTTPSuccess)
 
       doc = Nokogiri::XML(res.body)
       mediaNode = doc.css('manifest media').first

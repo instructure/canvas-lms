@@ -162,7 +162,7 @@ describe OAuth2ProviderController do
                       response_type: 'code',
                       scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       it 'accepts the deprecated name of scopes for scope param' do
@@ -173,7 +173,7 @@ describe OAuth2ProviderController do
                       response_type: 'code',
                       scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       it 'does not reuse userinfo tokens for other scopes' do
@@ -192,7 +192,7 @@ describe OAuth2ProviderController do
                              response_type: 'code',
                              scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       context 'when "prompt=none"' do
@@ -210,7 +210,7 @@ describe OAuth2ProviderController do
           @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects to the redirect uri if the developer key is trusted' do
@@ -218,13 +218,13 @@ describe OAuth2ProviderController do
           key.save!
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects with "interaction_required" if the current session cannot be used without a prompt' do
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params['error']).to eq 'interaction_required'
         end
@@ -474,8 +474,8 @@ describe OAuth2ProviderController do
       let(:redis) do
         redis = double('Redis')
         allow(redis).to receive(:get)
-        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
-        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
+        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
         redis
       end
 
@@ -486,7 +486,7 @@ describe OAuth2ProviderController do
         let(:success_setup) do
           expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
         end
-        let(:success_token_keys) { %w(access_token refresh_token user expires_in token_type) }
+        let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type] }
       end
 
       it 'renders a 302 if a code is not provided for an authorization_code grant' do
@@ -535,7 +535,7 @@ describe OAuth2ProviderController do
 
       it_behaves_like 'common oauth2 token checks' do
         let(:success_params) { { refresh_token: refresh_token } }
-        let(:success_token_keys) { %w(access_token user expires_in token_type) }
+        let(:success_token_keys) { %w[access_token user expires_in token_type] }
       end
 
       it 'does not generate a new access_token with an invalid refresh_token' do
@@ -603,7 +603,7 @@ describe OAuth2ProviderController do
       it_behaves_like 'common oauth2 token checks' do
         let(:success_params) { client_credentials_params }
         let(:overrides) { client_credentials_params }
-        let(:success_token_keys) { %w(access_token token_type expires_in scope) }
+        let(:success_token_keys) { %w[access_token token_type expires_in scope] }
       end
 
       describe 'additional client_credentials checks' do

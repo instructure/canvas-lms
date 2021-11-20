@@ -112,7 +112,7 @@ describe AlignmentsHelper do
       end
 
       it "includes class alignment" do
-        expect(html['class'].split(' ')).to include('alignment')
+        expect(html['class'].split).to include('alignment')
       end
 
       it "includes 1 data-* attribute" do
@@ -135,7 +135,7 @@ describe AlignmentsHelper do
       end
 
       it "has classes alignment & its content_type_class" do
-        classes = html['class'].split(' ')
+        classes = html['class'].split
         expect(classes).to include('alignment', alignment.content_type_class)
       end
 
@@ -155,7 +155,7 @@ describe AlignmentsHelper do
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes html class 'also_assignment'" do
-        classes = html['class'].split(' ')
+        classes = html['class'].split
         expect(classes).to include('also_assignment')
       end
     end

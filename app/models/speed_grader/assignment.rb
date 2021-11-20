@@ -35,22 +35,22 @@ module SpeedGrader
 
     def json
       Attachment.skip_thumbnails = true
-      submission_json_fields = %i(id submitted_at workflow_state grade
+      submission_json_fields = %i[id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
                                   grading_period_id excused updated_at attempt posted_at resource_link_lookup_uuid
-                                  redo_request cached_due_date)
+                                  redo_request cached_due_date]
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
 
-      attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
-                                  filename mime_class size submitter_id workflow_state)
+      attachment_json_fields = %i[id comment_id content_type context_id context_type display_name
+                                  filename mime_class size submitter_id workflow_state]
 
       if !assignment.anonymize_students? || course.account_membership_allows(current_user)
         attachment_json_fields << :viewed_at
       end
 
-      enrollment_json_fields = %i(course_section_id workflow_state user_id)
+      enrollment_json_fields = %i[course_section_id workflow_state user_id]
 
       res = assignment.as_json(
         :include => [
@@ -103,7 +103,7 @@ module SpeedGrader
       includes << { all_submission_comments: { submission: { assignment: { context: :root_account } } } }
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
-      student_json_fields = anonymous_students?(current_user: current_user, assignment: assignment) ? [] : %i(name id sortable_name)
+      student_json_fields = anonymous_students?(current_user: current_user, assignment: assignment) ? [] : %i[name id sortable_name]
 
       res[:context][:students] = students.map do |student|
         json = student.as_json(include_root: false, methods: submission_comment_methods, only: student_json_fields)
@@ -140,7 +140,7 @@ module SpeedGrader
       end
       res[:context][:quiz] = assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      attachment_includes = %i(crocodoc_document canvadoc root_attachment)
+      attachment_includes = %i[crocodoc_document canvadoc root_attachment]
       # Preload attachments for later looping
       attachments_for_submission =
         ::Submission.bulk_load_attachments_for_submissions(submissions, preloads: attachment_includes)
@@ -158,10 +158,12 @@ module SpeedGrader
       res[:too_many_quiz_submissions] = too_many = assignment.too_many_qs_versions?(submissions)
       qs_versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      enrollment_types_by_id = enrollments.inject({}) { |h, e| h[e.user_id] ||= e.type; h }
+      enrollment_types_by_id = enrollments.each_with_object({}) { |e, h|
+        h[e.user_id] ||= e.type
+      }
 
       if assignment.quiz
-        if assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
+        if assignment.quiz.assignment_overrides.to_a.count(&:active?) == 0
           assignment.quiz.has_no_overrides = true
         else
           assignment.quiz.context.preload_user_roles!
@@ -169,7 +171,7 @@ module SpeedGrader
       end
 
       res[:submissions] = submissions.map do |sub|
-        submission_methods = %i(submission_history late external_tool_url entered_score entered_grade seconds_late missing)
+        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing]
         submission_methods << :word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
         json = sub.as_json(
           include_root: false,
@@ -259,6 +261,7 @@ module SpeedGrader
                         upload_status: AttachmentUploadStatus.upload_status(a),
                       }
                     )
+                    attachment_json[:attachment][:word_count] = a.word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
                   end
                 end
               end
@@ -331,14 +334,15 @@ module SpeedGrader
           provisional_grades = provisional_grades.preload(:scorer)
         end
 
-        if grading_role == :provisional_grader
+        case grading_role
+        when :provisional_grader
           provisional_grades = if grader_comments_hidden?(current_user: current_user, assignment: assignment)
                                  provisional_grades.not_final.where(scorer: current_user)
                                else
                                  select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
                                  provisional_grades.select(select_fields)
                                end
-        elsif grading_role == :grader
+        when :grader
           provisional_grades = ModeratedGrading::ProvisionalGrade.none
         end
         provisional_grades.order(:id).to_a.group_by(&:submission_id)
@@ -424,7 +428,7 @@ module SpeedGrader
       group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
 
       # If we selected a group that is now deleted, don't use it
-      Group.active.exists?(id: group_id) ? group_id : nil
+      Group.active.where(id: group_id).exists? ? group_id : nil
     end
 
     def section_id_filter

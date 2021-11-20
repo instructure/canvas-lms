@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper.rb"
+require_relative "../../spec_helper"
 require_dependency "discussion_topic/scoped_to_sections"
 
 describe DiscussionTopic::ScopedToSections do

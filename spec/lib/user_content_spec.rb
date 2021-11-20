@@ -143,25 +143,25 @@ describe UserContent do
       end
 
       it "matches absolute paths with http" do
-        expect(regex.match(%Q{<img src="http://localhost:3000/files/110/preview">}).to_a).to eq([
-                                                                                                  "http://localhost:3000/files/110/preview",
-                                                                                                  "http://localhost:3000",
-                                                                                                  nil,
-                                                                                                  "files",
-                                                                                                  "110",
-                                                                                                  "/preview"
-                                                                                                ])
+        expect(regex.match('<img src="http://localhost:3000/files/110/preview">').to_a).to eq([
+                                                                                                "http://localhost:3000/files/110/preview",
+                                                                                                "http://localhost:3000",
+                                                                                                nil,
+                                                                                                "files",
+                                                                                                "110",
+                                                                                                "/preview"
+                                                                                              ])
       end
 
       it "matches absolute paths with https" do
-        expect(regex.match(%Q{<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">}).to_a).to eq([
-                                                                                                                                                    "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
-                                                                                                                                                    "https://this-is-terrible.example.com",
-                                                                                                                                                    "/courses/#{rewriter.context.id}",
-                                                                                                                                                    "pages",
-                                                                                                                                                    "whatever",
-                                                                                                                                                    "?srsly=0"
-                                                                                                                                                  ])
+        expect(regex.match(%(<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">)).to_a).to eq([
+                                                                                                                                                   "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
+                                                                                                                                                   "https://this-is-terrible.example.com",
+                                                                                                                                                   "/courses/#{rewriter.context.id}",
+                                                                                                                                                   "pages",
+                                                                                                                                                   "whatever",
+                                                                                                                                                   "?srsly=0"
+                                                                                                                                                 ])
       end
 
       it "doesn't match invalid hostnames" do

@@ -21,11 +21,11 @@
 module QuizMathDataFixup
   def fixup_quiz_questions_with_bad_math(quiz_or_bank, check_date: nil, question_bank: false)
     changed = false
-    if question_bank
-      questions = quiz_or_bank.assessment_questions
-    else
-      questions = quiz_or_bank.quiz_questions
-    end
+    questions = if question_bank
+                  quiz_or_bank.assessment_questions
+                else
+                  quiz_or_bank.quiz_questions
+                end
     questions = questions.where('updated_at>?', check_date) if check_date
     questions.find_each do |quiz_question|
       old_data = quiz_question.question_data.to_hash
@@ -115,12 +115,12 @@ module QuizMathDataFixup
       mjnodes =
         html.search('[class^="MathJax"]')
 
-      if mjnodes.length > 0
+      unless mjnodes.empty?
         n = mjnodes.filter('[data-mathml]')[0]
         mml = n.attribute('data-mathml') if n
         mjnodes.each(&:remove)
       end
-      if latex.content.length > 0
+      if !latex.content.empty?
         if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/ && latex.content !~ /[\\+-^=<>]|{.+}/
           # the content is not delimineted latex,
           # and doesn't even _look like_ latex
@@ -149,7 +149,7 @@ module QuizMathDataFixup
     html.search('[id^="MathJax"]').each(&:remove)
     html.search('span.hidden-readable').each(&:remove)
 
-    return html_str if html.content.length == 0 && html.search('img.equation_image').length == 0
+    return html_str if html.content.empty? && html.search('img.equation_image').empty?
 
     html.to_s
   end

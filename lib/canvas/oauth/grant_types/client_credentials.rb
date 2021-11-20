@@ -58,7 +58,7 @@ module Canvas::OAuth
       end
 
       def scopes_from_opts(opts)
-        (opts[:scope] || opts[:scopes] || '').split(' ')
+        (opts[:scope] || opts[:scopes] || '').split
       end
     end
   end

@@ -219,6 +219,15 @@ ul.outcome-level {
   }
 }
 
+.friendly-description {
+  background-color: $ic-color-medium-light;
+  padding: 8px;
+  margin-top: 10px;
+  .friendly-description-info {
+    font-weight: 200;
+  }
+}
+
 table.criterion {
   padding: 0;
   min-width: 600px;

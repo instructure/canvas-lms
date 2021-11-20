@@ -128,8 +128,8 @@ describe Quizzes::QuizQuestionsController do
           }
         }
       } }
-      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(/https:\/\/test.host/)
-      expect(assigns[:question].question_data[:answers][0][:html]).to match(/href=['"]\/courses\/#{@course.id}\/files\/27/)
+      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
+      expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
 
     it 'strips the origin from local URLs in answers when they are provided as an array' do
@@ -142,8 +142,8 @@ describe Quizzes::QuizQuestionsController do
           :comment_html => "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
         }]
       } }
-      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(/https:\/\/test.host/)
-      expect(assigns[:question].question_data[:answers][0][:html]).to match(/href=['"]\/courses\/#{@course.id}\/files\/27/)
+      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
+      expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
   end
 

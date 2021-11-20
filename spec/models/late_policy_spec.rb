@@ -56,6 +56,7 @@ describe LatePolicy do
     # Uniqueness
     describe 'uniqueness' do
       subject { course.create_late_policy }
+
       let(:course) { Course.create! }
 
       it { is_expected.to validate_uniqueness_of(:course_id) }

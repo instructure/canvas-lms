@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
 import I18n from 'i18n!feature_flags'
-import useFetchApi from '@canvas/use-fetch-api-hook'
+import React, {useState} from 'react'
 import {groupBy, debounce} from 'lodash'
-import FeatureFlagTable from './FeatureFlagTable'
-import FeatureFlagFilter from './FeatureFlagFilter'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -30,14 +27,40 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 
+import useFetchApi from '@canvas/use-fetch-api-hook'
+import FeatureFlagTable from './FeatureFlagTable'
+
 const SEARCH_DELAY = 350
 
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedFeatureStates, setSelectedFeatureStates] = useState([])
 
+  useFetchApi({
+    success: setFeatures,
+    loading: setLoading,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features`,
+    fetchAllPages: true,
+    params: {
+      hide_inherited_enabled: true,
+      per_page: 50
+    }
+  })
+
+  const groupedFeatures = groupBy(
+    features.filter(
+      feat =>
+        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
+        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    'applies_to'
+  )
+  if (groupedFeatures.Account || groupedFeatures.RootAccount) {
+    groupedFeatures.Account = (groupedFeatures.Account || []).concat(
+      groupedFeatures.RootAccount || []
+    )
+  }
   const categories = [
     {
       id: 'SiteAdmin',
@@ -54,97 +77,21 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     {
       id: 'User',
       title: I18n.t('User')
-    },
-    {
-      id: 'feature_option',
-      title: I18n.t('Feature Previews')
-    },
-    {
-      id: 'setting',
-      title: I18n.t('Stable Features')
     }
   ]
-
-  useFetchApi({
-    success: setFeatures,
-    loading: setLoading,
-    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features`,
-    fetchAllPages: true,
-    params: {
-      hide_inherited_enabled: true,
-      per_page: 50
-    }
-  })
-
-  let groupedFeatures = {}
-
-  if (ENV.FEATURES?.feature_flag_filters) {
-    groupedFeatures = features.reduce((accum, feat) => {
-      if (
-        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
-        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
-      ) {
-        let {applies_to} = feat
-        if (applies_to === 'RootAccount') {
-          applies_to = 'Account'
-        }
-        accum[feat.type] = accum[feat.type] || {}
-        for (const category of categories) {
-          accum[feat.type][category.title] = accum[feat.type][category.title] || []
-          if (category.id === applies_to) {
-            accum[feat.type][category.title] = accum[feat.type][category.title].concat(feat)
-          }
-        }
-      }
-      return accum
-    }, {})
-  } else {
-    groupedFeatures = groupBy(
-      features.filter(
-        feat =>
-          (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
-          feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
-      ),
-      'applies_to'
-    )
-
-    if (groupedFeatures.Account || groupedFeatures.RootAccount) {
-      groupedFeatures.Account = (groupedFeatures.Account || []).concat(
-        groupedFeatures.RootAccount || []
-      )
-    }
-  }
 
   const handleQueryChange = debounce(setSearchQuery, SEARCH_DELAY, {
     leading: false,
     trailing: true
   })
 
-  function featureStatusFilter() {
-    if (ENV.FEATURES?.feature_flag_filters) {
-      return (
-        <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
-          <FeatureFlagFilter
-            options={[
-              {id: 'beta', label: I18n.t('Active Development')},
-              {id: 'pending_enforcement', label: I18n.t('Pending Enforcement')}
-            ]}
-            onChange={statuses => setSelectedFeatureStates(statuses)}
-          />
-        </Flex.Item>
-      )
-    }
-  }
-
   return (
     <View as="div">
       {isLoading ? (
-        <Spinner renderTitle={I18n.t('Loading features')} />
+        <Spinner renderTitle={I18n.t('Loading feature options')} />
       ) : (
         <>
-          <Flex margin="0 0 medium 0" alignItems="start">
+          <View as="div" margin="0 0 medium">
             <Flex.Item>
               <TextInput
                 renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
@@ -155,11 +102,10 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
                 renderBeforeInput={<IconSearchLine inline={false} />}
               />
             </Flex.Item>
-            {featureStatusFilter()}
-          </Flex>
+          </View>
 
           {categories.map(cat => {
-            if (!groupedFeatures[cat.id] || !Object.keys(groupedFeatures[cat.id]).length) {
+            if (!groupedFeatures[cat.id]?.length) {
               return null
             }
             return (
@@ -168,7 +114,6 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
                 title={cat.title}
                 rows={groupedFeatures[cat.id]}
                 disableDefaults={disableDefaults}
-                showTitle={Object.keys(groupedFeatures[cat.id]).length > 0}
               />
             )
           })}

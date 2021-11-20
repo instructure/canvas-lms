@@ -195,8 +195,8 @@ describe "context modules" do
       module1_unpublished_tag = @module_1.add_item({ :id => @assignment_2.id, :type => 'assignment' })
       @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' }, module1_unpublished_tag.id => { :type => 'must_view' } }
       @module_1.save!
-      expect(@module_1.completion_requirements.map { |h| h[:id] }).to include(@tag_1.id)
-      expect(@module_1.completion_requirements.map { |h| h[:id] }).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
+      expect(@module_1.completion_requirements.pluck(:id)).to include(@tag_1.id)
+      expect(@module_1.completion_requirements.pluck(:id)).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
       module2_published_tag = @module_2.add_item({ :id => @quiz_1.id, :type => 'quiz' })
       @module_2.save!

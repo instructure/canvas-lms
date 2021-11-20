@@ -21,7 +21,7 @@ require 'spec_helper'
 
 describe IncomingMailProcessor::Instrumentation do
   let(:mailbox) do
-    obj = double()
+    obj = double
     allow(obj).to receive(:unprocessed_message_count).and_return(4, nil, 0, 50)
     obj
   end

@@ -46,7 +46,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
   describe ".each_message" do
     it "iterates through and yield files in a directory" do
       folder = default_config[:folder]
-      folder_entries = %w(. .. foo bar baz)
+      folder_entries = %w[. .. foo bar baz]
       expect(@mailbox).to receive(:files_in_folder).with(folder).and_return(folder_entries)
       folder_entries.each do |entry|
         expect(@mailbox).to receive(:file?).with(folder, entry).and_return(!entry.include?('.'))
@@ -65,7 +65,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
     it "iterates with stride and offset" do
       folder = default_config[:folder]
-      folder_entries = %w(. .. foo bar baz)
+      folder_entries = %w[. .. foo bar baz]
       expect(@mailbox).to receive(:files_in_folder).with(folder).twice.and_return(folder_entries)
       folder_entries.each do |entry|
         expect(@mailbox).to receive(:file?).with(folder, entry).and_return(!entry.include?('.'))

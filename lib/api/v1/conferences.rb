@@ -20,12 +20,12 @@
 
 module Api::V1::Conferences
   API_CONFERENCE_JSON_OPTS = {
-    :only => %w(
+    :only => %w[
       id title conference_type description
       duration ended_at started_at user_ids long_running
       recordings join_url has_advanced_settings conference_key
       context_type context_id
-    ).freeze
+    ].freeze
   }.freeze
 
   def api_conferences_json(conferences, user, session)
@@ -65,7 +65,7 @@ module Api::V1::Conferences
   def default_conference_json(context, user, session)
     conference = context.web_conferences.build(
       :title => I18n.t(:default_conference_title, "%{course_name} Conference", :course_name => context.name),
-      :duration => WebConference::DEFAULT_DURATION,
+      :duration => WebConference::DEFAULT_DURATION
     )
 
     conference.as_json(
@@ -73,7 +73,7 @@ module Api::V1::Conferences
         user: user,
         session: session,
       },
-      url: named_context_url(context, :context_conferences_url),
+      url: named_context_url(context, :context_conferences_url)
     )
   end
 
@@ -103,11 +103,11 @@ module Api::V1::Conferences
   end
 
   def translate_strings(object)
-    object.each_with_object({}) do |(k, v), h|
+    object.transform_values do |v|
       if v.is_a? Array
-        h[k] = v.map { |a| translate_strings(a) }
+        v.map { |a| translate_strings(a) }
       else
-        h[k] = v.respond_to?(:call) ? v.call() : v
+        v.respond_to?(:call) ? v.call : v
       end
     end
   end

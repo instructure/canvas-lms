@@ -69,6 +69,6 @@ class BookmarkedCollection::CompositeCollection < BookmarkedCollection::Collecti
     bookmark, _ = decompose_bookmark(bookmark)
     return false if bookmark.nil?
 
-    return true
+    true
   end
 end

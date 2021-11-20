@@ -169,7 +169,7 @@ class AssignmentGroupsController < ApplicationController
   def reorder_assignments
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
-      order = params[:order].split(',').map { |id| id.to_i }
+      order = params[:order].split(',').map(&:to_i)
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).distinct.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order)
 
@@ -425,7 +425,7 @@ class AssignmentGroupsController < ApplicationController
     if params[:exclude_assignment_submission_types].present?
       exclude_types = params[:exclude_assignment_submission_types]
       exclude_types = Array.wrap(exclude_types) &
-                      %w(online_quiz discussion_topic wiki_page external_tool)
+                      %w[online_quiz discussion_topic wiki_page external_tool]
       assignments = assignments.where.not(submission_types: exclude_types)
     end
 
@@ -449,7 +449,7 @@ class AssignmentGroupsController < ApplicationController
     end
 
     if assignment_includes.include?(:assignment_overrides)
-      assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
+      assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.empty? }
     end
 
     assignments

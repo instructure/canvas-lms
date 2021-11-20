@@ -49,7 +49,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       text = submission_data[question_key]
 
       if text.nil? || text.empty?
-        return nil
+        nil
       else
         text
       end

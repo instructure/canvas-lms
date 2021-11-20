@@ -33,8 +33,8 @@ module Stats
       enumerable.each { |item| self << item }
     end
 
-    def each
-      @items.each { |i| yield i }
+    def each(&block)
+      @items.each(&block)
     end
 
     def <<(item)
@@ -56,11 +56,17 @@ module Stats
     end
     alias_method :push, :<<
 
-    def size; @items.size; end
+    def size
+      @items.size
+    end
     alias_method :count, :size
-    def empty?; @items.size == 0; end
+    def empty?
+      @items.empty?
+    end
 
-    def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
+    def mean
+      @items.empty? ? nil : (sum.to_f / @items.size)
+    end
     alias_method :avg, :mean
 
     # population variance
@@ -73,7 +79,9 @@ module Stats
     alias_method :variance, :var
 
     # population standard deviation
-    def stddev; @items.empty? ? nil : Math::sqrt(variance); end
+    def stddev
+      @items.empty? ? nil : Math.sqrt(variance)
+    end
     alias_method :standard_deviation, :stddev
 
     def quartiles
@@ -90,7 +98,7 @@ module Stats
       # this one is very good
       # method is summarized well here:
       # http://www.stat.yale.edu/Courses/1997-98/101/numsum.htm
-      if @items.length == 0
+      if @items.empty?
         return [nil, nil, nil]
       end
 
@@ -140,11 +148,11 @@ module Stats
       bins = {}
       @items.each do |i|
         bin = (((i - bin_base) / bin_width).floor * bin_width) + bin_base
-        if bins.has_key?(bin)
-          bins[bin] = bins[bin] + 1
-        else
-          bins[bin] = 1
-        end
+        bins[bin] = if bins.key?(bin)
+                      bins[bin] + 1
+                    else
+                      1
+                    end
       end
       ret_val[:data] = bins
       ret_val

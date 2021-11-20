@@ -174,7 +174,7 @@ describe Types::SubmissionCommentType do
       before do
         @media_title = SecureRandom.hex
         @media_object = media_object(
-          title: @media_title,
+          title: @media_title
         )
         @submission_comments[0].update!(
           media_comment_id: @media_object.media_id

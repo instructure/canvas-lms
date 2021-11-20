@@ -48,7 +48,7 @@ module Importers
           quiz&.id, quiz_group&.id, hash['assessment_question_id'],
           hash.to_yaml, Time.now.utc, Time.now.utc, mig_id, position, root_account_id
         ]
-        query = self.item_class.send(:sanitize_sql, [<<~SQL, *args])
+        query = self.item_class.send(:sanitize_sql, [<<~SQL.squish, *args])
           INSERT INTO #{Quizzes::QuizQuestion.quoted_table_name} (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position, root_account_id)
           VALUES (?,?,?,?,?,?,?,?,?)
         SQL

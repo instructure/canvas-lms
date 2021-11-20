@@ -37,14 +37,14 @@ module JSONToken
     json = JSON.parse("[#{json}]")
     raise JSON::ParserError unless json.size == 1
 
-    return self.walk_json(json.first, self.method(:decode_binary_string))
+    self.walk_json(json.first, self.method(:decode_binary_string))
   end
 
   def self.walk_json(value, method)
     value = method.call(value)
     keys = case value
-           when Hash; value.keys
-           when Array; 0...value.length
+           when Hash then value.keys
+           when Array then 0...value.length
            else; []
            end
     keys.each do |key|

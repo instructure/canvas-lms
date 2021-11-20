@@ -24,17 +24,23 @@ require 'spec_helper'
 describe EventStream::Stream do
   let(:database) do
     database = double('database')
-    def database.batch; yield; end
+    def database.batch
+      yield
+    end
 
-    def database.update_record(*args); end
+    def database.update_record(*); end
 
-    def database.insert_record(*args); end
+    def database.insert_record(*); end
 
-    def database.update(*args); end
+    def database.update(*); end
 
-    def database.available?; true end
+    def database.available?
+      true
+    end
 
-    def database.keyspace; 'test_db' end
+    def database.keyspace
+      'test_db'
+    end
     database
   end
 
@@ -147,7 +153,7 @@ describe EventStream::Stream do
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
-        self.database -> { nil }
+        self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
@@ -182,7 +188,7 @@ describe EventStream::Stream do
 
       stream = EventStream::Stream.new do
         self.backend_strategy -> { :active_record }
-        self.database -> { nil }
+        self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
@@ -460,7 +466,7 @@ describe EventStream::Stream do
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc lambda { |_record| nil }
+          @index.entry_proc lambda { |_record| }
           expect(@index_strategy).not_to receive(:insert)
           @stream.insert(@record)
         end
@@ -488,7 +494,9 @@ describe EventStream::Stream do
     describe "failure" do
       before do
         @database = double('database')
-        def @database.available?; true end
+        def @database.available?
+          true
+        end
         allow(@stream).to receive(:database).and_return(@database)
         @record = double(
           :id => 'id',

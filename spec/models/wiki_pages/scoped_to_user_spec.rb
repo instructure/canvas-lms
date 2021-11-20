@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper.rb"
+require_relative "../../spec_helper"
 
 describe WikiPages::ScopedToUser do
   before(:once) do
@@ -36,9 +36,7 @@ describe WikiPages::ScopedToUser do
   let_once(:unpublished) do
     @course.wiki_pages.create({
                                 title: 'unpublished page'
-                              }).tap do |page|
-      page.unpublish
-    end
+                              }).tap(&:unpublish)
   end
 
   describe '#scope' do

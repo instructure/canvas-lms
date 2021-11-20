@@ -66,15 +66,13 @@ shared_examples_for "file uploads api" do
       'media_entry_id' => attachment.media_entry_id
     }
 
-    if options[:include] && options[:include].include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User) || attachment.context.is_a?(Group))
+    if options[:include]&.include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User) || attachment.context.is_a?(Group))
       json['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0, verifier: attachment.uuid)
     end
 
     unless options[:no_doc_preview]
-      json.merge!({
-                    'canvadoc_session_url' => nil,
-                    'crocodoc_session_url' => nil
-                  })
+      json['canvadoc_session_url'] = nil
+      json['crocodoc_session_url'] = nil
     end
 
     json
@@ -172,7 +170,7 @@ shared_examples_for "file uploads api" do
     expect(response).to be_successful
     attachment.reload
     json = json_parse(response.body)
-    expect(json).to eq attachment_json(attachment, { include: %w(enhanced_preview_url) })
+    expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
 
     expect(attachment.file_state).to eq 'available'
     expect(attachment.content_type).to eq "application/msword"

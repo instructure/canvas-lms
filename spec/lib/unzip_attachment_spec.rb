@@ -20,7 +20,7 @@
 
 describe UnzipAttachment do
   def fixture_filename(filename)
-    File.expand_path(File.join(File.dirname(__FILE__), %W(.. fixtures #{filename})))
+    File.expand_path(File.join(File.dirname(__FILE__), %W[.. fixtures #{filename}]))
   end
 
   def add_folder_to_course(name)
@@ -52,7 +52,10 @@ describe UnzipAttachment do
     end
 
     describe 'after processing' do
-      before { unzipper.process; @course.reload }
+      before {
+        unzipper.process
+        @course.reload
+      }
 
       let(:first_attachment) { @course.attachments.where(display_name: 'first_entry.txt').first }
       let(:second_attachment) { @course.attachments.where(display_name: 'second_entry.txt').first }
@@ -104,7 +107,7 @@ describe UnzipAttachment do
 
     it "updates progress as it goes" do
       progress = nil
-      unzipper.progress_proc = Proc.new { |pct| progress = pct }
+      unzipper.progress_proc = proc { |pct| progress = pct }
       unzipper.process
       expect(progress).not_to be_nil
     end
@@ -113,14 +116,14 @@ describe UnzipAttachment do
       filename = fixture_filename('alphabet_soup.zip')
       Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
-        expect(zip.entries.map(&:name)).to eql(%w(f.txt d/e.txt d/d.txt c.txt b.txt a.txt))
+        expect(zip.entries.map(&:name)).to eql(%w[f.txt d/e.txt d/d.txt c.txt b.txt a.txt])
       end
 
       ua = UnzipAttachment.new(:course => @course, :filename => filename)
       ua.process
 
       expect(@course.attachments.count).to eq 6
-      %w(a b c d e f).each_with_index do |letter, index|
+      %w[a b c d e f].each_with_index do |letter, index|
         expect(@course.attachments.where(position: index).first.display_name).to eq "#{letter}.txt"
       end
     end

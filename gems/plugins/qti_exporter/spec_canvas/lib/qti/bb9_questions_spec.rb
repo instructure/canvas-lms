@@ -31,7 +31,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -46,7 +49,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -59,7 +65,7 @@ if Qti.migration_executable
     it "imports multiple-answers questions" do
       hash = get_quiz_data(bb9_question_dir, 'multiple_answers')[0].detect { |qq| qq[:migration_id] == 'question_22_1' }
       expect(hash[:question_type]).to eq 'multiple_answers_question'
-      expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.map { |answer| answer[:weight] }).to eq [100, 0, 100, 100]
+      expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.pluck(:weight)).to eq [100, 0, 100, 100]
     end
 
     it "converts matching questions where the answers are given out of order" do
@@ -70,7 +76,10 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING2
     end
@@ -104,7 +113,7 @@ if Qti.migration_executable
                          { :right => "Phobos", :text => "Saturn", :left => "Saturn", :comments => "" },
                          { :right => "Luna", :text => "Earth", :left => "Earth", :comments => "" },
                          { :right => "Ganymede", :text => "Jupiter", :left => "Jupiter", :comments => "" }],
-                 :question_name => "" }
+                 :question_name => "" }.freeze
 
     MATCHING2 = { :answers =>
                     [{ :right => "right 1", :text => "left 1", :left => "left 1", :comments => "" },
@@ -123,6 +132,6 @@ if Qti.migration_executable
                      { :text => "right 2" },
                      { :text => "DISTRACTION" },
                      { :text => "right 4" },
-                     { :text => "right 3" }] }
+                     { :text => "right 3" }] }.freeze
   end
 end

@@ -100,12 +100,12 @@ class QuestionBanksController < ApplicationController
       end
       @questions = @bank.assessment_questions.where(:id => ids)
       if params[:move] != '1'
-        attributes = @questions.columns.map(&:name) - %w{id created_at updated_at assessment_question_bank_id}
+        attributes = @questions.columns.map(&:name) - %w[id created_at updated_at assessment_question_bank_id]
         connection = @questions.connection
         attributes = attributes.map { |attr| connection.quote_column_name(attr) }
         now = connection.quote(Time.now.utc)
         connection.insert(
-          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
+          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w[assessment_question_bank_id created_at updated_at] + attributes).join(', ')})" +
           @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql
         )
       else

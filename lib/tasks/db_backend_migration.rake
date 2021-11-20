@@ -12,7 +12,7 @@ namespace :db do
       logger = ActiveSupport::Logger.new(STDERR)
       migrator = PageView::CassandraMigrator.new
       migrator.logger = logger
-      migrator.run()
+      migrator.run
     end
   end
 end

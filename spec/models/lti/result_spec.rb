@@ -72,7 +72,7 @@ RSpec.describe Lti::Result, type: :model do
         lti_result_model(
           assignment: assignment,
           result_maximum: 1,
-          result_score: 0.5,
+          result_score: 0.5
         )
       end
 

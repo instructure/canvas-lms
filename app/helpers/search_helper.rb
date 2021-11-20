@@ -49,7 +49,13 @@ module SearchHelper
             :name => course.name,
             :type => :course,
             :term => term_for_course.call(course),
-            :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
+            :state => if type == :current
+                        :active
+                      elsif course.recently_ended?
+                        :recently_active
+                      else
+                        :inactive
+                      end,
             :available => type == :current && course.available?,
             :default_section_id => course.default_section(no_create: true).try(:id)
           }.tap do |hash|
@@ -107,7 +113,8 @@ module SearchHelper
         end
       end
 
-      if context.is_a?(Course)
+      case context
+      when Course
         add_courses.call [context], :current
         visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), require_message_permission: true)
         sections = case visibility
@@ -120,12 +127,12 @@ module SearchHelper
                    end
         add_sections.call sections
         add_groups.call context.groups.active, context
-      elsif context.is_a?(Group)
+      when Group
         if context.grants_right?(@current_user, session, :read)
           add_groups.call [context]
           add_courses.call [context.context], :current if context.context.is_a?(Course)
         end
-      elsif context.is_a?(CourseSection)
+      when CourseSection
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
         sections = visibility == :restricted ? [] : [context]
         add_courses.call [context.course], :current
@@ -211,7 +218,7 @@ module SearchHelper
             result = synthetic_contexts_for(course, context_name, options[:base_url])
             found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
             result << { :id => "#{context_name}_sections", :name => I18n.t(:course_sections, "Course Sections"), :item_count => sections.size, :type => :context } if found_custom_sections
-            result << { :id => "#{context_name}_groups", :name => I18n.t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context } if groups.size > 0
+            result << { :id => "#{context_name}_groups", :name => I18n.t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context } unless groups.empty?
             return result
           end
         when /\Acourse_\d+_groups\z/
@@ -277,7 +284,7 @@ module SearchHelper
     end
 
     # bulk count users in the remainder
-    asset_strings = result.map { |context| context[:asset_string] }
+    asset_strings = result.pluck(:asset_string)
     user_counts = @current_user.address_book.count_in_contexts(asset_strings)
 
     # build up the final representations

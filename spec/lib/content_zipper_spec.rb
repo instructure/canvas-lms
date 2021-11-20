@@ -134,7 +134,7 @@ describe ContentZipper do
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           expect(f.name).to match(/some9991234guy/)
-          expect(f.get_input_stream.read).to match(%r{This submission was a url})
+          expect(f.get_input_stream.read).to match(/This submission was a url/)
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
       end
@@ -205,12 +205,15 @@ describe ContentZipper do
     it "only includes one submission per group" do
       teacher_in_course active_all: true
       gc = @course.group_categories.create! name: "Homework Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
-      students = 4.times.map { student_in_course(active_all: true); @student }
+      groups = Array.new(2) { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      students = Array.new(4) do
+        student_in_course(active_all: true)
+        @student
+      end
       students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
       a = @course.assignments.create! group_category_id: gc.id,
                                       grade_group_students_individually: false,
-                                      submission_types: %w(text_entry)
+                                      submission_types: %w[text_entry]
       a.submit_homework(students.first, body: "group 1 submission")
       a.submit_homework(students.second, body: "group 2 submission")
 

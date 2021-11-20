@@ -43,9 +43,9 @@ class CourseSection < ActiveRecord::Base
   has_many :discussion_topics, :through => :discussion_topic_section_visibilities
 
   before_validation :infer_defaults, :verify_unique_sis_source_id, :verify_unique_integration_id
-  validates_presence_of :course_id, :root_account_id, :workflow_state
-  validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validates :course_id, :root_account_id, :workflow_state, presence: true
+  validates :sis_source_id, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false }
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
   validate :validate_section_dates
 
   has_many :sis_post_grades_statuses
@@ -58,9 +58,7 @@ class CourseSection < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
-  def account
-    course.account
-  end
+  delegate :account, to: :course
 
   def validate_section_dates
     if start_at.present? && end_at.present? && end_at < start_at
@@ -123,9 +121,7 @@ class CourseSection < ActiveRecord::Base
     ps
   end
 
-  def available?
-    course.available?
-  end
+  delegate :available?, to: :course
 
   def concluded?
     now = Time.now
@@ -278,7 +274,7 @@ class CourseSection < ActiveRecord::Base
     end
 
     CourseSection.unique_constraint_retry do
-      self.default_section = (course.course_sections.active.size == 0)
+      self.default_section = (course.course_sections.active.empty?)
       self.save!
     end
 
@@ -345,7 +341,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def crosslisted?
-    return !!self.nonxlist_course_id
+    !!self.nonxlist_course_id
   end
 
   def destroy_course_if_no_more_sections
@@ -406,7 +402,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
+    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w[start_at end_at]).any?)
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
                      .invalidate_states_for_course_or_section(self)
     end
