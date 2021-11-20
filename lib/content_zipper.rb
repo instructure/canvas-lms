@@ -30,8 +30,8 @@ class ContentZipper
 
   # we evaluate some ERB templates from under app/views/ while generating assignment zips
   include I18nUtilities
-  def t(*a, &b)
-    I18n.t(*a, &b)
+  def t(...)
+    I18n.t(...)
   end
 
   def self.process_attachment(*args)
