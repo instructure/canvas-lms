@@ -1974,7 +1974,7 @@ class Attachment < ActiveRecord::Base
 
   class << self
     def clone_url_strand_overrides
-      @clone_url_strand_overrides ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['clone_url_strand.yml'] || '{}')
+      @clone_url_strand_overrides ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['clone_url_strand.yml'] || '{}')
     end
 
     def reset_clone_url_strand_overrides
