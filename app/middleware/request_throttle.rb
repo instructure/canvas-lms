@@ -59,11 +59,11 @@ class RequestThrottle
     up_front_cost = bucket.get_up_front_cost_for_path(path)
     pre_judged = (approved?(request) || blocked?(request))
     cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
-      status, headers, response = if !allowed?(request, bucket)
+      status, headers, response = if allowed?(request, bucket)
+                                    @app.call(env)
+                                  else
                                     throttled = true
                                     rate_limit_exceeded
-                                  else
-                                    @app.call(env)
                                   end
 
       ending_cpu = Process.times

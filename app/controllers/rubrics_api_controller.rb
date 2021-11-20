@@ -295,15 +295,15 @@ class RubricsApiController < ApplicationController
     rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
     return render json: { message: "Rubric not found" }, status: :not_found unless rubric.present? && !rubric.deleted?
 
-    if !@context.errors.present?
+    if @context.errors.present?
+      render json: @context.errors, status: :bad_request
+    else
       assessments = rubric_assessments(rubric)
       associations = rubric_associations(rubric)
       render json: rubric_json(rubric, @current_user, session,
                                assessments: assessments,
                                associations: associations,
                                style: params[:style])
-    else
-      render json: @context.errors, status: :bad_request
     end
   end
 

@@ -175,9 +175,7 @@ class DiscussionEntry < ActiveRecord::Base
       message = format_message(message).first
     end
     user = nil unless user && context.users.include?(user)
-    if !user
-      raise IncomingMail::Errors::InvalidParticipant
-    else
+    if user
       shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,
                                                         user: user,
@@ -189,6 +187,8 @@ class DiscussionEntry < ActiveRecord::Base
           raise IncomingMail::Errors::ReplyToLockedTopic
         end
       end
+    else
+      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 
@@ -501,7 +501,9 @@ class DiscussionEntry < ActiveRecord::Base
     current_user ||= self.current_user
     return nil unless current_user
 
-    if new_state != read_state(current_user)
+    if new_state == read_state(current_user)
+      true
+    else
       entry_participant = update_or_create_participant(
         opts.merge(current_user: current_user, new_state: new_state)
       )
@@ -512,8 +514,6 @@ class DiscussionEntry < ActiveRecord::Base
         )
       end
       entry_participant
-    else
-      true
     end
   end
 

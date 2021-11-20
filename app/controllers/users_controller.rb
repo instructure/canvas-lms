@@ -3008,14 +3008,14 @@ class UsersController < ApplicationController
     @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
       @pairing_code = find_observer_pairing_code(params[:pairing_code]&.[](:code))
-      if !@pairing_code.nil?
+      if @pairing_code.nil?
+        @invalid_observee_code = ObserverPairingCode.new
+        @invalid_observee_code.errors.add('code', 'invalid')
+      else
         @observee = @pairing_code.user
         # If the user is using a valid pairing code, we don't need recaptcha
         # Just clear out any errors it may have generated
         @recaptcha_errors = nil
-      else
-        @invalid_observee_code = ObserverPairingCode.new
-        @invalid_observee_code.errors.add('code', 'invalid')
       end
     end
 
@@ -3068,10 +3068,10 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      if !@current_user # automagically logged in
-        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
-      else
+      if @current_user
         @pseudonym.send(:skip_session_maintenance=, true)
+      else # automagically logged in
+        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       end
       @user.save!
 

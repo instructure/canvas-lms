@@ -100,9 +100,7 @@ class PseudonymsController < ApplicationController
     end
 
     @ccs = @ccs.flatten.compact.uniq.select do |cc|
-      if !cc.user
-        false
-      else
+      if cc.user
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
         found = false
@@ -115,6 +113,8 @@ class PseudonymsController < ApplicationController
           end
         end
         found
+      else
+        false
       end
     end
     respond_to do |format|

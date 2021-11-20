@@ -149,7 +149,9 @@ class UserList
         user_start = 0
         in_quotes = false
         chars.each_with_index do |char, i|
-          if !in_quotes
+          if in_quotes
+            in_quotes = false if char == '"'
+          else
             case char
             when ','
               user_line = str[user_start, i - user_start].strip
@@ -158,8 +160,6 @@ class UserList
             when '"'
               in_quotes = true if quote_ends(chars, i)
             end
-          else
-            in_quotes = false if char == '"'
           end
         end
       end
@@ -267,9 +267,9 @@ class UserList
       number = sms[:address].gsub(/[^\d\w]/, '')
       sms[:address] = "(#{number[0, 3]}) #{number[3, 3]}-#{number[6, 4]}"
     end
-    sms_account_ids = @search_method != :closed ? [@root_account] : all_account_ids
+    sms_account_ids = @search_method == :closed ? all_account_ids : [@root_account]
     Shard.partition_by_shard(sms_account_ids) do |account_ids|
-      sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.where(:account_id => account_ids)
+      sms_scope = @search_method == :closed ? Pseudonym.where(:account_id => account_ids) : Pseudonym
       sms_scope.active
                .select('path AS address, users.name AS name, communication_channels.user_id AS user_id')
                .joins(:user => :communication_channels)

@@ -72,11 +72,11 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
-    if !res[:ready]
+    if res[:ready]
+      build_media_objects(res, root_account_id)
+    else
       MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY)
                  .refresh_media_files(res[:id], [], root_account_id)
-    else
-      build_media_objects(res, root_account_id)
     end
     res
   end
@@ -132,7 +132,9 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
-    if !res[:ready]
+    if res[:ready]
+      build_media_objects(res, root_account_id)
+    else
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
         wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
         MediaObject.delay(run_at: wait_period.minutes.from_now, priority: Delayed::LOW_PRIORITY)
@@ -142,8 +144,6 @@ class MediaObject < ActiveRecord::Base
         Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
       end
       res
-    else
-      build_media_objects(res, root_account_id)
     end
   end
 

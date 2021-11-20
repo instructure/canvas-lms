@@ -296,9 +296,7 @@ class SubmissionComment < ActiveRecord::Base
     user = opts[:user]
     message = opts[:text].strip
     user = nil unless user && submission.grants_right?(user, :comment)
-    if !user
-      raise IncomingMail::Errors::InvalidParticipant
-    else
+    if user
       shard.activate do
         submission.add_comment(
           author: user,
@@ -306,6 +304,8 @@ class SubmissionComment < ActiveRecord::Base
           provisional: provisional_grade_id.present?
         )
       end
+    else
+      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 

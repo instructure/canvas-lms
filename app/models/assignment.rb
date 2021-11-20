@@ -2101,7 +2101,11 @@ class Assignment < ActiveRecord::Base
     submissions = []
     students.each do |student|
       submission = submissions_hash[student.id]
-      if !submission
+      if submission
+        submission.assignment = self
+        submission.user = student
+        yield submission if block_given?
+      else
         begin
           transaction(requires_new: true) do
             submission = self.submissions.build(user: student)
@@ -2117,10 +2121,6 @@ class Assignment < ActiveRecord::Base
           submission.user = student
           yield submission if block_given?
         end
-      else
-        submission.assignment = self
-        submission.user = student
-        yield submission if block_given?
       end
       submissions << submission
     end

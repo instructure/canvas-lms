@@ -472,18 +472,18 @@ class SubmissionsApiController < ApplicationController
     assignments_hash = assignments.index_by(&:id)
 
     if params[:submitted_since].present?
-      if !Api::ISO8601_REGEX.match?(params[:submitted_since])
-        return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: :bad_request)
-      else
+      if Api::ISO8601_REGEX.match?(params[:submitted_since])
         submitted_since_date = Time.zone.parse(params[:submitted_since])
+      else
+        return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: :bad_request)
       end
     end
 
     if params[:graded_since].present?
-      if !Api::ISO8601_REGEX.match?(params[:graded_since])
-        return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: :bad_request)
-      else
+      if Api::ISO8601_REGEX.match?(params[:graded_since])
         graded_since_date = Time.zone.parse(params[:graded_since])
+      else
+        return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: :bad_request)
       end
     end
 

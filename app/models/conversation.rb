@@ -519,12 +519,12 @@ class Conversation < ActiveRecord::Base
     message = opts.delete(:text).to_s.strip
     participant = conversation_participants.where(user_id: user).first
     user = nil unless user && participant
-    if !user
-      raise IncomingMail::Errors::InvalidParticipant
-    else
+    if user
       participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
       message = truncate_message(message)
       add_message(user, message, opts)
+    else
+      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 

@@ -323,9 +323,7 @@ class UserMerge
   end
 
   def finish_ccs(max_position, to_retire_ids)
-    if from_user.shard != target_user.shard
-      handle_cross_shard_cc
-    else
+    if from_user.shard == target_user.shard
       from_user.shard.activate do
         ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: 'retired')
         merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
@@ -338,6 +336,8 @@ class UserMerge
         scope.touch_all
         scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
+    else
+      handle_cross_shard_cc
     end
     merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []

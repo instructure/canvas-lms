@@ -186,15 +186,7 @@ class EportfoliosController < ApplicationController
         @attachment = nil
       end
 
-      if !@attachment
-        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
-        @attachment.workflow_state = 'to_be_zipped'
-        @attachment.file_state = '0'
-        @attachment.user = @current_user
-        @attachment.save!
-        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
-        render :json => @attachment
-      else
+      if @attachment
         respond_to do |format|
           if @attachment.zipped?
             if @attachment.stored_locally?
@@ -214,6 +206,14 @@ class EportfoliosController < ApplicationController
             format.json { render :json => @attachment }
           end
         end
+      else
+        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.file_state = '0'
+        @attachment.user = @current_user
+        @attachment.save!
+        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
+        render :json => @attachment
       end
     end
   end

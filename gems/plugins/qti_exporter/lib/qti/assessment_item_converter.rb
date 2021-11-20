@@ -233,7 +233,7 @@ module Qti
              else
                response_identifier.to_s.sub(/response_/i, "").to_i
              end
-        id != 0 ? id : unique_local_id
+        id == 0 ? unique_local_id : id
       else
         unique_local_id
       end

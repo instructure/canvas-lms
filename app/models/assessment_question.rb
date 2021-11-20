@@ -274,7 +274,9 @@ class AssessmentQuestion < ActiveRecord::Base
     assessment_questions.map do |aq|
       aq.force_version_number(current_versions[aq.id] || 0)
       qq = existing_quiz_questions[aq.id].try(:first)
-      if !qq
+      if qq
+        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+      else
         begin
           Quizzes::QuizQuestion.transaction(requires_new: true) do
             qq = aq.create_quiz_question(quiz_id, quiz_group_id, duplicate_index)
@@ -285,8 +287,6 @@ class AssessmentQuestion < ActiveRecord::Base
                            duplicate_index: duplicate_index).take!
           qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
-      else
-        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
       end
       qq
     end

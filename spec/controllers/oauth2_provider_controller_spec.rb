@@ -682,7 +682,7 @@ describe OAuth2ProviderController do
 
             it "returns 302 when #{assertion} missing" do
               jwt.delete assertion.to_sym
-              expected = assertion != 'sub' ? request_url + assertion : client_url
+              expected = assertion == 'sub' ? client_url : request_url + assertion
               expect(subject).to redirect_to(expected)
             end
           end

@@ -162,10 +162,10 @@ module Csp::AccountHelper
     config = Canvas::DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
     if config['attachment_specific_file_domain'] == 'true'
       separator = config['attachment_specific_file_domain_separator'] || '.'
-      files_host = if separator != '.'
-                     "*.#{files_host[files_host.index('.') + 1..]}"
-                   else
+      files_host = if separator == '.'
                      "*.#{files_host}"
+                   else
+                     "*.#{files_host[files_host.index('.') + 1..]}"
                    end
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config['base_url']).host

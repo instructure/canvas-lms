@@ -1103,10 +1103,10 @@ class ConversationsController < ApplicationController
       @conversations_scope.where(:conversation_id => conversations.map(&:conversation_id)).pluck(:conversation_id)
     end
     visible_conversation_ids.each { |c_id| result[Shard.relative_id_for(c_id, @current_user.shard, Shard.current)] = true }
-    if !multiple
-      result[conversations.first.conversation_id]
-    else
+    if multiple
       result
+    else
+      result[conversations.first.conversation_id]
     end
   end
 

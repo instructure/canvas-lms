@@ -954,7 +954,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    check_state = !is_announcement ? 'unpublished' : 'post_delayed'
+    check_state = is_announcement ? 'post_delayed' : 'unpublished'
     became_active = workflow_state_before_last_save == check_state && workflow_state == 'active'
     if should_send_to_stream && (@content_changed || became_active)
       active_participants_with_visibility
@@ -1061,11 +1061,11 @@ class DiscussionTopic < ActiveRecord::Base
     else
       shard.activate do
         entry = discussion_entries.new(message: message, user: user)
-        if !entry.grants_right?(user, :create)
-          raise IncomingMail::Errors::ReplyToLockedTopic
-        else
+        if entry.grants_right?(user, :create)
           entry.save!
           entry
+        else
+          raise IncomingMail::Errors::ReplyToLockedTopic
         end
       end
     end
@@ -1292,7 +1292,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { users_with_permissions(active_participants_with_visibility) }
     p.whenever { |record|
       record.send_notification_for_context? and
-        ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
+        ((record.just_created && record.active?) || record.changed_state(:active, record.is_announcement ? :post_delayed : :unpublished))
     }
     p.data { course_broadcast_data }
   end

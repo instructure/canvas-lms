@@ -188,7 +188,7 @@ module Lti
     end
 
     def concluded_lis_roles
-      !concluded_course_enrollments.empty? ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
+      concluded_course_enrollments.empty? ? LtiOutbound::LTIRoles::System::NONE : enrollments_to_lis_roles(concluded_course_enrollments).join(',')
     end
 
     def granted_permissions(permissions_to_check)
