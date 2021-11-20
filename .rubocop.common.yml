@@ -91,6 +91,9 @@ Rails/ActiveRecordAliases:
   Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
+Rails/Blank:
+  UnlessPresent: false # allow `unless foo.present?`
+  Severity: error
 Rails/ContentTag:
   Severity: error
   Exclude:
@@ -131,6 +134,9 @@ Rails/Pluck:
 Rails/PluralizationGrammar:
   Severity: error
 Rails/Presence:
+  Severity: error
+Rails/Present:
+  UnlessBlank: false # allow `unless foo.blank?`
   Severity: error
 Rails/RedundantAllowNil:
   Severity: error

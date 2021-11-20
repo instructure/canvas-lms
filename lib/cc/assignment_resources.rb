@@ -249,7 +249,7 @@ module CC
               :anonymous_instructor_annotations,
               :allowed_attempts]
       atts.each do |att|
-        node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
+        node.tag!(att, assignment.send(att)) if assignment.send(att) == false || assignment.send(att).present?
       end
       if assignment.external_tool_tag
         if (content = assignment.external_tool_tag.content) && content.is_a?(ContextExternalTool)

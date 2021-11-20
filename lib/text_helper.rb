@@ -53,7 +53,7 @@ module TextHelper
 
   def datetime_span(*args)
     string = datetime_string(*args)
-    if string && !string.empty? && args[0]
+    if string.present? && args[0]
       "<span class='zone_cached_datetime' title='#{args[0].iso8601 rescue ""}'>#{string}</span>"
     else
       nil

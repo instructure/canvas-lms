@@ -757,7 +757,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def standard_url
     unless defined?(@standard_url)
-      @standard_url = !url.blank? && ContextExternalTool.standardize_url(url)
+      @standard_url = url.present? && ContextExternalTool.standardize_url(url)
     end
     @standard_url
   end

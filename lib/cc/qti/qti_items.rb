@@ -269,7 +269,7 @@ module CC
       ## question resprocessing methods
 
       def resprocessing(node, question)
-        if !question['neutral_comments'].blank? || !question['neutral_comments_html'].blank?
+        if question['neutral_comments'].present? || question['neutral_comments_html'].present?
           other_respcondition(node, 'Yes', 'general_fb')
         end
 
@@ -296,7 +296,7 @@ module CC
           numerical_resprocessing(node, question)
         end
 
-        if (!question['incorrect_comments'].blank? || !question['incorrect_comments_html'].blank?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
+        if (question['incorrect_comments'].present? || question['incorrect_comments_html'].present?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end

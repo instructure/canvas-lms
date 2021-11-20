@@ -157,7 +157,7 @@ module Importers
             obj = context.wiki_pages.where(migration_id: sub_item[:migration_id]).first
             contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
           elsif sub_item[:type] == 'embedded_content'
-            if contents && !contents.empty?
+            if contents.present?
               description += "<ul>\n#{contents}\n</ul>"
               contents = ""
             end
@@ -196,7 +196,7 @@ module Importers
             end
           end
         end
-        description += "<ul>\n#{contents}\n</ul>" if contents && !contents.empty?
+        description += "<ul>\n#{contents}\n</ul>" if contents.present?
 
         if hash[:footer]
           description += if hash[:footer][:is_html]
@@ -207,7 +207,7 @@ module Importers
         end
 
         item.body = description
-        allow_save = false if !description || description.empty?
+        allow_save = false if description.blank?
       elsif hash[:page_type] == 'module_toc'
       elsif hash[:topics]
         item.title = t('title_for_topics_category', '%{category} Topics', :category => hash[:category_name])

@@ -250,7 +250,7 @@ module GoogleDrive
         folder.add_file(entry) unless is_folder
       end
 
-      if extensions && !extensions.empty?
+      if extensions.present?
         root = root.select { |e| extensions.include?(e.extension) }
       end
 
@@ -278,7 +278,7 @@ module GoogleDrive
     end
 
     def file_extension_from_header(headers, entry)
-      file_extension = (entry.extension && !entry.extension.empty? && entry.extension) || 'unknown'
+      file_extension = (entry.extension.present? && entry.extension) || 'unknown'
 
       if headers['content-disposition']&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
         file_extension = Regexp.last_match[:file_extension]

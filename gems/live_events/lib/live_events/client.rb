@@ -38,8 +38,8 @@ module LiveEvents
           "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
         )
       end
-      return nil unless res && !res['kinesis_stream_name'].blank? &&
-                        (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
+      return nil unless res && res['kinesis_stream_name'].present? &&
+                        (res['aws_region'].present? || res['aws_endpoint'].present?)
 
       unless (defined?(Rails) && Rails.env.production?) ||
              res['custom_aws_credentials'] ||

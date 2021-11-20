@@ -32,7 +32,7 @@ module Api
       end
 
       def has_media_comment?
-        !media_id.blank?
+        media_id.present?
       end
 
       # (outgoing) turn anchor tags with media comments into html5 elements

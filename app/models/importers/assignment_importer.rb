@@ -148,7 +148,7 @@ module Importers
         item.copied = true
         item.copying = true
       end
-      if !hash[:submission_types].blank?
+      if hash[:submission_types].present?
         item.submission_types = hash[:submission_types]
       elsif ['discussion_topic'].include?(hash[:submission_format])
         item.submission_types = "discussion_topic"

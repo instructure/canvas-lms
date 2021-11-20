@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "active_support/core_ext/object/blank"
+
 module CanvasBreachMitigation
   class MaskingSecrets
     class << self
@@ -59,7 +61,7 @@ module CanvasBreachMitigation
       private
 
       def unmasked_token(encoded_masked_token)
-        if encoded_masked_token.nil? || encoded_masked_token.empty?
+        if encoded_masked_token.blank?
           return SecureRandom.base64(AUTHENTICITY_TOKEN_LENGTH)
         end
 

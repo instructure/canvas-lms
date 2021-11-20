@@ -49,7 +49,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   def empty?
     case event_type
     when EVT_QUESTION_ANSWERED
-      answers.nil? || answers.empty?
+      answers.blank?
     else
       false
     end

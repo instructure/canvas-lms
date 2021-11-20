@@ -109,7 +109,7 @@ class ExternalFeed < ActiveRecord::Base
       entry = external_feed_entries.where(uuid: uuid).first
       entry ||= external_feed_entries.where(url: item.link).first
       description = entry&.message
-      if !description || description.empty?
+      if description.blank?
         description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
         description += format_description(item.description || item.title)
       end
@@ -144,7 +144,7 @@ class ExternalFeed < ActiveRecord::Base
       entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new
       description = entry&.message
-      if !description || description.empty?
+      if description.blank?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
         description += format_description(item.content || item.title)
       end

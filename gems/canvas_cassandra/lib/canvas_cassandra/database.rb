@@ -241,7 +241,7 @@ module CanvasCassandra
 
       # inserts and updates in cassandra are equivalent,
       # so no need to differentiate here
-      if updates && !updates.empty?
+      if updates.present?
         args = []
         statement = +"UPDATE #{table_name}"
         if ttl_seconds
@@ -258,7 +258,7 @@ module CanvasCassandra
         update(statement, *args)
       end
 
-      if deletes && !deletes.empty?
+      if deletes.present?
         args = []
         delete_cql = deletes.map(&:first).join(", ")
         statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"

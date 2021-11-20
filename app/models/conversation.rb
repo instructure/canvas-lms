@@ -382,7 +382,7 @@ class Conversation < ActiveRecord::Base
 
         all_new_tags = options[:tags] || []
         message_participant_data = []
-        ConversationMessage.preload_latest(cps) if private? && !all_new_tags.present?
+        ConversationMessage.preload_latest(cps) if private? && all_new_tags.blank?
         cps.each do |cp|
           cp.user = users[cp.user_id]
           next unless cp.user

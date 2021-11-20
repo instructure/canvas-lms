@@ -70,7 +70,7 @@ module IncomingMailProcessor
 
     def move_message(message_id, target_folder)
       existing = @imap.list("", target_folder)
-      if !existing || existing.empty?
+      if existing.blank?
         @imap.create(target_folder)
       end
       @imap.copy(message_id, target_folder)

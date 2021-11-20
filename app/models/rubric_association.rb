@@ -350,16 +350,16 @@ class RubricAssociation < ActiveRecord::Base
           rating[:id] ||= r.id
         end
         save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
-        if rating[:comments] && !rating[:comments].empty? && save_comment
+        if rating[:comments].present? && save_comment
           self.summary_data ||= {}
           self.summary_data[:saved_comments] ||= {}
           self.summary_data[:saved_comments][criterion.id.to_s] ||= []
           self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
           # TODO i18n
-          self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc && !desc.empty? && desc != "No Details" }.uniq.sort
+          self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc.present? && desc != "No Details" }.uniq.sort
           save
         end
-        rating[:description] = t('no_details', "No details") if !rating[:description] || rating[:description].empty?
+        rating[:description] = t('no_details', "No details") if rating[:description].blank?
         ratings << rating
       end
     end

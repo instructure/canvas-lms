@@ -351,7 +351,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     return if !question || !question[:answers] || !(%w[multiple_choice_question multiple_answers_question].include? question[:question_type])
 
     question[:answers].each do |answer|
-      answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
+      answer[:text] = strip_tags(answer[:html]) if answer[:html].present? && answer[:text].blank?
     end
   end
 

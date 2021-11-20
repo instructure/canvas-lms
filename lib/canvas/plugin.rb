@@ -117,7 +117,7 @@ module Canvas
     end
 
     def has_settings_partial?
-      !meta[:settings_partial].blank?
+      meta[:settings_partial].present?
     end
 
     def test_cluster_inherit?

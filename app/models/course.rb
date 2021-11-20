@@ -391,7 +391,7 @@ class Course < ActiveRecord::Base
 
   def module_based?
     Rails.cache.fetch(['module_based_course', self].cache_key) do
-      context_modules.active.except(:order).any? { |m| m.completion_requirements && !m.completion_requirements.empty? }
+      context_modules.active.except(:order).any? { |m| m.completion_requirements.present? }
     end
   end
 
@@ -1281,7 +1281,7 @@ class Course < ActiveRecord::Base
   # to ensure permissions on the root folder are updated after hiding or showing the files tab
   def touch_root_folder_if_necessary
     if tab_configuration_changed?
-      files_tab_was_hidden = tab_configuration_was&.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
+      files_tab_was_hidden = tab_configuration_was&.any? { |h| h.present? && h['id'] == TAB_FILES && h['hidden'] }
       Folder.root_folders(self).each(&:touch) if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
@@ -2455,8 +2455,8 @@ class Course < ActiveRecord::Base
 
   def all_turnitin_comments
     comments = account.closest_turnitin_comments || ""
-    if turnitin_comments && !turnitin_comments.empty?
-      comments += "\n\n" if comments && !comments.empty?
+    if turnitin_comments.present?
+      comments += "\n\n" if comments.present?
       comments += turnitin_comments
     end
     extend TextHelper
