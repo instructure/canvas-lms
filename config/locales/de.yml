@@ -7367,7 +7367,7 @@ de:
     other: "%{count} Abgaben müssen benotet werden."
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} würde gelöscht und überschreitet den eingestellten Schwellenwert von %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} unveröffentlichte Änderungen"
+    one: "1 unveröffentlichte Änderung"
     other: "%{count} unveröffentlichte Änderungen"
   count_unread_cff5855: "%{count} ungelesen."
   count_unread_messages_99d6bf17: 
