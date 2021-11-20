@@ -277,6 +277,8 @@ Style/For:
   Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
+Style/GlobalStdStream:
+  Severity: error
 Style/HashConversion:
   Severity: error
 Style/HashEachMethods:

@@ -265,7 +265,7 @@ module CanvasHttp
   end
 
   def self.default_logger
-    @_default_logger ||= Logger.new(STDOUT)
+    @_default_logger ||= Logger.new($stdout)
   end
 
   class << self

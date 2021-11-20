@@ -35,7 +35,7 @@ module CanvasDynamoDB
       @client = client_opts[:client] || Aws::DynamoDB::Client.new(client_opts)
       @fingerprint = fingerprint
       @prefix = prefix
-      @logger = logger || Logger.new(STDOUT)
+      @logger = logger || Logger.new($stdout)
     end
 
     %i[delete_item get_item put_item query scan update_item].each do |method|
