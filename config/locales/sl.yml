@@ -5573,7 +5573,7 @@ sl:
     other: "%{count} oddaj je treba oceniti."
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} bo izbrisan in presega nastavljeni prag %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} neobjavljenih sprememb"
+    one: "1 neobjavljena sprememba"
     other: "%{count} neobjavljenih sprememb"
   count_unread_cff5855: "%{count} neprebranih."
   count_unread_messages_e312aa7b: 
