@@ -224,6 +224,8 @@ Style/Alias:
   Severity: error
 Style/AndOr:
   Severity: error
+Style/ArgumentsForwarding:
+  Severity: error
 Style/ArrayJoin:
   Severity: error
 Style/BarePercentLiterals:
