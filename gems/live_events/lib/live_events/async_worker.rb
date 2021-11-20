@@ -116,12 +116,12 @@ module LiveEvents
 
     def time_block
       res = nil
-      unless LiveEvents&.statsd.nil?
+      if LiveEvents&.statsd.nil?
+        res = yield
+      else
         LiveEvents.statsd.time("live_events.put_records") do
           res = yield
         end
-      else
-        res = yield
       end
     end
 

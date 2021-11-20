@@ -2159,11 +2159,11 @@ class Account < ActiveRecord::Base
       next unless params_keys.key?(key_type)
       next unless key.grants_right?(current_user, :write)
 
-      unless params_keys[key_type].blank?
+      if params_keys[key_type].blank?
+        key.delete
+      else
         key.key_value = params_keys[key_type]
         key.save!
-      else
-        key.delete
       end
     end
   end

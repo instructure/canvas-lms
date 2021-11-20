@@ -423,10 +423,10 @@ module CustomSeleniumRSpecMatchers
     failure_message do |actual|
       actual_value = actual.call
 
-      unless defined? @operator
-        "expected #{actual_value} to become #{expected}"
-      else
+      if defined? @operator
         "expected #{actual_value} to become #{@operator} #{@value}"
+      else
+        "expected #{actual_value} to become #{expected}"
       end
     end
 
@@ -435,10 +435,10 @@ module CustomSeleniumRSpecMatchers
 
       wait_for(method: :become) do
         disable_implicit_wait do
-          unless defined? @operator
-            actual.call == expected
-          else
+          if defined? @operator
             actual.call.__send__ @operator, @value
+          else
+            actual.call == expected
           end
         end
       end

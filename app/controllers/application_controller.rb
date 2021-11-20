@@ -2367,11 +2367,11 @@ class ApplicationController < ActionController::Base
     end
 
     # _don't_ call before_render hooks if we're not returning HTML
-    unless options.is_a?(Hash) &&
-           (options[:json] || options[:plain] || options[:layout] == false)
-      run_callbacks(:html_render) { super }
-    else
+    if options.is_a?(Hash) &&
+       (options[:json] || options[:plain] || options[:layout] == false)
       super
+    else
+      run_callbacks(:html_render) { super }
     end
   end
 

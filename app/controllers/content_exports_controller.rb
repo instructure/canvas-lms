@@ -46,7 +46,10 @@ class ContentExportsController < ApplicationController
 
   def create
     export = @context.content_exports_visible_to(@current_user).running.first
-    unless export
+    if export
+      # an export is already running, just return it
+      render_export(export)
+    else
       export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
@@ -71,9 +74,6 @@ class ContentExportsController < ApplicationController
       else
         render :json => { :error_message => t('errors.couldnt_create', "Couldn't create content export.") }
       end
-    else
-      # an export is already running, just return it
-      render_export(export)
     end
   end
 

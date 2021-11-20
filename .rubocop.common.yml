@@ -419,6 +419,8 @@ Style/TrailingCommaInArguments:
   Severity: error
 Style/TrivialAccessors:
   Severity: error
+Style/UnlessElse:
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhenThen:
