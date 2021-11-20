@@ -7609,7 +7609,7 @@ ru:
   count_unpublished_changes_a366ed45: 
     few: "%{count} неопубликованные изменения"
     many: "%{count} неопубликованные изменения"
-    one: "%{count} неопубликованные изменения"
+    one: "1 неопубликованное изменение"
     other: "%{count} неопубликованные изменения"
   count_unread_cff5855: "%{count} не прочитано."
   count_unread_messages_99d6bf17: 
