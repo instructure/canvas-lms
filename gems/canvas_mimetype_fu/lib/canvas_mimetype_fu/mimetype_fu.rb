@@ -21,11 +21,11 @@ class File
   def self.mime_type?(file)
     # INSTRUCTURE: added condition, file.class can also be Tempfile
     if file.instance_of?(File) || file.instance_of?(Tempfile)
-      mime = unless RUBY_PLATFORM.include? 'mswin32'
+      mime = if RUBY_PLATFORM.include? 'mswin32'
+               extensions[File.extname(file.path).delete('.').downcase] rescue nil
+             else
                # INSTRUCTURE: changed to IO.popen to avoid shell injection attacks when paths include user defined content
                IO.popen(['file', '--mime', '--brief', '--raw', '--', file.path], &:read).strip
-             else
-               extensions[File.extname(file.path).delete('.').downcase] rescue nil
              end
     elsif file.instance_of?(String)
       mime = extensions[(file[file.rindex('.') + 1, file.size]).downcase] rescue nil

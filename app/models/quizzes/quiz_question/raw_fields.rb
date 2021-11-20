@@ -28,11 +28,11 @@ class Quizzes::QuizQuestion::RawFields
   end
 
   def fetch_any(key, default = "")
-    unless key.is_a?(Array)
-      @fields[key] || default
-    else
+    if key.is_a?(Array)
       found = key.find { |k| @fields.key?(k) }
       @fields[found] || default
+    else
+      @fields[key] || default
     end
   end
 

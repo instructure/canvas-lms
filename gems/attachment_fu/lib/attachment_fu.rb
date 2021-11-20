@@ -346,12 +346,12 @@ module AttachmentFu # :nodoc:
         self.content_type = detect_mimetype(file_data)
         self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
         file_from_path = true
-        unless file_data.respond_to?(:path) && file_data.path.present?
+        if file_data.respond_to?(:path) && file_data.path.present?
+          temp_paths.unshift file_data
+        else
           file_data.rewind
           self.temp_data = file_data.read
           file_from_path = false
-        else
-          temp_paths.unshift file_data
         end
         # If we're overwriting an existing file, we need to take serious
         # precautions, since other Attachment records could be using this file.
@@ -395,11 +395,11 @@ module AttachmentFu # :nodoc:
       else
         self.content_type = file_data.content_type
         self.filename     = file_data.original_filename if respond_to?(:filename)
-        unless file_data.respond_to?(:path)
+        if file_data.respond_to?(:path)
+          self.temp_path = file_data
+        else
           file_data.rewind
           self.temp_data = file_data.read
-        else
-          self.temp_path = file_data
         end
       end
     end
