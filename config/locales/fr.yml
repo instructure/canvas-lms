@@ -7411,7 +7411,7 @@ fr:
     other: "%{count} soumissions doivent être notées"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} serait supprimé et dépasse la limite fixée à %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} modifications non publiées"
+    one: "1 modification non publiée"
     other: "%{count} modifications non publiées"
   count_unread_cff5855: "%{count} non lue(s)."
   count_unread_messages_99d6bf17: 
