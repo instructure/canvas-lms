@@ -182,7 +182,7 @@ module ActiveRecord
               list_scope.where("#{self.class.position_column}>=?", position)
                         .update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
             end
-            self.update_attribute(self.class.position_column, position)
+            update_attribute(self.class.position_column, position)
           end
         end
 

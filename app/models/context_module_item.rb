@@ -33,8 +33,8 @@ module ContextModuleItem
   # If we are locked, this will return the module item (ContentTag) that is
   # locking the item for the given user
   def locked_by_module_item?(user, opts = {})
-    if self.context_module_tags.present? && self.context_module_tags.all? { |tag| tag.locked_for?(user, opts) }
-      item = self.context_module_tags.first
+    if context_module_tags.present? && context_module_tags.all? { |tag| tag.locked_for?(user, opts) }
+      item = context_module_tags.first
     end
     item || false
   end

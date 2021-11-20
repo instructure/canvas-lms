@@ -31,7 +31,7 @@ class ApiRouteSet
   def self.draw(router, prefix = self.prefix, &block)
     @@prefixes ||= Set.new
     @@prefixes << prefix
-    route_set = self.new(prefix)
+    route_set = new(prefix)
     route_set.mapper = router
     route_set.instance_eval(&block)
   ensure
@@ -55,7 +55,7 @@ class ApiRouteSet
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    @routes ||= self.prefixes.map { |pfx| self.routes_for(pfx) }.flatten
+    @routes ||= prefixes.map { |pfx| routes_for(pfx) }.flatten
     @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
   end
 
@@ -65,7 +65,7 @@ class ApiRouteSet
 
   def method_missing(m, *a, &b)
     mapper.__send__(m, *a) {
-      self.instance_eval(&b) if b
+      instance_eval(&b) if b
     }
   end
 

@@ -25,7 +25,7 @@ require 'base64'
 # encoded JSON, e.g. to use in a URL
 module JSONToken
   def self.encode(data)
-    data = self.walk_json(data, self.method(:encode_binary_string))
+    data = walk_json(data, method(:encode_binary_string))
     Base64.encode64(data.to_json).tr('+/', '-_').gsub(/=|\n/, '')
   end
 
@@ -37,7 +37,7 @@ module JSONToken
     json = JSON.parse("[#{json}]")
     raise JSON::ParserError unless json.size == 1
 
-    self.walk_json(json.first, self.method(:decode_binary_string))
+    walk_json(json.first, method(:decode_binary_string))
   end
 
   def self.walk_json(value, method)

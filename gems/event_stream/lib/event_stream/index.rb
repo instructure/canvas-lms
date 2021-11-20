@@ -43,12 +43,12 @@ class EventStream::Index
   end
 
   def find_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_with(args, options)
   end
 
   def find_ids_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_ids_with(args, options)
   end
 

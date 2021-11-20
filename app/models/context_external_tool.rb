@@ -73,7 +73,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :lti_add_edit) }
+    given { |user, session| context.grants_right?(user, session, :lti_add_edit) }
     can :read and can :update and can :delete and can :update_manually
   end
 
@@ -224,11 +224,11 @@ class ContextExternalTool < ActiveRecord::Base
     return unless tag
 
     launch_url = assignment.external_tool_tag.url
-    self.find_external_tool(launch_url, assignment.context)
+    find_external_tool(launch_url, assignment.context)
   end
 
   def deployment_id
-    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"[0..254]
+    "#{id}:#{Lti::Asset.opaque_identifier_for(context)}"[0..254]
   end
 
   def content_migration_configured?
@@ -352,14 +352,14 @@ class ContextExternalTool < ActiveRecord::Base
     # (LTI 2 tools also, but those are not handled by this class)
     if developer_key_id.blank? &&
        Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
-      !!(self.selectable && (self.domain || self.url))
+      !!(selectable && (domain || url))
     else
-      self.context_external_tool_placements.to_a.any? { |p| p.placement_type == type.to_s }
+      context_external_tool_placements.to_a.any? { |p| p.placement_type == type.to_s }
     end
   end
 
   def can_be_rce_favorite?
-    !self.editor_button.nil?
+    !editor_button.nil?
   end
 
   def is_rce_favorite_in_context?(context)
@@ -367,23 +367,23 @@ class ContextExternalTool < ActiveRecord::Base
     context = context.account if context.is_a?(Course)
     rce_favorite_tool_ids = context.rce_favorite_tool_ids[:value]
     if rce_favorite_tool_ids
-      rce_favorite_tool_ids.include?(self.global_id)
+      rce_favorite_tool_ids.include?(global_id)
     else
       # TODO remove after the datafixup and this column is dropped
-      self.is_rce_favorite
+      is_rce_favorite
     end
   end
 
   def sync_placements!(placements)
-    self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
-    old_placements = self.context_external_tool_placements.pluck(:placement_type)
+    context_external_tool_placements.reload if context_external_tool_placements.loaded?
+    old_placements = context_external_tool_placements.pluck(:placement_type)
     placements_to_delete = Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) - placements
     if placements_to_delete.any?
-      self.context_external_tool_placements.where(placement_type: placements_to_delete).delete_all if self.persisted?
-      self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
+      context_external_tool_placements.where(placement_type: placements_to_delete).delete_all if persisted?
+      context_external_tool_placements.reload if context_external_tool_placements.loaded?
     end
     (placements - old_placements).each do |new_placement|
-      self.context_external_tool_placements.new(:placement_type => new_placement)
+      context_external_tool_placements.new(:placement_type => new_placement)
     end
   end
   private :sync_placements!
@@ -456,7 +456,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def privacy_level
-    self.workflow_state
+    workflow_state
   end
 
   def custom_fields_string
@@ -474,10 +474,10 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def validate_vendor_help_link
-    return if self.vendor_help_link.blank?
+    return if vendor_help_link.blank?
 
     begin
-      _value, uri = CanvasHttp.validate_url(self.vendor_help_link)
+      _value, uri = CanvasHttp.validate_url(vendor_help_link)
       self.vendor_help_link = uri.to_s
     rescue URI::Error, ArgumentError
       self.vendor_help_link = nil
@@ -526,7 +526,7 @@ class ContextExternalTool < ActiveRecord::Base
                   converter.convert_blti_xml(config_xml)
                 end
 
-    real_name = self.name
+    real_name = name
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
@@ -675,8 +675,8 @@ class ContextExternalTool < ActiveRecord::Base
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
     self.root_account ||= context.root_account
-    self.is_rce_favorite &&= self.can_be_rce_favorite?
-    ContextExternalTool.normalize_sizes!(self.settings)
+    self.is_rce_favorite &&= can_be_rce_favorite?
+    ContextExternalTool.normalize_sizes!(settings)
 
     Lti::ResourcePlacement::PLACEMENTS.each do |type|
       next unless settings[type]
@@ -699,7 +699,7 @@ class ContextExternalTool < ActiveRecord::Base
       uri.to_s
     end
 
-    self.domain = new_domain if self.domain
+    self.domain = new_domain if domain
 
     self.url = replace_host.call(self.url, new_domain) if self.url
 
@@ -757,7 +757,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def standard_url
     unless defined?(@standard_url)
-      @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
+      @standard_url = !url.blank? && ContextExternalTool.standardize_url(url)
     end
     @standard_url
   end
@@ -820,7 +820,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def duplicated_in_context?
-    duplicate_tool = self.class.find_external_tool(url, context, nil, self.id)
+    duplicate_tool = self.class.find_external_tool(url, context, nil, id)
 
     # If tool with same launch URL is found in the context
     return true if url.present? && duplicate_tool.present?
@@ -890,15 +890,15 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    self.active.where(consumer_key: consumer_key, context: contexts_to_search(context)).first
+    active.where(consumer_key: consumer_key, context: contexts_to_search(context)).first
   end
 
   def self.find_active_external_tool_by_client_id(client_id, context)
-    self.active.where(developer_key_id: client_id, context: contexts_to_search(context)).first
+    active.where(developer_key_id: client_id, context: contexts_to_search(context)).first
   end
 
   def self.find_external_tool_by_id(id, context)
-    self.where(id: id, context: contexts_to_search(context)).first
+    where(id: id, context: contexts_to_search(context)).first
   end
 
   # Order of precedence: Basic LTI defines precedence as first
@@ -1124,7 +1124,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def opaque_identifier_for(asset, context: nil)
-    ContextExternalTool.opaque_identifier_for(asset, self.shard, context: context)
+    ContextExternalTool.opaque_identifier_for(asset, shard, context: context)
   end
 
   def self.opaque_identifier_for(asset, shard, context: nil)
@@ -1137,13 +1137,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def visible_with_permission_check?(launch_type, user, context, session = nil)
-    return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
+    return false unless self.class.visible?(extension_setting(launch_type, 'visibility'), user, context, session)
 
     permission_given?(launch_type, user, context, session)
   end
 
   def permission_given?(launch_type, user, context, session = nil)
-    if (required_permissions_str = self.extension_setting(launch_type, 'required_permissions'))
+    if (required_permissions_str = extension_setting(launch_type, 'required_permissions'))
       # if configured with a comma-separated string of permissions, will only show the link
       # if all permissions are granted
       required_permissions_str.split(",").map(&:to_sym).all? do |p|
@@ -1242,14 +1242,14 @@ class ContextExternalTool < ActiveRecord::Base
   private
 
   def check_global_navigation_cache
-    if self.context.is_a?(Account) && self.context.root_account?
-      self.context.clear_cache_key(:global_navigation) # it's hard to know exactly _what_ changed so clear all initial global nav caches at once
+    if context.is_a?(Account) && context.root_account?
+      context.clear_cache_key(:global_navigation) # it's hard to know exactly _what_ changed so clear all initial global nav caches at once
     end
   end
 
   def clear_tool_domain_cache
-    if self.saved_change_to_domain? || self.saved_change_to_url? || self.saved_change_to_workflow_state?
-      self.context.clear_tool_domain_cache
+    if saved_change_to_domain? || saved_change_to_url? || saved_change_to_workflow_state?
+      context.clear_tool_domain_cache
     end
   end
 end

@@ -104,12 +104,12 @@ class SubmissionList
 
   # An iterator on a sorted and filtered list of submission versions.
   def each(&block)
-    self.submission_entries.each(&block)
+    submission_entries.each(&block)
   end
 
   # An iterator on the day only, not each submission
   def each_day(&block)
-    self.list.each(&block)
+    list.each(&block)
   end
 
   # An array of days with an array of grader open structs for that day and course.
@@ -120,7 +120,7 @@ class SubmissionList
     # puts "----------------------------------------------"
     # puts "starting"
     # puts "---------------------------------------------------------------------------------"
-    self.list.map do |day, _value|
+    list.map do |day, _value|
       # puts "-----------------------------------------------item #{Time.now - current}----------------------------"
       # current = Time.now
       OpenObject.new(:date => day, :graders => graders_for_day(day))
@@ -149,14 +149,14 @@ class SubmissionList
 
   # A cleaner look at a SubmissionList
   def inspect
-    "SubmissionList: course: #{self.course.name} submissions used: #{self.submission_entries.size} days used: #{self.list.keys.inspect} graders: #{self.graders.map(&:name).inspect}"
+    "SubmissionList: course: #{course.name} submissions used: #{submission_entries.size} days used: #{list.keys.inspect} graders: #{graders.map(&:name).inspect}"
   end
 
   protected
 
   # Returns an array of graders with an array of assignment open structs
   def graders_for_day(day)
-    hsh = self.list[day].each_with_object({}) do |submission, h|
+    hsh = list[day].each_with_object({}) do |submission, h|
       grader = submission[:grader]
       h[grader] ||= OpenObject.new(
         :assignments => assignments_for_grader_and_day(grader, day),
@@ -191,8 +191,8 @@ class SubmissionList
   # Produce @list, wich is a sorted, filtered, list of submissions with
   # all the meta data we need and no banned keys included.
   def process
-    @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }
-                .each_with_object(Hashery::Dictionary.new) do |se, d|
+    @list = submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }
+                              .each_with_object(Hashery::Dictionary.new) do |se, d|
       d[se[:graded_on]] ||= []
       d[se[:graded_on]] << se
     end
@@ -200,9 +200,9 @@ class SubmissionList
 
   # A hash of the current grades of each submission, keyed by submission.id
   def current_grade_map
-    @current_grade_map ||= self.course.submissions.not_placeholder.each_with_object({}) do |submission, hash|
+    @current_grade_map ||= course.submissions.not_placeholder.each_with_object({}) do |submission, hash|
       grader = if submission.grader_id.present?
-                 self.grader_map[submission.grader_id].try(:name)
+                 grader_map[submission.grader_id].try(:name)
                end
       grader ||= I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
 
@@ -291,7 +291,7 @@ class SubmissionList
 
   # A list of all versions in YAML format
   def yaml_list
-    @yaml_list ||= self.course.submissions.not_placeholder.preload(:versions).map do |s|
+    @yaml_list ||= course.submissions.not_placeholder.preload(:versions).map do |s|
       s.versions.map(&:yaml)
     end.flatten
   end
@@ -323,7 +323,7 @@ class SubmissionList
 
   # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
   def full_hash_list
-    @full_hash_list ||= self.raw_hash_list.map do |h|
+    @full_hash_list ||= raw_hash_list.map do |h|
       h[:grader] = if h.key? :score_before_regrade
                      I18n.t('gradebooks.history.regraded', "Regraded")
                    elsif h[:grader_id] && grader_map[h[:grader_id]]
@@ -332,10 +332,10 @@ class SubmissionList
                      I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
                    end
       h[:safe_grader_id] = h[:grader_id] || 0
-      h[:assignment_name] = self.assignment_map[h[:assignment_id]].title
+      h[:assignment_name] = assignment_map[h[:assignment_id]].title
       h[:student_user_id] = h[:user_id]
-      h[:student_name] = self.student_map[h[:user_id]].name
-      h[:course_id] = self.course.id
+      h[:student_name] = student_map[h[:user_id]].name
+      h[:course_id] = course.id
       h[:submission_id] = h[:id]
       h[:graded_on] = h[:graded_at].in_time_zone.to_date if h[:graded_at]
 

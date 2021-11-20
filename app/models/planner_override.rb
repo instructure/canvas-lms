@@ -50,16 +50,16 @@ class PlannerOverride < ActiveRecord::Base
   alias_method :published?, :active?
 
   def link_to_parent_topic
-    return unless self.plannable_type == 'DiscussionTopic'
+    return unless plannable_type == 'DiscussionTopic'
 
-    plannable = DiscussionTopic.find(self.plannable_id)
+    plannable = DiscussionTopic.find(plannable_id)
     self.plannable_id = plannable.root_topic_id if plannable.root_topic_id
   end
 
   def link_to_submittable
-    return unless self.plannable_type == 'Assignment'
+    return unless plannable_type == 'Assignment'
 
-    plannable = Assignment.find_by(id: self.plannable_id)
+    plannable = Assignment.find_by(id: plannable_id)
     if plannable&.quiz?
       self.plannable_type = PlannerHelper::PLANNABLE_TYPES['quiz']
       self.plannable_id = plannable.quiz.id
@@ -73,9 +73,9 @@ class PlannerOverride < ActiveRecord::Base
   end
 
   def associated_assignment_id
-    return self.plannable_id if self.plannable_type == 'Assignment'
+    return plannable_id if plannable_type == 'Assignment'
 
-    self.plannable.assignment_id if self.plannable.respond_to? :assignment_id
+    plannable.assignment_id if plannable.respond_to? :assignment_id
   end
 
   def self.update_for(obj)
@@ -107,13 +107,13 @@ class PlannerOverride < ActiveRecord::Base
   end
 
   def plannable_workflow_state
-    PlannerOverride.plannable_workflow_state(self.plannable)
+    PlannerOverride.plannable_workflow_state(plannable)
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    self.save
+    save
   end
 end

@@ -113,15 +113,15 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def prior_flag_state(operation)
-    operation == :create ? self.default_for_flag : self.state_in_database
+    operation == :create ? default_for_flag : state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? self.default_for_flag : self.state
+    operation == :destroy ? default_for_flag : state
   end
 
   def default_for_flag
-    Feature.definitions[self.feature]&.state || 'undefined'
+    Feature.definitions[feature]&.state || 'undefined'
   end
 
   private
@@ -141,6 +141,6 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def check_cache
-    clear_cache if self.changed?
+    clear_cache if changed?
   end
 end

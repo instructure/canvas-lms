@@ -182,7 +182,7 @@ module DatesOverridable
                           ObserverEnrollment.observed_students(context, user).keys
                         end
     dates = observed_students.map do |student|
-      self.all_dates_visible_to(student)
+      all_dates_visible_to(student)
     end
     dates.flatten.uniq
   end
@@ -221,10 +221,10 @@ module DatesOverridable
 
   def due_date_hash
     hash = { :due_at => due_at, :unlock_at => unlock_at, :lock_at => lock_at }
-    if self.is_a?(Assignment)
+    if is_a?(Assignment)
       hash[:all_day] = all_day
       hash[:all_day_date] = all_day_date
-    elsif self.assignment
+    elsif assignment
       hash[:all_day] = assignment.all_day
       hash[:all_day_date] = assignment.all_day_date
     end
@@ -246,27 +246,27 @@ module DatesOverridable
   def context_module_tag_info(user, context, user_is_admin: false, has_submission:)
     return {} unless user
 
-    self.association(:context).target ||= context
+    association(:context).target ||= context
     tag_info = Rails.cache.fetch_with_batched_keys(
       ["context_module_tag_info3", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
       batch_object: self, batched_keys: :availability
     ) do
       hash = {}
-      if user_is_admin && self.has_too_many_overrides
+      if user_is_admin && has_too_many_overrides
         hash[:has_many_overrides] = true
-      elsif self.multiple_due_dates_apply_to?(user)
+      elsif multiple_due_dates_apply_to?(user)
         hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-      elsif (due_date = self.overridden_for(user).due_at) ||
+      elsif (due_date = overridden_for(user).due_at) ||
             (user_is_admin && (due_date = all_due_dates.dig(0, :due_at)))
         hash[:due_date] = due_date
       end
       hash
     end
-    tag_info[:points_possible] = self.points_possible
+    tag_info[:points_possible] = points_possible
 
     if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now
-        if self.is_a?(Quizzes::Quiz) || (self.is_a?(Assignment) && expects_submission?)
+        if is_a?(Quizzes::Quiz) || (is_a?(Assignment) && expects_submission?)
           tag_info[:past_due] = true unless has_submission
         end
       end

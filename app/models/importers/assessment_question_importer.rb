@@ -119,7 +119,7 @@ module Importers
             next if question['assessment_question_id'] && question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
           end
 
-          question = self.import_from_migration(question, migration.context, migration, question_bank)
+          question = import_from_migration(question, migration.context, migration, question_bank)
           question_data[:aq_data][question['migration_id']] = question
         rescue
           migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
@@ -140,7 +140,7 @@ module Importers
       hash = hash.with_indifferent_access
       hash.delete(:question_bank_migration_id) if hash.key?(:question_bank_migration_id)
 
-      self.prep_for_import(hash, migration, :assessment_question)
+      prep_for_import(hash, migration, :assessment_question)
 
       import_warnings = hash.delete(:import_warnings) || []
       if (error = hash.delete(:import_error))

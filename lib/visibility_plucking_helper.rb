@@ -59,7 +59,7 @@ module VisibilityPluckingHelper
     end
 
     def pluck_own_and_user_ids(column_to_pluck, opts)
-      self.where(opts).pluck(:user_id, column_to_pluck)
+      where(opts).pluck(:user_id, column_to_pluck)
     end
   end
 end

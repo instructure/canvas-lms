@@ -181,7 +181,7 @@ module Api::V1::Course
   end
 
   def add_helper_dependant_entries(hash, course, builder)
-    request = self.respond_to?(:request) ? self.request : nil
+    request = respond_to?(:request) ? self.request : nil
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
     hash['syllabus_body'] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url

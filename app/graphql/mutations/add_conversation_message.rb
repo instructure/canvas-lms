@@ -47,7 +47,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       message_ids: input[:included_messages],
       body: input[:body],
       attachment_ids: input[:attachment_ids],
-      domain_root_account_id: self.context[:domain_root_account].id,
+      domain_root_account_id: context[:domain_root_account].id,
       media_comment_id: input[:media_comment_id],
       media_comment_type: input[:media_comment_type],
       user_note: input[:user_note]

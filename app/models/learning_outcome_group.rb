@@ -58,10 +58,10 @@ class LearningOutcomeGroup < ActiveRecord::Base
   end
 
   def touch_parent_group
-    return if self.skip_parent_group_touch
+    return if skip_parent_group_touch
 
-    self.touch
-    self.learning_outcome_group&.touch_parent_group
+    touch
+    learning_outcome_group&.touch_parent_group
   end
 
   # adds a new link to an outcome to this group. does nothing if a link already
@@ -76,7 +76,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     touch_parent_group
     child_outcome_links.create(
       content: outcome,
-      context: self.context || self,
+      context: context || self,
       skip_touch: skip_touch,
       migration_id: migration_id
     )
@@ -84,7 +84,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def sync_source_group
     transaction do
-      return unless self.source_outcome_group
+      return unless source_outcome_group
 
       source_outcome_group.child_outcome_links.active.each do |link|
         add_outcome(link.content, skip_touch: true)
@@ -104,7 +104,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
           target_child_group.description = source_child_group.description
           target_child_group.vendor_guid = source_child_group.vendor_guid
           target_child_group.source_outcome_group = source_child_group
-          target_child_group.context = self.context
+          target_child_group.context = context
           target_child_group.skip_parent_group_touch = true
           target_child_group.save!
         end
@@ -128,7 +128,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       copy.title = original.title
       copy.description = original.description
       copy.vendor_guid = original.vendor_guid
-      copy.context = self.context
+      copy.context = context
       copy.skip_parent_group_touch = true
       copy.save!
 
@@ -146,7 +146,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         copy.add_outcome(link.content, skip_touch: true)
       end
 
-      self.context&.touch unless opts[:skip_touch]
+      context&.touch unless opts[:skip_touch]
       touch_parent_group
 
       # done
@@ -157,14 +157,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # moves an existing outcome link from the same context to be under this
   # group.
   def adopt_outcome_link(outcome_link, opts = {})
-    return if self.context && self.context != outcome_link.context
+    return if context && context != outcome_link.context
     # no-op if the group is global and the link isn't
-    return if self.context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
+    return if context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
     # no-op if we're already the parent
     return outcome_link if outcome_link.associated_asset == self
 
     # update context_id if global
-    outcome_link.context_id = self.id if self.context.nil?
+    outcome_link.context_id = id if context.nil?
 
     # change the parent
     outcome_link.associated_asset = self
@@ -177,14 +177,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # group. cannot move an ancestor of the group.
   def adopt_outcome_group(group)
     # can only move within context, and no cycles!
-    return unless group.context == self.context
+    return unless group.context == context
     return if is_ancestor?(group.id)
 
     # no-op if we're already the parent
     return group if group.parent_outcome_group == self
 
     # change the parent
-    group.learning_outcome_group_id = self.id
+    group.learning_outcome_group_id = id
     group.save!
     group
   end
@@ -195,11 +195,11 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.preload(:content).each do |outcome_link|
+      child_outcome_links.active.preload(:content).each do |outcome_link|
         outcome_link.skip_touch = true if @skip_tag_touch
         outcome_link.destroy
       end
-      self.child_outcome_groups.active.each do |outcome_group|
+      child_outcome_groups.active.each do |outcome_group|
         outcome_group.skip_tag_touch = true if @skip_tag_touch
         outcome_group.destroy
       end
@@ -255,7 +255,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # because of old broken behavior a group can have multiple parents, including itself
   def ancestor_ids
     unless @ancestor_ids
-      @ancestor_ids = [self.id]
+      @ancestor_ids = [id]
 
       ids_to_check = parent_ids - @ancestor_ids
       until ids_to_check.empty?
@@ -263,7 +263,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
         new_ids = []
         ids_to_check.each do |id|
-          group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
+          group = LearningOutcomeGroup.for_context(context).active.where(id: id).first
           new_ids += group.parent_ids if group
         end
 
@@ -277,7 +277,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   private
 
   def infer_defaults
-    self.context ||= self.parent_outcome_group&.context
+    self.context ||= parent_outcome_group&.context
     if self.context&.learning_outcome_groups&.exists? && !building_default
       default = self.context.root_outcome_group
       self.learning_outcome_group_id ||= default.id unless self == default

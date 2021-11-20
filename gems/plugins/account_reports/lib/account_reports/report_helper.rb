@@ -425,7 +425,7 @@ module AccountReports::ReportHelper
       end
     rescue => e
       report_runner.fail
-      self.fail_with_error(e)
+      fail_with_error(e)
     ensure
       update_parallel_progress(account_report: @account_report, report_runner: report_runner)
       compile_parallel_report(headers, files: files) if last_account_report_runner?(@account_report)
@@ -537,7 +537,7 @@ module AccountReports::ReportHelper
     def <<(row)
       if lineno % 1_000 == 0
         GuardRail.activate(:primary) do
-          report = self.instance_variable_get(:@account_report).reload
+          report = instance_variable_get(:@account_report).reload
           updates = {}
           updates[:current_line] = lineno
           updates[:progress] = (lineno.to_f / (report.total_lines + 1) * 100).to_i if report.total_lines

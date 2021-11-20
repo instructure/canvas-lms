@@ -25,10 +25,10 @@ module Canvas::Migration::ExternalContent
       end
 
       def register_service(key, service)
-        raise "service with the key #{key} is already registered" if self.registered_services[key] && self.registered_services[key] != service
+        raise "service with the key #{key} is already registered" if registered_services[key] && registered_services[key] != service
 
         Canvas::Migration::ExternalContent::ServiceInterface.validate_service!(service)
-        self.registered_services[key] = service
+        registered_services[key] = service
       end
 
       # tells the services to begin exporting
@@ -36,7 +36,7 @@ module Canvas::Migration::ExternalContent
       def begin_exports(course, opts = {})
         pending_exports = {}
         pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
-        self.registered_services.each do |key, service|
+        registered_services.each do |key, service|
           if service.applies_to_course?(course)
             begin
               if (export = service.begin_export(course, opts))
@@ -102,7 +102,7 @@ module Canvas::Migration::ExternalContent
         if pending_export.respond_to?(:export_completed?)
           pending_export.export_completed?
         else
-          self.registered_services[key].export_completed?(pending_export)
+          registered_services[key].export_completed?(pending_export)
         end
       end
 
@@ -110,7 +110,7 @@ module Canvas::Migration::ExternalContent
         if pending_export.respond_to?(:retrieve_export)
           pending_export.retrieve_export
         else
-          self.registered_services[key].retrieve_export(pending_export)
+          registered_services[key].retrieve_export(pending_export)
         end
       end
 
@@ -138,7 +138,7 @@ module Canvas::Migration::ExternalContent
         if Lti::ContentMigrationService::KEY_REGEX.match?(key)
           Lti::ContentMigrationService.importer_for(key)
         else
-          self.registered_services[key]
+          registered_services[key]
         end
       end
 
@@ -149,7 +149,7 @@ module Canvas::Migration::ExternalContent
           if import_data.respond_to?(:import_completed?)
             import_data.import_completed?
           else
-            self.registered_services[key].import_completed?(import_data)
+            registered_services[key].import_completed?(import_data)
           end
         end
       end

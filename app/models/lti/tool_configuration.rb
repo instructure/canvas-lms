@@ -67,7 +67,7 @@ module Lti
       redirect_uris = settings[:target_link_uri]
 
       raise_error(:configuration, "Configuration must be present") if settings.blank?
-      self.transaction do
+      transaction do
         dk = DeveloperKey.create!(
           account: (account.site_admin? ? nil : account),
           is_lti_key: true,
@@ -76,7 +76,7 @@ module Lti
           redirect_uris: redirect_uris || [],
           scopes: settings[:scopes] || []
         )
-        self.create!(
+        create!(
           developer_key: dk,
           configuration: settings.deep_merge(
             'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
@@ -102,7 +102,7 @@ module Lti
     private_class_method :retrieve_and_extract_configuration
 
     def self.raise_error(type, message)
-      tool_config_obj = self.new
+      tool_config_obj = new
       tool_config_obj.errors.add(type, message)
       raise ActiveRecord::RecordInvalid, tool_config_obj
     end

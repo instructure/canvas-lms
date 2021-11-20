@@ -79,7 +79,7 @@ class DeveloperKey < ActiveRecord::Base
       lti_key_ids = Lti::ToolConfiguration.joins(:developer_key)
                                           .where(developer_keys: { id: site_admin_key_ids })
                                           .pluck(:developer_key_id)
-      self.where(id: lti_key_ids)
+      where(id: lti_key_ids)
     end
   end
 
@@ -98,7 +98,7 @@ class DeveloperKey < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save
+    save
   end
 
   def usable?
@@ -141,7 +141,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def generate_api_key(overwrite = false)
-    self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
+    self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !api_key
   end
 
   def generate_rsa_keypair!(overwrite: false)
@@ -250,7 +250,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def last_used_at
-    self.access_tokens.maximum(:last_used_at)
+    access_tokens.maximum(:last_used_at)
   end
 
   # verify that the given uri has the same domain as this key's
@@ -284,10 +284,10 @@ class DeveloperKey < ActiveRecord::Base
 
     # Search for bindings in the account chain starting with the highest account
     accounts = Account.account_chain_ids(binding_account).reverse
-    binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
+    binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, id)
 
     # If no explicity set bindings were found check for 'allow' bindings
-    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, id, false)
 
     # Check binding not for wrong account (on different shard)
     return nil if binding && binding.shard.id != binding_account.shard.id
@@ -363,8 +363,8 @@ class DeveloperKey < ActiveRecord::Base
   private
 
   def validate_lti_fields
-    return unless self.is_lti_key?
-    return if self.public_jwk.present? || self.public_jwk_url.present?
+    return unless is_lti_key?
+    return if public_jwk.present? || public_jwk_url.present?
 
     errors.add(:lti_key, "developer key must have public jwk or public jwk url")
   end
@@ -376,7 +376,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def normalize_public_jwk_url
-    self.public_jwk_url = nil if self.public_jwk_url.blank?
+    self.public_jwk_url = nil if public_jwk_url.blank?
   end
 
   def manage_external_tools(enqueue_args, method, affected_account)
@@ -525,15 +525,15 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_scopes!
-    return true if self.scopes.empty?
+    return true if scopes.empty?
 
-    invalid_scopes = self.scopes - TokenScopes.all_scopes
+    invalid_scopes = scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?
 
-    self.errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
+    errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
   end
 
   def site_admin?
-    self.account_id.nil?
+    account_id.nil?
   end
 end

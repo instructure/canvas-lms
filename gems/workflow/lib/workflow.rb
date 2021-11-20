@@ -243,7 +243,7 @@ module Workflow
     end
 
     def run_action_callback(action_name, *args)
-      self.send action_name.to_sym, *args if self.respond_to?(action_name.to_sym)
+      send action_name.to_sym, *args if respond_to?(action_name.to_sym)
     end
 
     def run_on_entry(state, prior_state, triggering_event, *args)

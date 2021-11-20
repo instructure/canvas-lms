@@ -71,7 +71,7 @@ module Importers
     # no idea what 'area' or 'media_collection' attachment types are, so we're ignoring them
     def self.import_migration_attachment_suffix(hash, context)
       suffix_method_name = "#{hash[:attachment_type]}_attachment_description"
-      suffix = self.send(suffix_method_name, hash, context) if self.respond_to?(suffix_method_name)
+      suffix = send(suffix_method_name, hash, context) if respond_to?(suffix_method_name)
       suffix || ""
     end
 

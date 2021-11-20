@@ -52,11 +52,11 @@ module Lti
     end
 
     def self.expansion_keys
-      self.expansions.keys.map { |c| c.to_s[1..] }
+      expansions.keys.map { |c| c.to_s[1..] }
     end
 
     def self.default_name_expansions
-      self.expansions.values.select { |v| v.default_name.present? }.map(&:name)
+      expansions.values.select { |v| v.default_name.present? }.map(&:name)
     end
 
     def self.find_expansion(key)
@@ -64,11 +64,11 @@ module Lti
 
       if (md = key.to_s.match(PARAMETERS_REGEX))
         real_key = md[1] + "<>"
-        if (expansion = self.expansions[real_key.to_sym])
+        if (expansion = expansions[real_key.to_sym])
           [expansion, md[2]]
         end
       else
-        self.expansions[key.to_sym]
+        expansions[key.to_sym]
       end
     end
 

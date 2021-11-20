@@ -37,8 +37,8 @@ class Role < ActiveRecord::Base
     def role
       return super if association(:role).loaded?
 
-      self.role = self.shard.activate do
-        Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) ? self.default_role : nil)
+      self.role = shard.activate do
+        Role.get_role_by_id(read_attribute(:role_id)) || (respond_to?(:default_role) ? default_role : nil)
       end
     end
 
@@ -47,8 +47,8 @@ class Role < ActiveRecord::Base
     end
 
     def resolve_cross_account_role
-      if self.will_save_change_to_role_id? && self.respond_to?(:root_account_id) && self.root_account_id && self.role.root_account_id != self.root_account_id
-        self.role = self.role.role_for_root_account_id(self.root_account_id)
+      if will_save_change_to_role_id? && respond_to?(:root_account_id) && root_account_id && role.root_account_id != root_account_id
+        self.role = role.role_for_root_account_id(root_account_id)
       end
     end
   end
@@ -68,9 +68,9 @@ class Role < ActiveRecord::Base
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
-    if self.built_in? &&
-       self.root_account_id != target_root_account_id &&
-       (target_role = Role.get_built_in_role(self.name, root_account_id: target_root_account_id))
+    if built_in? &&
+       root_account_id != target_root_account_id &&
+       (target_role = Role.get_built_in_role(name, root_account_id: target_root_account_id))
       target_role
     else
       self
@@ -78,28 +78,28 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_unique_name_for_account
-    if self.active?
-      scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", self.name, self.account_id, 'active')
-      if self.new_record? ? scope.exists? : scope.where.not(id: self.id).exists?
-        self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+    if active?
+      scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", name, account_id, 'active')
+      if new_record? ? scope.exists? : scope.where.not(id: id).exists?
+        errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
         false
       end
     end
   end
 
   def ensure_non_built_in_name
-    if !self.built_in? && Role.built_in_roles(root_account_id: self.root_account_id).map(&:label).include?(self.name)
-      self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+    if !built_in? && Role.built_in_roles(root_account_id: root_account_id).map(&:label).include?(name)
+      errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
       false
     end
   end
 
   def infer_root_account_id
-    unless self.account
-      self.errors.add(:account_id)
+    unless account
+      errors.add(:account_id)
       throw :abort
     end
-    self.root_account_id = self.account.resolved_root_account_id
+    self.root_account_id = account.resolved_root_account_id
   end
 
   include Workflow
@@ -150,15 +150,15 @@ class Role < ActiveRecord::Base
   end
 
   def ==(other_role)
-    if other_role.is_a?(Role) && self.built_in? && other_role.built_in?
-      self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
+    if other_role.is_a?(Role) && built_in? && other_role.built_in?
+      name == other_role.name # be equivalent even if they're on different shards/root_accounts
     else
       super
     end
   end
 
   def visible?
-    self.active? || (self.built_in? && !["AccountMembership", "NoPermissions"].include?(self.name))
+    active? || (built_in? && !["AccountMembership", "NoPermissions"].include?(name))
   end
 
   def account_role?
@@ -170,25 +170,25 @@ class Role < ActiveRecord::Base
   end
 
   def label
-    if self.built_in?
-      if self.course_role?
-        RoleOverride.enrollment_type_labels.detect { |label| label[:name] == self.name }[:label].call
-      elsif self.name == 'AccountAdmin'
+    if built_in?
+      if course_role?
+        RoleOverride.enrollment_type_labels.detect { |label| label[:name] == name }[:label].call
+      elsif name == 'AccountAdmin'
         RoleOverride::ACCOUNT_ADMIN_LABEL.call
       else
-        self.name
+        name
       end
     else
-      self.name
+      name
     end
   end
 
   # Should order course roles so we get "StudentEnrollment", custom student roles, "Teacher Enrollment", custom teacher roles, etc
   def display_sort_index
-    if self.course_role?
-      (ENROLLMENT_TYPES.index(self.base_role_type) * 2) + (self.built_in? ? 0 : 1)
+    if course_role?
+      (ENROLLMENT_TYPES.index(base_role_type) * 2) + (built_in? ? 0 : 1)
     else
-      self.built_in? ? 0 : 1
+      built_in? ? 0 : 1
     end
   end
 
@@ -296,8 +296,8 @@ class Role < ActiveRecord::Base
   def self.compile_manageable_roles(role_data, user, context)
     # for use with the old sad enrollment dialog
     granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
-    manageable = self.manageable_roles_by_user(user, context) unless granular_admin
-    addable, deleteable = self.add_delete_roles_by_user(user, context) if granular_admin
+    manageable = manageable_roles_by_user(user, context) unless granular_admin
+    addable, deleteable = add_delete_roles_by_user(user, context) if granular_admin
     role_data.each_with_object([]) { |role, roles|
       is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
       is_addable = addable.include?(role[:base_role_name]) if granular_admin
@@ -322,12 +322,12 @@ class Role < ActiveRecord::Base
   end
 
   def self.role_data(course, user, include_inactive = false)
-    role_data = self.custom_roles_and_counts_for_course(course, user, include_inactive)
-    self.compile_manageable_roles(role_data, user, course)
+    role_data = custom_roles_and_counts_for_course(course, user, include_inactive)
+    compile_manageable_roles(role_data, user, course)
   end
 
   def self.course_role_data_for_account(account, user)
-    role_data = self.all_enrollment_roles_for_account(account)
-    self.compile_manageable_roles(role_data, user, account)
+    role_data = all_enrollment_roles_for_account(account)
+    compile_manageable_roles(role_data, user, account)
   end
 end

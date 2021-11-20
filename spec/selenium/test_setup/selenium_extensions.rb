@@ -203,7 +203,7 @@ module SeleniumExtensions
       end
 
       def disable
-        original_wait = self.timeout
+        original_wait = timeout
         self.timeout = 0
         yield
       ensure

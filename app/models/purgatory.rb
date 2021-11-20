@@ -28,7 +28,7 @@ class Purgatory < ActiveRecord::Base
   end
 
   def self.expire_old_purgatories
-    Purgatory.active.where("updated_at < ?", self.days_until_expiration.days.ago).find_in_batches do |batch|
+    Purgatory.active.where("updated_at < ?", days_until_expiration.days.ago).find_in_batches do |batch|
       batch.each do |p|
         if p.new_instfs_uuid
           begin

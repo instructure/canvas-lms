@@ -50,12 +50,12 @@ class Progress < ActiveRecord::Base
     self.results = nil
     self.workflow_state = 'queued'
     self.completion = 0
-    GuardRail.activate(:primary) { self.save! }
+    GuardRail.activate(:primary) { save! }
   end
 
   def set_results(results)
     self.results = results
-    self.save
+    save
   end
 
   def update_completion!(value)
@@ -111,7 +111,7 @@ class Progress < ActiveRecord::Base
     end
 
     def perform
-      self.args[0] = @progress if self.args[0] == @progress # maintain the same object reference
+      args[0] = @progress if args[0] == @progress # maintain the same object reference
       @progress.start
       super
       @progress.reload

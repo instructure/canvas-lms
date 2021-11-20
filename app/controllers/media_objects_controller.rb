@@ -185,7 +185,7 @@ class MediaObjectsController < ApplicationController
         )
       end
 
-      self.extend TextHelper
+      extend TextHelper
       @media_object.user_entered_title =
         CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
       @media_object.save!
@@ -198,7 +198,7 @@ class MediaObjectsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
-        self.extend TextHelper
+        extend TextHelper
 
         # The MediaObject will be created on the current shard,
         # not the @context's shard.

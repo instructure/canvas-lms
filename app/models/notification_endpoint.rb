@@ -35,7 +35,7 @@ class NotificationEndpoint < ActiveRecord::Base
   def push_json(json)
     return false unless endpoint_exists? && own_endpoint? && endpoint_enabled? && !token_changed?
 
-    sns_client.publish(target_arn: self.arn, message: json, message_structure: 'json')
+    sns_client.publish(target_arn: arn, message: json, message_structure: 'json')
   end
 
   private
@@ -47,7 +47,7 @@ class NotificationEndpoint < ActiveRecord::Base
   end
 
   def endpoint_attributes
-    @endpoint_attributes ||= sns_client.get_endpoint_attributes(endpoint_arn: self.arn).attributes
+    @endpoint_attributes ||= sns_client.get_endpoint_attributes(endpoint_arn: arn).attributes
   end
 
   def endpoint_exists?
@@ -66,7 +66,7 @@ class NotificationEndpoint < ActiveRecord::Base
   end
 
   def token_changed?
-    self.token != endpoint_attributes['Token']
+    token != endpoint_attributes['Token']
   end
 
   def create_platform_endpoint
@@ -75,7 +75,7 @@ class NotificationEndpoint < ActiveRecord::Base
     begin
       response = sns_client.create_platform_endpoint(
         platform_application_arn: access_token.developer_key.sns_arn,
-        token: self.token,
+        token: token,
         custom_user_data: access_token.global_id.to_s
       )
       self.arn = response[:endpoint_arn]
@@ -89,7 +89,7 @@ class NotificationEndpoint < ActiveRecord::Base
       endpoint_updated = false
       begin
         sns_client.set_endpoint_attributes(
-          endpoint_arn: self.arn,
+          endpoint_arn: arn,
           attributes: { 'CustomUserData' => access_token.global_id.to_s }
         )
         endpoint_updated = true
@@ -115,6 +115,6 @@ class NotificationEndpoint < ActiveRecord::Base
   def delete_platform_endpoint
     return unless endpoint_exists? && own_endpoint?
 
-    sns_client.delete_endpoint(endpoint_arn: self.arn)
+    sns_client.delete_endpoint(endpoint_arn: arn)
   end
 end

@@ -97,7 +97,7 @@ module Canvas::Security
 
     # returns time in seconds
     def self.time_until_login_allowed(pseudonym, ip)
-      if self.allow_login_attempt?(pseudonym, ip)
+      if allow_login_attempt?(pseudonym, ip)
         0
       else
         Canvas.redis.ttl(login_attempts_key(pseudonym))

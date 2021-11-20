@@ -132,7 +132,7 @@ module Lti
           name: message_handler.resource_handler.name,
           description: message_handler.resource_handler.description,
           domain: URI(message_handler.launch_path).host,
-          placements: self.lti2_placements(message_handler, placements)
+          placements: lti2_placements(message_handler, placements)
         }
       end
 

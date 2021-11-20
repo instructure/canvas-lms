@@ -373,6 +373,8 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RedundantSelf:
+  Severity: error
 Style/RedundantSelfAssignment:
   Severity: error
 Style/RedundantSelfAssignmentBranch:
@@ -484,8 +486,6 @@ Style/Lambda: # TODO: autocorrect
 Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
 Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
-  Enabled: false
-Style/RedundantSelf: # TODO: autocorrect
   Enabled: false
 Style/RescueModifier: # TODO
   Severity: warning

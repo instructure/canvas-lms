@@ -207,9 +207,9 @@ class CanvasUnzip
 
     # yields byte count
     def extract(dest_path, overwrite = false, maximum_size = DEFAULT_BYTE_LIMIT)
-      dir = self.directory? ? dest_path : File.dirname(dest_path)
+      dir = directory? ? dest_path : File.dirname(dest_path)
       FileUtils.mkdir_p(dir) unless File.exist?(dir)
-      return unless self.file?
+      return unless file?
 
       raise SizeLimitExceeded if size > maximum_size
       if File.exist?(dest_path) && !overwrite

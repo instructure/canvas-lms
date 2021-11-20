@@ -31,9 +31,9 @@ class CourseAccountAssociation < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||=
       if account.root_account?
-        self.account.id
+        account.id
       else
-        self.account&.root_account_id
+        account&.root_account_id
       end
   end
 end

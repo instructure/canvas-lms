@@ -79,7 +79,7 @@ class AccessToken < ActiveRecord::Base
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
-    token = self.not_deleted.where(token_key => hashed_tokens).first
+    token = not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
       token.send("#{token_key}=", hashed_tokens.first)
@@ -90,7 +90,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.authenticate_refresh_token(token_string)
-    self.authenticate(token_string, :crypted_refresh_token)
+    authenticate(token_string, :crypted_refresh_token)
   end
 
   def self.hashed_token(token)
@@ -136,7 +136,7 @@ class AccessToken < ActiveRecord::Base
   def used!
     if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
       self.last_used_at = Time.now.utc
-      self.save
+      save
     end
   end
 
@@ -159,7 +159,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def generate_token(overwrite = false)
-    if overwrite || !self.crypted_token
+    if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
       self.expires_at = Time.now.utc + 1.hour if developer_key&.auto_expire_tokens

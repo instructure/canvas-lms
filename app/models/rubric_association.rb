@@ -97,7 +97,7 @@ class RubricAssociation < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
-    p.to { self.context.students rescue [] }
+    p.to { context.students rescue [] }
     p.whenever { |record|
       record.just_created && !record.context.is_a?(Course)
     }
@@ -126,8 +126,8 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def assignment
-    if self.association_object.is_a?(Assignment)
-      self.association_object
+    if association_object.is_a?(Assignment)
+      association_object
     else
       nil
     end
@@ -136,38 +136,38 @@ class RubricAssociation < ActiveRecord::Base
   def update_alignments
     return unless assignment
 
-    outcome_ids = self.deleted? ? [] : rubric.learning_outcome_alignments.map(&:learning_outcome_id)
+    outcome_ids = deleted? ? [] : rubric.learning_outcome_alignments.map(&:learning_outcome_id)
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
   end
 
   def touch_association
-    if self.association_type == "Assignment"
+    if association_type == "Assignment"
       self.class.connection.after_transaction_commit do
-        self.association_object.touch
+        association_object.touch
       end
     end
   end
 
   def update_old_rubric
-    if self.rubric_id_changed? && self.rubric_id_was && self.rubric_id_was != self.rubric_id
-      rubric = Rubric.find(self.rubric_id_was)
+    if rubric_id_changed? && rubric_id_was && rubric_id_was != rubric_id
+      rubric = Rubric.find(rubric_id_was)
       rubric.destroy if rubric.rubric_associations.count == 0 && rubric.rubric_assessments.count == 0
     end
   end
 
   def context_name
-    @cached_context_name ||= self.shard.activate do
-      Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
-        self.context.short_name rescue ""
+    @cached_context_name ||= shard.activate do
+      Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+        context.short_name rescue ""
       end
     end
   end
 
   def update_values
-    self.bookmarked = true if self.purpose == 'bookmark' || self.bookmarked.nil?
-    self.context_code ||= "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-    self.title ||= (self.association_object.title rescue self.association_object.name) rescue nil
+    self.bookmarked = true if purpose == 'bookmark' || bookmarked.nil?
+    self.context_code ||= "#{context_type.underscore}_#{context_id}" rescue nil
+    self.title ||= (association_object.title rescue association_object.name) rescue nil
     self.workflow_state ||= "active"
   end
   protected :update_values
@@ -175,49 +175,49 @@ class RubricAssociation < ActiveRecord::Base
   def user_can_assess_for?(assessor: nil, assessee: nil)
     raise "assessor and assessee required" unless assessor && assessee
 
-    self.context.grants_right?(assessor, :manage_grades) || self.assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id)
+    context.grants_right?(assessor, :manage_grades) || assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id)
   end
 
   def user_did_assess_for?(assessor: nil, assessee: nil)
     raise "assessor and assessee required" unless assessor && assessee
 
-    self.assessment_requests.complete.for_assessee(assessee).for_assessor(assessor).any?
+    assessment_requests.complete.for_assessee(assessee).for_assessor(assessor).any?
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete and can :manage
 
-    given { |user, session| self.context.grants_right?(user, session, :participate_as_student) }
+    given { |user, session| context.grants_right?(user, session, :participate_as_student) }
     can :submit
 
-    given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
+    given { |user, session| context.grants_right?(user, session, :view_all_grades) }
     can :view_rubric_assessments
   end
 
   def update_assignment_points
-    if self.use_for_grading && !self.skip_updating_points_possible && self.association_object && self.association_object.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association_object.points_possible != self.rubric.points_possible
-      self.association_object.points_possible = self.rubric.points_possible
-      self.association_object.save
+    if use_for_grading && !skip_updating_points_possible && association_object && association_object.respond_to?(:points_possible=) && rubric && rubric.points_possible && association_object.points_possible != rubric.points_possible
+      association_object.points_possible = rubric.points_possible
+      association_object.save
     end
   end
   protected :update_assignment_points
 
   def remind_user(assessee)
-    assessment_request = self.assessment_requests.where(user_id: assessee).first
-    assessment_request ||= self.assessment_requests.build(:user => assessee)
+    assessment_request = assessment_requests.where(user_id: assessee).first
+    assessment_request ||= assessment_requests.build(:user => assessee)
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
   end
 
   def update_rubric
-    cnt = self.rubric.rubric_associations.for_grading.length rescue 0
-    self.rubric&.with_versioning(false) do
-      self.rubric.read_only = cnt > 1
-      self.rubric.association_count = cnt
-      self.rubric.save
+    cnt = rubric.rubric_associations.for_grading.length rescue 0
+    rubric&.with_versioning(false) do
+      rubric.read_only = cnt > 1
+      rubric.association_count = cnt
+      rubric.save
 
-      self.rubric.destroy if cnt == 0 && self.rubric.rubric_associations.count == 0 && !self.rubric.public
+      rubric.destroy if cnt == 0 && rubric.rubric_associations.count == 0 && !rubric.public
     end
   end
   protected :update_rubric
@@ -229,8 +229,8 @@ class RubricAssociation < ActiveRecord::Base
     # Go up to the assignment and loop through all submissions.
     # Update each submission's assessment_requests with a link to this rubric association
     # but only if not already associated
-    if self.association_id && self.association_type == 'Assignment'
-      self.association_object.submissions.each do |sub|
+    if association_id && association_type == 'Assignment'
+      association_object.submissions.each do |sub|
         sub.assessment_requests.where(:rubric_association_id => nil).update_all(:rubric_association_id => id, :workflow_state => 'assigned')
       end
     end
@@ -238,7 +238,7 @@ class RubricAssociation < ActiveRecord::Base
   protected :link_to_assessments
 
   def unsubmitted_users
-    self.context.students - self.rubric_assessments.map(&:user) - self.assessment_requests.map(&:user)
+    context.students - rubric_assessments.map(&:user) - assessment_requests.map(&:user)
   end
 
   def self.generate(current_user, rubric, context, params)
@@ -277,11 +277,11 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def assessments_unique_per_asset?(assessment_type)
-    self.association_object.is_a?(Assignment) && self.purpose == "grading" && assessment_type == "grading"
+    association_object.is_a?(Assignment) && purpose == "grading" && assessment_type == "grading"
   end
 
   def assessment_points(criterion, data)
-    if criterion.learning_outcome_id && !self.context.feature_enabled?(:outcome_extra_credit)
+    if criterion.learning_outcome_id && !context.feature_enabled?(:outcome_extra_credit)
       [criterion.points, data[:points].to_f].min
     else
       data[:points].to_f
@@ -301,15 +301,15 @@ class RubricAssociation < ActiveRecord::Base
     raise "Assessment type required for assessing" unless params[:assessment_type]
 
     if opts[:artifact].is_a?(Quizzes::QuizSubmission)
-      opts[:artifact] = self.association_object.find_or_create_submission(opts[:artifact].user)
+      opts[:artifact] = association_object.find_or_create_submission(opts[:artifact].user)
     end
 
-    if self.association_object.is_a?(Assignment) && !self.association_object.grade_group_students_individually
-      group, students_to_assess = self.association_object.group_students(opts[:artifact].student)
+    if association_object.is_a?(Assignment) && !association_object.grade_group_students_individually
+      group, students_to_assess = association_object.group_students(opts[:artifact].student)
       if group
         provisional_grader = opts[:artifact].is_a?(ModeratedGrading::ProvisionalGrade) && opts[:assessor]
         artifacts_to_assess = students_to_assess.map do |student|
-          self.association_object.find_asset_for_assessment(self, student, :provisional_grader => provisional_grader).first
+          association_object.find_asset_for_assessment(self, student, :provisional_grader => provisional_grader).first
         end
       else
         artifacts_to_assess = [opts[:artifact]]
@@ -322,7 +322,7 @@ class RubricAssociation < ActiveRecord::Base
     score = nil
     replace_ratings = false
     has_score = false
-    self.rubric.criteria_object.each do |criterion|
+    rubric.criteria_object.each do |criterion|
       data = params["criterion_#{criterion.id}".to_sym]
       rating = {}
       if data
@@ -357,7 +357,7 @@ class RubricAssociation < ActiveRecord::Base
           self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
           # TODO i18n
           self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc && !desc.empty? && desc != "No Details" }.uniq.sort
-          self.save
+          save
         end
         rating[:description] = t('no_details', "No details") if !rating[:description] || rating[:description].empty?
         ratings << rating
@@ -375,7 +375,7 @@ class RubricAssociation < ActiveRecord::Base
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
-      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => self.rubric, :assessment_type => params[:assessment_type])
+      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => rubric, :assessment_type => params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
 
@@ -425,9 +425,9 @@ class RubricAssociation < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||=
       if context_type == 'Account' && context.root_account?
-        self.context.id
+        context.id
       else
-        self.context&.root_account_id
+        context&.root_account_id
       end
   end
 end

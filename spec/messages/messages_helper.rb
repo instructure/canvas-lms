@@ -37,7 +37,7 @@ shared_examples_for "a message" do
   include MessagesCommon
 
   def message_data_with_default
-    if self.respond_to?(:message_data)
+    if respond_to?(:message_data)
       message_data
     else
       {}

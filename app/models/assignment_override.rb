@@ -90,7 +90,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
-    ['CourseSection', 'Group', SET_TYPE_NOOP].include?(self.set_type) ||
+    ['CourseSection', 'Group', SET_TYPE_NOOP].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
@@ -142,23 +142,23 @@ class AssignmentOverride < ActiveRecord::Base
 
   def update_cached_due_dates
     if update_cached_due_dates?
-      if self.assignment
+      if assignment
         assignment.clear_cache_key(:availability)
         DueDateCacher.recompute(assignment)
       end
-      self.quiz&.clear_cache_key(:availability)
+      quiz&.clear_cache_key(:availability)
     end
   end
 
   def update_due_date_smart_alerts
-    if self.due_at.nil? || self.due_at < Time.zone.now
-      ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: self.id, alert_type: :due_date_reminder)&.destroy
+    if due_at.nil? || due_at < Time.zone.now
+      ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy
     else
       ScheduledSmartAlert.upsert(
         context_type: self.class.name,
-        context_id: self.id,
+        context_id: id,
         alert_type: :due_date_reminder,
-        due_at: self.due_at,
+        due_at: due_at,
         root_account_id: root_account_id
       )
     end
@@ -187,13 +187,13 @@ class AssignmentOverride < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
-      self.assignment_override_students.reload.destroy_all
+      assignment_override_students.reload.destroy_all
       self.workflow_state = 'deleted'
-      self.default_values
-      self.save!(validate: false)
+      default_values
+      save!(validate: false)
     end
 
-    ScheduledSmartAlert.where(context_type: self.class.name, context_id: self.id).destroy_all
+    ScheduledSmartAlert.where(context_type: self.class.name, context_id: id).destroy_all
   end
 
   scope :active, -> { where(:workflow_state => 'active') }
@@ -369,9 +369,9 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment&.context&.available? &&
-      self.assignment.published? &&
-      self.assignment.created_at < 3.hours.ago &&
+    assignment&.context&.available? &&
+      assignment.published? &&
+      assignment.created_at < 3.hours.ago &&
       (saved_change_to_workflow_state? ||
         saved_change_to_due_at_overridden? ||
         (due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save)))
@@ -400,8 +400,8 @@ class AssignmentOverride < ActiveRecord::Base
   def destroy_if_empty_set
     return unless set_type == 'ADHOC'
 
-    self.assignment_override_students.reload if self.id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
-    self.destroy if set.empty?
+    assignment_override_students.reload if id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
+    destroy if set.empty?
   end
 
   has_a_broadcast_policy
@@ -432,6 +432,6 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
+    write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
   end
 end

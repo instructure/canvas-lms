@@ -25,7 +25,7 @@ module Importers
 
     def self.process_migration(data, migration)
       AssignmentGroup.suspend_callbacks(:update_student_grades) do
-        self.add_groups_for_imported_assignments(data, migration)
+        add_groups_for_imported_assignments(data, migration)
         groups = data['assignment_groups'] || []
         groups.each do |group|
           if migration.import_object?("assignment_groups", group['migration_id'])

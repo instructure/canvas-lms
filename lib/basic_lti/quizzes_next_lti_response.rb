@@ -85,13 +85,13 @@ module BasicLTI
     end
 
     def raw_score
-      Float(self.result_total_score)
+      Float(result_total_score)
     rescue
       nil
     end
 
     def percentage_score
-      Float(self.result_score)
+      Float(result_score)
     rescue
       nil
     end

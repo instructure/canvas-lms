@@ -72,7 +72,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def clear_cache
-    self.shard.activate do
+    shard.activate do
       self.class.connection.after_transaction_commit do
         MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
       end
@@ -109,17 +109,17 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def clone_with_new_parent(new_parent_md5)
-    attrs = self.attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
+    attrs = attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
     attrs[:parent_md5] = new_parent_md5
     BrandConfig.for(attrs)
   end
 
   def dup?
-    BrandConfig.where(md5: self.md5).exists?
+    BrandConfig.where(md5: md5).exists?
   end
 
   def save_unless_dup!
-    self.save! unless dup?
+    save! unless dup?
   end
 
   def to_json(*args)

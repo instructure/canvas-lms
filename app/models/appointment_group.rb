@@ -385,7 +385,7 @@ class AppointmentGroup < ActiveRecord::Base
     return false unless participants_per_appointment
 
     appointments_participants.count >= appointments.sum(
-      sanitize_sql(['COALESCE(participants_per_appointment, ?)', self.participants_per_appointment])
+      sanitize_sql(['COALESCE(participants_per_appointment, ?)', participants_per_appointment])
     )
   end
 
@@ -399,7 +399,7 @@ class AppointmentGroup < ActiveRecord::Base
                     else
                       # can't have more than one group_category
                       group_categories = sub_contexts.find_all { |sc| sc.instance_of? GroupCategory }
-                      raise "inconsistent appointment group: #{self.id} #{group_categories}" if group_categories.length > 1
+                      raise "inconsistent appointment group: #{id} #{group_categories}" if group_categories.length > 1
 
                       group_category_id = group_categories.first.id
                       user.current_groups.detect { |g| g.group_category_id == group_category_id }
@@ -432,7 +432,7 @@ class AppointmentGroup < ActiveRecord::Base
                       .index_with { |attr| send(attr) }
 
     if @contexts_changed
-      changed[:root_account_id] = self.context&.root_account_id
+      changed[:root_account_id] = context&.root_account_id
       changed[:effective_context_code] = contexts.map(&:asset_string).join(",")
     end
 
@@ -495,7 +495,7 @@ class AppointmentGroup < ActiveRecord::Base
     transaction do
       self.workflow_state = 'deleted'
       save!
-      self.appointments.map do |a|
+      appointments.map do |a|
         a.updating_user = updating_user
         a.destroy(false)
       end

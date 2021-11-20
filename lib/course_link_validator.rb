@@ -39,7 +39,7 @@ class CourseLinkValidator
   end
 
   def self.process(progress)
-    validator = self.new(progress.context)
+    validator = new(progress.context)
     validator.check_course(progress)
     progress.set_results({ :issues => validator.issues, :completed_at => Time.now.utc, :version => 2 })
   rescue
@@ -62,24 +62,24 @@ class CourseLinkValidator
   # this is where the magic happens
   def check_course(progress)
     # Course card image
-    if self.course.image_url.present?
-      find_invalid_link(self.course.image_url) do |link|
-        self.issues << { :name => I18n.t("Course Card Image"), :type => :course_card_image,
-                         :content_url => "/courses/#{self.course.id}/settings",
-                         :invalid_links => [link.merge(:image => true)] }
+    if course.image_url.present?
+      find_invalid_link(course.image_url) do |link|
+        issues << { :name => I18n.t("Course Card Image"), :type => :course_card_image,
+                    :content_url => "/courses/#{course.id}/settings",
+                    :invalid_links => [link.merge(:image => true)] }
       end
       progress.update_completion! 1
     end
 
     # Syllabus
-    find_invalid_links(self.course.syllabus_body) do |links|
-      self.issues << { :name => I18n.t(:syllabus, "Course Syllabus"), :type => :syllabus,
-                       :content_url => "/courses/#{self.course.id}/assignments/syllabus" }.merge(:invalid_links => links)
+    find_invalid_links(course.syllabus_body) do |links|
+      issues << { :name => I18n.t(:syllabus, "Course Syllabus"), :type => :syllabus,
+                  :content_url => "/courses/#{course.id}/assignments/syllabus" }.merge(:invalid_links => links)
     end
     progress.update_completion! 5
 
     # Assessment questions
-    self.course.assessment_questions.active.each do |aq|
+    course.assessment_questions.active.each do |aq|
       next if aq.assessment_question_bank.deleted?
 
       check_question(aq)
@@ -87,53 +87,53 @@ class CourseLinkValidator
     progress.update_completion! 15
 
     # Assignments
-    self.course.assignments.active.each do |assignment|
+    course.assignments.active.each do |assignment|
       next if assignment.quiz || assignment.discussion_topic
 
       find_invalid_links(assignment.description) do |links|
-        self.issues << { :name => assignment.title, :type => :assignment,
-                         :content_url => "/courses/#{self.course.id}/assignments/#{assignment.id}" }.merge(:invalid_links => links)
+        issues << { :name => assignment.title, :type => :assignment,
+                    :content_url => "/courses/#{course.id}/assignments/#{assignment.id}" }.merge(:invalid_links => links)
       end
     end
     progress.update_completion! 25
 
     # Calendar events
-    self.course.calendar_events.active.each do |event|
+    course.calendar_events.active.each do |event|
       find_invalid_links(event.description) do |links|
-        self.issues << { :name => event.title, :type => :calendar_event,
-                         :content_url => "/courses/#{self.course.id}/calendar_events/#{event.id}" }.merge(:invalid_links => links)
+        issues << { :name => event.title, :type => :calendar_event,
+                    :content_url => "/courses/#{course.id}/calendar_events/#{event.id}" }.merge(:invalid_links => links)
       end
     end
     progress.update_completion! 35
 
     # Discussion topics
-    self.course.discussion_topics.active.each do |topic|
+    course.discussion_topics.active.each do |topic|
       find_invalid_links(topic.message) do |links|
-        self.issues << { :name => topic.title, :type => :discussion_topic,
-                         :content_url => "/courses/#{self.course.id}/discussion_topics/#{topic.id}" }.merge(:invalid_links => links)
+        issues << { :name => topic.title, :type => :discussion_topic,
+                    :content_url => "/courses/#{course.id}/discussion_topics/#{topic.id}" }.merge(:invalid_links => links)
       end
     end
     progress.update_completion! 55
 
     # External URL Module items (almost forgot about these)
     invalid_module_links = {}
-    self.course.context_module_tags.not_deleted.where(:content_type => "ExternalUrl").preload(:context_module).each do |ct|
+    course.context_module_tags.not_deleted.where(:content_type => "ExternalUrl").preload(:context_module).each do |ct|
       find_invalid_link(ct.url) do |invalid_link|
         (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(:link_text => ct.title)
       end
     end
     invalid_module_links.each do |mod, links|
-      self.issues << { :name => mod.name, :type => :module,
-                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => links)
+      issues << { :name => mod.name, :type => :module,
+                  :content_url => "/courses/#{course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => links)
     end
 
     progress.update_completion! 65
 
     # Quizzes
-    self.course.quizzes.active.each do |quiz|
+    course.quizzes.active.each do |quiz|
       find_invalid_links(quiz.description) do |links|
-        self.issues << { :name => quiz.title, :type => :quiz,
-                         :content_url => "/courses/#{self.course.id}/quizzes/#{quiz.id}" }.merge(:invalid_links => links)
+        issues << { :name => quiz.title, :type => :quiz,
+                    :content_url => "/courses/#{course.id}/quizzes/#{quiz.id}" }.merge(:invalid_links => links)
       end
       quiz.quiz_questions.active.each do |qq|
         check_question(qq)
@@ -142,10 +142,10 @@ class CourseLinkValidator
     progress.update_completion! 85
 
     # Wiki pages
-    self.course.wiki_pages.not_deleted.each do |page|
+    course.wiki_pages.not_deleted.each do |page|
       find_invalid_links(page.body) do |links|
-        self.issues << { :name => page.title, :type => :wiki_page,
-                         :content_url => "/courses/#{self.course.id}/pages/#{page.url}" }.merge(:invalid_links => links)
+        issues << { :name => page.title, :type => :wiki_page,
+                    :content_url => "/courses/#{course.id}/pages/#{page.url}" }.merge(:invalid_links => links)
       end
     end
     progress.update_completion! 99
@@ -174,10 +174,10 @@ class CourseLinkValidator
       case question
       when AssessmentQuestion
         hash[:type] = :assessment_question
-        hash[:content_url] = "/courses/#{self.course.id}/question_banks/#{question.assessment_question_bank_id}#question_#{question.id}_question_text"
+        hash[:content_url] = "/courses/#{course.id}/question_banks/#{question.assessment_question_bank_id}#question_#{question.id}_question_text"
       when Quizzes::QuizQuestion
         hash[:type] = :quiz_question
-        hash[:content_url] = "/courses/#{self.course.id}/quizzes/#{question.quiz_id}/take?preview=1#question_#{question.id}"
+        hash[:content_url] = "/courses/#{course.id}/quizzes/#{question.quiz_id}/take?preview=1#question_#{question.id}"
       end
       issues << hash
     end
@@ -214,11 +214,11 @@ class CourseLinkValidator
   def find_invalid_link(url)
     return if url.start_with?('mailto:')
 
-    unless (result = self.visited_urls[url])
+    unless (result = visited_urls[url])
       begin
-        if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
+        if ImportedHtmlConverter.relative_url?(url) || (domain_regex && url.match(domain_regex))
           result = if valid_route?(url)
-                     if url.match(%r{/courses/(\d+)}) && self.course.id.to_s != $1
+                     if url.match(%r{/courses/(\d+)}) && course.id.to_s != $1
                        :course_mismatch
                      else
                        check_object_status(url)
@@ -235,7 +235,7 @@ class CourseLinkValidator
         result = :unparsable
       end
       result ||= :success
-      self.visited_urls[url] = result
+      visited_urls[url] = result
     end
 
     unless result == :success

@@ -32,6 +32,6 @@ class Favorite < ActiveRecord::Base
   end
 
   def populate_root_account_id
-    self.root_account = self.context.root_account
+    self.root_account = context.root_account
   end
 end

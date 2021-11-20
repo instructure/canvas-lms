@@ -51,9 +51,9 @@ class ReportSnapshot < ActiveRecord::Base
 
   def report_value_over_time(*args)
     if args.length == 1
-      ReportSnapshot.report_value_over_time(self.data, args.first)
+      ReportSnapshot.report_value_over_time(data, args.first)
     else
-      ReportSnapshot.report_value_over_time(self.data[args.first], args.last)
+      ReportSnapshot.report_value_over_time(data[args.first], args.last)
     end
   end
 
@@ -81,8 +81,8 @@ class ReportSnapshot < ActiveRecord::Base
   scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
 
   def push_to_instructure_if_collection_enabled
-    return if self.report_type != REPORT_TO_SEND
-    return if self.account != Account.default
+    return if report_type != REPORT_TO_SEND
+    return if account != Account.default
 
     collection_type = Setting.get("usage_statistics_collection", "opt_out")
     return if collection_type == "opt_out"
@@ -92,7 +92,7 @@ class ReportSnapshot < ActiveRecord::Base
     data = {
       "collection_type" => collection_type,
       "installation_uuid" => Canvas.installation_uuid,
-      "report_type" => self.report_type,
+      "report_type" => report_type,
       "data" => read_attribute(:data),
       "rails_env" => Rails.env
     }

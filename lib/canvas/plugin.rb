@@ -48,7 +48,7 @@ module Canvas
 
     # custom serialization, since the meta can containt procs
     def _dump(_depth)
-      self.id.to_s
+      id.to_s
     end
 
     def self._load(str)
@@ -56,7 +56,7 @@ module Canvas
     end
 
     def encode_with(coder)
-      coder['id'] = self.id.to_s
+      coder['id'] = id.to_s
     end
 
     Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
@@ -70,7 +70,7 @@ module Canvas
     end
 
     def saved_settings
-      PluginSetting.settings_for_plugin(self.id, self)
+      PluginSetting.settings_for_plugin(id, self)
     end
 
     def settings
@@ -78,7 +78,7 @@ module Canvas
     end
 
     def enabled?
-      ps = PluginSetting.cached_plugin_setting(self.id)
+      ps = PluginSetting.cached_plugin_setting(id)
       return false unless ps
 
       ps.valid_settings? && ps.enabled?
@@ -156,12 +156,12 @@ module Canvas
         end
         res = validator_module.validate(settings, plugin_setting)
         if res.is_a?(Hash)
-          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+          plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(res || {})
         else
           false
         end
       else
-        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 

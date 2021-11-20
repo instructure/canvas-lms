@@ -26,7 +26,7 @@ module Api
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
 
-        content = self.new(html, host: host, port: port)
+        content = new(html, host: host, port: port)
         # shortcut html documents that definitely don't have anything we're interested in
         return html unless content.might_need_modification?
 
@@ -36,8 +36,8 @@ module Api
       def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
         return html if html.blank?
 
-        self.new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
-            .rewritten_html(url_helper)
+        new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
+          .rewritten_html(url_helper)
       end
 
       attr_reader :html

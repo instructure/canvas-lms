@@ -154,7 +154,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def self.all_cached
-    @all ||= self.all.to_a.each(&:readonly!)
+    @all ||= all.to_a.each(&:readonly!)
   end
 
   def self.valid_configurable_types
@@ -186,8 +186,8 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def duplicate
-    notification = self.clone
-    notification.id = self.id
+    notification = clone
+    notification.id = id
     notification.send(:remove_instance_variable, :@new_record)
     notification
   end
@@ -212,7 +212,7 @@ class Notification < Switchman::UnshardedRecord
 
   TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
   def preload_asset_roles_if_needed(asset)
-    if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(self.name)
+    if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(name)
       case asset
       when Assignment
         ActiveRecord::Associations::Preloader.new.preload(asset, :assignment_overrides)
@@ -258,31 +258,31 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def show_in_feed?
-    self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
+    category == "TestImmediately" || Notification.types_to_show_in_feed.include?(name)
   end
 
   def is_course_type?
-    COURSE_TYPES.include? self.category
+    COURSE_TYPES.include? category
   end
 
   def registration?
-    self.category == "Registration"
+    category == "Registration"
   end
 
   def migration?
-    self.category == "Migration"
+    category == "Migration"
   end
 
   def summarizable?
-    !self.registration? && !self.migration?
+    !registration? && !migration?
   end
 
   def dashboard?
-    NON_CONFIGURABLE_TYPES.exclude?(self.category)
+    NON_CONFIGURABLE_TYPES.exclude?(category)
   end
 
   def category_slug
-    (self.category || "").tr(' ', "_").gsub(/[^\w]/, "").downcase
+    (category || "").tr(' ', "_").gsub(/[^\w]/, "").downcase
   end
 
   # if user is given, categories that aren't relevant to that user will be
@@ -301,7 +301,7 @@ class Notification < Switchman::UnshardedRecord
 
   # Return a hash with information for a related user option if one exists.
   def related_user_setting(user, root_account)
-    if user.present? && self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
+    if user.present? && category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
       {
         name: :send_scores_in_emails,
         value: user.preferences[:send_scores_in_emails],
@@ -309,7 +309,7 @@ class Notification < Switchman::UnshardedRecord
           Include scores when alerting about grades.
           If your email is not an institution email this means sensitive content will be sent outside of the institution.
         TEXT
-        id: "cat_#{self.id}_option",
+        id: "cat_#{id}_option",
       }
     end
   end

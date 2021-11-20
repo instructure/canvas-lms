@@ -87,7 +87,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
   end
 
   def restore!
-    return unless self.deleted?
+    return unless deleted?
 
     update!(
       workflow_state: 'pending',

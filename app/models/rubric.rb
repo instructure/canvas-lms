@@ -52,32 +52,32 @@ class Rubric < ActiveRecord::Base
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
     can :read and can :create and can :delete_associations
 
-    given { |user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    given { |user, session| context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :read and can :create and can :delete_associations
 
-    given { |user, session| self.context.grants_right?(user, session, :manage) }
+    given { |user, session| context.grants_right?(user, session, :manage) }
     can :read and can :create and can :delete_associations
 
-    given { |user, session| self.context.grants_right?(user, session, :read_rubrics) }
+    given { |user, session| context.grants_right?(user, session, :read_rubrics) }
     can :read
 
     # read_only means "associated with > 1 object for grading purposes"
-    given { |user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    given { |user, session| !read_only && rubric_associations.for_grading.length < 2 && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :update and can :delete
 
-    given { |user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| !read_only && rubric_associations.for_grading.length < 2 && context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete
 
-    given { |user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    given { |user, session| context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
     can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :read) }
+    given { |user, session| context.grants_right?(user, session, :read) }
     can :read
   end
 
@@ -127,22 +127,22 @@ class Rubric < ActiveRecord::Base
     end
 
     cnt = 0
-    siblings = Rubric.where(context_id: self.context_id, context_type: self.context_type).where("workflow_state<>'deleted'")
-    siblings = siblings.where("id<>?", self.id) unless new_record?
-    if self.title.present?
-      original_title = self.title
-      while siblings.where(title: self.title).exists?
+    siblings = Rubric.where(context_id: context_id, context_type: context_type).where("workflow_state<>'deleted'")
+    siblings = siblings.where("id<>?", id) unless new_record?
+    if title.present?
+      original_title = title
+      while siblings.where(title: title).exists?
         cnt += 1
         self.title = "#{original_title} (#{cnt})"
       end
     end
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    if self.save
+    if save
       rubric_associations.in_batches.destroy_all
       true
     end
@@ -150,7 +150,7 @@ class Rubric < ActiveRecord::Base
 
   def restore
     self.workflow_state = 'active'
-    if self.save
+    if save
       rubric_associations_with_deleted.where(workflow_state: "deleted").find_each(&:restore)
       true
     end
@@ -175,7 +175,7 @@ class Rubric < ActiveRecord::Base
     end
 
     if rubric_associations.bookmarked.none?
-      self.destroy
+      destroy
     end
   end
 
@@ -209,19 +209,19 @@ class Rubric < ActiveRecord::Base
   end
 
   def criteria_object
-    OpenObject.process(self.data)
+    OpenObject.process(data)
   end
 
   def criteria
-    self.data
+    data
   end
 
   def associate_with(association, context, opts = {})
     if opts[:purpose] == "grading"
-      res = self.rubric_associations.where(association_id: association, association_type: association.class.to_s, purpose: 'grading').first
+      res = rubric_associations.where(association_id: association, association_type: association.class.to_s, purpose: 'grading').first
       return res if res
     elsif opts[:update_if_existing]
-      res = self.rubric_associations.where(association_id: association, association_type: association.class.to_s).first
+      res = rubric_associations.where(association_id: association, association_type: association.class.to_s).first
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
@@ -243,27 +243,27 @@ class Rubric < ActiveRecord::Base
     self.user ||= current_user
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
     @skip_updating_points_possible = association_params[:skip_updating_points_possible]
-    self.update_criteria(rubric_params)
+    update_criteria(rubric_params)
     RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association_object] || association_params[:url]
   end
 
   def unique_item_id(id = nil)
     @used_ids ||= {}
     while !id || @used_ids[id]
-      id = "#{self.rubric_id || self.id}_#{rand(10000)}"
+      id = "#{rubric_id || self.id}_#{rand(10000)}"
     end
     @used_ids[id] = true
     id
   end
 
   def update_criteria(params)
-    self.without_versioning(&:save) if self.new_record?
+    without_versioning(&:save) if new_record?
     data = generate_criteria(params)
-    self.hide_score_total = params[:hide_score_total] if self.hide_score_total.nil? || (self.association_count || 0) < 2
+    self.hide_score_total = params[:hide_score_total] if hide_score_total.nil? || (association_count || 0) < 2
     self.data = data.criteria
     self.title = data.title
     self.points_possible = data.points_possible
-    self.save
+    save
     self
   end
 
@@ -273,12 +273,12 @@ class Rubric < ActiveRecord::Base
     mastery_scale = context.resolved_outcome_proficiency
     return if mastery_scale.nil?
 
-    self.data.each do |criterion|
+    data.each do |criterion|
       update_criterion_from_mastery_scale(criterion, mastery_scale)
     end
-    if self.data_changed?
-      self.points_possible = total_points_from_criteria(self.data)
-      self.save! if save
+    if data_changed?
+      self.points_possible = total_points_from_criteria(data)
+      save! if save
     end
   end
 
@@ -305,12 +305,12 @@ class Rubric < ActiveRecord::Base
   end
 
   def update_learning_outcome_criteria(outcome)
-    self.data.each do |criterion|
+    data.each do |criterion|
       update_learning_outcome_criterion(criterion, outcome) if criterion[:learning_outcome_id] == outcome.id
     end
-    if self.data_changed?
-      self.points_possible = total_points_from_criteria(self.data)
-      self.save!
+    if data_changed?
+      self.points_possible = total_points_from_criteria(data)
+      save!
     end
   end
 
@@ -342,11 +342,11 @@ class Rubric < ActiveRecord::Base
 
   def will_change_with_update?(params)
     params ||= {}
-    return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
+    return true if params[:free_form_criterion_comments] && !!free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
 
     data = generate_criteria(params)
-    return true if data.title != self.title || data.points_possible != self.points_possible
-    return true if Rubric.normalize(data.criteria) != Rubric.normalize(self.criteria)
+    return true if data.title != title || data.points_possible != points_possible
+    return true if Rubric.normalize(data.criteria) != Rubric.normalize(criteria)
 
     false
   end
@@ -424,9 +424,9 @@ class Rubric < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||=
       if context_type == 'Account' && context.root_account?
-        self.context.id
+        context.id
       else
-        self.context&.root_account_id
+        context&.root_account_id
       end
   end
 end

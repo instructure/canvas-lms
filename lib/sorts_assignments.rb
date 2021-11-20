@@ -127,7 +127,7 @@ class SortsAssignments
                            user
                          end
 
-      sorted_assignments = self.by_due_date(
+      sorted_assignments = by_due_date(
         :course => context,
         :assignments => overridden_assignments,
         :user => user_for_sorting,

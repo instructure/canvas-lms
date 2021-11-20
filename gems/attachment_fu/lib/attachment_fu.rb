@@ -277,16 +277,16 @@ module AttachmentFu # :nodoc:
     end
 
     def create_thumbnail_size(target_size)
-      actual_size = self.attachment_options[:thumbnails][target_size]
+      actual_size = attachment_options[:thumbnails][target_size]
       raise "this class doesn't have a thubnail size for #{target_size}" if actual_size.nil?
 
       begin
-        tmp = self.create_temp_file
-        res = self.create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
+        tmp = create_temp_file
+        res = create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
       rescue Aws::S3::Errors::NoSuchKey => e
-        logger.warn("error when trying to make thumbnail for attachment_id: #{self.id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
+        logger.warn("error when trying to make thumbnail for attachment_id: #{id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
       rescue ThumbnailError => e
-        logger.warn("error creating thumbnail for attachment_id #{self.id}: #{e.inspect}")
+        logger.warn("error creating thumbnail for attachment_id #{id}: #{e.inspect}")
       ensure
         tmp&.unlink
       end
@@ -311,12 +311,12 @@ module AttachmentFu # :nodoc:
 
     # Returns true if the attachment data will be written to the storage system on the next save
     def save_attachment?
-      if self.is_a?(Attachment)
-        if self.root_attachment_id && self.new_record?
+      if is_a?(Attachment)
+        if root_attachment_id && new_record?
           return false
         end
 
-        self.filename && File.file?(temp_path.to_s)
+        filename && File.file?(temp_path.to_s)
       else
         File.file?(temp_path.to_s)
       end
@@ -341,7 +341,7 @@ module AttachmentFu # :nodoc:
     def uploaded_data=(file_data)
       return if file_data.blank?
 
-      if self.is_a?(Attachment)
+      if is_a?(Attachment)
         # glean information from the file handle
         self.content_type = detect_mimetype(file_data)
         self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
@@ -351,19 +351,19 @@ module AttachmentFu # :nodoc:
           self.temp_data = file_data.read
           file_from_path = false
         else
-          self.temp_paths.unshift file_data
+          temp_paths.unshift file_data
         end
         # If we're overwriting an existing file, we need to take serious
         # precautions, since other Attachment records could be using this file.
         # We first remove any root references for this file, and then we generate
         # a new unique filename for this file so anybody children of this attachment
         # will still be able to get at the original.
-        unless self.new_record?
+        unless new_record?
           self.root_attachment = nil
           self.root_attachment_id = nil
           self.workflow_state = nil
           self.filename = filename.sub(/\A\d+_\d+__/, "")
-          self.filename = "#{Time.now.to_i}_#{rand(999)}__#{self.filename}" if self.filename
+          self.filename = "#{Time.now.to_i}_#{rand(999)}__#{filename}" if filename
         end
         unless attachment_options[:skip_sis]
           read_bytes = false
@@ -371,7 +371,7 @@ module AttachmentFu # :nodoc:
           begin
             io = file_data
             if file_from_path
-              io = File.open(self.temp_path, 'rb')
+              io = File.open(temp_path, 'rb')
             end
             io.rewind
             io.each_line do |line|
@@ -405,9 +405,9 @@ module AttachmentFu # :nodoc:
     end
 
     def find_existing_attachment_for_md5
-      self.shard.activate do
+      shard.activate do
         GuardRail.activate(:secondary) do
-          if self.md5.present? && (ns = self.infer_namespace)
+          if md5.present? && (ns = infer_namespace)
             scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
             scope = scope.where.not(filename: nil)
             scope = scope.where("id<>?", self) unless new_record?
@@ -532,7 +532,7 @@ module AttachmentFu # :nodoc:
     # Stub for a #process_attachment method in a processor
     def process_attachment
       @saved_attachment = save_attachment?
-      run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
+      run_before_attachment_saved if @saved_attachment && respond_to?(:run_before_attachment_saved)
       @saved_attachment
     end
 
@@ -563,7 +563,7 @@ module AttachmentFu # :nodoc:
           save_to_storage
           @temp_paths.clear
           @saved_attachment = nil
-          run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
+          run_after_attachment_saved if respond_to?(:run_after_attachment_saved)
           run_callbacks(:save_and_attachment_processing)
         end
 
@@ -588,7 +588,7 @@ module AttachmentFu # :nodoc:
 
     # Removes the thumbnails for the attachment, if it has any
     def destroy_thumbnails
-      self.thumbnails.each(&:destroy) if thumbnailable?
+      thumbnails.each(&:destroy) if thumbnailable?
     end
   end
 end

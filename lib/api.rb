@@ -545,10 +545,10 @@ module Api
     # use the host of the request if available;
     # use a placeholder host for pre-generated content, which we will replace with the request host when available;
     # otherwise let HostUrl figure out what host is appropriate
-    if self.respond_to?(:request)
+    if respond_to?(:request)
       host, protocol = get_host_and_protocol_from_request
       target_shard = Shard.current
-    elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
+    elsif respond_to?(:use_placeholder_host?) && use_placeholder_host?
       host = PLACEHOLDER_HOST
       protocol = PLACEHOLDER_PROTOCOL
     else
@@ -589,7 +589,7 @@ module Api
   # and adds context (e.g. /courses/:id/) if it is missing
   # exception: it leaves user-context file links alone
   def process_incoming_html_content(html)
-    host, port = [request.host, request.port] if self.respond_to?(:request)
+    host, port = [request.host, request.port] if respond_to?(:request)
     Html::Content.process_incoming(html, host: host, port: port)
   end
 

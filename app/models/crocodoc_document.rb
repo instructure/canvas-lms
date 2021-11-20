@@ -149,9 +149,9 @@ class CrocodocDocument < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions
-        .preload(submission: :assignment)
-        .map(&:submission)
+    canvadocs_submissions
+      .preload(submission: :assignment)
+      .map(&:submission)
   end
 
   def apply_allow_list(user, opts, allow_list)

@@ -81,11 +81,11 @@ module RespondusSoapEndpoint
                  end
 
       # verify that the session was created for this user
-      if self.user
+      if user
         if session['user_id']
-          raise(ActiveSupport::MessageVerifier::InvalidSignature) unless self.user.id == session['user_id']
+          raise(ActiveSupport::MessageVerifier::InvalidSignature) unless user.id == session['user_id']
         else
-          session['user_id'] = self.user.id
+          session['user_id'] = user.id
         end
       end
     end

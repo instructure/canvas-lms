@@ -43,7 +43,7 @@ class PageView < ActiveRecord::Base
   validates :user_id, presence: true
 
   def self.generate(request, attributes = {})
-    self.new(attributes).tap do |p|
+    new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0, 255]
       p.http_method = request.request_method.downcase
       p.controller = request.path_parameters[:controller]
@@ -65,7 +65,7 @@ class PageView < ActiveRecord::Base
   end
 
   def self.find_for_update(request_id)
-    if PageView.updates_enabled? && (self.db? || self.cassandra?)
+    if PageView.updates_enabled? && (db? || cassandra?)
       begin
         # not using find_by_id or where(..).first because the cassandra
         # codepath doesn't support it
@@ -92,12 +92,12 @@ class PageView < ActiveRecord::Base
   end
 
   def ensure_account
-    self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
-    self.account_id ||= (self.context.is_a?(Account) ? self.context : self.context.account) if self.context
+    self.account_id ||= (context_type == 'Account' ? context_id : context.account_id) rescue nil
+    self.account_id ||= (context.is_a?(Account) ? context : context.account) if context
   end
 
   def cap_interaction_seconds
-    self.interaction_seconds = [self.interaction_seconds || 5, 10.minutes.to_i].min
+    self.interaction_seconds = [interaction_seconds || 5, 10.minutes.to_i].min
   end
 
   # the list of columns we display to users, export to csv, etc
@@ -126,7 +126,7 @@ class PageView < ActiveRecord::Base
   end
 
   def self.db?
-    self.page_view_method == :db
+    page_view_method == :db
   end
 
   def self.cassandra?
@@ -224,19 +224,19 @@ class PageView < ActiveRecord::Base
   def store
     self.created_at ||= Time.zone.now
     return false unless user
-    return false if self.is_update && !PageView.updates_enabled?
+    return false if is_update && !PageView.updates_enabled?
 
     result = case PageView.page_view_method
              when :log
-               Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
+               Rails.logger.info "PAGE VIEW: #{attributes.to_json}"
              when :db
                self.shard = user.shard if new_record?
-               self.save
+               save
              when :cassandra
-               self.save
+               save
              end
 
-    self.store_page_view_to_user_counts
+    store_page_view_to_user_counts
 
     result
   end
@@ -248,7 +248,7 @@ class PageView < ActiveRecord::Base
     shard.activate do
       updated_at = params['updated_at'] || self.updated_at || Time.now
       updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
-      seconds = self.interaction_seconds || 0
+      seconds = interaction_seconds || 0
       if params['interaction_seconds'].to_i > 0
         seconds += params['interaction_seconds'].to_i
       else
@@ -269,7 +269,7 @@ class PageView < ActiveRecord::Base
       run_callbacks(:create) do
         PageView::EventStream.insert(self)
         @new_record = false
-        self.id
+        id
       end
     end
     changes_applied
@@ -313,7 +313,7 @@ class PageView < ActiveRecord::Base
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
-        scope = self.where(:user_id => user).order('created_at desc')
+        scope = where(:user_id => user).order('created_at desc')
         scope = scope.where("created_at >= ?", options[:oldest]) if options[:oldest]
         scope = scope.where("created_at <= ?", options[:newest]) if options[:newest]
         if viewer
@@ -380,11 +380,11 @@ class PageView < ActiveRecord::Base
 
   def store_page_view_to_user_counts
     return unless Setting.get('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
-    return unless self.created_at.present? && self.user.present?
+    return unless self.created_at.present? && user.present?
 
     exptime = Setting.get('page_views_active_user_exptime', 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
-    Canvas.redis.sadd(bucket, self.user.global_id)
+    Canvas.redis.sadd(bucket, user.global_id)
     Canvas.redis.expire(bucket, exptime)
   end
 
@@ -394,7 +394,7 @@ class PageView < ActiveRecord::Base
   end
 
   def to_row
-    export_columns.map { |c| self.send(c).presence }
+    export_columns.map { |c| send(c).presence }
   end
 
   def app_name
@@ -420,11 +420,11 @@ class PageView < ActiveRecord::Base
     def load_migration_data(account_ids)
       self.migration_data = {}
       account_ids.each do |account_id|
-        data = self.migration_data[account_id] = {}
+        data = migration_data[account_id] = {}
         data.merge!(cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
 
         unless data['last_created_at']
-          data['last_created_at'] = self.start_at
+          data['last_created_at'] = start_at
         end
         # cassandra returns Time not TimeWithZone objects
         data['last_created_at'] = data['last_created_at'].in_time_zone
@@ -434,13 +434,13 @@ class PageView < ActiveRecord::Base
     # this is the batch size per account, not the overall batch size
     # returns true if any progress was made (if it makes sense to run_once again)
     def run_once(batch_size = 3000)
-      self.migration_data.inject(false) do |progress, (account_id, _)|
+      migration_data.inject(false) do |progress, (account_id, _)|
         run_once_for_account(account_id, batch_size) || progress
       end
     end
 
     def run_once_for_account(account_id, batch_size)
-      data = self.migration_data[account_id]
+      data = migration_data[account_id]
       raise("not configured for account id: #{account_id}") unless data
 
       last_created_at = data['last_created_at']

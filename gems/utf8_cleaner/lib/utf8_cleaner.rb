@@ -37,15 +37,15 @@ module Utf8Cleaner
   def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
     case object
     when Hash
-      object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each_value { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
     when Array
-      object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
     when String
       if object.encoding == Encoding::ASCII_8BIT && force_utf8
         object.force_encoding(Encoding::UTF_8)
       end
       unless object.valid_encoding?
-        object.replace(self.strip_invalid_utf8(object))
+        object.replace(strip_invalid_utf8(object))
       end
     end
   end

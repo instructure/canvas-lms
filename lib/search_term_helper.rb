@@ -25,7 +25,7 @@ module SearchTermHelper
       if search_term.present?
         SearchTermHelper.validate_search_term(search_term)
         scope = if scope.respond_to?(:where)
-                  scope.where(wildcard("#{self.table_name}.#{attr}", search_term))
+                  scope.where(wildcard("#{table_name}.#{attr}", search_term))
                 else
                   scope.select { |item| item.matches_attribute?(attr, search_term) }
                 end

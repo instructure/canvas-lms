@@ -30,7 +30,7 @@ module Importers
       rubrics.each do |rubric|
         if migration.import_object?("rubrics", rubric['migration_id'])
           begin
-            self.import_from_migration(rubric, migration)
+            import_from_migration(rubric, migration)
           rescue
             migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
           end

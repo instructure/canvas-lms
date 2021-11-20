@@ -37,7 +37,7 @@ module Polling
       can :create
 
       given do |user, http_session|
-        self.poll_sessions.shard(self).preload(:course).any? do |session|
+        poll_sessions.shard(self).preload(:course).any? do |session|
           session.course.grants_right?(user, http_session, :manage_content)
         end
       end
@@ -45,7 +45,7 @@ module Polling
 
       given do |user|
         can_read = false
-        self.poll_sessions.shard(self).activate do |scope|
+        poll_sessions.shard(self).activate do |scope|
           if scope.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                           Enrollment.where(user_id: user).active.select(:course_id),
                           Enrollment.where(user_id: user).active.select(:course_section_id)]).exists?

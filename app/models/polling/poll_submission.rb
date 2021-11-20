@@ -40,12 +40,12 @@ module Polling
 
     set_policy do
       given do |user, session|
-        self.poll.grants_right?(user, session, :update) || self.user == user
+        poll.grants_right?(user, session, :update) || self.user == user
       end
       can :read
 
       given do |user, session|
-        self.poll_session.grants_right?(user, session, :submit)
+        poll_session.grants_right?(user, session, :submit)
       end
       can :submit
     end
@@ -53,8 +53,8 @@ module Polling
     private
 
     def poll_is_published
-      if self.poll_session
-        unless self.poll_session.is_published?
+      if poll_session
+        unless poll_session.is_published?
           errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_is_published',
                                    'This poll session is not open for submissions.'))
         end
@@ -62,8 +62,8 @@ module Polling
     end
 
     def poll_choices_belong_to_poll
-      if self.poll
-        unless self.poll.poll_choices.include?(poll_choice)
+      if poll
+        unless poll.poll_choices.include?(poll_choice)
           errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_choice_belongs_to_poll',
                                    'That poll choice does not belong to the existing poll.'))
         end

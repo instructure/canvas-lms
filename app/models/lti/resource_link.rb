@@ -93,6 +93,6 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   def set_root_account
-    self.root_account_id ||= self.original_context_external_tool&.root_account_id
+    self.root_account_id ||= original_context_external_tool&.root_account_id
   end
 end

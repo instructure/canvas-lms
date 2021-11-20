@@ -112,7 +112,7 @@ class DueDateCacher
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
 
-    executing_user ||= self.current_executing_user
+    executing_user ||= current_executing_user
     due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user)
     if run_immediately
       due_date_cacher.recompute
@@ -133,7 +133,7 @@ class DueDateCacher
 
     current_caller = caller(1..1).first
     update_grades = inst_jobs_opts.delete(:update_grades) || false
-    executing_user = inst_jobs_opts.delete(:executing_user) || self.current_executing_user
+    executing_user = inst_jobs_opts.delete(:executing_user) || current_executing_user
     due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
 
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute

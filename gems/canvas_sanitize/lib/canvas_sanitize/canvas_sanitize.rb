@@ -384,17 +384,17 @@ module CanvasSanitize # :nodoc:
     def fully_sanitize_fields
       fields_hash = self.class.fully_sanitize_fields_config || {}
       fields_hash.each do |field, config|
-        next unless self.attribute_changed?(field)
+        next unless attribute_changed?(field)
 
         config ||= Sanitize::Config::RESTRICTED
         config = Sanitize::Config::RESTRICTED if config.empty?
         # Doesn't try to sanitize nil
-        f = self.send(field)
+        f = send(field)
         next unless f
         next unless f.is_a?(String) || f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
-        self.send((field.to_s + "="), val)
+        send((field.to_s + "="), val)
       end
     end
   end # InstanceMethods

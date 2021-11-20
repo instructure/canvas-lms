@@ -40,7 +40,7 @@ class UserNote < ActiveRecord::Base
   scope :desc_by_date, -> { order('created_at DESC') }
 
   set_policy do
-    given { |user| self.creator == user }
+    given { |user| creator == user }
     can :delete and can :read
 
     given { |user| self.user.grants_right?(user, :delete_user_notes) }
@@ -58,18 +58,18 @@ class UserNote < ActiveRecord::Base
   end
 
   def formatted_note(truncate = nil)
-    self.extend TextHelper
-    res = self.note
-    res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
+    extend TextHelper
+    res = note
+    res = truncate_html(note, :max_length => truncate, :words => true) if truncate
     res
   end
 
   def creator_name
-    self.creator ? self.creator.name : nil
+    creator ? creator.name : nil
   end
 
   def update_last_user_note
-    self.user.update_last_user_note
-    self.user.save
+    user.update_last_user_note
+    user.save
   end
 end

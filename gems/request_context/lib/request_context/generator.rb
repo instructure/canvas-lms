@@ -96,7 +96,7 @@ module RequestContext
     def self.store_interaction_seconds_update(token, interaction_seconds)
       data = CanvasSecurity::PageViewJwt.decode(token)
       if data
-        self.add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
+        add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
       end
     end
 
@@ -111,14 +111,14 @@ module RequestContext
     end
 
     def self.store_request_meta(request, context)
-      self.add_meta_header("o", request.path_parameters[:controller])
-      self.add_meta_header("n", request.path_parameters[:action])
+      add_meta_header("o", request.path_parameters[:controller])
+      add_meta_header("n", request.path_parameters[:action])
       if request.request_parameters && request.request_parameters['operationName']
-        self.add_meta_header("on", request.request_parameters['operationName'])
+        add_meta_header("on", request.request_parameters['operationName'])
       end
       if context
-        self.add_meta_header("t", context.class)
-        self.add_meta_header("i", context.id)
+        add_meta_header("t", context.class)
+        add_meta_header("i", context.id)
       end
     end
 
@@ -136,10 +136,10 @@ module RequestContext
     #
     # @param [PageView] the bundle of attributes we want to map to meta headers
     def self.store_page_view_meta(page_view)
-      self.add_meta_header("x", page_view.interaction_seconds)
-      self.add_meta_header("p", page_view.participated? ? "t" : "f")
-      self.add_meta_header("e", page_view.asset_user_access_id)
-      self.add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
+      add_meta_header("x", page_view.interaction_seconds)
+      add_meta_header("p", page_view.participated? ? "t" : "f")
+      add_meta_header("e", page_view.asset_user_access_id)
+      add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
     end
 
     class << self

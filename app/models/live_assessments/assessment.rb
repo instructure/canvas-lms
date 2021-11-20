@@ -34,24 +34,24 @@ module LiveAssessments
 
     set_policy do
       given do |user, session|
-        !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments)
+        !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments)
       end
       can :create and can :update
 
       given do |user, session|
-        self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments_add)
+        context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments_add)
       end
       can :create
 
       given do |user, session|
-        self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-          self.context.grants_right?(user, session, :manage_assignments_edit)
+        context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+          context.grants_right?(user, session, :manage_assignments_edit)
       end
       can :update
 
-      given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
+      given { |user, session| context.grants_right?(user, session, :view_all_grades) }
       can :read
     end
 

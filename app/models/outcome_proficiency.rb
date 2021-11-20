@@ -45,7 +45,7 @@ class OutcomeProficiency < ApplicationRecord
   alias_method :original_destroy_permanently!, :destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
-    self.outcome_proficiency_ratings.delete_all
+    outcome_proficiency_ratings.delete_all
     original_destroy_permanently!
   end
 
@@ -54,14 +54,14 @@ class OutcomeProficiency < ApplicationRecord
   def undestroy
     transaction do
       OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: 'active', updated_at: Time.zone.now.utc)
-      self.reload
+      reload
       original_undestroy
     end
   end
 
   def as_json(_options = {})
     {
-      'ratings' => self.outcome_proficiency_ratings.map(&:as_json)
+      'ratings' => outcome_proficiency_ratings.map(&:as_json)
     }
   end
 
@@ -117,7 +117,7 @@ class OutcomeProficiency < ApplicationRecord
       OutcomeProficiency.transaction do
         proficiency ||= OutcomeProficiency.new(context: context)
         proficiency.workflow_state = 'active'
-        proficiency.replace_ratings(self.default_ratings)
+        proficiency.replace_ratings(default_ratings)
         proficiency.save!
         proficiency
       end
@@ -133,19 +133,19 @@ class OutcomeProficiency < ApplicationRecord
   private
 
   def next_ratings
-    self.outcome_proficiency_ratings.reject(&:marked_for_destruction?)
+    outcome_proficiency_ratings.reject(&:marked_for_destruction?)
   end
 
   def single_mastery_rating
     if next_ratings.count(&:mastery) != 1
-      self.errors.add(:outcome_proficiency_ratings, t('Exactly one rating can have mastery'))
+      errors.add(:outcome_proficiency_ratings, t('Exactly one rating can have mastery'))
     end
   end
 
   def strictly_decreasing_points
     next_ratings.each_cons(2) do |l, r|
       if l.points <= r.points
-        self.errors.add(
+        errors.add(
           :outcome_proficiency_ratings,
           t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points)
         )
@@ -160,7 +160,7 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   def detect_changes_for_rubrics
-    @update_rubrics = self.changed_for_autosave?
+    @update_rubrics = changed_for_autosave?
   end
 
   def propagate_changes_to_rubrics

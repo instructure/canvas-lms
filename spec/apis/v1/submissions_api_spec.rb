@@ -2014,7 +2014,7 @@ describe 'Submissions API', type: :request do
                               { :controller => 'submissions_api', :action => 'for_students',
                                 :format => 'json', :course_id => @course.to_param },
                               { :student_ids => [@student.to_param] }]
-      self.send(*args)
+      send(*args)
     end
 
     context "as student" do
@@ -2271,7 +2271,7 @@ describe 'Submissions API', type: :request do
                                 { :controller => 'submissions_api', :action => 'show',
                                   :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
                                 { :include => includes }]
-        self.send(*args)
+        send(*args)
       end
 
       context "as teacher" do

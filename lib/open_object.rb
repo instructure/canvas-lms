@@ -36,14 +36,14 @@ class OpenObject < OpenStruct
   end
 
   def id
-    self.table[:id]
+    table[:id]
   end
 
   def asset_string
-    return self.table[:asset_string] if self.table[:asset_string]
-    return nil unless self.type && self.id
+    return table[:asset_string] if table[:asset_string]
+    return nil unless type && id
 
-    "#{self.type.underscore}_#{self.id}"
+    "#{type.underscore}_#{id}"
   end
 
   def as_json(options = {})

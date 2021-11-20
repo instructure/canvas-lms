@@ -56,7 +56,7 @@ module Courses
 
     def get_visibilities_for_user_ids(item_type, user_ids)
       GuardRail.activate(:secondary) do
-        opts = { user_id: user_ids, course_id: [self.id] }
+        opts = { user_id: user_ids, course_id: [id] }
         case item_type
         when :assignment
           AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)

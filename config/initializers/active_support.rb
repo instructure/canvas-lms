@@ -20,7 +20,7 @@
 ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
 ActiveSupport::SafeBuffer.class_eval do
   def encode_with(coder)
-    coder.scalar("!str", self.to_str)
+    coder.scalar("!str", to_str)
   end
 end
 

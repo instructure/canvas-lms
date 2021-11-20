@@ -119,7 +119,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      self.finalize_report(account_report, error_message)
+      finalize_report(account_report, error_message)
       @er = nil
     end
   end

@@ -61,27 +61,27 @@ class Folder < ActiveRecord::Base
   after_commit :clear_permissions_cache, if: -> { [:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? { |k| saved_changes.key?(k) } }
 
   def file_attachments_visible_to(user)
-    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
-       self.grants_right?(user, :read_as_admin)
-      self.active_file_attachments
+    if context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
+       grants_right?(user, :read_as_admin)
+      active_file_attachments
     else
-      self.visible_file_attachments.not_locked
+      visible_file_attachments.not_locked
     end
   end
 
   def populate_root_account_id
-    self.root_account_id = if self.context_type == "User"
+    self.root_account_id = if context_type == "User"
                              0
                            elsif context_type == 'Account' && context.root_account?
-                             self.context_id
+                             context_id
                            else
-                             self.context.root_account_id
+                             context.root_account_id
                            end
   end
 
   def protect_root_folder_name
-    if self.parent_folder_id.blank? && self.name != Folder.root_folder_name_for_context(context)
-      if self.new_record?
+    if parent_folder_id.blank? && name != Folder.root_folder_name_for_context(context)
+      if new_record?
         root_folder = Folder.root_folders(context).first
         self.parent_folder_id = root_folder.id
         true
@@ -93,7 +93,7 @@ class Folder < ActiveRecord::Base
   end
 
   def reject_recursive_folder_structures
-    return true unless self.parent_folder_id_changed?
+    return true unless parent_folder_id_changed?
 
     seen_folders = Set.new([self])
     folder = self
@@ -109,7 +109,7 @@ class Folder < ActiveRecord::Base
   end
 
   def restrict_submission_folder_context
-    if self.for_submissions? && !self.context.is_a?(User) && !self.context.is_a?(Group)
+    if for_submissions? && !context.is_a?(User) && !context.is_a?(Group)
       errors.add(:submission_context_code, t("submissions folders must be created in User or Group context"))
       return false
     end
@@ -125,10 +125,10 @@ class Folder < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.active_file_attachments.each(&:destroy)
-    self.active_sub_folders.each(&:destroy)
+    active_file_attachments.each(&:destroy)
+    active_sub_folders.each(&:destroy)
     self.deleted_at = Time.now.utc
-    self.save
+    save
   end
 
   scope :active, -> { where("folders.workflow_state<>'deleted'") }
@@ -148,7 +148,7 @@ class Folder < ActiveRecord::Base
     return read_attribute(:full_name) if !reload && read_attribute(:full_name)
 
     folder = self
-    names = [self.name]
+    names = [name]
     while folder.parent_folder_id
       folder = Folder.find(folder.parent_folder_id) # folder.parent_folder
       names << folder.name if folder
@@ -157,33 +157,33 @@ class Folder < ActiveRecord::Base
   end
 
   def infer_hidden_state
-    self.workflow_state ||= self.parent_folder.workflow_state if self.parent_folder && !self.deleted?
+    self.workflow_state ||= parent_folder.workflow_state if parent_folder && !deleted?
   end
   protected :infer_hidden_state
 
   def infer_full_name
     # TODO i18n
     t :default_folder_name, 'New Folder'
-    self.name = 'New Folder' if self.name.blank?
-    self.name = self.name.strip.tr('/', "_")
+    self.name = 'New Folder' if name.blank?
+    self.name = name.strip.tr('/', "_")
     @update_sub_folders = false
-    self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
-    self.context = self.parent_folder.context if self.parent_folder
-    self.prevent_duplicate_name
-    self.full_name = self.full_name(true)
-    if self.parent_folder_id_changed? || !self.parent_folder_id || self.full_name_changed? || self.name_changed?
+    self.parent_folder_id = nil if !parent_folder || parent_folder.context != context || parent_folder_id == id
+    self.context = parent_folder.context if parent_folder
+    prevent_duplicate_name
+    self.full_name = full_name(true)
+    if parent_folder_id_changed? || !parent_folder_id || full_name_changed? || name_changed?
       @update_sub_folders = true
     end
-    @folder_id = self.id
+    @folder_id = id
   end
   protected :infer_full_name
 
   def prevent_duplicate_name
-    return unless self.parent_folder
+    return unless parent_folder
 
-    existing_folders = self.parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(self.name)}(\\s\\d+)?$", self.id.to_i).pluck(:name)
+    existing_folders = parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(name)}(\\s\\d+)?$", id.to_i).pluck(:name)
 
-    return unless existing_folders.include?(self.name)
+    return unless existing_folders.include?(name)
 
     iterations, usable_iterator, candidate = [], nil, 2
 
@@ -202,14 +202,14 @@ class Folder < ActiveRecord::Base
     end
 
     usable_iterator ||= existing_folders.size + 1
-    self.name = "#{self.name} #{usable_iterator}"
+    self.name = "#{name} #{usable_iterator}"
   end
   protected :prevent_duplicate_name
 
   def update_sub_folders
     return unless @update_sub_folders
 
-    self.sub_folders.each { |f|
+    sub_folders.each { |f|
       f.reload
       f.full_name = f.full_name(true)
       f.save
@@ -222,21 +222,21 @@ class Folder < ActiveRecord::Base
 
   def subcontent(opts = {})
     res = []
-    res += self.active_sub_folders
-    res += self.active_file_attachments unless opts[:exclude_files]
+    res += active_sub_folders
+    res += active_file_attachments unless opts[:exclude_files]
     res
   end
 
   def visible?
     return @visible if defined?(@visible)
 
-    @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
+    @visible = (self.workflow_state == "visible") && (!parent_folder || parent_folder.visible?)
   end
 
   def hidden?
     return @hidden if defined?(@hidden)
 
-    @hidden = self.workflow_state == 'hidden' || self.parent_folder&.hidden?
+    @hidden = self.workflow_state == 'hidden' || parent_folder&.hidden?
   end
 
   def hidden
@@ -254,7 +254,7 @@ class Folder < ActiveRecord::Base
   def public?
     return @public if defined?(@public)
 
-    @public = self.workflow_state == 'public' || self.parent_folder&.public?
+    @public = self.workflow_state == 'public' || parent_folder&.public?
   end
 
   def mime_class
@@ -263,32 +263,32 @@ class Folder < ActiveRecord::Base
 
   # true if there are any active files or folders
   def has_contents?
-    self.active_file_attachments.any? || self.active_sub_folders.any?
+    active_file_attachments.any? || active_sub_folders.any?
   end
 
   attr_accessor :clone_updated
 
   def clone_for(context, dup = nil, options = {})
-    if !self.cloned_item && !self.new_record?
+    if !cloned_item && !new_record?
       self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
+      save!
     end
     existing = context.folders.active.where(id: self).first
-    existing ||= context.folders.active.where(cloned_item_id: self.cloned_item_id || 0).first
+    existing ||= context.folders.active.where(cloned_item_id: cloned_item_id || 0).first
     return existing if existing && !options[:overwrite] && !options[:force_copy]
 
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
+    attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
       dup.send("#{key}=", val)
     end
-    if self.unique_type && context.folders.active.where(:unique_type => self.unique_type).exists?
+    if unique_type && context.folders.active.where(:unique_type => unique_type).exists?
       dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone
     end
     dup.context = context
     if options[:include_subcontent] != false
       dup.save!
-      self.subcontent.each do |item|
+      subcontent.each do |item|
         if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
           case item
           when Attachment
@@ -309,7 +309,7 @@ class Folder < ActiveRecord::Base
   end
 
   def root_folder?
-    !self.parent_folder_id
+    !parent_folder_id
   end
 
   def self.root_folder_name_for_context(context)
@@ -480,60 +480,60 @@ class Folder < ActiveRecord::Base
   def locked?
     return @locked if defined?(@locked)
 
-    @locked = self.locked ||
-              (self.lock_at && Time.zone.now > self.lock_at) ||
-              (self.unlock_at && Time.zone.now < self.unlock_at) ||
-              self.parent_folder&.locked?
+    @locked = locked ||
+              (lock_at && Time.zone.now > lock_at) ||
+              (unlock_at && Time.zone.now < unlock_at) ||
+              parent_folder&.locked?
   end
 
   def for_student_annotation_documents?
-    self.unique_type == Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
+    unique_type == Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
   end
 
   def for_submissions?
-    !self.submission_context_code.nil?
+    !submission_context_code.nil?
   end
 
   def currently_locked
-    self.locked || (self.lock_at && Time.zone.now > self.lock_at) || (self.unlock_at && Time.zone.now < self.unlock_at) || self.workflow_state == 'hidden'
+    locked || (lock_at && Time.zone.now > lock_at) || (unlock_at && Time.zone.now < unlock_at) || self.workflow_state == 'hidden'
   end
   alias_method :currently_locked?, :currently_locked
 
   set_policy do
-    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
+    given { |user, session| visible? && context.grants_right?(user, session, :read) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin, :read_contents, :read_contents_for_export
 
     given do |user, session|
-      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) &&
-        !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES))
+      visible? && !locked? && context.grants_right?(user, session, :read) &&
+        !(context.is_a?(Course) && context.tab_hidden?(Course::TAB_FILES))
     end
     can :read_contents, :read_contents_for_export
 
     given do |user, session|
-      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read)
+      visible? && !locked? && context.grants_right?(user, session, :read)
     end
     can :read_contents_for_export
 
     given do |user, session|
-      self.context.grants_any_right?(user, session, :manage_files_add, :manage_files_delete, :manage_files_edit)
+      context.grants_any_right?(user, session, :manage_files_add, :manage_files_delete, :manage_files_edit)
     end
     can :read and can :read_contents
 
     given do |user, session|
-      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_add)
+      !for_submissions? && context.grants_right?(user, session, :manage_files_add)
     end
     can :create and can :manage_contents
 
     given do |user, session|
-      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_edit)
+      !for_submissions? && context.grants_right?(user, session, :manage_files_edit)
     end
     can :update and can :manage_contents
 
     given do |user, session|
-      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_delete)
+      !for_submissions? && context.grants_right?(user, session, :manage_files_delete)
     end
     can :delete and can :manage_contents
   end

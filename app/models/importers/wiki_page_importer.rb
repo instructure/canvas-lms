@@ -32,7 +32,7 @@ module Importers
 
       outline['root_folder'] = true
       begin
-        self.import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
+        import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
       rescue
         migration.add_warning("Error importing the course outline.", $!)
       end
@@ -54,7 +54,7 @@ module Importers
         next unless wiki_page_migration?(migration, wiki)
 
         begin
-          self.import_from_migration(wiki, migration.context, migration) if wiki
+          import_from_migration(wiki, migration.context, migration) if wiki
         rescue
           migration.add_import_warning(t('#migration.wiki_page_type', "Wiki Page"), wiki[:title], $!)
         end

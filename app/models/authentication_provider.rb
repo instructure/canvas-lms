@@ -151,9 +151,9 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def destroy
-    self.send(:remove_from_list_for_destroy)
+    send(:remove_from_list_for_destroy)
     self.workflow_state = 'deleted'
-    self.save!
+    save!
     enable_canvas_authentication
     delay_if_production.soft_delete_pseudonyms
     true
@@ -167,9 +167,9 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def auth_decrypted_password
-    return nil unless self.auth_password_salt && self.auth_crypted_password
+    return nil unless auth_password_salt && auth_crypted_password
 
-    ::Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
+    ::Canvas::Security.decrypt_password(auth_crypted_password, auth_password_salt, 'instructure_auth')
   end
 
   def auth_provider_filter
@@ -368,7 +368,7 @@ class AuthenticationProvider < ActiveRecord::Base
   protected
 
   def statsd_prefix
-    "auth.account_#{Shard.global_id_for(account_id)}.config_#{self.global_id}"
+    "auth.account_#{Shard.global_id_for(account_id)}.config_#{global_id}"
   end
 
   private
@@ -432,7 +432,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_key(key)
-    ['auth_provider_debugging', self.global_id, key.to_s].cache_key
+    ['auth_provider_debugging', global_id, key.to_s].cache_key
   end
 
   def debug_expire

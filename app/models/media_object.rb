@@ -57,7 +57,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| (self.user && self.user == user) || self.context&.grants_right?(user, :manage_content) }
+    given { |user| (self.user && self.user == user) || context&.grants_right?(user, :manage_content) }
     can :add_captions and can :delete_captions
   end
 
@@ -170,10 +170,10 @@ class MediaObject < ActiveRecord::Base
   def update_title_on_kaltura
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
-    res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
+    res = client.mediaUpdate(media_id, :name => user_entered_title)
     unless res[:error]
-      self.title = self.user_entered_title
-      self.save
+      self.title = user_entered_title
+      save
     end
     res
   end
@@ -183,58 +183,58 @@ class MediaObject < ActiveRecord::Base
   end
 
   def media_sources
-    CanvasKaltura::ClientV3.new.media_sources(self.media_id)
+    CanvasKaltura::ClientV3.new.media_sources(media_id)
   end
 
   def retrieve_details_ensure_codecs(attempt = 0)
     retrieve_details
-    if !transcoded_details && self.created_at > 6.hours.ago
+    if !transcoded_details && created_at > 6.hours.ago
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
       else
         Canvas::Errors.capture(:media_object_failure, {
                                  message: "Kaltura flavor retrieval failed",
-                                 object: self.inspect.to_s,
+                                 object: inspect.to_s,
                                }, :warn)
       end
     end
   end
 
   def name
-    self.title
+    title
   end
 
   def guaranteed_title
-    self.user_entered_title.presence || self.title.presence || I18n.t("Untitled")
+    user_entered_title.presence || title.presence || I18n.t("Untitled")
   end
 
   def process_retrieved_details(entry, media_type, assets)
     if entry
-      self.title = self.title.presence || entry[:name]
+      self.title = title.presence || entry[:name]
       self.media_type = media_type
       self.duration = entry[:duration].to_i
-      self.data[:plays] = entry[:plays].to_i
-      self.data[:download_url] = entry[:downloadUrl]
+      data[:plays] = entry[:plays].to_i
+      data[:download_url] = entry[:downloadUrl]
       tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?('old_id_') }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
-    self.data[:extensions] ||= {}
+    data[:extensions] ||= {}
     assets.each do |asset|
       asset[:fileExt] = "none" if asset[:fileExt].blank?
-      self.data[:extensions][asset[:fileExt].to_sym] = asset # .slice(:width, :height, :id, :entryId, :status, :containerFormat, :fileExt, :size
+      data[:extensions][asset[:fileExt].to_sym] = asset # .slice(:width, :height, :id, :entryId, :status, :containerFormat, :fileExt, :size
       if asset[:size]
-        self.max_size = [self.max_size || 0, asset[:size].to_i].max
+        self.max_size = [max_size || 0, asset[:size].to_i].max
       end
     end
-    self.total_size = [self.max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
-    self.save
+    self.total_size = [max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
+    save
     ensure_attachment
-    self.data
+    data
   end
 
   def retrieve_details
-    return unless self.media_id
+    return unless media_id
 
     # From Kaltura, retrieve the title (if it's not already set)
     # and the list of valid flavors along with their id's.
@@ -243,18 +243,18 @@ class MediaObject < ActiveRecord::Base
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     self.data ||= {}
 
-    entry = client.mediaGet(self.media_id)
+    entry = client.mediaGet(media_id)
     media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s if entry
     # attachment#build_content_types_sql assumes the content_type has a "/"
     media_type = "#{media_type}/*" unless media_type.blank? || media_type.include?("/")
-    assets = client.flavorAssetGetByEntryId(self.media_id) || []
+    assets = client.flavorAssetGetByEntryId(media_id) || []
     process_retrieved_details(entry, media_type, assets)
   end
 
   def podcast_format_details
     data = transcoded_details
     unless data
-      self.retrieve_details
+      retrieve_details
       data = transcoded_details
     end
     data
@@ -267,22 +267,22 @@ class MediaObject < ActiveRecord::Base
   end
 
   def delete_from_remote
-    return unless self.media_id
+    return unless media_id
 
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
-    client.mediaDelete(self.media_id)
+    client.mediaDelete(media_id)
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.attachment&.destroy
+    attachment&.destroy
     save!
   end
 
   def data
-    self.read_or_initialize_attribute(:data, {})
+    read_or_initialize_attribute(:data, {})
   end
 
   def viewed!
@@ -292,7 +292,7 @@ class MediaObject < ActiveRecord::Base
 
   def updated_viewed_at_and_retrieve_details(time)
     self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
-    self.retrieve_details
+    retrieve_details
   end
 
   def destroy_without_destroying_attachment
@@ -302,18 +302,18 @@ class MediaObject < ActiveRecord::Base
   end
 
   def ensure_attachment
-    return if self.attachment_id
-    return unless %w[Account Course Group User].include?(self.context_type)
+    return if attachment_id
+    return unless %w[Account Course Group User].include?(context_type)
 
-    sources = self.media_sources
+    sources = media_sources
     return unless sources.present?
 
     attachment = build_attachment({
                                     "context" => context,
-                                    "display_name" => self.title,
-                                    "filename" => self.title,
-                                    "content_type" => self.media_type,
-                                    "media_entry_id" => self.media_id,
+                                    "display_name" => title,
+                                    "filename" => title,
+                                    "content_type" => media_type,
+                                    "media_entry_id" => media_id,
                                     "workflow_state" => "processed",
                                     "folder_id" => Folder.media_folder(context).id
                                   })
@@ -328,7 +328,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def deleted?
-    self.workflow_state == 'deleted'
+    workflow_state == 'deleted'
   end
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }

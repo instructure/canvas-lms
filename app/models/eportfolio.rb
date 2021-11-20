@@ -49,13 +49,13 @@ class Eportfolio < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    self.save
+    save
   end
 
   def restore
     self.workflow_state = 'active'
     self.deleted_at = nil
-    self.save
+    save
   end
 
   def flagged_as_possible_spam?
@@ -88,43 +88,43 @@ class Eportfolio < ActiveRecord::Base
 
     # User is the author and eportfolios are enabled (whether this eportfolio
     # is spam or not, the author can see it and delete it).
-    given { |user| self.active? && self.user == user && user.eportfolios_enabled? }
+    given { |user| active? && self.user == user && user.eportfolios_enabled? }
     can :read and can :delete
 
     # If an eportfolio has been flagged as possible spam or marked as spam, don't let the author
     # update it. If an admin marks the content as safe, the user will be able to make updates again,
     # but we don't want to let the user make changes before an admin can review the content.
-    given { |user| self.active? && self.user == user && user.eportfolios_enabled? && !self.spam? }
+    given { |user| active? && self.user == user && user.eportfolios_enabled? && !spam? }
     can :update and can :manage
 
     # The eportfolio is public, eportfolios are enabled, and it hasn't been flagged or marked as spam.
-    given { |_| self.active? && self.public && !self.spam? && self.user.eportfolios_enabled? }
+    given { |_| active? && public && !spam? && self.user.eportfolios_enabled? }
     can :read
 
     # The eportfolio is private and the user has access to the private link
     # (we know this by way of the session having the eportfolio id) and the
     # eportfolio hasn't been flagged or marked as spam.
     given do |_, session|
-      self.active? && session && session[:eportfolio_ids] &&
-        session[:eportfolio_ids].include?(self.id) &&
-        !self.spam?
+      active? && session && session[:eportfolio_ids] &&
+        session[:eportfolio_ids].include?(id) &&
+        !spam?
     end
     can :read
 
     given do |user|
-      self.user != user && self.active? && self.user&.grants_right?(user, :moderate_user_content)
+      self.user != user && active? && self.user&.grants_right?(user, :moderate_user_content)
     end
     can :read and can :moderate and can :delete and can :restore
 
     given do |user|
-      self.user != user && self.deleted? && self.user&.grants_right?(user, :moderate_user_content)
+      self.user != user && deleted? && self.user&.grants_right?(user, :moderate_user_content)
     end
     can :restore
   end
 
   def ensure_defaults
-    cat = self.eportfolio_categories.first
-    cat ||= self.eportfolio_categories.create!(name: t(:first_category, 'Home'))
+    cat = eportfolio_categories.first
+    cat ||= eportfolio_categories.create!(name: t(:first_category, 'Home'))
     if cat && cat.eportfolio_entries.empty?
       entry =
         cat.eportfolio_entries.build(eportfolio: self, name: t('first_entry.title', 'Welcome'))

@@ -54,7 +54,7 @@ module ContentNotices
   end
 
   def cn_cache_key(tag)
-    ["content_notice_present", tag, self.asset_string].cache_key
+    ["content_notice_present", tag, asset_string].cache_key
   end
 
   # add a notice to this context. if the notice with the given tag is already active for the context,

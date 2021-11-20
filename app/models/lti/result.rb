@@ -110,6 +110,6 @@ class Lti::Result < ApplicationRecord
   private
 
   def set_root_account
-    self.root_account_id ||= self.submission&.root_account_id || self.line_item&.root_account_id
+    self.root_account_id ||= submission&.root_account_id || line_item&.root_account_id
   end
 end

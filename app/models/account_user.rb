@@ -54,52 +54,50 @@ class AccountUser < ActiveRecord::Base
 
   def clear_user_cache
     self.class.connection.after_transaction_commit do
-      self.user.touch unless User.skip_touch_for_type?(:account_users)
-      self.user.clear_cache_key(:account_users)
+      user.touch unless User.skip_touch_for_type?(:account_users)
+      user.clear_cache_key(:account_users)
     end
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    return if self.new_record?
+    return if new_record?
 
     self.workflow_state = 'deleted'
-    self.save!
+    save!
   end
 
   def update_account_associations_if_changed
-    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_before_last_save != 'deleted'
-    if (self.saved_change_to_account_id? || self.saved_change_to_user_id?) || being_deleted
-      if self.new_record?
-        return if %w[creation_pending deleted].include?(self.user.workflow_state)
+    being_deleted = workflow_state == 'deleted' && workflow_state_before_last_save != 'deleted'
+    if (saved_change_to_account_id? || saved_change_to_user_id?) || being_deleted
+      if new_record?
+        return if %w[creation_pending deleted].include?(user.workflow_state)
 
-        account_chain = self.account.account_chain
+        account_chain = account.account_chain
         associations = {}
         account_chain.each_with_index { |account, idx| associations[account.id] = idx }
-        self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
+        user.update_account_associations(:incremental => true, :precalculated_associations => associations)
       else
-        self.user.update_account_associations_later
+        user.update_account_associations_later
       end
     end
   end
 
-  def update_account_associations_later
-    self.user.update_account_associations_later
-  end
+  delegate :update_account_associations_later, to: :user
 
   def infer_defaults
-    self.role ||= Role.get_built_in_role('AccountAdmin', root_account_id: self.account.resolved_root_account_id)
+    self.role ||= Role.get_built_in_role('AccountAdmin', root_account_id: account.resolved_root_account_id)
   end
 
   def valid_role?
     return true if role.built_in?
 
     unless role.account_role?
-      self.errors.add(:role_id, "is not a valid account role")
+      errors.add(:role_id, "is not a valid account role")
     end
 
-    unless self.account.valid_role?(role)
-      self.errors.add(:role_id, "is not an available role for this account")
+    unless account.valid_role?(role)
+      errors.add(:role_id, "is not an available role for this account")
     end
   end
 
@@ -119,7 +117,7 @@ class AccountUser < ActiveRecord::Base
 
   set_policy do
     # NOTE: If modifying this, make sure `create_permissions_cache` stays accurate as well.
-    given { |user| self.account.grants_right?(user, :manage_account_memberships) && is_subset_of?(user) }
+    given { |user| account.grants_right?(user, :manage_account_memberships) && is_subset_of?(user) }
     can :create and can :destroy
   end
 
@@ -145,19 +143,19 @@ class AccountUser < ActiveRecord::Base
 
   def account_user_registration!
     @account_user_registration = true
-    self.save!
+    save!
     @account_user_registration = false
   end
 
   def account_user_notification!
     @account_user_notification = true
-    self.save!
+    save!
     @account_user_notification = false
   end
 
   def enabled_for?(context, action)
     @permission_lookup ||= {}
-    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(context, action, self.role, self.account)
+    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(context, action, self.role, account)
   end
 
   def has_permission_to?(context, action)

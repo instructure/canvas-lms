@@ -23,7 +23,7 @@ module Schemas
     delegate :validate, :valid?, to: :schema_checker
 
     def self.simple_validation_errors(json_hash)
-      error = self.new.validate(json_hash).to_a.first
+      error = new.validate(json_hash).to_a.first
       return nil if error.blank?
       if error['data_pointer'].present?
         return "#{error['data']} #{error['data_pointer']}. Schema: #{error['schema']}"

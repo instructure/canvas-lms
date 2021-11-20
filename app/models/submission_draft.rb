@@ -39,12 +39,12 @@ class SubmissionDraft < ActiveRecord::Base
   before_save :validate_lti_launch_url
 
   def validate_url
-    if self.url.present?
+    if url.present?
       begin
         # also updates the url with a scheme if missing and is a valid url
         # otherwise leaves the url as whatever the user submitted as thier draft
-        value, = CanvasHttp.validate_url(self.url)
-        self.send("url=", value)
+        value, = CanvasHttp.validate_url(url)
+        send("url=", value)
       rescue
         nil
       end
@@ -55,13 +55,13 @@ class SubmissionDraft < ActiveRecord::Base
     return if lti_launch_url.blank?
 
     value, = CanvasHttp.validate_url(lti_launch_url)
-    self.send("lti_launch_url=", value) if value
+    send("lti_launch_url=", value) if value
   rescue
     # we couldn't validate, just leave it
   end
 
   def media_object_id_matches_media_object
-    if self.media_object_id.present? && self.media_object.blank?
+    if media_object_id.present? && media_object.blank?
       err = I18n.t('the media_object_id must match an existing media object')
       errors.add(:media_object_id, err)
     end
@@ -69,8 +69,8 @@ class SubmissionDraft < ActiveRecord::Base
   private :media_object_id_matches_media_object
 
   def submission_attempt_matches_submission
-    current_submission_attempt = self.submission&.attempt || 0
-    this_submission_attempt = self.submission_attempt || 0
+    current_submission_attempt = submission&.attempt || 0
+    this_submission_attempt = submission_attempt || 0
     if this_submission_attempt > (current_submission_attempt + 1)
       err = I18n.t('submission draft cannot be more then one attempt ahead of the current submission')
       errors.add(:submission_draft_attempt, err)
@@ -79,22 +79,22 @@ class SubmissionDraft < ActiveRecord::Base
   private :submission_attempt_matches_submission
 
   def meets_media_recording_criteria?
-    self.media_object_id.present?
+    media_object_id.present?
   end
 
   def meets_text_entry_criteria?
-    self.body.present?
+    body.present?
   end
 
   def meets_upload_criteria?
-    self.attachments.present?
+    attachments.present?
   end
 
   def meets_url_criteria?
-    return false if self.url.blank?
+    return false if url.blank?
 
     begin
-      CanvasHttp.validate_url(self.url)
+      CanvasHttp.validate_url(url)
       true
     rescue
       false
@@ -102,7 +102,7 @@ class SubmissionDraft < ActiveRecord::Base
   end
 
   def meets_student_annotation_criteria?
-    self.submission.annotation_context(in_progress: true).present?
+    submission.annotation_context(in_progress: true).present?
   end
 
   def meets_basic_lti_launch_criteria?
@@ -118,7 +118,7 @@ class SubmissionDraft < ActiveRecord::Base
 
   # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
-    submission_types = self.submission.assignment.submission_types.split(',')
+    submission_types = submission.assignment.submission_types.split(',')
     submission_types.each do |type|
       case type
       when 'media_recording'
