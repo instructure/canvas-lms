@@ -3223,7 +3223,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     change_column :schema_migrations, :version, :string, limit: 255
 
-    self.connection.execute <<~SQL.squish
+    connection.execute <<~SQL.squish
       CREATE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
         SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
@@ -3279,7 +3279,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
           )
     SQL
 
-    self.connection.execute <<~SQL.squish
+    connection.execute <<~SQL.squish
       CREATE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
         SELECT DISTINCT q.id as quiz_id,
         e.user_id as user_id,

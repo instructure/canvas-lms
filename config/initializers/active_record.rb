@@ -91,7 +91,7 @@ class ActiveRecord::Base
   end
 
   def feed_code
-    id = self.uuid rescue self.id
+    id = uuid rescue self.id
     "#{self.class.reflection_type_name}_#{id}"
   end
 
@@ -158,7 +158,7 @@ class ActiveRecord::Base
   end
 
   def self.asset_string(id)
-    "#{self.reflection_type_name}_#{id}"
+    "#{reflection_type_name}_#{id}"
   end
 
   def asset_string
@@ -188,7 +188,7 @@ class ActiveRecord::Base
     unless method
       # this is weird, but gets the instance methods defined so they can be chained
       begin
-        self.new.send("#{association_version_name}_id")
+        new.send("#{association_version_name}_id")
       rescue
         # the db doesn't exist yet; no need to bother with backcompat methods anyway
         return
@@ -217,7 +217,7 @@ class ActiveRecord::Base
   end
 
   def to_row
-    export_columns.map { |c| self.send(c) }
+    export_columns.map { |c| send(c) }
   end
 
   def is_a_context?
@@ -225,10 +225,10 @@ class ActiveRecord::Base
   end
 
   def cached_context_short_name
-    if self.respond_to?(:context)
-      code = self.respond_to?(:context_code) ? self.context_code : self.context.asset_string
+    if respond_to?(:context)
+      code = respond_to?(:context_code) ? context_code : context.asset_string
       @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', code].cache_key) do
-        self.context.short_name rescue ""
+        context.short_name rescue ""
       end
     else
       raise "Can only call cached_context_short_name on items with a context"
@@ -241,16 +241,16 @@ class ActiveRecord::Base
 
   def save_without_touching_context
     @skip_touch_context = true
-    self.save
+    save
     @skip_touch_context = false
   end
 
   def touch_context
     return if @@skip_touch_context ||= false || @skip_touch_context ||= false
 
-    if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
+    if respond_to?(:context_type) && respond_to?(:context_id) && context_type && context_id
       self.class.connection.after_transaction_commit do
-        self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
+        context_type.constantize.where(id: context_id).update_all(updated_at: Time.now.utc)
       end
     end
   rescue
@@ -258,9 +258,9 @@ class ActiveRecord::Base
   end
 
   def touch_user
-    if self.respond_to?(:user_id) && self.user_id
+    if respond_to?(:user_id) && user_id
       User.connection.after_transaction_commit do
-        User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
+        User.where(:id => user_id).update_all(:updated_at => Time.now.utc)
       end
     end
     true
@@ -270,7 +270,7 @@ class ActiveRecord::Base
   end
 
   def context_url_prefix
-    "#{self.context_type.downcase.pluralize}/#{self.context_id}"
+    "#{context_type.downcase.pluralize}/#{context_id}"
   end
 
   # Example:
@@ -278,18 +278,18 @@ class ActiveRecord::Base
   def as_json(options = nil)
     options = options.try(:dup) || {}
 
-    self.set_serialization_options if self.respond_to?(:set_serialization_options)
+    set_serialization_options if respond_to?(:set_serialization_options)
 
     except = options.delete(:except) || []
     except = Array(except).dup
     except.concat(self.class.serialization_excludes) if self.class.respond_to?(:serialization_excludes)
-    except.concat(self.serialization_excludes) if self.respond_to?(:serialization_excludes)
+    except.concat(serialization_excludes) if respond_to?(:serialization_excludes)
     except.uniq!
 
     methods = options.delete(:methods) || []
     methods = Array(methods).dup
     methods.concat(self.class.serialization_methods) if self.class.respond_to?(:serialization_methods)
-    methods.concat(self.serialization_methods) if self.respond_to?(:serialization_methods)
+    methods.concat(serialization_methods) if respond_to?(:serialization_methods)
     methods.uniq!
 
     options[:except] = except unless except.empty?
@@ -312,19 +312,19 @@ class ActiveRecord::Base
 
     if options[:permissions]
       obj_hash = options[:include_root] ? hash[self.class.base_class.model_name.element] : hash
-      if self.respond_to?(:filter_attributes_for_user)
-        self.filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
+      if respond_to?(:filter_attributes_for_user)
+        filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
       end
       unless options[:permissions][:include_permissions] == false
-        permissions_hash = self.rights_status(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
-        if self.respond_to?(:serialize_permissions)
-          permissions_hash = self.serialize_permissions(permissions_hash, options[:permissions][:user], options[:permissions][:session])
+        permissions_hash = rights_status(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
+        if respond_to?(:serialize_permissions)
+          permissions_hash = serialize_permissions(permissions_hash, options[:permissions][:user], options[:permissions][:session])
         end
         obj_hash["permissions"] = permissions_hash
       end
     end
 
-    self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
+    revert_from_serialization_options if respond_to?(:revert_from_serialization_options)
 
     hash.with_indifferent_access
   end
@@ -619,7 +619,7 @@ class ActiveRecord::Base
   def self.current_xlog_location
     Shard.current(shard_category).database_server.unguard do
       GuardRail.activate(:primary) do
-        if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
+        if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
         else
           connection.current_wal_lsn
@@ -666,17 +666,17 @@ class ActiveRecord::Base
 
     array_columns = records.first.select { |_k, v| v.is_a?(Array) }.keys
     array_columns.each do |column_name|
-      cast_type = connection.send(:lookup_cast_type_from_column, self.columns_hash[column_name.to_s])
+      cast_type = connection.send(:lookup_cast_type_from_column, columns_hash[column_name.to_s])
       records.each do |row|
         row[column_name] = cast_type.serialize(row[column_name])
       end
     end
 
-    if self.respond_to?(:attrs_in_partition_groups)
+    if respond_to?(:attrs_in_partition_groups)
       # this model is partitioned, we need to send a separate
       # insert statement for each partition represented
       # in the input records
-      self.attrs_in_partition_groups(records) do |partition_name, partition_records|
+      attrs_in_partition_groups(records) do |partition_name, partition_records|
         transaction do
           connection.bulk_insert(partition_name, partition_records)
         end
@@ -691,8 +691,8 @@ class ActiveRecord::Base
   include ActiveSupport::Callbacks::Suspension
 
   def self.touch_all_records
-    self.find_ids_in_ranges do |min_id, max_id|
-      self.where(primary_key => min_id..max_id).touch_all
+    find_ids_in_ranges do |min_id, max_id|
+      where(primary_key => min_id..max_id).touch_all
     end
   end
 
@@ -1195,7 +1195,7 @@ ActiveRecord::Relation.class_eval do
   end
 
   def touch_all
-    self.activate do |relation|
+    activate do |relation|
       relation.update_all_locked_in_order(updated_at: Time.now.utc)
     end
   end
@@ -1523,7 +1523,7 @@ class ActiveRecord::MigrationProxy
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as exactly one of predeploy or postdeploy!" unless (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).length == 1
+    raise "#{name} (#{version}) is not tagged as exactly one of predeploy or postdeploy!" unless (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).length == 1
 
     @migration
   end
@@ -1762,7 +1762,7 @@ module SkipTouchCallbacks
 
     def touch_callbacks_skipped?(name)
       @skip_touch_callbacks&.include?(name) ||
-        (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
+        (superclass < ActiveRecord::Base && superclass.touch_callbacks_skipped?(name))
     end
   end
 
@@ -1859,7 +1859,7 @@ module ExplainAnalyze
         yield
       else
         # fold in switchman's override
-        self.activate { |relation| relation.send(:exec_queries) }
+        activate { |relation| relation.send(:exec_queries) }
       end
     end, analyze: analyze)
   end

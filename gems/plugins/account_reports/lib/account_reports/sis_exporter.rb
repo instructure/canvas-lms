@@ -55,13 +55,13 @@ module AccountReports
       when 0
         send_report
       when 1
-        csv = self.send(@reports.first)
+        csv = send(@reports.first)
         send_report(csv)
       else
         csvs = {}
 
         @reports.each do |report_name|
-          csvs[report_name] = self.send(report_name)
+          csvs[report_name] = send(report_name)
         end
         send_report(csvs)
         csvs

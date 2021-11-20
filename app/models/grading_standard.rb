@@ -69,7 +69,7 @@ class GradingStandard < ActiveRecord::Base
   VERSION = 2
 
   set_policy do
-    given { |user| self.context.grants_right?(user, :manage_grades) }
+    given { |user| context.grants_right?(user, :manage_grades) }
     can :manage
   end
 
@@ -143,9 +143,9 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def data
-    unless self.version == VERSION
+    unless version == VERSION
       data = read_attribute(:data)
-      data = GradingStandard.upgrade_data(data, self.version) unless data.nil?
+      data = GradingStandard.upgrade_data(data, version) unless data.nil?
       self.data = data
     end
     read_attribute(:data)
@@ -174,17 +174,15 @@ class GradingStandard < ActiveRecord::Base
   private :trim_whitespace
 
   def update_usage_count
-    self.usage_count = self.assignments.active.count
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    self.usage_count = assignments.active.count
+    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
   def assessed_assignment?
-    self.assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+    assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
   end
 
-  def context_name
-    self.context.name
-  end
+  delegate :name, to: :context, prefix: true
 
   def update_data(params)
     self.data = params.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
@@ -192,8 +190,8 @@ class GradingStandard < ActiveRecord::Base
 
   def display_name
     res = ""
-    res += self.user.name + ", " rescue ""
-    res += self.context.name rescue ""
+    res += user.name + ", " rescue ""
+    res += context.name rescue ""
     res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
@@ -201,12 +199,12 @@ class GradingStandard < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save
+    save
   end
 
   def grading_scheme
     res = {}
-    self.data.sort_by { |_, lower_bound| lower_bound }.reverse_each do |grade_name, lower_bound|
+    data.sort_by { |_, lower_bound| lower_bound }.reverse_each do |grade_name, lower_bound|
       res[grade_name] = lower_bound.to_f
     end
     res
@@ -222,9 +220,9 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def valid_grading_scheme_data
-    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.present? && self.data.any? { |v| v[1] < 0 }
-    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.present? && self.data.map { |v| v[1] } != self.data.map { |v| v[1] }.uniq
-    self.errors.add(:data, 'a grading scheme name is too long') if self.data.present? && self.data.any? { |v| v[0].length > self.class.maximum_string_length }
+    errors.add(:data, 'grading scheme values cannot be negative') if data.present? && data.any? { |v| v[1] < 0 }
+    errors.add(:data, 'grading scheme cannot contain duplicate values') if data.present? && data.map { |v| v[1] } != data.map { |v| v[1] }.uniq
+    errors.add(:data, 'a grading scheme name is too long') if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
   end
 
   def full_range_scheme

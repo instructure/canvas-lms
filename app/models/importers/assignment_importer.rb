@@ -129,7 +129,7 @@ module Importers
                               end
       end
       if hash[:instructions_in_html] == false
-        self.extend TextHelper
+        extend TextHelper
       end
 
       description = ""

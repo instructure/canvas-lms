@@ -35,7 +35,7 @@ class RoleOverride < ActiveRecord::Base
   include Role::AssociationHelper
 
   def clear_caches
-    RoleOverride.clear_caches(self.account, self.role)
+    RoleOverride.clear_caches(account, role)
   end
 
   def self.clear_caches(account, role)
@@ -45,7 +45,7 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def must_apply_to_something
-    self.errors.add(nil, "Must apply to something") unless applies_to_self? || applies_to_descendants?
+    errors.add(nil, "Must apply to something") unless applies_to_self? || applies_to_descendants?
   end
 
   def applies_to
@@ -1590,7 +1590,7 @@ class RoleOverride < ActiveRecord::Base
 
   # permissions that apply to concluded courses/enrollments
   def self.concluded_permission_types
-    self.permissions.select { |_k, p| p[:applies_to_concluded] }
+    permissions.select { |_k, p| p[:applies_to_concluded] }
   end
 
   def self.manageable_permissions(context, base_role_type = nil)
@@ -1619,11 +1619,11 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.readonly_for(context, permission, role, role_context = :role_account)
-    self.permission_for(context, permission, role, role_context)[:readonly]
+    permission_for(context, permission, role, role_context)[:readonly]
   end
 
   def self.title_for(context, permission, role, role_context = :role_account)
-    if self.readonly_for(context, permission, role, role_context)
+    if readonly_for(context, permission, role, role_context)
       t 'tooltips.readonly', "you do not have permission to change this."
     else
       t 'tooltips.toogle', "Click to toggle this permission ON or OFF"
@@ -1631,11 +1631,11 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.locked_for(context, permission, role, role_context = :role_account)
-    self.permission_for(context, permission, role, role_context)[:locked]
+    permission_for(context, permission, role, role_context)[:locked]
   end
 
   def self.hidden_value_for(context, permission, role, role_context = :role_account)
-    generated_permission = self.permission_for(context, permission, role, role_context)
+    generated_permission = permission_for(context, permission, role, role_context)
     if !generated_permission[:readonly] && generated_permission[:explicit]
       generated_permission[:enabled] ? 'checked' : 'unchecked'
     else
@@ -1656,7 +1656,7 @@ class RoleOverride < ActiveRecord::Base
     # we can avoid a query since we're just using it for the batched keys on redis
     permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
     account = context.is_a?(Account) ? context : Account.new(id: context.account_id)
-    default_data = self.permissions[permission]
+    default_data = permissions[permission]
 
     if default_data[:account_allows] || no_caching
       # could depend on anything - can't cache (but that's okay because it's not super common)

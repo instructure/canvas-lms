@@ -67,13 +67,13 @@ class PseudonymSession < Authlogic::Session::Base
     if cookie
       token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
       self.unauthorized_record = token.use! if token
-      is_valid = self.valid?
+      is_valid = valid?
       if is_valid
         # this token has been used -- destroy it, and generate a new one
         # remember_me is implicitly true when they login via the remember_me token
         controller.session[:used_remember_me_token] = true
         self.remember_me = true
-        self.save!
+        save!
       end
       is_valid
     else
@@ -119,8 +119,8 @@ class PseudonymSession < Authlogic::Session::Base
   # to know why your user that was previously logged in is now not
   # logged in.
   def self.find_with_validation
-    self.with_scope(find_options: Pseudonym.eager_load(:user)) do
-      sess = self.new({ priority_record: nil }, nil)
+    with_scope(find_options: Pseudonym.eager_load(:user)) do
+      sess = new({ priority_record: nil }, nil)
       if sess.nil?
         Rails.logger.info "[AUTH] Failed to create pseudonym session"
         return false

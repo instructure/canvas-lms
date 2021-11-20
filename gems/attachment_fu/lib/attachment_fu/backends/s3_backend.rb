@@ -166,8 +166,8 @@ module AttachmentFu # :nodoc:
       end
 
       def sanitize_filename(filename)
-        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
-          self.root_attachment.filename
+        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
+          root_attachment.filename
         else
           Attachment.truncate_filename(filename, 255) do |component, len|
             CanvasTextHelper.cgi_escape_truncate(component, len)
@@ -182,7 +182,7 @@ module AttachmentFu # :nodoc:
 
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
-        obj = (respond_to?(:root_attachment) && self.root_attachment) || self
+        obj = (respond_to?(:root_attachment) && root_attachment) || self
         if (namespace = obj.read_attribute(:namespace))
           File.join(namespace, obj.attachment_options[:path_prefix])
         else

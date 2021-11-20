@@ -84,7 +84,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     Shard.default.activate do
       MultiCache.fetch(site_admin_cache_key(developer_key)) do
         GuardRail.activate(:secondary) do
-          binding = self.where.not(workflow_state: 'allow').find_by(
+          binding = where.not(workflow_state: 'allow').find_by(
             account: Account.site_admin,
             developer_key: developer_key
           )

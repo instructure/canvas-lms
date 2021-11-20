@@ -143,19 +143,19 @@ class DelayedMessage < ActiveRecord::Base
 
   def set_send_at
     # no cc yet = wait
-    return unless self.communication_channel&.user
-    return if self.send_at
+    return unless communication_channel&.user
+    return if send_at
 
     # I got tired of trying to figure out time zones in my head, and I realized
     # if we do it this way, Rails will take care of it all for us!
-    if self.frequency == 'weekly'
-      target = self.communication_channel.user.weekly_notification_time
+    if frequency == 'weekly'
+      target = communication_channel.user.weekly_notification_time
     else
       # Find the appropriate timezone. For weekly notifications, always use
       # Eastern. For other notifications, try and user the user's time zone,
       # defaulting to mountain. (Should be impossible to not find mountain, but
       # default to system time if necessary.)
-      time_zone = self.communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
+      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
       target = time_zone.now.change(:hour => 18)
       target += 1.day if target < time_zone.now
     end

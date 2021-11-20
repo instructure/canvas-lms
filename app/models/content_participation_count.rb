@@ -61,7 +61,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
     case type
     when "Submission"
-      self.unread_submission_count_for(context, user)
+      unread_submission_count_for(context, user)
     else
       0
     end
@@ -112,17 +112,17 @@ class ContentParticipationCount < ActiveRecord::Base
   end
 
   def unread_count(refresh: true)
-    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.seconds.ago.utc
+    refresh_unread_count if refresh && !frozen? && ttl.present? && updated_at.utc < ttl.seconds.ago.utc
     read_attribute(:unread_count)
   end
 
   def refresh_unread_count
     self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-    GuardRail.activate(:primary) { self.save } if self.changed?
+    GuardRail.activate(:primary) { save } if changed?
   end
 
   def set_root_account_id
-    self.root_account_id = self.context&.root_account_id
+    self.root_account_id = context&.root_account_id
   end
 
   # Things we know of that will only get updated by a refresh:

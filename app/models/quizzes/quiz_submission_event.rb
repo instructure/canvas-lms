@@ -47,9 +47,9 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   #
   # If this returns true, you can safely skip storing this event.
   def empty?
-    case self.event_type
+    case event_type
     when EVT_QUESTION_ANSWERED
-      self.answers.nil? || self.answers.empty?
+      answers.nil? || answers.empty?
     else
       false
     end

@@ -43,7 +43,7 @@ class WebZipExport < EpubExport
 
   # WebZip Exportable overrides
   def content_cartridge
-    self.content_export.attachment
+    content_export.attachment
   end
 
   def convert_to_offline_web_zip

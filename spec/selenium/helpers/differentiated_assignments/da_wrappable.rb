@@ -46,7 +46,7 @@ module DifferentiatedAssignments
     end
 
     def assign_overrides
-      self.assignees.each { |assignee| assign_to(assignee) }
+      assignees.each { |assignee| assign_to(assignee) }
     end
 
     private
@@ -61,7 +61,7 @@ module DifferentiatedAssignments
     end
 
     def validate_assignees
-      (DifferentiatedAssignments::HomeworkAssignee::ASSIGNEES & self.assignees).empty?
+      (DifferentiatedAssignments::HomeworkAssignee::ASSIGNEES & assignees).empty?
     end
 
     def assign_to(assignee)
@@ -90,8 +90,8 @@ module DifferentiatedAssignments
     end
 
     def assignees_by_type(type)
-      self.assignees.select { |a| a.include? type }
-          .sort
+      assignees.select { |a| a.include? type }
+               .sort
     end
   end
 end

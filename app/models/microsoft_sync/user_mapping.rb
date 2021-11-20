@@ -143,11 +143,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     Rails.logger.info("Triggering Microsoft Sync User Mappings hard delete for account #{account.global_id}")
     # We only need one job deleting UserMappings, so we can drop all other jobs
     # for the same root account that try to start up.
-    self.delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
-        .delete_user_mappings_for_account(account, batch_size)
+    delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
+      .delete_user_mappings_for_account(account, batch_size)
   end
 
   def self.delete_user_mappings_for_account(account, batch_size)
-    while self.where(root_account: account).limit(batch_size).delete_all > 0; end
+    while where(root_account: account).limit(batch_size).delete_all > 0; end
   end
 end

@@ -1268,7 +1268,7 @@ describe Lti::IMS::NamesAndRolesController do
   end
 
   def match_enrollment(*enrollment)
-    if self.respond_to?(:rlid_param) && rlid_param.present?
+    if respond_to?(:rlid_param) && rlid_param.present?
       match_enrollment_for_rlid({}, *enrollment)
     elsif enrollment.first.is_a?(Enrollment)
       be_lti_course_membership({ expected: enrollment })

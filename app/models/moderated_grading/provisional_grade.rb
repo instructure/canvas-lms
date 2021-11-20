@@ -83,9 +83,9 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def grade_attributes
-    self.as_json(:only => ModeratedGrading::GRADE_ATTRIBUTES_ONLY,
-                 :methods => [:provisional_grade_id, :grade_matches_current_submission, :entered_score, :entered_grade],
-                 :include_root => false)
+    as_json(:only => ModeratedGrading::GRADE_ATTRIBUTES_ONLY,
+            :methods => [:provisional_grade_id, :grade_matches_current_submission, :entered_score, :entered_grade],
+            :include_root => false)
   end
 
   def entered_score
@@ -97,24 +97,22 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def grade_matches_current_submission
-    submission.submitted_at.nil? || self.graded_at.nil? || submission.submitted_at <= self.graded_at
+    submission.submitted_at.nil? || graded_at.nil? || submission.submitted_at <= graded_at
   end
 
   def provisional_grade_id
-    self.id
+    id
   end
 
   def submission_comments
     if submission.all_submission_comments.loaded?
       submission.all_submission_comments.select { |c| c.provisional_grade_id == id || c.provisional_grade_id.nil? }
     else
-      submission.all_submission_comments.where("provisional_grade_id = ? OR provisional_grade_id IS NULL", self.id)
+      submission.all_submission_comments.where("provisional_grade_id = ? OR provisional_grade_id IS NULL", id)
     end
   end
 
-  def student
-    self.submission.student
-  end
+  delegate :student, to: :submission
 
   def publish!(skip_grade_calc: false)
     original_skip_grade_calc = submission.skip_grade_calc
@@ -172,7 +170,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def copy_submission_comments!(dest_provisional_grade)
-    self.submission_comments.each do |prov_comment|
+    submission_comments.each do |prov_comment|
       pub_comment = prov_comment.dup
       pub_comment.provisional_grade_id = dest_provisional_grade && dest_provisional_grade.id
       pub_comment.save!
@@ -180,7 +178,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def publish_rubric_assessments!
-    self.rubric_assessments.each do |provisional_assessment|
+    rubric_assessments.each do |provisional_assessment|
       rubric_association = provisional_assessment.active_rubric_association? ? provisional_assessment.rubric_association : nil
       # This case arises when a rubric is deleted.
       next if rubric_association.nil?
@@ -198,7 +196,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
       rubric_assessment ||= rubric_association.rubric_assessments.build(
         params.merge(
           assessor: provisional_assessment.assessor,
-          user: self.student,
+          user: student,
           rubric: rubric_association.rubric
         )
       )
@@ -212,7 +210,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def infer_grade
-    if self.score.present? && self.grade.nil?
+    if score.present? && grade.nil?
       self.grade = submission.assignment.score_to_grade(score)
     end
   end

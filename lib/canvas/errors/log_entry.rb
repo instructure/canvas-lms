@@ -33,7 +33,7 @@ module Canvas
       # on a condition and write a message if a surprising
       # thing happens
       def self.write(exception, data, level = :error)
-        msg = self.new(exception, data).message
+        msg = new(exception, data).message
         Rails.logger.send(level, msg)
       end
 

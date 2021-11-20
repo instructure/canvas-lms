@@ -45,7 +45,7 @@ module MessageBus
       @logger = MessageBus.logger
       @interval = MessageBus.worker_process_interval
 
-      self.start! if start_thread
+      start! if start_thread
     end
 
     def push(namespace, topic_name, message)
@@ -78,7 +78,7 @@ module MessageBus
     end
 
     def start!
-      @thread = Thread.new { self.run_thread }
+      @thread = Thread.new { run_thread }
     end
 
     def run_thread

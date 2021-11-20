@@ -201,7 +201,7 @@ class ConversationParticipant < ActiveRecord::Base
   def as_json(options = {})
     latest = last_message
     latest_authored = last_authored_message
-    subject = self.conversation.subject
+    subject = conversation.subject
     options[:include_context_info] ||= private?
     {
       :id => conversation_id,
@@ -220,11 +220,11 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def all_messages
-    self.conversation.shard.activate do
-      ConversationMessage.shard(self.conversation.shard)
+    conversation.shard.activate do
+      ConversationMessage.shard(conversation.shard)
                          .select("conversation_messages.*, conversation_message_participants.tags")
                          .joins(:conversation_message_participants)
-                         .where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id)
+                         .where("conversation_id=? AND user_id=?", conversation_id, user_id)
                          .order("created_at DESC, id DESC")
     end
   end
@@ -285,19 +285,19 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def process_new_message(message_args, recipients, included_message_ids, tags)
-    if recipients && !self.private?
-      self.add_participants recipients, no_messages: true
+    if recipients && !private?
+      add_participants recipients, no_messages: true
     end
-    self.reload
+    reload
 
     if included_message_ids
       ConversationMessage.where(:id => included_message_ids).each do |msg|
-        self.conversation.add_message_to_participants(msg, new_message: false, only_users: recipients, reset_unread_counts: false)
+        conversation.add_message_to_participants(msg, new_message: false, only_users: recipients, reset_unread_counts: false)
       end
     end
 
     message = Conversation.build_message(*message_args)
-    self.add_message(message, :tags => tags, :update_for_sender => false, :only_users => recipients)
+    add_message(message, :tags => tags, :update_for_sender => false, :only_users => recipients)
 
     message
   end
@@ -342,10 +342,10 @@ class ConversationParticipant < ActiveRecord::Base
   #
   # Returns nothing.
   def remove_or_delete_messages(operation, *to_delete)
-    self.conversation.shard.activate do
+    conversation.shard.activate do
       scope = ConversationMessageParticipant.joins(:conversation_message)
-                                            .where(:conversation_messages => { :conversation_id => self.conversation_id },
-                                                   :user_id => self.user_id)
+                                            .where(:conversation_messages => { :conversation_id => conversation_id },
+                                                   :user_id => user_id)
       if to_delete == [:all]
         if operation == :delete
           scope.delete_all
@@ -368,7 +368,7 @@ class ConversationParticipant < ActiveRecord::Base
       save
     end
     # update the stream item data but leave the instances alone
-    StreamItem.delay_if_production(priority: 25).generate_or_update(self.conversation)
+    StreamItem.delay_if_production(priority: 25).generate_or_update(conversation)
   end
 
   def update(hash)
@@ -414,7 +414,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def other_participants(participants = conversation.participants)
-    participants.reject { |u| u.id == self.user_id }
+    participants.reject { |u| u.id == user_id }
   end
 
   def other_participant
@@ -492,7 +492,7 @@ class ConversationParticipant < ActiveRecord::Base
   def move_to_user(new_user)
     conversation.shard.activate do
       self.class.unscoped do
-        old_shard = self.user.shard
+        old_shard = user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user.id)
         if (existing = conversation.conversation_participants.where(user_id: new_user).first)
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
@@ -500,7 +500,7 @@ class ConversationParticipant < ActiveRecord::Base
           destroy
         else
           ConversationMessageParticipant.joins(:conversation_message)
-                                        .where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id)
+                                        .where(:conversation_messages => { :conversation_id => conversation_id }, :user_id => user_id)
                                         .update_all(:user_id => new_user.id)
           update_attribute :user, new_user
           clear_participants_cache
@@ -528,7 +528,7 @@ class ConversationParticipant < ActiveRecord::Base
   attr_writer :last_authored_message
 
   def last_authored_message
-    @last_authored_message ||= self.conversation.shard.activate { messages.human.by_user(user_id).first } if visible_last_authored_at
+    @last_authored_message ||= conversation.shard.activate { messages.human.by_user(user_id).first } if visible_last_authored_at
   end
 
   def self.preload_latest_messages(conversations, author)
@@ -572,10 +572,10 @@ class ConversationParticipant < ActiveRecord::Base
       self.starred = false
 
     when 'destroy'
-      self.remove_messages(:all)
+      remove_messages(:all)
 
     end
-    self.save!
+    save!
   end
 
   def self.do_batch_update(progress, user, conversation_ids, update_params)
@@ -616,7 +616,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def destroy_conversation_message_participants
     @destroyed = true
-    delete_messages(:all) if self.conversation_id
+    delete_messages(:all) if conversation_id
   end
 
   def update_unread_count(direction = :up, user_id = self.user_id)

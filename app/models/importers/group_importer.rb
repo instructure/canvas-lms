@@ -28,7 +28,7 @@ module Importers
       groups.each do |group|
         if migration.import_object?("groups", group['migration_id'])
           begin
-            self.import_from_migration(group, migration.context, migration)
+            import_from_migration(group, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
           end

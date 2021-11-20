@@ -52,9 +52,9 @@ class CustomData < ActiveRecord::Base
 
   def lock_and_save
     transaction do
-      self.lock!
+      lock!
       yield
-      self.destroyed? || save
+      destroyed? || save
     end
   end
 
@@ -122,7 +122,7 @@ class CustomData < ActiveRecord::Base
       end
     end
     ret = del_frd.call(hash)
-    self.destroy if hash.empty?
+    destroy if hash.empty?
     ret
   end
 

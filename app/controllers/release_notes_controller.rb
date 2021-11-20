@@ -169,8 +169,8 @@ class ReleaseNotesController < ApplicationController
 
   # For specs only
   def clear_ivars
-    self.instance_variables.each do |ivar|
-      self.instance_variable_set(ivar, nil)
+    instance_variables.each do |ivar|
+      instance_variable_set(ivar, nil)
     end
   end
 end

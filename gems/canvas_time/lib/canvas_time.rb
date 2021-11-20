@@ -49,7 +49,7 @@ module CanvasTime
   end
 
   def utc_datetime
-    timestamp = self.getutc
+    timestamp = getutc
     DateTime.civil(timestamp.year,
                    timestamp.month,
                    timestamp.day,

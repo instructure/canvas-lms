@@ -35,10 +35,10 @@ class StudentEnrollment < Enrollment
   end
 
   def evaluate_modules
-    ContextModuleProgression.for_user(self.user_id)
+    ContextModuleProgression.for_user(user_id)
                             .joins(:context_module)
                             .readonly(false)
-                            .where(:context_modules => { :context_type => 'Course', :context_id => self.course_id })
+                            .where(:context_modules => { :context_type => 'Course', :context_id => course_id })
                             .each(&:mark_as_outdated!)
   end
 

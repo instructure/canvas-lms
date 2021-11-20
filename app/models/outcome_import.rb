@@ -73,15 +73,15 @@ class OutcomeImport < ApplicationRecord
 
   def as_json(_options = {})
     data = {
-      "id" => self.id,
-      "created_at" => self.created_at,
-      "ended_at" => self.ended_at,
-      "updated_at" => self.updated_at,
-      "progress" => self.progress,
-      "workflow_state" => self.workflow_state,
+      "id" => id,
+      "created_at" => created_at,
+      "ended_at" => ended_at,
+      "updated_at" => updated_at,
+      "progress" => progress,
+      "workflow_state" => workflow_state,
       "data" => self.data
     }
-    data["processing_errors"] = self.outcome_import_errors.order(:row).limit(25).pluck(:row, :message)
+    data["processing_errors"] = outcome_import_errors.order(:row).limit(25).pluck(:row, :message)
     data
   end
 
@@ -103,13 +103,13 @@ class OutcomeImport < ApplicationRecord
     root_account.shard.activate do
       job_started!
       I18n.locale = locale if locale.present?
-      file = self.attachment.open(need_local_file: true)
+      file = attachment.open(need_local_file: true)
 
       Outcomes::CSVImporter.new(self, file).run do |status|
         status[:errors].each do |row, error|
           add_error row, error
         end
-        self.update!(progress: status[:progress])
+        update!(progress: status[:progress])
       end
 
       job_completed!

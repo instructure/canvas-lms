@@ -39,8 +39,8 @@ class Quizzes::QuizQuestion::FileUploadQuestion < Quizzes::QuizQuestion::Base
   end
 
   def score_question(answer_data)
-    user_answer = Quizzes::QuizQuestion::FileUploadAnswer.new(self.question_id,
-                                                              self.points_possible,
+    user_answer = Quizzes::QuizQuestion::FileUploadAnswer.new(question_id,
+                                                              points_possible,
                                                               answer_data)
     super(answer_data, user_answer)
   end

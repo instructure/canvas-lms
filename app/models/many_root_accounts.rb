@@ -21,7 +21,7 @@
 module ManyRootAccounts
   def global_root_account_ids
     root_account_ids&.map do |id|
-      Shard.global_id_for(id, self.shard)
+      Shard.global_id_for(id, shard)
     end
   end
 end

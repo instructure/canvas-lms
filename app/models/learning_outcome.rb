@@ -55,27 +55,27 @@ class LearningOutcome < ActiveRecord::Base
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
-    given { |user, session| self.context_id && self.context.grants_right?(user, session, :manage_outcomes) }
+    given { |user, session| context_id && context.grants_right?(user, session, :manage_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a contextual outcome is also allowed by read_outcomes on the outcome's context
-    given { |user, session| self.context_id && self.context.grants_right?(user, session, :read_outcomes) }
+    given { |user, session| context_id && context.grants_right?(user, session, :read_outcomes) }
     can :read
 
     # managing a global outcome requires manage_global_outcomes on the site_admin
-    given { |user, session| self.context_id.nil? && Account.site_admin.grants_right?(user, session, :manage_global_outcomes) }
+    given { |user, session| context_id.nil? && Account.site_admin.grants_right?(user, session, :manage_global_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a global outcome is also allowed by just being logged in
-    given { |user| self.context_id.nil? && user }
+    given { |user| context_id.nil? && user }
     can :read
   end
 
   def infer_defaults
-    if self.data && self.data[:rubric_criterion]
-      self.data[:rubric_criterion][:description] = self.short_description
+    if data && data[:rubric_criterion]
+      data[:rubric_criterion][:description] = short_description
     end
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
 
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
@@ -84,12 +84,12 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def infer_root_account_ids
-    return if self.root_account_ids.present?
+    return if root_account_ids.present?
 
     context_root_account_id = context.try(:resolved_root_account_id)
 
     # find linked contexts
-    links = if self.new_record?
+    links = if new_record?
               []
             else
               ContentTag.learning_outcome_links
@@ -104,20 +104,20 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def add_root_account_id_for_context!(context)
-    return if self.root_account_ids.nil? # not initialized yet
+    return if root_account_ids.nil? # not initialized yet
 
     root_account_id = context.try(:resolved_root_account_id)
     return if root_account_id.nil?
 
-    unless self.root_account_ids.include? root_account_id
-      self.root_account_ids << root_account_id
-      self.save!
+    unless root_account_ids.include? root_account_id
+      root_account_ids << root_account_id
+      save!
     end
   end
 
   def validate_calculation_int
     unless self.class.valid_calculation_int?(calculation_int, calculation_method)
-      valid_ints = self.class.valid_calculation_ints(self.calculation_method)
+      valid_ints = self.class.valid_calculation_ints(calculation_method)
       if valid_ints.to_a.empty?
         errors.add(:calculation_int, t(
                                        "A calculation value is not used with this calculation method"
@@ -188,19 +188,19 @@ class LearningOutcome < ActiveRecord::Base
       create_missing_outcome_link(context)
       if MasterCourses::MasterTemplate.is_master_course?(context)
         # mark for re-sync
-        context.learning_outcome_links.where(content: self).touch_all if self.context_type == "Account"
-        self.touch
+        context.learning_outcome_links.where(content: self).touch_all if context_type == "Account"
+        touch
       end
     end
     tag
   end
 
   def remove_alignment(alignment_id, context)
-    tag = self.alignments.where({
-                                  context_id: context,
-                                  context_type: context.class_name,
-                                  id: alignment_id
-                                }).first
+    tag = alignments.where({
+                             context_id: context,
+                             context_type: context.class_name,
+                             id: alignment_id
+                           }).first
     tag&.destroy
     tag
   end
@@ -227,7 +227,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def title
-    self.short_description
+    short_description
   end
 
   def title=(new_title)
@@ -241,8 +241,8 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def cached_context_short_name
-    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
-      self.context.short_name rescue ""
+    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+      context.short_name rescue ""
     end
   end
 
@@ -321,7 +321,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def assessed?(course = nil)
     if course
-      self.learning_outcome_results.active.where(context_id: course, context_type: "Course").exists?
+      learning_outcome_results.active.where(context_id: course, context_type: "Course").exists?
     else
       if learning_outcome_results.active.loaded?
         learning_outcome_results.active.any?
@@ -336,11 +336,11 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def mastery_points
-    self.rubric_criterion[:mastery_points]
+    rubric_criterion[:mastery_points]
   end
 
   def points_possible
-    self.rubric_criterion[:points_possible]
+    rubric_criterion[:points_possible]
   end
 
   def mastery_percent
@@ -358,7 +358,7 @@ class LearningOutcome < ActiveRecord::Base
                 @tied_context.all_courses.select(:id).map(&:asset_string)
               end
     end
-    self.learning_outcome_results.active.for_context_codes(codes).count
+    learning_outcome_results.active.for_context_codes(codes).count
   end
 
   def self.delete_if_unused(ids)
@@ -395,10 +395,10 @@ class LearningOutcome < ActiveRecord::Base
 
   def propagate_changes_to_rubrics
     # exclude new outcomes
-    return if self.saved_change_to_id?
-    return if !self.saved_change_to_data? &&
-              !self.saved_change_to_short_description? &&
-              !self.saved_change_to_description?
+    return if saved_change_to_id?
+    return if !saved_change_to_data? &&
+              !saved_change_to_short_description? &&
+              !saved_change_to_description?
 
     delay_if_production.update_associated_rubrics
   end
@@ -414,7 +414,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def updateable_rubrics
-    conds = { learning_outcome_id: self.id, content_type: 'Rubric', workflow_state: 'active' }
+    conds = { learning_outcome_id: id, content_type: 'Rubric', workflow_state: 'active' }
     # Find all unassessed, active rubrics aligned to this outcome, referenced by no more than one assignment
     Rubric.where(
       id: Rubric
@@ -437,13 +437,13 @@ class LearningOutcome < ActiveRecord::Base
       content_type: "LearningOutcome"
     ).pluck(:content_id)
 
-    unless context_outcomes.include?(self.id)
+    unless context_outcomes.include?(id)
       context.root_outcome_group.add_outcome(self)
     end
   end
 
   def find_or_create_tag(asset, context)
-    self.alignments.find_or_create_by(
+    alignments.find_or_create_by(
       content: asset,
       tag_type: 'learning_outcome',
       context: context

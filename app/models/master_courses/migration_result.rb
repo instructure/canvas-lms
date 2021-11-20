@@ -33,6 +33,6 @@ class MasterCourses::MigrationResult < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= self.master_migration.root_account_id
+    self.root_account_id ||= master_migration.root_account_id
   end
 end

@@ -36,7 +36,7 @@ class EtherpadCollaboration < Collaboration
   # /ep/pad/view/PAD_ID/latest  read-only view (still reveals pad id)
 
   def initialize_document
-    self.url ||= "http://#{EtherpadCollaboration.config[:domain]}/i-#{self.uuid}"
+    self.url ||= "http://#{EtherpadCollaboration.config[:domain]}/i-#{uuid}"
   end
 
   def self.config

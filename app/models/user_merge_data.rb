@@ -37,10 +37,10 @@ class UserMergeData < ActiveRecord::Base
 
   def build_more_data(objects, user: nil, workflow_state: nil, data: [])
     # to get relative ids in previous_user_id, we need to be on the records shard
-    self.shard.activate do
+    shard.activate do
       objects.each do |o|
         user ||= o.user_id
-        r = self.records.new(context: o, previous_user_id: user)
+        r = records.new(context: o, previous_user_id: user)
         r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
         r.previous_workflow_state = o.file_state if o.instance_of?(Attachment)
         r.previous_workflow_state = workflow_state if workflow_state
@@ -51,7 +51,7 @@ class UserMergeData < ActiveRecord::Base
   end
 
   def bulk_insert_merge_data(data)
-    self.shard.activate do
+    shard.activate do
       data.each_slice(1000) { |batch| UserMergeDataRecord.bulk_insert_objects(batch) }
     end
   end
@@ -59,6 +59,6 @@ class UserMergeData < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save!
+    save!
   end
 end

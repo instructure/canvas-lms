@@ -60,7 +60,7 @@ describe EventStream::Stream do
         self.table table
         self.id_column id_column
         self.record_type record_type
-        self.read_consistency_level 'ALL'
+        read_consistency_level 'ALL'
       end
 
       expect(stream.database).to eq database
@@ -120,7 +120,7 @@ describe EventStream::Stream do
         self.table table
         self.id_column id_column
         self.record_type record_type
-        self.read_consistency_level 'ALL'
+        read_consistency_level 'ALL'
       end
 
       expect(stream.database).to be database
@@ -139,7 +139,7 @@ describe EventStream::Stream do
         self.table table
         self.id_column id_column
         self.record_type record_type
-        self.read_consistency_level 'ALL'
+        read_consistency_level 'ALL'
       end
 
       expect(stream.database).to be database
@@ -157,7 +157,7 @@ describe EventStream::Stream do
         self.table table
         self.id_column id_column
         self.record_type record_type
-        self.read_consistency_level 'ALL'
+        read_consistency_level 'ALL'
       end
 
       expect(stream.database).to be nil
@@ -187,13 +187,13 @@ describe EventStream::Stream do
       end
 
       stream = EventStream::Stream.new do
-        self.backend_strategy -> { :active_record }
+        backend_strategy -> { :active_record }
         self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
-        self.read_consistency_level 'ALL'
-        self.active_record_type ar_type
+        read_consistency_level 'ALL'
+        active_record_type ar_type
       end
 
       expect(stream.database_name).to eq("active_record_db")
@@ -243,7 +243,7 @@ describe EventStream::Stream do
       it "changes at runtime with different setting" do
         strat_value = :cassandra
         stream = EventStream::Stream.new do
-          self.backend_strategy -> { strat_value }
+          backend_strategy -> { strat_value }
           self.table "table"
         end
         expect(stream.current_backend.class).to eq(EventStream::Backend::Cassandra)
@@ -436,7 +436,7 @@ describe EventStream::Stream do
         table = @table
         @index = @stream.add_index :thing do
           self.table table
-          self.entry_proc lambda { |record| record.entry }
+          entry_proc lambda { |record| record.entry }
         end
         @index_strategy = @index.strategy_for(:cassandra)
 

@@ -26,6 +26,6 @@ class PageComment < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user) }
 
   def user_name
-    self.user.name rescue t(:default_user_name, "Anonymous")
+    user.name rescue t(:default_user_name, "Anonymous")
   end
 end

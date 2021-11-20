@@ -42,7 +42,7 @@ module ConditionalRelease
     def self.current_assignments(student_id_or_ids, sets = nil)
       conditions = { student_id: student_id_or_ids }
       conditions[:assignment_set] = sets if sets
-      self.where(id: self.latest.where(conditions), action: 'assign')
+      where(id: latest.where(conditions), action: 'assign')
     end
 
     def self.create_from_sets(assigned, unassigned, opts = {})

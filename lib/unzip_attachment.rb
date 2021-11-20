@@ -34,11 +34,11 @@ class UnzipAttachment
 
   # for backwards compatibility
   def course
-    self.context
+    context
   end
 
   def course_files_folder
-    self.context_files_folder
+    context_files_folder
   end
 
   def initialize(opts = {})
@@ -53,9 +53,9 @@ class UnzipAttachment
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
 
-    raise ArgumentError, "Must provide a context." unless self.context&.is_a_context?
-    raise ArgumentError, "Must provide a filename." unless self.filename
-    raise ArgumentError, "Must provide a context files folder." unless self.context_files_folder
+    raise ArgumentError, "Must provide a context." unless context&.is_a_context?
+    raise ArgumentError, "Must provide a filename." unless filename
+    raise ArgumentError, "Must provide a context files folder." unless context_files_folder
   end
 
   def update_progress(pct)
@@ -96,7 +96,7 @@ class UnzipAttachment
 
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      CanvasUnzip.extract_archive(self.filename) do |entry, index|
+      CanvasUnzip.extract_archive(filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -151,11 +151,11 @@ class UnzipAttachment
   end
 
   def attach(path, entry, folder, md5, migration_id: nil)
-    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
+                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
   rescue
-    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
+                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
   end
 
   def with_unzip_configuration
@@ -215,7 +215,7 @@ class UnzipAttachment
   # Actually creates the folder in the database.
   def assert_folder(root, dir)
     folder = Folder.new(:parent_folder_id => root.id, :name => dir)
-    folder.context = self.context
+    folder.context = context
     folder.save!
     folder
   end
@@ -226,7 +226,7 @@ class UnzipAttachment
     @folders = nil if reset
     return @folders if @folders
 
-    @folders = OpenStruct.new(:root_directory => self.context_files_folder)
+    @folders = OpenStruct.new(:root_directory => context_files_folder)
   end
 end
 

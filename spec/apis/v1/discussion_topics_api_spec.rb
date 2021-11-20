@@ -1437,7 +1437,7 @@ describe DiscussionTopicsController, type: :request do
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
       calls.reject! { |call| opts[:except].include?(call) }
-      calls.each { |call| expect(self.send(call, topic).to_s).not_to eq "401" }
+      calls.each { |call| expect(send(call, topic).to_s).not_to eq "401" }
     end
 
     def calls_do_not_show_topic(topic)
@@ -1445,7 +1445,7 @@ describe DiscussionTopicsController, type: :request do
       expect(JSON.parse(response.body).to_s).not_to include(topic.assignment.title.to_s)
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
-      calls.each { |call| expect(self.send(call, topic).to_s).to eq "401" }
+      calls.each { |call| expect(send(call, topic).to_s).to eq "401" }
     end
 
     def get_index(course)

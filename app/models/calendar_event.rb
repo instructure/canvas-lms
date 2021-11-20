@@ -37,7 +37,7 @@ class CalendarEvent < ActiveRecord::Base
   attr_accessor :cancel_reason, :imported
 
   sanitize_field :description, CanvasSanitize::SANITIZE
-  copy_authorized_links(:description) { [self.effective_context, nil] }
+  copy_authorized_links(:description) { [effective_context, nil] }
 
   include Workflow
 
@@ -225,11 +225,11 @@ class CalendarEvent < ActiveRecord::Base
   attr_reader :validate_context
 
   def default_values
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
-    self.title ||= (self.context_type.to_s + " Event") rescue "Event"
+    self.context_code = "#{context_type.underscore}_#{context_id}"
+    self.title ||= (context_type.to_s + " Event") rescue "Event"
 
     populate_missing_dates
-    populate_all_day_flag unless self.imported
+    populate_all_day_flag unless imported
 
     if parent_event
       populate_with_parent_event
@@ -239,16 +239,16 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
-  def set_root_account(ctx = self.context)
+  def set_root_account(ctx = context)
     if ctx.respond_to?(:root_account)
       self.root_account = ctx.root_account # course, section, group
     else
       case ctx
       when User
-        if self.effective_context.is_a?(User)
+        if effective_context.is_a?(User)
           self.root_account_id = 0
         else
-          self.set_root_account(self.effective_context)
+          set_root_account(effective_context)
         end
       when AppointmentGroup
         self.root_account = context.context&.root_account
@@ -257,7 +257,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def child_event_participants_scope
-    self.shard.activate do
+    shard.activate do
       # user is set directly, or context is user
       User.where("id IN
         (#{child_events.where.not(:user_id => nil).select(:user_id).to_sql}
@@ -293,7 +293,7 @@ class CalendarEvent < ActiveRecord::Base
 
   # Populate the start and end dates if they are not set, or if they are invalid
   def populate_missing_dates
-    self.end_at ||= self.start_at
+    self.end_at ||= start_at
     self.start_at ||= self.end_at
     if self.start_at && self.end_at && self.end_at < self.start_at
       self.end_at = self.start_at
@@ -303,14 +303,14 @@ class CalendarEvent < ActiveRecord::Base
 
   def populate_all_day_flag
     # If the all day flag has been changed to all day, set the times to 00:00
-    if self.all_day_changed? && self.all_day?
+    if all_day_changed? && all_day?
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
-    elsif self.start_at_changed? || self.end_at_changed? || Canvas::Plugin.value_to_boolean(self.remove_child_events)
+    elsif start_at_changed? || end_at_changed? || Canvas::Plugin.value_to_boolean(remove_child_events)
       self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
     end
 
-    if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
+    if all_day && (!all_day_date || start_at_changed? || all_day_date_changed?)
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
       self.all_day_date = (zoned_start_at.to_date rescue nil)
@@ -321,12 +321,12 @@ class CalendarEvent < ActiveRecord::Base
   # Localized start_at
   def zoned_start_at
     self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
-                                                     ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
+                                                     ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
   end
 
   def zoned_end_at
     self.end_at && ActiveSupport::TimeWithZone.new(self.end_at.utc,
-                                                   ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
+                                                   ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
   end
 
   CASCADED_ATTRIBUTES = [
@@ -609,21 +609,21 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (self.new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == '00:00')
+    read_attribute(:all_day) || (new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == '00:00')
   end
 
   def to_atom(opts = {})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", :event_title => self.title) unless opts[:include_context]
-      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => self.context.name, :event_title => self.title) if opts[:include_context]
-      entry.authors << Atom::Person.new(:name => self.context.name)
-      entry.updated   = self.updated_at.utc
-      entry.published = self.created_at.utc
+      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => context.name, :event_title => self.title) if opts[:include_context]
+      entry.authors << Atom::Person.new(:name => context.name)
+      entry.updated   = updated_at.utc
+      entry.published = created_at.utc
       entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{self.id}")
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/calendar_events/#{self.feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new("#{datetime_string(self.start_at, self.end_at)}<br/>#{self.description}")
+                                    :href => "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}")
+      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
+      entry.content   = Atom::Content::Html.new("#{datetime_string(self.start_at, self.end_at)}<br/>#{description}")
     end
   end
 
@@ -639,7 +639,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :read) } # students.include?(user) }
+    given { |user, session| context.grants_right?(user, session, :read) } # students.include?(user) }
     can :read
 
     given do |user, session|
@@ -665,13 +665,13 @@ class CalendarEvent < ActiveRecord::Base
     }
     can :reserve
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
+    given { |user, session| context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
     can :read and can :create
 
-    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && self.context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
+    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
     can :update and can :update_content
 
-    given { |user, session| !deleted? && self.context.grants_right?(user, session, :manage_calendar) }
+    given { |user, session| !deleted? && context.grants_right?(user, session, :manage_calendar) }
     can :delete
   end
 

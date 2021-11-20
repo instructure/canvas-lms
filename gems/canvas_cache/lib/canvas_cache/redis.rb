@@ -50,7 +50,7 @@ module CanvasCache
     end
 
     def self.enabled?
-      @enabled ||= self.config.present?
+      @enabled ||= config.present?
     end
 
     def self.disconnect!
@@ -172,7 +172,7 @@ module CanvasCache
       Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
       settings_store.skip_cache do
-        if self.ignore_redis_failures?
+        if ignore_redis_failures?
           CanvasCache.invoke_on_captured_error(e)
           last_redis_failure[redis_name] = Time.zone.now
           failure_retval
@@ -230,7 +230,7 @@ module CanvasCache
         if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
           failure_val = :failure
         end
-        CanvasCache::Redis.handle_redis_failure(failure_val, self.location) do
+        CanvasCache::Redis.handle_redis_failure(failure_val, location) do
           super
         end
       end

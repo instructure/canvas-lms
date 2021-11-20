@@ -37,7 +37,7 @@ module Api
     self.errors = {}
 
     def self.define_error(error_id, opts)
-      self.errors[error_id] = opts
+      errors[error_id] = opts
     end
 
     define_error :deprecated_request_syntax,

@@ -40,11 +40,11 @@ class NotificationFailureProcessor
   end
 
   def self.enabled?
-    !!self.config
+    !!config
   end
 
   def self.process
-    self.new.process
+    new.process
   end
 
   def initialize

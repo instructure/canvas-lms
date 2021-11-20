@@ -25,7 +25,7 @@ module ConditionalRelease
     private_class_method :new
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, includes: [])
-      enabled = self.enabled_in_context?(context)
+      enabled = enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }

@@ -39,13 +39,13 @@ class StreamItem < ActiveRecord::Base
   before_save :ensure_notification_category
 
   def ensure_notification_category
-    if self.asset_type == 'Message'
+    if asset_type == 'Message'
       self.notification_category ||= get_notification_category
     end
   end
 
   def get_notification_category
-    self.read_attribute(:data)['notification_category'] || self.data.notification_category
+    read_attribute(:data)['notification_category'] || data.notification_category
   end
 
   def self.reconstitute_ar_object(type, data)
@@ -100,7 +100,7 @@ class StreamItem < ActiveRecord::Base
 
   def data(viewing_user_id = nil)
     # reconstitute AR objects
-    @ar_data ||= self.shard.activate do
+    @ar_data ||= shard.activate do
       self.class.reconstitute_ar_object(asset_type, read_attribute(:data))
     end
     res = @ar_data
@@ -148,14 +148,14 @@ class StreamItem < ActiveRecord::Base
 
   def regenerate!(obj = nil)
     obj ||= asset
-    return nil if self.asset_type == 'Message' && self.asset_id.nil?
+    return nil if asset_type == 'Message' && asset_id.nil?
 
     if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == 'deleted')
-      self.destroy
+      destroy
       return nil
     end
     res = generate_data(obj)
-    self.save
+    save
     res
   end
 
@@ -216,8 +216,8 @@ class StreamItem < ActiveRecord::Base
     else
       raise "Unexpected stream item type: #{object.class}"
     end
-    if self.context_type
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{self.context_type.underscore}_#{self.context_id}"].cache_key) do
+    if context_type
+      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{context_type.underscore}_#{context_id}"].cache_key) do
         self.context.short_name rescue ''
       end
     end
@@ -243,7 +243,7 @@ class StreamItem < ActiveRecord::Base
       return item if item
     end
 
-    item = self.new
+    item = new
     item.generate_data(object)
     StreamItem.unique_constraint_retry do |retry_count|
       retry_count == 0 ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
@@ -414,10 +414,10 @@ class StreamItem < ActiveRecord::Base
   def associated_shards
     if self.context.try(:respond_to?, :associated_shards)
       self.context.associated_shards
-    elsif self.data.respond_to?(:associated_shards)
-      self.data.associated_shards
+    elsif data.respond_to?(:associated_shards)
+      data.associated_shards
     else
-      [self.shard]
+      [shard]
     end
   end
 
@@ -469,13 +469,13 @@ class StreamItem < ActiveRecord::Base
   public
 
   def destroy_stream_item_instances
-    self.stream_item_instances.shard(self).activate do |scope|
+    stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
-      if !self.invalidate_immediately && user_ids.count > 100
+      if !invalidate_immediately && user_ids.count > 100
         StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY)
-                       .invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
+                       .invalidate_all_recent_stream_items(user_ids, context_type, context_id)
       else
-        StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
+        StreamItemCache.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
       end
       scope.delete_all
       nil

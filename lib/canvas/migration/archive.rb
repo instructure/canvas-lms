@@ -112,7 +112,7 @@ module Canvas::Migration
     end
 
     def package_root
-      @package_root ||= PackageRoot.new(self.unzipped_file_path)
+      @package_root ||= PackageRoot.new(unzipped_file_path)
     end
 
     def get_converter
@@ -160,16 +160,16 @@ module Canvas::Migration
     # If the file is a zip file, unzip it, if it's an xml file, copy
     # it into the directory with the given file name
     def prepare_cartridge_file(file_name = 'imsmanifest.xml')
-      if self.path.ends_with?('xml')
-        FileUtils.cp(self.path, package_root.item_path(file_name))
+      if path.ends_with?('xml')
+        FileUtils.cp(path, package_root.item_path(file_name))
       else
         unzip_archive
       end
     end
 
     def delete_unzipped_file
-      if File.exist?(self.unzipped_file_path)
-        FileUtils.rm_rf(self.unzipped_file_path)
+      if File.exist?(unzipped_file_path)
+        FileUtils.rm_rf(unzipped_file_path)
       end
     end
 

@@ -74,7 +74,7 @@ class ContentTag < ActiveRecord::Base
   acts_as_list :scope => :context_module
 
   set_policy do
-    given { |user, session| self.context&.grants_right?(user, session, :manage_content) }
+    given { |user, session| context&.grants_right?(user, session, :manage_content) }
     can :delete
   end
 
@@ -96,9 +96,9 @@ class ContentTag < ActiveRecord::Base
   attr_accessor :skip_touch
 
   def touch_context_module
-    return true if skip_touch.present? || self.context_module_id.nil?
+    return true if skip_touch.present? || context_module_id.nil?
 
-    ContentTag.touch_context_modules([self.context_module_id])
+    ContentTag.touch_context_modules([context_module_id])
   end
 
   def touch_context_module_after_transaction
@@ -120,16 +120,16 @@ class ContentTag < ActiveRecord::Base
   end
 
   def touch_context_if_learning_outcome
-    if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
-      self.context_type.constantize.where(:id => self.context_id).update_all(:updated_at => Time.now.utc)
+    if (tag_type == 'learning_outcome_association' || tag_type == 'learning_outcome') && skip_touch.blank?
+      context_type.constantize.where(:id => context_id).update_all(:updated_at => Time.now.utc)
     end
   end
 
   def update_outcome_contexts
-    return unless self.tag_type == 'learning_outcome_association'
+    return unless tag_type == 'learning_outcome_association'
 
-    if self.context_type == 'Account' || self.context_type == 'Course'
-      self.content.add_root_account_id_for_context!(self.context)
+    if context_type == 'Account' || context_type == 'Course'
+      content.add_root_account_id_for_context!(context)
     end
   end
 
@@ -141,22 +141,22 @@ class ContentTag < ActiveRecord::Base
   end
 
   def default_values
-    self.title ||= self.content.title rescue nil
-    self.title ||= self.content.name rescue nil
-    self.title ||= self.content.display_name rescue nil
+    self.title ||= content.title rescue nil
+    self.title ||= content.name rescue nil
+    self.title ||= content.display_name rescue nil
     self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
-    self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}"
+    self.context_code = "#{context_type.to_s.underscore}_#{context_id}"
   end
   protected :default_values
 
   def context_code
-    read_attribute(:context_code) || "#{self.context_type.to_s.underscore}_#{self.context_id}" rescue nil
+    read_attribute(:context_code) || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
   end
 
   def context_name
-    self.context.name rescue ""
+    context.name rescue ""
   end
 
   def update_could_be_locked
@@ -181,23 +181,23 @@ class ContentTag < ActiveRecord::Base
   end
 
   def confirm_valid_module_requirements
-    self.context_module&.confirm_valid_requirements
+    context_module&.confirm_valid_requirements
   end
 
   def scoreable?
-    self.content_type_quiz? || self.graded?
+    content_type_quiz? || graded?
   end
 
   def graded?
-    return true if self.content_type == 'Assignment'
-    return false if self.content_type == 'WikiPage'
-    return false unless self.can_have_assignment?
+    return true if content_type == 'Assignment'
+    return false if content_type == 'WikiPage'
+    return false unless can_have_assignment?
 
     content && !content.assignment_id.nil?
   end
 
   def duplicate_able?
-    case self.content_type_class
+    case content_type_class
     when 'assignment'
       content&.can_duplicate?
     when 'discussion_topic', 'wiki_page'
@@ -220,11 +220,11 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_class(is_student = false)
-    case self.content_type
+    case content_type
     when 'Assignment'
-      if self.content && self.content.submission_types == 'online_quiz'
+      if content && content.submission_types == 'online_quiz'
         is_student ? 'lti-quiz' : 'quiz'
-      elsif self.content && self.content.submission_types == 'discussion_topic'
+      elsif content && content.submission_types == 'discussion_topic'
         'discussion_topic'
       elsif self&.content&.quiz_lti?
         'lti-quiz'
@@ -234,25 +234,25 @@ class ContentTag < ActiveRecord::Base
     when 'Quizzes::Quiz'
       is_student ? 'lti-quiz' : 'quiz'
     else
-      self.content_type.underscore
+      content_type.underscore
     end
   rescue
-    (self.content_type || "").underscore
+    (content_type || "").underscore
   end
 
   def item_class
-    (self.content_type || "").gsub(/\A[A-Za-z]+::/, '') + '_' + self.content_id.to_s
+    (content_type || "").gsub(/\A[A-Za-z]+::/, '') + '_' + content_id.to_s
   end
 
   def can_have_assignment?
-    ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].include?(self.content_type)
+    ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].include?(content_type)
   end
 
   def assignment
-    if self.content_type == 'Assignment'
-      self.content
+    if content_type == 'Assignment'
+      content
     elsif can_have_assignment?
-      self.content&.assignment
+      content&.assignment
     else
       nil
     end
@@ -260,7 +260,7 @@ class ContentTag < ActiveRecord::Base
 
   alias_method :old_content, :content
   def content
-    TABLELESS_CONTENT_TYPES.include?(self.content_type) ? nil : old_content
+    TABLELESS_CONTENT_TYPES.include?(content_type) ? nil : old_content
   end
 
   def content_or_self
@@ -269,7 +269,7 @@ class ContentTag < ActiveRecord::Base
 
   def asset_safe_title(column)
     name = self.title.to_s
-    if (limit = self.content.class.try(:columns_hash)[column].try(:limit)) && name.length > limit
+    if (limit = content.class.try(:columns_hash)[column].try(:limit)) && name.length > limit
       name = name[0, limit][/.{0,#{limit}}/mu]
     end
     name
@@ -299,16 +299,16 @@ class ContentTag < ActiveRecord::Base
   end
 
   def asset_workflow_state
-    ContentTag.asset_workflow_state(self.content)
+    ContentTag.asset_workflow_state(content)
   end
 
   def asset_context_matches?
-    self.content.respond_to?(:context) && self.content.context == context
+    content.respond_to?(:context) && content.context == context
   end
 
   def update_asset_name!(user = nil)
-    return unless self.sync_title_to_asset_title?
-    return unless self.asset_context_matches?
+    return unless sync_title_to_asset_title?
+    return unless asset_context_matches?
 
     # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
     if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
@@ -325,17 +325,17 @@ class ContentTag < ActiveRecord::Base
   end
 
   def update_asset_workflow_state!
-    return unless self.sync_workflow_state_to_asset?
-    return unless self.asset_context_matches?
-    return unless self.content.respond_to?(:publish!)
+    return unless sync_workflow_state_to_asset?
+    return unless asset_context_matches?
+    return unless content.respond_to?(:publish!)
 
     # update the asset and also update _other_ content tags that point at it
-    if self.unpublished? && self.content.published? && self.content.can_unpublish?
-      self.content.unpublish!
-      self.class.update_for(self.content, exclude_tag: self)
-    elsif self.active? && !self.content.published?
-      self.content.publish!
-      self.class.update_for(self.content, exclude_tag: self)
+    if unpublished? && content.published? && content.can_unpublish?
+      content.unpublish!
+      self.class.update_for(content, exclude_tag: self)
+    elsif active? && !content.published?
+      content.publish!
+      self.class.update_for(content, exclude_tag: self)
     end
   end
 
@@ -346,22 +346,22 @@ class ContentTag < ActiveRecord::Base
 
   def can_destroy?
     # if it's a learning outcome link...
-    if self.tag_type == 'learning_outcome_association'
+    if tag_type == 'learning_outcome_association'
       # and there are no other links to the same outcome in the same context...
-      outcome = self.content
+      outcome = content
       other_link = ContentTag.learning_outcome_links.active
-                             .where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome)
+                             .where(:context_type => context_type, :context_id => context_id, :content_id => outcome)
                              .where("id<>?", self).first
       unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
         alignment_conditions = { :learning_outcome_id => outcome.id }
-        native = outcome.context_type == self.context_type && outcome.context_id == self.context_id
+        native = outcome.context_type == context_type && outcome.context_id == context_id
         if native
           @should_destroy_outcome = true
         else
-          alignment_conditions[:context_id] = self.context_id
-          alignment_conditions[:context_type] = self.context_type
+          alignment_conditions[:context_id] = context_id
+          alignment_conditions[:context_type] = context_type
         end
 
         @active_alignment_tags = ContentTag.learning_outcome_alignments.active.where(alignment_conditions)
@@ -384,10 +384,10 @@ class ContentTag < ActiveRecord::Base
     context_module&.remove_completion_requirement(id)
 
     self.workflow_state = 'deleted'
-    self.save!
+    save!
 
     # for outcome links delete the associated friendly description
-    delete_outcome_friendly_description if self.content_type == 'LearningOutcome'
+    delete_outcome_friendly_description if content_type == 'LearningOutcome'
 
     run_due_date_cacher_for_quizzes_next(force: true)
 
@@ -396,40 +396,40 @@ class ContentTag < ActiveRecord::Base
     # (a) LearningOutcome#destroy *should* only ever be called from here, and
     # (b) we've already determined other_link and native
     if @should_destroy_outcome
-      self.content.destroy
+      content.destroy
     end
 
     true
   end
 
   def locked_for?(user, opts = {})
-    return unless self.context_module && !self.context_module.deleted?
+    return unless context_module && !context_module.deleted?
 
-    self.context_module.locked_for?(user, opts.merge({ :tag => self }))
+    context_module.locked_for?(user, opts.merge({ :tag => self }))
   end
 
   def available_for?(user, opts = {})
-    self.context_module.available_for?(user, opts.merge({ :tag => self }))
+    context_module.available_for?(user, opts.merge({ :tag => self }))
   end
 
   def send_items_to_stream
-    if self.content_type == "DiscussionTopic" && self.saved_change_to_workflow_state? && self.workflow_state == 'active'
+    if content_type == "DiscussionTopic" && saved_change_to_workflow_state? && workflow_state == 'active'
       content.send_items_to_stream
     end
   end
 
   def clear_discussion_stream_items
-    if self.content_type == "DiscussionTopic"
-      if self.saved_change_to_workflow_state? &&
-         ['active', nil].include?(self.workflow_state_before_last_save) &&
-         self.workflow_state == 'unpublished'
+    if content_type == "DiscussionTopic"
+      if saved_change_to_workflow_state? &&
+         ['active', nil].include?(workflow_state_before_last_save) &&
+         workflow_state == 'unpublished'
         content.clear_stream_items
       end
     end
   end
 
   def clear_stream_items_if_module_is_unpublished
-    if self.content_type == "DiscussionTopic" && context_module&.workflow_state == 'unpublished'
+    if content_type == "DiscussionTopic" && context_module&.workflow_state == 'unpublished'
       content.clear_stream_items
     end
   end
@@ -463,24 +463,24 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_title_to_asset_title?
-    self.tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(self.content_type)
+    tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(content_type)
   end
 
   def sync_workflow_state_to_asset?
-    self.content_type_quiz? || ['Attachment', 'Assignment', 'WikiPage', 'DiscussionTopic'].include?(self.content_type)
+    content_type_quiz? || ['Attachment', 'Assignment', 'WikiPage', 'DiscussionTopic'].include?(content_type)
   end
 
   def content_type_quiz?
-    Quizzes::Quiz.class_names.include?(self.content_type)
+    Quizzes::Quiz.class_names.include?(content_type)
   end
 
   def content_type_discussion?
-    'DiscussionTopic' == self.content_type
+    'DiscussionTopic' == content_type
   end
 
   def context_module_action(user, action, points = nil)
     GuardRail.activate(:primary) do
-      self.context_module&.update_for(user, action, self, points)
+      context_module&.update_for(user, action, self, points)
     end
   end
 
@@ -489,11 +489,11 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_asset_string
-    @content_asset_string ||= "#{self.content_type.underscore}_#{self.content_id}"
+    @content_asset_string ||= "#{content_type.underscore}_#{content_id}"
   end
 
   def associated_asset_string
-    @associated_asset_string ||= "#{self.associated_asset_type.underscore}_#{self.associated_asset_id}"
+    @associated_asset_string ||= "#{associated_asset_type.underscore}_#{associated_asset_id}"
   end
 
   def content_asset_string=(val)
@@ -632,18 +632,18 @@ class ContentTag < ActiveRecord::Base
   end
 
   def visible_to_user?(user, opts = nil, session = nil)
-    return unless self.context_module
+    return unless context_module
 
-    opts ||= self.context_module.visibility_for_user(user, session)
+    opts ||= context_module.visibility_for_user(user, session)
     return false unless opts[:can_read]
 
     return true if opts[:can_read_as_admin]
-    return false unless self.published?
+    return false unless published?
 
-    if self.assignment
-      self.assignment.visible_to_user?(user, opts)
-    elsif self.content_type_quiz?
-      self.content.visible_to_user?(user, opts)
+    if assignment
+      assignment.visible_to_user?(user, opts)
+    elsif content_type_quiz?
+      content.visible_to_user?(user, opts)
     else
       true
     end
@@ -654,9 +654,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def check_for_restricted_content_changes
-    if !self.new_record? && self.title_changed? && !@importing_migration && self.content && self.content.respond_to?(:is_child_content?) &&
-       self.content.is_child_content? && self.content.editing_restricted?(:content)
-      self.errors.add(:title, "cannot change title - associated content locked by Master Course")
+    if !new_record? && title_changed? && !@importing_migration && content && content.respond_to?(:is_child_content?) &&
+       content.is_child_content? && content.editing_restricted?(:content)
+      errors.add(:title, "cannot change title - associated content locked by Master Course")
     end
   end
 
@@ -669,13 +669,13 @@ class ContentTag < ActiveRecord::Base
   end
 
   def set_root_account
-    return if self.root_account_id.present?
+    return if root_account_id.present?
 
-    self.root_account_id = case self.context
+    self.root_account_id = case context
                            when Account
-                             self.context.resolved_root_account_id
+                             context.resolved_root_account_id
                            else
-                             self.context&.root_account_id
+                             context&.root_account_id
                            end
   end
 
@@ -699,6 +699,6 @@ class ContentTag < ActiveRecord::Base
   end
 
   def delete_outcome_friendly_description
-    OutcomeFriendlyDescription.active.find_by(context: self.context, learning_outcome_id: self.content_id)&.destroy
+    OutcomeFriendlyDescription.active.find_by(context: context, learning_outcome_id: content_id)&.destroy
   end
 end

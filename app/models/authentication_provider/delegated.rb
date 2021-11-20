@@ -22,9 +22,9 @@ class AuthenticationProvider::Delegated < AuthenticationProvider
   after_create :disable_open_registration
 
   def disable_open_registration
-    if self.account.open_registration?
-      self.account.settings[:open_registration] = false
-      self.account.save!
+    if account.open_registration?
+      account.settings[:open_registration] = false
+      account.save!
     end
   end
 

@@ -163,7 +163,7 @@ class AssetUserAccessLog
   # We can remove them entirely, along with the postgres read/write
   # code paths, once that transition is complete.
   def self.write_to_message_bus?(shard)
-    self.channel_config(shard).fetch("pulsar_writes_enabled", false)
+    channel_config(shard).fetch("pulsar_writes_enabled", false)
   end
 
   # TODO: these config predicate methods should only exist while we are
@@ -171,7 +171,7 @@ class AssetUserAccessLog
   # We can remove them entirely, along with the postgres read/write
   # code paths, once that transition is complete.
   def self.write_to_db_partition?(shard)
-    self.channel_config(shard).fetch("db_writes_enabled", true)
+    channel_config(shard).fetch("db_writes_enabled", true)
   end
 
   # TODO: these config predicate methods should only exist while we are
@@ -179,7 +179,7 @@ class AssetUserAccessLog
   # We can remove them entirely, along with the postgres read/write
   # code paths, once that transition is complete.
   def self.read_from_message_bus?(shard)
-    self.channel_config(shard).fetch("pulsar_reads_enabled", false)
+    channel_config(shard).fetch("pulsar_reads_enabled", false)
   end
 
   # This config map is intended to be used during the transition
@@ -263,14 +263,14 @@ class AssetUserAccessLog
   def self.compact
     ps = plugin_setting
     if ps.nil? || ps.settings[:write_path] != "log"
-      return self.log_message("PluginSetting configured OFF, aborting")
+      return log_message("PluginSetting configured OFF, aborting")
     end
 
     shard = ::Switchman::Shard.current
-    caught_up = if self.read_from_message_bus?(shard)
-                  self.message_bus_compact
+    caught_up = if read_from_message_bus?(shard)
+                  message_bus_compact
                 else
-                  self.postgres_compact
+                  postgres_compact
                 end
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
@@ -289,9 +289,9 @@ class AssetUserAccessLog
   def self.message_bus_compact
     Bundler.require(:pulsar) # makes sure we can capture Pulsar errors
     # Step 0) load iterator state and settings
-    compaction_state = self.metadatum_payload
+    compaction_state = metadatum_payload
     compaction_start = Time.now.utc
-    mb_settings = self.compaction_settings
+    mb_settings = compaction_settings
     log_batch_size = mb_settings[:log_batch_size]
     max_compaction_time = mb_settings[:max_compaction_time]
     receive_timeout = mb_settings[:receive_timeout]
@@ -332,7 +332,7 @@ class AssetUserAccessLog
       # the earliest message in storage on that topic, but we
       # can use the compaction state from metadatum_payload to
       # skip forward until we find messages we haven't processed.
-      topic = self.message_bus_topic_name(root_account)
+      topic = message_bus_topic_name(root_account)
       # we explicitly close this consumer at the end of processing, so we don't want
       # a cached consumer.
       consumer = nil
@@ -392,7 +392,7 @@ class AssetUserAccessLog
       while continue_consuming_from_bus
         consumed_count = 0
         skip_count = 0
-        self.log_message("Pulling messages from bus for RA #{root_account_id}...")
+        log_message("Pulling messages from bus for RA #{root_account_id}...")
         # 4) subscribe to start receiving messages
         while !caught_up_for_account && (consumed_count < log_batch_size)
           message = nil
@@ -406,7 +406,7 @@ class AssetUserAccessLog
           end
           message_hash = JSON.parse(message.data).with_indifferent_access
           unless message_hash.key?(:asset_user_access_id)
-            self.log_message("MALFORMED MESSAGE, skipping: #{message.data}")
+            log_message("MALFORMED MESSAGE, skipping: #{message.data}")
             next
           end
           # 5) check each entry against the metadata index to see if it should be processed before adding to datastructure
@@ -470,7 +470,7 @@ class AssetUserAccessLog
           else
             skip_count += 1
             if skip_count % 1000 == 0
-              self.log_message("...Skipped #{skip_count} so far...")
+              log_message("...Skipped #{skip_count} so far...")
             end
           end
           # 8) loop on subscription until the datastructure is filled or the receive operation times out
@@ -496,16 +496,16 @@ class AssetUserAccessLog
           # state are updated in lock step, so if we fail we should re-aggregate from the same point.
           AssetUserAccess.transaction do
             unless aggregation_results.empty?
-              self.log_message("message bus batch updating (sometimes these queries don't get logged)...")
-              AssetUserAccess.connection.execute(self.compaction_sql(aggregation_results))
+              log_message("message bus batch updating (sometimes these queries don't get logged)...")
+              AssetUserAccess.connection.execute(compaction_sql(aggregation_results))
             end
             # Here we want to write the iteration state into the database
             # so that we don't double count rows later.  The next time the job
             # runs it can pick up at this point and only count rows that haven't yet been counted.
             compaction_state[:temp_root_account_max_log_ids][root_account_id.to_s] = root_account_postgres_iterator_state
             compaction_state[:pulsar_partition_iterators][root_account_id.to_s] = new_message_bus_iterator_state
-            self.update_metadatum(compaction_state)
-            self.log_message("...batch update complete")
+            update_metadatum(compaction_state)
+            log_message("...batch update complete")
           end
         end
 
@@ -608,7 +608,7 @@ class AssetUserAccessLog
     unless yesterday_model.take(1).empty?
       yesterday_completed = compact_partition(yesterday_ts)
       ps.reload
-      compaction_state = self.metadatum_payload
+      compaction_state = metadatum_payload
       max_yesterday_id = compaction_state[:max_log_ids][yesterday_ts.wday]
       if yesterday_completed && max_yesterday_id >= yesterday_model.maximum(:id)
         # we have now compacted all the writes from the previous day.
@@ -625,7 +625,7 @@ class AssetUserAccessLog
               yesterday_model.connection.truncate(yesterday_model.table_name)
             end
             compaction_state[:max_log_ids][yesterday_ts.wday] = 0
-            self.update_metadatum(compaction_state)
+            update_metadatum(compaction_state)
           end
         end
       end
@@ -670,7 +670,7 @@ class AssetUserAccessLog
     # We'd expect them to usually be 0 because we reset the value after truncating the partition
     # (defends against sequences being reset to the "highest" record in a table and then
     # deciding we already chomped these logs).
-    compaction_state = self.metadatum_payload
+    compaction_state = metadatum_payload
 
     GuardRail.activate(:secondary) do
       # select the boundaries of the log segment we're going to iterate.
@@ -693,7 +693,7 @@ class AssetUserAccessLog
       use_pulsar_ripcord_iterators = !root_account_max_ids_map.empty?
       log_id_bookmark = [(partition_lower_bound - 1), state_max_log_ids[ts.wday]].max
       while log_id_bookmark < partition_upper_bound
-        self.log_message("processing #{log_id_bookmark} from #{partition_upper_bound}")
+        log_message("processing #{log_id_bookmark} from #{partition_upper_bound}")
         # maybe we won't need this, but if we need to slow down throughput and don't want to hold
         # the jobs, increasing this setting value could tradeoff throughput for latency
         # slowly.  We load in INSIDE the loop so that SIGHUPS can get recognized
@@ -722,14 +722,14 @@ class AssetUserAccessLog
           new_iterator_pos = log_segment_aggregation.map { |r| r["max_id"] }.max
           GuardRail.activate(:primary) do
             partition_model.transaction do
-              self.log_message("batch updating (sometimes these queries don't get logged)...")
+              log_message("batch updating (sometimes these queries don't get logged)...")
               partition_model.connection.execute(update_query)
-              self.log_message("...batch update complete")
+              log_message("...batch update complete")
               # Here we want to write the iteration state into the database
               # so that we don't double count rows later.  The next time the job
               # runs it can pick up at this point and only count rows that haven't yet been counted.
               compaction_state[:max_log_ids][ts.wday] = new_iterator_pos
-              self.update_metadatum(compaction_state)
+              update_metadatum(compaction_state)
             end
           end
           log_id_bookmark = new_iterator_pos
@@ -757,7 +757,7 @@ class AssetUserAccessLog
           new_bookmark_id = next_id - 1
           GuardRail.activate(:primary) do
             compaction_state[:max_log_ids][ts.wday] = new_bookmark_id
-            self.update_metadatum(compaction_state)
+            update_metadatum(compaction_state)
           end
           log_id_bookmark = new_bookmark_id
         end
@@ -776,7 +776,7 @@ class AssetUserAccessLog
       # iteration state from the pulsar processing anymore since we've moved
       # the global iterator past those positions, and we can null out that state
       compaction_state[:temp_root_account_max_log_ids] = {}
-      self.update_metadatum(compaction_state)
+      update_metadatum(compaction_state)
     end
     true # to indicate we didn't bail
   end

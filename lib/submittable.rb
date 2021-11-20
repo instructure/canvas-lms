@@ -48,9 +48,9 @@ module Submittable
       # section-specific discussions, so here get the ones visible to everyone in the
       # course, and below get the ones that are visible to the right section.
       ids_visible_to_all = if opts[:item_type] == :discussion
-                             self.without_assignment_in_course(opts[:course_id]).where(:is_section_specific => false).pluck(:id)
+                             without_assignment_in_course(opts[:course_id]).where(:is_section_specific => false).pluck(:id)
                            else
-                             self.without_assignment_in_course(opts[:course_id]).pluck(:id)
+                             without_assignment_in_course(opts[:course_id]).pluck(:id)
                            end
 
       # Now get the section-specific discussions that are in the proper sections.
@@ -72,74 +72,74 @@ module Submittable
 
     def pluck_visibilities(opts)
       name = self.name.underscore.pluralize
-      self.joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-          .pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
+      joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+        .pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
     end
   end
 
   def sync_assignment
-    if (a = self.assignment)
-      a.title = self.title
+    if (a = assignment)
+      a.title = title
       name = self.class.name.underscore
       a.submission_types = name
       a.saved_by = name.to_sym
-      a.workflow_state = self.published? ? "published" : "unpublished"
+      a.workflow_state = published? ? "published" : "unpublished"
     end
   end
 
   def for_assignment?
     name = self.class.name.underscore
-    self.assignment && self.assignment.submission_types =~ /#{name}/
+    assignment && assignment.submission_types =~ /#{name}/
   end
 
   def restore(from = nil)
     self.workflow_state = 'unpublished'
-    self.save
+    save
 
-    if from != :assignment && self.for_assignment? && self.assignment.deleted?
+    if from != :assignment && for_assignment? && assignment.deleted?
       name = self.class.name.underscore
-      self.assignment.restore(name.to_sym)
+      assignment.restore(name.to_sym)
     end
   end
 
   def unlink!(type)
     @saved_by = type
     self.assignment = nil
-    self.destroy
+    destroy
   end
 
   def restore_old_assignment
-    return nil unless self.old_assignment&.deleted?
+    return nil unless old_assignment&.deleted?
 
-    self.old_assignment.workflow_state = 'published'
+    old_assignment.workflow_state = 'published'
     name = self.class.name.underscore
-    self.old_assignment.saved_by = name.to_sym
-    self.old_assignment.save(:validate => false)
-    self.old_assignment
+    old_assignment.saved_by = name.to_sym
+    old_assignment.save(:validate => false)
+    old_assignment
   end
 
   def update_assignment
-    if self.deleted?
-      if self.for_assignment? && !self.assignment.deleted?
+    if deleted?
+      if for_assignment? && !assignment.deleted?
         self.class.connection.after_transaction_commit do
-          self.assignment.destroy
+          assignment.destroy
         end
       end
     else
-      if !self.assignment_id && @old_assignment_id
-        self.context_module_tags.each(&:confirm_valid_module_requirements)
+      if !assignment_id && @old_assignment_id
+        context_module_tags.each(&:confirm_valid_module_requirements)
       end
       if @old_assignment_id
         Assignment.where(
           id: @old_assignment_id,
-          context: self.context,
+          context: context,
           submission_types: 'wiki_page'
         ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
-      elsif self.assignment && @saved_by != :assignment
+      elsif assignment && @saved_by != :assignment
         # let the stack unwind before we sync this, so that we're not nesting callbacks
         self.class.connection.after_transaction_commit do
-          self.sync_assignment
-          self.assignment.save
+          sync_assignment
+          assignment.save
         end
       end
     end
@@ -147,14 +147,14 @@ module Submittable
   protected :update_assignment
 
   def default_submission_values
-    if self.assignment_id != self.assignment_id_was
-      @old_assignment_id = self.assignment_id_was
+    if assignment_id != assignment_id_was
+      @old_assignment_id = assignment_id_was
     end
-    if self.assignment_id
-      self.assignment_id = nil unless (self.assignment &&
-                                      self.assignment.context == self.context) ||
-                                      self.try(:root_topic).try(:assignment_id) == self.assignment_id
-      self.old_assignment_id = self.assignment_id if self.assignment_id
+    if assignment_id
+      self.assignment_id = nil unless (assignment &&
+                                      assignment.context == context) ||
+                                      try(:root_topic).try(:assignment_id) == assignment_id
+      self.old_assignment_id = assignment_id if assignment_id
     end
   end
   protected :default_submission_values

@@ -25,7 +25,7 @@ class CanvasPartmanTest::Animal < ActiveRecord::Base
   belongs_to :zoo, class_name: 'CanvasPartmanTest::Zoo'
 
   def self.create_schema
-    self.drop_schema
+    drop_schema
 
     CanvasPartmanTest::SchemaHelper.create_table :partman_animals do |t|
       t.string :race

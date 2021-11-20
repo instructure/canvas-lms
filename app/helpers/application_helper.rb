@@ -111,7 +111,7 @@ module ApplicationHelper
         nil
       end
       opts[-1][:only_path] = true unless opts[-1][:only_path] == false
-      res = self.send name, *opts
+      res = send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]
       begin
@@ -121,7 +121,7 @@ module ApplicationHelper
       end
       opts[:only_path] = true
       opts["#{context_name}_id"] = context.id
-      res = self.url_for opts
+      res = url_for opts
     else
       res = context_name.to_s + opts.to_json.to_s
     end

@@ -61,13 +61,13 @@ Rails.application.config.after_initialize do
       end
 
       def encrypt_settings
-        s = self.settings.dup
+        s = settings.dup
         if (encryption_key = s.delete(:encryption_key))
           secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
           s[:encryption_key_enc] = secret
           s[:encryption_key_salt] = salt
         end
-        if s != self.settings
+        if s != settings
           self.settings = s
         end
         s

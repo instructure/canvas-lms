@@ -69,7 +69,7 @@ module CanvasPartman
                     partitions.last[base_class.table_name.length + 1..].to_i
                   end
 
-        if self.partition_on_primary_key?
+        if partition_on_primary_key?
           partitions.reverse_each do |partition|
             break if empties >= advance
             break if base_class.from(base_class.connection.quote_table_name(partition)).exists?
@@ -77,7 +77,7 @@ module CanvasPartman
             empties += 1
           end
         else
-          id = self.maximum_foreign_id
+          id = maximum_foreign_id
           last_needed = id ? (id / base_class.partition_size) : -1
           # yes `empties` could be negative but that just means we'll make even more partitions to catch up
           empties = current - last_needed

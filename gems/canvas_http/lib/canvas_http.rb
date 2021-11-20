@@ -200,13 +200,13 @@ module CanvasHttp
     end
     raise ArgumentError if !allowed_schemes.nil? && !allowed_schemes.include?(uri.scheme.downcase)
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
-    raise InsecureUriError if check_host && self.insecure_host?(uri.host)
+    raise InsecureUriError if check_host && insecure_host?(uri.host)
 
     [value, uri]
   end
 
   def self.insecure_host?(host)
-    return unless (filters = self.blocked_ip_filters)
+    return unless (filters = blocked_ip_filters)
 
     resolved_addrs = Resolv.getaddresses(host)
     unless resolved_addrs.any?

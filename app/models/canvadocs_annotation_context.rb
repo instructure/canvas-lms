@@ -63,7 +63,7 @@ class CanvadocsAnnotationContext < ApplicationRecord
   end
 
   def draft?
-    self.submission_attempt.nil?
+    submission_attempt.nil?
   end
 
   def set_launch_id
@@ -71,6 +71,6 @@ class CanvadocsAnnotationContext < ApplicationRecord
   end
 
   def set_root_account_id
-    self.root_account_id ||= self.submission&.root_account_id
+    self.root_account_id ||= submission&.root_account_id
   end
 end

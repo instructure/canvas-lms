@@ -8122,7 +8122,7 @@ describe Assignment do
         @called = false
         allow_any_instance_of(Submission).to receive(:assignment_muted_changed) do
           @called = true
-          expect(self.submission_model).to eq @submission
+          expect(submission_model).to eq @submission
         end
 
         @assignment.unmute!

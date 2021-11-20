@@ -26,7 +26,7 @@ module Importers
     def self.process_migration(data, migration)
       pace_plans = data['pace_plans'] || []
       pace_plans.each do |pace_plan|
-        self.import_from_migration(pace_plan, migration.context, migration)
+        import_from_migration(pace_plan, migration.context, migration)
       end
     end
 

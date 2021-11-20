@@ -29,17 +29,17 @@ module Polling
 
     set_policy do
       given do |user, session|
-        self.poll.grants_right?(user, session, :update)
+        poll.grants_right?(user, session, :update)
       end
       can :read and can :create and can :delete and can :publish
 
       given do |user, session|
-        self.visible_to?(user, session)
+        visible_to?(user, session)
       end
       can :read
 
       given do |user, session|
-        self.visible_to?(user, session) && self.is_published?
+        visible_to?(user, session) && is_published?
       end
       can :submit
     end
@@ -69,15 +69,15 @@ module Polling
     end
 
     def visible_to?(user, session)
-      self.course.grants_right?(user, session, :read) &&
-        (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
+      course.grants_right?(user, session, :read) &&
+        (course_section ? course_section.grants_right?(user, session, :read) : true)
     end
 
     private
 
     def section_belongs_to_course
-      if self.course && self.course_section
-        unless self.course.course_sections.include?(course_section)
+      if course && course_section
+        unless course.course_sections.include?(course_section)
           errors.add(:base, I18n.t('polling.poll_sessions.validations.section_belongs_to_course',
                                    'That course section does not belong to the existing course.'))
         end

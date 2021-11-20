@@ -220,7 +220,7 @@ class WebConference < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    [self.user_id] + self.web_conference_participants.map(&:user_id)
+    [user_id] + web_conference_participants.map(&:user_id)
   end
 
   def context_is_available?
@@ -237,14 +237,14 @@ class WebConference < ActiveRecord::Base
   def add_user(user, type)
     return unless user
 
-    p = self.web_conference_participants.where(user_id: user).first
-    p ||= self.web_conference_participants.build(user: user)
+    p = web_conference_participants.where(user_id: user).first
+    p ||= web_conference_participants.build(user: user)
     p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.
     if type == 'attendee'
       self.started_at ||= Time.now
-      self.save
+      save
     end
     p.save
   end
@@ -283,7 +283,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def context_code
-    read_attribute(:context_code) || "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    read_attribute(:context_code) || "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
   def infer_conference_settings; end
@@ -306,19 +306,19 @@ class WebConference < ActiveRecord::Base
   def infer_conference_details
     infer_conference_settings
     self.conference_type ||= config && config[:conference_type]
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
     self.added_user_ids ||= ""
-    self.title ||= self.context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
+    self.title ||= context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
     self.start_at ||= self.started_at
-    self.end_at ||= self.ended_at
-    self.end_at ||= self.start_at + self.duration.minutes if self.start_at && self.duration
-    if self.started_at && self.ended_at && self.ended_at < self.started_at
+    self.end_at ||= ended_at
+    self.end_at ||= self.start_at + duration.minutes if self.start_at && duration
+    if self.started_at && ended_at && ended_at < self.started_at
       self.ended_at = self.started_at
     end
   end
 
   def initiator
-    self.user
+    user
   end
 
   def available?
@@ -326,7 +326,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def finished?
-    self.started_at && !self.active?
+    self.started_at && !active?
   end
 
   def long_running?
@@ -352,10 +352,10 @@ class WebConference < ActiveRecord::Base
 
   def restart
     self.start_at ||= Time.now
-    self.end_at = self.duration && (self.start_at + self.duration_in_seconds)
+    self.end_at = duration && (self.start_at + duration_in_seconds)
     self.started_at ||= self.start_at
     self.ended_at = nil
-    self.save
+    save
   end
 
   # Default implementation since most implementations don't support scheduling yet
@@ -370,9 +370,9 @@ class WebConference < ActiveRecord::Base
 
   def active?(force_check = false, allow_check = true)
     unless force_check
-      return false if self.ended_at && Time.now > self.ended_at
+      return false if ended_at && Time.now > ended_at
       return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.now > self.start_at && Time.now < self.end_at))
-      return true if self.ended_at && Time.now < self.ended_at
+      return true if ended_at && Time.now < ended_at
       return @conference_active unless @conference_active.nil?
     end
     unless allow_check
@@ -386,19 +386,19 @@ class WebConference < ActiveRecord::Base
     # based on the start time and duration
     if @conference_active && !self.end_at && !long_running?
       self.start_at ||= Time.now
-      self.end_at = [self.start_at, Time.now].compact.min + self.duration_in_seconds
-      self.save
+      self.end_at = [self.start_at, Time.now].compact.min + duration_in_seconds
+      save
     # If the conference is still active but it's been more than fifteen minutes
     # since it was supposed to end, just go ahead and end it
-    elsif @conference_active && self.end_at && self.end_at < 15.minutes.ago && !self.ended_at
+    elsif @conference_active && self.end_at && self.end_at < 15.minutes.ago && !ended_at
       self.ended_at = Time.now
       self.start_at ||= self.started_at
-      self.end_at ||= self.ended_at
+      self.end_at ||= ended_at
       @conference_active = false
-      self.save
+      save
     # If the conference is no longer in use and its end_at has passed,
     # consider it ended
-    elsif @conference_active == false && self.started_at && self.end_at && self.end_at < Time.now && !self.ended_at
+    elsif @conference_active == false && self.started_at && self.end_at && self.end_at < Time.now && !ended_at
       close
     end
     @conference_active
@@ -420,7 +420,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def attendee_key
-    @attendee_key ||= self.conference_key
+    @attendee_key ||= conference_key
   end
 
   # Default implementaiton since not every conference type requires initiation
@@ -436,7 +436,7 @@ class WebConference < ActiveRecord::Base
   def craft_url(user = nil, session = nil, return_to = "http://www.instructure.com")
     user ||= self.user
     (initiate_conference and touch) or return nil
-    if user == self.user || self.grants_right?(user, session, :initiate)
+    if user == self.user || grants_right?(user, session, :initiate)
       admin_join_url(user, return_to)
     else
       participant_join_url(user, return_to)
@@ -454,19 +454,19 @@ class WebConference < ActiveRecord::Base
   scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
-    given { |user, session| self.users.include?(user) && self.context.grants_right?(user, session, :read) }
+    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) }
     can :read and can :join
 
-    given { |user, session| self.users.include?(user) && self.context.grants_right?(user, session, :read) && long_running? && active? }
+    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) && long_running? && active? }
     can :resume
 
-    given { |user, session| self.context.grants_right?(user, session, :create_conferences) }
+    given { |user, session| context.grants_right?(user, session, :create_conferences) }
     can :create
 
-    given { |user, session| user && user.id == self.user_id && self.context.grants_right?(user, session, :create_conferences) }
+    given { |user, session| user && user.id == user_id && context.grants_right?(user, session, :create_conferences) }
     can :initiate and can :close
 
-    given { |user, session| self.context.grants_all_rights?(user, session, :manage_content, :create_conferences) }
+    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) }
     can :read and can :join and can :initiate and can :delete and can :close and can :manage_recordings
 
     given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && !finished? }
@@ -506,7 +506,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def user_ids
-    self.web_conference_participants.pluck(:user_id)
+    web_conference_participants.pluck(:user_id)
   end
 
   def self.conference_types(context)
@@ -551,7 +551,7 @@ class WebConference < ActiveRecord::Base
     plugins.filter_map { |plugin|
       next unless plugin.enabled? &&
                   (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-                  klass < self.base_class
+                  klass < base_class
 
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
@@ -576,11 +576,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def set_root_account_id
-    case self.context
+    case context
     when Course, Group
-      self.root_account_id = self.context.root_account_id
+      self.root_account_id = context.root_account_id
     when Account
-      self.root_account_id = self.context.resolved_root_account_id
+      self.root_account_id = context.resolved_root_account_id
     end
   end
 end

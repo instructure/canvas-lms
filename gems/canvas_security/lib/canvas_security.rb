@@ -93,7 +93,7 @@ module CanvasSecurity
   def self.encrypt_data(data)
     nonce = SecureRandom.bytes(12)
     encryptor = OpenSSL::Cipher.new('aes-256-gcm').encrypt
-    encryptor.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    encryptor.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     encryptor.iv = nonce
     encryptor.auth_data = 'Canvas-v1.0.0'
     encrypted_data = encryptor.update(data) + encryptor.final
@@ -103,7 +103,7 @@ module CanvasSecurity
 
   def self.decrypt_data(data, nonce, tag)
     decipher = OpenSSL::Cipher.new('aes-256-gcm').decrypt
-    decipher.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    decipher.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     decipher.iv = nonce
     decipher.auth_tag = tag
     decipher.auth_data = 'Canvas-v1.0.0'

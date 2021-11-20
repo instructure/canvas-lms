@@ -420,7 +420,7 @@ describe EventStream::IndexStrategy::Cassandra do
       @table = double('table')
       table = @table
       @stream = EventStream::Stream.new do
-        self.database database
+        database database
         self.table table
       end
       base_index = @stream.add_index :thing do

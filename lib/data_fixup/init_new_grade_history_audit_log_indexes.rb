@@ -70,7 +70,7 @@ module DataFixup
       result.fetch do |row|
         last_id = row['id']
         INDEX_METHODS.each do |method|
-          result = self.send(method, row)
+          result = send(method, row)
           index_entries << result if result
         end
       end

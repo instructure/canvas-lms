@@ -52,8 +52,8 @@ class UserObservationLink < ActiveRecord::Base
 
     shard = cross_shard_record ? observer.shard : student.shard
     result = shard.activate do
-      self.unique_constraint_retry do
-        if (uo = self.where(student: student, observer: observer).for_root_accounts(root_account).take)
+      unique_constraint_retry do
+        if (uo = where(student: student, observer: observer).for_root_accounts(root_account).take)
           if uo.workflow_state == 'deleted'
             uo.workflow_state = 'active'
             uo.sis_batch_id = nil
@@ -83,21 +83,21 @@ class UserObservationLink < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    if !self.skip_destroy_other_record && (other = other_record)
+    if !skip_destroy_other_record && (other = other_record)
       other.skip_destroy_other_record = true
       other.destroy
     end
     self.workflow_state = 'deleted'
-    self.save!
+    save!
     remove_linked_enrollments if primary_record?
   end
 
   def not_same_user
-    self.errors.add(:observer_id, "Cannot observe yourself") if self.user_id == self.observer_id
+    errors.add(:observer_id, "Cannot observe yourself") if user_id == observer_id
   end
 
   def filter_enrollment_scope(user, scope)
-    account_ids = [self.root_account.id] + self.root_account.trusted_account_ids
+    account_ids = [root_account.id] + root_account.trusted_account_ids
     shards = account_ids.map { |id| Shard.shard_for(id) }.uniq & user.associated_shards
     scope.shard(shards).where(root_account_id: account_ids)
   end

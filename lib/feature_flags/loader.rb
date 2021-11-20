@@ -77,9 +77,9 @@ module FeatureFlags
     end
 
     def self.load_feature_flags
-      definitions = self.load_yaml_files
+      definitions = load_yaml_files
       definitions.each do |name, definition|
-        self.load_definition(name, definition)
+        load_definition(name, definition)
       end
     end
 

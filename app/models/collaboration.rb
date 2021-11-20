@@ -55,15 +55,15 @@ class Collaboration < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    [self.user_id] + self.collaborators.map(&:user_id)
+    [user_id] + collaborators.map(&:user_id)
   end
 
   set_policy do
     given { |user|
       user &&
-        !self.new_record? &&
-        (self.user_id == user.id ||
-         self.users.include?(user) ||
+        !new_record? &&
+        (user_id == user.id ||
+         users.include?(user) ||
          Collaborator
              .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id")
              .where('collaborators.group_id IS NOT NULL AND
@@ -72,15 +72,15 @@ class Collaboration < ActiveRecord::Base
     }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :create_collaborations) }
+    given { |user, session| context.grants_right?(user, session, :create_collaborations) }
     can :create
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
+    given { |user, session| context.grants_right?(user, session, :manage_content) }
     can :read and can :update and can :delete
 
     given { |user, session|
-      user && self.user_id == user.id &&
-        self.context.grants_right?(user, session, :create_collaborations)
+      user && user_id == user.id &&
+        context.grants_right?(user, session, :create_collaborations)
     }
     can :read and can :update and can :delete
   end
@@ -212,14 +212,14 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def include_author_as_collaborator
-    return unless self.user.present?
+    return unless user.present?
 
-    author = collaborators.where(:user_id => self.user_id).first
+    author = collaborators.where(:user_id => user_id).first
 
     unless author
       collaborator = Collaborator.new(:collaboration => self)
-      collaborator.user_id = self.user_id
-      collaborator.authorized_service_user_id = authorized_service_user_id_for(self.user)
+      collaborator.user_id = user_id
+      collaborator.authorized_service_user_id = authorized_service_user_id_for(user)
       collaborator.save
     end
   end
@@ -238,7 +238,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a comma-seperated list of collaborator user IDs.
   def collaborator_ids
-    self.collaborators.pluck(:user_id).join(',')
+    collaborators.pluck(:user_id).join(',')
   end
 
   # Internal: Create the collaboration document in the remote service.
@@ -302,7 +302,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a context code.
   def set_context_code
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
+    self.context_code = "#{context_type.underscore}_#{context_id}"
   rescue NoMethodError
     nil
   end
@@ -324,7 +324,7 @@ class Collaboration < ActiveRecord::Base
         users_to_remove.uniq!
       end
       # make real user objects, instead of just ids, cause that's what this code expects
-      users_to_remove.reject! { |id| id == self.user.id }
+      users_to_remove.reject! { |id| id == user.id }
       users_to_remove = users_to_remove.map { |id| User.send(:instantiate, 'id' => id) }
       remove_users_from_document(users_to_remove)
     end

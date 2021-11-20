@@ -35,9 +35,7 @@ class ActiveSupport::TimeWithZone
     false
   end
 
-  def utc_datetime
-    self.comparable_time.utc_datetime
-  end
+  delegate :utc_datetime, to: :comparable_time
 end
 
 module TimeZoneAsJson

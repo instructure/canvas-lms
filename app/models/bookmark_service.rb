@@ -31,7 +31,7 @@ class BookmarkService < UserService
     description = opts[:comments] || ""
     tags = opts[:tags] || ['instructure']
     begin
-      case self.service
+      case service
       when 'delicious'
         delicious_post_bookmark(self, url, title, description, tags)
       when 'diigo'
@@ -43,7 +43,7 @@ class BookmarkService < UserService
   end
 
   def find_bookmarks(query)
-    if self.service == 'diigo'
+    if service == 'diigo'
       last_get = Rails.cache.fetch('last_diigo_lookup') { Time.now - 60 }
       if Time.now - last_get < 8
         Rails.cache.write('last_diigo_lookup', Time.now)

@@ -23,11 +23,11 @@ module Folio::WillPaginate::ActiveRecord::Pagination
   def paginate(options = {})
     unless options.key?(:total_entries)
       scope = if ::Rails.version < '4'
-                self.scoped
-              elsif self.is_a?(::ActiveRecord::Relation)
+                scoped
+              elsif is_a?(::ActiveRecord::Relation)
                 self
               elsif self < ::ActiveRecord::Base
-                self.all
+                all
               else
                 self.scope
               end

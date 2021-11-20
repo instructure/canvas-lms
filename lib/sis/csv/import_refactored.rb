@@ -81,7 +81,7 @@ module SIS
       end
 
       def self.process(root_account, opts = {})
-        importer = self.new(root_account, opts)
+        importer = new(root_account, opts)
         importer.process
         importer
       end

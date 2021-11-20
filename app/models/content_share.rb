@@ -47,13 +47,13 @@ class ContentShare < ActiveRecord::Base
   scope :by_date, -> { order(created_at: :desc) }
 
   def clone_for(receiver)
-    receiver.received_content_shares.create!(sender: self.user,
-                                             content_export: self.content_export,
-                                             name: self.name,
+    receiver.received_content_shares.create!(sender: user,
+                                             content_export: content_export,
+                                             name: name,
                                              read_state: 'unread')
   end
 
   def set_root_account_id
-    self.root_account_id = self.content_export&.context&.root_account_id if self.content_export&.context.respond_to?(:root_account_id)
+    self.root_account_id = content_export&.context&.root_account_id if content_export&.context.respond_to?(:root_account_id)
   end
 end

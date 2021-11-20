@@ -121,8 +121,8 @@ class BigBlueButtonConference < WebConference
   def initiate_conference
     return conference_key if conference_key && !retouch?
 
-    unless self.conference_key
-      self.conference_key = "instructure_#{self.feed_code}".gsub(/[^a-zA-Z0-9_]/, "_")
+    unless conference_key
+      self.conference_key = "instructure_#{feed_code}".gsub(/[^a-zA-Z0-9_]/, "_")
       chars = ('a'..'z').to_a + ('0'..'9').to_a
       # create user/admin passwords for this conference. we may want to show
       # the admin passwords in the ui in case moderators need them for any
@@ -153,14 +153,14 @@ class BigBlueButtonConference < WebConference
   end
 
   def recording_ready_user
-    if self.grants_right?(self.user, :create)
-      "#{self.user['name']} <#{self.user.email}>"
+    if grants_right?(user, :create)
+      "#{user['name']} <#{user.email}>"
     end
   end
 
   def recording_ready_url(current_host = nil)
     polymorphic_url([:api_v1, context, :conferences, :recording_ready],
-                    conference_id: self.id,
+                    conference_id: id,
                     protocol: HostUrl.protocol,
                     host: HostUrl.context_host(context, current_host))
   end
@@ -260,7 +260,7 @@ class BigBlueButtonConference < WebConference
   def use_fallback_config?
     # use the fallback config (if possible) if it wasn't created with the current config
     self.class.config[:use_fallback] &&
-      self.settings[:domain] != self.class.config[:domain]
+      settings[:domain] != self.class.config[:domain]
   end
 
   private

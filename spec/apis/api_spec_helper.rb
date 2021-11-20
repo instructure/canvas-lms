@@ -22,7 +22,7 @@ require 'nokogiri'
 
 class HashWithDupCheck < Hash
   def []=(k, v)
-    if self.key?(k)
+    if key?(k)
       raise ArgumentError, "key already exists: #{k.inspect}"
     else
       super

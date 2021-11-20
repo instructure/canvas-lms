@@ -51,26 +51,26 @@ class AssessmentQuestion < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+      context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
     end
     can :read and can :create and can :update and can :delete
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_add)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_delete)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_delete)
     end
     can :read and can :delete
   end
 
   def user_can_see_through_quiz_question?(user, session = nil)
-    self.shard.activate do
-      quiz_ids = self.quiz_questions.distinct.pluck(:quiz_id)
+    shard.activate do
+      quiz_ids = quiz_questions.distinct.pluck(:quiz_id)
       quiz_ids.any? && Quizzes::Quiz.where(:id => quiz_ids, :context_type => "Course",
                                            :context_id => Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
     end
@@ -84,15 +84,15 @@ class AssessmentQuestion < ActiveRecord::Base
       end
       self.question_data[:name] = self.question_data[:question_name]
     end
-    self.name = self.question_data[:question_name] || self.name
-    self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(self.initial_context)
+    self.name = self.question_data[:question_name] || name
+    self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(initial_context)
   end
 
   def translate_links_if_changed
     # this has to be in an after_save, because translate_links may create attachments
     # with this question as the context, and if this question does not exist yet,
     # creating that attachment will fail.
-    if self.saved_change_to_question_data? && !@skip_translate_links
+    if saved_change_to_question_data? && !@skip_translate_links
       AssessmentQuestion.connection.after_transaction_commit do
         translate_links
       end
@@ -182,21 +182,21 @@ class AssessmentQuestion < ActiveRecord::Base
       self.question_data = hash
 
       @skip_translate_links = true
-      self.save!
+      save!
       @skip_translate_links = false
     end
   end
 
   def data
     res = self.question_data || HashWithIndifferentAccess.new
-    res[:assessment_question_id] = self.id
+    res[:assessment_question_id] = id
     res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz
     # has some questions manually created and some pulled from a
     # bank, it's possible that a manual question's id could match
     # an assessment_question's id.  This would prevent the user
     # from being able to answer both questions when taking the quiz.
-    res[:id] = self.id
+    res[:id] = id
     res
   end
 
@@ -236,17 +236,17 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def editable_by?(question)
-    if self.independently_edited? ||
+    if independently_edited? ||
        # If the assessment_question was created long before the quiz_question,
        # then the assessment question must have been created on its own, which means
        # it shouldn't be affected by changes to the quiz_question since it wasn't
        # based on the quiz_question to begin with
-       (!self.new_record? && question.assessment_question_id == self.id && question.created_at && self.created_at < question.created_at + 5.minutes && self.created_at > question.created_at + 30.seconds) ||
+       (!new_record? && question.assessment_question_id == id && question.created_at && created_at < question.created_at + 5.minutes && created_at > question.created_at + 30.seconds) ||
        (self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title) ||
        (question.is_a?(Quizzes::QuizQuestion) && question.generated?)
       false
     else
-      self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
+      new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == id)
     end
   end
 
@@ -318,7 +318,7 @@ class AssessmentQuestion < ActiveRecord::Base
     self.assessment_question_bank.touch
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    self.save
+    save
   end
 
   def self.parse_question(qdata, assessment_question = nil)
@@ -361,7 +361,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def clone_for(question_bank, dup = nil, **)
     dup ||= AssessmentQuestion.new
-    self.attributes.except("id", "question_data").each do |key, val|
+    attributes.except("id", "question_data").each do |key, val|
       dup.send("#{key}=", val)
     end
     dup.assessment_question_bank_id = question_bank

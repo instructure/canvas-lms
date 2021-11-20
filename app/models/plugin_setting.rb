@@ -62,12 +62,12 @@ class PluginSetting < ActiveRecord::Base
   # it's set) and be able to tell when it gets blanked out.
   DUMMY_STRING = "~!?3NCRYPT3D?!~"
   def initialize_plugin_setting
-    return unless settings && self.plugin
+    return unless settings && plugin
 
     @valid_settings = true
-    if self.plugin.encrypted_settings
-      was_dirty = self.changed?
-      self.plugin.encrypted_settings.each do |key|
+    if plugin.encrypted_settings
+      was_dirty = changed?
+      plugin.encrypted_settings.each do |key|
         if settings["#{key}_enc".to_sym]
           begin
             settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
@@ -78,7 +78,7 @@ class PluginSetting < ActiveRecord::Base
         end
       end
       # We shouldn't consider a plugin setting to be dirty if all that changed were the decrypted/placeholder attributes
-      self.clear_changes_information unless was_dirty
+      clear_changes_information unless was_dirty
     end
   end
 
@@ -87,8 +87,8 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def encrypt_settings
-    if settings && self.plugin && self.plugin.encrypted_settings
-      self.plugin.encrypted_settings.each do |key|
+    if settings && plugin && plugin.encrypted_settings
+      plugin.encrypted_settings.each do |key|
         unless settings[key].blank?
           value = settings.delete(key)
           settings.delete("#{key}_dec".to_sym)
@@ -139,7 +139,7 @@ class PluginSetting < ActiveRecord::Base
 
   def clear_cache
     self.class.connection.after_transaction_commit do
-      MultiCache.delete(PluginSetting.settings_cache_key(self.name))
+      MultiCache.delete(PluginSetting.settings_cache_key(name))
     end
   end
 

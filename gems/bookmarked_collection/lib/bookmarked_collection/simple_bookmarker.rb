@@ -55,7 +55,7 @@
 module BookmarkedCollection
   class Bookmark < Array
     def <=>(other)
-      length = [self.size, other.size].min
+      length = [size, other.size].min
       length.times do |i|
         if self[i].nil? && other[i].nil?
           next
