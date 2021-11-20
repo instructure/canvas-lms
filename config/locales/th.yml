@@ -4984,7 +4984,7 @@ th:
     other: "%{count} ผลงานจัดส่งที่ต้องให้เกรด"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} จะถูกลบและเกินกว่าเกณฑ์ขั้นต่ำที่กำหนดไว้ที่ %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} การเปลี่ยนแปลงที่ไม่ได้เผยแพร่"
+    one: "1 การเปลี่ยนแปลงที่ไม่ได้เผยแพร่"
     other: "%{count} การเปลี่ยนแปลงที่ไม่ได้เผยแพร่"
   count_unread_cff5855: "%{count} ที่ไม่ได้อ่าน"
   count_unread_messages_e312aa7b: 
