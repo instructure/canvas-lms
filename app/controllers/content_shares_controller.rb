@@ -279,7 +279,7 @@ class ContentSharesController < ApplicationController
       false
     end
 
-    # TODO verify we're allowed to send content to these users, once we decide how to do that
+    # TODO: verify we're allowed to send content to these users, once we decide how to do that
   end
 
   def create_receiver_shares(sender_share, receivers)

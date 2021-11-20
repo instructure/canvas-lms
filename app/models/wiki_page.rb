@@ -123,7 +123,7 @@ class WikiPage < ActiveRecord::Base
 
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/) { $1.capitalize }.strip }
     self.title ||= to_cased_title.call(url || "page")
-    # TODO i18n (see wiki.rb)
+    # TODO: i18n (see wiki.rb)
 
     if self.title == "Front Page" && new_record?
       baddies = context.wiki_pages.not_deleted.where(title: "Front Page").reject { |p| p.url == "front-page" }

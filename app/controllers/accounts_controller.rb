@@ -1580,7 +1580,7 @@ class AccountsController < ApplicationController
   end
   protected :build_course_stats
 
-  # TODO Refactor add_account_user and remove_account_user actions into
+  # TODO: Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if (role_id = params[:role_id])

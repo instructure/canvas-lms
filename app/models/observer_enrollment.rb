@@ -70,7 +70,7 @@ class ObserverEnrollment < Enrollment
     end
   end
 
-  # note: naively finding users by these ID's may not work due to sharding
+  # NOTE: naively finding users by these ID's may not work due to sharding
   def self.observed_student_ids(context, current_user)
     context.shard.activate do
       context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user).pluck(:associated_user_id)

@@ -187,7 +187,7 @@ class GradeCalculator
         reloaded_scores = Score.where(id: scores_info[:ids]).index_by(&:id)
         scores_batch.each do |score|
           reloaded_score = reloaded_scores[score.id]
-          # Note: only the old score has enrollment pre-loaded
+          # NOTE: only the old score has enrollment pre-loaded
           create_course_grade_live_event(score, reloaded_score) if @emit_live_event
 
           thresholds = preloaded_thresholds.fetch(score.enrollment.user_id, [])

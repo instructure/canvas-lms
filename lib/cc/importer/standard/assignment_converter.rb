@@ -33,7 +33,7 @@ module CC::Importer::Standard
           end
           parse_cc_assignment_data(asmnt, doc, resource_dir)
 
-          # FIXME check the XML namespace to make sure it's actually a canvas assignment
+          # FIXME: check the XML namespace to make sure it's actually a canvas assignment
           # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
           if (assgn_node = doc.at_css('extensions > assignment'))
             parse_canvas_assignment_data(assgn_node, nil, asmnt)
@@ -72,7 +72,7 @@ module CC::Importer::Standard
       if doc.css('attachment')
         asmnt[:description] += "\n<ul>"
         doc.css('attachment').each do |att_node|
-          # todo next if type is teachers
+          # TODO: next if type is teachers
           att_path = att_node['href']
           url = @canvas_converter ? att_path : (get_canvas_att_replacement_url(att_path, resource_dir) || att_path)
           asmnt[:description] += "\n<li><a href=\"#{url}\">#{File.basename att_path}</a>"

@@ -33,7 +33,7 @@ describe "assignments" do
   include CustomSeleniumActions
   include K5Common
 
-  # note: due date testing can be found in assignments_overrides_spec
+  # NOTE: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
     before(:once) do

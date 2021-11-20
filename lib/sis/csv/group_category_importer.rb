@@ -20,7 +20,7 @@
 
 module SIS
   module CSV
-    # note these are account-level group categories, not course groups
+    # NOTE: these are account-level group categories, not course groups
     class GroupCategoryImporter < CSVBaseImporter
       def self.group_category_csv?(row)
         row.include?('group_category_id') && row.include?('category_name')

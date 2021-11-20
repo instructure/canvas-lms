@@ -461,7 +461,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.starred = false
       self.visible_last_authored_at = nil
     end
-    # note that last_authored_at doesn't know/care about messages you may
+    # NOTE: last_authored_at doesn't know/care about messages you may
     # have deleted... this is because it is only used by other participants
     # when displaying the most active participants in the conversation.
     # visible_last_authored_at, otoh, takes into account ones you've deleted

@@ -554,7 +554,7 @@ class AppointmentGroupsController < ApplicationController
     ag_scope = AppointmentGroup.current.reservable_by(@current_user)
     ids = Array(params[:appointment_group_ids])
     ag_scope = ag_scope.where(id: ids) if ids.any?
-    # FIXME this could be a lot faster if we didn't look at eligibility to sign up.
+    # FIXME: this could be a lot faster if we didn't look at eligibility to sign up.
     # since the UI only cares about the date to jump to, it might not make a difference in many cases
     events = ag_scope.preload(:appointments => :child_events).to_a.filter_map do |ag|
       ag.appointments.detect do |appointment|

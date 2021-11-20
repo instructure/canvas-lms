@@ -697,7 +697,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
-    # note that self may not match versions.current, because we only save a new version on actual submit
+    # NOTE: that self may not match versions.current, because we only save a new version on actual submit
     raise "Can't update submission scores unless it's completed" if !completed? && !params[:submission_version_number]
 
     data = version.model.submission_data || []

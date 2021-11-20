@@ -189,7 +189,7 @@ module Autoextend::ClassMethods
   end
 end
 
-# Note: Autoextend can't detect a module being defined,
+# NOTE: Autoextend can't detect a module being defined,
 # only when it gets included into a class.
 module Autoextend::ModuleMethods
   def prepended(klass)

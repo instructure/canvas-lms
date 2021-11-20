@@ -168,7 +168,7 @@ describe "content migrations", :non_parallel do
       @filename = 'cc_full_test.zip'
     end
 
-    # TODO reimplement per CNVS-29593, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29593, but make sure we're testing at the right level
     it "should import all content immediately by default"
 
     it "shows each form" do
@@ -226,10 +226,10 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    # TODO reimplement per CNVS-29594, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29594, but make sure we're testing at the right level
     it "should import selective content"
 
-    # TODO reimplement per CNVS-29595, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29595, but make sure we're testing at the right level
     it "should overwrite quizzes when option is checked and duplicate otherwise"
 
     it "shifts dates" do
@@ -256,17 +256,17 @@ describe "content migrations", :non_parallel do
       expect(Date.parse(opts["new_end_date"])).to eq Date.new(2014, 8, 15)
     end
 
-    # TODO reimplement per CNVS-29596, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29596, but make sure we're testing at the right level
     it "should remove dates"
 
     context "default question bank" do
-      # TODO reimplement per CNVS-29597, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29597, but make sure we're testing at the right level
       it "should import into selected question bank"
 
-      # TODO reimplement per CNVS-29598, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29598, but make sure we're testing at the right level
       it "should import into new question bank"
 
-      # TODO reimplement per CNVS-29599, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29599, but make sure we're testing at the right level
       it "should import into default question bank if not selected"
     end
   end

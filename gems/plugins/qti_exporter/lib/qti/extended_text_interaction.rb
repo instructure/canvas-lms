@@ -43,7 +43,7 @@ module Qti
     def process_response_conditions
       fib_map = {}
       if @question[:is_vista_fib]
-        # todo: refactor Blackboard FIB stuff into FillInTheBlank class
+        # TODO: refactor Blackboard FIB stuff into FillInTheBlank class
         # if it's a vista fill in the blank we need to change the FIB01 labels to the blank name in the question text
         regex = /\[([^\]]*)\]/
         count = 0

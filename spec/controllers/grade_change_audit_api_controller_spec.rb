@@ -427,7 +427,7 @@ describe GradeChangeAuditApiController do
       end
 
       before do
-        # FIXME this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
+        # FIXME: this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
         Auditors::GradeChange.record(override_grade_change: @override_grade_change)
       end
 

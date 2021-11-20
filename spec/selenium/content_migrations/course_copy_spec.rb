@@ -50,7 +50,7 @@ describe "course copy" do
     expect(@new_course.wiki_pages.count).to eq 1
   end
 
-  # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
+  # TODO: reimplement per CNVS-29604, but make sure we're testing at the right level
   it "should copy the course with different settings"
 
   it "sets the course name and code correctly" do

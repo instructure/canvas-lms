@@ -464,7 +464,7 @@ class GroupCategory < ActiveRecord::Base
 
   def create_groups(num)
     group_name = name
-    # TODO i18n
+    # TODO: i18n
     group_name = group_name.singularize if I18n.locale == :en
     num.times do |idx|
       groups.create(name: "#{group_name} #{idx + 1}", :context => context)

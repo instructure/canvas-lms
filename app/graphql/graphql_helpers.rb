@@ -59,7 +59,7 @@ module GraphQLHelpers
     end
   end
 
-  # TODO - move this into LockType after we switch to the class-based api
+  # TODO: move this into LockType after we switch to the class-based api
   def self.make_lock_resolver(attr)
     ->(lock, _, _) {
       if lock == false

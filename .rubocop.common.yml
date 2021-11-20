@@ -241,6 +241,8 @@ Style/ClassEqualityComparison:
   Severity: error
 Style/ColonMethodCall:
   Severity: error
+Style/CommentAnnotation:
+  Severity: error
 Style/ConditionalAssignment:
   Severity: error
 Style/DefWithParentheses:

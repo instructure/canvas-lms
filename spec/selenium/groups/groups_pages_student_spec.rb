@@ -175,7 +175,7 @@ describe "groups" do
           message: 'The Force Awakens',
           user: @user
         )
-        # note announcement_url includes a leading '/'
+        # NOTE: announcement_url includes a leading '/'
         AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload

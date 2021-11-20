@@ -162,7 +162,7 @@ class Folder < ActiveRecord::Base
   protected :infer_hidden_state
 
   def infer_full_name
-    # TODO i18n
+    # TODO: i18n
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if name.blank?
     self.name = name.strip.tr('/', "_")
