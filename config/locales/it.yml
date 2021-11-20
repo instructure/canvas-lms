@@ -6873,7 +6873,7 @@ it:
     other: "%{count} consegne richiedono la valutazione"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} verrebbe eliminato e supera la soglia impostata di %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} modifiche non pubblicate"
+    one: "1 modifica non pubblicata"
     other: "%{count} modifiche non pubblicate"
   count_unread_cff5855: "%{count} non letto."
   count_unread_messages_99d6bf17: 
