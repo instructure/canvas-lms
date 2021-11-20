@@ -258,6 +258,8 @@ Style/EvalWithLocation:
   Severity: error
 Style/EvenOdd:
   Severity: error
+Style/FloatDivision:
+  Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/For:
   Severity: error
 Style/FrozenStringLiteralComment:
