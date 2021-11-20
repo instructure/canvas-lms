@@ -84,12 +84,12 @@ describe "instfs file uploads" do
 
   def compare_md5s(image_element_src, original_file_path)
     downloaded_data = download_file(image_element_src)
-    if downloaded_data != false
+    if downloaded_data == false
+      false
+    else
       temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
       temp_md5 == original_md5
-    else
-      false
     end
   end
 

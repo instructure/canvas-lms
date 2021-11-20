@@ -176,7 +176,10 @@ class ContextModulesController < ApplicationController
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on
         if rule.present? && (rule[:locked] || !rule[:selected_set_id] || rule[:assignment_sets].length > 1)
-          if !rule[:locked]
+          if rule[:locked]
+            flash[:warning] = t('Module Item is locked.')
+            return redirect_to named_context_url(@context, :context_context_modules_url)
+          else
             options = rule[:assignment_sets].map { |set|
               option = {
                 setId: set[:id]
@@ -207,9 +210,6 @@ class ContextModulesController < ApplicationController
             @page_title = join_title(t('Choose Assignment Set'), @context.name)
 
             return render :html => '', :layout => true
-          else
-            flash[:warning] = t('Module Item is locked.')
-            return redirect_to named_context_url(@context, :context_context_modules_url)
           end
         end
       end

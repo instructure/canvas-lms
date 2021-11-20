@@ -182,10 +182,10 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       response = sendRequest(:generate_report, :oid => object_id, :utp => '2', :current_user => current_user, :user => user, :course => course, :assignment => assignment)
-      if !response.nil?
-        response[:report_url]
-      else
+      if response.nil?
         nil
+      else
+        response[:report_url]
       end
     end
 
@@ -195,10 +195,10 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       response = sendRequest(:generate_report, :oid => object_id, :utp => '1', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :tem => email(course))
-      if !response.nil?
-        response[:report_url]
-      else
+      if response.nil?
         nil
+      else
+        response[:report_url]
       end
     end
 

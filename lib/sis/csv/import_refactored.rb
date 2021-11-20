@@ -366,13 +366,13 @@ module SIS
 
         SisBatch.transaction do
           @batch.reload(:lock => true)
-          if !@batch.data[:completed_importers].include?(importer_type) # check for race condition
+          if @batch.data[:completed_importers].include?(importer_type)
+            false
+          else # check for race condition
             @batch.data[:completed_importers] << importer_type
             @batch.data[:counts][importer_type.to_s.pluralize.to_sym] = @batch.parallel_importers.where(:importer_type => importer_type).sum(:rows_processed).to_i
             @batch.save
             true
-          else
-            false
           end
         end
       end

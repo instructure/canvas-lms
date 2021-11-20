@@ -478,10 +478,10 @@ class WebConference < ActiveRecord::Base
   end
 
   def valid_config?
-    if !config
-      false
-    else
+    if config
       config[:class_name] == self.class.to_s
+    else
+      false
     end
   end
 

@@ -282,15 +282,15 @@ module AccountReports
     end
 
     def join_course_sub_account_scope(account, scope, table = 'courses')
-      if account != account.root_account
+      if account == account.root_account
+        scope
+      else
         scope.joins(<<~SQL.squish)
           join #{CourseAccountAssociation.quoted_table_name} caa
             ON caa.account_id = #{account.id}
             AND caa.course_id = #{table}.id
             AND caa.course_section_id IS NULL
         SQL
-      else
-        scope
       end
     end
 

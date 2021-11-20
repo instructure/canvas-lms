@@ -1870,10 +1870,7 @@ class ApplicationController < ActionController::Base
       @assignment&.prepare_for_ags_if_needed!(@tool)
 
       tag.context_module_action(@current_user, :read)
-      if !@tool
-        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-        redirect_to named_context_url(context, error_redirect_symbol)
-      else
+      if @tool
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -1969,6 +1966,9 @@ class ApplicationController < ActionController::Base
 
         @append_template = 'context_modules/tool_sequence_footer' if render_external_tool_append_template?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
+      else
+        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
+        redirect_to named_context_url(context, error_redirect_symbol)
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"

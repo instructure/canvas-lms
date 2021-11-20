@@ -158,10 +158,7 @@ module Api::V1::AssignmentOverride
 
     if !set_type && data.key?(:group_id)
       group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
-      if !group_category_id
-        # don't recognize group_id for non-group assignments
-        errors << "group_id is not valid for non-group assignments"
-      else
+      if group_category_id
         set_type = 'Group'
         # look up the group
         begin
@@ -170,6 +167,9 @@ module Api::V1::AssignmentOverride
           errors << "unknown group id #{data[:group_id].inspect}"
         end
         override_data[:group] = group
+      else
+        # don't recognize group_id for non-group assignments
+        errors << "group_id is not valid for non-group assignments"
       end
     end
 

@@ -704,7 +704,13 @@ module AccountReports
       end
 
       root_account.shard.activate do
-        group_categories = if account != root_account
+        group_categories = if account == root_account
+                             root_account.all_group_categories
+                                         .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
+                     AND group_categories.context_type = 'Account'
+                   LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+                     AND group_categories.context_type = 'Course'")
+                           else
                              GroupCategory
                                .joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                    AND group_categories.context_type = 'Course'")
@@ -713,12 +719,6 @@ module AccountReports
                                .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
                                       account,
                                       CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
-                           else
-                             root_account.all_group_categories
-                                         .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
-                     AND group_categories.context_type = 'Account'
-                   LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
-                     AND group_categories.context_type = 'Course'")
                            end
         group_categories = group_category_query_options(group_categories)
 

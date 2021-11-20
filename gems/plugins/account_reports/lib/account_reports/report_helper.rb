@@ -134,7 +134,9 @@ module AccountReports::ReportHelper
   end
 
   def add_course_sub_account_scope(scope, table = 'courses')
-    if account != root_account
+    if account == root_account
+      scope
+    else
       scope.where(<<~SQL.squish, account)
         EXISTS (SELECT course_id
                 FROM #{CourseAccountAssociation.quoted_table_name} caa
@@ -142,8 +144,6 @@ module AccountReports::ReportHelper
                 AND caa.course_id=#{table}.id
                 AND caa.course_section_id IS NULL)
       SQL
-    else
-      scope
     end
   end
 
@@ -156,13 +156,13 @@ module AccountReports::ReportHelper
   end
 
   def add_user_sub_account_scope(scope, table = 'users')
-    if account != root_account
+    if account == root_account
+      scope
+    else
       scope.where("EXISTS (SELECT user_id
                            FROM #{UserAccountAssociation.quoted_table_name} uaa
                            WHERE uaa.account_id = ?
                            AND uaa.user_id=#{table}.id)", account)
-    else
-      scope
     end
   end
 

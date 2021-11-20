@@ -161,11 +161,11 @@ class CutyCapt
       end
     end
 
-    if !success
+    if success
+      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
+    else
       File.unlink(img_file) if File.exist?(img_file)
       return nil
-    else
-      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
     end
 
     if block_given?

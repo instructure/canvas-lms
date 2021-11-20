@@ -713,28 +713,7 @@ class AssetUserAccessLog
           agg_sql = pulsar_ripcord_aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary, root_account_max_ids_map, ts.wday)
         end
         log_segment_aggregation = partition_model.connection.execute(agg_sql)
-        if !log_segment_aggregation.to_a.empty?
-          # we found records in this segment, we need to both
-          # compute the new iterator position (it's just the max
-          # of all ids because we constrained the aggregation to a range of ids,
-          # taking the full set of logs in that range)
-          update_query = compaction_sql(log_segment_aggregation)
-          new_iterator_pos = log_segment_aggregation.map { |r| r["max_id"] }.max
-          GuardRail.activate(:primary) do
-            partition_model.transaction do
-              log_message("batch updating (sometimes these queries don't get logged)...")
-              partition_model.connection.execute(update_query)
-              log_message("...batch update complete")
-              # Here we want to write the iteration state into the database
-              # so that we don't double count rows later.  The next time the job
-              # runs it can pick up at this point and only count rows that haven't yet been counted.
-              compaction_state[:max_log_ids][ts.wday] = new_iterator_pos
-              update_metadatum(compaction_state)
-            end
-          end
-          log_id_bookmark = new_iterator_pos
-          sleep(intra_batch_pause) if intra_batch_pause > 0.0
-        else
+        if log_segment_aggregation.to_a.empty?
           # no records found in this range, we must be paging through an open segment.
           # If we actually have a jump in sequences, there will
           # be more records greater than the batch, so we will choose
@@ -760,6 +739,27 @@ class AssetUserAccessLog
             update_metadatum(compaction_state)
           end
           log_id_bookmark = new_bookmark_id
+        else
+          # we found records in this segment, we need to both
+          # compute the new iterator position (it's just the max
+          # of all ids because we constrained the aggregation to a range of ids,
+          # taking the full set of logs in that range)
+          update_query = compaction_sql(log_segment_aggregation)
+          new_iterator_pos = log_segment_aggregation.map { |r| r["max_id"] }.max
+          GuardRail.activate(:primary) do
+            partition_model.transaction do
+              log_message("batch updating (sometimes these queries don't get logged)...")
+              partition_model.connection.execute(update_query)
+              log_message("...batch update complete")
+              # Here we want to write the iteration state into the database
+              # so that we don't double count rows later.  The next time the job
+              # runs it can pick up at this point and only count rows that haven't yet been counted.
+              compaction_state[:max_log_ids][ts.wday] = new_iterator_pos
+              update_metadatum(compaction_state)
+            end
+          end
+          log_id_bookmark = new_iterator_pos
+          sleep(intra_batch_pause) if intra_batch_pause > 0.0
         end
         batch_timestamp = Time.now.utc
         if (batch_timestamp - compaction_start) > (max_compaction_time * 60)

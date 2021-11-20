@@ -81,7 +81,12 @@ module Importers
         end
       end
 
-      if !outcome
+      if outcome
+        item = outcome
+        if context.respond_to?(:root_account) && context.root_account.feature_enabled?(:outcome_alignments_course_migration)
+          migration.add_imported_item(item, key: CC::CCHelper.create_key(item, global: true))
+        end
+      else
         if hash[:is_global_standard]
           if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
             # import from vendor with global outcomes
@@ -127,11 +132,6 @@ module Importers
         item.save!
 
         migration.add_imported_item(item)
-      else
-        item = outcome
-        if context.respond_to?(:root_account) && context.root_account.feature_enabled?(:outcome_alignments_course_migration)
-          migration.add_imported_item(item, key: CC::CCHelper.create_key(item, global: true))
-        end
       end
 
       # don't add a deleted outcome to an outcome group, or align it with an assignment

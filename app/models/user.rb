@@ -601,10 +601,10 @@ class User < ActiveRecord::Base
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
     unless precalculated_associations
-      users = if !users_or_user_ids.first.is_a?(User)
-                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-              else
+      users = if users_or_user_ids.first.is_a?(User)
                 users_or_user_ids
+              else
+                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
               end
 
       if opts[:all_shards]
@@ -2695,10 +2695,10 @@ class User < ActiveRecord::Base
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                 .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if !favorites.empty?
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    else
+    @menu_courses = if favorites.empty?
                       courses
+                    else
+                      favorites + courses.reject { |c| can_favorite.call(c) }
                     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses

@@ -308,6 +308,8 @@ Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
   Severity: error
+Style/NegatedIfElseCondition:
+  Severity: error
 Style/NegatedUnless:
   Severity: error
 Style/NegatedWhile:

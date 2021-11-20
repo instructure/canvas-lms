@@ -395,11 +395,11 @@ class GroupsController < ApplicationController
             return
           end
           @group.request_user(@current_user)
-          if !@group.grants_right?(@current_user, session, :read)
-            render :membership_pending
-          else
+          if @group.grants_right?(@current_user, session, :read)
             flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
             redirect_to named_context_url(@group.context, :context_groups_url)
+          else
+            render :membership_pending
           end
           return
         end

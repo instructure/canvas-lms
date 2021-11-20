@@ -847,11 +847,11 @@ class AccountsController < ApplicationController
             next unless quota_settings.key?(quota_type)
 
             quota_value = quota_settings[quota_type].to_s.strip
-            if !INTEGER_REGEX.match?(quota_value.to_s)
-              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
-            else
+            if INTEGER_REGEX.match?(quota_value.to_s)
               @account.errors.add(quota_type, t(:quota_must_be_positive, 'Value must be positive')) if quota_value.to_i < 0
               @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= (2**62) / 1.megabytes
+            else
+              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
             end
           end
         else

@@ -426,13 +426,13 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@page, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@page)
 
-      if !@was_front_page
+      if @was_front_page
+        @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
+        render :json => @page.errors, :status => :bad_request
+      else
         @page.destroy
         process_front_page
         render :json => wiki_page_json(@page, @current_user, session)
-      else
-        @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
-        render :json => @page.errors, :status => :bad_request
       end
     end
   end
