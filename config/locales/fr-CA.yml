@@ -7058,7 +7058,7 @@ fr-CA:
     other: "%{count} envois doivent être notées"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} éléments seront supprimés et dépassent la limite définie de %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} modifications non publiées"
+    one: "1 modification non publiée"
     other: "%{count} modifications non publiées"
   count_unread_cff5855: "%{count} non-lu."
   count_unread_messages_99d6bf17: 
