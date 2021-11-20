@@ -7424,7 +7424,7 @@ en-GB:
     other: "%{count} submissions need grading"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} unpublished changes"
+    one: "1 unpublished change"
     other: "%{count} unpublished changes"
   count_unread_cff5855: "%{count} unread."
   count_unread_messages_99d6bf17: 
