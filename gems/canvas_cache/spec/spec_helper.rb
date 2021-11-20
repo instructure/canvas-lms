@@ -50,7 +50,7 @@ CanvasCache.settings_store = MemorySettings.new
 
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
 RSpec.shared_context "caching_helpers", :shared_context => :metadata do
   # provide a way to temporarily replace the rails
