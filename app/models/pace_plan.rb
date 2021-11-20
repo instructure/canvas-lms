@@ -51,7 +51,7 @@ class PacePlan < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage) }
+    given { |user, session| course.grants_right?(user, session, :manage) }
     can :read
   end
 
@@ -59,7 +59,7 @@ class PacePlan < ActiveRecord::Base
 
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
-      self.errors.add(:base, "Only one of course_section_id and user_id can be given")
+      errors.add(:base, "Only one of course_section_id and user_id can be given")
     end
   end
 
@@ -70,10 +70,10 @@ class PacePlan < ActiveRecord::Base
       published_at: nil,
       workflow_state: 'unpublished'
     }
-    pace_plan = self.dup
+    pace_plan = dup
     pace_plan.attributes = default_opts.merge(opts)
 
-    self.pace_plan_module_items.each do |pace_plan_module_item|
+    pace_plan_module_items.each do |pace_plan_module_item|
       pace_plan.pace_plan_module_items.new(
         module_item_id: pace_plan_module_item.module_item_id,
         duration: pace_plan_module_item.duration,

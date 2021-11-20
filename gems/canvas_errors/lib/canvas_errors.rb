@@ -83,7 +83,7 @@ module CanvasErrors
   # convenience method, use this if you want to apply the 'type' tag without
   # having to pass in a whole hash
   def self.capture_exception(type, exception, level = :error)
-    self.capture(exception, { tags: { type: type.to_s } }, level)
+    capture(exception, { tags: { type: type.to_s } }, level)
   end
 
   # This is really just for clearing out the registry during tests,

@@ -32,30 +32,30 @@ class UserService < ActiveRecord::Base
   after_save :clear_cache_key
 
   def should_have_communication_channel?
-    [CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
+    [CommunicationChannel::TYPE_TWITTER].include?(service) && user
   end
 
   def assert_relations
     if should_have_communication_channel?
-      cc = self.user.communication_channels.where(path_type: service).first_or_initialize
+      cc = user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
       cc.workflow_state = 'active'
-      cc.path = "#{self.service_user_id}@#{service}.com"
+      cc.path = "#{service_user_id}@#{service}.com"
       cc.save!
     end
-    if self.user_id && self.service
-      UserService.where(:user_id => self.user_id, :service => self.service).where("id<>?", self).delete_all
+    if user_id && service
+      UserService.where(:user_id => user_id, :service => service).where("id<>?", self).delete_all
     end
     true
   end
 
   def clear_cache_key
-    self.user.clear_cache_key(:user_services)
+    user.clear_cache_key(:user_services)
   end
 
   def assert_communication_channel
     # why is twitter getting special treatment?
-    self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
+    touch if should_have_communication_channel? && !user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
 
   def infer_defaults
@@ -82,7 +82,7 @@ class UserService < ActiveRecord::Base
   scope :visible, -> { where("visible") }
 
   def service_name
-    self.service.titleize rescue ""
+    service.titleize rescue ""
   end
 
   def password=(password)
@@ -90,9 +90,9 @@ class UserService < ActiveRecord::Base
   end
 
   def decrypted_password
-    return nil unless self.password_salt && self.crypted_password
+    return nil unless password_salt && crypted_password
 
-    Canvas::Security.decrypt_password(self.crypted_password, self.password_salt, 'instructure_user_service')
+    Canvas::Security.decrypt_password(crypted_password, password_salt, 'instructure_user_service')
   end
 
   def self.register(opts = {})

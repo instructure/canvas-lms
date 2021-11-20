@@ -113,7 +113,7 @@ module Importers
             migration.update_import_progress(20)
             mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
             begin
-              self.import_media_objects(mo_attachments, migration)
+              import_media_objects(mo_attachments, migration)
             rescue => e
               er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
               error_message = t('Failed to import media objects')
@@ -180,7 +180,7 @@ module Importers
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
-          self.import_settings_from_migration(course, data, migration)
+          import_settings_from_migration(course, data, migration)
         end
         migration.update_import_progress(90)
 
@@ -200,7 +200,7 @@ module Importers
         syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
         if syllabus_should_be_added
           syllabus_body = data[:course][:syllabus_body] if data[:course]
-          self.import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
+          import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
         end
 
         course.save! if course.changed?
@@ -292,7 +292,7 @@ module Importers
     def self.adjust_dates(course, migration)
       # Adjust dates
       if (shift_options = migration.date_shift_options)
-        shift_options = self.shift_date_options(course, shift_options)
+        shift_options = shift_date_options(course, shift_options)
 
         Assignment.suspend_due_date_caching do
           migration.imported_migration_items_by_class(Assignment).each do |event|

@@ -43,7 +43,7 @@ class Canvadoc < ActiveRecord::Base
       self.document_id = response['id']
       self.process_state = response['status']
       self.has_annotations = opts[:annotatable]
-      self.save!
+      save!
     elsif response.nil?
       raise UploadTimeout, "no response received (request timed out?)"
     else
@@ -52,9 +52,9 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions
-        .preload(submission: :assignment)
-        .map(&:submission)
+    canvadocs_submissions
+      .preload(submission: :assignment)
+      .map(&:submission)
   end
 
   def available?

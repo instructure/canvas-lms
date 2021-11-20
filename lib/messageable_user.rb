@@ -146,8 +146,8 @@ class MessageableUser < User
   after_find :populate_common_contexts
 
   def include_common_contexts_from(other)
-    combine_common_contexts(self.global_common_courses, other.global_common_courses)
-    combine_common_contexts(self.global_common_groups, other.global_common_groups)
+    combine_common_contexts(global_common_courses, other.global_common_courses)
+    combine_common_contexts(global_common_groups, other.global_common_groups)
   end
 
   def serializable_hash(options = {})

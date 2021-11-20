@@ -47,16 +47,16 @@ module Importers
 
       # forward translations to CalendarEvent; they used to live there.
       def translate(*args)
-        raise "Needs self.item_class to be set in #{self}" unless self.item_class
+        raise "Needs self.item_class to be set in #{self}" unless item_class
 
-        self.item_class.translate(*args)
+        item_class.translate(*args)
       end
       alias_method :t, :translate
 
       def logger(*args)
-        raise "Needs self.item_class to be set in #{self}" unless self.item_class
+        raise "Needs self.item_class to be set in #{self}" unless item_class
 
-        self.item_class.logger(*args)
+        item_class.logger(*args)
       end
     end
   end

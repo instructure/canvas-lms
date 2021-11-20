@@ -140,7 +140,7 @@ module Api::V1::StreamItem
           end
         end
       end
-      Api.paginate(scope, self, self.send(opts[:paginate_url], @context), default_per_page: 21).to_a
+      Api.paginate(scope, self, send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end
     items.select!(&:stream_item)
     stream_item_preloads(items.map(&:stream_item))

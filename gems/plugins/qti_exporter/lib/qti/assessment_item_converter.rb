@@ -149,9 +149,9 @@ module Qti
           @question[:question_type] = @migration_type
           @question[:unsupported] = true
         elsif !%w[text_only_question file_upload_question].include?(@migration_type)
-          self.parse_question_data
+          parse_question_data
         else
-          self.get_feedback if @migration_type == 'file_upload_question'
+          get_feedback if @migration_type == 'file_upload_question'
           @question[:question_type] ||= @migration_type
         end
       rescue => e

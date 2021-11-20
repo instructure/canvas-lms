@@ -44,7 +44,7 @@ module SendToStream
   module SendToStreamInstanceMethods
     def queue_create_stream_items
       block = self.class.send_to_stream_block rescue nil
-      stream_recipients = Array(self.instance_eval(&block)) if block
+      stream_recipients = Array(instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
         delay_if_production(priority: Delayed::LOW_PRIORITY).create_stream_items
       end
@@ -55,7 +55,7 @@ module SendToStream
       return if stream_item_inactive?
 
       block = self.class.send_to_stream_block
-      stream_recipients = Array(self.instance_eval(&block)) if block
+      stream_recipients = Array(instance_eval(&block)) if block
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
       if Rails.env.production?
@@ -67,14 +67,14 @@ module SendToStream
 
     def generate_stream_items(stream_recipients)
       @generated_stream_items ||= []
-      self.extend TextHelper
+      extend TextHelper
       @stream_item_recipient_ids = stream_recipients.compact.filter_map { |u| User.infer_id(u) }.uniq
       @generated_stream_items = StreamItem.generate_all(self, @stream_item_recipient_ids)
     end
 
     def queue_update_stream_items
       block = self.class.send_to_stream_update_block
-      stream_recipients = Array(self.instance_eval(&block)) if block
+      stream_recipients = Array(instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
         delay_if_production(priority: 25).generate_stream_items(stream_recipients)
         true
@@ -87,7 +87,7 @@ module SendToStream
     attr_reader :generated_stream_items, :stream_item_recipient_ids
 
     def stream_item_inactive?
-      (self.respond_to?(:workflow_state) && self.workflow_state == 'deleted') || (self.respond_to?(:deleted?) && self.deleted?)
+      (respond_to?(:workflow_state) && workflow_state == 'deleted') || (respond_to?(:deleted?) && deleted?)
     end
 
     def clear_stream_items_on_destroy
@@ -97,7 +97,7 @@ module SendToStream
     def clear_stream_items
       # We need to pass the asset_string, not the asset itself, since we're about to delete the asset
       root_object = StreamItem.root_object(self)
-      StreamItem.delay_if_production.delete_all_for([root_object.class.base_class.name, root_object.id], [self.class.base_class.name, self.id])
+      StreamItem.delay_if_production.delete_all_for([root_object.class.base_class.name, root_object.id], [self.class.base_class.name, id])
     end
   end
 

@@ -65,7 +65,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
 
       Enrollment.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
         # these are taking long enough that we should batch them
-        self.move_roles_for_enrollments(old_role_ids, start_at, end_at)
+        move_roles_for_enrollments(old_role_ids, start_at, end_at)
       end
     end
   end

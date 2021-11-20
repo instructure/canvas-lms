@@ -33,13 +33,13 @@ class EportfolioCategory < ActiveRecord::Base
   acts_as_list :scope => :eportfolio
 
   def infer_unique_slug
-    categories = self.eportfolio.eportfolio_categories
+    categories = eportfolio.eportfolio_categories
     self.name ||= t(:default_section, "Section Name")
     self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
-    categories = categories.where("id<>?", self) unless self.new_record?
-    match_cnt = categories.where(:slug => self.slug).count
+    categories = categories.where("id<>?", self) unless new_record?
+    match_cnt = categories.where(:slug => slug).count
     if match_cnt > 0
-      self.slug = self.slug + "_" + (match_cnt + 1).to_s
+      self.slug = slug + "_" + (match_cnt + 1).to_s
     end
   end
   protected :infer_unique_slug

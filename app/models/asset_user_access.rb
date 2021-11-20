@@ -53,7 +53,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def category
-    self.asset_category
+    asset_category
   end
 
   def infer_defaults
@@ -78,24 +78,24 @@ class AssetUserAccess < ActiveRecord::Base
   def asset_display_name
     return nil unless asset
 
-    if self.asset.respond_to?(:title) && !self.asset.title.nil?
+    if asset.respond_to?(:title) && !asset.title.nil?
       asset.title
-    elsif self.asset.is_a? Enrollment
+    elsif asset.is_a? Enrollment
       asset.user.name
-    elsif self.asset.respond_to?(:name) && !self.asset.name.nil?
+    elsif asset.respond_to?(:name) && !asset.name.nil?
       asset.name
     else
-      self.asset_code
+      asset_code
     end
   end
 
   def context_code
-    "#{self.context_type.underscore}_#{self.context_id}" rescue nil
+    "#{context_type.underscore}_#{context_id}" rescue nil
   end
 
   def readable_name(include_group_name: true)
-    if self.asset_code&.include?(':')
-      split = self.asset_code.split(":")
+    if asset_code&.include?(':')
+      split = asset_code.split(":")
 
       if split[1].match?(/course_\d+/)
         case split[0]
@@ -162,14 +162,14 @@ class AssetUserAccess < ActiveRecord::Base
         when "files"
           t('User Files')
         else
-          self.display_name
+          display_name
         end
       else
-        self.display_name
+        display_name
       end
     else
-      re = Regexp.new("#{self.asset_code} - ")
-      self.display_name.nil? ? "" : self.display_name.gsub(re, "")
+      re = Regexp.new("#{asset_code} - ")
+      display_name.nil? ? "" : display_name.gsub(re, "")
     end
   end
 
@@ -185,7 +185,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset_class_name
-    name = self.asset.class.name.underscore if self.asset
+    name = asset.class.name.underscore if asset
     name = "Quiz" if name == "Quizzes::Quiz"
     name
   end
@@ -209,7 +209,7 @@ class AssetUserAccess < ActiveRecord::Base
   def self.log(user, context, accessed_asset)
     return unless user && accessed_asset[:code]
 
-    correct_context = self.get_correct_context(context, accessed_asset)
+    correct_context = get_correct_context(context, accessed_asset)
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
 
     GuardRail.activate(:secondary) do
@@ -232,7 +232,7 @@ class AssetUserAccess < ActiveRecord::Base
     infer_defaults
     infer_root_account_id(accessed[:asset_for_root_account_id])
 
-    if self.class.use_log_compaction_for_views? && self.eligible_for_log_path?
+    if self.class.use_log_compaction_for_views? && eligible_for_log_path?
       # Since this is JUST a view bump, we'll write it to the
       # view log and let periodic jobs compact them later
       # (this is intentionally trading off more latency for less I/O pressure)
@@ -248,8 +248,8 @@ class AssetUserAccess < ActiveRecord::Base
     # view count updates happen a LOT though, so if the setting is
     # configured such that we're allowed to use the log path, check
     # if this set of changes is "just" a view update.
-    change_hash = self.changes_to_save
-    updated_key_set = self.changes_to_save.keys.to_set
+    change_hash = changes_to_save
+    updated_key_set = changes_to_save.keys.to_set
     return false unless updated_key_set.include?('view_score')
     return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
 
@@ -268,13 +268,13 @@ class AssetUserAccess < ActiveRecord::Base
     increment(:view_score) if %w[view participate].include?(level)
     increment(:participate_score) if %w[participate submit].include?(level)
 
-    if self.action_level != 'participate'
+    if action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level
     end
   end
 
   def self.use_log_compaction_for_views?
-    self.view_counting_method.to_s == "log"
+    view_counting_method.to_s == "log"
   end
 
   def self.view_counting_method
@@ -292,7 +292,7 @@ class AssetUserAccess < ActiveRecord::Base
     deductible_points = 0
 
     if 'quizzes' == self.asset_group_code
-      deductible_points = self.participate_score || 0
+      deductible_points = participate_score || 0
     end
 
     self.view_score ||= 0
@@ -332,7 +332,7 @@ class AssetUserAccess < ActiveRecord::Base
   private
 
   def increment(attribute)
-    incremented_value = (self.send(attribute) || 0) + 1
-    self.send("#{attribute}=", incremented_value)
+    incremented_value = (send(attribute) || 0) + 1
+    send("#{attribute}=", incremented_value)
   end
 end

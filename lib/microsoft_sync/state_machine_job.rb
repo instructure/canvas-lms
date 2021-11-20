@@ -245,8 +245,8 @@ module MicrosoftSync
           raise InternalError, 'A job is waiting to be retried; use run_later() to enqueue another'
         end
 
-        self.delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
-            .run(nil, initial_mem_state)
+        delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
+          .run(nil, initial_mem_state)
       end
     end
 
@@ -321,8 +321,8 @@ module MicrosoftSync
         return
       end
 
-      self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
-          .run(step, initial_mem_state)
+      delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
+        .run(step, initial_mem_state)
     end
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)

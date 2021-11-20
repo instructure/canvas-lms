@@ -72,7 +72,7 @@ module Diigo
     end
 
     def self.key
-      self.config['api_key']
+      config['api_key']
     end
 
     def self.config_check(settings)

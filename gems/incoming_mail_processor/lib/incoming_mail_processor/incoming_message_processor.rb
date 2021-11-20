@@ -114,10 +114,10 @@ module IncomingMailProcessor
 
         config.symbolize_keys.each do |key, value|
           if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
-            self.settings.send("#{key}=", value)
+            settings.send("#{key}=", value)
           elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
             logger&.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
-            self.deprecated_settings.send("#{key}=", value)
+            deprecated_settings.send("#{key}=", value)
           else
             raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
           end
@@ -162,12 +162,12 @@ module IncomingMailProcessor
     end
 
     def self.queue_processors
-      if self.run_periodically?
-        imp = self.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
-        self.workers.times do |worker_id|
-          if self.dedicated_workers_per_mailbox
+      if run_periodically?
+        imp = new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
+        workers.times do |worker_id|
+          if dedicated_workers_per_mailbox
             # Launch one per mailbox
-            self.mailbox_accounts.each do |account|
+            mailbox_accounts.each do |account|
               imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}")
                  .process({ worker_id: worker_id, mailbox_account_address: account.address })
             end

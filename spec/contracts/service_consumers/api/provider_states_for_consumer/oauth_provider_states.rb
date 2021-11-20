@@ -171,7 +171,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
 
       # Always set ignore_expiration to true when calling the decode_jwt method.
       CanvasSecurity.class_eval do
-        @old_decode_jwt = self.method(:decode_jwt)
+        @old_decode_jwt = method(:decode_jwt)
 
         def self.decode_jwt(body, keys = [])
           @old_decode_jwt.call(body, keys, ignore_expiration: true)

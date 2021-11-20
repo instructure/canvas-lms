@@ -154,7 +154,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def show_lti_tab?(tab, user, account)
-    tab[:visibility] != 'admins' || self.grants_right?(user, account, :view_lti_tool)
+    tab[:visibility] != 'admins' || grants_right?(user, account, :view_lti_tool)
   end
 
   def insert_observer_tabs(tabs, user)

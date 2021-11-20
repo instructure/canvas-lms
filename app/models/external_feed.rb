@@ -41,7 +41,7 @@ class ExternalFeed < ActiveRecord::Base
   def infer_defaults
     self.consecutive_failures ||= 0
     self.refresh_at ||= Time.now.utc
-    unless VERBOSITIES.include?(self.verbosity)
+    unless VERBOSITIES.include?(verbosity)
       self.verbosity = "full"
     end
     true
@@ -49,8 +49,8 @@ class ExternalFeed < ActiveRecord::Base
   protected :infer_defaults
 
   def display_name(short = true)
-    short_url = (self.url || "").split("/")[0, 3].join("/")
-    self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url)
+    short_url = (url || "").split("/")[0, 3].join("/")
+    title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : url)
   end
 
   def header_match=(str)
@@ -63,16 +63,16 @@ class ExternalFeed < ActiveRecord::Base
 
   def destroy_entries_and_unlink_topics
     external_feed_entries.in_batches(of: 100).delete_all
-    while self.discussion_topics.limit(100).update_all(:external_feed_id => nil) > 0; end
+    while discussion_topics.limit(100).update_all(:external_feed_id => nil) > 0; end
   end
 
   def inactive?
-    !self.context || self.context.root_account.deleted? || self.context.inactive?
+    !context || context.root_account.deleted? || context.inactive?
   end
 
   def add_rss_entries(rss)
     items = rss.items.filter_map { |item| add_entry(item, rss, :rss) }
-    self.context.add_aggregate_entries(items, self) if self.context.respond_to?(:add_aggregate_entries)
+    context.add_aggregate_entries(items, self) if context.respond_to?(:add_aggregate_entries)
     items
   end
 
@@ -80,17 +80,17 @@ class ExternalFeed < ActiveRecord::Base
     items = []
     atom.each_entry { |item| items << add_entry(item, atom, :atom) }
     items.compact!
-    self.context.add_aggregate_entries(items, self) if self.context.respond_to?(:add_aggregate_entries)
+    context.add_aggregate_entries(items, self) if context.respond_to?(:add_aggregate_entries)
     items
   end
 
   def format_description(desc)
     desc = (desc || "").to_s
-    case self.verbosity
+    case verbosity
     when 'link_only'
       ""
     when 'truncate'
-      self.extend TextHelper
+      extend TextHelper
       truncate_html(desc, :max_length => 250)
     else
       desc
@@ -106,8 +106,8 @@ class ExternalFeed < ActiveRecord::Base
       end
       uuid ||= Digest::SHA256.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
 
-      entry = self.external_feed_entries.where(uuid: uuid).first
-      entry ||= self.external_feed_entries.where(url: item.link).first
+      entry = external_feed_entries.where(uuid: uuid).first
+      entry ||= external_feed_entries.where(url: item.link).first
       description = entry&.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -122,26 +122,26 @@ class ExternalFeed < ActiveRecord::Base
         return entry
       end
       date = (item.respond_to?(:date) && item.date) || Time.zone.today
-      return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
-      return nil if (date && self.created_at > date rescue false)
+      return nil if header_match && !item.title.downcase.include?(header_match.downcase)
+      return nil if (date && created_at > date rescue false)
 
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
-      entry = self.external_feed_entries.new(
+      entry = external_feed_entries.new(
         :title => item.title.to_s,
         :message => description,
         :source_name => feed.channel.title,
         :source_url => feed.channel.link,
         :posted_at => Time.parse(date.to_s),
-        :user => self.user,
+        :user => user,
         :url => item.link,
         :uuid => uuid
       )
       return entry if entry.save
     when :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
-      entry = self.external_feed_entries.where(uuid: uuid).first
-      entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
+      entry = external_feed_entries.where(uuid: uuid).first
+      entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new
       description = entry&.message
       if !description || description.empty?
@@ -159,19 +159,19 @@ class ExternalFeed < ActiveRecord::Base
         )
         return entry
       end
-      return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
-      return nil if (item.published && self.created_at > item.published rescue false)
+      return nil if header_match && !item.title.downcase.include?(header_match.downcase)
+      return nil if (item.published && created_at > item.published rescue false)
 
       description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
-      entry = self.external_feed_entries.new(
+      entry = external_feed_entries.new(
         :title => item.title,
         :message => description,
         :source_name => feed.title.to_s,
         :source_url => feed.links.alternate.to_s,
         :posted_at => item.published,
         :url => item.links.alternate.to_s,
-        :user => self.user,
+        :user => user,
         :author_name => author.name,
         :author_url => author.uri,
         :author_email => author.email,

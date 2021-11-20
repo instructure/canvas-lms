@@ -68,7 +68,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def self.date_in_closed_grading_period?(course:, date:, periods: nil)
-    period = self.for_date_in_course(date: date, course: course, periods: periods)
+    period = for_date_in_course(date: date, course: course, periods: periods)
     period.present? && period.closed?
   end
 
@@ -156,7 +156,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def self.json_for(context, user)
     periods = self.for(context).sort_by(&:start_date)
-    self.periods_json(periods, user)
+    periods_json(periods, user)
   end
 
   def self.periods_json(periods, user)

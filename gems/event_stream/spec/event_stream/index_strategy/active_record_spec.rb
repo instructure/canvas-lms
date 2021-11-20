@@ -32,7 +32,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       end
 
       def self.to_ary
-        [self.new]
+        [new]
       end
 
       def self.next_page
@@ -67,9 +67,9 @@ describe EventStream::IndexStrategy::ActiveRecord do
                       :active_record_type => fake_record_type)
       ar_cls = fake_record_type
       base_index = EventStream::Index.new(stream) do
-        self.table "table"
-        self.entry_proc lambda { |_a1, _a2| }
-        self.ar_scope_proc lambda { |a1, a2| ar_cls.where({ one: a1.id, two: a2.id }) }
+        table "table"
+        entry_proc lambda { |_a1, _a2| }
+        ar_scope_proc lambda { |a1, a2| ar_cls.where({ one: a1.id, two: a2.id }) }
       end
       @index = base_index.strategy_for(:active_record)
     end

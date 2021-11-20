@@ -248,7 +248,7 @@ Implemented for: Canvas LMS)
     mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
       self.workflow_state = 'imported'
-      self.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
+      migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
     end
     allow(ContentMigration).to receive(:new).and_return(mock_migration)
     allow(ContentMigration).to receive(:find).with(mock_migration.id).and_return(mock_migration)

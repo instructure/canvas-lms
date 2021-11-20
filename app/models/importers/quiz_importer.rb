@@ -234,7 +234,7 @@ module Importers
       recache_due_dates = item.assignment&.needs_update_cached_due_dates # quiz ends up getting reloaded by the end
       build_assignment = false
 
-      self.import_questions(item, hash, context, migration, question_data, new_record)
+      import_questions(item, hash, context, migration, question_data, new_record)
 
       if hash[:assignment]
         if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)

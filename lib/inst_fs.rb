@@ -61,7 +61,7 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s
       }
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
+      Canvas::Security.create_jwt(claims, expires_in.from_now, jwt_secret, :HS512)
     end
 
     def authenticated_url(attachment, options = {})
@@ -329,7 +329,7 @@ module InstFS
     # `expires_at` can be either a Time or an ActiveSupport::Duration
     def service_jwt(claims, expires_at)
       expires_at = expires_at.from_now if expires_at.respond_to?(:from_now)
-      Canvas::Security.create_jwt(claims, expires_at, self.jwt_secret, :HS512)
+      Canvas::Security.create_jwt(claims, expires_at, jwt_secret, :HS512)
     end
 
     # floor_to rounds `number` down to a multiple of the chosen step.

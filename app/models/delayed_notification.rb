@@ -60,17 +60,17 @@ class DelayedNotification < ActiveRecord::Base
     res = []
     if asset
       iterate_to_list do |to_list_slice|
-        slice_res = notification.create_message(self.asset, to_list_slice, data: self.data)
+        slice_res = notification.create_message(asset, to_list_slice, data: data)
         res.concat(slice_res) if Rails.env.test?
       end
     end
-    self.do_process unless self.new_record?
+    do_process unless new_record?
     res
   rescue => e
     Canvas::Errors.capture(e, message: "Delayed Notification processing failed")
     logger.error "delayed notification processing failed: #{e.message}\n#{e.backtrace.join "\n"}"
     self.workflow_state = 'errored'
-    self.save
+    save
     []
   end
 

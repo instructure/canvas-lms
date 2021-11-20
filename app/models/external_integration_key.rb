@@ -25,7 +25,7 @@ class ExternalIntegrationKey < ActiveRecord::Base
   validates :context_type, presence: true
   validates :key_type, presence: true
   validates :key_value, presence: true
-  validates :key_type, inclusion: { in: proc { self.key_types } }
+  validates :key_type, inclusion: { in: proc { key_types } }
   validates :key_type, uniqueness: { scope: [:context_type, :context_id] }
 
   def key_type
@@ -47,10 +47,10 @@ class ExternalIntegrationKey < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| self.grants_right_for?(user, :read) }
+    given { |user| grants_right_for?(user, :read) }
     can :read
 
-    given { |user| self.grants_right_for?(user, :write) }
+    given { |user| grants_right_for?(user, :write) }
     can :write
   end
 

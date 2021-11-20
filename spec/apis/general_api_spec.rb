@@ -43,7 +43,7 @@ describe "API", type: :request do
       course_with_teacher
       @course.send(:extend, RSpec::Matchers)
       def @course.filter_attributes_for_user(hash, user, session)
-        expect(user).to eq self.teachers.first
+        expect(user).to eq teachers.first
         expect(session).to be_nil
         hash.delete('sis_source_id')
       end

@@ -312,7 +312,7 @@ class RequestThrottle
       self.class.up_front_cost_by_path_regex.each do |regex, cost|
         return cost if regex&.match?(path)
       end
-      self.up_front_cost # otherwise use the default
+      up_front_cost # otherwise use the default
     end
 
     # This method does an initial increment by the up_front_cost, loading the
@@ -347,7 +347,7 @@ class RequestThrottle
       end
 
       current_time = current_time.to_f
-      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json.to_a).to_json}")
+      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + as_json.to_a).to_json}")
       redis = self.redis
       count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f

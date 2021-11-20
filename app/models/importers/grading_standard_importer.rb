@@ -36,7 +36,7 @@ module Importers
       standards.each do |standard|
         if migration.import_object?('grading_standards', standard['migration_id'])
           begin
-            self.import_from_migration(standard, migration.context, migration)
+            import_from_migration(standard, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
           end

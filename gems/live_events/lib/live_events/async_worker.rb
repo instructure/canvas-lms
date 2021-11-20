@@ -35,7 +35,7 @@ module LiveEvents
       @stream_client = stream_client
       @stream_name = stream_name
 
-      self.start! if start_thread
+      start! if start_thread
     end
 
     def push(event, partition_key = SecureRandom.uuid)
@@ -76,7 +76,7 @@ module LiveEvents
     def start!
       return if @running
 
-      @thread = Thread.new { self.run_thread }
+      @thread = Thread.new { run_thread }
       @running = true
       at_exit { stop! unless stopped? }
     end

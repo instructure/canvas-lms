@@ -40,22 +40,22 @@ module Plannable
 
   def check_if_associated_planner_overrides_need_updating
     @associated_planner_items_need_updating = false
-    return if self.new_record?
-    return if self.respond_to?(:context_type) && !PlannerOverride::CONTENT_TYPES.include?(self.context_type)
+    return if new_record?
+    return if respond_to?(:context_type) && !PlannerOverride::CONTENT_TYPES.include?(context_type)
 
-    @associated_planner_items_need_updating = true if self.try(:workflow_state_changed?) || self.workflow_state == 'deleted'
+    @associated_planner_items_need_updating = true if try(:workflow_state_changed?) || workflow_state == 'deleted'
   end
 
   def planner_override_for(user)
-    if self.respond_to? :submittable_object
-      submittable_override = self.submittable_object&.planner_override_for(user)
+    if respond_to? :submittable_object
+      submittable_override = submittable_object&.planner_override_for(user)
       return submittable_override if submittable_override
     end
 
-    if self.association(:planner_overrides).loaded?
-      self.planner_overrides.find { |po| po.user_id == user.id && po.workflow_state != 'deleted' }
+    if association(:planner_overrides).loaded?
+      planner_overrides.find { |po| po.user_id == user.id && po.workflow_state != 'deleted' }
     else
-      self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
+      planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
     end
   end
 

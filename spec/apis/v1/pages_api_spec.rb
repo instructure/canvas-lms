@@ -1550,14 +1550,14 @@ describe "Pages API", type: :request do
       expect(JSON.parse(response.body).to_s).to include(page.title)
 
       calls.reject! { |call| opts[:except].include?(call) }
-      calls.each { |call| expect(self.send(call, page).to_s).to eq "200" }
+      calls.each { |call| expect(send(call, page).to_s).to eq "200" }
     end
 
     def calls_fail(page)
       get_index
       expect(JSON.parse(response.body).to_s).not_to include(page.title.to_s)
 
-      calls.each { |call| expect(self.send(call, page).to_s).to eq "401" }
+      calls.each { |call| expect(send(call, page).to_s).to eq "401" }
     end
 
     before :once do

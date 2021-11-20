@@ -74,7 +74,7 @@ module BasicLTI
         assignment = course.assignments.active.find_by(id: token[:assignment_id])
       end
 
-      sourcedid = self.new(tool, course, assignment, user)
+      sourcedid = new(tool, course, assignment, user)
       sourcedid.validate!
       sourcedid
     end

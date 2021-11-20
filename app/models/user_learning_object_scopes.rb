@@ -48,7 +48,7 @@ module UserLearningObjectScopes
         ignore.save!
       end
     end
-    self.touch
+    touch
   end
 
   def assignments_visible_in_course(course)

@@ -64,6 +64,6 @@ class ContentParticipation < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id = self.content.assignment.root_account_id
+    self.root_account_id = content.assignment.root_account_id
   end
 end

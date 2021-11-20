@@ -43,7 +43,7 @@ module ActiveSupport
           end
 
           if batch_object && !opts[:force] &&
-             defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
+             defined?(::ActiveSupport::Cache::RedisCacheStore) && is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
              batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
             fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
           else

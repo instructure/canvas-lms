@@ -427,7 +427,7 @@ class OutcomeResultsController < ApplicationController
     linked = {}
     includes = Api.value_to_array(params[:include])
     includes.uniq.each do |include_name|
-      linked[include_name] = self.send(include_method_name(include_name))
+      linked[include_name] = send(include_method_name(include_name))
     end
     linked
   end
@@ -520,7 +520,7 @@ class OutcomeResultsController < ApplicationController
       when 'users'
         reject! "can't include users unless aggregate is not set" if params[:aggregate].present?
       else
-        reject! "invalid include: #{include_name}" unless self.respond_to? include_method_name(include_name), :include_private
+        reject! "invalid include: #{include_name}" unless respond_to? include_method_name(include_name), :include_private
       end
     end
     true

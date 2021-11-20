@@ -53,11 +53,11 @@ module AcademicBenchmark
   end
 
   def self.check_config
-    if !self.config
+    if !config
       "(needs partner_key and partner_id)"
-    elsif self.config[:partner_key].blank?
+    elsif config[:partner_key].blank?
       "(needs partner_key)"
-    elsif self.config[:partner_id].blank?
+    elsif config[:partner_id].blank?
       "(needs partner_id)"
     end
   end
@@ -86,7 +86,7 @@ module AcademicBenchmark
   # browsed in order to retrieve specifics like NGSS and Common Core
   ##
   def self.retrieve_authorities(api)
-    self.sort_authorities(api.standards.authorities)
+    sort_authorities(api.standards.authorities)
   end
 
   # sort national standards at the top, followed by country standards,
@@ -95,9 +95,9 @@ module AcademicBenchmark
     national_stds, rest = authorities.partition { |a| NATIONAL_STDS.include?(a.code) || NATIONAL_STDS.include?(a.description) }
     country_stds, rest = rest.partition { |a| COUNTRY_STDS.include?(a.description) }
     [
-      self.sort_authorities_by_description(national_stds),
-      self.sort_authorities_by_description(country_stds),
-      self.sort_authorities_by_description(rest)
+      sort_authorities_by_description(national_stds),
+      sort_authorities_by_description(country_stds),
+      sort_authorities_by_description(rest)
     ].flatten
   end
 
@@ -110,12 +110,12 @@ module AcademicBenchmark
   # These can be passed to the `create` action
   ##
   def self.list_of_available_guids
-    api = self.api_handle
-    auth_list = self.retrieve_authorities(api)
+    api = api_handle
+    auth_list = retrieve_authorities(api)
 
     # prepend the common core, next gen science standards (Achieve),
     # and the ISTE (NETS) standards to the list
-    auth_list.unshift(self.extract_nat_stds(api, self.nat_stds_guid_from_auths(auth_list)))
+    auth_list.unshift(extract_nat_stds(api, nat_stds_guid_from_auths(auth_list)))
     auth_list.unshift(api.standards.authority_publications(ACHIEVE_AUTHORITY))
     auth_list.unshift(api.standards.authority_publications(COMMON_CORE_AUTHORITY))
 
@@ -133,23 +133,23 @@ module AcademicBenchmark
   class APIError < StandardError; end
 
   def self.import(guid, options = {})
-    is_auth = self.auth?(guid)
+    is_auth = auth?(guid)
     authority = is_auth ? guid : nil
     publication = is_auth ? nil : guid
     check_args(authority, publication)
-    self.ensure_ab_credentials
+    ensure_ab_credentials
 
     AcademicBenchmark.queue_migration_for(
       authority: authority,
       publication: publication,
-      user: self.authorized?,
+      user: authorized?,
       options: options
     ).first
   end
 
   def self.queue_migration_for(authority:, publication:, user:, options: {})
     cm = ContentMigration.new(context: Account.site_admin)
-    cm.converter_class = self.config['converter_class']
+    cm.converter_class = config['converter_class']
     cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     cm.migration_settings[:import_immediately] = true
     cm.migration_settings[:authority] = authority
@@ -172,7 +172,7 @@ module AcademicBenchmark
   end
 
   def self.auth?(guid)
-    self.api_handle.standards.authorities.map(&:guid).include?(guid)
+    api_handle.standards.authorities.map(&:guid).include?(guid)
   end
 
   def self.check_args(authority, publication)
@@ -184,8 +184,8 @@ module AcademicBenchmark
 
   def self.ensure_ab_credentials
     err = nil
-    err ||= self.ensure_partner_id
-    err ||= self.ensure_partner_key
+    err ||= ensure_partner_id
+    err ||= ensure_partner_key
     if err
       raise Canvas::Migration::Error,
             "Not importing academic benchmark data because the Academic Benchmarks #{err}"
@@ -205,8 +205,8 @@ module AcademicBenchmark
   end
 
   def self.authorized?
-    self.check_for_import_rights(
-      user: self.ensure_real_user(user_id: self.ensure_user_id_set)
+    check_for_import_rights(
+      user: ensure_real_user(user_id: ensure_user_id_set)
     )
   end
 

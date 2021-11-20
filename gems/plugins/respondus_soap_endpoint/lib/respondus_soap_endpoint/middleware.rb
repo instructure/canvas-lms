@@ -58,9 +58,9 @@ module RespondusSoapEndpoint
         RespondusAPIPort::Methods.each do |definitions|
           opt = definitions.last
           if opt[:request_style] == :document
-            @router.add_document_operation(self.servant, *definitions)
+            @router.add_document_operation(servant, *definitions)
           else
-            @router.add_rpc_operation(self.servant, *definitions)
+            @router.add_rpc_operation(servant, *definitions)
           end
         end
         self.mapping_registry = UrnRespondusAPIMappingRegistry::EncodedRegistry
@@ -82,7 +82,7 @@ module RespondusSoapEndpoint
     end
 
     def handle(env)
-      self.servant.rack_env = env
+      servant.rack_env = env
       super(env)
     end
   end

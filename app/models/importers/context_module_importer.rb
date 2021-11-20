@@ -46,7 +46,7 @@ module Importers
       return if migration.import_everything?
 
       (data['modules'] || []).each do |mod|
-        self.select_linked_module_items(mod, migration)
+        select_linked_module_items(mod, migration)
       end
     end
 
@@ -55,7 +55,7 @@ module Importers
         (mod['items'] || []).each do |item|
           if item['type'] == 'submodule'
             # recursively select content in submodules
-            self.select_linked_module_items(item, migration, true)
+            select_linked_module_items(item, migration, true)
           elsif (resource_class = linked_resource_type_class(item['linked_resource_type']))
             migration.import_object!(resource_class.table_name, item['linked_resource_id'])
           end
@@ -63,7 +63,7 @@ module Importers
       else
         (mod['items'] || []).each do |item|
           if item['type'] == 'submodule'
-            self.select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
+            select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
           end
         end
       end
@@ -74,7 +74,7 @@ module Importers
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
 
       modules.each do |mod|
-        self.process_module(mod, migration)
+        process_module(mod, migration)
       end
       migration.context.context_modules.first.try(:fix_position_conflicts)
       migration.context.touch
@@ -83,7 +83,7 @@ module Importers
     def self.process_module(mod, migration)
       if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
         begin
-          self.import_from_migration(mod, migration.context, migration)
+          import_from_migration(mod, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
         end
@@ -92,7 +92,7 @@ module Importers
         (mod['items'] || []).each do |item|
           next unless item['type'] == 'submodule'
 
-          self.process_module(item, migration)
+          process_module(item, migration)
         end
       end
     end
@@ -101,7 +101,7 @@ module Importers
       if item['type'] == 'submodule'
         sub_items = []
         sub_items << { :type => 'heading', :title => item['title'], :indent => indent, :migration_id => item['migration_id'] }.with_indifferent_access
-        sub_items += (item['items'] || []).map { |i| self.flatten_item(i, indent + 1) }
+        sub_items += (item['items'] || []).map { |i| flatten_item(i, indent + 1) }
         sub_items
       else
         item[:indent] = (item[:indent] || 0) + indent
@@ -162,12 +162,12 @@ module Importers
       item_map = {}
       item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
-      items = items.map { |i| self.flatten_item(i, 0) }.flatten
+      items = items.map { |i| flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
 
       items.each do |tag_hash|
-        tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
         imported_migration_ids.concat tags.map(&:migration_id)
       rescue
         migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
@@ -368,7 +368,7 @@ module Importers
         items << item
       end
       hash[:sub_items]&.each do |tag_hash|
-        items.concat self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
+        items.concat add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
       end
       items
     end

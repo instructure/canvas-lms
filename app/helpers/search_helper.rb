@@ -321,7 +321,7 @@ class ContextBookmarker
   end
 
   def self.wrap(collection)
-    BookmarkedCollection.build(self.new(collection)) do |pager|
+    BookmarkedCollection.build(new(collection)) do |pager|
       page_start = pager.current_bookmark ? pager.current_bookmark + 1 : 0
       page_end = page_start + pager.per_page
       pager.replace collection[page_start, page_end]

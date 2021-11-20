@@ -95,7 +95,7 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def weighted_actually_changed?
-    !self.new_record? && saved_change_to_weighted?
+    !new_record? && saved_change_to_weighted?
   end
 
   def recache_grading_period

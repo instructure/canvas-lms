@@ -38,8 +38,8 @@ class AccountNotification < ActiveRecord::Base
   validates :months_in_display_cycle, inclusion: { in: 1..48, allow_nil: true }
 
   def validate_dates
-    if self.start_at && self.end_at
-      errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time")) if self.end_at < self.start_at
+    if start_at && end_at
+      errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time")) if end_at < start_at
     end
   end
 
@@ -47,24 +47,24 @@ class AccountNotification < ActiveRecord::Base
     if start_at > Time.zone.now
       delay(run_at: start_at,
             on_conflict: :overwrite,
-            singleton: "create_notification_alert:#{self.global_id}")
+            singleton: "create_notification_alert:#{global_id}")
         .create_alert
       return
     end
 
-    return unless self.account.root_account?
+    return unless account.root_account?
 
-    roles = self.account_notification_roles.map(&:role_name)
+    roles = account_notification_roles.map(&:role_name)
     return if roles.count > 0 && (roles & ['StudentEnrollment', 'ObserverEnrollment']).none?
 
-    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement')
+    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(account), alert_type: 'institution_announcement')
                                        .where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
     thresholds.find_each do |threshold|
       ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
-                           alert_type: 'institution_announcement', action_date: self.start_at,
+                           alert_type: 'institution_announcement', action_date: start_at,
                            title: I18n.t('Institution announcement: "%{announcement_title}"', {
-                                           announcement_title: self.subject
+                                           announcement_title: subject
                                          }))
     end
   end
@@ -82,7 +82,7 @@ class AccountNotification < ActiveRecord::Base
   def self.for_user_and_account(user, root_account, include_past: false)
     GuardRail.activate(:secondary) do
       if root_account.site_admin?
-        current = self.for_account(root_account, include_past: include_past)
+        current = for_account(root_account, include_past: include_past)
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
@@ -92,7 +92,7 @@ class AccountNotification < ActiveRecord::Base
                                .joins(:account).where(accounts: { workflow_state: 'active' })
                                .distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = self.for_account(root_account, all_account_ids, include_past: include_past)
+        current = for_account(root_account, all_account_ids, include_past: include_past)
       end
 
       user_role_ids = {}
@@ -160,7 +160,7 @@ class AccountNotification < ActiveRecord::Base
         # on user id)
         current.reject! do |announcement|
           if (months_in_period = announcement.months_in_display_cycle)
-            !self.display_for_user?(user.id, months_in_period)
+            !display_for_user?(user.id, months_in_period)
           end
         end
 
@@ -297,30 +297,30 @@ class AccountNotification < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :account_notification
-    p.to { self.message_recipients }
+    p.to { message_recipients }
     p.whenever { |record|
       record.should_send_message? && record.message_recipients.present?
     }
   end
 
   def send_message_not_set_for_site_admin
-    if self.send_message? && self.account.site_admin?
+    if send_message? && account.site_admin?
       # i mean maybe we could try but there are almost certainly better ways to send mass emails than this
       errors.add(:send_message, 'Cannot send messages for site admin accounts')
     end
   end
 
   def should_send_message?
-    self.send_message? && !self.messages_sent_at &&
-      (self.start_at.nil? || (self.start_at < Time.now.utc)) &&
-      (self.end_at.nil? || (self.end_at > Time.now.utc))
+    send_message? && !messages_sent_at &&
+      (start_at.nil? || (start_at < Time.now.utc)) &&
+      (end_at.nil? || (end_at > Time.now.utc))
   end
 
   def queue_message_broadcast
-    if self.send_message? && !self.messages_sent_at && !self.message_recipients
+    if send_message? && !messages_sent_at && !message_recipients
       delay(run_at: start_at || Time.now.utc,
             on_conflict: :overwrite,
-            singleton: "account_notification_broadcast_messages:#{self.global_id}").broadcast_messages
+            singleton: "account_notification_broadcast_messages:#{global_id}").broadcast_messages
     end
   end
 
@@ -336,22 +336,22 @@ class AccountNotification < ActiveRecord::Base
   end
 
   def broadcast_messages
-    return unless self.should_send_message? # sanity check before we start grabbing user ids
+    return unless should_send_message? # sanity check before we start grabbing user ids
 
     # don't try to send a message to an entire account in one job
-    self.applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
+    applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
       self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
-      self.save # trigger the broadcast policy
+      save # trigger the broadcast policy
     ensure
       self.message_recipients = nil
     end
-    self.update_attribute(:messages_sent_at, Time.now.utc)
+    update_attribute(:messages_sent_at, Time.now.utc)
   end
 
   def applicable_user_ids
-    roles = self.account_notification_roles.preload(:role).to_a.map(&:role)
+    roles = account_notification_roles.preload(:role).to_a.map(&:role)
     GuardRail.activate(:secondary) do
-      self.class.applicable_user_ids_for_account_and_roles(self.account, roles)
+      self.class.applicable_user_ids_for_account_and_roles(account, roles)
     end
   end
 

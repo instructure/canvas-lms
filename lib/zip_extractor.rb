@@ -52,10 +52,10 @@ class ZipExtractor
 
       local_name = File.join(dirname, File.split(zip_entry.name).last)
       zip_entry.extract(local_name)
-      self.unzipped_files << local_name
+      unzipped_files << local_name
     end
-    block&.call(self.unzipped_files)
-    self.unzipped_files
+    block&.call(unzipped_files)
+    unzipped_files
   end
 
   def remove_extracted_files!

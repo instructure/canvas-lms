@@ -287,7 +287,7 @@ class GradebooksController < ApplicationController
   private :show_learning_mastery
 
   def post_grades_ltis
-    @post_grades_ltis ||= self.external_tools.map { |tool| external_tool_detail(tool) }
+    @post_grades_ltis ||= external_tools.map { |tool| external_tool_detail(tool) }
   end
 
   def external_tool_detail(tool)

@@ -33,12 +33,12 @@ class MediaTrack < ActiveRecord::Base
   }
 
   def webvtt_content
-    self.read_attribute(:webvtt_content) || self.content
+    read_attribute(:webvtt_content) || content
   end
 
   def convert_srt_to_wvtt
-    if self.content.exclude?('WEBVTT') && (self.content_changed? || self.read_attribute(:webvtt_content).nil?)
-      srt_content = self.content.dup
+    if content.exclude?('WEBVTT') && (content_changed? || read_attribute(:webvtt_content).nil?)
+      srt_content = content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
       srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})(,)([0-9]{3})/, '\1.\3')
       srt_content.gsub!("\r\n", "\n")

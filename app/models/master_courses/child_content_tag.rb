@@ -55,6 +55,6 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= self.child_subscription.root_account_id
+    self.root_account_id ||= child_subscription.root_account_id
   end
 end

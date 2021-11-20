@@ -36,13 +36,13 @@ module BroadcastPolicy
     # reasons.
     def broadcast(record)
       return if record.respond_to?(:skip_broadcasts) && record.skip_broadcasts
-      return unless record.instance_eval(&self.whenever)
+      return unless record.instance_eval(&whenever)
 
-      notification = BroadcastPolicy.notification_finder.by_name(self.dispatch)
+      notification = BroadcastPolicy.notification_finder.by_name(dispatch)
       return if notification.nil?
 
       record.class.connection.after_transaction_commit do
-        to_list = record.instance_eval(&self.to)
+        to_list = record.instance_eval(&to)
         to_list = Array(to_list).flatten
         next if to_list.empty?
 
@@ -50,7 +50,7 @@ module BroadcastPolicy
         to_list.each_slice(NotificationPolicy.slice_size) do |to_slice|
           BroadcastPolicy.notifier.send_notification(
             record,
-            self.dispatch,
+            dispatch,
             notification,
             to_slice,
             data

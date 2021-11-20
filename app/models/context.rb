@@ -57,7 +57,7 @@ module Context
 
   def clear_cached_short_name
     self.class.connection.after_transaction_commit do
-      Rails.cache.delete(['short_name_lookup', self.asset_string].cache_key)
+      Rails.cache.delete(['short_name_lookup', asset_string].cache_key)
     end
   end
 
@@ -71,7 +71,7 @@ module Context
           :message => entry.message
         )
       elsif !entry.asset
-        announcement = self.announcements.build(
+        announcement = announcements.build(
           :title => entry.title,
           :message => entry.message
         )
@@ -90,11 +90,11 @@ module Context
 
   def rubric_contexts(user)
     associations = []
-    course_ids = [self.id]
+    course_ids = [id]
     course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map { |id| Shard.relative_id_for(id, user.shard, Shard.current) }).uniq if user
     Shard.partition_by_shard(course_ids) do |sharded_course_ids|
       context_codes = sharded_course_ids.map { |id| "course_#{id}" }
-      if Shard.current == self.shard
+      if Shard.current == shard
         context = self
         while context.respond_to?(:account) || context.respond_to?(:parent_account)
           context = context.respond_to?(:account) ? context.account : context.parent_account
@@ -121,18 +121,18 @@ module Context
     return @active_record_types[only_check] if @active_record_types[only_check]
 
     possible_types = {
-      files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
-      modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
+      files: -> { respond_to?(:attachments) && attachments.active.exists? },
+      modules: -> { respond_to?(:context_modules) && context_modules.active.exists? },
       quizzes: -> {
-                 (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
-                   (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?)
+                 (respond_to?(:quizzes) && quizzes.active.exists?) ||
+                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?)
                },
-      assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
-      pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
-      conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },
-      announcements: -> { self.respond_to?(:announcements) && self.announcements.active.exists? },
-      outcomes: -> { self.respond_to?(:has_outcomes?) && self.has_outcomes? },
-      discussions: -> { self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:preload).exists? }
+      assignments: -> { respond_to?(:assignments) && assignments.active.exists? },
+      pages: -> { respond_to?(:wiki_pages) && wiki_pages.active.exists? },
+      conferences: -> { respond_to?(:web_conferences) && web_conferences.active.exists? },
+      announcements: -> { respond_to?(:announcements) && announcements.active.exists? },
+      outcomes: -> { respond_to?(:has_outcomes?) && has_outcomes? },
+      discussions: -> { respond_to?(:discussion_topics) && discussion_topics.only_discussion_topics.except(:preload).exists? }
     }
 
     types_to_check = if only_check
@@ -351,7 +351,7 @@ module Context
   end
 
   def nickname_for(_user, fallback = :name, prefer_friendly_name: true)
-    self.send fallback if fallback
+    send fallback if fallback
   end
 
   def self.last_updated_at(klasses_to_ids)
@@ -376,6 +376,6 @@ module Context
   end
 
   def resolved_root_account_id
-    self.root_account_id if self.respond_to? :root_account_id
+    root_account_id if respond_to? :root_account_id
   end
 end

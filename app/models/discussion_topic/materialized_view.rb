@@ -43,13 +43,13 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     discussion_topic.shard.activate do
       # first try to pull the view from the secondary. we can't just do this in the
       # unique_constraint_retry since it begins a transaction.
-      view = GuardRail.activate(:secondary) { self.where(discussion_topic_id: discussion_topic).first }
+      view = GuardRail.activate(:secondary) { where(discussion_topic_id: discussion_topic).first }
       unless view
         # if the view wasn't found, drop into the unique_constraint_retry
         # transaction loop on master.
         unique_constraint_retry do
-          view = self.where(discussion_topic_id: discussion_topic).first ||
-                 self.create!(:discussion_topic => discussion_topic)
+          view = where(discussion_topic_id: discussion_topic).first ||
+                 create!(:discussion_topic => discussion_topic)
         end
       end
       view
@@ -66,26 +66,26 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   def all_entries
-    if self.discussion_topic.sort_by_rating
-      self.discussion_topic.rated_discussion_entries
+    if discussion_topic.sort_by_rating
+      discussion_topic.rated_discussion_entries
     else
-      self.discussion_topic.discussion_entries
+      discussion_topic.discussion_entries
     end
   end
 
   def relativize_ids(ids)
-    if self.shard.id == Shard.current.id
+    if shard.id == Shard.current.id
       ids
     else
-      ids.map { |id| Shard.relative_id_for(id, self.shard, Shard.current) }
+      ids.map { |id| Shard.relative_id_for(id, shard, Shard.current) }
     end
   end
 
   def recursively_relativize_json_ids(data)
     data.map do |entry|
-      entry["id"] = Shard.relative_id_for(entry["id"], self.shard, Shard.current).to_s
+      entry["id"] = Shard.relative_id_for(entry["id"], shard, Shard.current).to_s
       if entry.key? "user_id"
-        entry["user_id"] = Shard.relative_id_for(entry["user_id"], self.shard, Shard.current).to_s
+        entry["user_id"] = Shard.relative_id_for(entry["user_id"], shard, Shard.current).to_s
       end
       if entry["replies"]
         entry["replies"] = recursively_relativize_json_ids(entry["replies"])
@@ -95,10 +95,10 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   def relativize_json_structure_ids
-    if self.shard.id == Shard.current.id
-      self.json_structure
+    if shard.id == Shard.current.id
+      json_structure
     else
-      data = JSON.parse(self.json_structure)
+      data = JSON.parse(json_structure)
       relativized = recursively_relativize_json_ids(data)
       JSON.dump(relativized)
     end
@@ -117,10 +117,10 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       update_materialized_view(xlog_location: self.class.current_xlog_location)
     end
 
-    if self.json_structure.present?
+    if json_structure.present?
       json_structure = relativize_json_structure_ids
-      participant_ids = relativize_ids(self.participants_array)
-      entry_ids = relativize_ids(self.entry_ids_array)
+      participant_ids = relativize_ids(participants_array)
+      entry_ids = relativize_ids(entry_ids_array)
 
       if opts[:include_new_entries]
         @for_mobile = true if opts[:include_mobile_overrides]
@@ -145,18 +145,18 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
         # failed to replicate - requeue later
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
-        delay(singleton: "materialized_discussion:#{Shard.birth.activate { self.discussion_topic_id }}", run_at: run_at)
+        delay(singleton: "materialized_discussion:#{Shard.birth.activate { discussion_topic_id }}", run_at: run_at)
           .update_materialized_view(synchronous: true, xlog_location: xlog_location, use_master: use_master)
         raise ReplicationTimeoutError, "timed out waiting for replication"
       end
     end
     self.generation_started_at = Time.zone.now
     view_json, user_ids, entry_lookup =
-      self.build_materialized_view(use_master: use_master)
+      build_materialized_view(use_master: use_master)
     self.json_structure = view_json
     self.participants_array = user_ids
     self.entry_ids_array = entry_lookup
-    self.save!
+    save!
   rescue ReplicationTimeoutError => e
     Canvas::Errors.capture_exception(:discussion_materialization, e, :warn)
     raise Delayed::RetriableError, e.message

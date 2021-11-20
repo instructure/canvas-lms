@@ -76,7 +76,7 @@ class Feature
   end
 
   def self.production_environment?
-    self.environment == :production
+    environment == :production
   end
 
   # Register one or more features.  Must be done during application initialization.
@@ -171,7 +171,7 @@ class Feature
     if environments
       raise "invalid environment tag for feature #{feature_name}: must be one of #{VALID_ENVS}" unless (environments.keys - VALID_ENVS).empty?
 
-      env = self.environment
+      env = environment
       if environments.key?(env)
         feature_hash.merge!(environments[env])
       end
@@ -248,7 +248,7 @@ class Feature
   end
 
   def self.remove_obsolete_flags
-    valid_features = self.definitions.keys
+    valid_features = definitions.keys
     cutoff = Setting.get('obsolete_feature_flag_cutoff_days', 60).to_i.days.ago
     delete_scope = FeatureFlag.where('updated_at<?', cutoff).where.not(feature: valid_features)
     delete_scope.in_batches.delete_all

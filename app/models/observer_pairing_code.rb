@@ -26,6 +26,6 @@ class ObserverPairingCode < ActiveRecord::Base
 
   def destroy
     self.workflow_state = 'deleted'
-    self.save!
+    save!
   end
 end

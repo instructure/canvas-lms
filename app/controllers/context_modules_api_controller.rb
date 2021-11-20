@@ -177,7 +177,7 @@ class ContextModulesApiController < ApplicationController
 
       if includes.include?('items')
         if @context.user_has_been_observer?(@student || @current_user)
-          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user))
+          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
         end
       end
 

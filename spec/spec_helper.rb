@@ -118,7 +118,7 @@ end
 Time.class_eval do
   def compare_with_round(other)
     other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-    Time.at(self.to_i, self.usec).compare_without_round(other)
+    Time.at(to_i, usec).compare_without_round(other)
   end
   alias_method :compare_without_round, :<=>
   alias_method :<=>, :compare_with_round
@@ -131,7 +131,7 @@ end
 # has already been built, and I can't put myself between the two
 module ActionView::TestCase::Behavior
   def view_assigns
-    if self.is_a?(RSpec::Rails::HelperExampleGroup)
+    if is_a?(RSpec::Rails::HelperExampleGroup)
       # the original implementation. we can't call super because
       # we replaced the whole original method
       return _user_defined_ivars.map do |ivar|

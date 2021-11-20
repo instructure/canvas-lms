@@ -488,7 +488,7 @@ describe AdheresToPolicy::InstanceMethods do
             given { |_| true }
             can :create
 
-            given { |u| self.grants_right?(u, :create) }
+            given { |u| grants_right?(u, :create) }
             can :update
           end
         end
@@ -510,7 +510,7 @@ describe AdheresToPolicy::InstanceMethods do
             given { |_| true }
             can :create
 
-            given { |u| self.grants_right?(u, :create) }
+            given { |u| grants_right?(u, :create) }
             can :update
           end
         end

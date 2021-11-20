@@ -64,41 +64,41 @@ class GroupMembership < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
-    p.to { self.user }
+    p.to { user }
     p.whenever { |record|
       record.just_created &&
         record.accepted? &&
         record.group &&
         record.group.context_available? &&
-        record.group&.can_participate?(self.user) &&
+        record.group&.can_participate?(user) &&
         record.sis_batch_id.blank?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :new_context_group_membership_invitation
-    p.to { self.user }
+    p.to { user }
     p.whenever { |record|
       record.just_created &&
         record.invited? &&
         record.group &&
         record.group.context_available? &&
-        record.group&.can_participate?(self.user) &&
+        record.group&.can_participate?(user) &&
         record.sis_batch_id.blank?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :group_membership_accepted
-    p.to { self.user }
+    p.to { user }
     p.whenever { |record| record.changed_state(:accepted, :requested) }
     p.data { course_broadcast_data }
 
     p.dispatch :group_membership_rejected
-    p.to { self.user }
+    p.to { user }
     p.whenever { |record| record.changed_state(:rejected, :requested) }
     p.data { course_broadcast_data }
 
     p.dispatch :new_student_organized_group
-    p.to { self.group.context.participating_admins }
+    p.to { group.context.participating_admins }
     p.whenever { |record|
       record.group.context.is_a?(Course) &&
         record.just_created &&
@@ -116,38 +116,38 @@ class GroupMembership < ActiveRecord::Base
   # auto accept 'requested' or 'invited' memberships until we implement
   # accepting requests/invitations
   def auto_join
-    return true if self.group.try(:group_category).try(:communities?)
+    return true if group.try(:group_category).try(:communities?)
 
-    self.workflow_state = 'accepted' if self.group && (self.requested? || self.invited?)
+    self.workflow_state = 'accepted' if group && (requested? || invited?)
     true
   end
   protected :auto_join
 
   def update_group_leadership
-    GroupLeadership.new(Group.find(self.group_id)).member_changed_event(self)
+    GroupLeadership.new(Group.find(group_id)).member_changed_event(self)
   end
   protected :update_group_leadership
 
   def ensure_mutually_exclusive_membership
-    return unless self.group
-    return if self.deleted?
+    return unless group
+    return if deleted?
 
-    peer_groups = self.group.peer_groups.map(&:id)
-    GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
+    peer_groups = group.peer_groups.map(&:id)
+    GroupMembership.active.where(:group_id => peer_groups, :user_id => user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
 
   def restricted_self_signup?
-    self.group.group_category&.restricted_self_signup?
+    group.group_category&.restricted_self_signup?
   end
 
   def has_common_section_with_me?
-    self.group.has_common_section_with_user?(user)
+    group.has_common_section_with_user?(user)
   end
 
   def verify_section_homogeneity_if_necessary
     if new_record? && restricted_self_signup? && !has_common_section_with_me?
-      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
+      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => user.name, :group => group.name))
       throw :abort
     end
   end
@@ -163,7 +163,7 @@ class GroupMembership < ActiveRecord::Base
   attr_accessor :old_group_id
 
   def capture_old_group_id
-    self.old_group_id = self.group_id_was if self.group_id_changed?
+    self.old_group_id = group_id_was if group_id_changed?
     true
   end
   protected :capture_old_group_id
@@ -188,8 +188,8 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def touch_groups
-    groups_to_touch = [self.group_id]
-    groups_to_touch << self.old_group_id if self.old_group_id
+    groups_to_touch = [group_id]
+    groups_to_touch << old_group_id if old_group_id
     Group.where(:id => groups_to_touch).touch_all
   end
   protected :touch_groups
@@ -213,31 +213,31 @@ class GroupMembership < ActiveRecord::Base
   # true iff 'active' and the pair of user and group's course match one of the
   # provided enrollments
   def active_given_enrollments?(enrollments)
-    accepted? && (!self.group.context.is_a?(Course) ||
-     enrollments.any? { |e| e.user == self.user && e.course == self.group.context })
+    accepted? && (!group.context.is_a?(Course) ||
+     enrollments.any? { |e| e.user == user && e.course == group.context })
   end
 
   def invalidate_user_membership_cache
-    self.user.clear_cache_key(:groups)
+    user.clear_cache_key(:groups)
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.save!
+    save!
   end
 
   set_policy do
     #################### Begin legacy permission block #########################
 
     given do |user, session|
-      !self.group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && self.group && !self.group.group_category.try(:communities?) &&
+      !group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+        user && self.user && group && !group.group_category.try(:communities?) &&
         (
-          (user == self.user && self.group.grants_right?(user, session, :join)) ||
+          (user == self.user && group.grants_right?(user, session, :join)) ||
             (
-              self.group.can_join?(self.user) && self.group.context &&
-                self.group.context.grants_right?(user, session, :manage_groups)
+              group.can_join?(self.user) && group.context &&
+                group.context.grants_right?(user, session, :manage_groups)
             )
         )
     end
@@ -248,13 +248,13 @@ class GroupMembership < ActiveRecord::Base
     # for non-communities, people can be placed into groups by users who can
     # manage groups at the context level, but not moderators (hence :manage_groups_manage)
     given do |user, session|
-      self.group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && self.group && !self.group.group_category.try(:communities?) &&
+      group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
+        user && self.user && group && !group.group_category.try(:communities?) &&
         (
-          (user == self.user && self.group.grants_right?(user, session, :join)) ||
+          (user == self.user && group.grants_right?(user, session, :join)) ||
             (
-              self.group.can_join?(self.user) && self.group.context &&
-                self.group.context.grants_right?(user, session, :manage_groups_manage)
+              group.can_join?(self.user) && group.context &&
+                group.context.grants_right?(user, session, :manage_groups_manage)
             )
         )
     end
@@ -262,25 +262,25 @@ class GroupMembership < ActiveRecord::Base
 
     # for communities, users must initiate in order to be added to a group
     given do |user, _session|
-      user && self.group && user == self.user && self.group.grants_right?(user, :join) &&
-        self.group.group_category.try(:communities?)
+      user && group && user == self.user && group.grants_right?(user, :join) &&
+        group.group_category.try(:communities?)
     end
     can :create
 
     # user can read group membership if they can read its group's roster
-    given { |user, session| user && self.group && self.group.grants_right?(user, session, :read_roster) }
+    given { |user, session| user && group && group.grants_right?(user, session, :read_roster) }
     can :read
 
-    given { |user, session| user && self.group && self.group.grants_right?(user, session, :manage) }
+    given { |user, session| user && group && group.grants_right?(user, session, :manage) }
     can :update
 
     # allow moderators to kick people out
     # hence :manage instead of :manage_groups_delete on the context
     given do |user, session|
-      user && self.user && self.group &&
+      user && self.user && group &&
         (
-          (user == self.user && self.group.grants_right?(self.user, session, :leave)) ||
-            self.group.grants_right?(user, session, :manage)
+          (user == self.user && group.grants_right?(self.user, session, :leave)) ||
+            group.grants_right?(user, session, :manage)
         )
     end
     can :delete

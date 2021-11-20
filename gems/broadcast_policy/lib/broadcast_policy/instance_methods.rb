@@ -99,14 +99,14 @@ module BroadcastPolicy
 
     def save_without_broadcasting
       @skip_broadcasts = true
-      self.save
+      save
     ensure
       @skip_broadcasts = false
     end
 
     def save_without_broadcasting!
       @skip_broadcasts = true
-      self.save!
+      save!
     ensure
       @skip_broadcasts = false
     end

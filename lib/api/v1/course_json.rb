@@ -36,7 +36,7 @@ module Api::V1
       @enrollments = enrollments
       @precalculated_permissions = precalculated_permissions
       @hash = if block_given?
-                yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
+                yield(self, allowed_attributes, methods_to_send, permissions_to_include)
               else
                 {}
               end
@@ -76,7 +76,7 @@ module Api::V1
     end
 
     def self.to_hash(course, user, includes, enrollments, precalculated_permissions: nil, &block)
-      self.new(course, user, includes, enrollments, precalculated_permissions: precalculated_permissions, &block).to_hash
+      new(course, user, includes, enrollments, precalculated_permissions: precalculated_permissions, &block).to_hash
     end
 
     def clear_unneeded_fields(hash)

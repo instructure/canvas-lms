@@ -40,7 +40,7 @@ class Alert < ActiveRecord::Base
     include_student = false
     include_teachers = false
     admin_role_ids = []
-    self.recipients.try(:each) do |recipient|
+    recipients.try(:each) do |recipient|
       case recipient
       when :student
         include_student = true
@@ -66,11 +66,11 @@ class Alert < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.repetition = nil if self.repetition.blank?
+    self.repetition = nil if repetition.blank?
   end
 
   def as_json(**)
-    converted_recipients = self.recipients.to_a.map do |recipient|
+    converted_recipients = recipients.to_a.map do |recipient|
       case recipient
       when String
         find_role_by_name(recipient).id
@@ -93,14 +93,14 @@ class Alert < ActiveRecord::Base
       values = values.map do |params|
         if params[:id].present?
           id = params.delete(:id).to_i
-          criterion = self.criteria.to_ary.find { |c| c.id == id }
+          criterion = criteria.to_ary.find { |c| c.id == id }
           criterion.attributes = params
         else
-          criterion = self.criteria.build(params)
+          criterion = criteria.build(params)
         end
         criterion
       end
     end
-    self.criteria.replace(values)
+    criteria.replace(values)
   end
 end

@@ -173,7 +173,7 @@ class ErrorReport < ActiveRecord::Base
     self.data ||= {}
     data.each do |k, v|
       if respond_to?(:"#{k}=") && !ErrorReport::PROTECTED_FIELDS.include?(k.to_sym)
-        self.send(:"#{k}=", v)
+        send(:"#{k}=", v)
       else
         # dup'ing because some strings come in from Rack as frozen sometimes,
         # depending on the web server, and our invalid utf-8 stripping breaks on that
@@ -210,8 +210,8 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def guess_email
-    self.email = nil if self.email && self.email.empty?
-    self.email ||= self.user.email rescue nil
+    self.email = nil if email && email.empty?
+    self.email ||= user.email rescue nil
     unless self.email
       domain = HostUrl.outgoing_email_domain.gsub(/[^a-zA-Z0-9]/, '-')
       # example.com definitely won't exist
@@ -223,7 +223,7 @@ class ErrorReport < ActiveRecord::Base
   # delete old error reports before a given date
   # returns the number of destroyed error reports
   def self.destroy_error_reports(before_date)
-    self.where("created_at<?", before_date).delete_all
+    where("created_at<?", before_date).delete_all
   end
 
   def self.categories

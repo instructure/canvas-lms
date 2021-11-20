@@ -141,70 +141,70 @@ class Auditors::Course
   def self.record_created(course, user, changes, opts = {})
     return unless course && changes
 
-    changes = self.remove_empty_changes(changes)
+    changes = remove_empty_changes(changes)
     return if changes.empty?
 
-    self.record(course, user, "created", changes, opts)
+    record(course, user, "created", changes, opts)
   end
 
   def self.record_updated(course, user, changes, opts = {})
     return unless course && changes
 
-    changes = self.remove_empty_changes(changes)
+    changes = remove_empty_changes(changes)
     return if changes.empty?
 
-    self.record(course, user, 'updated', changes, opts)
+    record(course, user, 'updated', changes, opts)
   end
 
   def self.record_concluded(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'concluded', {}, opts)
+    record(course, user, 'concluded', {}, opts)
   end
 
   def self.record_unconcluded(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'unconcluded', {}, opts)
+    record(course, user, 'unconcluded', {}, opts)
   end
 
   def self.record_deleted(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'deleted', {}, opts)
+    record(course, user, 'deleted', {}, opts)
   end
 
   def self.record_restored(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'restored', {}, opts)
+    record(course, user, 'restored', {}, opts)
   end
 
   def self.record_published(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'published', {}, opts)
+    record(course, user, 'published', {}, opts)
   end
 
   def self.record_claimed(course, user, opts = {})
     return unless course
 
-    self.record(course, user, 'claimed', {}, opts)
+    record(course, user, 'claimed', {}, opts)
   end
 
   def self.record_copied(course, copy, user, opts = {})
     return unless course && copy
 
-    copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
-    copied_to = self.record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
+    copied_from = record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
+    copied_to = record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
     [copied_from, copied_to]
   end
 
   def self.record_reset(course, new_course, user, opts = {})
     return unless course && new_course
 
-    reset_from = self.record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
-    reset_to = self.record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
+    reset_from = record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
+    reset_to = record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
     [reset_from, reset_to]
   end
 

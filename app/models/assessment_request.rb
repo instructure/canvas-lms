@@ -56,14 +56,14 @@ class AssessmentRequest < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
-    p.to { self.assessor }
+    p.to { assessor }
     p.whenever {
       should_send_reminder? && active_rubric_association?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
-    p.to { self.assessor }
+    p.to { assessor }
     p.whenever {
       should_send_reminder? && !active_rubric_association?
     }
@@ -86,25 +86,25 @@ class AssessmentRequest < ActiveRecord::Base
 
   set_policy do
     given { |user, session|
-      self.can_read_assessment_user_name?(user, session)
+      can_read_assessment_user_name?(user, session)
     }
     can :read_assessment_user
   end
 
   def can_read_assessment_user_name?(user, session)
-    !self.considered_anonymous? ||
-      self.user_id == user.id ||
-      self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
+    !considered_anonymous? ||
+      user_id == user.id ||
+      submission.assignment.context.grants_right?(user, session, :view_all_grades)
   end
 
   def considered_anonymous?
-    self.submission.assignment.anonymous_peer_reviews?
+    submission.assignment.anonymous_peer_reviews?
   end
 
   def send_reminder!
     @send_reminder = true
     self.updated_at = Time.now
-    self.save!
+    save!
   ensure
     @send_reminder = nil
   end
@@ -124,7 +124,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def assessor_name
-    self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))
+    rubric_assessment.assessor_name rescue ((assessor.name rescue nil) || t("#unknown", "Unknown"))
   end
 
   def incomplete?
@@ -132,10 +132,10 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    self.assessor
+    assessor
   end
   on_update_send_to_streams do
-    self.assessor
+    assessor
   end
 
   workflow do
@@ -148,15 +148,15 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def asset_title
-    (self.asset.assignment.title rescue self.asset.title) rescue t("#unknown", "Unknown")
+    (asset.assignment.title rescue asset.title) rescue t("#unknown", "Unknown")
   end
 
   def comment_added
-    self.workflow_state = "completed" unless active_rubric_association? && self.rubric_association.rubric
+    self.workflow_state = "completed" unless active_rubric_association? && rubric_association.rubric
   end
 
   def asset_user_name
-    self.asset.user.name rescue t("#unknown", "Unknown")
+    asset.user.name rescue t("#unknown", "Unknown")
   end
 
   def self.serialization_excludes
@@ -165,12 +165,12 @@ class AssessmentRequest < ActiveRecord::Base
 
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'
-      override = PlannerOverride.find_by(plannable_id: self.id, plannable_type: 'AssessmentRequest', user: assessor)
+      override = PlannerOverride.find_by(plannable_id: id, plannable_type: 'AssessmentRequest', user: assessor)
       override.update(marked_complete: true) if override.present?
     end
   end
 
   def active_rubric_association?
-    !!self.rubric_association&.active?
+    !!rubric_association&.active?
   end
 end

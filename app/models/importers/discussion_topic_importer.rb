@@ -37,7 +37,7 @@ module Importers
         event[:type] = 'announcement'
 
         begin
-          self.import_from_migration(event, migration.context, migration)
+          import_from_migration(event, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
@@ -67,7 +67,7 @@ module Importers
     end
 
     def self.import_from_migration(hash, context, migration, item = nil)
-      importer = self.new(hash, context, migration, item)
+      importer = new(hash, context, migration, item)
       importer.run
     end
 

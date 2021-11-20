@@ -35,7 +35,7 @@ module LuckySneaks
       if defined?(RedCloth)
         if lite_mode
           RedCloth.new(self, [:lite_mode]).to_html
-        elsif self.include?('<pre>')
+        elsif include?('<pre>')
           RedCloth.new(self).to_html.tr("\t", "")
         else
           RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")

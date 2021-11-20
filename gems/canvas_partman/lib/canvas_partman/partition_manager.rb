@@ -141,7 +141,7 @@ SQL
     end
 
     def initialize(base_class)
-      raise NotImplementedError if self.instance_of?(PartitionManager)
+      raise NotImplementedError if instance_of?(PartitionManager)
 
       @base_class = base_class
     end

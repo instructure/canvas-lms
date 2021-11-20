@@ -36,9 +36,9 @@ module AssignmentOverrideApplicator
       return setup_overridden_clone(assignment_or_quiz)
     end
 
-    overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
+    overrides = overrides_for_assignment_and_user(assignment_or_quiz, user)
 
-    result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides)
+    result_assignment_or_quiz = assignment_with_overrides(assignment_or_quiz, overrides)
     result_assignment_or_quiz.overridden_for_user = user
 
     # students get the last overridden date that applies to them, but teachers
@@ -94,7 +94,7 @@ module AssignmentOverrideApplicator
         ["overrides_for_assignment_and_user3", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
         batch_object: user, batched_keys: [:enrollments, :groups]
       ) do
-        next [] if self.has_invalid_args?(assignment_or_quiz, user)
+        next [] if has_invalid_args?(assignment_or_quiz, user)
 
         context = assignment_or_quiz.context
 
@@ -287,7 +287,7 @@ module AssignmentOverrideApplicator
     [:id, :updated_at, :created_at].each { |attr|
       clone[attr] = assignment.send(attr)
     }
-    self.copy_preloaded_associations_to_clone(assignment, clone)
+    copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
 
     clone.applied_overrides = overrides
@@ -307,10 +307,10 @@ module AssignmentOverrideApplicator
   def self.assignment_with_overrides(assignment_or_quiz, overrides)
     unoverridden_assignment_or_quiz = assignment_or_quiz.without_overrides
 
-    self.setup_overridden_clone(unoverridden_assignment_or_quiz,
-                                overrides) do |cloned_assignment_or_quiz|
+    setup_overridden_clone(unoverridden_assignment_or_quiz,
+                           overrides) do |cloned_assignment_or_quiz|
       if overrides&.any?
-        self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
+        collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
           value = value.in_time_zone if value.respond_to?(:in_time_zone) && !value.is_a?(Date)
@@ -337,14 +337,14 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
+    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)].cache_key
     RequestCache.cache('collapsed_overrides', cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
         # clone the assignment_or_quiz, apply overrides, and freeze
         [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
           if assignment_or_quiz.respond_to?(field)
-            value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
+            value = send("overridden_#{field}", assignment_or_quiz, overrides)
             # force times to un-zoned UTC -- this will be a cached value and should
             # not care about the TZ of the user that cached it. the user's TZ will
             # be applied before it's returned.

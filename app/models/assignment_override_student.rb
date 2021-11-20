@@ -129,7 +129,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       assignment.clear_cache_key(:availability)
       DueDateCacher.recompute_users_for_course(user_id, assignment.context, [assignment])
     end
-    self.quiz&.clear_cache_key(:availability)
+    quiz&.clear_cache_key(:availability)
   end
 
   def set_root_account_id

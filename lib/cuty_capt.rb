@@ -62,7 +62,7 @@ class CutyCapt
     end
     setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
-    self.process_config
+    process_config
     @@config = nil unless @@config[:path] || @@config[:screencap_service]
     @@config
   end
@@ -85,7 +85,7 @@ class CutyCapt
   end
 
   def self.enabled?
-    !self.config.nil?
+    !config.nil?
   end
 
   def self.verify_url(url)
@@ -120,7 +120,7 @@ class CutyCapt
 
   def self.snapshot_url(url)
     return nil unless (config = self.config)
-    return nil unless self.verify_url(url)
+    return nil unless verify_url(url)
 
     format = "png"
 
@@ -179,7 +179,7 @@ class CutyCapt
 
   def self.snapshot_attachment_for_url(url)
     attachment = nil
-    self.snapshot_url(url) do |file_path|
+    snapshot_url(url) do |file_path|
       # this is a really odd way to get Attachment the data it needs, which
       # should probably be remedied at some point
       attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))

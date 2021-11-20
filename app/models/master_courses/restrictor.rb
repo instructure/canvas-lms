@@ -63,8 +63,8 @@ module MasterCourses::Restrictor
         raise "invalid restriction type" unless MasterCourses::LOCK_TYPES.include?(edit_type)
 
         columns = Array(columns).map(&:to_s)
-        current = self.restricted_column_settings[edit_type] || []
-        self.restricted_column_settings[edit_type] = (current + columns).uniq
+        current = restricted_column_settings[edit_type] || []
+        restricted_column_settings[edit_type] = (current + columns).uniq
       end
 
       def restrict_assignment_columns
@@ -86,24 +86,24 @@ module MasterCourses::Restrictor
     end
 
     def check_for_restricted_column_changes
-      return true if @importing_migration || !is_child_content? || !self.check_restrictions?
+      return true if @importing_migration || !is_child_content? || !check_restrictions?
 
       locked_columns = []
       self.class.base_class.restricted_column_settings.each do |type, columns|
-        changed_columns = (self.changes.keys & columns)
+        changed_columns = (changes.keys & columns)
         if changed_columns.any?
-          locked_columns += changed_columns if self.child_content_restrictions[type]
+          locked_columns += changed_columns if child_content_restrictions[type]
         end
       end
       if locked_columns.any?
-        self.errors.add(:base, "cannot change column(s): #{locked_columns.join(", ")} - locked by Master Course")
+        errors.add(:base, "cannot change column(s): #{locked_columns.join(", ")} - locked by Master Course")
       end
     end
 
     def editing_restricted?(edit_type = :all) # edit_type can be :all, :any, or a specific type: :content, :settings, :due_dates, :availability_dates, :points
       return false unless is_child_content?
 
-      restrictions = self.child_content_restrictions
+      restrictions = child_content_restrictions
       return false unless restrictions.present?
       return true if restrictions[:all]
 
@@ -121,20 +121,20 @@ module MasterCourses::Restrictor
   end
 
   def check_restrictions?
-    !self.new_record?
+    !new_record?
   end
 
   def mark_downstream_changes(changed_columns = nil)
     return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
 
-    changed_columns ||= self.saved_changes.keys & self.class.base_class.restricted_column_settings.values.flatten
-    state_column = self.is_a?(Attachment) ? "file_state" : "workflow_state"
-    if self.saved_changes[state_column]&.last == "deleted"
+    changed_columns ||= saved_changes.keys & self.class.base_class.restricted_column_settings.values.flatten
+    state_column = is_a?(Attachment) ? "file_state" : "workflow_state"
+    if saved_changes[state_column]&.last == "deleted"
       changed_columns.delete(state_column)
       changed_columns << "manually_deleted"
     end
     if changed_columns.any?
-      tag_content = if self.is_a?(Assignment) && (submittable = self.submittable_object)
+      tag_content = if is_a?(Assignment) && (submittable = submittable_object)
                       submittable # mark on the owner's tag
                     else
                       self
@@ -148,7 +148,7 @@ module MasterCourses::Restrictor
             child_tag.save!
           end
         else
-          Rails.logger.warn("Child content tag was not found for #{self.class.name} #{self.id} - either this is from old code or something bad happened")
+          Rails.logger.warn("Child content tag was not found for #{self.class.name} #{id} - either this is from old code or something bad happened")
         end
       end
     end
@@ -171,19 +171,19 @@ module MasterCourses::Restrictor
     self.class.base_class.restricted_column_settings.each do |type, columns|
       changed_columns = (child_tag.downstream_changes & columns) # should unlink all changes if _any_ in the category has been changed
       if changed_columns.any?
-        if self.child_content_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
+        if child_content_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
           child_tag.downstream_changes -= changed_columns # remove them from the downstream changes since we overwrote
           child_tag.save!
         else
           # if not locked then we should undo _all_ the changes in the category (content or settings) we were about to make
-          columns_to_restore += (self.changes.keys & columns)
+          columns_to_restore += (changes.keys & columns)
         end
       end
     end
 
-    state_column = self.is_a?(Attachment) ? "file_state" : "workflow_state"
-    if self.changes[state_column]&.first == "deleted" && child_tag.downstream_changes.include?("manually_deleted")
-      if self.editing_restricted?(:any)
+    state_column = is_a?(Attachment) ? "file_state" : "workflow_state"
+    if changes[state_column]&.first == "deleted" && child_tag.downstream_changes.include?("manually_deleted")
+      if editing_restricted?(:any)
         child_tag.downstream_changes.delete("manually_deleted")
         child_tag.save!
       else
@@ -193,8 +193,8 @@ module MasterCourses::Restrictor
 
     if columns_to_restore.any?
       @importing_migration.add_skipped_item(child_tag)
-      Rails.logger.debug("Undoing imported changes to #{self.class} #{self.id} because changed downstream - #{columns_to_restore.join(', ')}")
-      self.restore_attributes(columns_to_restore)
+      Rails.logger.debug("Undoing imported changes to #{self.class} #{id} because changed downstream - #{columns_to_restore.join(', ')}")
+      restore_attributes(columns_to_restore)
     end
   end
 
@@ -210,7 +210,7 @@ module MasterCourses::Restrictor
 
     locked_types = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
-      if !self.child_content_restrictions[type] && (child_tag.downstream_changes & columns).any?
+      if !child_content_restrictions[type] && (child_tag.downstream_changes & columns).any?
         locked_types << type
       end
     end
@@ -219,7 +219,7 @@ module MasterCourses::Restrictor
   end
 
   def is_child_content?
-    self.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+    migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
   end
 
   def child_content_restrictions
@@ -228,25 +228,25 @@ module MasterCourses::Restrictor
 
   def master_course_api_restriction_data(course_status)
     hash = {}
-    if course_status == :child && self.is_child_content?
+    if course_status == :child && is_child_content?
       hash['is_master_course_child_content'] = true
-      is_restricted = self.editing_restricted?(:any)
+      is_restricted = editing_restricted?(:any)
       hash['restricted_by_master_course'] = is_restricted
-      hash['master_course_restrictions'] = self.child_content_restrictions if is_restricted
-    elsif course_status == :master && self.current_master_template_restrictions
+      hash['master_course_restrictions'] = child_content_restrictions if is_restricted
+    elsif course_status == :master && current_master_template_restrictions
       hash['is_master_course_master_content'] = true
-      is_restricted = self.current_master_template_restrictions.values.any? { |v| v }
+      is_restricted = current_master_template_restrictions.values.any? { |v| v }
       hash['restricted_by_master_course'] = is_restricted
-      hash['master_course_restrictions'] = self.current_master_template_restrictions if is_restricted
+      hash['master_course_restrictions'] = current_master_template_restrictions if is_restricted
     end
     hash
   end
 
   def find_child_content_restrictions
     if @importing_migration
-      @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(self.migration_id) # for extra speeds on import
+      @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(migration_id) # for extra speeds on import
     else
-      MasterCourses::MasterContentTag.where(:migration_id => self.migration_id).pluck(:restrictions).first
+      MasterCourses::MasterContentTag.where(:migration_id => migration_id).pluck(:restrictions).first
     end
   end
 

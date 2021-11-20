@@ -128,11 +128,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def entity_id
-    self.class.saml_default_entity_id_for_account(self.account, persist: !new_record?)
+    self.class.saml_default_entity_id_for_account(account, persist: !new_record?)
   end
 
   def set_saml_defaults
-    self.requested_authn_context = nil if self.requested_authn_context.blank?
+    self.requested_authn_context = nil if requested_authn_context.blank?
   end
 
   def validate_urls
@@ -274,8 +274,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
     end
 
-    self.settings[:signing_certificates] = idp.signing_keys.filter_map(&:x509)
-    self.settings[:signing_keys] = idp.signing_keys.filter_map(&:key).map(&:to_s)
+    settings[:signing_certificates] = idp.signing_keys.filter_map(&:x509)
+    settings[:signing_keys] = idp.signing_keys.filter_map(&:key).map(&:to_s)
     case idp.want_authn_requests_signed?
     when true
       # use ||= to not overwrite a specific algorithm that has otherwise been

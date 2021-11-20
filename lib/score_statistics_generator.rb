@@ -37,8 +37,8 @@ class ScoreStatisticsGenerator
   def self.update_score_statistics(course_id)
     root_account_id = Course.find_by(id: course_id)&.root_account_id
 
-    self.update_assignment_score_statistics(course_id, root_account_id: root_account_id)
-    self.update_course_score_statistic(course_id)
+    update_assignment_score_statistics(course_id, root_account_id: root_account_id)
+    update_course_score_statistic(course_id)
   end
 
   def self.update_assignment_score_statistics(course_id, root_account_id:)

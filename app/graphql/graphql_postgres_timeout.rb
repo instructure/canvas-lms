@@ -24,7 +24,7 @@ module GraphQLPostgresTimeout
   end
 
   def self.wrap(query)
-    if self.do_not_wrap
+    if do_not_wrap
       yield
     else
       ActiveRecord::Base.transaction do

@@ -50,26 +50,26 @@ class EnrollmentState < ActiveRecord::Base
 
   # check if we've manually marked the enrollment state as potentially out of date (or if the stored date trigger has past)
   def state_needs_recalculation?
-    !self.state_is_current? || (self.state_valid_until && self.state_valid_until < Time.now)
+    !state_is_current? || (state_valid_until && state_valid_until < Time.now)
   end
 
   def ensure_current_state
     GuardRail.activate(:primary) do
       retry_count = 0
       begin
-        self.recalculate_state if self.state_needs_recalculation? || retry_count > 0 # force double-checking on lock conflict
-        self.recalculate_access if !self.access_is_current? || retry_count > 0
-        self.save! if self.changed?
+        recalculate_state if state_needs_recalculation? || retry_count > 0 # force double-checking on lock conflict
+        recalculate_access if !access_is_current? || retry_count > 0
+        save! if changed?
       rescue ActiveRecord::StaleObjectError
         # retry up to five times, otherwise return current (stale) data
 
-        self.enrollment.association(:enrollment_state).target = nil # don't cache an old enrollment state, just in case
-        self.reload
+        enrollment.association(:enrollment_state).target = nil # don't cache an old enrollment state, just in case
+        reload
 
         retry_count += 1
         retry if retry_count < 5
 
-        logger.error { "Failed to evaluate stale enrollment state: #{self.inspect}" }
+        logger.error { "Failed to evaluate stale enrollment state: #{inspect}" }
       end
     end
   end
@@ -79,61 +79,61 @@ class EnrollmentState < ActiveRecord::Base
   # - an invitation in a course yet to start is functionally identical to an invitation in a started course
   # - :accepted is kind of silly, but it's how the old code signified an active enrollment in a course that hadn't started
   def get_effective_state
-    self.ensure_current_state
+    ensure_current_state
 
     if restricted_access?
       :inactive
-    elsif self.state == 'pending_invited'
+    elsif state == 'pending_invited'
       :invited
-    elsif self.state == 'pending_active'
+    elsif state == 'pending_active'
       :accepted
     else
-      self.state.to_sym
+      state.to_sym
     end
   end
 
   def get_display_state
-    self.ensure_current_state
+    ensure_current_state
 
     if pending?
       :pending
     else
-      self.state.to_sym
+      state.to_sym
     end
   end
 
   def pending?
-    %w[pending_active pending_invited creation_pending].include?(self.state)
+    %w[pending_active pending_invited creation_pending].include?(state)
   end
 
   def recalculate_state
     self.state_valid_until = nil
     self.state_started_at = nil
 
-    wf_state = self.enrollment.workflow_state
+    wf_state = enrollment.workflow_state
     invited_or_active = %w[invited active].include?(wf_state)
 
     if invited_or_active
-      if self.enrollment.course.completed?
+      if enrollment.course.completed?
         self.state = 'completed'
       else
-        self.calculate_state_based_on_dates
+        calculate_state_based_on_dates
       end
     else
       self.state = wf_state
     end
     self.state_is_current = true
 
-    if self.state_changed? && self.enrollment.view_restrictable?
+    if state_changed? && enrollment.view_restrictable?
       self.access_is_current = false
     end
 
-    if self.state_changed?
+    if state_changed?
       self.user_needs_touch = true
-      unless self.skip_touch_user
+      unless skip_touch_user
         self.class.connection.after_transaction_commit do
-          self.enrollment.user.touch unless User.skip_touch_for_type?(:enrollments)
-          self.enrollment.user.clear_cache_key(:enrollments)
+          enrollment.user.touch unless User.skip_touch_for_type?(:enrollments)
+          enrollment.user.clear_cache_key(:enrollments)
         end
       end
     end
@@ -144,8 +144,8 @@ class EnrollmentState < ActiveRecord::Base
   # so this translates the current enrollment's workflow_state depending
   # whether we're currently before the start, after the end, or between the two
   def calculate_state_based_on_dates
-    wf_state = self.enrollment.workflow_state
-    ranges = self.enrollment.enrollment_dates
+    wf_state = enrollment.workflow_state
+    ranges = enrollment.enrollment_dates
     now = Time.now
 
     # start_at <= now <= end_at, allowing for open ranges on either end
@@ -165,13 +165,13 @@ class EnrollmentState < ActiveRecord::Base
         # we've past the end date so no matter what the state was, we're "completed" now
         self.state_started_at = ranges.filter_map(&:last).min
         self.state = 'completed'
-      elsif self.enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
+      elsif enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts
         self.state = wf_state
       else
         # the course has yet to begin for the enrollment
         self.state_valid_until = global_start_at # store the date when that will change
-        self.state = if self.enrollment.view_restrictable?
+        self.state = if enrollment.view_restrictable?
                        # these enrollment states mean they still can't participate yet even if they've accepted it,
                        # but should be able to view just like an invited enrollment
                        if wf_state == 'active'
@@ -191,11 +191,11 @@ class EnrollmentState < ActiveRecord::Base
   # you can still access the course in a "view-only" mode
   # but courses/accounts can disable this
   def recalculate_access
-    self.restricted_access = if self.enrollment.view_restrictable?
-                               if self.pending?
-                                 self.enrollment.restrict_future_view?
-                               elsif self.state == 'completed'
-                                 self.enrollment.restrict_past_view?
+    self.restricted_access = if enrollment.view_restrictable?
+                               if pending?
+                                 enrollment.restrict_future_view?
+                               elsif state == 'completed'
+                                 enrollment.restrict_past_view?
                                else
                                  false
                                end

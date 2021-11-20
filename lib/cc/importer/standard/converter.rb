@@ -42,7 +42,7 @@ module CC::Importer::Standard
       @resources = {}
       @file_path_migration_id = {}
       @resource_nodes_for_flat_manifest = {}
-      @convert_html_to_pages = self.content_migration&.context&.feature_enabled?(:common_cartridge_page_conversion)
+      @convert_html_to_pages = content_migration&.context&.feature_enabled?(:common_cartridge_page_conversion)
     end
 
     # exports the package into the intermediary json

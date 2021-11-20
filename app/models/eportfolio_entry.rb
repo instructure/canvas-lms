@@ -41,23 +41,23 @@ class EportfolioEntry < ActiveRecord::Base
   serialize :content
 
   set_policy do
-    given { |user| user && self.allow_comments }
+    given { |user| user && allow_comments }
     can :comment
   end
 
   def infer_comment_visibility
-    self.show_comments = false unless self.allow_comments
+    self.show_comments = false unless allow_comments
     true
   end
   protected :infer_comment_visibility
 
   def update_portfolio
-    self.eportfolio.save!
+    eportfolio.save!
   end
   protected :update_portfolio
 
   def content_sections
-    ((self.content.is_a?(String) && Array(self.content)) || self.content || []).map do |section|
+    ((content.is_a?(String) && Array(content)) || content || []).map do |section|
       if section.is_a?(Hash)
         section.with_indifferent_access
       else
@@ -75,14 +75,14 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def full_slug
-    (self.eportfolio_category.slug rescue "") + "_" + self.slug
+    (eportfolio_category.slug rescue "") + "_" + slug
   end
 
   def attachments
     res = []
     content_sections.each do |section|
       if section["attachment_id"].present? && section["section_type"] == "attachment"
-        res << (self.eportfolio.user.all_attachments.where(id: section["attachment_id"]).first rescue nil)
+        res << (eportfolio.user.all_attachments.where(id: section["attachment_id"]).first rescue nil)
       end
     end
     res.compact
@@ -92,7 +92,7 @@ class EportfolioEntry < ActiveRecord::Base
     res = []
     content_sections.each do |section|
       if section["submission_id"].present? && section["section_type"] == "submission"
-        res << (self.eportfolio.user.submissions.where(id: section["submission_id"]).first rescue nil)
+        res << (eportfolio.user.submissions.where(id: section["submission_id"]).first rescue nil)
       end
     end
     res.compact
@@ -128,24 +128,24 @@ class EportfolioEntry < ActiveRecord::Base
       end
 
       if new_obj
-        self.content << new_obj
+        content << new_obj
       end
     end
-    self.content << t(:default_content, "No Content Added Yet") if self.content.empty?
+    content << t(:default_content, "No Content Added Yet") if content.empty?
   end
 
   def category_slug
-    self.eportfolio_category.slug rescue self.eportfolio_category_id
+    eportfolio_category.slug rescue eportfolio_category_id
   end
 
   def infer_unique_slug
-    pages = self.eportfolio_category.eportfolio_entries rescue []
+    pages = eportfolio_category.eportfolio_entries rescue []
     self.name ||= t(:default_name, "Page Name")
     self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
-    pages = pages.where("id<>?", self) unless self.new_record?
-    match_cnt = pages.where(:slug => self.slug).count
+    pages = pages.where("id<>?", self) unless new_record?
+    match_cnt = pages.where(:slug => slug).count
     if match_cnt > 0
-      self.slug = self.slug + "_" + (match_cnt + 1).to_s
+      self.slug = slug + "_" + (match_cnt + 1).to_s
     end
   end
   protected :infer_unique_slug
@@ -154,12 +154,12 @@ class EportfolioEntry < ActiveRecord::Base
     Atom::Entry.new do |entry|
       entry.title = self.name.to_s
       entry.authors << Atom::Person.new(:name => t(:atom_author, "ePortfolio Entry"))
-      entry.updated   = self.updated_at
-      entry.published = self.created_at
-      url = "http://#{HostUrl.default_host}/eportfolios/#{self.eportfolio_id}/#{self.eportfolio_category.slug}/#{self.slug}"
-      url += "?verifier=#{self.eportfolio.uuid}" if opts[:private]
+      entry.updated   = updated_at
+      entry.published = created_at
+      url = "http://#{HostUrl.default_host}/eportfolios/#{eportfolio_id}/#{eportfolio_category.slug}/#{slug}"
+      url += "?verifier=#{eportfolio.uuid}" if opts[:private]
       entry.links << Atom::Link.new(:rel => 'alternate', :href => url)
-      entry.id = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{self.feed_code}_#{self.created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
+      entry.id = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       rendered_content = t(:click_through, "Click to view page content")
       entry.content = Atom::Content::Html.new(rendered_content)
     end

@@ -114,10 +114,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def abort_csv_generation
-    self.progress.destroy
-    self.reload
+    progress.destroy
+    reload
 
-    Delayed::Job.where({ strand: self.csv_job_strand_id }).destroy_all
+    Delayed::Job.where({ strand: csv_job_strand_id }).destroy_all
   end
 
   def self.csv_job_tag
@@ -125,7 +125,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def csv_job_strand_id
-    Shard.birth.activate { "quiz_statistics_#{quiz_id}_#{self.id}" }
+    Shard.birth.activate { "quiz_statistics_#{quiz_id}_#{id}" }
   end
 
   def update_progress(i, n)

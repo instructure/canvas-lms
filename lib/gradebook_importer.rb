@@ -55,7 +55,7 @@ class GradebookImporter
               :submissions, :missing_assignments, :missing_students, :upload
 
   def self.create_from(progress, gradebook_upload, user, attachment)
-    self.new(gradebook_upload, attachment, user, progress).parse!
+    new(gradebook_upload, attachment, user, progress).parse!
   rescue CSV::MalformedCSVError => e
     Canvas::Errors.capture_exception(:gradebook_import, e, :info)
     # this isn't actually "retryable", but this error will make sure
@@ -300,7 +300,7 @@ class GradebookImporter
       end
     end
 
-    @upload.gradebook = self.as_json
+    @upload.gradebook = as_json
     @upload.save!
   end
 

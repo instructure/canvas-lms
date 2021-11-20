@@ -182,7 +182,7 @@ module BasicLTI
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
-        source_id = self.sourcedid
+        source_id = sourcedid
 
         begin
           assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
@@ -192,14 +192,14 @@ module BasicLTI
           return true
         end
 
-        op = self.operation_ref_identifier.underscore
+        op = operation_ref_identifier.underscore
         # Write results are disabled for concluded users, read results are still allowed
         if op != 'read_result' && !user_enrollment_active?(assignment, user)
           report_failure(:course_not_available, 'Course not available for student')
           self.body = "<#{operation_ref_identifier}Response />"
           return true
-        elsif self.respond_to?("handle_#{op}", true)
-          return self.send("handle_#{op}", tool, assignment, user)
+        elsif respond_to?("handle_#{op}", true)
+          return send("handle_#{op}", tool, assignment, user)
         end
 
         false
@@ -250,12 +250,12 @@ module BasicLTI
       end
 
       def failure?
-        self.code_major == "failure"
+        code_major == "failure"
       end
 
       def handle_replace_result(tool, assignment, user)
-        text_value = self.result_score
-        score_value = self.result_total_score
+        text_value = result_score
+        score_value = result_total_score
         begin
           new_score = Float(text_value)
         rescue

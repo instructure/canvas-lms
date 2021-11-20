@@ -33,29 +33,29 @@ class DiscussionEntryParticipant < ActiveRecord::Base
                                        message: "%{value} is not valid" }
 
   def prevent_creates
-    if self.new_record?
+    if new_record?
       # e.g. DiscussionEntryParticipant.upsert_for_entries(entry, user, new_state: 'read')
-      self.errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
+      errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
     end
   end
 
   def self.read_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
-        .pluck(:discussion_entry_id)
+    where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
+      .pluck(:discussion_entry_id)
   end
 
   def self.forced_read_state_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
-        .pluck(:discussion_entry_id)
+    where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
+      .pluck(:discussion_entry_id)
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
+    ratings = where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
     ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
-    entry_participant = self.new(discussion_entry: entry, user: user)
+    entry_participant = new(discussion_entry: entry, user: user)
     error_message = "Null value in column '#{column}' violates not-null constraint"
     entry_participant.errors.add(column, error_message)
     entry_participant
@@ -196,6 +196,6 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   }
 
   def set_root_account_id
-    self.root_account_id = self.discussion_entry.root_account_id
+    self.root_account_id = discussion_entry.root_account_id
   end
 end
