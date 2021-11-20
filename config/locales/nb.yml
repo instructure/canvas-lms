@@ -7411,7 +7411,7 @@ nb:
     other: "%{count}  innleveringer trenger vurdering"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} ville bli slettet og overstiger den fastsatte grensen for %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} upubliserte endringer"
+    one: "1 upublisert endring"
     other: "%{count} upubliserte endringer"
   count_unread_cff5855: "%{count} ulest."
   count_unread_messages_99d6bf17: 
