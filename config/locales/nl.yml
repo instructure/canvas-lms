@@ -7403,7 +7403,7 @@ nl:
     other: "%{count} inleveringen nog te beoordelen"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} zouden worden verwijderd en overschrijdt de ingestelde drempel van %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} niet-gepubliceerde wijzigingen"
+    one: "1 niet-gepubliceerde wijziging"
     other: "%{count} niet-gepubliceerde wijzigingen"
   count_unread_cff5855: "%{count} ongelezen."
   count_unread_messages_99d6bf17: 
