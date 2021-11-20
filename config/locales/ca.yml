@@ -5472,7 +5472,7 @@ ca:
     other: "%{count} entregues requereixen qualificació"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} se suprimiria i supera el llindar establert de %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} canvis no publicats"
+    one: "1 canvi no publicat"
     other: "%{count} canvis no publicats"
   count_unread_cff5855: "%{count} sense llegir."
   count_unread_messages_e312aa7b: 
