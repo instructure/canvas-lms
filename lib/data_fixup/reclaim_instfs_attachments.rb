@@ -32,7 +32,7 @@ module DataFixup::ReclaimInstfsAttachments
   end
 
   def self.reclaim_attachment(attachment)
-    # note: this downloads the whole attachment at once into a temp file.
+    # NOTE: this downloads the whole attachment at once into a temp file.
     # unfortunately, this is unavoidable with how attachment_fu works
     attachment.uploaded_data = attachment.open
     attachment.instfs_uuid = nil

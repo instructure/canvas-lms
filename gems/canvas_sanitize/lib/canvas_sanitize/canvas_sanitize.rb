@@ -76,7 +76,7 @@ module CanvasSanitize # :nodoc:
                'role',
                'lang',
                'dir',
-               :data, # Note: the symbol :data allows for arbitrary HTML5 data-* attributes
+               :data, # NOTE: the symbol :data allows for arbitrary HTML5 data-* attributes
                'aria-labelledby',
                'aria-atomic',
                'aria-busy',

@@ -56,7 +56,7 @@ module Importers
       begin
         item.data = GradingStandard.upgrade_data(JSON.parse(hash[:data]), hash[:version] || 1)
       rescue
-        # todo - add to message to display to user
+        # TODO: add to message to display to user
       end
 
       item.save!

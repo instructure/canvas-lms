@@ -509,7 +509,7 @@ class FilesController < ApplicationController
     GuardRail.activate(:secondary) do
       params[:id] ||= params[:file_id]
       get_context
-      # note that the /files/XXX URL implicitly uses the current user as the
+      # NOTE: the /files/XXX URL implicitly uses the current user as the
       # context, even though it doesn't search for the file using
       # @current_user.attachments.find , since it might not actually be a user
       # attachment.
@@ -519,7 +519,7 @@ class FilesController < ApplicationController
         @context = nil unless @context == @current_user || @context == @attachment.context
         @skip_crumb = true unless @context
       else
-        # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+        # NOTE: Attachment#find has special logic to find overwriting files; see FindInContextAssociation
         @attachment ||= @context.attachments.find(params[:id])
       end
 

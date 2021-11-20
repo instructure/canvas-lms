@@ -32,7 +32,7 @@ module Exporters
             attachment_ids = submission.attachment_ids.try(:split, ",")
             attachments = attachment_ids.present? ? main_sub.shard.activate { Attachment.where(id: attachment_ids) } : []
             attachments.each do |attachment|
-              # TODO handle missing attachments
+              # TODO: handle missing attachments
               path = File.join(base_path, attachment.display_name)
               ExporterHelper.add_attachment_to_zip(attachment, zipfile, path, files_in_zip)
             end

@@ -158,7 +158,7 @@ module StreamItemsHelper
     when "Assignment"
       asset.subject
     when "AssessmentRequest"
-      # TODO I18N should use placeholders, not concatenation
+      # TODO: I18N should use placeholders, not concatenation
       asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
     when "DiscussionEntry"
       I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title'] })

@@ -42,7 +42,7 @@ class ScoreStatisticsGenerator
   end
 
   def self.update_assignment_score_statistics(course_id, root_account_id:)
-    # note: because a score is needed for max/min/ave we are not filtering
+    # NOTE: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
     statistics = GuardRail.activate(:secondary) do

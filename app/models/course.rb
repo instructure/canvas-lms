@@ -925,7 +925,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.default_name
-    # TODO i18n
+    # TODO: i18n
     t('default_name', "My Course")
   end
 
@@ -3747,7 +3747,7 @@ class Course < ActiveRecord::Base
     send(association_type).clear_cache_keys(:todo_list)
   end
 
-  def touch_admins # TODO remove after existing jobs run
+  def touch_admins # TODO: remove after existing jobs run
     clear_todo_list_cache(:admins)
   end
 

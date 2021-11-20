@@ -2358,7 +2358,7 @@ describe MasterCourses::MasterMigration do
       expect(mm.migration_results.first.content_migration.warnings).to be_empty
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).take
-      qg_to = quiz_to.quiz_groups.first # note: it's migration_id isn't mig_id(group) because qti_generator is an oddball. oh well.
+      qg_to = quiz_to.quiz_groups.first # NOTE: it's migration_id isn't mig_id(group) because qti_generator is an oddball. oh well.
 
       expect(qg_to.question_points).to eq 2.0
       qg_to.question_points = 3.0

@@ -54,7 +54,7 @@ module IncomingMailProcessor
 
     def each_message(opts = {})
       mails = @pop.mails
-      # note that stride and offset require the pop server to support the optional UIDL command
+      # NOTE: stride and offset require the pop server to support the optional UIDL command
       mails = mails.select { |mail| Zlib.crc32(with_timeout { mail.uidl }) % opts[:stride] == opts[:offset] } if opts[:stride] && opts[:offset]
       mails.each do |message|
         yield message, message.pop

@@ -289,7 +289,7 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, api_v1_audit_grade_change_url, course: course, remove_anonymous: params[:student_id].present?)
   end
 
-  # TODO remove Cassandra cruft and make Gradebook History use the admin search above
+  # TODO: remove Cassandra cruft and make Gradebook History use the admin search above
   # once OSS users have been given the opportunity to migrate to Postgres auditors
   def for_course_and_other_parameters
     begin

@@ -1923,7 +1923,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state, null: false, limit: 255
       t.text :raw_data, null: false
       t.timestamps null: true
-      # Note: I think the original migration didn't want this to remain the
+      # NOTE: I think the original migration didn't want this to remain the
       # default, but they didn't remove it properly, so it still is.
       t.string :context_type, null: false, default: 'Account', limit: 255
       t.string :name, limit: 255

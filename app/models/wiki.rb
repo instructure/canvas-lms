@@ -88,7 +88,7 @@ class Wiki < ActiveRecord::Base
     url = get_front_page_url
     return nil if url.nil?
 
-    # TODO i18n
+    # TODO: i18n
     t :front_page_name, "Front Page"
     # attempt to find the page and store it's url (if it is found)
     page = wiki_pages.not_deleted.where(url: url).first
@@ -183,7 +183,7 @@ class Wiki < ActiveRecord::Base
         context.lock!
         return context.wiki if context.wiki_id
 
-        # TODO i18n
+        # TODO: i18n
         t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
         t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 

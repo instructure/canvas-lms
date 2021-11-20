@@ -803,7 +803,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def finished_converting
-    # todo finish progress if selective
+    # TODO: finish progress if selective
   end
 
   # expects values between 0 and 100 for the conversion process

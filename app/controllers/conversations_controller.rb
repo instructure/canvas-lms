@@ -267,7 +267,7 @@ class ConversationsController < ApplicationController
     if request.format == :json
       @conversations_scope = @conversations_scope.where('message_count > 0')
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
-      # optimize loading the most recent messages for each conversation into a single query
+      # OPTIMIZE: loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       @conversations_json = conversations_json(conversations, @current_user,
                                                session, include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
@@ -1125,7 +1125,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # TODO API v2: default to false, like we do in the UI
+  # TODO: API v2: default to false, like we do in the UI
   def auto_mark_as_read?
     params[:auto_mark_as_read] ||= api_request?
     value_to_boolean(params[:auto_mark_as_read])
