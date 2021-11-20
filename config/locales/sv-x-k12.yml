@@ -6677,7 +6677,7 @@ sv-x-k12:
     other: "%{count} inlämningar måste bedömas"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} skulle raderas och överskrida den inställda tröskeln för %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} opublicerade ändringar"
+    one: "1 opublicerad ändring"
     other: "%{count} opublicerade ändringar"
   count_unread_cff5855: "%{count} olästa."
   count_unread_messages_e312aa7b: 
