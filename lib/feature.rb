@@ -86,16 +86,16 @@ class Feature
   #   automatic_essay_grading: {
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
   #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
-  #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-  #     state: 'allowed',     # or 'on', 'hidden', or 'disabled'
-  #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
-  #                           #   (in that context and below) to other users
-  #                           # - 'disabled' means the feature will not appear in the feature list and
-  #                           #   cannot be turned on. It is intended for use in environment state overrides.
-  #     root_opt_in: false,   # if true, 'allowed' features in source or site admin
-  #                           # will be inherited in "off" state by root accounts
-  #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
-  #     beta: false,          # 'beta' tag shown in UI
+  #     applies_to: 'Course',     # or 'RootAccount' or 'Account' or 'User'
+  #     state: 'allowed',         # or 'on', 'hidden', or 'disabled'
+  #                               # - 'hidden' means the feature must be set by a site admin before it will be visible
+  #                               #   (in that context and below) to other users
+  #                               # - 'disabled' means the feature will not appear in the feature list and
+  #                               #   cannot be turned on. It is intended for use in environment state overrides.
+  #     root_opt_in: false,       # if true, 'allowed' features in source or site admin
+  #                               # will be inherited in "off" state by root accounts
+  #     enable_at: "2014-01-01",  # estimated release date shown in UI
+  #     beta: false,              # 'beta' tag shown in UI
   #     release_notes_url: 'http://example.com/',
   #
   #     # features that are pending_enforcement are nearing completion and will be finalized at a future date

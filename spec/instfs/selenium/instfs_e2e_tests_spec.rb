@@ -128,14 +128,14 @@ describe "instfs file uploads" do
   end
 
   def check_file_link(file_link)
-    downloaded_data = open(file_link)
+    downloaded_data = URI.parse(file_link).open
     !downloaded_data.empty?
   end
 
   def download_file(file_link)
     # if a file is less than 10K, it will return a StringIO, not a file object.
     # in that case get the string from the StringIO
-    downloaded_data = open(file_link)
+    downloaded_data = URI.parse(file_link).open
     if downloaded_data.instance_of?(StringIO)
       downloaded_data = downloaded_data.string
     elsif !downloaded_data.empty?
@@ -185,7 +185,7 @@ describe "instfs file uploads" do
       thumbnail_link = f(".media-object")["style"]
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
       file_link = get_file_link_from_bg_image(thumbnail_link)
-      downloaded_file = open(file_link)
+      downloaded_file = URI.parse(file_link).open
       expect(downloaded_file.size).to be > 0
     end
 
@@ -420,7 +420,7 @@ describe "instfs file uploads" do
       file_link = get_file_link_from_bg_image(image_link)
       thumbnail_link = get_link_redirect_path(file_link)
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
-      downloaded_file = open(file_link)
+      downloaded_file = URI.parse(file_link).open
       expect(downloaded_file.size).to be > 0
     end
   end

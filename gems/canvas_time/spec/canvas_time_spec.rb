@@ -19,6 +19,7 @@
 
 require 'spec_helper'
 
+# rubocop:disable Security/MarshalLoad
 describe 'Time Marshal override' do
   it "preserves the old marshalling for post-1900 dates" do
     raw_time = Time.zone.parse('2013-02-16 05:43:21.15Z').time
@@ -45,6 +46,7 @@ describe 'Time Marshal override' do
     expect(Marshal.load(Marshal.dump(old_time))).to eq(old_time)
   end
 end
+# rubocop:enable Security/MarshalLoad
 
 describe "utc_datetime" do
   it "returns a DateTime" do

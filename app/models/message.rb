@@ -554,6 +554,7 @@ class Message < ActiveRecord::Base
     notification.name.parameterize.underscore + "." + path_type + ".erb"
   end
 
+  # rubocop:disable Security/Eval ERB rendering
   # Public: Apply an HTML email template to this message.
   #
   # Returns an HTML template (or nil).
@@ -675,6 +676,7 @@ class Message < ActiveRecord::Base
 
     @i18n_scope = nil
   end
+  # rubocop:enable Security/Eval
 
   # Public: Deliver this message.
   #

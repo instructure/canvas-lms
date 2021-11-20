@@ -61,7 +61,7 @@ namespace :db do
   desc "Find or create the notifications"
   task :load_notifications => :load_environment do
     # Load the "notification_types.yml" file that provides initial values for the notifications.
-    categories = YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
+    categories = YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
     categories.each do |category|
       category['notifications'].each do |notification|
         create_notification({ :name => notification['name'],

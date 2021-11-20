@@ -28,7 +28,7 @@ require 'redis'
 # non-default configuration
 cache = Redis.new
 
-data = JSON.load(STDIN.read)
+data = JSON.parse(STDIN.read)
 data.each do |event|
   id = event['ID']
   # only invalidate events we haven't seen yet

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# rubocop:disable Security/YAMLLoad
 describe "safe_yaml" do
   let(:test_yaml) do
     <<~YAML
@@ -210,3 +211,4 @@ describe "safe_yaml" do
     expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to eq false
   end
 end
+# rubocop:enable Security/YAMLLoad

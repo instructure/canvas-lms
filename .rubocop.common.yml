@@ -201,6 +201,13 @@ RSpec/SubjectStub:
 RSpec/StubbedMock:
   Enabled: false # this style goes along with spies
 
+Security:
+  Severity: error
+Security/YAMLLoad:
+  # technically even YAML.load is fairly safe in Canvas because we override it and only allow certain types
+  # but still avoid it if you can.
+  Severity: warning
+
 Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*

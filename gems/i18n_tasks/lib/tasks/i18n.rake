@@ -327,7 +327,7 @@ namespace :i18n do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     if args[:source_file]
-      source_translations = YAML.safe_load(open(args[:source_file]))
+      source_translations = YAML.safe_load(File.read(args[:source_file]))
     else
       loop do
         puts "Enter path to original en.yml file:"
@@ -337,7 +337,7 @@ namespace :i18n do
     end
 
     if args[:translated_file]
-      new_translations = YAML.safe_load(open(args[:translated_file]))
+      new_translations = YAML.safe_load(File.read(args[:translated_file]))
     else
       loop do
         puts "Enter path to translated file:"
@@ -376,11 +376,11 @@ namespace :i18n do
     require 'open-uri'
 
     source_translations = if args[:source_file].present?
-                            YAML.safe_load(open(args[:source_file]))
+                            YAML.safe_load(File.read(args[:source_file]))
                           else
-                            YAML.safe_load(open("config/locales/generated/en.yml"))
+                            YAML.safe_load(File.read("config/locales/generated/en.yml"))
                           end
-    new_translations = YAML.safe_load(open(args[:translated_file]))
+    new_translations = YAML.safe_load(File.read(args[:translated_file]))
     autoimport(source_translations, new_translations)
   end
 
@@ -455,7 +455,7 @@ namespace :i18n do
     require 'json'
     languages = parsed_languages(args[:languages])
     source_file = args[:source_file] || 'config/locales/generated/en.yml'
-    source_translations = YAML.safe_load(open(source_file))
+    source_translations = YAML.safe_load(File.read(source_file))
 
     languages.each do |lang|
       if lang.is_a?(Array)
@@ -474,7 +474,7 @@ namespace :i18n do
           s3_download(args[:s3_bucket], remote_lang)
         end
       File.write("tmp/#{lang}.yml", yml)
-      new_translations = { lang => YAML.load(yml)[remote_lang] }
+      new_translations = { lang => YAML.safe_load(yml)[remote_lang] }
 
       puts "Importing #{lang}.yml"
       autoimport(source_translations, new_translations)
@@ -553,7 +553,7 @@ namespace :i18n do
       locale = File.basename(filename, ".yml")
       next if options[:locales].present? && !options[:locales].include?(locale)
 
-      data = YAML.safe_load(open(filename))
+      data = YAML.safe_load(File.read(filename))
 
       options[:keys].each do |path|
         search = data[locale]

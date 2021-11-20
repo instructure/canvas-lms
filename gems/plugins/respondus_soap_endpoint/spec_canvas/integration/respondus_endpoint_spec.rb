@@ -231,7 +231,7 @@ Implemented for: Canvas LMS)
     expect(pair.value).to eq @question_bank.to_param
 
     # clear boxin
-    data = Marshal.load(Base64.decode64(context.split('--').first))
+    data = Marshal.load(Base64.decode64(context.split('--').first)) # rubocop:disable Security/MarshalLoad
     expect(data['selection_state']).to eq [@course.to_param]
   end
 

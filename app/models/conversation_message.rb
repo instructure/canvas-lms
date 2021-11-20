@@ -220,7 +220,7 @@ class ConversationMessage < ActiveRecord::Base
   def event_data
     return {} unless generated?
 
-    @event_data ||= YAML.load(read_attribute(:body))
+    @event_data ||= YAML.safe_load(read_attribute(:body))
   end
 
   def format_event_message

@@ -23,7 +23,7 @@ module LuckySneaks
   module Unidecoder
     # Contains Unicode codepoints, loading as needed from JSON files
     CODEPOINTS = Hash.new { |h, k|
-      h[k] = JSON.load(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
+      h[k] = JSON.parse(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
     } unless defined?(CODEPOINTS)
 
     class << self
