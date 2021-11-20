@@ -7406,7 +7406,7 @@ da:
     other: "%{count} opgaver kræver karakter"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} ville blive slettet og overstiger den fastsatte tærskel på %{change_threshold}%"
   count_unpublished_changes_a366ed45: 
-    one: "%{count} ikke offentliggjorte ændringer"
+    one: "1 ikke offentliggjort ændring"
     other: "%{count} ikke offentliggjorte ændringer"
   count_unread_cff5855: "%{count} ulæst."
   count_unread_messages_99d6bf17: 
