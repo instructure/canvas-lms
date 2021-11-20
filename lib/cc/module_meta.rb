@@ -65,7 +65,7 @@ module CC
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
 
-            if cm.prerequisites && !cm.prerequisites.empty?
+            if cm.prerequisites.present?
               m_node.prerequisites do |pre_reqs|
                 cm.prerequisites.each do |pre_req|
                   pre_reqs.prerequisite(:type => pre_req[:type]) do |pr|
@@ -106,7 +106,7 @@ module CC
               end
             end
 
-            if cm.completion_requirements && !cm.completion_requirements.empty?
+            if cm.completion_requirements.present?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
                   crs_node.completionRequirement(:type => c_req[:type]) do |cr_node|

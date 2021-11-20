@@ -963,7 +963,7 @@ class EnrollmentsApiController < ApplicationController
     clauses = []
     replacements = {}
 
-    if !role_ids.present? && role_names.present?
+    if role_ids.blank? && role_names.present?
       role_ids = Array(role_names).map { |name| @context.account.get_course_role_by_name(name).id }
     end
 

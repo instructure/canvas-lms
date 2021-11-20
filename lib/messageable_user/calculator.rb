@@ -89,8 +89,8 @@ class MessageableUser
       # self, or share the given conversation)
       if strict_checks
         questionable = users.select do |user|
-          !user.common_courses.present? &&
-            !user.common_groups.present? &&
+          user.common_courses.blank? &&
+            user.common_groups.blank? &&
             user.id != @user.id
         end
 

@@ -89,7 +89,7 @@ class DisablePostToSisApiController < ApplicationController
   end
 
   def grading_period_exists?
-    params.key?(:grading_period_id) && !params[:grading_period_id].blank?
+    params.key?(:grading_period_id) && params[:grading_period_id].present?
   end
 
   def require_authorized_user

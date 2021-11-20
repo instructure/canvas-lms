@@ -229,7 +229,7 @@ class Quizzes::TakeQuizPresenter
 
     answers.reject! do |_, status_entries|
       # an answer must not be falsy/empty
-      status_entries.any? { |status| !dataset[status].present? } ||
+      status_entries.any? { |status| dataset[status].blank? } ||
         # all zeroes for an answer is a no-answer
         status_entries.all? { |status| dataset[status] == '0' }
     end

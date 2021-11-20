@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "active_support/core_ext/object/blank"
+
 module LtiOutbound
   class LTIUser < LTIContext
     ACTIVE_STATE = 'active'
@@ -27,12 +29,12 @@ module LtiOutbound
                   :name, :timezone, :current_observee_ids
 
     def current_role_types
-      roles = current_roles.join(',') if current_roles && !current_roles.empty?
+      roles = current_roles.join(',') if current_roles.present?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_role_types
-      roles = concluded_roles.join(',') if concluded_roles && !concluded_roles.empty?
+      roles = concluded_roles.join(',') if concluded_roles.present?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 

@@ -1490,7 +1490,7 @@ class User < ActiveRecord::Base
 
   def self.avatar_key(user_id)
     user_id = user_id.to_s
-    if !user_id.blank? && user_id != '0'
+    if user_id.present? && user_id != '0'
       "#{user_id}-#{Canvas::Security.hmac_sha1(user_id)[0, 10]}"
     else
       "0"
@@ -2247,7 +2247,7 @@ class User < ActiveRecord::Base
 
   def upcoming_events(opts = {})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
+    return [] if context_codes.blank?
 
     now = Time.zone.now
 
@@ -2340,7 +2340,7 @@ class User < ActiveRecord::Base
   def undated_events(opts = {})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
+    return [] if context_codes.blank?
 
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])

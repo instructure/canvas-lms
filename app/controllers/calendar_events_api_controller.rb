@@ -1442,7 +1442,7 @@ class CalendarEventsApiController < ApplicationController
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them
-    if codes && !codes.empty?
+    if codes.present?
       selected_context_codes = Set.new(@context_codes)
       codes.each do |c|
         unless selected_context_codes.include?(c)

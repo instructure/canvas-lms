@@ -481,7 +481,7 @@ module QuizzesHelper
     doc = Nokogiri::HTML5.fragment(res)
     selects = doc.css(".question_input")
     selects.each do |s|
-      if answer_list && !answer_list.empty?
+      if answer_list.present?
         a = answer_list[index]
         index += 1
       else

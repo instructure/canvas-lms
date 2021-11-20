@@ -156,7 +156,7 @@ module Api::V1::Assignment
 
     hash['grades_published'] = assignment.grades_published? if opts[:include_grades_published]
 
-    if !opts[:overrides].blank?
+    if opts[:overrides].present?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
     elsif opts[:include_overrides]
       hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)

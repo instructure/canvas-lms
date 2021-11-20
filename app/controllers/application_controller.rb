@@ -696,7 +696,7 @@ class ApplicationController < ActionController::Base
   # scopes all time objects to the user's specified time zone
   def set_time_zone
     user = not_fake_student_user
-    if user && !user.time_zone.blank?
+    if user && user.time_zone.present?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
         Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ") rescue nil

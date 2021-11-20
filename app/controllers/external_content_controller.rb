@@ -174,7 +174,7 @@ class ExternalContentController < ApplicationController
   end
 
   def param_if_set(param_key)
-    param_value = params[param_key] && !params[param_key].empty? && params[param_key]
+    param_value = params[param_key].present? && params[param_key]
     param_value = param_value.to_s if param_value
     if param_value && block_given?
       yield param_value

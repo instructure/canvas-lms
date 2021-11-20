@@ -295,7 +295,7 @@ module IncomingMailProcessor
       mailbox.connect
       mailbox.each_message(opts) do |message_id, raw_contents|
         message, errors = parse_message(raw_contents)
-        if message && !errors.present?
+        if message && errors.blank?
           process_message(message, account)
           mailbox.delete_message(message_id)
         else

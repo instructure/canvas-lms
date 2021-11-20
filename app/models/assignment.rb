@@ -2862,7 +2862,7 @@ class Assignment < ActiveRecord::Base
   # course_ids should be courses that restrict visibility based on overrides
   # ie: courses with differentiated assignments on or in which the user is not a teacher
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
-    if course_ids_that_have_da_enabled.nil? || course_ids_that_have_da_enabled.empty?
+    if course_ids_that_have_da_enabled.blank?
       active
     else
       user_ids = Array.wrap(user_ids).join(',')
