@@ -377,10 +377,10 @@ class WikiPage < ActiveRecord::Base
   def participants
     res = []
     if context&.available?
-      res += if !active?
-               context.participating_admins
-             else
+      res += if active?
                context.participants(by_date: true)
+             else
+               context.participating_admins
              end
     end
     res.flatten.uniq

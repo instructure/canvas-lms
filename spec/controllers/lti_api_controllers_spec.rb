@@ -188,7 +188,7 @@ describe LtiApiController, type: :request do
     end
 
     result_data_xml = ''
-    if result_data && !result_data.empty?
+    if result_data.present?
       result_data_xml = "<resultData>\n"
       result_data.each_pair do |key, val|
         result_data_xml += "<#{key}>#{val}</#{key}>"

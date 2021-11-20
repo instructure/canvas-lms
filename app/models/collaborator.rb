@@ -34,11 +34,11 @@ class Collaborator < ActiveRecord::Base
     p.to {
       users = group_id.nil? ? [user] : group.users - [user]
       if context.is_a?(Course)
-        if !context.workflow_state.in?(['available', 'completed'])
-          users = [] # do not send notifications to any users if the course is unpublished
-        else
+        if context.workflow_state.in?(['available', 'completed'])
           enrolled_user_ids = context.enrollments.active_by_date.where(:user_id => users).pluck(:user_id).to_set
           users = users.select { |u| enrolled_user_ids.include?(u.id) }
+        else
+          users = [] # do not send notifications to any users if the course is unpublished
         end
       end
       if collaboration.collaboration_type == 'google_docs'

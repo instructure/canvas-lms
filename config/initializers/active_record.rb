@@ -1308,10 +1308,10 @@ module UpdateAndDeleteWithJoins
   def update_all(updates, *args)
     db = Shard.current(klass.shard_category).database_server
     if joins_values.empty?
-      if ::GuardRail.environment != db.guard_rail_environment
-        Shard.current.database_server.unguard { return super }
-      else
+      if ::GuardRail.environment == db.guard_rail_environment
         return super
+      else
+        Shard.current.database_server.unguard { return super }
       end
     end
 
@@ -1348,10 +1348,10 @@ module UpdateAndDeleteWithJoins
     end
     where_sql = collector.value
     sql.concat('WHERE ' + where_sql)
-    if ::GuardRail.environment != db.guard_rail_environment
-      Shard.current.database_server.unguard { connection.update(sql, "#{name} Update") }
-    else
+    if ::GuardRail.environment == db.guard_rail_environment
       connection.update(sql, "#{name} Update")
+    else
+      Shard.current.database_server.unguard { connection.update(sql, "#{name} Update") }
     end
   end
 

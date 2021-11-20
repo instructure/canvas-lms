@@ -156,7 +156,7 @@ module AttachmentFu # :nodoc:
 
       def self.load_s3_config(path = nil)
         s3_config_path = path || Rails.root.join('config/amazon_s3.yml')
-        YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
       # Overwrites the base filename writer in order to store the old filename

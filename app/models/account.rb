@@ -615,14 +615,14 @@ class Account < ActiveRecord::Base
 
   def equella_settings
     endpoint = settings[:equella_endpoint] || equella_endpoint
-    if !endpoint.blank?
+    if endpoint.blank?
+      nil
+    else
       OpenObject.new({
                        :endpoint => endpoint,
                        :default_action => settings[:equella_action] || 'selectOrAdd',
                        :teaser => settings[:equella_teaser]
                      })
-    else
-      nil
     end
   end
 
@@ -1709,10 +1709,10 @@ class Account < ActiveRecord::Base
   end
 
   def self_enrollment_allowed?(course)
-    if !settings[:self_enrollment].blank?
-      !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
-    else
+    if settings[:self_enrollment].blank?
       !!(parent_account && parent_account.self_enrollment_allowed?(course))
+    else
+      !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
     end
   end
 
@@ -2159,11 +2159,11 @@ class Account < ActiveRecord::Base
       next unless params_keys.key?(key_type)
       next unless key.grants_right?(current_user, :write)
 
-      unless params_keys[key_type].blank?
+      if params_keys[key_type].blank?
+        key.delete
+      else
         key.key_value = params_keys[key_type]
         key.save!
-      else
-        key.delete
       end
     end
   end

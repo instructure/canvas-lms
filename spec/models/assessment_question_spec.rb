@@ -106,18 +106,18 @@ describe AssessmentQuestion do
     data = {
       :name => 'test question',
       :question_type => 'multiple_choice_question',
-      :question_text => "which ones are like this one? #{attachment_tag.call("[:question_text]")} what about: #{attachment_tag.call("[:question_text]")}",
-      :correct_comments => "yay! #{attachment_tag.call("[:correct_comments]")}",
-      :incorrect_comments => "boo! #{attachment_tag.call("[:incorrect_comments]")}",
-      :neutral_comments => "meh. #{attachment_tag.call("[:neutral_comments]")}",
-      :text_after_answers => "oh btw #{attachment_tag.call("[:text_after_answers]")}",
+      :question_text => "which ones are like this one? #{attachment_tag.call([:question_text])} what about: #{attachment_tag.call([:question_text])}",
+      :correct_comments => "yay! #{attachment_tag.call([:correct_comments])}",
+      :incorrect_comments => "boo! #{attachment_tag.call([:incorrect_comments])}",
+      :neutral_comments => "meh. #{attachment_tag.call([:neutral_comments])}",
+      :text_after_answers => "oh btw #{attachment_tag.call([:text_after_answers])}",
       :answers => [
         { :weight => 1, :text => "A",
-          :html => "A #{attachment_tag.call("[:answers][0][:html]")}",
-          :comments_html => "yeppers #{attachment_tag.call("[:answers][0][:comments_html]")}" },
+          :html => "A #{attachment_tag.call([:answers, 0, :html])}",
+          :comments_html => "yeppers #{attachment_tag.call([:answers, 0, :comments_html])}" },
         { :weight => 1, :text => "B",
-          :html => "B #{attachment_tag.call("[:answers][1][:html]")}",
-          :comments_html => "yeppers #{attachment_tag.call("[:answers][1][:comments_html]")}" }
+          :html => "B #{attachment_tag.call([:answers, 1, :html])}",
+          :comments_html => "yeppers #{attachment_tag.call([:answers, 1, :comments_html])}" }
       ]
     }
 
@@ -128,7 +128,7 @@ describe AssessmentQuestion do
     @attachment_clones = @attachments.transform_values { |ary| ary.map { |a| @question.attachments.where(root_attachment_id: a).first } }
 
     @attachment_clones.each do |key, ary|
-      string = eval "@question.question_data#{key}"
+      string = @question.question_data.dig(*key)
       matches = string.scan %r{/assessment_questions/\d+/files/\d+/download\?verifier=\w+}
       expect(matches.length).to eq ary.length
       matches.each_with_index do |match, index|

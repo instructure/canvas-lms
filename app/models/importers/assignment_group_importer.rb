@@ -89,7 +89,7 @@ module Importers
       item.group_weight = hash[:group_weight] if hash[:group_weight]
 
       rules = ""
-      if hash[:rules] && !hash[:rules].empty?
+      if hash[:rules].present?
         hash[:rules].each do |rule|
           case rule[:drop_type]
           when "drop_lowest", "drop_highest"

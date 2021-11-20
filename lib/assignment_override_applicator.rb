@@ -249,9 +249,7 @@ module AssignmentOverrideApplicator
 
   def self.current_override_version(assignment_or_quiz, all_overrides)
     all_overrides.map do |override|
-      if !override.versions.exists?
-        override
-      else
+      if override.versions.exists?
         override_version = override.versions.detect do |version|
           model_version = assignment_or_quiz.is_a?(Quizzes::Quiz) ? version.model.quiz_version : version.model.assignment_version
           next if model_version.nil?
@@ -259,6 +257,8 @@ module AssignmentOverrideApplicator
           model_version <= assignment_or_quiz.version_number
         end
         override_version ? override_version.model : nil
+      else
+        override
       end
     end
   end

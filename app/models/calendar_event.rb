@@ -726,10 +726,10 @@ class CalendarEvent < ActiveRecord::Base
         # there is always at least one element in current_apts
         current_appts = user_events.select { |appointment| @event.id == appointment[:parent_id] }
         if current_appts.any?
-          if !event.description.nil?
-            event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
-          else
+          if event.description.nil?
             event.description = current_appts[0][:course_name] + "\n\n"
+          else
+            event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
           end
 
           event.description.concat("Participants: ")

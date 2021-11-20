@@ -185,7 +185,7 @@ module Canvas::Migration::Helpers
     end
 
     def attachment_data(content_list, course_data)
-      return [] unless course_data['attachments'] && !course_data['attachments'].empty?
+      return [] unless course_data['attachments'].present?
 
       remove_name_regex = %r{/[^/]*\z}
       course_data['attachments'].each { |a|

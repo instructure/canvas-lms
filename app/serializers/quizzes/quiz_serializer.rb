@@ -273,17 +273,17 @@ module Quizzes
     def serializable_object(**)
       hash = super
       # legacy v1 api
-      unless accepts_jsonapi?
-        hash.delete('links')
-        # id = hash['assignment_group']
-        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
-      else
+      if accepts_jsonapi?
         # since we're not embedding QuizStatistics as an association because
         # the statistics objects are built on-demand when the endpoint is
         # requested, and we only need the link, we'll have to assign it manually
         hash['links'] ||= {}
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
+      else
+        hash.delete('links')
+        # id = hash['assignment_group']
+        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       end
       if (mc_status = serializer_option(:master_course_status))
         hash.merge!(quiz.master_course_api_restriction_data(mc_status))

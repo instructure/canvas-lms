@@ -132,10 +132,10 @@ unless $canvas_tasks_loaded
       output = `script/render_json_lint`
       exit_status = $?.exitstatus
       puts output
-      if exit_status != 0
-        raise "lint:render_json test failed"
-      else
+      if exit_status == 0
         puts "lint:render_json test succeeded"
+      else
+        raise "lint:render_json test failed"
       end
     end
   end

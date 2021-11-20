@@ -58,7 +58,7 @@ class CutyCapt
 
     setting = begin
       consul_config = Canvas::DynamicSettings.find(tree: :private)['cutycapt.yml']
-      (consul_config && YAML.load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
+      (consul_config && YAML.safe_load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
     end
     setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
@@ -161,11 +161,11 @@ class CutyCapt
       end
     end
 
-    if !success
+    if success
+      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
+    else
       File.unlink(img_file) if File.exist?(img_file)
       return nil
-    else
-      logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
     end
 
     if block_given?

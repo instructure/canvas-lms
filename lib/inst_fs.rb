@@ -465,13 +465,13 @@ module InstFS
         query = (uri.query_values || {}).with_indifferent_access
         # We only want to redirect once, if the redirect param is present then we already redirected.
         # In which case we don't send the original_url param again
-        if !Canvas::Plugin.value_to_boolean(query[:redirect])
+        if Canvas::Plugin.value_to_boolean(query[:redirect])
+          nil
+        else
           query[:redirect] = true
           query[:no_cache] = true
           uri.query_values = query
           uri.to_s
-        else
-          nil
         end
       end
     end

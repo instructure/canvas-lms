@@ -1782,14 +1782,14 @@ class CoursesController < ApplicationController
 
       session[:accepted_enrollment_uuid] = enrollment.uuid
 
-      if params[:action] != 'show'
-        # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
-        # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
-        redirect_back(fallback_location: course_url(@context.id))
-      else
+      if params[:action] == 'show'
         @context_enrollment = enrollment
         enrollment = nil
         false
+      else
+        # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
+        # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
+        redirect_back(fallback_location: course_url(@context.id))
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -3218,7 +3218,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html {
         flash[:notice] = t('notices.updated', 'Course was successfully updated.')
-        redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to])
+        redirect_to(params[:continue_to].presence || course_url(@course))
       }
       format.json do
         if api_request?

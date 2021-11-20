@@ -91,6 +91,9 @@ Rails/ActiveRecordAliases:
   Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
+Rails/Blank:
+  UnlessPresent: false # allow `unless foo.present?`
+  Severity: error
 Rails/ContentTag:
   Severity: error
   Exclude:
@@ -131,6 +134,9 @@ Rails/Pluck:
 Rails/PluralizationGrammar:
   Severity: error
 Rails/Presence:
+  Severity: error
+Rails/Present:
+  UnlessBlank: false # allow `unless foo.blank?`
   Severity: error
 Rails/RedundantAllowNil:
   Severity: error
@@ -201,6 +207,13 @@ RSpec/SubjectStub:
 RSpec/StubbedMock:
   Enabled: false # this style goes along with spies
 
+Security:
+  Severity: error
+Security/YAMLLoad:
+  # technically even YAML.load is fairly safe in Canvas because we override it and only allow certain types
+  # but still avoid it if you can.
+  Severity: warning
+
 Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
@@ -258,6 +271,8 @@ Style/EvalWithLocation:
   Severity: error
 Style/EvenOdd:
   Severity: error
+Style/FloatDivision:
+  Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/For:
   Severity: error
 Style/FrozenStringLiteralComment:
@@ -298,6 +313,8 @@ Style/MultilineWhenThen:
 Style/MutableConstant:
   Severity: error
 Style/NegatedIf:
+  Severity: error
+Style/NegatedIfElseCondition:
   Severity: error
 Style/NegatedUnless:
   Severity: error
@@ -416,6 +433,8 @@ Style/TernaryParentheses:
 Style/TrailingCommaInArguments:
   Severity: error
 Style/TrivialAccessors:
+  Severity: error
+Style/UnlessElse:
   Severity: error
 Style/UnpackFirst:
   Severity: error

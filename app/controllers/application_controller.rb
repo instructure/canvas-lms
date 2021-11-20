@@ -696,7 +696,7 @@ class ApplicationController < ActionController::Base
   # scopes all time objects to the user's specified time zone
   def set_time_zone
     user = not_fake_student_user
-    if user && !user.time_zone.blank?
+    if user && user.time_zone.present?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
         Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ") rescue nil
@@ -1870,10 +1870,7 @@ class ApplicationController < ActionController::Base
       @assignment&.prepare_for_ags_if_needed!(@tool)
 
       tag.context_module_action(@current_user, :read)
-      if !@tool
-        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-        redirect_to named_context_url(context, error_redirect_symbol)
-      else
+      if @tool
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -1969,6 +1966,9 @@ class ApplicationController < ActionController::Base
 
         @append_template = 'context_modules/tool_sequence_footer' if render_external_tool_append_template?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
+      else
+        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
+        redirect_to named_context_url(context, error_redirect_symbol)
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
@@ -2367,11 +2367,11 @@ class ApplicationController < ActionController::Base
     end
 
     # _don't_ call before_render hooks if we're not returning HTML
-    unless options.is_a?(Hash) &&
-           (options[:json] || options[:plain] || options[:layout] == false)
-      run_callbacks(:html_render) { super }
-    else
+    if options.is_a?(Hash) &&
+       (options[:json] || options[:plain] || options[:layout] == false)
       super
+    else
+      run_callbacks(:html_render) { super }
     end
   end
 

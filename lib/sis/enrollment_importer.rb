@@ -151,10 +151,10 @@ module SIS
             root_account = @root_account
           end
 
-          pseudo = if !enrollment_info.user_integration_id.blank?
-                     root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
-                   else
+          pseudo = if enrollment_info.user_integration_id.blank?
                      root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
+                   else
+                     root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
                    end
 
           unless pseudo
@@ -411,11 +411,11 @@ module SIS
           # this will allow the enrollment to continue to be created
           false
         else
-          if enrollment.workflow_state != 'deleted'
-            @enrollments_to_delete << enrollment
-          else
+          if enrollment.workflow_state == 'deleted'
             @enrollments_to_update_sis_batch_ids << enrollment.id
             @success_count += 1
+          else
+            @enrollments_to_delete << enrollment
           end
           # we are done and we con go to the next enrollment
           true

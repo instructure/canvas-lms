@@ -39,10 +39,10 @@ module CC::Exporter::Epub::Converters
 
         next unless include_item?(meta_node, "active")
 
-        if get_node_val(meta_node, 'type') != "announcement"
-          topics << convert_topic(cc_doc, meta_node)
-        else
+        if get_node_val(meta_node, 'type') == "announcement"
           announcements << convert_announcement(cc_doc, meta_node)
+        else
+          topics << convert_topic(cc_doc, meta_node)
         end
       end
 

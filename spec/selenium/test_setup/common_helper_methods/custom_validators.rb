@@ -37,7 +37,7 @@ module CustomValidators
     require 'open-uri'
     expect(element).to be_displayed
     expect(element.tag_name).to eq 'img'
-    temp_file = open(element.attribute('src'))
+    temp_file = URI.parse(element.attribute('src')).open
     expect(temp_file.size).to be > 0
   end
 
@@ -45,7 +45,7 @@ module CustomValidators
     require 'open-uri'
     expect(element).to be_displayed
     expect(element.tag_name).to eq 'a'
-    temp_file = open(element.attribute('href'))
+    temp_file = URI.parse(element.attribute('href')).open
     expect(temp_file.size).to be > 0
     temp_file
   end

@@ -1131,7 +1131,7 @@ class DiscussionTopicsController < ApplicationController
   def reorder
     if authorized_action(@context.discussion_topics.temp_record, @current_user, :update)
       order = Api.value_to_array(params[:order])
-      reject! "order parameter required" unless order && !order.empty?
+      reject! "order parameter required" unless order.present?
       topics = pinned_topics.where(id: order)
       reject! "topics not found" unless topics.length == order.length
       topics[0].update_order(order)
@@ -1174,7 +1174,9 @@ class DiscussionTopicsController < ApplicationController
                                           allow_rating only_graders_can_rate sort_by_rating].freeze
 
   def set_sections
-    if params[:specific_sections] != "all"
+    if params[:specific_sections] == "all"
+      @topic.is_section_specific = false
+    else
       @topic.is_section_specific = true
       section_ids = params[:specific_sections]
       section_ids = section_ids.split(",") if section_ids.is_a?(String)
@@ -1183,8 +1185,6 @@ class DiscussionTopicsController < ApplicationController
         @topic.course_sections = CourseSection.find(new_section_ids)
         @topic.sections_changed = true
       end
-    else
-      @topic.is_section_specific = false
     end
   end
 
@@ -1291,9 +1291,7 @@ class DiscussionTopicsController < ApplicationController
     else
       @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
-        if !@topic.is_section_specific
-          @topic.course_sections = []
-        else
+        if @topic.is_section_specific
           # HACK: For some reason apply_assignment_parameters saves the submittable
           # so we can't run it until everything is already good.  But if the topic
           # is section specific stuff isn't good until we clear out the assignment,
@@ -1301,6 +1299,8 @@ class DiscussionTopicsController < ApplicationController
           if params[:assignment] && !value_to_boolean(params[:assignment][:set_assignment])
             @topic.assignment = nil
           end
+        else
+          @topic.course_sections = []
         end
         @topic.update(discussion_topic_hash)
         @topic.root_topic.try(:save)
@@ -1510,8 +1510,7 @@ class DiscussionTopicsController < ApplicationController
   def apply_attachment_parameters
     # handle creating/removing attachment
     if @topic.grants_right?(@current_user, session, :attach)
-      attachment = params[:attachment] &&
-                   !params[:attachment].empty? &&
+      attachment = params[:attachment].present? &&
                    params[:attachment]
 
       return if attachment && attachment.size > 1.kilobytes &&

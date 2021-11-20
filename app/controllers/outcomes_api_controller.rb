@@ -302,9 +302,7 @@ class OutcomesApiController < ApplicationController
   # @returns [OutcomeAlignment]
 
   def outcome_alignments
-    if !params[:student_id]
-      render json: { message: "student_id is required" }, status: :bad_request
-    else
+    if params[:student_id]
       course = Course.find(params[:course_id])
       can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       student_id = params[:student_id].to_i
@@ -359,6 +357,8 @@ class OutcomesApiController < ApplicationController
       alignments.concat(quiz_alignments, magic_marker_alignments)
 
       render :json => alignments
+    else
+      render json: { message: "student_id is required" }, status: :bad_request
     end
   rescue ActiveRecord::RecordNotFound => e
     render json: { message: e.message }, status: :not_found

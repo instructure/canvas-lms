@@ -275,7 +275,7 @@ module SIS
 
           # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
           # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-          if !user_row.password.blank? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
+          if user_row.password.present? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
             pseudo.password = user_row.password
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true

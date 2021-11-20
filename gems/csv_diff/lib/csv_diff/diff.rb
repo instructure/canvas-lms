@@ -82,7 +82,7 @@ module CsvDiff
         left join previous on previous.key = current.key
         where current.data <> previous.data or previous.key is null
       SQL
-        row = Marshal.load(data)
+        row = Marshal.load(data) # rubocop:disable Security/MarshalLoad
         @row_count += 1
         @output << row
       end
@@ -94,7 +94,7 @@ module CsvDiff
         left join current on previous.key = current.key
         where current.key is null
       SQL
-        row = CSV::Row.new(headers, Marshal.load(data))
+        row = CSV::Row.new(headers, Marshal.load(data)) # rubocop:disable Security/MarshalLoad
         # Allow the caller to munge the row to indicate deletion.
         cb.call(row)
         @row_count += 1

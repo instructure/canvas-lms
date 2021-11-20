@@ -65,12 +65,12 @@ module CC
               r_node.external_identifier rubric.id
             end
             atts.each do |att|
-              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || !rubric.send(att).blank?
+              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || rubric.send(att).present?
             end
             r_node.description rubric.description if rubric.description
 
             r_node.criteria do |c_node|
-              if rubric.data && !rubric.data.empty?
+              if rubric.data.present?
                 rubric.data.each do |crit|
                   add_criterion(c_node, crit)
                 end
@@ -103,7 +103,7 @@ module CC
           end
         end
 
-        if criterion[:ratings] && !criterion[:ratings].empty?
+        if criterion[:ratings].present?
           c_node.ratings do |ratings_node|
             criterion[:ratings].each do |rating|
               ratings_node.rating do |rating_node|

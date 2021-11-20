@@ -395,11 +395,11 @@ class GroupsController < ApplicationController
             return
           end
           @group.request_user(@current_user)
-          if !@group.grants_right?(@current_user, session, :read)
-            render :membership_pending
-          else
+          if @group.grants_right?(@current_user, session, :read)
             flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
             redirect_to named_context_url(@group.context, :context_groups_url)
+          else
+            render :membership_pending
           end
           return
         end
@@ -576,7 +576,7 @@ class GroupsController < ApplicationController
     group_params = api_request? ? params : params.require(:group)
     attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
                                 :leader => strong_anything, :members => strong_anything)
-    attrs[:leader] = nil if group_params.key?(:leader) && !group_params[:leader].present?
+    attrs[:leader] = nil if group_params.key?(:leader) && group_params[:leader].blank?
 
     if !api_request? && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id

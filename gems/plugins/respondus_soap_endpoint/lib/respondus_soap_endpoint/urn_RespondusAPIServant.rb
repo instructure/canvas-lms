@@ -594,9 +594,7 @@ Implemented for: Canvas LMS)]
       session['pending_migration_id'] = migration.id
       session['pending_migration_itemType'] = itemType
 
-      if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        poll_for_completion
-      else
+      if Setting.get('respondus_endpoint.polling_api', 'true') == 'false'
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.
         timeout(5.minutes.to_i) do
@@ -609,6 +607,8 @@ Implemented for: Canvas LMS)]
             end
           end
         end
+      else
+        poll_for_completion
       end
     end
 

@@ -45,19 +45,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
 
     lock_key = "lock:#{key}"
 
-    unless entry
-      until entry
-        unless (lock_nonce = lock(lock_key, options))
-          # someone else is already generating it; wait for them
-          sleep 0.1
-          entry = read_entry(key, options)
-          next
-        else
-          @safe_redis_internal_options[:lock_nonce] = lock_nonce
-          break
-        end
-      end
-    else
+    if entry
       if entry.expired? && (lock_nonce = lock(lock_key, options))
         @safe_redis_internal_options[:lock_nonce] = lock_nonce
         @safe_redis_internal_options[:stale_entry] = entry
@@ -65,6 +53,18 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
       end
       # just return the stale value; someone else is busy
       # regenerating it
+    else
+      until entry
+        if (lock_nonce = lock(lock_key, options))
+          @safe_redis_internal_options[:lock_nonce] = lock_nonce
+          break
+        else
+          # someone else is already generating it; wait for them
+          sleep 0.1
+          entry = read_entry(key, options)
+          next
+        end
+      end
     end
     entry
   end

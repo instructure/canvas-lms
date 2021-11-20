@@ -76,7 +76,7 @@ class DockerfileWriter
   end
 
   def run
-    contents = eval(Erubi::Engine.new(File.read(in_file), { :bufval => 'SuffixedStringWriter.new(self)' }).src + ";_buf.contents")
+    contents = eval(Erubi::Engine.new(File.read(in_file), { :bufval => 'SuffixedStringWriter.new(self)' }).src + ";_buf.contents") # rubocop:disable Security/Eval
 
     contents.each do |k, v|
       File.open(k.empty? ? out_file : "#{out_file}.#{k}", "w") do |f|
@@ -100,7 +100,7 @@ class DockerfileWriter
   end
 
   def yarn_packages
-    JSON.load(File.open('package.json'))['workspaces']['packages']
+    JSON.parse(File.read('package.json'))['workspaces']['packages']
   end
 end
 

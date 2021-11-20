@@ -601,10 +601,10 @@ class User < ActiveRecord::Base
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
     unless precalculated_associations
-      users = if !users_or_user_ids.first.is_a?(User)
-                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-              else
+      users = if users_or_user_ids.first.is_a?(User)
                 users_or_user_ids
+              else
+                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
               end
 
       if opts[:all_shards]
@@ -1490,7 +1490,7 @@ class User < ActiveRecord::Base
 
   def self.avatar_key(user_id)
     user_id = user_id.to_s
-    if !user_id.blank? && user_id != '0'
+    if user_id.present? && user_id != '0'
       "#{user_id}-#{Canvas::Security.hmac_sha1(user_id)[0, 10]}"
     else
       "0"
@@ -2247,7 +2247,7 @@ class User < ActiveRecord::Base
 
   def upcoming_events(opts = {})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
+    return [] if context_codes.blank?
 
     now = Time.zone.now
 
@@ -2340,7 +2340,7 @@ class User < ActiveRecord::Base
   def undated_events(opts = {})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
+    return [] if context_codes.blank?
 
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])
@@ -2695,10 +2695,10 @@ class User < ActiveRecord::Base
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                 .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if !favorites.empty?
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    else
+    @menu_courses = if favorites.empty?
                       courses
+                    else
+                      favorites + courses.reject { |c| can_favorite.call(c) }
                     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses

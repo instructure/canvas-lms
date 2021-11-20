@@ -38,7 +38,7 @@ unless defined?(CANVAS_RAILS6_0)
       require 'net/http'
       require 'yaml'
 
-      environment = YAML.load(File.read(File.expand_path('consul.yml', __dir__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
+      environment = YAML.safe_load(File.read(File.expand_path('consul.yml', __dir__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
 
       keys = [
         ["private/canvas", environment, $canvas_cluster, "rails6.1"].compact.join("/"),
@@ -54,7 +54,7 @@ unless defined?(CANVAS_RAILS6_0)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS6_0 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'false')
+      CANVAS_RAILS6_0 = !(result && Base64.decode64(JSON.parse(result.body).first['Value']) == 'false')
     rescue
       CANVAS_RAILS6_0 = true
     end
