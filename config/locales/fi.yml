@@ -5934,7 +5934,7 @@ fi:
     other: "%{count} tehtäväpalautusta pitää arvioida"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} poistettaisiin ja ylittää määritetyn kynnyksen %{change_threshold}% "
   count_unpublished_changes_a366ed45: 
-    one: "%{count} julkistamatonta muutosta"
+    one: "1 julkistamaton muutos"
     other: "%{count} julkistamatonta muutosta"
   count_unread_cff5855: "%{count} lukematon."
   count_unread_messages_99d6bf17: 
