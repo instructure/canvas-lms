@@ -7609,7 +7609,7 @@ pl:
   count_unpublished_changes_a366ed45: 
     few: "%{count} nieopublikowane zmiany"
     many: "%{count} nieopublikowane zmiany"
-    one: "%{count} nieopublikowane zmiany"
+    one: "1 nieopublikowana zmiana"
     other: "%{count} nieopublikowane zmiany"
   count_unread_cff5855: "%{count} nieprzeczytane."
   count_unread_messages_99d6bf17: 
