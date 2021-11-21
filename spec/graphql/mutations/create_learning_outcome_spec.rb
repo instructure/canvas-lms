@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 
 describe Mutations::CreateLearningOutcome do
   before :once do
-    @account = Account.default
+    @domain_root_account = @account = Account.default
     @course = @account.courses.create!
     @global_group = LearningOutcomeGroup.global_root_outcome_group
     @course_group = @course.learning_outcome_groups.create!(title: "Group Course Level")
@@ -50,12 +50,11 @@ describe Mutations::CreateLearningOutcome do
             contextId
             calculationMethod
             calculationInt
-            rubricCriterion {
-              masteryPoints
-              ratings {
-                description
-                points
-              }
+            masteryPoints
+            ratings {
+              description
+              points
+              mastery
             }
           }
           errors {
@@ -65,7 +64,7 @@ describe Mutations::CreateLearningOutcome do
         }
       }
     GQL
-    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
+    context = { current_user: user_executing, domain_root_account: @domain_root_account, request: ActionDispatch::TestRequest.create, session: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -80,23 +79,23 @@ describe Mutations::CreateLearningOutcome do
     {
       calculation_method: "n_mastery",
       calculation_int: 3,
-      rubric_criterion: {
-        mastery_points: 2,
-        ratings: [
-          {
-            description: "GraphQL Exceeds Expectations",
-            points: 3
-          },
-          {
-            description: "GraphQL Expectations",
-            points: 2
-          },
-          {
-            description: "GraphQL Does Not Meet Expectations",
-            points: 1
-          }
-        ]
-      }
+      ratings: [
+        {
+          description: "GraphQL Exceeds Expectations",
+          points: 3,
+          mastery: false
+        },
+        {
+          description: "GraphQL Expectations",
+          points: 2,
+          mastery: true
+        },
+        {
+          description: "GraphQL Does Not Meet Expectations",
+          points: 1,
+          mastery: false
+        }
+      ]
     }
   end
 
@@ -106,13 +105,10 @@ describe Mutations::CreateLearningOutcome do
     <<~GQL
       calculationMethod: "#{args[:calculation_method]}",
       calculationInt: #{args[:calculation_int]},
-      rubricCriterion: {
-        masteryPoints: #{args[:rubric_criterion][:mastery_points]}
-        ratings: #{
-          args[:rubric_criterion][:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
+      ratings: #{
+        args[:ratings]
+          .to_json
+          .gsub(/"([a-z]+)":/, '\1:')
       }
     GQL
   end
@@ -137,12 +133,13 @@ describe Mutations::CreateLearningOutcome do
   end
 
   it "creates a learning outcome with mastery scale" do
-    @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-    @course.root_account.disable_feature!(:account_level_mastery_scales)
+    @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
+    @domain_root_account.enable_feature!(:improved_outcomes_management)
+    @domain_root_account.disable_feature!(:account_level_mastery_scales)
 
     calculation_method = default_rating_variables[:calculation_method]
     calculation_int = default_rating_variables[:calculation_int]
-    rubric_criterion = default_rating_variables[:rubric_criterion]
+    ratings = default_rating_variables[:ratings]
 
     result = execute_with_input "#{variables},#{rating_variables}"
     expect(result["errors"]).to be_nil
@@ -153,15 +150,15 @@ describe Mutations::CreateLearningOutcome do
 
     expect(result["calculationMethod"]).to eq calculation_method
     expect(result["calculationInt"]).to eq calculation_int
-    expect(result["rubricCriterion"]["masteryPoints"]).to eq rubric_criterion[:mastery_points]
-    expect(result["rubricCriterion"]["ratings"].count).to eq rubric_criterion[:ratings].count
-    expect(result["rubricCriterion"]["ratings"][0]["description"]).to eq rubric_criterion[:ratings][0][:description]
+    expect(result["masteryPoints"]).to eq ratings[1][:points]
+    expect(result["ratings"].count).to eq ratings.count
+    expect(result["ratings"][0]["description"]).to eq ratings[0][:description]
 
     expect(result_record.calculation_method).to eq calculation_method
     expect(result_record.calculation_int).to eq calculation_int
-    expect(result_record.mastery_points).to eq rubric_criterion[:mastery_points]
-    expect(result_record.rubric_criterion[:ratings].count).to eq rubric_criterion[:ratings].count
-    expect(result_record.rubric_criterion[:ratings][0][:description]).to eq rubric_criterion[:ratings][0][:description]
+    expect(result_record.mastery_points).to eq ratings[1][:points]
+    expect(result_record.rubric_criterion[:ratings].count).to eq ratings.count
+    expect(result_record.rubric_criterion[:ratings][0][:description]).to eq ratings[0][:description]
   end
 
   it "creates a global outcome" do

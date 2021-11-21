@@ -277,18 +277,35 @@ class LearningOutcome < ActiveRecord::Base
     self.data ||= {}
 
     if hash
+      infer_rubric_criterion_mastery_points = lambda do |ratings|
+        return nil unless ratings.present?
+
+        rating_with_mastery_flag = ratings.find { |r| r[:mastery] }
+
+        return rating_with_mastery_flag[:points] unless rating_with_mastery_flag.nil?
+
+        ratings[0][:points]
+      end
+
       criterion = {}
       criterion[:description] = hash[:description] || t(:no_description, "No Description")
       criterion[:ratings] = []
       ratings = hash[:enable] ? hash[:ratings].values : (hash[:ratings] || [])
       ratings.each do |rating|
-        criterion[:ratings] << {
+        criterion_rating = {
           description: rating[:description] || t(:no_comment, "No Comment"),
-          points: rating[:points].to_f || 0
+          points: rating[:points].to_f || 0.00
         }
+
+        criterion_rating[:mastery] = rating[:mastery] || false if rating.key?(:mastery)
+
+        criterion[:ratings] << criterion_rating
       end
       criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
-      criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
+      criterion[:mastery_points] = (
+        hash[:mastery_points] ||
+        infer_rubric_criterion_mastery_points.call(criterion[:ratings])
+      ).to_f
       criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
     else
       criterion = self.class.default_rubric_criterion
