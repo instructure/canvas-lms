@@ -19,8 +19,9 @@
 #
 
 module Types
-  class RubricCriterionRatingInputType < Types::BaseInputObject
+  class ProficiencyRatingInputType < Types::BaseInputObject
     argument :description, String, required: true
-    argument :points, Integer, required: true
+    argument :points, Float, required: true
+    argument :mastery, Boolean, required: true
   end
 end

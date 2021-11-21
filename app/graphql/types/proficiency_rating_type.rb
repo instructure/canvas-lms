@@ -29,6 +29,8 @@ module Types
 
     field :mastery, Boolean, null: false
     def mastery
+      return object[:mastery] || false if object.is_a?(Hash)
+
       !!object.mastery
     end
 
