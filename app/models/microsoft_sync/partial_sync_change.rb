@@ -28,7 +28,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
 
   resolves_root_account through: :course
 
-  # Note: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
+  # NOTE: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
   # but rather "owner" or "member", also referred to as "MSFT role type"
   OWNER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::OWNER_MSFT_ROLE_TYPE
   MEMBER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::MEMBER_MSFT_ROLE_TYPE

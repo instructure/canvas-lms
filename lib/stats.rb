@@ -88,7 +88,7 @@ module Stats
       # returns the 1st quartile, 2nd quartile (median),
       # and 3rd quartile for the data
 
-      # note that methodology for determining quartiles
+      # NOTE: methodology for determining quartiles
       # is not universally agreed upon (oddly enough)
       # this method picks medians and gets
       # results that are universally agreed upon.

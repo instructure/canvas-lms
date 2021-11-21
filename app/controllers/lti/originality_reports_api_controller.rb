@@ -393,7 +393,7 @@ module Lti
       raise ActiveRecord::RecordNotFound if submission.blank?
 
       @report = OriginalityReport.find_by(id: params[:id])
-      # Note: we could end up looking up by file_id, attachment: nil or attempt
+      # NOTE: we could end up looking up by file_id, attachment: nil or attempt
       # even in the `update` or `show` endpoints, if they give us a bogus report id :/
       @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?

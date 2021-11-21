@@ -86,7 +86,7 @@ module Lti
         hash[key] = val
       end
 
-      # note that this base string has duplicate oauth parameters in it when logged,
+      # NOTE: this base string has duplicate oauth parameters in it when logged,
       # though these parameters don't affect signature generation and oauth launches (I hope?)
       Lti::Logging.lti_1_launch_generated(request.oauth_helper.signature_base_string)
 

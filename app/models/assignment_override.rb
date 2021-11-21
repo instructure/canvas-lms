@@ -415,7 +415,7 @@ class AssignmentOverride < ActiveRecord::Base
     p.to { applies_to_students }
     p.whenever(&:notify_change?)
     p.filter_asset_by_recipient { |record, user|
-      # note that our asset for this message is an Assignment, not an AssignmentOverride
+      # NOTE: our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
     }
     p.data { course_broadcast_data }

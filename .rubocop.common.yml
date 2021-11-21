@@ -213,6 +213,7 @@ Security/YAMLLoad:
   # technically even YAML.load is fairly safe in Canvas because we override it and only allow certain types
   # but still avoid it if you can.
   Severity: warning
+  AutoCorrect: false
 
 Specs/EnsureSpecExtension:
   Exclude:
@@ -240,6 +241,8 @@ Style/ClassCheck:
 Style/ClassEqualityComparison:
   Severity: error
 Style/ColonMethodCall:
+  Severity: error
+Style/CommentAnnotation:
   Severity: error
 Style/ConditionalAssignment:
   Severity: error
@@ -276,6 +279,8 @@ Style/FloatDivision:
 Style/For:
   Severity: error
 Style/FrozenStringLiteralComment:
+  Severity: error
+Style/GlobalStdStream:
   Severity: error
 Style/HashConversion:
   Severity: error

@@ -21,7 +21,7 @@ require 'byebug'
 require 'request_context'
 require 'rails'
 Rails.env = 'test'
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|

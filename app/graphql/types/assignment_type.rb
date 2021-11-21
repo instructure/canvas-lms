@@ -283,7 +283,7 @@ module Types
       Assignments::NeedsGradingCountQuery.new(
         assignment,
         current_user
-        # TODO course proxy stuff
+        # TODO: course proxy stuff
         # (actually for some reason not passing along a course proxy doesn't
         # seem to matter)
       ).count

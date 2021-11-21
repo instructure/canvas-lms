@@ -286,7 +286,7 @@ module AccountReports
     # shows last_activity_at on enrollments for users with
     # enrollments in this account
 
-    # note: activity on other root accounts' enrollments will not show
+    # NOTE: activity on other root accounts' enrollments will not show
     def last_enrollment_activity
       report_extra_text
 

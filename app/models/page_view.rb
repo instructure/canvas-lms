@@ -35,7 +35,7 @@ class PageView < ActiveRecord::Base
 
   attr_accessor :is_update
 
-  # note that currently we never query page views from the perspective of the course;
+  # NOTE: currently we never query page views from the perspective of the course;
   # we simply don't record them for non-logged-in users in a public course
   # if we ever do either of the above, we'll need to remove this, and figure out
   # where such page views should belong (currently page views end up on the user's

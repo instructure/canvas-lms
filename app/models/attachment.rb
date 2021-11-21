@@ -1666,7 +1666,7 @@ class Attachment < ActiveRecord::Base
       scope = Attachment.where(:md5 => md5, :namespace => namespace, :root_attachment_id => nil)
       scope.update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
 
-      # TODO when RECNVS-323 is complete, branch here to call an inst-fs
+      # TODO: when RECNVS-323 is complete, branch here to call an inst-fs
       # copy method to avoid sending object when it is not necessary
       Attachments::Storage.store_for_attachment(destination, open)
 
@@ -1876,7 +1876,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.current_root_account=(account)
-    # TODO rename to @current_root_account
+    # TODO: rename to @current_root_account
     @domain_namespace = account
   end
 

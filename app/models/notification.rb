@@ -362,7 +362,7 @@ class Notification < Switchman::UnshardedRecord
     end
   end
 
-  # TODO i18n: show the localized notification name in the dashboard (or
+  # TODO: i18n: show the localized notification name in the dashboard (or
   # wherever), even if we continue to store the english string in the db
   # (it's actually just the titleized message template filename)
   def names

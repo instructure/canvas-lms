@@ -51,7 +51,7 @@ class AnnouncementNewEdit
       wait_for_new_page_load { submit_form('.form-actions') }
     end
 
-    # Note: This *appends* to the existing content in the text area
+    # NOTE: This *appends* to the existing content in the text area
     def add_message(message)
       type_in_tiny('textarea[name=message]', message)
     end

@@ -312,7 +312,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   def update_associations
     if authorized_action(@course.account, @current_user, [:manage_courses, :manage_courses_admin])
-      # note that I'm additionally requiring course management rights on the account
+      # NOTE: that I'm additionally requiring course management rights on the account
       # since (for now) we're only allowed to associate courses derived from it
       ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
       ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
@@ -575,7 +575,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def subscriptions_index
     scope = @course.master_course_subscriptions.active
     subs = Api.paginate(scope, self, api_v1_course_blueprint_subscriptions_url)
-    # TODO preload subscription -> master template -> course if we ever support multiple subscriptions
+    # TODO: preload subscription -> master template -> course if we ever support multiple subscriptions
     render :json => subs.map { |sub| child_subscription_json(sub) }
   end
 

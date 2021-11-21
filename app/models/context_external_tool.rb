@@ -369,7 +369,7 @@ class ContextExternalTool < ActiveRecord::Base
     if rce_favorite_tool_ids
       rce_favorite_tool_ids.include?(global_id)
     else
-      # TODO remove after the datafixup and this column is dropped
+      # TODO: remove after the datafixup and this column is dropped
       is_rce_favorite
     end
   end

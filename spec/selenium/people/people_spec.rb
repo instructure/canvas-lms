@@ -398,7 +398,7 @@ describe "people" do
       expect(f("#content")).not_to contain_css('.reset_course_content_button')
     end
 
-    # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29609, but make sure we're testing at the right level
     it "should validate that a TA cannot rename a teacher"
 
     it "includes login id column if the user has :view_user_logins, even if they don't have :manage_students" do

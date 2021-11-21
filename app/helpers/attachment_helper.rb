@@ -119,7 +119,7 @@ module AttachmentHelper
   end
 
   def set_cache_header(attachment, direct)
-    # TODO [RECNVS-73]
+    # TODO: [RECNVS-73]
     # instfs JWTs cannot be shared across users, so we cannot cache them across
     # users. while most browsers will only service one user and caching
     # independent of user would not be detrimental, we cannot guarantee that.

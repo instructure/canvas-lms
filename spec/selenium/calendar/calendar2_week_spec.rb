@@ -46,7 +46,7 @@ describe "calendar2" do
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
       end
 
-      # TODO reimplement per CNVS-29592, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29592, but make sure we're testing at the right level
       it "should render assignments due just before midnight"
 
       it 'shows manual assignment event due saturday after 6pm', priority: "1", test_id: 486894 do

@@ -2338,7 +2338,7 @@ describe DiscussionTopic do
       add_section_to_topic(announcement, @section)
       expect(announcement.valid?).to eq false
       errors = announcement.errors[:is_section_specific]
-      # note that the feature flag validation will also fail here, but we still want this
+      # NOTE: the feature flag validation will also fail here, but we still want this
       # validation to trigger too.
       expect(errors.include?("Only course announcements and discussions can be section-specific")).to eq true
     end

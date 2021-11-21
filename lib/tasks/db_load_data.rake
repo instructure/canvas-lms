@@ -3,7 +3,7 @@
 require 'securerandom'
 
 def ping
-  STDOUT.sync = true
+  $stdout.sync = true
   print '.'
 end
 
@@ -112,7 +112,7 @@ namespace :db do
                                           role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.default.id)).first_or_create!
       user
     rescue => e
-      STDERR.puts "Problem creating administrative account, please try again: #{e}"
+      $stderr.puts "Problem creating administrative account, please try again: #{e}"
       nil
     end
 
