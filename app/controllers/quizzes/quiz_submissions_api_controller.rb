@@ -445,10 +445,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   def validate_ldb_status!(quiz = @quiz)
-    if quiz.require_lockdown_browser?
-      unless ldb_plugin.authorized?(self)
-        reject! 'this quiz requires the lockdown browser', :forbidden
-      end
+    if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
+      reject! 'this quiz requires the lockdown browser', :forbidden
     end
   end
 

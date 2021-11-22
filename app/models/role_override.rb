@@ -1777,13 +1777,12 @@ class RoleOverride < ActiveRecord::Base
     }
     generated_permission[:group] = default_data[:group] if default_data[:group].present?
 
-    if default_data[:account_only]
-      # NOTE: built-in roles don't have an account so we need to remember to send it in explicitly
-      if (default_data[:account_only] == :root && !(role_context && role_context.is_a?(Account) && role_context.root_account?)) ||
-         (default_data[:account_only] == :site_admin && !(role_context && role_context.is_a?(Account) && role_context.site_admin?))
-        generated_permission[:enabled] = false
-        return generated_permission # shouldn't be able to be overridden because the account_user doesn't belong to the root/site_admin
-      end
+    # NOTE: built-in roles don't have an account so we need to remember to send it in explicitly
+    if default_data[:account_only] &&
+       ((default_data[:account_only] == :root && !(role_context && role_context.is_a?(Account) && role_context.root_account?)) ||
+        (default_data[:account_only] == :site_admin && !(role_context && role_context.is_a?(Account) && role_context.site_admin?)))
+      generated_permission[:enabled] = false
+      return generated_permission # shouldn't be able to be overridden because the account_user doesn't belong to the root/site_admin
     end
 
     # cannot be overridden; don't bother looking for overrides

@@ -226,22 +226,20 @@ module SimplyVersioned
     end
 
     def simply_versioned_create_version
-      if versioning_enabled?
-        # INSTRUCTURE
-        if @versioning_explicitly_enabled || @changes_are_worth_versioning
-          @changes_are_worth_versioning = nil
-          if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
-            version = versions.current
-            version.yaml = attributes.except(*simply_versioned_options[:exclude]).to_yaml
-            if version.save
-              simply_versioned_options[:on_update].try(:call, self, version)
-            end
-          else
-            version = versions.create(:yaml => attributes.except(*simply_versioned_options[:exclude]).to_yaml)
-            if version.valid?
-              simply_versioned_options[:on_create].try(:call, self, version)
-              versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]
-            end
+      # INSTRUCTURE
+      if versioning_enabled? && (@versioning_explicitly_enabled || @changes_are_worth_versioning)
+        @changes_are_worth_versioning = nil
+        if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
+          version = versions.current
+          version.yaml = attributes.except(*simply_versioned_options[:exclude]).to_yaml
+          if version.save
+            simply_versioned_options[:on_update].try(:call, self, version)
+          end
+        else
+          version = versions.create(:yaml => attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+          if version.valid?
+            simply_versioned_options[:on_create].try(:call, self, version)
+            versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]
           end
         end
       end

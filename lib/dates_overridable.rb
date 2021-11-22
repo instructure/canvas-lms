@@ -157,21 +157,19 @@ module DatesOverridable
       else
         all_due_dates
       end
-    else
-      if ObserverEnrollment.observed_students(context, user).any?
-        observed_student_due_dates(user)
-      elsif context.user_has_been_student?(user) ||
-            context.user_has_been_admin?(user) ||
-            context.user_has_been_observer?(user)
-        overrides = overrides_for(user)
-        overrides = overrides.map(&:as_hash)
-        if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
-          overrides << base_due_date_hash
-        end
-        overrides
-      else
-        all_due_dates
+    elsif ObserverEnrollment.observed_students(context, user).any?
+      observed_student_due_dates(user)
+    elsif context.user_has_been_student?(user) ||
+          context.user_has_been_admin?(user) ||
+          context.user_has_been_observer?(user)
+      overrides = overrides_for(user)
+      overrides = overrides.map(&:as_hash)
+      if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
+        overrides << base_due_date_hash
       end
+      overrides
+    else
+      all_due_dates
     end
   end
 
@@ -265,10 +263,10 @@ module DatesOverridable
     tag_info[:points_possible] = points_possible
 
     if user && tag_info[:due_date]
-      if tag_info[:due_date] < Time.now
-        if is_a?(Quizzes::Quiz) || (is_a?(Assignment) && expects_submission?)
-          tag_info[:past_due] = true unless has_submission
-        end
+      if tag_info[:due_date] < Time.now &&
+         (is_a?(Quizzes::Quiz) || (is_a?(Assignment) && expects_submission?)) &&
+         !has_submission
+        tag_info[:past_due] = true
       end
 
       tag_info[:due_date] = tag_info[:due_date].utc.iso8601

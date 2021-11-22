@@ -144,11 +144,9 @@ module SIS
         rows = 0
         ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS) do |faster_csv|
           while faster_csv.shift
-            unless @read_only
-              if create_importers && rows % @rows_for_parallel == 0
-                @parallel_importers[importer] ||= []
-                @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
-              end
+            if !@read_only && create_importers && rows % @rows_for_parallel == 0
+              @parallel_importers[importer] ||= []
+              @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
             end
             rows += 1
           end
@@ -246,10 +244,10 @@ module SIS
           fail_with_error!(e, csv: csv)
         end
       ensure
-        unless @run_immediately || ensure_later
-          if is_last_parallel_importer_of_type?(parallel_importer)
-            queue_next_importer_set unless should_stop_import?
-          end
+        if !(@run_immediately || ensure_later) &&
+           is_last_parallel_importer_of_type?(parallel_importer) &&
+           !should_stop_import?
+          queue_next_importer_set
         end
       end
 

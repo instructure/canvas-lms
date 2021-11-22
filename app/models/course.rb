@@ -367,17 +367,15 @@ class Course < ActiveRecord::Base
   def update_enrollment_states_if_necessary
     return if saved_change_to_id # new object, nothing to possibly invalidate
 
-    if (saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
+    # a lot of things can change the date logic here :/
+    if ((saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
        (restrict_enrollments_to_course_dates? && (saved_changes.keys & %w[start_at conclude_at]).any?) ||
-       (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == 'completed'))
-      # a lot of things can change the date logic here :/
-
-      if enrollments.exists?
-        EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
-                       .invalidate_states_for_course_or_section(self)
-      end
-      # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
+       (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == 'completed'))) &&
+       enrollments.exists?
+      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
+                     .invalidate_states_for_course_or_section(self)
     end
+    # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     if saved_change_to_account_id? || @changed_settings
       state_settings = [:restrict_student_future_view, :restrict_student_past_view]
       changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
@@ -408,12 +406,10 @@ class Course < ActiveRecord::Base
       else
         context_modules.not_deleted
       end
+    elsif array_is_okay && association(:context_modules).loaded?
+      context_modules.select(&:active?)
     else
-      if array_is_okay && association(:context_modules).loaded?
-        context_modules.select(&:active?)
-      else
-        context_modules.active
-      end
+      context_modules.active
     end
   end
 
@@ -1137,8 +1133,8 @@ class Course < ActiveRecord::Base
       if account
         if account.root_account?
           self.account = nil if root_account_id != account.id
-        else
-          self.account = nil if account&.root_account_id != root_account_id
+        elsif account&.root_account_id != root_account_id
+          self.account = nil
         end
       end
       self.account_id ||= self.root_account_id
@@ -1273,8 +1269,8 @@ class Course < ActiveRecord::Base
 
   # set license to "private" if it's present but not recognized
   def validate_license
-    unless license.nil?
-      self.license = 'private' unless self.class.licenses.key?(license)
+    if !license.nil? && !self.class.licenses.key?(license)
+      self.license = 'private'
     end
   end
 
@@ -2287,8 +2283,8 @@ class Course < ActiveRecord::Base
     enrollment_state ||= available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
       enrollment_state = 'invited' if enrollment_state == 'creation_pending'
-    else
-      enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !available?
+    elsif enrollment_state == 'invited' && !available?
+      enrollment_state = 'creation_pending'
     end
     Course.unique_constraint_retry do
       e = if opts[:allow_multiple_enrollments]

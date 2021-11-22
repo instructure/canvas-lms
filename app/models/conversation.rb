@@ -366,8 +366,8 @@ class Conversation < ActiveRecord::Base
 
       cps = cps.visible if options[:only_existing]
 
-      unless options[:new_message]
-        cps = cps.where.not(user_id: skip_participants.map(&:user_id)) if skip_participants.present?
+      if !options[:new_message] && skip_participants.present?
+        cps = cps.where.not(user_id: skip_participants.map(&:user_id))
       end
 
       cps = cps.where(:user_id => (options[:only_users] + [message.author]).map(&:id)) if options[:only_users]

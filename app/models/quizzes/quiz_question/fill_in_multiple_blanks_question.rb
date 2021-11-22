@@ -121,16 +121,14 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
               right[:user_ids] << response[:user_id]
             end
           end
-          unless found
-            if answer_md5
-              match = {
-                :id => answer_md5,
-                :responses => 1,
-                :user_ids => [response[:user_id]],
-                :text => response["answer_for_#{answer[:blank_id]}".to_sym]
-              }
-              answer[:answer_matches] << match
-            end
+          if !found && answer_md5
+            match = {
+              :id => answer_md5,
+              :responses => 1,
+              :user_ids => [response[:user_id]],
+              :text => response["answer_for_#{answer[:blank_id]}".to_sym]
+            }
+            answer[:answer_matches] << match
           end
         end
       end

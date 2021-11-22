@@ -116,11 +116,10 @@ module CC::Importer::Standard
     end
 
     def get_canvas_att_replacement_url(path, resource_dir = nil)
-      if path.start_with?('../')
-        if (url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir))
-          return url
-        end
+      if path.start_with?('../') && (url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir))
+        return url
       end
+
       path = path[1..] if path.start_with?('/')
       mig_id = nil
       if resource_dir && resource_dir != "."
@@ -176,12 +175,9 @@ module CC::Importer::Standard
                     node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
                   end
                 end
-              else
-                if ImportedHtmlConverter.relative_url?(val)
-                  if (new_url = get_canvas_att_replacement_url(val))
-                    node[attr] = URI.escape(new_url)
-                  end
-                end
+              elsif ImportedHtmlConverter.relative_url?(val) &&
+                    (new_url = get_canvas_att_replacement_url(val))
+                node[attr] = URI.escape(new_url)
               end
             rescue URI::Error
               Rails.logger.warn "attempting to translate invalid url: #{val}"

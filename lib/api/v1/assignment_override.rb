@@ -31,12 +31,10 @@ module Api::V1::AssignmentOverride
       when 'ADHOC'
         json[:student_ids] = if override.preloaded_student_ids
                                override.preloaded_student_ids
+                             elsif visible_users.present?
+                               override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
                              else
-                               if visible_users.present?
-                                 override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
-                               else
-                                 override.assignment_override_students.pluck(:user_id)
-                               end
+                               override.assignment_override_students.pluck(:user_id)
                              end
       when 'Group'
         json[:group_id] = override.set_id

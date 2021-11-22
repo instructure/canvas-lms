@@ -47,16 +47,14 @@ module CC
 
       def add_ref_or_question(node, question)
         aq = nil
-        unless question[:assessment_question_id].blank?
-          if (aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first)
-            if aq.deleted? ||
-               !aq.assessment_question_bank ||
-               aq.assessment_question_bank.deleted? ||
-               aq.assessment_question_bank.context_id != @course.id ||
-               aq.assessment_question_bank.context_type != @course.class.to_s
-              aq = nil
-            end
-          end
+        if question[:assessment_question_id].present? &&
+           (aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first) &&
+           (aq.deleted? ||
+              !aq.assessment_question_bank ||
+              aq.assessment_question_bank.deleted? ||
+              aq.assessment_question_bank.context_id != @course.id ||
+              aq.assessment_question_bank.context_type != @course.class.to_s)
+          aq = nil
         end
 
         if aq

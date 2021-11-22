@@ -58,8 +58,8 @@ module Quizzes
       @submission.with_versioning(true) do |s|
         original_score = s.kept_score
         original_workflow_state = s.workflow_state
-        if s.save
-          track_outcomes(s.attempt) if outcomes_require_update(s, original_score, original_workflow_state)
+        if s.save && outcomes_require_update(s, original_score, original_workflow_state)
+          track_outcomes(s.attempt)
         end
       end
       @submission.context_module_action

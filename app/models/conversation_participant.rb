@@ -389,8 +389,8 @@ class ConversationParticipant < ActiveRecord::Base
       if subscribed?
         update_cached_data(:recalculate_count => false, :set_last_message_at => false, :regenerate_tags => false)
         self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
-      else
-        self.workflow_state = 'read' if unread?
+      elsif unread?
+        self.workflow_state = 'read'
       end
     end
     subscribed?

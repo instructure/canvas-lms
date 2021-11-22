@@ -97,13 +97,12 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context
-    unless association(:context).loaded?
-      if association(:wiki).loaded? &&
-         wiki.context_loaded? &&
-         context_type == wiki.context_type &&
-         context_id == wiki.context_id
-        self.context = wiki.context
-      end
+    if !association(:context).loaded? &&
+       association(:wiki).loaded? &&
+       wiki.context_loaded? &&
+       context_type == wiki.context_type &&
+       context_id == wiki.context_id
+      self.context = wiki.context
     end
     super
   end

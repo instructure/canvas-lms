@@ -96,8 +96,8 @@ module SIS
           end
 
           course_account_stuck = course.stuck_sis_fields.include?(:account_id)
-          unless course_account_stuck
-            course.account = account if account
+          if !course_account_stuck && account
+            course.account = account
           end
           course.account ||= @root_account
 

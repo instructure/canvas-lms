@@ -401,19 +401,17 @@ class AppointmentGroupsController < ApplicationController
 
   # Shows the edit page for an assignment group
   def edit
-    if request.format == :html
-      if authorized_action(@group, @current_user, :update)
-        @page_title = t('Edit %{title}', { title: @group.title })
-        js_env({
-                 :APPOINTMENT_GROUP_ID => @group.id,
-                 :CALENDAR => {
-                   MAX_GROUP_CONVERSATION_SIZE: 100,
-                 }
-               })
-        js_bundle :calendar_appointment_group_edit
-        css_bundle :calendar_appointment_group_edit
-        render :html => "".html_safe, :layout => true
-      end
+    if request.format == :html && authorized_action(@group, @current_user, :update)
+      @page_title = t('Edit %{title}', { title: @group.title })
+      js_env({
+               :APPOINTMENT_GROUP_ID => @group.id,
+               :CALENDAR => {
+                 MAX_GROUP_CONVERSATION_SIZE: 100,
+               }
+             })
+      js_bundle :calendar_appointment_group_edit
+      css_bundle :calendar_appointment_group_edit
+      render :html => "".html_safe, :layout => true
     end
   end
 

@@ -424,19 +424,18 @@ class ContextModulesController < ApplicationController
     tags.each do |tag|
       if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
         progression.requirements_met ||= []
-        unless progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
-          if !before_tag || tag.position <= before_tag.position
-            pre = {
-              :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
-              :id => tag.id,
-              :context_module_id => mod.id,
-              :title => tag.title
-            }
-            pre[:requirement] = req
-            pre[:requirement_description] = ContextModule.requirement_description(req)
-            pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
-            pres << pre
-          end
+        if progression.requirements_met.none? { |r| r[:id] == req[:id] && r[:type] == req[:type] } &&
+           (!before_tag || tag.position <= before_tag.position)
+          pre = {
+            :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
+            :id => tag.id,
+            :context_module_id => mod.id,
+            :title => tag.title
+          }
+          pre[:requirement] = req
+          pre[:requirement_description] = ContextModule.requirement_description(req)
+          pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
+          pres << pre
         end
       end
     end
@@ -668,13 +667,11 @@ class ContextModulesController < ApplicationController
         if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && (@user = @context.students.find(params[:user_id]))
             @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
+          elsif @context.large_roster
+            @progressions = []
           else
-            if @context.large_roster
-              @progressions = []
-            else
-              context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
-            end
+            context_module_ids = @context.context_modules.active.pluck(:id)
+            @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
           @progressions = @context.context_modules.active.order(:id).map { |m| m.evaluate_for(@current_user) }

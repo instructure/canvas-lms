@@ -1446,10 +1446,9 @@ class AssignmentsApiController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
 
     @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
-    if @context.grants_right?(@current_user, :view_all_grades)
-      # teacher, ta
-      return if @context.students_visible_to(@current_user).include?(@user)
-    end
+    # teacher, ta
+    return if @context.grants_right?(@current_user, :view_all_grades) && @context.students_visible_to(@current_user).include?(@user)
+
     # self, observer
     authorized_action(@user, @current_user, %i[read_as_parent read])
   end

@@ -680,10 +680,9 @@ module Api::V1::Assignment
       update_params.delete('peer_reviews_assign_at')
     end
 
-    if update_params.key?("anonymous_peer_reviews")
-      if Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
-        ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
-      end
+    if update_params.key?("anonymous_peer_reviews") &&
+       Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
+      ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
     end
 
     if update_params["submission_types"].is_a? Array
@@ -925,10 +924,9 @@ module Api::V1::Assignment
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
-    if assignment_params[:points_possible].blank?
-      if assignment.new_record? || assignment_params.key?(:points_possible) # only change if they're deliberately updating to blank
-        assignment_params[:points_possible] = 0
-      end
+    if assignment_params[:points_possible].blank? &&
+       (assignment.new_record? || assignment_params.key?(:points_possible)) # only change if they're deliberately updating to blank
+      assignment_params[:points_possible] = 0
     end
 
     unless assignment.new_record?

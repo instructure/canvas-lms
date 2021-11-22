@@ -134,8 +134,8 @@ module SectionTabHelper
         'section_tabs_hash',
         I18n.locale
       ]
-      if context.is_a?(Course)
-        k << 'homeroom_course' if context.elementary_homeroom_course?
+      if context.is_a?(Course) && context.elementary_homeroom_course?
+        k << 'homeroom_course'
       end
 
       k.cache_key

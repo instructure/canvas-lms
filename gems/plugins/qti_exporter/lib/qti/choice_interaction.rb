@@ -217,10 +217,8 @@ module Qti
                 answer[:feedback_id] ||= get_feedback_id(r_if)
 
                 # flag whether this answer was set or added to
-                if @use_set_var_set_as_correct
-                  if answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
-                    answer[:zero_weight_set_not_summed] = true
-                  end
+                if @use_set_var_set_as_correct && (answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]'))
+                  answer[:zero_weight_set_not_summed] = true
                 end
               end
             end

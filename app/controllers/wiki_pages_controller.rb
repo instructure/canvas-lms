@@ -46,14 +46,12 @@ class WikiPagesController < ApplicationController
   end
 
   def set_pandapub_read_token
-    if @page&.grants_right?(@current_user, session, :read)
-      if CanvasPandaPub.enabled?
-        channel = "/private/wiki_page/#{@page.global_id}/update"
-        js_env :WIKI_PAGE_PANDAPUB => {
-          :CHANNEL => channel,
-          :TOKEN => CanvasPandaPub.generate_token(channel, true)
-        }
-      end
+    if @page&.grants_right?(@current_user, session, :read) && CanvasPandaPub.enabled?
+      channel = "/private/wiki_page/#{@page.global_id}/update"
+      js_env :WIKI_PAGE_PANDAPUB => {
+        :CHANNEL => channel,
+        :TOKEN => CanvasPandaPub.generate_token(channel, true)
+      }
     end
   end
 
@@ -107,15 +105,14 @@ class WikiPagesController < ApplicationController
         return
       end
 
-      if authorized_action(@page, @current_user, :read)
-        if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
-          add_crumb(@page.title)
-          log_asset_access(@page, 'wiki', @wiki)
-          wiki_pages_js_env(@context)
-          set_master_course_js_env_data(@page, @context)
-          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
-          @padless = true
-        end
+      if authorized_action(@page, @current_user, :read) &&
+         (!@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page))
+        add_crumb(@page.title)
+        log_asset_access(@page, 'wiki', @wiki)
+        wiki_pages_js_env(@context)
+        set_master_course_js_env_data(@page, @context)
+        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
+        @padless = true
       end
       js_bundle :wiki_page_show
       css_bundle :wiki_page
@@ -132,11 +129,9 @@ class WikiPagesController < ApplicationController
         add_crumb(@page.title)
         @padless = true
       end
-    else
-      if authorized_action(@page, @current_user, :read)
-        flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
-        redirect_to polymorphic_url([@context, @page])
-      end
+    elsif authorized_action(@page, @current_user, :read)
+      flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
+      redirect_to polymorphic_url([@context, @page])
     end
   end
 
@@ -148,11 +143,9 @@ class WikiPagesController < ApplicationController
 
         @padless = true
       end
-    else
-      if authorized_action(@page, @current_user, :read)
-        flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', :title => @page.title)
-        redirect_to polymorphic_url([@context, @page])
-      end
+    elsif authorized_action(@page, @current_user, :read)
+      flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', :title => @page.title)
+      redirect_to polymorphic_url([@context, @page])
     end
   end
 

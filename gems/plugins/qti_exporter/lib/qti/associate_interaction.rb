@@ -285,12 +285,10 @@ module Qti
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
-            if /response(Else)?If/.match?(response_if.name)
-              if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
-                match_id = get_node_val(match, 'baseValue', '').strip
-                answer[:match_id] = match_map[match_id]
-                break
-              end
+            if /response(Else)?If/.match?(response_if.name) && response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+              match_id = get_node_val(match, 'baseValue', '').strip
+              answer[:match_id] = match_map[match_id]
+              break
             end
           end
         end

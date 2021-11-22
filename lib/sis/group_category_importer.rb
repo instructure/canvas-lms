@@ -68,8 +68,8 @@ module SIS
 
         gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
 
-        if gc && gc.groups.active.exists?
-          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it." unless context.id == gc.context_id && context.class.base_class.name == gc.context_type
+        if gc && gc.groups.active.exists? && !(context.id == gc.context_id && context.class.base_class.name == gc.context_type)
+          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it."
         end
 
         gc ||= context.group_categories.new

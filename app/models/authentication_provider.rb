@@ -326,15 +326,11 @@ class AuthenticationProvider < ActiveRecord::Base
         user.send("#{attribute}=", value)
       end
     end
-    if pseudonym.changed?
-      unless pseudonym.save
-        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
-      end
+    if pseudonym.changed? && !pseudonym.save
+      Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
     end
-    if user.changed?
-      unless user.save
-        Rails.logger.warn("Unable to save federated user: #{user.errors}")
-      end
+    if user.changed? && !user.save
+      Rails.logger.warn("Unable to save federated user: #{user.errors}")
     end
   end
 

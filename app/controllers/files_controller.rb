@@ -596,16 +596,14 @@ class FilesController < ApplicationController
         format.html do
           if attachment.locked_for?(@current_user, :check_policies => true)
             render :show, status: :forbidden
+          elsif attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
+            # redirect to the files domain and have the files domain redirect back with the param set
+            # so we know the user session has been set there and relative files from the html will work
+            query = URI.parse(request.url).query
+            return_url = request.url + (query.present? ? '&' : '?') + 'fd_cookie_set=1'
+            redirect_to safe_domain_file_url(attachment, return_url: return_url)
           else
-            if attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
-              # redirect to the files domain and have the files domain redirect back with the param set
-              # so we know the user session has been set there and relative files from the html will work
-              query = URI.parse(request.url).query
-              return_url = request.url + (query.present? ? '&' : '?') + 'fd_cookie_set=1'
-              redirect_to safe_domain_file_url(attachment, return_url: return_url)
-            else
-              render :show
-            end
+            render :show
           end
         end
       end
@@ -671,10 +669,9 @@ class FilesController < ApplicationController
     verify_authenticity_token unless @context.is_a?(Account)
 
     # if the relative path matches the given file id use that file
-    if file_id && (@attachment = @context.attachments.where(id: file_id).first)
-      unless @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
-        @attachment = nil
-      end
+    if file_id && (@attachment = @context.attachments.where(id: file_id).first) &&
+       !(@attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path))
+      @attachment = nil
     end
 
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)

@@ -76,22 +76,20 @@ describe "admin settings tab" do
     if is_symbol == false
       check_state = Account.default.service_enabled?(features[:allowed_services])
       state_checker checker, check_state
-    else
-      if features.is_a? Array
-        default_selectors = []
-        features.each do |feature|
-          check_state = Account.default.service_enabled?(feature)
-          state_checker checker, check_state
-          default_selectors.push("#account_services_#{feature}")
-        end
-        if checker
-          default_selectors += css_selectors
-        end
-        css_selectors = default_selectors
-      else
-        check_state = Account.default.settings[features]
+    elsif features.is_a? Array
+      default_selectors = []
+      features.each do |feature|
+        check_state = Account.default.service_enabled?(feature)
         state_checker checker, check_state
+        default_selectors.push("#account_services_#{feature}")
       end
+      if checker
+        default_selectors += css_selectors
+      end
+      css_selectors = default_selectors
+    else
+      check_state = Account.default.settings[features]
+      state_checker checker, check_state
     end
     css_selectors.each do |selector|
       check_state = is_checked(selector)

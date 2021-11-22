@@ -84,8 +84,8 @@ module CC::Importer::Standard
           question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
           question[:answers].each do |ans|
             ans.each_pair do |key, val|
-              if key.to_s.end_with? "html"
-                ans[key] = replace_urls(val, resource_id) if ans[key]
+              if key.to_s.end_with?("html") && ans[key]
+                ans[key] = replace_urls(val, resource_id)
               end
             end
           end

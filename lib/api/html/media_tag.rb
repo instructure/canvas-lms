@@ -62,8 +62,8 @@ module Api
         node_builder.new('a', doc).tap do |n|
           if tag_is_an_anchor?
             tag.attributes.each { |k, v| n[k] = v }
-            unless already_has_av_comment?
-              n['class'] += " #{media_object.media_type}_comment" if media_object
+            if !already_has_av_comment? && media_object
+              n['class'] += " #{media_object.media_type}_comment"
             end
           else
             n['class'] = "instructure_inline_media_comment #{tag.name}_comment"

@@ -504,16 +504,15 @@ class SubmissionsController < SubmissionsBaseController
     # if extensions are being restricted, check that the extension is allowed
     # The first check here is for web interface submissions that contain only one file
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
-    if @assignment.allowed_extensions.present?
-      if params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
-         params[:attachments].values.any? do |a|
-           !a[:uploaded_data].empty? &&
-           !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
-         end
-        flash[:error] = t('errors.invalid_file_type', "Invalid file type")
-        redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-        return false
-      end
+    if @assignment.allowed_extensions.present? &&
+       (params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
+          params[:attachments].values.any? do |a|
+            !a[:uploaded_data].empty? &&
+            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+          end)
+      flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      return false
     end
     true
   end

@@ -390,12 +390,10 @@ module Qti
     def get_feedback_id(cond)
       id = nil
 
-      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]'))
-        if feedback.at_css('variable[identifier=FEEDBACK]')
-          if (feedback = feedback.at_css('baseValue[baseType=identifier]'))
-            id = feedback.text.strip
-          end
-        end
+      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')) &&
+         feedback.at_css('variable[identifier=FEEDBACK]') &&
+         (feedback = feedback.at_css('baseValue[baseType=identifier]'))
+        id = feedback.text.strip
       end
       # Sometimes individual answers are assigned general feedback, don't return
       # the identifier if that's the case

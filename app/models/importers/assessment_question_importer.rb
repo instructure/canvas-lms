@@ -114,10 +114,10 @@ module Importers
         end
 
         begin
-          if migration.for_master_course_import?
-            # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
-            next if question['assessment_question_id'] && question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
-          end
+          # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
+          next if migration.for_master_course_import? &&
+                  question['assessment_question_id'] &&
+                  question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
           question = import_from_migration(question, migration.context, migration, question_bank)
           question_data[:aq_data][question['migration_id']] = question

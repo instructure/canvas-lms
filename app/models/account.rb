@@ -1873,9 +1873,9 @@ class Account < ActiveRecord::Base
       if enable
         # only enable if it is not enabled by default
         allowed_service_names << "+#{service}" unless AccountServices.default_allowable_services[service]
-      else
+      elsif AccountServices.default_allowable_services[service]
         # only disable if it is not enabled by default
-        allowed_service_names << "-#{service}" if AccountServices.default_allowable_services[service]
+        allowed_service_names << "-#{service}"
       end
     end
     # rubocop:enable Style/IdenticalConditionalBranches
@@ -2109,10 +2109,8 @@ class Account < ActiveRecord::Base
       terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
     end
 
-    if terms.changed?
-      unless terms.save
-        errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
-      end
+    if terms.changed? && !terms.save
+      errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
     end
   end
 

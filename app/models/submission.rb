@@ -2090,12 +2090,10 @@ class Submission < ActiveRecord::Base
            else
              pgs.detect { |pg2| !pg2.final && pg2.scorer_id == scorer.id }
            end
+         elsif final
+           provisional_grades.final.first
          else
-           if final
-             provisional_grades.final.first
-           else
-             provisional_grades.not_final.where(scorer_id: scorer).first
-           end
+           provisional_grades.not_final.where(scorer_id: scorer).first
          end
 
     if default_to_null_grade && pg.nil?

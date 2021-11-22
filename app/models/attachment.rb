@@ -339,13 +339,11 @@ class Attachment < ActiveRecord::Base
     if dup.new_record? || ![id, root_attachment_id].include?(dup.id)
       if shard == dup.shard
         dup.root_attachment_id = root_attachment_id || id
+      elsif (existing_attachment = dup.find_existing_attachment_for_md5)
+        dup.root_attachment = existing_attachment
       else
-        if (existing_attachment = dup.find_existing_attachment_for_md5)
-          dup.root_attachment = existing_attachment
-        else
-          dup.write_attribute(:filename, filename)
-          Attachments::Storage.store_for_attachment(dup, self.open)
-        end
+        dup.write_attribute(:filename, filename)
+        Attachments::Storage.store_for_attachment(dup, self.open)
       end
     end
     dup.write_attribute(:filename, filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?

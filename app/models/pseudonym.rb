@@ -133,8 +133,8 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def must_be_root_account
-    if account_id_changed?
-      errors.add(:account_id, "must belong to a root_account") unless account.root_account?
+    if account_id_changed? && !account.root_account?
+      errors.add(:account_id, "must belong to a root_account")
     end
   end
 
@@ -241,11 +241,12 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def validate_unique_id
-    if (!self.account || self.account.email_pseudonyms) && !deleted?
-      unless unique_id.present? && EmailAddressValidator.valid?(unique_id)
-        errors.add(:unique_id, "not_email")
-        throw :abort
-      end
+    if (!account || account.email_pseudonyms) &&
+       !deleted? &&
+       (unique_id.blank? ||
+       !EmailAddressValidator.valid?(unique_id))
+      errors.add(:unique_id, "not_email")
+      throw :abort
     end
     unless deleted?
       shard.activate do

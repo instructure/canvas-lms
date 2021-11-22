@@ -71,8 +71,8 @@ class HostUrl
     end
 
     def default_host
-      unless @@default_host
-        @@default_host = domain_config[:domain] if domain_config.key?(:domain)
+      if !@@default_host && domain_config.key?(:domain)
+        @@default_host = domain_config[:domain]
       end
       res = @@default_host
       res ||= ENV['RAILS_HOST_WITH_PORT']

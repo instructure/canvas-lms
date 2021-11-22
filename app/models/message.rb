@@ -699,10 +699,9 @@ class Message < ActiveRecord::Base
 
     return skip_and_cancel if path_type == 'sms'
 
-    if path_type == "push"
-      if Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?
-        return skip_and_cancel
-      end
+    if path_type == "push" &&
+       (Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?)
+      return skip_and_cancel
     end
 
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
@@ -1131,14 +1130,12 @@ class Message < ActiveRecord::Base
   def infer_from_name
     return name_helper.from_name if name_helper.from_name.present?
 
-    if name_helper.asset.is_a? AppointmentGroup
-      unless name_helper.asset.contexts_for_user(user).nil?
-        names = name_helper.asset.contexts_for_user(user).map(&:name).join(", ")
-        if names == ""
-          return name_helper.asset.context.name
-        else
-          return names
-        end
+    if name_helper.asset.is_a?(AppointmentGroup) && !(names = name_helper.asset.contexts_for_user(user)).nil?
+      names = names.map(&:name).join(", ")
+      if names == ""
+        return name_helper.asset.context.name
+      else
+        return names
       end
     end
     return context_context.nickname_for(user) if can_use_name_for_from?(context_context)

@@ -91,13 +91,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
           end
         end
       end
-    else
-      if saved_change_to_default_restrictions?
-        count = master_content_tags.where(:use_default_restrictions => true)
-                                   .update_all(:restrictions => default_restrictions)
-        if count > 0 && default_restrictions.any? { |setting, locked| locked && !default_restrictions_before_last_save[setting] } # tightened restrictions
-          touch_all_content_for_tags
-        end
+    elsif saved_change_to_default_restrictions?
+      count = master_content_tags.where(:use_default_restrictions => true)
+                                 .update_all(:restrictions => default_restrictions)
+      if count > 0 && default_restrictions.any? { |setting, locked| locked && !default_restrictions_before_last_save[setting] } # tightened restrictions
+        touch_all_content_for_tags
       end
     end
   end
@@ -125,10 +123,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def require_valid_restrictions
-    if default_restrictions_changed?
-      if (default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
-        errors.add(:default_restrictions, "Invalid settings")
-      end
+    if default_restrictions_changed? && (default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
+      errors.add(:default_restrictions, "Invalid settings")
     end
     if default_restrictions_by_type_changed?
       if (default_restrictions_by_type.keys - MasterCourses::RESTRICTED_OBJECT_TYPES).any?

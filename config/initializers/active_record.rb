@@ -1871,8 +1871,8 @@ module TableRename
   RENAMES = { 'authentication_providers' => 'account_authorization_configs' }.freeze
 
   def columns(table_name)
-    if (old_name = RENAMES[table_name])
-      table_name = old_name if connection.table_exists?(old_name)
+    if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)
+      table_name = old_name
     end
     super
   end

@@ -108,11 +108,10 @@ module Importers
         questions.each_with_index do |matching_question, mq_index|
           next if qq_index == mq_index # don't match to yourself
 
-          if aq_mig_id == matching_question['migration_id']
-            # make sure that the match's core question data is identical
-            if check_question_equality(quiz_question, matching_question)
-              aq_dups << [quiz_question, matching_question['migration_id']]
-            end
+          # make sure that the match's core question data is identical
+          if aq_mig_id == matching_question['migration_id'] &&
+             check_question_equality(quiz_question, matching_question)
+            aq_dups << [quiz_question, matching_question['migration_id']]
           end
         end
       end
@@ -148,10 +147,9 @@ module Importers
               assessment[:assignment][:id] = Quizzes::Quiz.find(item_id.to_i).try(:assignment_id)
             end
           end
-          if assessment['assignment_migration_id']
-            if (assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] })
-              assignment['quiz_migration_id'] = migration_id
-            end
+          if assessment['assignment_migration_id'] &&
+             (assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] })
+            assignment['quiz_migration_id'] = migration_id
           end
           begin
             Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
@@ -171,14 +169,12 @@ module Importers
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.quizzes.temp_record
       item.mark_as_importing!(migration)
-      if item
-        if !allow_update && item.deleted?
-          item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
-          item.saved_by = :migration
-          item.quiz_groups.destroy_all
-          item.quiz_questions.preload(assessment_question: :assessment_question_bank).destroy_all
-          item.save
-        end
+      if item && !allow_update && item.deleted?
+        item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
+        item.saved_by = :migration
+        item.quiz_groups.destroy_all
+        item.quiz_questions.preload(assessment_question: :assessment_question_bank).destroy_all
+        item.save
       end
       new_record = item.new_record? || item.deleted?
 
@@ -275,10 +271,8 @@ module Importers
         end
       end
 
-      if item.graded? && !item.assignment
-        unless migration.canvas_import? || hash['assignment_migration_id']
-          build_assignment = true
-        end
+      if item.graded? && !item.assignment && !(migration.canvas_import? || hash['assignment_migration_id'])
+        build_assignment = true
       end
 
       item.generate_quiz_data if hash[:available] || item.published?
@@ -291,10 +285,9 @@ module Importers
         item.assignment.workflow_state = 'unpublished' if item.assignment
       end
 
-      if hash[:assignment_group_migration_id]
-        if (g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first)
-          item.assignment_group = g
-        end
+      if hash[:assignment_group_migration_id] &&
+         (g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first)
+        item.assignment_group = g
       end
 
       if new_record && item.for_assignment? && !item.assignment && item.can_unpublish?

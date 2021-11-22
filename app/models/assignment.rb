@@ -777,11 +777,9 @@ class Assignment < ActiveRecord::Base
   private :needs_to_recompute_grade?
 
   def update_grades_if_details_changed
-    if needs_to_recompute_grade?
-      unless saved_by == :migration
-        Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
-        self.class.connection.after_transaction_commit { context.recompute_student_scores }
-      end
+    if needs_to_recompute_grade? && saved_by != :migration
+      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
+      self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
     true
   end
@@ -2064,8 +2062,8 @@ class Assignment < ActiveRecord::Base
     submission.audit_grade_changes = false
 
     if opts[:provisional]
-      unless score.present? || submission.excused
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE unless opts[:grade] == ""
+      if !(score.present? || submission.excused) && opts[:grade] != ""
+        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
       end
 
       submission.find_or_create_provisional_grade!(
@@ -2155,9 +2153,9 @@ class Assignment < ActiveRecord::Base
       submissions: []
     }
 
-    if opts[:comment] && opts[:assessment_request]
+    if opts[:comment] && opts[:assessment_request] && !opts[:assessment_request].active_rubric_association?
       # if there is no rubric the peer review is complete with just a comment
-      opts[:assessment_request].complete unless opts[:assessment_request].active_rubric_association?
+      opts[:assessment_request].complete
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2734,15 +2732,13 @@ class Assignment < ActiveRecord::Base
         group_ids = peer_review_params[:submissions].select { |s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id }.map(&:id)
         candidate_set -= group_ids
       end
-    else
-      if discussion_topic? && discussion_topic.group_category_id
-        # only assign to other members in the group discussion
-        child_topic = discussion_topic.child_topic_for(current_submission.user)
-        if child_topic
-          other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
-          candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
-        end
+    elsif discussion_topic? && discussion_topic.group_category_id
+      child_topic = discussion_topic.child_topic_for(current_submission.user)
+      if child_topic
+        other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
+        candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
       end
+      # only assign to other members in the group discussion
     end
     candidate_set
   end
@@ -3166,13 +3162,11 @@ class Assignment < ActiveRecord::Base
   def att_frozen?(att, user = nil)
     return false unless frozen?
 
-    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer))
-      if Canvas::Plugin.value_to_boolean(settings[att.to_s])
-        if user
-          return !context.grants_right?(user, :manage_frozen_assignments)
-        else
-          return true
-        end
+    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer)) && Canvas::Plugin.value_to_boolean(settings[att.to_s])
+      if user
+        return !context.grants_right?(user, :manage_frozen_assignments)
+      else
+        return true
       end
     end
 
@@ -3862,11 +3856,9 @@ class Assignment < ActiveRecord::Base
 
   def due_date_ok?
     # lock_at OR unlock_at can be empty
-    if (unlock_at || lock_at) && due_at
-      unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
-        errors.add(:due_at, I18n.t("must be between availability dates"))
-        return false
-      end
+    if (unlock_at || lock_at) && due_at && !AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
+      errors.add(:due_at, I18n.t("must be between availability dates"))
+      return false
     end
     unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))

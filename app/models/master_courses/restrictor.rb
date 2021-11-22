@@ -91,8 +91,8 @@ module MasterCourses::Restrictor
       locked_columns = []
       self.class.base_class.restricted_column_settings.each do |type, columns|
         changed_columns = (changes.keys & columns)
-        if changed_columns.any?
-          locked_columns += changed_columns if child_content_restrictions[type]
+        if changed_columns.any? && child_content_restrictions[type]
+          locked_columns += changed_columns
         end
       end
       if locked_columns.any?

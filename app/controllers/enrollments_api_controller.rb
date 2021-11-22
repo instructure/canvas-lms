@@ -670,11 +670,10 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, api_user_id)
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
 
-    if @context.concluded?
-      # allow moving users already in the course to open sections
-      unless @section && user.enrollments.shard(@context.shard).where(course_id: @context).exists? && !@section.concluded?
-        return render_create_errors([@@errors[:concluded_course]])
-      end
+    # allow moving users already in the course to open sections
+    if @context.concluded? &&
+       !(@section && user.enrollments.shard(@context.shard).where(course_id: @context).exists? && !@section.concluded?)
+      return render_create_errors([@@errors[:concluded_course]])
     end
 
     params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].key?(:limit_privileges_to_course_section)
@@ -1005,10 +1004,8 @@ class EnrollmentsApiController < ApplicationController
 
   def check_sis_permissions(sis_context)
     sis_filters = %w[sis_account_id sis_course_id sis_section_id sis_user_id]
-    if (params.keys & sis_filters).present?
-      unless sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
-        return false
-      end
+    if (params.keys & sis_filters).present? && !sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
+      return false
     end
 
     true

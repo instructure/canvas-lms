@@ -59,9 +59,9 @@ module Qti
               return nil
             end
           end
-          if (item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value'))
+          if (item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value')) && /last/i.match?(item)
             # known possible values: Highest, First, Last (highest is instructure default)
-            @quiz[:which_attempt_to_keep] = "keep_latest" if /last/i.match?(item)
+            @quiz[:which_attempt_to_keep] = "keep_latest"
           end
           if (item = get_node_att(md, 'instructureField[name=max_score]', 'value'))
             @quiz[:points_possible] = item
@@ -170,8 +170,8 @@ module Qti
       group = nil
       questions_list = @quiz[:questions]
 
-      if (shuffle = get_node_att(section, 'ordering', 'shuffle'))
-        @quiz[:shuffle_answers] = true if /true/i.match?(shuffle)
+      if (shuffle = get_node_att(section, 'ordering', 'shuffle')) && /true/i.match?(shuffle)
+        @quiz[:shuffle_answers] = true
       end
       if (select = AssessmentTestConverter.parse_pick_count(section))
         group = { :questions => [], :pick_count => select, :question_type => 'question_group', :title => section['title'] }
@@ -197,11 +197,9 @@ module Qti
         group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
         questions_list = group[:questions]
       end
-      if section['visible'] && section['visible'] =~ /true/i
-        if (title = section['title'])
-          # Create an empty question with a title in it
-          @quiz[:questions] << { :question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id }
-        end
+      if section['visible'] && section['visible'] =~ /true/i && (title = section['title'])
+        # Create an empty question with a title in it
+        @quiz[:questions] << { :question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id }
       end
 
       section.children.each do |child|

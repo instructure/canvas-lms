@@ -726,11 +726,11 @@ class RoleOverridesController < ApplicationController
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin
           site_admin[:group_permissions] << hash if is_course_permission
-        else
-          account[:group_permissions] << hash if is_course_permission
+        elsif is_course_permission
+          account[:group_permissions] << hash
         end
-      else
-        course[:group_permissions] << hash if is_course_permission
+      elsif is_course_permission
+        course[:group_permissions] << hash
       end
     end
 

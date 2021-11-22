@@ -215,9 +215,9 @@ module Importers
       return if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
       return if migration.migration_type == "canvas_cartridge_importer" && hash[:title] && tool.name != hash[:title]
 
-      if preexisting_tool
+      if preexisting_tool && (((hash[:consumer_key] || 'fake') == 'fake') && ((hash[:shared_secret] || 'fake') == 'fake'))
         # we're matching to existing tools; go with their config if we don't have a real one
-        ignore_key_check = true if ((hash[:consumer_key] || 'fake') == 'fake') && ((hash[:shared_secret] || 'fake') == 'fake')
+        ignore_key_check = true
       end
       return unless ignore_key_check || (tool.consumer_key == (hash[:consumer_key] || 'fake') && tool.shared_secret == (hash[:shared_secret] || 'fake'))
 

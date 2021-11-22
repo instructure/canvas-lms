@@ -231,8 +231,8 @@ class Rubric < ActiveRecord::Base
                                    :purpose => purpose
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
     ra.updating_user = opts[:current_user]
-    if ra.save
-      association.mark_downstream_changes(["rubric"]) if association.is_a?(Assignment)
+    if ra.save && association.is_a?(Assignment)
+      association.mark_downstream_changes(["rubric"])
     end
     ra.updating_user = nil
     ra

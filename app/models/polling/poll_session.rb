@@ -76,11 +76,9 @@ module Polling
     private
 
     def section_belongs_to_course
-      if course && course_section
-        unless course.course_sections.include?(course_section)
-          errors.add(:base, I18n.t('polling.poll_sessions.validations.section_belongs_to_course',
-                                   'That course section does not belong to the existing course.'))
-        end
+      if course && course_section && !course.course_sections.include?(course_section)
+        errors.add(:base, I18n.t('polling.poll_sessions.validations.section_belongs_to_course',
+                                 'That course section does not belong to the existing course.'))
       end
     end
   end

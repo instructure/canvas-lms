@@ -499,12 +499,10 @@ class ContextModuleItemsApiController < ApplicationController
           else
             return render json: { message: "item can't be published" }, status: :unprocessable_entity
           end
+        elsif module_item_unpublishable?(@tag)
+          @tag.unpublish
         else
-          if module_item_unpublishable?(@tag)
-            @tag.unpublish
-          else
-            return render :json => { :message => "item can't be unpublished" }, :status => :forbidden
-          end
+          return render :json => { :message => "item can't be unpublished" }, :status => :forbidden
         end
         @tag.save
         @tag.update_asset_workflow_state!

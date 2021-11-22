@@ -108,19 +108,17 @@ module FilesCommon
       driver.find_elements(:name, 'permissions')[0].click
     elsif permission_type == :unpublish
       driver.find_elements(:name, 'permissions')[1].click
+    elsif restricted_access_option == :available_with_link
+      driver.find_elements(:name, 'permissions')[2].click
     else
-      if restricted_access_option == :available_with_link
-        driver.find_elements(:name, 'permissions')[2].click
-      else
-        driver.find_elements(:name, 'permissions')[3].click
-        ff('.ui-datepicker-trigger.btn')[0].click
-        fln("15").click
-        ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
-        wait_for_ajaximations
-        ff('.ui-datepicker-trigger.btn')[1].click
-        fln("25").click
-        ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar
-      end
+      driver.find_elements(:name, 'permissions')[3].click
+      ff('.ui-datepicker-trigger.btn')[0].click
+      fln("15").click
+      ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
+      wait_for_ajaximations
+      ff('.ui-datepicker-trigger.btn')[1].click
+      fln("25").click
+      ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar
     end
     ff('.btn.btn-primary')[1].click
     wait_for_ajaximations

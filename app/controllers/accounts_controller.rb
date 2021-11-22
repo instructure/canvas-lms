@@ -804,14 +804,12 @@ class AccountsController < ApplicationController
         end
       end
 
-      if params[:account][:services]
-        if authorized_action(@account, @current_user, :manage_account_settings)
-          params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
-            @account.set_service_availability(key, value_to_boolean(value))
-          end
-          includes << 'services'
-          params[:account].delete :services
+      if params[:account][:services] && authorized_action(@account, @current_user, :manage_account_settings)
+        params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
+          @account.set_service_availability(key, value_to_boolean(value))
         end
+        includes << 'services'
+        params[:account].delete :services
       end
 
       # Set default Dashboard View
@@ -1041,9 +1039,10 @@ class AccountsController < ApplicationController
         end
 
         # If the setting is present (update is called from 2 different settings forms, one for notifications)
-        if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
+        if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present? &&
+           params[:account][:settings][:outgoing_email_default_name_option] == 'default'
           # If set to default, remove the custom name so it doesn't get saved
-          params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
+          params[:account][:settings][:outgoing_email_default_name] = ''
         end
 
         if @account.grants_right?(@current_user, :manage_site_settings)
@@ -1079,11 +1078,10 @@ class AccountsController < ApplicationController
           end
         end
 
-        if params[:account][:settings]&.key?(:trusted_referers)
-          if (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
-             @account.root_account?
-            @account.trusted_referers = trusted_referers
-          end
+        if params[:account][:settings]&.key?(:trusted_referers) &&
+           (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
+           @account.root_account?
+          @account.trusted_referers = trusted_referers
         end
 
         # privacy settings
@@ -1099,14 +1097,10 @@ class AccountsController < ApplicationController
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
 
-        if (sis_id = params[:account].delete(:sis_source_id))
-          if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
-            @account.sis_source_id = if sis_id == ''
-                                       nil
-                                     else
-                                       sis_id
-                                     end
-          end
+        if (sis_id = params[:account].delete(:sis_source_id)) &&
+           !@account.root_account? && sis_id != @account.sis_source_id &&
+           @account.root_account.grants_right?(@current_user, session, :manage_sis)
+          @account.sis_source_id = sis_id.presence
         end
 
         @account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
@@ -1649,11 +1643,9 @@ class AccountsController < ApplicationController
   end
 
   def set_default_dashboard_view(new_view)
-    if new_view != @account.default_dashboard_view
-      if authorized_action(@account, @current_user, :manage_account_settings)
-        # NOTE: Only _sets_ the property. It's up to the caller to `save` it
-        @account.default_dashboard_view = new_view
-      end
+    if new_view != @account.default_dashboard_view && authorized_action(@account, @current_user, :manage_account_settings)
+      # NOTE: Only _sets_ the property. It's up to the caller to `save` it
+      @account.default_dashboard_view = new_view
     end
   end
 

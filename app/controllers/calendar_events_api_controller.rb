@@ -1464,11 +1464,10 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def check_for_past_signup(event)
-    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup)
-      unless event.context.grants_right?(@current_user, :manage)
-        render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
-        return false
-      end
+    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
+       !event.context.grants_right?(@current_user, :manage)
+      render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
+      return false
     end
     true
   end

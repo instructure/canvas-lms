@@ -494,13 +494,11 @@ module QuizzesHelper
         if (opt_tag = s.children.css("option[value='#{a}']").first)
           opt_tag["selected"] = "selected"
         end
-      else
+      elsif (opt_tag = s.children.css("option[value='#{a}']").first)
         # If existing answer is one of the options, replace it with a span
-        if (opt_tag = s.children.css("option[value='#{a}']").first)
-          span = doc.fragment("<span />").children.first
-          span.children = opt_tag.children
-          s.swap(span)
-        end
+        span = doc.fragment("<span />").children.first
+        span.children = opt_tag.children
+        s.swap(span)
       end
 
       s['aria-label'] = I18n.t("Multiple dropdowns, read surrounding text")
