@@ -287,6 +287,8 @@ Style/FloatDivision:
   Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/For:
   Severity: error
+Style/FormatStringToken:
+  Enabled: false # I18n requires template style, but ohter code uses annotated style, and there are some trivial unannotted that don't really need to be annotated
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/GlobalStdStream:
@@ -509,8 +511,6 @@ Style/BlockDelimiters: # TODO: autocorrect
     - spec/shared_examples/**/*.rb
   AutoCorrect: false
 Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
 Style/GuardClause: # TODO
   Enabled: false
