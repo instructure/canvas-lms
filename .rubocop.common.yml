@@ -351,6 +351,8 @@ Style/OneLineConditional:
   Severity: error
 Style/OrAssignment:
   Severity: error
+Style/ParallelAssignment:
+  Enabled: false # most uses are legitimate deconstruction or value swapping
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PercentLiteralDelimiters:
@@ -512,8 +514,6 @@ Style/HashSyntax:
 Style/Lambda: # TODO: autocorrect
   Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
-  Enabled: false
-Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
   Enabled: false
 Style/RescueModifier: # TODO
   Severity: warning
