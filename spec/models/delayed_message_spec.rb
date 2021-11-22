@@ -105,7 +105,7 @@ describe DelayedMessage do
     user = user_with_pseudonym(:account => account)
     expect(user.pseudonym.account).to eq account
     expect(SisPseudonym).to receive(:for).with(user, Account.default, type: :implicit, require_sis: false).and_return(user.pseudonym)
-    expect(HostUrl).to receive(:context_host).with(account).at_least(1).and_return("dm.dummy.test.host")
+    expect(HostUrl).to receive(:context_host).with(account, any_args).at_least(1).and_return("dm.dummy.test.host")
     allow(HostUrl).to receive(:default_host).and_return("test.host")
     user.communication_channel.confirm!
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
@@ -150,7 +150,7 @@ describe DelayedMessage do
         account = Account.create!(:name => 'new acct')
         user = user_with_pseudonym(:account => account)
         expect(user.pseudonym.account).to eq account
-        expect(HostUrl).to receive(:context_host).with(user.pseudonym.account).at_least(1).and_return("dm.dummy.test.host")
+        expect(HostUrl).to receive(:context_host).with(user.pseudonym.account, any_args).at_least(1).and_return("dm.dummy.test.host")
         allow(HostUrl).to receive(:default_host).and_return("test.host")
         @cc = user.communication_channel
         @cc.confirm!
