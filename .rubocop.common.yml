@@ -256,6 +256,8 @@ Style/Dir:
   Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/DoubleNegation:
+  Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
 Style/EmptyLambdaParameter:
   Severity: error
 Style/EachForSimpleLoop:
@@ -507,8 +509,6 @@ Style/BlockDelimiters: # TODO: autocorrect
     - spec/shared_examples/**/*.rb
   AutoCorrect: false
 Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
