@@ -39,7 +39,7 @@ describe SisBatch do
       else
         path = "#{tmpdir}/sisfile.zip"
         Zip::File.open(path, Zip::File::CREATE) do |z|
-          data.each do |dat|
+          Array(data).each do |dat|
             z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
             i += 1
           end
@@ -453,10 +453,10 @@ test_1,TC 101,Test Course 101,,term1,deleted
       @c3.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
-      process_csv_data([
-                         "course_id,short_name,long_name,account_id,term_id,status\n" +
-                         "another_course,not-delete,not deleted not changed,,term1,active"
-                       ])
+      process_csv_data(<<~CSV)
+        course_id,short_name,long_name,account_id,term_id,status
+        another_course,not-delete,not deleted not changed,,term1,active
+      CSV
       @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in

@@ -167,12 +167,12 @@ module CanvasKaltura
         :type => "2",
       }.merge(opts)
 
-      "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
-        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, '')}" +
-        "/width/#{opts[:width].to_i}" +
-        "/height/#{opts[:height].to_i}" +
-        "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, '')}" +
-        "/type/#{opts[:type].to_i}" +
+      "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" \
+        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, '')}" \
+        "/width/#{opts[:width].to_i}" \
+        "/height/#{opts[:height].to_i}" \
+        "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, '')}" \
+        "/type/#{opts[:type].to_i}" \
         "/vid_sec/#{opts[:vid_sec].to_i}"
     end
 
