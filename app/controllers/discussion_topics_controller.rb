@@ -580,7 +580,8 @@ class DiscussionTopicsController < ApplicationController
         manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
-      ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity)
+      ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity),
+      allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
