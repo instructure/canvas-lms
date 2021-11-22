@@ -1,6 +1,6 @@
 {
   "name": "tinymce-a11y-checker",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "An accessibility checker plugin for TinyMCE.",
   "main": "lib/plugin.js",
   "module": "lib/modules/plugin.js",
