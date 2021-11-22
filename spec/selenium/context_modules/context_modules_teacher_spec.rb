@@ -54,27 +54,27 @@ describe "context modules" do
       wait_for_ajaximations
     end
 
-    it "shows all module items", priority: "1", test_id: 126743 do
+    it "shows all module items", priority: "1" do
       module_with_two_items
       f(".expand_module_link").click
       wait_for_animations
       expect(f('.context_module .content')).to be_displayed
     end
 
-    it "expands/collapses module with 0 items", priority: "2", test_id: 126731 do
+    it "expands/collapses module with 0 items", priority: "2" do
       modules = create_modules(1, true)
       get "/courses/#{@course.id}/modules"
       f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
       expect(f('.icon-mini-arrow-down')).to be_displayed
     end
 
-    it "hides module items", priority: "1", test_id: 280415 do
+    it "hides module items", priority: "1" do
       module_with_two_items
       wait_for_animations
       expect(f('.context_module .content')).not_to be_displayed
     end
 
-    it "rearranges child objects in same module", priority: "1", test_id: 126733 do
+    it "rearranges child objects in same module", priority: "1" do
       modules = create_modules(1, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -91,7 +91,7 @@ describe "context modules" do
       expect(list_prior_drag[1]).to eq list_post_drag[0]
     end
 
-    it "rearranges child object to new module", priority: "1", test_id: 126734 do
+    it "rearranges child object to new module", priority: "1" do
       modules = create_modules(2, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1_mod1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -109,7 +109,7 @@ describe "context modules" do
       expect(f("#content")).not_to contain_css('#context_modules .context_module:last-child .context_module_items .context_module_item')
     end
 
-    it "deletes a module item", priority: "1", test_id: 126739 do
+    it "deletes a module item", priority: "1" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -120,7 +120,7 @@ describe "context modules" do
       expect(f('.context_module_items')).not_to include_text(@assignment.title)
     end
 
-    it "edits a module item and validate the changes stick", priority: "1", test_id: 126737 do
+    it "edits a module item and validate the changes stick", priority: "1" do
       get "/courses/#{@course.id}/modules"
 
       item_edit_text = "Assignment Edit 1"
@@ -205,7 +205,7 @@ describe "context modules" do
       expect(@ag2.assignments.first.title).to eq "New Quiz"
     end
 
-    it "adds a text header to a module", priority: "1", test_id: 126729 do
+    it "adds a text header to a module", priority: "1" do
       get "/courses/#{@course.id}/modules"
       header_text = 'new header text'
       add_module('Text Header Module')
@@ -219,7 +219,7 @@ describe "context modules" do
       expect(module_item).to include_text(header_text)
     end
 
-    it "always shows module contents on empty module", priority: "1", test_id: 126732 do
+    it "always shows module contents on empty module", priority: "1" do
       get "/courses/#{@course.id}/modules"
       add_module 'Test module'
       ff(".icon-mini-arrow-down")[0].click
@@ -238,7 +238,7 @@ describe "context modules" do
       expect(@assignment.reload.context_module_tags.size).to eq 2
     end
 
-    it "does not save an invalid external tool", priority: "1", test_id: 2624908 do
+    it "does not save an invalid external tool", priority: "1" do
       get "/courses/#{@course.id}/modules"
 
       add_module 'Test module'
@@ -250,7 +250,7 @@ describe "context modules" do
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
-    it "shows the added pre requisites in the header of a module", priority: "1", test_id: 250297 do
+    it "shows the added pre requisites in the header of a module", priority: "1" do
       add_modules_and_set_prerequisites
       get "/courses/#{@course.id}/modules"
       expect(f('.item-group-condensed:nth-of-type(3) .ig-header .prerequisites_message').text)
@@ -438,7 +438,7 @@ describe "context modules" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "publishes a file from the modules page", priority: "1", test_id: 126727 do
+    it "publishes a file from the modules page", priority: "1" do
       @module = @course.context_modules.create!(:name => "some module")
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
       @tag = @module.add_item({ :id => @file.id, :type => 'attachment' })
@@ -475,14 +475,14 @@ describe "context modules" do
       expect(f(".context_module_item.assignment .icon-publish")).to be_displayed
     end
 
-    it "adds a discussion item to a module", priority: "1", test_id: 126711 do
+    it "adds a discussion item to a module", priority: "1" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
       verify_persistence('New Discussion Title')
     end
 
-    it "adds an external url item to a module", priority: "1", test_id: 126707 do
+    it "adds an external url item to a module", priority: "1" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External URL', 'www.google.com', 'Google')
@@ -507,7 +507,7 @@ describe "context modules" do
       expect(f("#select_context_content_dialog")).to be_displayed
     end
 
-    it "adds an external tool item to a module", priority: "1", test_id: 2624909 do
+    it "adds an external tool item to a module", priority: "1" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')

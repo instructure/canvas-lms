@@ -152,7 +152,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'adds numbered lists', priority: '1', test_id: 307_625 do
+      it 'adds numbered lists', priority: '1' do
         rce_wysiwyg_state_setup(@course)
 
         click_list_toggle_button
@@ -163,7 +163,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'removes numbered lists', priority: '1', test_id: 537_619 do
+      it 'removes numbered lists', priority: '1' do
         text = '<ol><li>1</li><li>2</li><li>3</li></ol>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 

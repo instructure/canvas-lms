@@ -37,7 +37,7 @@ describe "speed grader - quiz submissions" do
     end
   end
 
-  it "links to the quiz history page when there are too many quiz submissions", priority: "2", test_id: 283742 do
+  it "links to the quiz history page when there are too many quiz submissions", priority: "2" do
     Setting.set("too_many_quiz_submission_versions", 2)
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     expect(f("#content")).not_to contain_css("#submission_to_view")
@@ -46,7 +46,7 @@ describe "speed grader - quiz submissions" do
     expect(uri.query).to eq "user_id=#{@student.id}"
   end
 
-  it "lets you view previous quiz submissions", priority: "1", test_id: 283743 do
+  it "lets you view previous quiz submissions", priority: "1" do
     skip_if_chrome('broken - needs research')
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
@@ -65,7 +65,7 @@ describe "speed grader - quiz submissions" do
     end
   end
 
-  it "hides student's name from quiz if hide student names is enabled", priority: "1", test_id: 283744 do
+  it "hides student's name from quiz if hide student names is enabled", priority: "1" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     Speedgrader.click_settings_link
@@ -78,7 +78,7 @@ describe "speed grader - quiz submissions" do
     end
   end
 
-  it "only displays 2 decimal points on a quiz submission", priority: "1", test_id: 283997 do
+  it "only displays 2 decimal points on a quiz submission", priority: "1" do
     # create our quiz and our multiple answers question
     @context = @course
     @q = quiz_model
@@ -113,7 +113,7 @@ describe "speed grader - quiz submissions" do
     end
   end
 
-  it "hides answers of anonymous graded quizzes", priority: "1", test_id: 283738 do
+  it "hides answers of anonymous graded quizzes", priority: "1" do
     @quiz.update_attribute(:anonymous_submissions, true)
     qs = @quiz.generate_submission(@student)
     qs.start_grading
@@ -122,7 +122,7 @@ describe "speed grader - quiz submissions" do
     expect(f('#this_student_has_a_submission')).to be_displayed
   end
 
-  it "updates quiz grade automatically when the update button is clicked", priority: "1", test_id: 283739 do
+  it "updates quiz grade automatically when the update button is clicked", priority: "1" do
     expected_points = "6"
     @quiz.quiz_questions.create!(
       quiz: @quiz,
@@ -163,7 +163,7 @@ describe "speed grader - quiz submissions" do
   end
 
   it "properly displays student quiz results when the teacher also " \
-     "has a student enrollment", priority: "2", test_id: 283740 do
+     "has a student enrollment", priority: "2" do
     @course.enroll_student(@teacher).accept!
 
     @quiz.quiz_questions.create!(quiz: @quiz, question_data: {
@@ -193,7 +193,7 @@ describe "speed grader - quiz submissions" do
     end
   end
 
-  it "includes fake student (Student View Student) submissions in 'X/Y Graded' text", priority: "2", test_id: 283991 do
+  it "includes fake student (Student View Student) submissions in 'X/Y Graded' text", priority: "2" do
     # TODO: this *should* be a quiz, since that's the submission type,
     # but that causes `TypeError: submissionHistory is null` in an ajax
     # callback, which usually causes this spec to hang and ultimately fail

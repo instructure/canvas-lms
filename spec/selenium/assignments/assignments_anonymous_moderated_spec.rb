@@ -30,7 +30,7 @@ describe 'Anonymous Moderated Marking' do
   end
 
   context 'with Anonymous Marking Flag' do
-    it 'Anonymous Grading option is displayed if Anonymous Marking Flag is ON', priority: '1', test_id: 3496269 do
+    it 'Anonymous Grading option is displayed if Anonymous Marking Flag is ON', priority: '1' do
       Account.default.enable_feature!(:anonymous_marking)
       user_session(@teacher)
       AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
@@ -48,7 +48,7 @@ describe 'Anonymous Moderated Marking' do
   end
 
   context 'with Moderated Marking Flag' do
-    it 'Moderated Grading option is displayed if Moderated Marking Flag is ON', priority: '1', test_id: 3496270 do
+    it 'Moderated Grading option is displayed if Moderated Marking Flag is ON', priority: '1' do
       Account.default.enable_feature!(:moderated_grading)
       user_session(@teacher)
       AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
@@ -86,11 +86,11 @@ describe 'Anonymous Moderated Marking' do
       SubmissionDetails.visit_as_student(@course.id, @anonymous_assignment.id, @student.id)
     end
 
-    it 'student can see add comment text box', priority: '1', test_id: 3513996 do
+    it 'student can see add comment text box', priority: '1' do
       expect(SubmissionDetails.add_comment_text_area).to be_displayed
     end
 
-    it 'student can leave comments on submission details page', priority: '1', test_id: 3513996 do
+    it 'student can leave comments on submission details page', priority: '1' do
       SubmissionDetails.submit_comment("Student submission details comment")
       refresh_page
       expect(SubmissionDetails.comments).to include_text 'Student submission details comment'
@@ -119,11 +119,11 @@ describe 'Anonymous Moderated Marking' do
       SubmissionDetails.visit_as_student(@course.id, @moderated_assignment.id, @student.id)
     end
 
-    it 'student can see add comment text box', priority: '1', test_id: 3513996 do
+    it 'student can see add comment text box', priority: '1' do
       expect(SubmissionDetails.add_comment_text_area).to be_displayed
     end
 
-    it 'student can leave comment on submission details page', priority: '1', test_id: 3513996 do
+    it 'student can leave comment on submission details page', priority: '1' do
       SubmissionDetails.submit_comment("Student submission details comment")
       refresh_page
       expect(SubmissionDetails.comments).to include_text 'Student submission details comment'

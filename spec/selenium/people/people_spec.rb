@@ -144,7 +144,7 @@ describe "people" do
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
     end
 
-    it "displays the option to remove a student from a course has a SIS ID", priority: "1", test_id: 336018 do
+    it "displays the option to remove a student from a course has a SIS ID", priority: "1" do
       @course.sis_source_id = 'xyz'
       @course.save
       enroll_student(@student_2)
@@ -160,7 +160,7 @@ describe "people" do
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_2.id}]")).to be true
     end
 
-    it "displays remove option for student with/without SIS id", priority: "1", test_id: 332576 do
+    it "displays remove option for student with/without SIS id", priority: "1" do
       enroll_student(@student_2)
       @student = user_with_managed_pseudonym
       @course.enroll_student(@student)
@@ -181,14 +181,14 @@ describe "people" do
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@test_ta.id}]")).to be true
     end
 
-    it "displays activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
+    it "displays activity report on clicking Student Interaction button", priority: "1" do
       get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       fln("Student Interactions Report").click
       expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
-    it "does not display Student Interaction button for a student", priority: "1", test_id: 244450 do
+    it "does not display Student Interaction button for a student", priority: "1" do
       user_session(@student_1)
       get "/courses/#{@course.id}/users"
       expect(f("#content")).not_to contain_link("Student Interactions Report")
@@ -509,7 +509,7 @@ describe "people" do
       expect(f('#peoplesearch_select_section').attribute('value')).to eq 'Unnamed Course'
     end
 
-    it "adds a student to a section", priority: "1", test_id: 296460 do
+    it "adds a student to a section", priority: "1" do
       student = create_user("student@example.com")
       enroll_student(student)
       get "/courses/#{@course.id}/users"
@@ -525,7 +525,7 @@ describe "people" do
       expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
 
-    it "removes a student from a section", priority: "1", test_id: 296461 do
+    it "removes a student from a section", priority: "1" do
       @student = user_factory
       @course.enroll_student(@student, allow_multiple_enrollments: true)
       @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
@@ -812,7 +812,7 @@ describe "people" do
         @enrollment = @course.enroll_student(@student, enrollment_state: :active)
       end
 
-      it "course people page should display student name in tray", priority: "1", test_id: 3022066 do
+      it "course people page should display student name in tray", priority: "1" do
         get("/courses/#{@course.id}/users")
         f("a[data-student_id='#{@student.id}']").click
         expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student@test.com")

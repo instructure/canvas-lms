@@ -37,7 +37,7 @@ describe 'unpublishing a quiz on the quiz show page' do
       create_quiz_with_due_date
     end
 
-    it 'performs all expected changes on the page', priority: "1", test_id: 401338 do
+    it 'performs all expected changes on the page', priority: "1" do
       skip('flaky test - fails in wait_for_ajaximations in line 29')
       unpublish_quiz_via_ui
 

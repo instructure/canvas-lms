@@ -65,7 +65,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for assignment", priority: "2", test_id: 3178864 do
+    it "shows sync history modal for assignment", priority: "2" do
       update_child_assignment(@minion, :points_possible, 8.0)
       update_master_assignment_and_migrate(@master, :points_possible, 15.0)
       open_sync_history
@@ -86,7 +86,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for discussions", priority: "2", test_id: 3179204 do
+    it "shows sync history modal for discussions", priority: "2" do
       update_child_discussion(@minion)
       update_master_discussion_and_migrate(@master)
       open_sync_history
@@ -107,7 +107,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history for availability dates exception in assignments", priority: "2", test_id: 3179204 do
+    it "shows sync history for availability dates exception in assignments", priority: "2" do
       update_child_assignment(@minion, :unlock_at, Time.zone.now + 1.day)
       update_master_assignment_and_migrate(@master, :unlock_at, Time.zone.now + 3.days)
       open_sync_history
@@ -128,7 +128,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for pages", priority: "2", test_id: 3179205 do
+    it "shows sync history modal for pages", priority: "2" do
       update_child_page(@minion)
       update_master_page_and_migrate(@master)
       open_sync_history
@@ -149,7 +149,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for quizzes", priority: "2", test_id: 3179206 do
+    it "shows sync history modal for quizzes", priority: "2" do
       update_child_quiz(@minion)
       update_master_quiz_and_migrate(@master)
       open_sync_history

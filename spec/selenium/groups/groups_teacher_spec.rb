@@ -30,7 +30,7 @@ describe "new groups" do
       course_with_teacher_logged_in
     end
 
-    it "allows teachers to add a group set", priority: "1", test_id: 94152 do
+    it "allows teachers to add a group set", priority: "1" do
       get "/courses/#{@course.id}/groups"
       click_add_group_set
       f('#new_category_name').send_keys("Test Group Set")
@@ -41,7 +41,7 @@ describe "new groups" do
       expect(fj('.collectionViewItems[role=tablist]>li:last-child').text).to match "Test Group Set"
     end
 
-    it "allows teachers to create groups within group sets", priority: "1", test_id: 94153 do
+    it "allows teachers to create groups within group sets", priority: "1" do
       seed_groups(1, 0)
 
       get "/courses/#{@course.id}/groups"
@@ -55,7 +55,7 @@ describe "new groups" do
       expect(fj('.collectionViewItems.unstyled.groups-list>li:last-child')).to include_text("Test Group")
     end
 
-    it "allows teachers to add a student to a group", priority: "1", test_id: 94155 do
+    it "allows teachers to add a student to a group", priority: "1" do
       # Creates one user, and one groupset with a group inside it
       group_test_setup(1, 1, 1)
 
@@ -76,7 +76,7 @@ describe "new groups" do
       expect(f('.group-user-name')).to include_text(@students.first.name)
     end
 
-    it "allows teachers to move a student to a different group", priority: "1", test_id: 94157 do
+    it "allows teachers to move a student to a different group", priority: "1" do
       # Creates 1 user, 1 groupset, and 2 groups within the groupset
       group_test_setup(1, 1, 2)
       # Add seeded student to first seeded group
@@ -113,7 +113,7 @@ describe "new groups" do
       expect(f('.group-user')).to include_text(@students.first.name)
     end
 
-    it "allows teachers to remove a student from a group", priority: "1", test_id: 94158 do
+    it "allows teachers to remove a student from a group", priority: "1" do
       group_test_setup
       add_user_to_group(@students.first, @testgroup[0])
 
@@ -135,7 +135,7 @@ describe "new groups" do
       expect(f('#sections_autocomplete_root').text).to eq ""
     end
 
-    it "allows teachers to make a student a group leader", priority: "1", test_id: 96021 do
+    it "allows teachers to make a student a group leader", priority: "1" do
       group_test_setup
       add_user_to_group(@students.first, @testgroup[0])
 
@@ -173,7 +173,7 @@ describe "new groups" do
       expect(@course).to eq Conversation.last.context
     end
 
-    it "allows a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
+    it "allows a teacher to set up a group set with member limits", priority: "1" do
       group_test_setup(3, 0, 0)
       get "/courses/#{@course.id}/groups"
 
@@ -188,7 +188,7 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
 
-    it "updates student count when they're added to groups limited by group set", priority: "1", test_id: 94162 do
+    it "updates student count when they're added to groups limited by group set", priority: "1" do
       seed_students(3)
       @category = create_category(has_max_membership: true, member_limit: 3)
       @group = @course.groups.create!(name: "test group", group_category: @category)
@@ -210,7 +210,7 @@ describe "new groups" do
       manually_fill_limited_group("2", 2)
     end
 
-    it "allows a teacher to set up a group with member limits", priority: "1", test_id: 94161 do
+    it "allows a teacher to set up a group with member limits", priority: "1" do
       group_test_setup(3, 1, 0)
       get "/courses/#{@course.id}/groups"
 
@@ -218,7 +218,7 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
 
-    it "Allows teacher to join students to groups in unpublished courses", priority: "1", test_id: 245957 do
+    it "Allows teacher to join students to groups in unpublished courses", priority: "1" do
       group_test_setup(3, 1, 2)
       @course.workflow_state = 'unpublished'
       @course.save!
@@ -252,7 +252,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
     end
 
-    it "updates student count when they're added to groups limited by group", priority: "1", test_id: 94167 do
+    it "updates student count when they're added to groups limited by group", priority: "1" do
       group_test_setup(3, 1, 0)
       create_group(group_category: @group_category.first, has_max_membership: true, member_limit: 2)
       get "/courses/#{@course.id}/groups"
@@ -261,7 +261,7 @@ describe "new groups" do
       manually_fill_limited_group("2", 2)
     end
 
-    it "shows the FULL icon moving from one group to the next", priority: "1", test_id: 94163 do
+    it "shows the FULL icon moving from one group to the next", priority: "1" do
       group_test_setup(4, 1, 2)
       @group_category.first.update_attribute(:group_limit, 2)
 
@@ -299,7 +299,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full")).to be_displayed
     end
 
-    it "removes a student from a group and update the group status", priority: "1", test_id: 94165 do
+    it "removes a student from a group and update the group status", priority: "1" do
       group_test_setup(4, 1, 2)
       @group_category.first.update_attribute(:group_limit, 2)
 
@@ -329,7 +329,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value('display')).to eq 'none'
     end
 
-    it 'moves group leader', priority: "1", test_id: 96023 do
+    it 'moves group leader', priority: "1" do
       group_test_setup(4, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|
@@ -353,7 +353,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
     end
 
-    it 'moves non-leader', priority: "1", test_id: 96024 do
+    it 'moves non-leader', priority: "1" do
       skip_if_chrome('research')
       group_test_setup(4, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, true)
@@ -386,7 +386,7 @@ describe "new groups" do
       expect(f("#content")).not_to contain_css(".group[data-id=\"#{@testgroup[1].id}\"] .group-leader")
     end
 
-    it 'removes group leader', priority: "1", test_id: 96025 do
+    it 'removes group leader', priority: "1" do
       group_test_setup(4, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|
@@ -417,7 +417,7 @@ describe "new groups" do
       expect(f("#content")).not_to contain_css('.row-fluid .group-leader')
     end
 
-    it "splits students into groups automatically", priority: "1", test_id: 163990 do
+    it "splits students into groups automatically", priority: "1" do
       seed_students(4)
 
       get "/courses/#{@course.id}/groups"
@@ -438,7 +438,7 @@ describe "new groups" do
       expect(ffj('.group-name:visible').size).to eq 2
     end
 
-    it 'respects individual group member limits when randomly assigning', priority: "1", test_id: 134767 do
+    it 'respects individual group member limits when randomly assigning', priority: "1" do
       group_test_setup(16, 1, 2)
       @testgroup.first.update_attribute(:max_membership, 7)
       get "/courses/#{@course.id}/groups"
@@ -463,7 +463,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full").css_value('display')).to eq 'none'
     end
 
-    it 'creates a group with a given name and limit', priority: "2", test_id: 94166 do
+    it 'creates a group with a given name and limit', priority: "2" do
       skip("broken qa-729")
       group_test_setup(5, 1, 1)
       3.times do |n|
@@ -498,7 +498,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[2].id}\"] .group-name")).to include_text('Test Group 3')
     end
 
-    it 'adds students via drag and drop', priority: "1", test_id: 94154 do
+    it 'adds students via drag and drop', priority: "1" do
       group_test_setup(2, 1, 2)
       get "/courses/#{@course.id}/groups"
 
@@ -521,7 +521,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
     end
 
-    it 'moves student using drag and drop', priority: "1", test_id: 94156 do
+    it 'moves student using drag and drop', priority: "1" do
       group_test_setup(2, 1, 2)
       add_user_to_group(@students[0], @testgroup.first, false)
       add_user_to_group(@students[1], @testgroup.last, false)
@@ -548,7 +548,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('0 students')
     end
 
-    it 'removes student using drag and drop', priority: "1", test_id: 94159 do
+    it 'removes student using drag and drop', priority: "1" do
       group_test_setup(1, 1, 1)
       add_user_to_group(@students[0], @testgroup.first, false)
 
@@ -571,7 +571,7 @@ describe "new groups" do
       expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
     end
 
-    it 'changes group limit status with student drag and drop', priority: "1", test_id: 94164 do
+    it 'changes group limit status with student drag and drop', priority: "1" do
       group_test_setup(5, 1, 1)
       @group_category.first.update_attribute(:group_limit, 5)
       5.times do |n|
@@ -599,7 +599,7 @@ describe "new groups" do
       expect(fj(drop_target1)).to include_text('Test Student 3')
     end
 
-    it 'moves leader via drag and drop', priority: "1", test_id: 96022 do
+    it 'moves leader via drag and drop', priority: "1" do
       group_test_setup(5, 1, 2)
       2.times do |n|
         add_user_to_group(@students[n], @testgroup.first, false)

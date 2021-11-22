@@ -165,7 +165,7 @@ describe "instfs file uploads" do
       enable_instfs
     end
 
-    it "uploads a file to instfs on the files page", priority: "1", test_id: 3399288 do
+    it "uploads a file to instfs on the files page", priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/files"
       wait_for_ajaximations
@@ -176,7 +176,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "displays a thumbnail from instfs", priority: "1", test_id: 3399295 do
+    it "displays a thumbnail from instfs", priority: "1" do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
@@ -189,7 +189,7 @@ describe "instfs file uploads" do
       expect(downloaded_file.size).to be > 0
     end
 
-    it "downloads an instfs file with instfs disabled", priority: "1", test_id: 3399305 do
+    it "downloads an instfs file with instfs disabled", priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
       get "/files"
@@ -203,7 +203,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "uploads a file to instfs with content exports", priority: "1", test_id: 3399292 do
+    it "uploads a file to instfs with content exports", priority: "1" do
       get "/courses/#{@course.id}/content_exports"
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
@@ -226,7 +226,7 @@ describe "instfs file uploads" do
       @ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_upload" })
     end
 
-    it 'allows the teacher to see the uploaded file on speedgrader', priority: "1", test_id: 3399286 do
+    it 'allows the teacher to see the uploaded file on speedgrader', priority: "1" do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
@@ -240,7 +240,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "allows Rich Content Editor to access InstFS files", priority: "1", test_id: 3399287 do
+    it "allows Rich Content Editor to access InstFS files", priority: "1" do
       course_folder = Folder.root_folders(@course).first
       filename = "test_image.jpg"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
@@ -256,7 +256,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "uploads course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1", test_id: 3455114 do
+    it "uploads course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/courses/#{@course.id}/settings"
       wait_for_ajaximations
@@ -268,7 +268,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'allows the teacher to see the uploaded file on submissions page', priority: "1", test_id: 3399291 do
+    it 'allows the teacher to see the uploaded file on submissions page', priority: "1" do
       filename = "test_image.jpg"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
@@ -288,7 +288,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "displays an attached instfs file in a discussion for the student", priority: "1", test_id: 3455116 do
+    it "displays an attached instfs file in a discussion for the student", priority: "1" do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       discussion = @course.discussion_topics.create!(user: @teacher, title: 'cool stuff', message: 'cool message')
@@ -314,7 +314,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'uploads submission discussion files to instfs', priority: "1", test_id: 3399302 do
+    it 'uploads submission discussion files to instfs', priority: "1" do
       ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_text_entry" })
       ass.submit_homework(@student, submission_type: 'online_text_entry', body: "so cool")
       user_logged_in(:user => @student)
@@ -338,7 +338,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'allows the teacher to see the uploaded file on a quiz submission', priority: "1", test_id: 3399299 do
+    it 'allows the teacher to see the uploaded file on a quiz submission', priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "files/instructure.png")
       quiz = @course.quizzes.create
       quiz.workflow_state = "available"
@@ -374,7 +374,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'displays instfs images on course modules', priority: "1", test_id: 3455117 do
+    it 'displays instfs images on course modules', priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       get "/courses/#{@course.id}/modules"
       wait_for_ajaximations
@@ -404,7 +404,7 @@ describe "instfs file uploads" do
       enable_instfs
     end
 
-    it "uploads avatar images to instfs", priority: "1", test_id: 3455115 do
+    it "uploads avatar images to instfs", priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       Account.default.enable_service(:avatars)
       Account.default.save!

@@ -28,7 +28,7 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  it "allows creating through index", priority: "2", test_id: 209971 do
+  it "allows creating through index", priority: "2" do
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
     # create assignment
@@ -47,7 +47,7 @@ describe "external tool assignments" do
     expect(a.submission_types).to eq 'external_tool'
   end
 
-  it "allows creating through the 'More Options' link", priority: "2", test_id: 209973 do
+  it "allows creating through the 'More Options' link", priority: "2" do
     get "/courses/#{@course.id}/assignments"
 
     # create assignment
@@ -82,7 +82,7 @@ describe "external tool assignments" do
     expect(a.external_tool_tag.new_tab).to be_falsey
   end
 
-  it "allows editing", priority: "2", test_id: 209974 do
+  it "allows editing", priority: "2" do
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')

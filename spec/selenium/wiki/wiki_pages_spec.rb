@@ -39,7 +39,7 @@ describe "Wiki Pages" do
       course_with_teacher_logged_in :account => @account
     end
 
-    it "navigates to pages tab with no front page set", priority: "1", test_id: 126843 do
+    it "navigates to pages tab with no front page set", priority: "1" do
       @course.wiki_pages.create!(title: 'Page1')
       @course.wiki_pages.create!(title: 'Page2')
       get "/courses/#{@course.id}"
@@ -51,7 +51,7 @@ describe "Wiki Pages" do
       expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
     end
 
-    it "navigates to front page when set", priority: "1", test_id: 126844 do
+    it "navigates to front page when set", priority: "1" do
       front = @course.wiki_pages.create!(title: 'Front')
       front.set_as_front_page!
       front.save!
@@ -65,7 +65,7 @@ describe "Wiki Pages" do
       expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
     end
 
-    it "has correct front page UI elements when set as home page", priority: "1", test_id: 126848 do
+    it "has correct front page UI elements when set as home page", priority: "1" do
       front = @course.wiki_pages.create!(title: 'Front')
       front.set_as_front_page!
       @course.update_attribute :default_view, "wiki"
@@ -92,12 +92,12 @@ describe "Wiki Pages" do
       keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
 
-    it "alerts a teacher when accessing a non-existant page", priority: "1", test_id: 126842 do
+    it "alerts a teacher when accessing a non-existant page", priority: "1" do
       get "/courses/#{@course.id}/pages/fake"
       expect_flash_message :info
     end
 
-    it "updates with changes made in other window", priority: "1", test_id: 126833, custom_timeout: 40.seconds do
+    it "updates with changes made in other window", priority: "1", custom_timeout: 40.seconds do
       @course.wiki_pages.create!(title: 'Page1')
       edit_page('this is')
       driver.execute_script("window.open()")
@@ -111,14 +111,14 @@ describe "Wiki Pages" do
       end
     end
 
-    it "blocks linked page from redirecting parent page", priority: "2", test_id: 927147 do
+    it "blocks linked page from redirecting parent page", priority: "2" do
       @course.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
                                  body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
       get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
       expect(f('#click_here_now').attribute("rel")).to eq "noreferrer noopener"
     end
 
-    it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
+    it "does not mark valid links as invalid", priority: "2" do
       Setting.set('link_validator_poll_timeout', 100)
       Setting.set('link_validator_poll_timeout_initial', 100)
 
@@ -137,7 +137,7 @@ describe "Wiki Pages" do
       course_with_teacher_logged_in
     end
 
-    it "edits page title from pages index", priority: "1", test_id: 126849 do
+    it "edits page title from pages index", priority: "1" do
       @course.wiki_pages.create!(title: 'B-Team')
       get "/courses/#{@course.id}/pages"
       f('tbody .al-trigger').click
@@ -149,7 +149,7 @@ describe "Wiki Pages" do
       expect(f('.collectionViewItems')).to include_text('A-Team')
     end
 
-    it "displays a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
+    it "displays a warning alert when accessing a deleted page", priority: "1" do
       @course.wiki_pages.create!(title: 'deleted')
       get "/courses/#{@course.id}/pages"
       f('tbody .al-trigger').click
@@ -166,7 +166,7 @@ describe "Wiki Pages" do
       course_with_student_logged_in
     end
 
-    it "displays a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
+    it "displays a warning alert to a student when accessing a deleted page", priority: "1" do
       page = @course.wiki_pages.create!(title: 'delete_deux')
       # sets the workflow_state = deleted to act as a deleted page
       page.workflow_state = 'deleted'
@@ -175,7 +175,7 @@ describe "Wiki Pages" do
       expect_flash_message :warning
     end
 
-    it "displays a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
+    it "displays a warning alert when accessing a non-existant page", priority: "1" do
       get "/courses/#{@course.id}/pages/non-existant"
       expect_flash_message :warning
     end
@@ -187,7 +187,7 @@ describe "Wiki Pages" do
       course_with_student_logged_in account: @account
     end
 
-    it "locks page based on module date", priority: "1", test_id: 126845 do
+    it "locks page based on module date", priority: "1" do
       locked = @course.wiki_pages.create! title: 'locked'
       mod2 = @course.context_modules.create! name: 'mod2', unlock_at: 1.day.from_now
       mod2.add_item id: locked.id, type: 'wiki_page'
@@ -201,7 +201,7 @@ describe "Wiki Pages" do
       expect(lock_explanation).to include 'The following requirements need to be completed before this page will be unlocked:'
     end
 
-    it "locks page based on module progression", priority: "1", test_id: 126846 do
+    it "locks page based on module progression", priority: "1" do
       foo = @course.wiki_pages.create! title: 'foo'
       bar = @course.wiki_pages.create! title: 'bar'
       mod = @course.context_modules.create! name: 'the_mod', require_sequential_progress: true
@@ -234,7 +234,7 @@ describe "Wiki Pages" do
       course_with_teacher
     end
 
-    it "displays public content to unregistered users", priority: "1", test_id: 270035 do
+    it "displays public content to unregistered users", priority: "1" do
       Canvas::Plugin.register(:kaltura, nil, :settings => { 'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1' })
 
       @course.is_public = true
@@ -290,7 +290,7 @@ describe "Wiki Pages" do
   context "when a public course is accessed" do
     include_context "public course as a logged out user"
 
-    it "displays wiki content", priority: "1", test_id: 270035 do
+    it "displays wiki content", priority: "1" do
       @coures = public_course
       title = "foo"
       public_course.wiki_pages.create!(:title => title, :body => "bar")
@@ -306,7 +306,7 @@ describe "Wiki Pages" do
       @course.wiki_pages.create!(title: 'Page1')
     end
 
-    it "embeds vimeo video in the page", priority: "1", test_id: 126835 do
+    it "embeds vimeo video in the page", priority: "1" do
       get "/courses/#{@course.id}/pages/Page1/edit"
       switch_editor_views
       switch_to_raw_html_editor

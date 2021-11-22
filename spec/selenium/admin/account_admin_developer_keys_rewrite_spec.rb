@@ -47,7 +47,7 @@ describe 'Developer Keys' do
       )
     end
 
-    it "allows creation through 'add developer key button'", test_id: 344077 do
+    it "allows creation through 'add developer key button'" do
       get "/accounts/#{Account.default.id}/developer_keys"
 
       find_button("Developer Key").click
@@ -68,7 +68,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/delete.png"
     end
 
-    it "allows update through 'edit this key button'", test_id: 344078 do
+    it "allows update through 'edit this key button'" do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
       click_edit_icon
@@ -90,7 +90,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it 'allows editing of developer key', test_id: 3469351 do
+    it 'allows editing of developer key' do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -113,7 +113,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it "allows deletion through 'delete this key button'", test_id: 344079 do
+    it "allows deletion through 'delete this key button'" do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -124,7 +124,7 @@ describe 'Developer Keys' do
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
-    it "allows for pagination on account tab", test_id: 344532 do
+    it "allows for pagination on account tab" do
       11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
       get "/accounts/#{Account.default.id}/developer_keys"
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(10)
@@ -132,7 +132,7 @@ describe 'Developer Keys' do
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
-    it "allows for pagination on inherited tab", test_id: 344532 do
+    it "allows for pagination on inherited tab" do
       site_admin_logged_in
       11.times { |i| DeveloperKey.create!(name: "tool #{i}") }
       DeveloperKey.all.each { |key| key.update(visible: true) }
@@ -143,7 +143,7 @@ describe 'Developer Keys' do
       expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
     end
 
-    it "renders the key not visible by default upon creation", test_id: 3485785 do
+    it "renders the key not visible by default upon creation" do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
@@ -151,7 +151,7 @@ describe 'Developer Keys' do
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
-    it "renders the key visible", test_id: 3485785 do
+    it "renders the key visible" do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
@@ -161,13 +161,13 @@ describe 'Developer Keys' do
     end
 
     context "Account Binding" do
-      it "creates an account binding with default workflow_state 'off'", test_id: 3482823 do
+      it "creates an account binding with default workflow_state 'off'" do
         site_admin_developer_key
         expect(DeveloperKeyAccountBinding.last.workflow_state).to eq 'off'
         expect(DeveloperKeyAccountBinding.last.account_id).to eq Account.site_admin.id
       end
 
-      it "site admin dev key is visible and set to 'off' in root account", test_id: 3482823 do
+      it "site admin dev key is visible and set to 'off' in root account" do
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
@@ -175,7 +175,7 @@ describe 'Developer Keys' do
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
-      it "root account inherits 'on' binding workflow state from site admin key", test_id: 3482823 do
+      it "root account inherits 'on' binding workflow state from site admin key" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
@@ -186,7 +186,7 @@ describe 'Developer Keys' do
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
       end
 
-      it "root account inherits 'off' binding workflow state from site admin key", test_id: 3482823 do
+      it "root account inherits 'off' binding workflow state from site admin key" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
@@ -198,7 +198,7 @@ describe 'Developer Keys' do
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
-      it "root account keeps self binding workflow state if site admin key state is 'allow'", test_id: 3482823 do
+      it "root account keeps self binding workflow state if site admin key state is 'allow'" do
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
@@ -216,7 +216,7 @@ describe 'Developer Keys' do
         expect(fj("fieldset:last")).not_to have_attribute('aria-disabled')
       end
 
-      it "allows for root account dev key status 'on'", test_id: 3482823 do
+      it "allows for root account dev key status 'on'" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
@@ -224,7 +224,7 @@ describe 'Developer Keys' do
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'on'
       end
 
-      it "allows for root account dev key status 'off'", test_id: 3482823 do
+      it "allows for root account dev key status 'off'" do
         root_developer_key
         DeveloperKeyAccountBinding.last.update(workflow_state: 'on')
         get "/accounts/#{Account.default.id}/developer_keys"
@@ -233,7 +233,7 @@ describe 'Developer Keys' do
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq 'off'
       end
 
-      it "persists state when switching between account and inheritance tabs", test_id: 3488599 do
+      it "persists state when switching between account and inheritance tabs" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
@@ -242,7 +242,7 @@ describe 'Developer Keys' do
         expect(f("table[data-automation='devKeyAdminTable'] input[value='on']").attribute('tabindex')).to eq "0"
       end
 
-      it "persists state when switching between inheritance and account tabs", test_id: 3488600 do
+      it "persists state when switching between inheritance and account tabs" do
         site_admin_developer_key
         DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
         DeveloperKeyAccountBinding.first.update(workflow_state: 'allow')

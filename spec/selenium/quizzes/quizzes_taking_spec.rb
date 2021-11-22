@@ -102,9 +102,9 @@ describe 'quiz taking' do
     expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
   end
 
-  it 'should not restrict whitelisted ip addresses', priority: '1', test_id: 338_082
+  it 'should not restrict whitelisted ip addresses', priority: '1'
 
-  it 'accounts for question group settings', priority: '1', test_id: 140_591 do
+  it 'accounts for question group settings', priority: '1' do
     skip_if_chrome('research')
     quiz = quiz_model
     bank = AssessmentQuestionBank.create!(context: @course)

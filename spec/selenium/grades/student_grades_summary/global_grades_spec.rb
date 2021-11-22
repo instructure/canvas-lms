@@ -133,7 +133,7 @@ describe 'Global Grades' do
       GlobalGrades.visit
     end
 
-    it 'goes to student grades page', priority: "1", test_id: 3491485 do
+    it 'goes to student grades page', priority: "1" do
       # grab score to compare
       course_score = GlobalGrades.get_score_for_course(@course_with_gp)
       # find link for Second Course and click
@@ -145,13 +145,13 @@ describe 'Global Grades' do
       expect(StudentGradesPage.final_grade.text.strip).to eq(course_score)
     end
 
-    it 'show score for grading period', priority: "1", test_id: 3501070 do
+    it 'show score for grading period', priority: "1" do
       GlobalGrades.select_grading_period(@course_with_gp, "old grading period")
       # verify course grade
       expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq(grade_old_gp.round(2))
     end
 
-    it 'show score for course without grading periods', priority: "1", test_id: 3501470 do
+    it 'show score for course without grading periods', priority: "1" do
       expect(GlobalGrades.get_score_for_course_no_percent(@course_no_gp)).to eq(grade_total_no_gp.round(2))
     end
   end
@@ -164,7 +164,7 @@ describe 'Global Grades' do
       GlobalGrades.visit
     end
 
-    it 'has grades table with courses', priority: "1", test_id: 3500053 do
+    it 'has grades table with courses', priority: "1" do
       expect(GlobalGrades.course_details).to include_text(@course_no_gp.name)
       expect(GlobalGrades.course_details).to include_text(@course_with_gp.name)
     end
@@ -180,7 +180,7 @@ describe 'Global Grades' do
       expect(GlobalGrades.report(@course_with_gp)).to contain_link("Student Interactions Report")
     end
 
-    it 'goes to gradebook page', priority: "1", test_id: 3494790 do
+    it 'goes to gradebook page', priority: "1" do
       # find link for Second Course and click
       wait_for_new_page_load { GlobalGrades.click_course_link(@course_with_gp) }
 
@@ -190,7 +190,7 @@ describe 'Global Grades' do
       expect(Gradebook::Cells.get_total_grade(@student)).to eq("#{grade_current_gp.round(2)}%")
     end
 
-    it 'goes to student interactions report', priority: "1", test_id: 3500433 do
+    it 'goes to student interactions report', priority: "1" do
       wait_for_new_page_load { GlobalGrades.click_report_link(@course_with_gp) }
 
       expect(StudentInteractionsReport.report).to be_displayed

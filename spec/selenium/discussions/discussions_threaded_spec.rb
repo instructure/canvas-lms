@@ -59,7 +59,7 @@ describe "threaded discussions" do
       expect(f("iframe[src='https://example.com']")).to be_present
     end
 
-    it "allows edits to entries with replies", priority: "2", test_id: 222520 do
+    it "allows edits to entries with replies", priority: "2" do
       edit_text = 'edit message'
       entry = @topic.discussion_entries.create!(
         user: @student,
@@ -75,7 +75,7 @@ describe "threaded discussions" do
       expect(entry.reload.message).to match(edit_text)
     end
 
-    it "does not allow edits for a concluded student", priority: "2", test_id: 222526 do
+    it "does not allow edits for a concluded student", priority: "2" do
       student_enrollment = course_with_student(
         :course => @course,
         :user => @student,
@@ -95,7 +95,7 @@ describe "threaded discussions" do
       expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
     end
 
-    it "does not allow deletes for a concluded student", priority: "2", test_id: 222526 do
+    it "does not allow deletes for a concluded student", priority: "2" do
       student_enrollment = course_with_student(
         :course => @course,
         :user => @student,
@@ -115,7 +115,7 @@ describe "threaded discussions" do
       expect(fj('.al-options:visible').text).to include("Delete (Disabled)")
     end
 
-    it "allows edits to discussion with replies", priority: "1", test_id: 150513 do
+    it "allows edits to discussion with replies", priority: "1" do
       reply_depth = 3
       reply_depth.times { |i|
         @topic.discussion_entries.create!(user: @student,
@@ -128,7 +128,7 @@ describe "threaded discussions" do
       expect(get_all_replies.count).to eq 3
     end
 
-    it "does not allow students to edit replies to a locked topic", priority: "1", test_id: 222521 do
+    it "does not allow students to edit replies to a locked topic", priority: "1" do
       user_session(@student)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       @topic.lock!
@@ -141,7 +141,7 @@ describe "threaded discussions" do
       expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
     end
 
-    it "shows a reply time that is different from the creation time", priority: "2", test_id: 113813 do
+    it "shows a reply time that is different from the creation time", priority: "2" do
       @enrollment.workflow_state = 'active'
       @enrollment.save!
 
@@ -170,14 +170,14 @@ describe "threaded discussions" do
       expect(replied_at).not_to eql(edited_at)
     end
 
-    it "deletes a reply", priority: "1", test_id: 150515 do
+    it "deletes a reply", priority: "1" do
       skip_if_safari(:alert)
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
       delete_entry(entry)
     end
 
-    it "displays editor name and timestamp after edit", priority: "2", test_id: 222522 do
+    it "displays editor name and timestamp after edit", priority: "2" do
       skip_if_chrome('needs research: passes locally fails on Jenkins ')
       edit_text = 'edit message'
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
@@ -187,7 +187,7 @@ describe "threaded discussions" do
       expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
     end
 
-    it "supports repeated editing", priority: "2", test_id: 222523 do
+    it "supports repeated editing", priority: "2" do
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
       edit_entry(entry, 'New text 1')
@@ -198,7 +198,7 @@ describe "threaded discussions" do
       expect(entry.message).to match 'New text 2'
     end
 
-    it "re-renders replies after editing", priority: "2", test_id: 222524 do
+    it "re-renders replies after editing", priority: "2" do
       edit_text = 'edit message'
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 
@@ -215,7 +215,7 @@ describe "threaded discussions" do
       expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy
     end
 
-    it "displays editor name and timestamp after delete", priority: "2", test_id: 222525 do
+    it "displays editor name and timestamp after delete", priority: "2" do
       entry_text = 'new entry'
       Discussion.visit(@course, @topic)
 
@@ -231,7 +231,7 @@ describe "threaded discussions" do
         @account = Account.default
       end
 
-      it "discussion page should display student name in tray", priority: "1", test_id: 3022069 do
+      it "discussion page should display student name in tray", priority: "1" do
         topic = @course.discussion_topics.create!(
           user: @teacher,
           title: 'Non threaded discussion',

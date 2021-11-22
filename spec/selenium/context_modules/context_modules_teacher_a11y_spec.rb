@@ -58,7 +58,7 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "creates a new module using enter key", priority: "2", test_id: 126705 do
+    it "creates a new module using enter key", priority: "2" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")

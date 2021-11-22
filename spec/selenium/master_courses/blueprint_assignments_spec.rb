@@ -56,7 +56,7 @@ describe "blueprint courses assignments" do
       user_session(@master_teacher)
     end
 
-    it "can lock down associated course's assignment fields", priority: "1", test_id: 3127590 do
+    it "can lock down associated course's assignment fields", priority: "1" do
       change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f('.bpc-lock-toggle button').click

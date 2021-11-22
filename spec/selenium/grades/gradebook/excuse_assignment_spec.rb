@@ -42,26 +42,26 @@ describe 'Excuse an Assignment' do
       user_session @student
     end
 
-    it 'Assignment index displays scores as excused', priority: "1", test_id: 246616 do
+    it 'Assignment index displays scores as excused', priority: "1" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
       expect(f('[id^="assignment_"] span.non-screenreader').text).to eq 'Excused'
     end
 
-    it 'Assignment details displays scores as excused', priority: "1", test_id: 201937 do
+    it 'Assignment details displays scores as excused', priority: "1" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations
       expect(f('#sidebar_content .details .header').text).to eq 'Excused!'
     end
 
-    it 'Submission details displays scores as excused', priority: "1", test_id: 246617 do
+    it 'Submission details displays scores as excused', priority: "1" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       wait_for_ajaximations
       expect(f('#content span.entered_grade').text).to eq 'Excused'
     end
   end
 
-  it 'Gradebook export accounts for excused assignment', priority: "1", test_id: 209242 do
+  it 'Gradebook export accounts for excused assignment', priority: "1" do
     assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
     assignment.grade_student @student, excuse: true, grader: @teacher
 
@@ -70,7 +70,7 @@ describe 'Excuse an Assignment' do
     expect(score).to eq 'EX'
   end
 
-  it 'Gradebook import accounts for excused assignment', priority: "1", test_id: 223509 do
+  it 'Gradebook import accounts for excused assignment', priority: "1" do
     skip_if_chrome('fragile upload process')
     @course.assignments.create! title: 'Excuse Me', points_possible: 20
     rows = ['Student Name,ID,Section,Excuse Me',
@@ -111,7 +111,7 @@ describe 'Excuse an Assignment' do
   end
 
   context 'SpeedGrader' do
-    it 'can excuse complete/incomplete assignments', priority: "1", test_id: 209315 do
+    it 'can excuse complete/incomplete assignments', priority: "1" do
       assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20, grading_type: 'pass_fail'
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
@@ -122,7 +122,7 @@ describe 'Excuse an Assignment' do
       expect(Gradebook::Cells.grading_cell(@course.students[0], assignment)).to contain_css(".excused")
     end
 
-    it 'excuses an assignment properly', priority: "1", test_id: 201949 do
+    it 'excuses an assignment properly', priority: "1" do
       a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
       a2 = @course.assignments.create! title: 'Don\'t Excuse Me', points_possible: 10
       a1.grade_student(@student, grade: 20, grader: @teacher)
@@ -142,7 +142,7 @@ describe 'Excuse an Assignment' do
       expect(Gradebook::Cells.get_total_grade(@student)).to eq "100%"
     end
 
-    it 'indicates excused assignment as graded', priority: "1", test_id: 209316 do
+    it 'indicates excused assignment as graded', priority: "1" do
       assignment = @course.assignments.build
       assignment.publish
 
@@ -305,7 +305,7 @@ describe 'Excuse an Assignment' do
   context 'Gradebook Grid' do
     it_behaves_like 'Basic Behavior'
 
-    it 'default grade cannot be set to excused', priority: "1", test_id: 209380 do
+    it 'default grade cannot be set to excused', priority: "1" do
       assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
       get "/courses/#{@course.id}/grades"
       Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
@@ -319,7 +319,7 @@ describe 'Excuse an Assignment' do
     end
 
     %w[EX ex Ex eX].each do |ex|
-      it "'#{ex}' can be used to excuse assignments", priority: "1", test_id: 225630 do
+      it "'#{ex}' can be used to excuse assignments", priority: "1" do
         assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
 
         get "/courses/#{@course.id}/gradebook/"

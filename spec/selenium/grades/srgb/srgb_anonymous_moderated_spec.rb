@@ -59,7 +59,7 @@ describe "Individual View Gradebook" do
       user_session(@teacher2)
     end
 
-    it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3504343 do
+    it 'prevents unmuting the assignment before grades are posted', priority: '2' do
       SRGB.visit(@course.id)
       SRGB.select_assignment(@moderated_assignment)
       wait_for_ajaximations
@@ -69,7 +69,7 @@ describe "Individual View Gradebook" do
       expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to eq 'true'
     end
 
-    it 'prevents grading for the assignment before grades are posted', priority: '2', test_id: 3505171 do
+    it 'prevents grading for the assignment before grades are posted', priority: '2' do
       SRGB.visit(@course.id)
       SRGB.select_student(@student1)
       SRGB.select_assignment(@moderated_assignment)
@@ -87,7 +87,7 @@ describe "Individual View Gradebook" do
         SRGB.visit(@course.id)
       end
 
-      it 'allows grading for the assignment', priority: '2', test_id: 3505171 do
+      it 'allows grading for the assignment', priority: '2' do
         SRGB.select_student(@student1)
         SRGB.select_assignment(@moderated_assignment)
 
@@ -95,7 +95,7 @@ describe "Individual View Gradebook" do
         expect(SRGB.current_grade).to eq '15'
       end
 
-      it 'allows unmuting the assignment', priority: '2', test_id: 3504343 do
+      it 'allows unmuting the assignment', priority: '2' do
         SRGB.select_assignment(@moderated_assignment)
         wait_for_ajaximations
         scroll_into_view('#assignment_muted_check')
@@ -130,7 +130,7 @@ describe "Individual View Gradebook" do
       SRGB.visit(@course.id)
     end
 
-    it 'excludes the muted assignment from the assignment list', priority: '1', test_id: 3505168 do
+    it 'excludes the muted assignment from the assignment list', priority: '1' do
       SRGB.select_student(@student1)
       SRGB.assignment_dropdown.click
 
@@ -140,7 +140,7 @@ describe "Individual View Gradebook" do
       expect(SRGB.assignment_dropdown).to include_text 'Unmuted Anon Assignment'
     end
 
-    it 'hides student names in speedgrader', priority: '2', test_id: 3505167 do
+    it 'hides student names in speedgrader', priority: '2' do
       # Open speedgrader for the anonymous assignment
       SRGB.select_assignment(@anonymous_assignment)
       scroll_into_view('#assignment-speedgrader-link')

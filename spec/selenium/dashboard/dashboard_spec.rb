@@ -25,7 +25,7 @@ describe "dashboard" do
   include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
-    it "loads events list sidebar", priority: "2", test_id: 210275 do
+    it "loads events list sidebar", priority: "2" do
       get "/"
       wait_for_ajaximations
       expect(f('.events_list')).to be_displayed
@@ -81,7 +81,7 @@ describe "dashboard" do
       JS
     end
 
-    it "expand/collapses recent activity category", priority: "1", test_id: 215580 do
+    it "expand/collapses recent activity category", priority: "1" do
       create_announcement
       get '/'
       f('#DashboardOptionsMenu_Container button').click
@@ -93,7 +93,7 @@ describe "dashboard" do
       assert_recent_activity_category_closed
     end
 
-    it "does not expand category when a course/group link is clicked", priority: "2", test_id: 215581 do
+    it "does not expand category when a course/group link is clicked", priority: "2" do
       create_announcement
       get '/'
       f('#DashboardOptionsMenu_Container button').click
@@ -107,7 +107,7 @@ describe "dashboard" do
     it "should update the item count on stream item hide"
     it "should remove the stream item category if all items are removed"
 
-    it "shows conversation stream items on the dashboard", priority: "1", test_id: 197536 do
+    it "shows conversation stream items on the dashboard", priority: "1" do
       c = User.create.initiate_conversation([@user, User.create])
       c.add_message('test')
       c.add_participants([User.create])
@@ -121,7 +121,7 @@ describe "dashboard" do
       expect(ff('#conversation-details tbody tr').size).to eq 1
     end
 
-    it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
+    it "shows an assignment stream item under Recent Activity in dashboard", priority: "1" do
       setup_notification(@student, name: 'Assignment Created')
       assignment_model({ :submission_types => ['online_text_entry'], :course => @course })
       get "/"
@@ -131,7 +131,7 @@ describe "dashboard" do
       expect(fj('.fake-link:contains("Unnamed")')).to be_present
     end
 
-    it "shows account notifications on the dashboard", priority: "1", test_id: 215582 do
+    it "shows account notifications on the dashboard", priority: "1" do
       u = User.create!
       a1 = @course.account.announcements.create!(:subject => 'test',
                                                  :message => "hey there",
@@ -174,7 +174,7 @@ describe "dashboard" do
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
-    it "shows appointment stream items on the dashboard", priority: "2", test_id: 215585 do
+    it "shows appointment stream items on the dashboard", priority: "2" do
       skip "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
@@ -206,7 +206,7 @@ describe "dashboard" do
         get "/"
       end
 
-      it "displays course name in course menu", priority: "1", test_id: 215586 do
+      it "displays course name in course menu", priority: "1" do
         f('#global_nav_courses_link').click
         expect(driver.current_url).not_to match(%r{/courses$})
         expect(fj("[aria-label='Courses tray'] h2:contains('Courses')")).to be_displayed
@@ -214,7 +214,7 @@ describe "dashboard" do
         expect(fj("[aria-label='Courses tray'] a:contains('#{@course.name}')")).to be_displayed
       end
 
-      it "displays student groups in header nav", priority: "2", test_id: 215587 do
+      it "displays student groups in header nav", priority: "2" do
         group = Group.create!(:name => "group1", :context => @course)
         group.add_user(@user)
 
@@ -233,14 +233,14 @@ describe "dashboard" do
         expect(list).to_not include_text(other_group.name)
       end
 
-      it "goes to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
+      it "goes to a course when clicking a course link from the menu", priority: "1" do
         f('#global_nav_courses_link').click
         fj("[aria-label='Courses tray'] li a:contains('#{@course.name}')").click
         expect(driver.current_url).to match "/courses/#{@course.id}"
       end
     end
 
-    it "displays scheduled web conference in stream", priority: "1", test_id: 216354 do
+    it "displays scheduled web conference in stream", priority: "1" do
       PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
 
       # NOTE: recently changed the behavior here: conferences only display on
@@ -257,7 +257,7 @@ describe "dashboard" do
       expect(f('.conference .notification_message')).to include_text(@conference.title)
     end
 
-    it "ends conferences from stream", priority: "1", test_id: 216355 do
+    it "ends conferences from stream", priority: "1" do
       skip_if_safari(:alert)
       PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
 
@@ -283,7 +283,7 @@ describe "dashboard" do
       expect(@conference).to be_finished
     end
 
-    it "creates an announcement for the first course that is not visible in the second course", priority: "1", test_id: 216356 do
+    it "creates an announcement for the first course that is not visible in the second course", priority: "1" do
       @context = @course
       announcement_model({ :title => "hey all read this k", :message => "announcement" })
       @second_course = Course.create!(:name => 'second course')
@@ -309,7 +309,7 @@ describe "dashboard" do
       expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
-    it "validates the functionality of soft concluded courses in dropdown", priority: "1", test_id: 216372 do
+    it "validates the functionality of soft concluded courses in dropdown", priority: "1" do
       course_with_student(:active_all => true, :course_name => "a_soft_concluded_course", :user => @user)
       c1 = @course
       c1.conclude_at = 1.week.ago
@@ -323,7 +323,7 @@ describe "dashboard" do
       expect(f("[aria-label='Courses tray']")).not_to include_text(c1.name)
     end
 
-    it "shows recent feedback and it should work", priority: "1", test_id: 216373 do
+    it "shows recent feedback and it should work", priority: "1" do
       assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
       assign.grade_student(@student, grade: '4', grader: @teacher)
 
@@ -338,7 +338,7 @@ describe "dashboard" do
       expect(f('h1').text).to eq "Submission Details"
     end
 
-    it "validates the functionality of soft concluded courses on courses page", priority: "1", test_id: 216374 do
+    it "validates the functionality of soft concluded courses on courses page", priority: "1" do
       term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
       term.root_account_id = @course.root_account_id
       term.save!
@@ -351,7 +351,7 @@ describe "dashboard" do
     end
 
     context "course menu customization" do
-      it "always has a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
+      it "always has a link to the courses page (with customizations)", priority: "1" do
         course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
         get "/"
         f('#global_nav_courses_link').click
@@ -406,7 +406,7 @@ describe "dashboard" do
       end
     end
 
-    it "displays assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do
+    it "displays assignment to grade in to do list for a teacher", priority: "1" do
       assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')

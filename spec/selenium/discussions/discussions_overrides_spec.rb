@@ -35,7 +35,7 @@ describe "discussions overrides" do
                                                           assignment: @assignment)
   end
 
-  it "adds multiple due dates", priority: "2", test_id: 58763 do
+  it "adds multiple due dates", priority: "2" do
     get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
     expect_new_page_load { f('.edit-btn').click }
     expect(f('.ic-token-label')).to include_text('Everyone')
@@ -77,7 +77,7 @@ describe "discussions overrides" do
       end
     end
 
-    it "toggles between due dates", priority: "2", test_id: 114317 do
+    it "toggles between due dates", priority: "2" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       f(' .toggle_due_dates').click
       wait_for_ajaximations
@@ -92,7 +92,7 @@ describe "discussions overrides" do
       expect(f('.discussion-topic-due-dates')).to be_present
     end
 
-    it "does not show the add due date button after the last available section is selected", priority: "2", test_id: 114319 do
+    it "does not show the add due date button after the last available section is selected", priority: "2" do
       skip('Example skipped due to an issue in the assignment add button for due dates')
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       @new_section_1 = @course.course_sections.create!(name: 'Additional Section')
@@ -104,7 +104,7 @@ describe "discussions overrides" do
       expect(f('#add_due_date')).not_to be_present
     end
 
-    it "allows to not set due dates for everyone", priority: "2", test_id: 114320 do
+    it "allows to not set due dates for everyone", priority: "2" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect_new_page_load { f('.edit-btn').click }
       f('#bordered-wrapper .Container__DueDateRow-item:nth-of-type(2) button[title = "Remove These Dates"]').click
@@ -127,14 +127,14 @@ describe "discussions overrides" do
         @override_due = format_date_for_view(Time.zone.now.advance(days: 2))
       end
 
-      it "shows due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do
+      it "shows due dates in mouse hover in the assignments index page", priority: "2" do
         get "/courses/#{@course.id}/assignments"
         hover_text = "Everyone else\n#{@default_due}\nNew Section\n#{@override_due}"
         hover f('.assignment-date-due .vdd_tooltip_link')
         expect(f('.ui-tooltip-content')).to include_text(hover_text)
       end
 
-      it "lists discussions in the syllabus", priority: "2", test_id: 114321 do
+      it "lists discussions in the syllabus", priority: "2" do
         get "/courses/#{@course.id}/assignments/syllabus"
         expect(f('#syllabus tbody tr:nth-of-type(1) .day_date').text).to include(@default_due)
         expect(f('#syllabus tbody tr:nth-of-type(1)').text).to include(@discussion_topic.title)
@@ -143,12 +143,12 @@ describe "discussions overrides" do
         expect(f('#syllabus tbody tr:nth-of-type(2).detail_list td .special_date_title').text).to include(@new_section.name)
       end
 
-      it "lists the discussions in course dashboard page", priority: "2", test_id: 114322 do
+      it "lists the discussions in course dashboard page", priority: "2" do
         get "/courses/#{@course.id}"
         expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
       end
 
-      it "lists the discussions in main dashboard page", priority: "2", test_id: 632022 do
+      it "lists the discussions in main dashboard page", priority: "2" do
         course_with_admin_logged_in(course: @course)
         get ""
         expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates")

@@ -52,7 +52,7 @@ describe "Notifications" do
         @submission.save!
       end
 
-      it "shows assignment submitted notifications to teacher", priority: "1", test_id: 186561 do
+      it "shows assignment submitted notifications to teacher", priority: "1" do
         get "/users/#{@teacher.id}/messages"
 
         # Checks that the notification is there and has the correct "Notification Name" field
@@ -61,7 +61,7 @@ describe "Notifications" do
         expect(ff('.ic-Table--condensed.grid td')[3]).to include_text("Submission: #{@student.name}, #{@assignment.name}")
       end
 
-      it "shows assignment re-submitted notifications to teacher", priority: "1", test_id: 186562 do
+      it "shows assignment re-submitted notifications to teacher", priority: "1" do
         # Re-submit homework
         submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'hello heyy')
         submission.workflow_state = 'submitted'
@@ -75,7 +75,7 @@ describe "Notifications" do
         expect(ff('.ic-Table--condensed.grid td')[3]).to include_text("Re-Submission: #{@student.name}, #{@assignment.name}")
       end
 
-      it "does not show the name of the reviewer for anonymous peer reviews", priority: "1", test_id: 360185 do
+      it "does not show the name of the reviewer for anonymous peer reviews", priority: "1" do
         @assignment.peer_reviews = true
         @assignment.anonymous_peer_reviews = true
         @assignment.save!
@@ -111,7 +111,7 @@ describe "Notifications" do
           setup_notification(@observer, name: 'Submission Comment')
         end
 
-        it "shows assignment graded notification to the observer", priority: "2", test_id: 1040284 do
+        it "shows assignment graded notification to the observer", priority: "2" do
           @assignment.grade_student @student, grade: 2, grader: @teacher
 
           get "/users/#{@observer.id}/messages"
@@ -123,7 +123,7 @@ describe "Notifications" do
             .to include_text("Assignment Graded: #{@assignment.name}, #{@course.name}")
         end
 
-        it "does not send assignment graded notification to observers not linked to students", priority: "2", test_id: 1040286 do
+        it "does not send assignment graded notification to observers not linked to students", priority: "2" do
           @observer2 = user_with_pseudonym(username: 'observer2@example.com', active_all: 1)
           @course.enroll_user(@observer2, 'ObserverEnrollment', enrollment_state: 'active')
           @assignment.grade_student @student, grade: 2, grader: @teacher
@@ -132,7 +132,7 @@ describe "Notifications" do
           expect(f("#content")).not_to contain_css('.messages .message')
         end
 
-        it "shows submission comment notification to the observer", priority: "2", test_id: 1040563 do
+        it "shows submission comment notification to the observer", priority: "2" do
           submission_comment_model({ author: @teacher, submission: @assignment.find_or_create_submission(@student) })
 
           get "/users/#{@observer.id}/messages"
@@ -144,7 +144,7 @@ describe "Notifications" do
             .to include_text("Submission Comment: #{@student.name}, #{@assignment.name}, #{@course.name}")
         end
 
-        it "does not send submission comment notification to observers not linked to students", priority: "2", test_id: 1040565 do
+        it "does not send submission comment notification to observers not linked to students", priority: "2" do
           @observer2 = user_with_pseudonym(username: 'observer2@example.com', active_all: 1)
           @course.enroll_user(@observer2, 'ObserverEnrollment', enrollment_state: 'active')
           submission_comment_model({ author: @teacher, submission: @assignment.find_or_create_submission(@student) })
@@ -160,7 +160,7 @@ describe "Notifications" do
         setup_notification(@student, name: 'New Announcement', category: 'Announcement', sms: true)
       end
 
-      it "shows announcement notifications to student", priority: "1", test_id: 186563 do
+      it "shows announcement notifications to student", priority: "1" do
         @course.announcements.create!(:title => 'Announcement', :message => 'Announcement time!')
         # Checks that the notification is there and has the correct "Notification Name" field
         get "/users/#{@student.id}/messages"
@@ -179,7 +179,7 @@ describe "Notifications" do
           setup_notification(@student, name: 'Grade Weight Changed')
         end
 
-        it "shows grade chaged notifications to the observers", priority: "2", test_id: 1040569 do
+        it "shows grade chaged notifications to the observers", priority: "2" do
           @course.apply_assignment_group_weights = true
           @course.save!
 
@@ -204,7 +204,7 @@ describe "Notifications" do
           setup_notification(@student, name: 'Event Date Changed')
         end
 
-        it "shows event created and updated notification to the observer", priority: "2", test_id: 1040568 do
+        it "shows event created and updated notification to the observer", priority: "2" do
           event = make_event(title: "New Event", start_at: Time.zone.now.beginning_of_day + 6.hours)
 
           get "/users/#{@observer.id}/messages"

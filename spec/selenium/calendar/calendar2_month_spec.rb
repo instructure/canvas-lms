@@ -58,7 +58,7 @@ describe "calendar2" do
         expect(find('#agenda')).to have_class('active')
       end
 
-      it "creates an event through clicking on a calendar day", priority: "1", test_id: 138638 do
+      it "creates an event through clicking on a calendar day", priority: "1" do
         create_middle_day_event
       end
 
@@ -66,7 +66,7 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
-      it 'translates am/pm time strings in assignment event datepicker', priority: "2", test_id: 467482 do
+      it 'translates am/pm time strings in assignment event datepicker', priority: "2" do
         skip('CNVS-28437')
         @user.locale = 'fa'
         @user.save!
@@ -121,7 +121,7 @@ describe "calendar2" do
           expect(assignment1.assignment_overrides.first.due_at).to eql(@one_day_later)
         end
 
-        it "drags and drop assignment forward", priority: "1", test_id: 495537 do
+        it "drags and drop assignment forward", priority: "1" do
           assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -141,7 +141,7 @@ describe "calendar2" do
           expect(assignment1.start_at).to eql(@one_day_later)
         end
 
-        it "drags and drop event forward", priority: "1", test_id: 495538 do
+        it "drags and drop event forward", priority: "1" do
           event1 = make_event(start: @initial_time, title: 'new week view event')
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -161,7 +161,7 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@one_day_later)
         end
 
-        it "drags and drop assignment back", priority: "1", test_id: 567749 do
+        it "drags and drop assignment back", priority: "1" do
           assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -181,7 +181,7 @@ describe "calendar2" do
           expect(assignment1.start_at).to eql(@three_days_earlier)
         end
 
-        it "drags and drop event back", priority: "1", test_id: 567750 do
+        it "drags and drop event back", priority: "1" do
           event1 = make_event(start: @initial_time, title: 'new week view event')
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -201,7 +201,7 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@three_days_earlier)
         end
 
-        it "extends event to multiple days by draging", priority: "2", test_id: 419527 do
+        it "extends event to multiple days by draging", priority: "2" do
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute('data-date')
           date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime('%Y-%m-%d')
@@ -293,7 +293,7 @@ describe "calendar2" do
         expect(f('body')).not_to contain_css('.delete_event_link')
       end
 
-      it "displays next month on arrow press", priority: "1", test_id: 197555 do
+      it "displays next month on arrow press", priority: "1" do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:next)
@@ -308,7 +308,7 @@ describe "calendar2" do
         expect(fj(last_thursday)).to have_attribute('data-date', '2012-03-01')
       end
 
-      it "displays previous month on arrow press", priority: "1", test_id: 419290 do
+      it "displays previous month on arrow press", priority: "1" do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:prev)
@@ -376,7 +376,7 @@ describe "calendar2" do
         expect(details.find('.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
 
-      it "has a working today button", priority: "1", test_id: 142041 do
+      it "has a working today button", priority: "1" do
         load_month_view
         date = Time.now.strftime("%-d")
 
@@ -422,7 +422,7 @@ describe "calendar2" do
         expect(find('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
-      it "strikethroughs past due assignment", priority: "1", test_id: 518370 do
+      it "strikethroughs past due assignment", priority: "1" do
         date_due = Time.zone.now.utc - 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -438,7 +438,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "strikethroughs past due graded discussion", priority: "1", test_id: 518371 do
+      it "strikethroughs past due graded discussion", priority: "1" do
         date_due = Time.zone.now.utc - 2.days
         a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
         @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
@@ -487,7 +487,7 @@ describe "calendar2" do
     end
 
     describe "main month calendar" do
-      it "strikethroughs completed assignment title", priority: "1", test_id: 518372 do
+      it "strikethroughs completed assignment title", priority: "1" do
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -509,7 +509,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "strikethroughs completed graded discussion", priority: "1", test_id: 518373 do
+      it "strikethroughs completed graded discussion", priority: "1" do
         date_due = Time.zone.now.utc + 2.days
         reply = 'Replying to discussion'
 

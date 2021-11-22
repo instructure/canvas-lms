@@ -61,7 +61,7 @@ describe ConversationMessage do
       expect(message.author_short_name_with_shared_contexts(@user)).to eq message.author.short_name
     end
 
-    it "creates appropriate notifications on new message", priority: "1", test_id: 186561 do
+    it "creates appropriate notifications on new message", priority: "1" do
       message = add_message
       expect(message.messages_sent).to be_include("Conversation Message")
       expect(message.messages_sent).not_to be_include("Added To Conversation")

@@ -453,7 +453,7 @@ describe TermsController, type: :request do
         expect(json['errors']['base'].first['message']).to eq "End dates cannot be before start dates"
       end
 
-      it "rejects override for invalid enrollment type", priority: "1", test_id: 3046399 do
+      it "rejects override for invalid enrollment type", priority: "1" do
         result = @term1.enrollment_dates_overrides.where(enrollment_type: 'ObserverEnrollment').to_a
         api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
                  { controller: 'terms', action: 'update', format: 'json',

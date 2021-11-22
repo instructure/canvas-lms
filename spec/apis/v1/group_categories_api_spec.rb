@@ -736,18 +736,18 @@ describe "Group Categories API", type: :request do
           @account.account_users.create(user: @user)
         end
 
-        it "shows SIS fields if the user has permission", priority: 3, test_id: 3436530 do
+        it "shows SIS fields if the user has permission", priority: 3 do
           expect(json[0]).to have_key("sis_group_category_id")
           expect(json[0]).to have_key("sis_import_id")
         end
 
-        it "shows only sis_group_category_id without manage_sis permission", priority: 3, test_id: 3436880 do
+        it "shows only sis_group_category_id without manage_sis permission", priority: 3 do
           @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
           expect(json[0]).to have_key("sis_group_category_id")
           expect(json[0]).not_to have_key("sis_import_id")
         end
 
-        it "does not show SIS fields if the user doesn't have permission", priority: 3, test_id: 3436531 do
+        it "does not show SIS fields if the user doesn't have permission", priority: 3 do
           @account.role_overrides.create(role: admin, enabled: false, permission: :read_sis)
           @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
           expect(json[0]).not_to have_key("sis_group_category_id")

@@ -56,7 +56,7 @@ describe "discussions" do
         user_session(teacher)
       end
 
-      it "adds an attachment to a new topic", priority: "1", test_id: 150466 do
+      it "adds an attachment to a new topic", priority: "1" do
         skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         topic_title = 'new topic with file'
         get url
@@ -66,7 +66,7 @@ describe "discussions" do
         expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "creates a podcast enabled topic", priority: "1", test_id: 150467 do
+      it "creates a podcast enabled topic", priority: "1" do
         get url
         wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "This is my test title")
@@ -88,7 +88,7 @@ describe "discussions" do
       end
 
       context "graded" do
-        it "allows creating multiple due dates", priority: "1", test_id: 150468 do
+        it "allows creating multiple due dates", priority: "1" do
           assignment_group
           group_category
           new_section
@@ -126,7 +126,7 @@ describe "discussions" do
           expect(other_override.due_at.to_date).to eq due_at2.to_date
         end
 
-        it "validates that a group category is selected", priority: "1", test_id: 150469 do
+        it "validates that a group category is selected", priority: "1" do
           assignment_group
           get url
 
@@ -170,7 +170,7 @@ describe "discussions" do
         user_session(student)
       end
 
-      it "creates a delayed discussion", priority: "1", test_id: 150470 do
+      it "creates a delayed discussion", priority: "1" do
         get url
         wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "Student Delayed")
@@ -185,7 +185,7 @@ describe "discussions" do
         expect(f('.discussion-availability').text).to include("Not available until #{unlock_text_index_page}")
       end
 
-      it "allows a student to create a discussion", priority: "1", test_id: 150471 do
+      it "allows a student to create a discussion", priority: "1" do
         skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         get url
         wait_for_tiny(f('textarea[name=message]'))
@@ -197,7 +197,7 @@ describe "discussions" do
         expect(f("#content")).not_to contain_css('#topic_publish_button')
       end
 
-      it 'does not show file attachment if allow_student_forum_attachments is not true', priority: '2', test_id: 223507 do
+      it 'does not show file attachment if allow_student_forum_attachments is not true', priority: '2' do
         skip_if_safari(:alert)
         # given
         course.allow_student_forum_attachments = false
@@ -220,7 +220,7 @@ describe "discussions" do
       context 'in a course group' do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
-        it 'does not show file attachment if allow_student_forum_attachments is not true', priority: '2', test_id: 223508 do
+        it 'does not show file attachment if allow_student_forum_attachments is not true', priority: '2' do
           skip_if_safari(:alert)
           # given
           course.allow_student_forum_attachments = false

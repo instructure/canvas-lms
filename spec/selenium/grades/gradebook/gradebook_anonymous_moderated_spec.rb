@@ -56,19 +56,19 @@ describe 'New Gradebook' do
       Gradebook.visit(@course)
     end
 
-    it 'score cell disabled in grade detail tray', priority: '1', test_id: 3500571 do
+    it 'score cell disabled in grade detail tray', priority: '1' do
       Gradebook::Cells.open_tray(@student1, @anonymous_assignment)
       expect(Gradebook::GradeDetailTray.grade_input).to have_attribute('disabled', 'true')
     end
 
-    it 'causes score cells to be greyed out with grades invisible when grades are not posted', priority: '1', test_id: 3504000 do
+    it 'causes score cells to be greyed out with grades invisible when grades are not posted', priority: '1' do
       grid_cell = Gradebook::Cells.grid_assignment_row_cell(@student1, @anonymous_assignment)
       class_attribute_fetched = grid_cell.attribute('class')
       expect(class_attribute_fetched).to include 'grayed-out'
       expect(Gradebook::Cells.get_grade(@student1, @anonymous_assignment)).to eq ''
     end
 
-    it 'causes score cells to be not greyed out with grades visible when grades are posted', priority: '1', test_id: 3504000 do
+    it 'causes score cells to be not greyed out with grades visible when grades are posted', priority: '1' do
       Gradebook.manually_post_grades(@anonymous_assignment, 'Everyone')
       Gradebook::Cells.edit_grade(@student1, @anonymous_assignment, '12')
       expect(Gradebook::Cells.get_grade(@student1, @anonymous_assignment)).to eq '12'
@@ -98,7 +98,7 @@ describe 'New Gradebook' do
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
     end
 
-    it 'prevents posting grades before they are released', priority: '1', test_id: 3496196 do
+    it 'prevents posting grades before they are released', priority: '1' do
       user_session(@teacher1)
       ModeratePage.visit(@course.id, @moderated_assignment.id)
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
@@ -110,7 +110,7 @@ describe 'New Gradebook' do
       expect(Gradebook.assignment_menu_selector('No grades to post')).to be_displayed
     end
 
-    it 'allows posting grades after they are released', priority: '1', test_id: 3496196 do
+    it 'allows posting grades after they are released', priority: '1' do
       user_session(@teacher1)
       ModeratePage.visit(@course.id, @moderated_assignment.id)
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
@@ -132,13 +132,13 @@ describe 'New Gradebook' do
         Gradebook.visit(@course)
       end
 
-      it "not allowed until grades are posted", priority: "1", test_id: 3501496 do
+      it "not allowed until grades are posted", priority: "1" do
         grid_cell = Gradebook::Cells.grid_assignment_row_cell(@student1, @moderated_assignment)
         class_attribute_fetched = grid_cell.attribute('class')
         expect(class_attribute_fetched).to include 'grayed-out cannot_edit'
       end
 
-      it "allowed if grades are posted", priority: "1", test_id: 3501496 do
+      it "allowed if grades are posted", priority: "1" do
         @moderated_assignment.update!(grades_published_at: Time.zone.now)
         @moderated_assignment.unmute!
         refresh_page

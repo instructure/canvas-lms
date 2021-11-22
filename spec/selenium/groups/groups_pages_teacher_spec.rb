@@ -189,14 +189,14 @@ describe "groups" do
     describe "people page" do
       it_behaves_like 'people_page', :teacher
 
-      it "displays and show a list of group members", priority: "2", test_id: 324929 do
+      it "displays and show a list of group members", priority: "2" do
         get people_page
         # Checks that all students and teachers created in setup are listed on page
         expect(ff('.student_roster .user_name').size).to eq 4
         expect(ff('.teacher_roster .user_name').size).to eq 2
       end
 
-      it "shows both active and inactive members in groups to teachers", priority: "2", test_id: 2771091 do
+      it "shows both active and inactive members in groups to teachers", priority: "2" do
         get people_page
         expect(ff('.student_roster .user_name').size).to eq 4
         student_enrollment = StudentEnrollment.last
@@ -211,14 +211,14 @@ describe "groups" do
     describe "discussions page" do
       it_behaves_like 'discussions_page', :teacher
 
-      it "allows teachers to create discussions within a group", priority: "1", test_id: 285586 do
+      it "allows teachers to create discussions within a group", priority: "1" do
         get discussions_page
         expect_new_page_load { f('#add_discussion').click }
         # This creates the discussion and also tests its creation
         edit_topic('from a teacher', 'tell me a story')
       end
 
-      it "has three options when creating a discussion", priority: "1", test_id: 285584 do
+      it "has three options when creating a discussion", priority: "1" do
         get discussions_page
         expect_new_page_load { f('#add_discussion').click }
         expect(f('#threaded')).to be_displayed
@@ -226,7 +226,7 @@ describe "groups" do
         expect(f('#podcast_enabled')).to be_displayed
       end
 
-      it "allows teachers to access a discussion", priority: "1", test_id: 285585 do
+      it "allows teachers to access a discussion", priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @students.first,
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
@@ -235,7 +235,7 @@ describe "groups" do
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
-      it "allows teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
+      it "allows teachers to delete their group discussions", priority: "1", ignore_js_errors: true do
         skip_if_safari(:alert)
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                      title: 'Group Discussion', message: 'Group')
@@ -259,19 +259,19 @@ describe "groups" do
       describe "pages page" do
         it_behaves_like 'pages_page', :teacher
 
-        it "allows teachers to create a page", priority: "1", test_id: 289993 do
+        it "allows teachers to create a page", priority: "1" do
           skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
           get pages_page
           manually_create_wiki_page('stuff', 'it happens')
         end
 
-        it "allows teachers to access a page", priority: "1", test_id: 289992 do
+        it "allows teachers to access a page", priority: "1" do
           @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
           # Verifies teacher can access the group page & that it's the correct page
           verify_member_sees_group_page
         end
 
-        it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
+        it "has unique pages in the cloned groups", priority: "2" do
           @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
           get pages_page
           expect(f('.index-content')).to contain_css('.wiki-page-link')
@@ -295,13 +295,13 @@ describe "groups" do
     describe "Files page" do
       it_behaves_like 'files_page', :teacher
 
-      it "allows teacher to add a new folder", priority: "2", test_id: 303703 do
+      it "allows teacher to add a new folder", priority: "2" do
         get files_page
         add_folder
         expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
       end
 
-      it "allows teacher to delete a folder", priority: "2", test_id: 304184 do
+      it "allows teacher to delete a folder", priority: "2" do
         skip_if_safari(:alert)
         get files_page
         add_folder
@@ -309,7 +309,7 @@ describe "groups" do
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
-      it "allows a teacher to delete a file", priority: "2", test_id: 304183 do
+      it "allows a teacher to delete a file", priority: "2" do
         skip_if_safari(:alert)
         add_test_files
         get files_page
@@ -318,26 +318,26 @@ describe "groups" do
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
-      it "allows teachers to move a file", priority: "2", test_id: 304185 do
+      it "allows teachers to move a file", priority: "2" do
         add_test_files
         get files_page
         add_folder('destination_folder')
         move_file_to_folder('example.pdf', 'destination_folder')
       end
 
-      it "allows teachers to move a folder", priority: "2", test_id: 304667 do
+      it "allows teachers to move a folder", priority: "2" do
         get files_page
         create_folder_structure
         move_folder(@inner_folder)
       end
 
-      it "hides the publish cloud", priority: "1", test_id: 304673 do
+      it "hides the publish cloud", priority: "1" do
         add_test_files
         get files_page
         expect(f('#content')).not_to contain_css('.btn-link.published-status')
       end
 
-      it "does not allow teachers to restrict access to a file", priority: "1", test_id: 304900 do
+      it "does not allow teachers to restrict access to a file", priority: "1" do
         add_test_files
         get files_page
         f('.ef-item-row .ef-date-created-col').click

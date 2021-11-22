@@ -41,7 +41,7 @@ describe "master courses banner" do
       user_session(@master_teacher)
     end
 
-    it "can lock down associated course's page content", priority: "1", test_id: 3127591 do
+    it "can lock down associated course's page content", priority: "1" do
       change_blueprint_settings(@master, content: true)
       get "/courses/#{@master.id}/pages/#{@original_page.id}"
       f('.bpc-lock-toggle button').click

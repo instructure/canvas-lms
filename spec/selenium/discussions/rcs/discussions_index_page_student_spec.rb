@@ -62,7 +62,7 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      it "allows a student to create a discussion", priority: "1", test_id: 270941 do
+      it "allows a student to create a discussion", priority: "1" do
         get url
         expect_new_page_load { f('#add_discussion').click }
         edit_topic("from a student", "tell me a story")

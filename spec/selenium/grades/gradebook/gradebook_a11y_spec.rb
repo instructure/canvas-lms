@@ -45,7 +45,7 @@ describe "Gradebook" do
       Gradebook.open_action_menu
     end
 
-    it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
+    it "moves focus to Actions menu trigger button during current export", priority: "2" do
       Gradebook.action_menu_item_selector("export").click
 
       expect(current_active_element.tag_name).to eq('button')
@@ -63,7 +63,7 @@ describe "Gradebook" do
                                        attachment: attachment)
       end
 
-      it "maintains focus to Actions menu trigger during past csv export", priority: "2", test_id: 720460 do
+      it "maintains focus to Actions menu trigger during past csv export", priority: "2" do
         Gradebook.select_previous_grade_export
 
         expect(current_active_element.tag_name).to eq('button')
@@ -78,7 +78,7 @@ describe "Gradebook" do
       Gradebook.visit(@course)
     end
 
-    it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
+    it "moves focus to Actions menu trigger button during current export", priority: "2" do
       Gradebook.select_export
 
       Gradebook.action_menu_item_selector("export").click
@@ -98,7 +98,7 @@ describe "Gradebook" do
                                        attachment: attachment)
       end
 
-      it "maintains focus to Actions menu trigger during past csv export", priority: "2", test_id: 720460 do
+      it "maintains focus to Actions menu trigger during past csv export", priority: "2" do
         Gradebook.select_export
         Gradebook.select_previous_grade_export
 
@@ -111,7 +111,7 @@ describe "Gradebook" do
   context "return focus to settings menu when it closes" do
     before { Gradebook.visit(@course) }
 
-    it "after arrange columns is clicked", priority: "2", test_id: 720462 do
+    it "after arrange columns is clicked", priority: "2" do
       Gradebook.open_view_menu_and_arrange_by_menu
       Gradebook.select_gradebook_menu_option('Due Date - Oldest to Newest')
       expect(check_element_has_focus(Gradebook.view_options_menu_selector)).to be true

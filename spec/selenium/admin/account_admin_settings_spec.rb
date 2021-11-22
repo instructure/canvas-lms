@@ -161,7 +161,7 @@ describe "root account basic settings" do
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
-  it "changes the default user quota", priority: "1", test_id: 250002 do
+  it "changes the default user quota", priority: "1" do
     course_with_admin_logged_in
     group_model(context: @course)
     get account_settings_url

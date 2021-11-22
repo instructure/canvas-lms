@@ -57,7 +57,7 @@ describe "Gradebook - total column menu options" do
       should_show_points(15, 10, 10)
     end
 
-    it "shows percentages when group weights are set", test_id: 164231, priority: "2" do
+    it "shows percentages when group weights are set", priority: "2" do
       @course.show_total_grade_as_points = false
       @course.save!
       @course.reload
@@ -76,7 +76,7 @@ describe "Gradebook - total column menu options" do
       expect(dialog).to include_text("Warning")
     end
 
-    it 'allows toggling display by points or percent', priority: "1", test_id: 164012 do
+    it 'allows toggling display by points or percent', priority: "1" do
       should_show_percentages
       Gradebook.toggle_grade_display
 
@@ -122,7 +122,7 @@ describe "Gradebook - total column menu options" do
       Gradebook.visit(@course)
     end
 
-    it 'sort by > Low to High', priority: "1", test_id: 3253348 do
+    it 'sort by > Low to High', priority: "1" do
       Gradebook.click_total_header_sort_by('Grade - Low to High')
 
       expect(final_score_for_row(0)).to eq @student_2_total_ignoring_ungraded
@@ -136,7 +136,7 @@ describe "Gradebook - total column menu options" do
       Gradebook.visit(@course)
     end
 
-    it 'Moves total column to the front', priority: "1", test_id: 3253355 do
+    it 'Moves total column to the front', priority: "1" do
       Gradebook.click_total_header_menu_option('Move to Front')
 
       expect(Gradebook.gradebook_slick_header_columns[1]).to match("Total")

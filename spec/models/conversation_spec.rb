@@ -445,7 +445,7 @@ describe Conversation do
       end
     end
 
-    it "broadcasts conversation created", priority: "1", test_id: 193163 do
+    it "broadcasts conversation created", priority: "1" do
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
       [sender].each do |user|

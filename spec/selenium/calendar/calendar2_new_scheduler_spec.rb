@@ -38,17 +38,17 @@ describe "scheduler" do
       user_session(@student1)
     end
 
-    it 'shows the find appointment button with feature flag turned on', priority: "1", test_id: 2908326 do
+    it 'shows the find appointment button with feature flag turned on', priority: "1" do
       get "/calendar2"
       expect(f('#select-course-component')).to contain_css("#FindAppointmentButton")
     end
 
-    it 'does not show the scheduler tab when the feature flag is turned on', priority: "1", test_id: 2926048 do
+    it 'does not show the scheduler tab when the feature flag is turned on', priority: "1" do
       get "/calendar2"
       expect(f('.calendar_view_buttons')).not_to contain_css('#scheduler')
     end
 
-    it 'changes the Find Appointment button to a close button once the modal to select courses is closed', priority: "1", test_id: 2916527 do
+    it 'changes the Find Appointment button to a close button once the modal to select courses is closed', priority: "1" do
       get "/calendar2"
       f('#FindAppointmentButton').click
       expect(f('[role="dialog"][aria-label="Select Course"]')).to contain_css('select')
@@ -56,7 +56,7 @@ describe "scheduler" do
       expect(f('#FindAppointmentButton')).to include_text('Close')
     end
 
-    it 'shows appointment slots on calendar in Find Appointment mode', priority: "1", test_id: 2925320 do
+    it 'shows appointment slots on calendar in Find Appointment mode', priority: "1" do
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       # the order they come back could vary depending on whether they split
@@ -70,7 +70,7 @@ describe "scheduler" do
       expect(f('.fc-content .fc-title')).to include_text(@app3.title)
     end
 
-    it 'hides the already reserved appointment slot for the student', priority: "1", test_id: 2925694 do
+    it 'hides the already reserved appointment slot for the student', priority: "1" do
       reserve_appointment_for(@student2, @student2, @app1)
       get "/calendar2"
       open_select_courses_modal(@course1.name)
@@ -80,7 +80,7 @@ describe "scheduler" do
       expect(f('.fc-time')).to include_text expected_time
     end
 
-    it 'does not show the course name with no appointment in the drop down', priority: "1", test_id: 2925695 do
+    it 'does not show the course name with no appointment in the drop down', priority: "1" do
       get "/calendar2"
       f('#FindAppointmentButton').click
       options = get_options('.ic-Input')
@@ -89,13 +89,13 @@ describe "scheduler" do
       end
     end
 
-    it 'hides the find appointment button for a student if there is no appointment group to sign up to', priority: "1", test_id: 3189024 do
+    it 'hides the find appointment button for a student if there is no appointment group to sign up to', priority: "1" do
       user_session(@student3)
       get "/calendar2"
       expect(f('#select-course-component')).not_to contain_css('#FindAppointmentButton')
     end
 
-    it 'reserves appointment slots in find appointment mode', priority: "1", test_id: 2936790 do
+    it 'reserves appointment slots in find appointment mode', priority: "1" do
       skip('Skip for flakiness and fix with: LS-2145')
       get "/calendar2"
       open_select_courses_modal(@course1.name)
@@ -109,7 +109,7 @@ describe "scheduler" do
       expect(f('.fc-time')).to include_text expected_time
     end
 
-    it 'unreserves appointment slot', priority: "1", test_id: 2936791 do
+    it 'unreserves appointment slot', priority: "1" do
       reserve_appointment_for(@student1, @student1, @app1)
       expect(@app1.appointments.first.workflow_state).to eq('locked')
       get "/calendar2"
@@ -123,7 +123,7 @@ describe "scheduler" do
       expect(@app1.appointments.first.workflow_state).to eq('active')
     end
 
-    it 'does not allow scheduling multiple appointment slots when it is restricted', priority: "1", test_id: 2936793 do
+    it 'does not allow scheduling multiple appointment slots when it is restricted', priority: "1" do
       reserve_appointment_for(@student1, @student1, @app1)
       get "/calendar2"
       open_select_courses_modal(@course1.name)

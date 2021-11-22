@@ -54,7 +54,7 @@ describe "discussions" do
         context "someone else's topic" do
           let(:topic) { student_topic }
 
-          it "updates subscribed button when user posts to a topic", priority: "2", test_id: 345483 do
+          it "updates subscribed button when user posts to a topic", priority: "2" do
             get url
             expect(f('.topic-subscribe-button')).to be_displayed
             add_reply "student posting"
@@ -63,7 +63,7 @@ describe "discussions" do
         end
       end
 
-      it "displays the current username when adding a reply", priority: "1", test_id: 150485 do
+      it "displays the current username when adding a reply", priority: "1" do
         get url
         expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
@@ -74,7 +74,7 @@ describe "discussions" do
       context "side comments" do
         let(:topic) { side_comment_topic }
 
-        it "adds a side comment", priority: "1", test_id: 345488 do
+        it "adds a side comment", priority: "1" do
           side_comment_text = 'new side comment'
           get url
 
@@ -90,7 +90,7 @@ describe "discussions" do
           expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
         end
 
-        it "edits a side comment", priority: "1", test_id: 345491 do
+        it "edits a side comment", priority: "1" do
           edit_text = 'this has been edited'
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)

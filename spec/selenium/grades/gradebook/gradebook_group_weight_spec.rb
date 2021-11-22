@@ -119,12 +119,12 @@ describe "Gradebook - group weights" do
       @assignment2.grade_student @student, grade: 5, grader: @teacher
     end
 
-    it 'displays a warning icon in the total column', priority: '1', test_id: 164013 do
+    it 'displays a warning icon in the total column', priority: '1' do
       Gradebook.visit(@course)
       expect(Gradebook.total_cell_warning_icon_select.size).to eq(1)
     end
 
-    it 'does not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
+    it 'does not display warning icons if group weights are turned off', priority: "1" do
       @course.apply_assignment_group_weights = false
       @course.save!
       Gradebook.visit(@course)

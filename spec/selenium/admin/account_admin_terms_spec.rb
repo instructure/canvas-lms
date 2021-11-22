@@ -127,7 +127,7 @@ describe "account admin terms" do
         group.enrollment_terms = [term]
       end
 
-      it "displays link to grading standards page", test_id: 2528663, priority: "1" do
+      it "displays link to grading standards page", priority: "1" do
         get "/accounts/#{account.id}/terms"
         standards_url = "/accounts/#{account.id}/grading_standards"
         expect(fln(group.title).attribute('href')).to include(standards_url)

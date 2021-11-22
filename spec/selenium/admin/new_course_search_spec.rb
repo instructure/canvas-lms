@@ -48,7 +48,7 @@ describe "new account course search" do
     expect(left_navigation).not_to include_text("Courses")
   end
 
-  it "hides courses without enrollments if checked", test_id: 3454769, priority: 1 do
+  it "hides courses without enrollments if checked", priority: 1 do
     empty_course = course_factory(:account => @account, :course_name => "no enrollments")
     not_empty_course = course_factory(:account => @account, :course_name => "yess enrollments", :active_all => true)
     student_in_course(:course => not_empty_course, :active_all => true)
@@ -65,7 +65,7 @@ describe "new account course search" do
     expect(rows[0]).not_to include_text(empty_course.name)
   end
 
-  it "paginates", test_id: 3454771, priority: 1 do
+  it "paginates", priority: 1 do
     16.times { |i| @account.courses.create!(:name => "course #{i + 1}") }
 
     visit_courses(@account)
@@ -82,7 +82,7 @@ describe "new account course search" do
     expect(rows.first).to include_text("course 16")
   end
 
-  it "searches by term", test_id: 3454772, priority: 1 do
+  it "searches by term", priority: 1 do
     term = @account.enrollment_terms.create!(:name => "some term")
     term_course = course_factory(:account => @account, :course_name => "term course_factory")
     term_course.enrollment_term = term
@@ -128,7 +128,7 @@ describe "new account course search" do
     expect(rows.first).to include_text(match_course.name)
   end
 
-  it "brings up course page when clicking name", priority: "1", test_id: 3415212 do
+  it "brings up course page when clicking name", priority: "1" do
     named_course = course_factory(:account => @account, :course_name => "named_course")
     named_course.default_view = 'feed'
     named_course.save
@@ -138,7 +138,7 @@ describe "new account course search" do
     expect(course_header).to include_text named_course.name
   end
 
-  it "searches but not find bogus course", priority: "1", test_id: 3415214 do
+  it "searches but not find bogus course", priority: "1" do
     bogus = 'jtsdumbthing'
     visit_courses(@account)
 
@@ -181,7 +181,7 @@ describe "new account course search" do
     expect(section_options).to eq(sections.map(&:name))
   end
 
-  it "creates a new course from the 'Add a New Course' dialog", test_id: 3454775, priority: 1 do
+  it "creates a new course from the 'Add a New Course' dialog", priority: 1 do
     @account.enrollment_terms.create!(:name => "Test Enrollment Term")
     subaccount = @account.sub_accounts.create!(name: "Test Sub Account")
 
@@ -208,7 +208,7 @@ describe "new account course search" do
     expect(rows.first).to include_text('Test Course Name')
   end
 
-  it "lists course name at top of add user modal", priority: "1", test_id: 3391719 do
+  it "lists course name at top of add user modal", priority: "1" do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
     visit_courses(@account)

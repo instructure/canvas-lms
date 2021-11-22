@@ -266,7 +266,7 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
-          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
+          it 'matches unconfirmed channels', priority: 1 do
             communication_channel(user, { username: 'unconfirmed@example.com' })
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end

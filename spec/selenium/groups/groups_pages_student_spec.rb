@@ -64,7 +64,7 @@ describe "groups" do
     describe "home page" do
       it_behaves_like 'home_page', :student
 
-      it "only allows group members to access the group home page", priority: "1", test_id: 319908 do
+      it "only allows group members to access the group home page", priority: "1" do
         get url
         expect(f('.recent-activity-header')).to be_displayed
         verify_no_course_user_access(url)
@@ -116,7 +116,7 @@ describe "groups" do
         end
       end
 
-      it "hides groups for inaccessible courses in groups list", priority: "2", test_id: 927757 do
+      it "hides groups for inaccessible courses in groups list", priority: "2" do
         term = EnrollmentTerm.find(@course.enrollment_term_id)
         term.end_at = Time.zone.now - 2.days
         term.save!
@@ -217,7 +217,7 @@ describe "groups" do
         verify_no_course_user_access(announcements_page)
       end
 
-      it "does not allow group members to edit someone else's announcement via discussion page", priority: "1", test_id: 327111 do
+      it "does not allow group members to edit someone else's announcement via discussion page", priority: "1" do
         announcement = @testgroup.first.announcements.create!(
           :title => "foobers",
           :user => @students.first,
@@ -229,7 +229,7 @@ describe "groups" do
         expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
-      it "allows all group members to see announcements", priority: "1", test_id: 273613, ignore_js_errors: true do
+      it "allows all group members to see announcements", priority: "1", ignore_js_errors: true do
         @announcement = @testgroup.first.announcements.create!(
           title: 'Group Announcement',
           message: 'Group',
@@ -246,14 +246,14 @@ describe "groups" do
     describe "people page" do
       it_behaves_like 'people_page', :student
 
-      it "displays and show a list of group members", priority: "1", test_id: 273614 do
+      it "displays and show a list of group members", priority: "1" do
         get people_page
         # Checks that all students and teachers created in setup are listed on page
         expect(ff('.student_roster .user_name').size).to eq 5
         expect(ff('.teacher_roster .user_name').size).to eq 1
       end
 
-      it "shows only active members in groups to students", priority: "2", test_id: 840142 do
+      it "shows only active members in groups to students", priority: "2" do
         get people_page
         student_enrollment = StudentEnrollment.last
         student = User.find(student_enrollment.user_id)
@@ -264,7 +264,7 @@ describe "groups" do
         expect(f('.student_roster')).not_to contain_css("a[href*='#{student.id}']")
       end
 
-      it "allows access to people page only within the scope of a group", priority: "1", test_id: 319906 do
+      it "allows access to people page only within the scope of a group", priority: "1" do
         get people_page
         expect(f('.roster.student_roster')).to be_displayed
         verify_no_course_user_access(people_page)
@@ -275,14 +275,14 @@ describe "groups" do
     describe "discussions page" do
       it_behaves_like 'discussions_page', :student
 
-      it "allows discussions to be created within a group", priority: "1", test_id: 273615 do
+      it "allows discussions to be created within a group", priority: "1" do
         get discussions_page
         expect_new_page_load { f('#add_discussion').click }
         # This creates the discussion and also tests its creation
         edit_topic('from a student', 'tell me a story')
       end
 
-      it "allows group members to access a discussion", priority: "1", test_id: 273616 do
+      it "allows group members to access a discussion", priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
@@ -291,7 +291,7 @@ describe "groups" do
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
-      it "has two options when creating a discussion", priority: "1", test_id: 273617 do
+      it "has two options when creating a discussion", priority: "1" do
         get discussions_page
         expect_new_page_load { f('#add_discussion').click }
         expect(f('#threaded')).to be_displayed
@@ -300,13 +300,13 @@ describe "groups" do
         expect(f("#content")).not_to contain_css('#podcast_enabled')
       end
 
-      it "only allows group members to access discussions", priority: "1", test_id: 315332 do
+      it "only allows group members to access discussions", priority: "1" do
         get discussions_page
         expect(f('#add_discussion')).to be_displayed
         verify_no_course_user_access(discussions_page)
       end
 
-      it "allows discussions to be deleted by their creator", priority: "1", test_id: 329626, ignore_js_errors: true do
+      it "allows discussions to be deleted by their creator", priority: "1", ignore_js_errors: true do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
         get discussions_page
         expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
@@ -318,7 +318,7 @@ describe "groups" do
         expect(f(".discussions-container__wrapper")).not_to contain_css("[data-testid='discussion-link-#{dt.id}']")
       end
 
-      it "is not able to delete a discussion by a different creator", priority: "1", test_id: 420009 do
+      it "is not able to delete a discussion by a different creator", priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: 'Back to the Future day',
@@ -328,7 +328,7 @@ describe "groups" do
         expect(f(".discussions-container__wrapper")).not_to contain_css('#discussions-index-manage-menu')
       end
 
-      it "allows group members to edit their discussions", priority: "1", test_id: 312866 do
+      it "allows group members to edit their discussions", priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @user,
                                      title: 'White Snow',
@@ -343,7 +343,7 @@ describe "groups" do
         expect(f('.user_content')).to include_text('The slopes are ready,')
       end
 
-      it "does not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
+      it "does not allow group member to edit discussions by other creators", priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: 'White Snow',
@@ -362,13 +362,13 @@ describe "groups" do
       describe "pages page" do
         it_behaves_like 'pages_page', :student
 
-        it "allows group members to create a page", priority: "1", test_id: 273611 do
+        it "allows group members to create a page", priority: "1" do
           skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
           get pages_page
           manually_create_wiki_page('yo', 'this be a page')
         end
 
-        it "allows all group members to access a page", priority: "1", test_id: 273612 do
+        it "allows all group members to access a page", priority: "1" do
           @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @teacher)
           # Verifying with a few different group members should be enough to ensure all group members can see it
           verify_member_sees_group_page
@@ -377,7 +377,7 @@ describe "groups" do
           verify_member_sees_group_page
         end
 
-        it "only allows group members to access pages", priority: "1", test_id: 315331 do
+        it "only allows group members to access pages", priority: "1" do
           get pages_page
           expect(f('.new_page')).to be_displayed
           verify_no_course_user_access(pages_page)
@@ -393,13 +393,13 @@ describe "groups" do
     describe "Files page" do
       it_behaves_like 'files_page', :student
 
-      it "allows group members to add a new folder", priority: "1", test_id: 273625 do
+      it "allows group members to add a new folder", priority: "1" do
         get files_page
         add_folder
         expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
       end
 
-      it "allows group members to delete a folder", priority: "1", test_id: 273631 do
+      it "allows group members to delete a folder", priority: "1" do
         skip_if_safari(:alert)
         get files_page
         add_folder
@@ -407,18 +407,18 @@ describe "groups" do
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
-      it "allows group members to move a folder", priority: "1", test_id: 273632 do
+      it "allows group members to move a folder", priority: "1" do
         get files_page
         create_folder_structure
         move_folder(@inner_folder)
       end
 
-      it "only allows group members to access files", priority: "1", test_id: 273626 do
+      it "only allows group members to access files", priority: "1" do
         get files_page
         verify_no_course_user_access(files_page)
       end
 
-      it "allows a group member to delete a file", priority: "1", test_id: 273630 do
+      it "allows a group member to delete a file", priority: "1" do
         skip_if_safari(:alert)
         add_test_files(false)
         get files_page
@@ -430,20 +430,20 @@ describe "groups" do
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
-      it "allows group members to move a file", priority: "1", test_id: 273633 do
+      it "allows group members to move a file", priority: "1" do
         add_test_files
         get files_page
         add_folder('destination_folder')
         move_file_to_folder('example.pdf', 'destination_folder')
       end
 
-      it "hides the publish cloud", priority: "1", test_id: 273628 do
+      it "hides the publish cloud", priority: "1" do
         add_test_files
         get files_page
         expect(f('#content')).not_to contain_css('.btn-link.published-status')
       end
 
-      it "does not allow group members to restrict access to a file", priority: "1", test_id: 304672 do
+      it "does not allow group members to restrict access to a file", priority: "1" do
         add_test_files
         get files_page
         f('.ef-item-row .ef-date-created-col').click
@@ -460,7 +460,7 @@ describe "groups" do
 
       it_behaves_like 'conferences_page', :student
 
-      it "allows access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
+      it "allows access to conferences only within the scope of a group", priority: "1" do
         get conferences_page
         expect(f('.new-conference-btn')).to be_displayed
         verify_no_course_user_access(conferences_page)
@@ -491,7 +491,7 @@ describe "groups" do
         end
       end
 
-      it 'lets student in group create a collaboration', priority: "1", test_id: 273641 do
+      it 'lets student in group create a collaboration', priority: "1" do
         get collaborations_page
         replace_content(find('#collaboration_title'), "c1")
         replace_content(find('#collaboration_description'), "c1 description")
@@ -504,7 +504,7 @@ describe "groups" do
         expect(fj('.collaboration .description:contains("c1 description")')).to be_present
       end
 
-      it 'can invite people within your group', priority: "1", test_id: 273642 do
+      it 'can invite people within your group', priority: "1" do
         students_in_group = @students
         seed_students(2, 'non-group student')
         get collaborations_page
@@ -513,7 +513,7 @@ describe "groups" do
         end
       end
 
-      it 'cannot invite people not in your group', priority: "1", test_id: 588010 do
+      it 'cannot invite people not in your group', priority: "1" do
         # overriding '@students' array with new students not included in the group
         seed_students(2, 'non-group Student')
         get collaborations_page
@@ -532,7 +532,7 @@ describe "groups" do
         expect(f(".available-users")).not_to contain_jqcss("li:contains(#{inactive_student.sortable_name}) .icon-user")
       end
 
-      it "only allows group members to access the group collaborations page", priority: "1", test_id: 319904 do
+      it "only allows group members to access the group collaborations page", priority: "1" do
         get collaborations_page
         expect(find('#breadcrumbs').text).to include('Collaborations')
         verify_no_course_user_access(collaborations_page)
