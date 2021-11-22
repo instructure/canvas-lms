@@ -261,7 +261,7 @@ module SeleniumDriverSetup
     rescue error_class => e
       puts "Attempt #{tries += 1} got error: #{e}"
       if tries >= how_many
-        $stderr.puts "Giving up"
+        warn "Giving up"
         failure_proc ? failure_proc.call : raise
       else
         sleep delay

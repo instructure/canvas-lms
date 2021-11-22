@@ -29,7 +29,7 @@ module ErrorContext
       super
       write_error_page if summary.example.exception
     rescue
-      $stderr.puts "There was an error generating the error page, sadlol: #{$ERROR_INFO}"
+      warn "There was an error generating the error page, sadlol: #{$ERROR_INFO}"
     end
 
     def escape_code(code)

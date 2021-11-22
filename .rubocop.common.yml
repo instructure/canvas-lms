@@ -432,6 +432,8 @@ Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/StderrPuts:
+  Severity: error
 Style/StringChars:
   Severity: error
 Style/StructInheritance:
@@ -519,8 +521,6 @@ Style/RescueModifier: # TODO
   Severity: warning
   AutoCorrect: false
 Style/ReturnNil: # TODO: autocorrect (investigate violations)
-  Enabled: false
-Style/StderrPuts: # TODO: autocorrect
   Enabled: false
 Style/StringConcatenation: # TODO: autocorrect (maybe)
   Enabled: false

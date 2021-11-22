@@ -28,7 +28,7 @@ namespace :i18n do
 
     Process.wait js_pid
     if $?.exitstatus > 0
-      $stderr.puts "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
+      warn "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
       exit $?.exitstatus
     end
     js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
@@ -131,7 +131,7 @@ namespace :i18n do
 
     system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
     if $?.exitstatus > 0
-      $stderr.puts "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
+      warn "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
       exit $?.exitstatus
     end
     file_translations = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
@@ -246,13 +246,13 @@ namespace :i18n do
               if (previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil)
                 last_export = { :type => :commit, :data => previous }
               else
-                $stderr.puts "Unable to load en.yml file"
+                warn "Unable to load en.yml file"
               end
             else
-              $stderr.puts "Commit contains no en.yml file"
+              warn "Commit contains no en.yml file"
             end
           else
-            $stderr.puts "Invalid commit hash"
+            warn "Invalid commit hash"
           end
           `git status -s | grep -v '^\?\?' | wc -l`
         else
@@ -261,10 +261,10 @@ namespace :i18n do
             if (previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil)
               last_export = { :type => :file, :data => previous }
             else
-              $stderr.puts "Unable to load yml file"
+              warn "Unable to load yml file"
             end
           else
-            $stderr.puts "Invalid path"
+            warn "Invalid path"
           end
         end
         break if last_export

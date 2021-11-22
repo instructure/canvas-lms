@@ -170,9 +170,9 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       desc "start spec_server."
       task :start do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts "spec_server is already running."
+          warn "spec_server is already running."
         else
-          $stderr.puts "Starting up spec_server ..."
+          warn "Starting up spec_server ..."
           FileUtils.mkdir_p('tmp/pids') unless test 'd', 'tmp/pids'
           system("ruby", "script/spec_server", "--daemon", "--pid", daemonized_server_pid)
         end
@@ -181,11 +181,11 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       desc "stop spec_server."
       task :stop do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts "Shutting down spec_server ..."
+          warn "Shutting down spec_server ..."
           system("kill", "-s", "TERM", File.read(daemonized_server_pid).strip) &&
             File.delete(daemonized_server_pid)
         else
-          $stderr.puts "No server running."
+          warn "No server running."
         end
       end
 
@@ -195,9 +195,9 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       desc "check if spec server is running"
       task :status do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts %{spec_server is running (PID: #{File.read(daemonized_server_pid).delete("\n")})}
+          warn %{spec_server is running (PID: #{File.read(daemonized_server_pid).delete("\n")})}
         else
-          $stderr.puts "No server running."
+          warn "No server running."
         end
       end
     end
