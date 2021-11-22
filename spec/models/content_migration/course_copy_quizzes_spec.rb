@@ -834,7 +834,7 @@ describe ContentMigration do
                :answers => [{
                  :text => "answer_text", :weight => 100,
                  :numerical_answer_type => "precision_answer",
-                 :answer_approximate => 99000000, :answer_precision => 2
+                 :answer_approximate => 99_000_000, :answer_precision => 2
                }] }.with_indifferent_access
       q.quiz_questions.create!(:question_data => data)
 
@@ -843,7 +843,7 @@ describe ContentMigration do
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
       answer = q2.quiz_questions[0].question_data["answers"][0]
       expect(answer["numerical_answer_type"]).to eq "precision_answer"
-      expect(answer["approximate"]).to eq 99000000
+      expect(answer["approximate"]).to eq 99_000_000
       expect(answer["precision"]).to eq 2
     end
 

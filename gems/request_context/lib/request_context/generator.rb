@@ -105,7 +105,7 @@ module RequestContext
         match = header_val.match(/t=(?<req_start>\d+)/)
         return unless match
 
-        delta = (Time.now.utc.to_f * 1000000).to_i - match['req_start'].to_i
+        delta = (Time.now.utc.to_f * 1_000_000).to_i - match['req_start'].to_i
         RequestContext::Generator.add_meta_header("q", delta)
       end
     end

@@ -54,8 +54,8 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'shows the grade' do
-    @assignment.update!(points_possible: 5782394)
-    @assignment.grade_student(@user, grade: 5782394, grader: @teacher)
+    @assignment.update!(points_possible: 5_782_394)
+    @assignment.grade_student(@user, grade: 5_782_394, grader: @teacher)
     @submission.reload
 
     render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
@@ -64,8 +64,8 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'shows the grade and the comment' do
-    @assignment.update!(points_possible: 25734)
-    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @assignment.update!(points_possible: 25_734)
+    @assignment.grade_student(@user, grade: 25_734, grader: @teacher)
     @assignment.update_submission(@user, comment: 'something different', commenter: @teacher)
     @submission.reload
 
@@ -77,8 +77,8 @@ describe "/courses/_recent_feedback" do
 
   it 'contains the new url when assignments 2 student view is enabled' do
     @course.enable_feature!(:assignments_2_student)
-    @assignment.update!(points_possible: 25734)
-    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @assignment.update!(points_possible: 25_734)
+    @assignment.grade_student(@user, grade: 25_734, grader: @teacher)
     @submission.reload
 
     render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
@@ -87,8 +87,8 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'contains the old url when assignments 2 student view is disabled' do
-    @assignment.update!(points_possible: 25734)
-    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @assignment.update!(points_possible: 25_734)
+    @assignment.grade_student(@user, grade: 25_734, grader: @teacher)
     @submission.reload
 
     assign(:current_user, @user)

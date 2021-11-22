@@ -190,7 +190,7 @@ describe WebConference do
     end
 
     it "rejects ridiculously long conferences" do
-      conference.duration = 100000000000000
+      conference.duration = 100_000_000_000_000
       expect(conference).not_to be_valid
     end
 

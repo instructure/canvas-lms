@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 describe CanvasConnect::MeetingArchive do
-  subject { CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).first }
+  subject { CanvasConnect::MeetingArchive.retrieve(38_230, mock_client.new).first }
 
   let(:mock_client) do
     Class.new do
@@ -49,7 +49,7 @@ describe CanvasConnect::MeetingArchive do
   end
 
   it "returns the correct number" do
-    expect(CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).count).to eq 2
+    expect(CanvasConnect::MeetingArchive.retrieve(38_230, mock_client.new).count).to eq 2
   end
 
   it "returns the name" do

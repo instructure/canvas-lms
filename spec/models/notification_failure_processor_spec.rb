@@ -120,7 +120,7 @@ describe NotificationFailureProcessor do
     end
 
     it "fails silently when given an invalid message id" do
-      nonexistent_id = 123456789
+      nonexistent_id = 123_456_789
 
       failure_queue = mock_queue([
                                    {

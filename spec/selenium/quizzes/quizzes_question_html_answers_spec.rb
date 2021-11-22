@@ -96,8 +96,7 @@ describe 'quizzes question with html answers' do
   end
 
   it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers',
-     priority: '1',
-     test_id: 209_358 do
+     priority: '1' do
     quiz_with_new_questions
     click_questions_tab
     edit_first_question
@@ -151,8 +150,7 @@ describe 'quizzes question with html answers' do
   end
 
   it 'saves open html answers when the question is submitted for multiple choice',
-     priority: '1',
-     test_id: 209_361 do
+     priority: '1' do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -167,7 +165,6 @@ describe 'quizzes question with html answers' do
 
   it 'saves open html answers when the question is submitted for multiple answers',
      priority: '1',
-     test_id: 209_362,
      custom_timeout: 30 do
     quiz_with_new_questions
     click_questions_tab

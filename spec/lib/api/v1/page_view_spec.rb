@@ -42,7 +42,7 @@ describe Api::V1::PageView do
                               :context_type => 'Course',
                               :context_id => @course.id,
                               :asset_type => 'asset',
-                              :asset_id => 12345,
+                              :asset_id => 12_345,
                               :user_agent => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/536.30.1 (KHTML, like Gecko) Version/6.0.5 Safari/536.30.1',
                               :render_time => 0.369,
                               :participated => false,

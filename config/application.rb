@@ -203,7 +203,7 @@ module CanvasRails
 
           configure_connection
 
-          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
+          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
 
           break
         rescue ::PG::Error => e

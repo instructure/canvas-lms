@@ -67,7 +67,7 @@ module ConditionalRelease
       end
 
       it 'must return an empty relation when nothing matches' do
-        expect(ScoringRange.for_score(-10000).count).to eq 0
+        expect(ScoringRange.for_score(-10_000).count).to eq 0
       end
 
       it 'must apply bounds when both assigned' do

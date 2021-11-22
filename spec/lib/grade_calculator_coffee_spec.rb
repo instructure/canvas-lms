@@ -269,7 +269,7 @@ describe GradeCalculator do
 
     it "grade dropping should work even in ridiculous circumstances" do
       set_grades [[nil, 20], [3, 10], [nil, 10],
-                  [nil, 999999999],
+                  [nil, 999_999_999],
                   [nil, nil]]
 
       @group.update_attribute(:rules, 'drop_lowest:2')

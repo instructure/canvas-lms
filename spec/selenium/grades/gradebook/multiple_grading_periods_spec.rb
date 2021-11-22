@@ -158,13 +158,13 @@ describe "interaction with grading periods" do
         )
       end
 
-      it 'lists an assignment from a previous grading period', priority: "2", test_course: 381145 do
+      it 'lists an assignment from a previous grading period', priority: "2", test_course: 381_145 do
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
         expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
       end
 
-      it 'lists an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
+      it 'lists an assignment from a current grading period when due date is updated', priority: "2", test_course: 576_764 do
         assignment.update(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"

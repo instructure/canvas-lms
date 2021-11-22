@@ -66,12 +66,12 @@ describe 'Delayed::Job' do
     end
 
     it "is resiliant to unexpected data" do
-      job = Delayed::Job.new(priority: 20, created_at: Time.zone.now, strand: "test", account_id: 12345)
+      job = Delayed::Job.new(priority: 20, created_at: Time.zone.now, strand: "test", account_id: 12_345)
       log_hash = JSON.parse(job.to_log_format).with_indifferent_access
       expect(log_hash["priority"]).to eq(20)
       expect(log_hash["strand"]).to eq("test")
       expect(log_hash["shard_id"]).to eq(Shard.current.id)
-      expect(log_hash["account_id"]).to eq(12345)
+      expect(log_hash["account_id"]).to eq(12_345)
       expect(log_hash["root_account_id"]).to be_nil
       expect(log_hash["jobs_cluster"]).to eq(Shard.current.delayed_jobs_shard.id)
       expect(log_hash["db_cluster"]).to eq(Shard.current.database_server.id)

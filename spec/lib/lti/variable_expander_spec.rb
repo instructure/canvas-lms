@@ -662,10 +662,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.account.id' do
-        allow(account).to receive(:id).and_return(12345)
+        allow(account).to receive(:id).and_return(12_345)
         exp_hash = { test: '$Canvas.account.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 12345
+        expect(exp_hash[:test]).to eq 12_345
       end
 
       it 'has substitution for $Canvas.account.name' do
@@ -683,10 +683,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.rootAccount.id' do
-        allow(root_account).to receive(:id).and_return(54321)
+        allow(root_account).to receive(:id).and_return(54_321)
         exp_hash = { test: '$Canvas.rootAccount.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 54321
+        expect(exp_hash[:test]).to eq 54_321
       end
 
       it 'has substitution for $Canvas.rootAccount.sisSourceId' do
@@ -697,10 +697,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.id' do
-        allow(root_account).to receive(:id).and_return(54321)
+        allow(root_account).to receive(:id).and_return(54_321)
         exp_hash = { test: '$Canvas.root_account.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 54321
+        expect(exp_hash[:test]).to eq 54_321
       end
 
       it 'has substitution for $Canvas.root_account.uuid' do
@@ -718,10 +718,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.global_id' do
-        allow(root_account).to receive(:global_id).and_return(10054321)
+        allow(root_account).to receive(:global_id).and_return(10_054_321)
         exp_hash = { test: '$Canvas.root_account.global_id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 10054321
+        expect(exp_hash[:test]).to eq 10_054_321
       end
 
       it 'has substitution for $Canvas.shard.id' do

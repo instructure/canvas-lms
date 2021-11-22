@@ -82,7 +82,7 @@ describe ExternalToolsController do
 
     it "sets status code to 404 if the requested tool id does not exist" do
       user_session(@teacher)
-      get :jwt_token, params: { course_id: @course.id, tool_id: 999999 }
+      get :jwt_token, params: { course_id: @course.id, tool_id: 999_999 }
       expect(response.status).to eq 404
     end
 

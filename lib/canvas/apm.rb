@@ -44,7 +44,7 @@ module Canvas
   #  calling Canvas::Apm.annotate_trace() with the shard and account
   #  will provide the facets useful for searching by in the aggregation client.
   module Apm
-    HOST_SAMPLING_INTERVAL = 10000
+    HOST_SAMPLING_INTERVAL = 10_000
     class << self
       attr_writer :enable_debug_mode, :hostname, :tracer
       attr_accessor :canvas_cluster

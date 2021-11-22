@@ -700,7 +700,7 @@ RSpec.describe ApplicationController do
       let(:page_view_info) do
         {
           request_id: '379b0dbc-f01c-4dc4-ae05-15f23588cefb',
-          user_id: 10000000000004,
+          user_id: 10_000_000_000_004,
           created_at: '2020-06-12T17:02:44.14Z'
         }
       end
@@ -1731,7 +1731,7 @@ RSpec.describe ApplicationController do
     end
 
     it 'stringifies the non-strings in the context attributes' do
-      current_user_attributes = { global_id: 12345, time_zone: 'asdf' }
+      current_user_attributes = { global_id: 12_345, time_zone: 'asdf' }
 
       current_user = double(current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)

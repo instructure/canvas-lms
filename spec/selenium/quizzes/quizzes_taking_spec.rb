@@ -62,7 +62,6 @@ describe 'quiz taking' do
   it 'allows to take the quiz as long as there are attempts left',
      :xbrowser,
      priority: '1',
-     test_id: 140_606,
      custom_timeout: 30 do
     @quiz.allowed_attempts = 2
     @quiz.save!
@@ -82,8 +81,7 @@ describe 'quiz taking' do
   end
 
   it 'shows a prompt when attempting to submit with unanswered questions',
-     priority: '1',
-     test_id: 140_608 do
+     priority: '1' do
     skip_if_safari(:alert)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f('#take_quiz_link').click }

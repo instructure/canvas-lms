@@ -644,7 +644,7 @@ module Api
 
         before do
           @sis_id = 1357
-          @batch = 991357
+          @batch = 991_357
           @has_right = false
         end
 

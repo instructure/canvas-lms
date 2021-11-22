@@ -23,7 +23,7 @@ class ChangeSubmissionCommentDraftDefault < ActiveRecord::Migration[4.2]
 
   def up
     change_column_default(:submission_comments, :draft, false)
-    DataFixup::BackfillNulls.run(SubmissionComment, :draft, default_value: false, batch_size: 10000)
+    DataFixup::BackfillNulls.run(SubmissionComment, :draft, default_value: false, batch_size: 10_000)
   end
 
   def down

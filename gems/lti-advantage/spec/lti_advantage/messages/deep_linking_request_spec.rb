@@ -30,8 +30,8 @@ module LtiAdvantage::Messages
         azp: '163440e5-1c75-4c28-a07c-43e8a9cd3110',
         sub: '7da708b6-b6cf-483b-b899-11831c685b6f',
         deployment_id: 'ee493d2e-9f2e-4eca-b2a0-122413887caa',
-        iat: 1529681618,
-        exp: 1529681634,
+        iat: 1_529_681_618,
+        exp: 1_529_681_634,
         iss: 'https://platform.example.edu',
         nonce: '5a234202-6f0e-413d-8793-809db7a95930',
         deep_linking_settings: LtiAdvantage::Models::DeepLinkingSetting.new(
@@ -106,8 +106,8 @@ module LtiAdvantage::Messages
           azp: '163440e5-1c75-4c28-a07c-43e8a9cd3110',
           sub: '7da708b6-b6cf-483b-b899-11831c685b6f',
           deployment_id: 'ee493d2e-9f2e-4eca-b2a0-122413887caa',
-          iat: 1529681618,
-          exp: 1529681634,
+          iat: 1_529_681_618,
+          exp: 1_529_681_634,
           iss: 'https://platform.example.edu',
           nonce: '5a234202-6f0e-413d-8793-809db7a95930',
           deep_linking_settings: LtiAdvantage::Models::DeepLinkingSetting.new(

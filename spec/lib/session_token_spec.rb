@@ -28,7 +28,7 @@ describe SessionToken do
     expect(new_token).to be_valid
 
     # there was an error with the padding of the base64 encoding for a different sized token
-    token = SessionToken.new(1145874)
+    token = SessionToken.new(1_145_874)
     token_string = token.to_s
     new_token = SessionToken.parse(token_string)
     expect(new_token).to be_valid

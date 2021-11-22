@@ -27,7 +27,7 @@ module Canvas
     class Info
       attr_reader :req, :account, :user, :rci, :type
 
-      MAX_DATA_SIZE = 65535
+      MAX_DATA_SIZE = 65_535
 
       def initialize(request, root_account, user, opts = {})
         @req = request

@@ -22,7 +22,7 @@ class AddLegacyToDiscussionEntry < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    new_pg = connection.postgresql_version >= 110000
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
     defaults = new_pg ? { default: true, null: false } : {}
     add_column :discussion_entries, :legacy, :boolean, if_not_exists: true, **defaults
 

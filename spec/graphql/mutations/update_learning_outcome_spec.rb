@@ -85,7 +85,7 @@ describe Mutations::UpdateLearningOutcome do
     end
 
     it "requires outcome to exist" do
-      result = execute_with_input(variables(id: 99999))
+      result = execute_with_input(variables(id: 99_999))
       expect_error(result, "unable to find LearningOutcome")
     end
 

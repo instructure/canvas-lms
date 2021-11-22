@@ -69,7 +69,7 @@ describe IncomingMail::ReplyToAddress do
         expect(message).to receive(:path_type).and_return('email')
         expect(message).to receive(:context_type).and_return('Course')
         expect(message).to receive(:id).twice.and_return(Shard::IDS_PER_SHARD - 1)
-        @shard1.id = 123456
+        @shard1.id = 123_456
         @shard1.save!
         expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(Shard::IDS_PER_SHARD - 1))
         created_at = 50.years.from_now

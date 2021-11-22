@@ -215,7 +215,7 @@ describe CanvasKaltura::ClientV3 do
 
   describe "startSession" do
     it "sends Kaltura a request with proper parameters for a user" do
-      user_id = 12345
+      user_id = 12_345
       session_type = CanvasKaltura::SessionType::USER
 
       kaltura_stub = stub_kaltura_session(
@@ -268,7 +268,7 @@ describe CanvasKaltura::ClientV3 do
 
   describe "mediaGet" do
     it "calls getRequest with proper parameters" do
-      entry_id = 12345
+      entry_id = 12_345
 
       expect(@kaltura).to receive(:getRequest).with(
         :media, :get, { :ks => nil, :entryId => entry_id }
@@ -292,12 +292,12 @@ describe CanvasKaltura::ClientV3 do
       expect(@kaltura).to receive(:getRequest).with(
         :media, :update, {
           :ks => nil,
-          :entryId => 12345,
+          :entryId => 12_345,
           'mediaEntry:key' => 'value'
         }
       ).and_return(double(:children => []))
 
-      @kaltura.mediaUpdate(12345, { "key" => "value" })
+      @kaltura.mediaUpdate(12_345, { "key" => "value" })
     end
 
     it "returns a properly formatted item" do
@@ -313,10 +313,10 @@ describe CanvasKaltura::ClientV3 do
   describe "mediaDelete" do
     it "calls getRequest with proper parameters" do
       expect(@kaltura).to receive(:getRequest).with(
-        :media, :delete, { :ks => nil, :entryId => 12345 }
+        :media, :delete, { :ks => nil, :entryId => 12_345 }
       )
 
-      @kaltura.mediaDelete(12345)
+      @kaltura.mediaDelete(12_345)
     end
   end
 

@@ -100,7 +100,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     it 'rejects an unknown match' do
       rc = subject.serialize([{
                                answer_id: 7396,
-                               match_id: 123456
+                               match_id: 123_456
                              }])
 
       expect(rc.error).not_to be_nil

@@ -287,7 +287,7 @@ describe GroupCategoriesController do
 
     it "fails if category doesn't exist" do
       user_session(@teacher)
-      delete 'destroy', params: { :course_id => @course.id, :id => 11235 }
+      delete 'destroy', params: { :course_id => @course.id, :id => 11_235 }
       expect(response).not_to be_successful
     end
 

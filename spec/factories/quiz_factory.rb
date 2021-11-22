@@ -152,7 +152,7 @@ module Factories
       "name" => "Question",
       "correct_comments" => "",
       "question_type" => "true_false_question",
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "neutral_comments" => "",
       "incorrect_comments" => "",
       "question_name" => "Question",
@@ -181,7 +181,7 @@ module Factories
       "name" => "Question",
       "correct_comments" => "",
       "question_type" => "short_answer_question",
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "neutral_comments" => "",
       "incorrect_comments" => "",
       "question_name" => "Question",
@@ -206,11 +206,11 @@ module Factories
   end
 
   def short_answer_question_data_one_blank
-    { "name" => "Question", "correct_comments" => "", "question_type" => "short_answer_question", "assessment_question_id" => 8197062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 16.5, "answers" => [{ "comments" => "", "weight" => 100, "text" => "stupid", "id" => 7100 }, { "comments" => "", "weight" => 100, "text" => "dumb", "id" => 2159 }, { "comments" => "", "weight" => 100, "text" => "", "id" => 9090 }], "question_text" => "<p>there's no such thing as a _____ question</p>", "id" => 1 }.with_indifferent_access
+    { "name" => "Question", "correct_comments" => "", "question_type" => "short_answer_question", "assessment_question_id" => 8_197_062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 16.5, "answers" => [{ "comments" => "", "weight" => 100, "text" => "stupid", "id" => 7100 }, { "comments" => "", "weight" => 100, "text" => "dumb", "id" => 2159 }, { "comments" => "", "weight" => 100, "text" => "", "id" => 9090 }], "question_text" => "<p>there's no such thing as a _____ question</p>", "id" => 1 }.with_indifferent_access
   end
 
   def essay_question_data
-    { "name" => "Question", "correct_comments" => "", "question_type" => "essay_question", "comments" => nil, "assessment_question_id" => 8197062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 13.6, "answers" => [], "question_text" => "<p>Please summarize the history of the world in 3 sentences</p>", "id" => 1 }.with_indifferent_access
+    { "name" => "Question", "correct_comments" => "", "question_type" => "essay_question", "comments" => nil, "assessment_question_id" => 8_197_062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 13.6, "answers" => [], "question_text" => "<p>Please summarize the history of the world in 3 sentences</p>", "id" => 1 }.with_indifferent_access
   end
 
   def text_only_question_data
@@ -218,7 +218,7 @@ module Factories
   end
 
   def multiple_dropdowns_question_data
-    { "position" => 3, "correct_comments" => "", "name" => "Question 3", "question_type" => "multiple_dropdowns_question", "assessment_question_id" => 1695442, "neutral_comments" => "", "incorrect_comments" => "", "id" => 1630873, "question_name" => "Question 3", "points_possible" => 0.5, "original_question_text" => "[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]", "answers" => [
+    { "position" => 3, "correct_comments" => "", "name" => "Question 3", "question_type" => "multiple_dropdowns_question", "assessment_question_id" => 1_695_442, "neutral_comments" => "", "incorrect_comments" => "", "id" => 1_630_873, "question_name" => "Question 3", "points_possible" => 0.5, "original_question_text" => "[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]", "answers" => [
       { "comments" => "", "weight" => 100, "text" => "y", "id" => 4390, "blank_id" => "structure1" },
       { "comments" => "", "weight" => 0, "text" => "n", "id" => 1522, "blank_id" => "structure1" },
       { "comments" => "", "weight" => 0, "text" => "n", "id" => 7446, "blank_id" => "structure1" },
@@ -287,7 +287,7 @@ module Factories
   end
 
   def numerical_question_data
-    { "name" => "Question", "correct_comments" => "", "question_type" => "numerical_question", "assessment_question_id" => 8197062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 26.2, "answers" => [
+    { "name" => "Question", "correct_comments" => "", "question_type" => "numerical_question", "assessment_question_id" => 8_197_062, "neutral_comments" => "", "incorrect_comments" => "", "question_name" => "Question", "points_possible" => 26.2, "answers" => [
       { "exact" => 4, "comments" => "", "numerical_answer_type" => "exact_answer", "margin" => 0, "weight" => 100, "text" => "", "id" => 9222 },
       { "exact" => -4, "comments" => "", "numerical_answer_type" => "exact_answer", "margin" => 0, "weight" => 100, "text" => "", "id" => 997 },
       { "comments" => "", "numerical_answer_type" => "range_answer", "weight" => 100, "text" => "", "id" => 9370, "end" => 4.1, "start" => 3.9 },
@@ -300,7 +300,7 @@ module Factories
     { "name" => "Question",
       "correct_comments" => "",
       "question_type" => "numerical_question",
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "neutral_comments" => "",
       "incorrect_comments" => "",
       "question_name" => "Question",
@@ -318,7 +318,7 @@ module Factories
       "answer_tolerance" => 0.02,
       "question_type" => "calculated_question",
       "formulas" => [{ "formula" => "5 + (x - y)" }],
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "variables" =>
       [{ "name" => "x", "scale" => 2, "max" => 7, "min" => 2 },
        { "name" => "y", "scale" => 0, "max" => 23, "min" => 17 }],
@@ -345,7 +345,7 @@ module Factories
     data = { "name" => "Question",
              "correct_comments" => "",
              "question_type" => "multiple_answers_question",
-             "assessment_question_id" => 8197062,
+             "assessment_question_id" => 8_197_062,
              "neutral_comments" => "",
              "incorrect_comments" => "",
              "question_name" => "Question",

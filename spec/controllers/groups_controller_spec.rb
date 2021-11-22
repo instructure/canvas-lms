@@ -409,7 +409,7 @@ describe GroupsController do
     it "fails when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
       @course.group_categories.create(:name => 'some category')
-      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11235 } }
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11_235 } }
       expect(response).not_to be_successful
     end
 
@@ -496,7 +496,7 @@ describe GroupsController do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
-      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => 11235 } }
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => 11_235 } }
       expect(response).not_to be_successful
     end
 

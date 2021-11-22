@@ -1089,7 +1089,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
         # Cross-shard -- to be ignored (can't tell if it exists or not easily)
         f3 = Folder.create!(context: @course)
-        f3.update_columns(context_id: ((Shard.last&.id.to_i + 99999) * Shard::IDS_PER_SHARD) + 1)
+        f3.update_columns(context_id: ((Shard.last&.id.to_i + 99_999) * Shard::IDS_PER_SHARD) + 1)
 
         # Course exists. Not returned.
         f4 = Folder.create!(context: @course)

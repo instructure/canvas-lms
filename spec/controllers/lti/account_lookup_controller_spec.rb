@@ -63,7 +63,7 @@ describe Lti::AccountLookupController do
 
     context 'when an invalid account ID is given' do
       let(:params_overrides) do
-        { account_id: 991234 }
+        { account_id: 991_234 }
       end
 
       it 'returns a 404' do
@@ -74,11 +74,11 @@ describe Lti::AccountLookupController do
 
     context 'when an ID on an invalid shard given' do
       let(:params_overrides) do
-        { account_id: 1987650000000000000 + Account.root_accounts.first.local_id }
+        { account_id: 1_987_650_000_000_000_000 + Account.root_accounts.first.local_id }
       end
 
       it 'returns a 404' do
-        expect(Shard.find_by(id: 198765)).to eq(nil)
+        expect(Shard.find_by(id: 198_765)).to eq(nil)
         send_request
         expect(response.code).to eq('404')
       end

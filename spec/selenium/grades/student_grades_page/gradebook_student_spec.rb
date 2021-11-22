@@ -46,8 +46,7 @@ describe 'Student Gradebook' do
   ]
 
   shared_examples 'Student Gradebook View' do |role|
-    it "for #{role == 'observer' ? 'an Observer' : 'a Student'}", priority: '1',
-                                                                  test_id: role == 'observer' ? 164027 : 164024 do
+    it "for #{role == 'observer' ? 'an Observer' : 'a Student'}", priority: '1' do
       course_with_student_logged_in({ course_name: 'Course A' })
       course1 = @course
       student = @user

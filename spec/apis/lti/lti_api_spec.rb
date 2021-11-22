@@ -52,7 +52,7 @@ describe LtiApiController, type: :request do
 
   let(:request_body) do
     {
-      "paperid" => 200505101,
+      "paperid" => 200_505_101,
       "outcomes_tool_placement_url" => "https://sandbox.turnitin.com/api/lti/1p0/outcome_tool_data/200505101?lang=en_us",
       "lis_result_sourcedid" => Lti::LtiOutboundAdapter.new(tool, lti_student, lti_course).encode_source_id(lti_assignment)
     }

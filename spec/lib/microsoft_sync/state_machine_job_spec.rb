@@ -186,7 +186,7 @@ module MicrosoftSync
 
       # On Jenkins, global and local IDs seems to be the same, so test this explicitly:
       it 'uses the global id in the strand name' do
-        expect(state_record).to receive(:global_id).and_return 987650000000012345
+        expect(state_record).to receive(:global_id).and_return 987_650_000_000_012_345
         subject.run_later
         expect(steps_object.steps_run[0][1][0][:strand]).to eq(
           "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:987650000000012345"

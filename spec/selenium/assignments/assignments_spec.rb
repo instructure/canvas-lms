@@ -242,7 +242,7 @@ describe "assignments" do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
-      assignment_name = "test_assignment_thing_#{rand(10000)}"
+      assignment_name = "test_assignment_thing_#{rand(10_000)}"
       get "/courses/#{@course.id}/assignments"
       group = @course.assignment_groups.first
       f('.add_assignment').click

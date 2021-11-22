@@ -79,7 +79,7 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
 
   let(:outcome_response_json) do
     {
-      "paperid" => 200505101,
+      "paperid" => 200_505_101,
       "outcomes_tool_placement_url" => "https://turnitin.example.com/api/lti/1p0/outcome_tool_data/201?lang=en_us",
       "lis_result_sourcedid" => Lti::LtiOutboundAdapter.new(
         tool,

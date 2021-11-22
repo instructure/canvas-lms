@@ -53,7 +53,7 @@ class CanvasUnzip
     warnings[tag] << entry.name
   end
 
-  BUFFER_SIZE = 65536
+  BUFFER_SIZE = 65_536
   DEFAULT_BYTE_LIMIT = 50 << 30
   def self.default_limits(file_size)
     # * maximum byte count is, unless specified otherwise,

@@ -79,7 +79,7 @@ describe EventStream::IndexStrategy::Cassandra do
       before do
         @id = double('id', :to_s => '1234567890')
         @key = "key_value"
-        @timestamp = double('timestamp', :to_i => 12345)
+        @timestamp = double('timestamp', :to_i => 12_345)
         @record = double('record', :id => @id, :created_at => @timestamp)
       end
 

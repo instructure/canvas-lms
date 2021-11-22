@@ -119,7 +119,7 @@ describe Mutations::CreateLearningOutcomeGroup do
     end
 
     it "requires parent outcome group to exist" do
-      result = execute_query(mutation_str(id: 99999, title: title), context)
+      result = execute_query(mutation_str(id: 99_999, title: title), context)
       expect_error(result, 'Group not found')
     end
 

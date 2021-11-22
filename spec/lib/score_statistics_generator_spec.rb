@@ -195,14 +195,14 @@ describe ScoreStatisticsGenerator do
     end
 
     it "doesn't write to the database if the average is too large" do
-      @course.student_enrollments.find_by(user_id: @student).scores.where(course_score: true).update_all(current_score: 10000000.0)
+      @course.student_enrollments.find_by(user_id: @student).scores.where(course_score: true).update_all(current_score: 10_000_000.0)
 
       expect(CourseScoreStatistic).not_to receive(:connection)
       ScoreStatisticsGenerator.update_course_score_statistic(@course.id)
     end
 
     it "doesn't write to the database if the average is too small" do
-      @course.student_enrollments.find_by(user_id: @student).scores.where(course_score: true).update_all(current_score: -10000000.0)
+      @course.student_enrollments.find_by(user_id: @student).scores.where(course_score: true).update_all(current_score: -10_000_000.0)
 
       expect(CourseScoreStatistic).not_to receive(:connection)
       ScoreStatisticsGenerator.update_course_score_statistic(@course.id)

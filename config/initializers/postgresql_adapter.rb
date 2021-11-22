@@ -92,7 +92,7 @@ module PostgreSQLAdapterExtensions
   # have max length validations in the models.
   def type_to_sql(type, limit: nil, **)
     if type == :text && limit
-      if limit <= 10485760
+      if limit <= 10_485_760
         type = :string
       else
         limit = nil
@@ -293,7 +293,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def icu_collations
-    return [] if postgresql_version < 120000
+    return [] if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
 
     @collations ||= select_rows <<~SQL.squish, "SCHEMA"
       SELECT nspname, collname
@@ -307,7 +307,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def create_icu_collations
-    return if postgresql_version < 120000
+    return if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
 
     original_locale = I18n.locale
 

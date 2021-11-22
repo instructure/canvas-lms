@@ -689,7 +689,7 @@ describe "ZipPackage" do
         zip_package = create_zip_package
         course_data = zip_package.parse_course_data
         expect(course_data[:assignments]).to eq []
-        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }]
+        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30_339, files: nil }]
       end
 
       it "exports items that are module items" do
@@ -818,15 +818,15 @@ describe "ZipPackage" do
         course_data = create_zip_package.parse_course_data
         expect(course_data[:pages].length).to eq 1
         expect(course_data[:files]).to include(
-          { type: 'file', name: '292.mp3', size: 123716, files: nil },
-          { type: 'file', name: 'cn_image.jpg', size: 30339, files: nil },
+          { type: 'file', name: '292.mp3', size: 123_716, files: nil },
+          { type: 'file', name: 'cn_image.jpg', size: 30_339, files: nil },
           { type: 'file', name: 'amazing_file.txt', size: 26, files: nil }
         )
       end
 
       it 'does not blow up when exporting linked recorded media files' do
         media_id = "m_media-id"
-        file_data = { type: 'file', name: 'video.mp4', size: 172780, files: nil }
+        file_data = { type: 'file', name: 'video.mp4', size: 172_780, files: nil }
         att = Attachment.create!(
           filename: 'video.mp4',
           uploaded_data: StringIO.new('recorded stuff'),
@@ -854,7 +854,7 @@ describe "ZipPackage" do
 
       it "doesn't blow up when a media upload is in another folder" do
         media_id = "m_media-id"
-        file_data = { type: 'file', name: 'video.mp4', size: 172780, files: nil }
+        file_data = { type: 'file', name: 'video.mp4', size: 172_780, files: nil }
         att = Attachment.create!(
           filename: 'video.mp4',
           uploaded_data: StringIO.new('recorded stuff'),
@@ -909,7 +909,7 @@ describe "ZipPackage" do
           assignmentExportId: create_key(survey.assignment), questionCount: 0, timeLimit: nil,
           attempts: 1, graded: false, dueAt: due_at.iso8601, lockAt: nil, unlockAt: nil
         }]
-        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }]
+        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30_339, files: nil }]
       end
 
       it "exports quizzes and discussions that are linked as assignments" do
@@ -952,7 +952,7 @@ describe "ZipPackage" do
           lockAt: nil, unlockAt: nil, graded: false
         }]
         expect(course_data[:files]).to eq [{ type: "folder", name: "folder#1", size: nil, files:
-          [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }] }]
+          [{ type: "file", name: "cn_image.jpg", size: 30_339, files: nil }] }]
       end
 
       it "does not crash on index links" do
@@ -977,7 +977,7 @@ describe "ZipPackage" do
         module2.unlock_at = 1.day.from_now
         module2.save!
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }]
+        expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30_339, files: nil }]
         expect(course_data[:pages]).to eq []
       end
     end

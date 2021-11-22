@@ -110,7 +110,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
   end
 
   def sort_key
-    [question[:position] || 10000, question_text, question[:id], -all_respondents.size]
+    [question[:position] || 10_000, question_text, question[:id], -all_respondents.size]
   end
 
   private

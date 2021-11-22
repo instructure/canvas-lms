@@ -29,8 +29,8 @@ module Canvas
 
       let(:request_context_id) { 'abcdefg1234567' }
       let(:auth_header) { "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
-      let(:account) { double(global_id: 1122334455) }
-      let(:user) { double(global_id: 5544332211) }
+      let(:account) { double(global_id: 1_122_334_455) }
+      let(:user) { double(global_id: 5_544_332_211) }
       let(:opts) { { request_context_id: request_context_id, type: 'core_meltdown' } }
 
       describe 'initialization' do
@@ -49,7 +49,7 @@ module Canvas
 
         it 'digests request information' do
           allow(request).to receive(:remote_ip).and_return("123.456")
-          expect(output[:tags][:account_id]).to eq(1122334455)
+          expect(output[:tags][:account_id]).to eq(1_122_334_455)
           expect(output[:tags][:type]).to eq('core_meltdown')
           expect(output[:extra][:request_context_id]).to eq(request_context_id)
           expect(output[:extra]['REMOTE_ADDR']).to eq("123.456")
@@ -66,7 +66,7 @@ module Canvas
         end
 
         it 'includes user information' do
-          expect(output[:tags][:user_id]).to eq(5544332211)
+          expect(output[:tags][:user_id]).to eq(5_544_332_211)
         end
 
         it 'passes important headers' do

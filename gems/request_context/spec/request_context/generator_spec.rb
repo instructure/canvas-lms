@@ -119,12 +119,12 @@ describe "RequestContext::Generator" do
   it "calculates the 'queued' time if header is passed" do
     Timecop.freeze do
       Thread.current[:context] = nil
-      env['HTTP_X_REQUEST_START'] = "t=#{(1.minute.ago.to_f * 1000000).to_i}"
+      env['HTTP_X_REQUEST_START'] = "t=#{(1.minute.ago.to_f * 1_000_000).to_i}"
       _, headers, = RequestContext::Generator.new(lambda do |_env|
         [200, {}, []]
       end).call(env)
       q = headers["X-Canvas-Meta"].match(/q=(\d+)/)[1].to_f
-      expect(q / 1000000).to eq 60.0
+      expect(q / 1_000_000).to eq 60.0
     end
   end
 

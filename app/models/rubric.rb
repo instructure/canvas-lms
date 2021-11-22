@@ -250,7 +250,7 @@ class Rubric < ActiveRecord::Base
   def unique_item_id(id = nil)
     @used_ids ||= {}
     while !id || @used_ids[id]
-      id = "#{rubric_id || self.id}_#{rand(10000)}"
+      id = "#{rubric_id || self.id}_#{rand(10_000)}"
     end
     @used_ids[id] = true
     id

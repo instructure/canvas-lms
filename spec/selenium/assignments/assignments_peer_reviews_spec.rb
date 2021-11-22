@@ -281,7 +281,7 @@ describe "assignments" do
         submission_data[:status] = "scored"
         submission_data[:object_id] = "canvas/1/25/5/ee0486b43afa304201c1d8dd44ec2da3d76dd86c"
         submission_data[:submit_time] = Time.now.to_i
-        submission_data[:similarity_score_check_time] = 1481569668
+        submission_data[:similarity_score_check_time] = 1_481_569_668
         submission_data[:similarity_score_time] = Time.now.to_i
         submission_data[:similarity_score] = Time.now.to_i
         submission_data[:similarity_score] = 100

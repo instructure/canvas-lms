@@ -103,10 +103,10 @@ class Quizzes::QuizQuestion::AnswerGroup
         return suggested_id
       end
 
-      id = rand(10000)
+      id = rand(10_000)
 
       while taken_ids.include?(id)
-        id = rand(10000)
+        id = rand(10_000)
       end
 
       id

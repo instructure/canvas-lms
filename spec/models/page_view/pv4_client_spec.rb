@@ -63,11 +63,11 @@ describe PageView::Pv4Client do
       expect(pv.url).to eq 'http://canvas.instructure.com/accounts/2/users/1'
       expect(pv.created_at).to eq Time.zone.parse("2015-11-05T17:01:20.306Z")
       expect(pv.session_id).to eq 'c73d248f3e4cec530261c95232ba63fg'
-      expect(pv.context_id).to eq 120000000000002
+      expect(pv.context_id).to eq 120_000_000_000_002
       expect(pv.context_type).to eq 'Account'
       expect(pv.user_agent).to be_include('Safari')
-      expect(pv.account_id).to eq 120000000000002
-      expect(pv.user_id).to eq 31410000000000028
+      expect(pv.account_id).to eq 120_000_000_000_002
+      expect(pv.user_id).to eq 31_410_000_000_000_028
       expect(pv.remote_ip).to eq '192.168.0.1'
       expect(pv.render_time).to eq 6.367549
     end

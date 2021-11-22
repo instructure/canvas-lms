@@ -159,7 +159,7 @@ class Login::CanvasController < ApplicationController
     flash[:error] = if mobile_device?
                       message
                     else
-                      { html: message, timeout: 15000 }
+                      { html: message, timeout: 15_000 }
                     end
     @errored = true
     @headers = false
