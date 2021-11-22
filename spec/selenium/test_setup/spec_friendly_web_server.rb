@@ -39,7 +39,7 @@ class SpecFriendlyWebServer
       Thread.new do
         @server.run
       rescue
-        $stderr.puts "Unexpected server error: #{$ERROR_INFO.message}"
+        warn "Unexpected server error: #{$ERROR_INFO.message}"
         exit! 1
       end
     rescue Errno::EADDRINUSE, Errno::EACCES
@@ -60,7 +60,7 @@ class SpecFriendlyWebServer
         sleep 1
       end
       puts "Failed!"
-      $stderr.puts "unable to start web server within #{timeout} seconds!"
+      warn "unable to start web server within #{timeout} seconds!"
       raise SeleniumDriverSetup::ServerStartupError # we'll rescue and retry on a new port
     end
 

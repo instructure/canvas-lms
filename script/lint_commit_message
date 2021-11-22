@@ -24,12 +24,12 @@ def comment(severity, line, message, link_to_guidelines: false)
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
     payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message }
     `gergich comment #{Shellwords.escape(payload.to_json)}`
-    $stderr.puts "line #{line}: [#{severity}]: #{message}"
+    warn "line #{line}: [#{severity}]: #{message}"
   elsif line
-    $stderr.puts $lines[line - 1]
-    $stderr.puts "  ^: [#{severity}]: #{message}"
+    warn $lines[line - 1]
+    warn "  ^: [#{severity}]: #{message}"
   else
-    $stderr.puts "[#{severity}]: #{message}"
+    warn "[#{severity}]: #{message}"
   end
 end
 
