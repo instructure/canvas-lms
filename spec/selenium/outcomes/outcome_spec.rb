@@ -43,19 +43,19 @@ describe "outcomes" do
     end
 
     context "create/edit/delete outcomes" do
-      it "creates a learning outcome with a new rating (root level)", priority: "1", test_id: 250533 do
+      it "creates a learning outcome with a new rating (root level)", priority: "1" do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
-      it "creates a learning outcome (nested)", priority: "1", test_id: 250534 do
+      it "creates a learning outcome (nested)", priority: "1" do
         should_create_a_learning_outcome_nested
       end
 
-      it "edits a learning outcome and delete a rating", priority: "1", test_id: 250535 do
+      it "edits a learning outcome and delete a rating", priority: "1" do
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
-      it "deletes a learning outcome", priority: "1", test_id: 250536 do
+      it "deletes a learning outcome", priority: "1" do
         skip_if_safari(:alert)
         should_delete_a_learning_outcome
       end
@@ -66,7 +66,7 @@ describe "outcomes" do
           f('.add_outcome_link').click
         end
 
-        it "validates default values", priority: "1", test_id: 261707 do
+        it "validates default values", priority: "1" do
           expect(f('#calculation_method')).to have_value('decaying_average')
           expect(f('#calculation_int')).to have_value('65')
           expect(f('#calculation_int_example')).to include_text("Most recent result counts as 65%"\
@@ -75,17 +75,17 @@ describe "outcomes" do
                                                                 " will be returned.")
         end
 
-        it "validates decaying average_range", priority: "2", test_id: 261708 do
+        it "validates decaying average_range", priority: "2" do
           should_validate_decaying_average_range
         end
 
-        it "validates calculation int accepatble values", priority: "1", test_id: 261709 do
+        it "validates calculation int accepatble values", priority: "1" do
           save_without_error(1)
           f('.edit_button').click
           save_without_error(99)
         end
 
-        it "retains the settings after saving", priority: "1", test_id: 261710 do
+        it "retains the settings after saving", priority: "1" do
           save_without_error(rand(1..99), 'Decaying Average')
           expect(f('#calculation_method').text).to include('Decaying Average')
         end
@@ -97,7 +97,7 @@ describe "outcomes" do
           f('.add_outcome_link').click
         end
 
-        it "validates default values", priority: "1", test_id: 261711 do
+        it "validates default values", priority: "1" do
           click_option('#calculation_method', "n Number of Times")
           expect(f('#calculation_int')).to have_value('5')
           expect(f('#mastery_points')).to have_value('3')
@@ -106,18 +106,18 @@ describe "outcomes" do
                                                                 " to calculate final score")
         end
 
-        it "validates n mastery_range", priority: "2", test_id: 303711 do
+        it "validates n mastery_range", priority: "2" do
           should_validate_n_mastery_range
         end
 
-        it "validates calculation int acceptable range values", priority: "1", test_id: 261713 do
+        it "validates calculation int acceptable range values", priority: "1" do
           click_option('#calculation_method', "n Number of Times")
           save_without_error(2)
           f('.edit_button').click
           save_without_error(5)
         end
 
-        it "retains the settings after saving", priority: "1", test_id: 261714 do
+        it "retains the settings after saving", priority: "1" do
           click_option('#calculation_method', "n Number of Times")
           save_without_error(3, 'n Number of Times')
           refresh_page
@@ -128,24 +128,24 @@ describe "outcomes" do
       end
 
       context "create/edit/delete outcome groups" do
-        it "creates an outcome group (root level)", priority: "2", test_id: 560586 do
+        it "creates an outcome group (root level)", priority: "2" do
           should_create_an_outcome_group_root_level
         end
 
-        it "creates an outcome group (nested)", priority: "1", test_id: 250237 do
+        it "creates an outcome group (nested)", priority: "1" do
           should_create_an_outcome_group_nested
         end
 
-        it "edits an outcome group", priority: "2", test_id: 114340 do
+        it "edits an outcome group", priority: "2" do
           should_edit_an_outcome_group
         end
 
-        it "deletes an outcome group", priority: "2", test_id: 250553 do
+        it "deletes an outcome group", priority: "2" do
           skip_if_safari(:alert)
           should_delete_an_outcome_group
         end
 
-        it "drags and drop an outcome to an outcome group", priority: "2", test_id: 114339 do
+        it "drags and drop an outcome to an outcome group", priority: "2" do
           group = @course.learning_outcome_groups.create!(title: 'groupage')
           group2 = @course.learning_outcome_groups.create!(title: 'groupage2')
           group.adopt_outcome_group(group2)
@@ -171,7 +171,7 @@ describe "outcomes" do
     end
 
     context "actions" do
-      it "does not render an HTML-escaped title in outcome directory while editing", priority: "2", test_id: 250554 do
+      it "does not render an HTML-escaped title in outcome directory while editing", priority: "2" do
         title = 'escape & me <<->> if you dare'
         @context = who_to_login == 'teacher' ? @course : account
         outcome_model
@@ -202,7 +202,7 @@ describe "outcomes" do
     end
 
     context "#show" do
-      it "shows rubrics as aligned items", priority: "2", test_id: 250555 do
+      it "shows rubrics as aligned items", priority: "2" do
         outcome_with_rubric
 
         get "/courses/#{@course.id}/outcomes/#{@outcome.id}"

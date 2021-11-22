@@ -46,7 +46,7 @@ describe 'quizzes question with html answers' do
     expect(f('#content')).not_to contain_jqcss('.edit_html:visible')
   end
 
-  it 'allows HTML answers for multiple choice', priority: '1', test_id: 209_356 do
+  it 'allows HTML answers for multiple choice', priority: '1' do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -63,7 +63,7 @@ describe 'quizzes question with html answers' do
     expect(html).to eq '<p>HTML</p>'
   end
 
-  it 'preserves HTML image answers for multiple choice', priority: '2', test_id: 3_103_797 do
+  it 'preserves HTML image answers for multiple choice', priority: '2' do
     img_url = 'http://invalid.nowhere.test/nothing.jpg'
     img_alt = 'sample alt text'
     img_cls = 'sample_image'
@@ -86,7 +86,7 @@ describe 'quizzes question with html answers' do
     expect(alt_after).to eq alt_before
   end
 
-  it 'sets focus back to the edit button after editing', priority: '1', test_id: 209_357 do
+  it 'sets focus back to the edit button after editing', priority: '1' do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -110,7 +110,7 @@ describe 'quizzes question with html answers' do
     check_for_no_edit_button 'Numerical Answer'
   end
 
-  it 'restores normal input when html answer is empty', priority: '1', test_id: 209_359 do
+  it 'restores normal input when html answer is empty', priority: '1' do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -124,7 +124,7 @@ describe 'quizzes question with html answers' do
     expect(input_length).to eq 1
   end
 
-  it 'populates the editor and input elements properly', priority: '1', test_id: 209_360 do
+  it 'populates the editor and input elements properly', priority: '1' do
     quiz_with_new_questions
     click_questions_tab
 

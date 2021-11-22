@@ -34,11 +34,11 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
       get "/courses/#{@course.id}/quizzes"
     end
 
-    it 'shows the due dates for Section A', priority: "1", test_id: 282165 do
+    it 'shows the due dates for Section A', priority: "1" do
       expect(f('.date-due')).to include_text("Due #{format_time_for_view(@due_at_a)}")
     end
 
-    it 'shows the availability dates for Section A', priority: "1", test_id: 282389 do
+    it 'shows the availability dates for Section A', priority: "1" do
       expect(f('.date-available')).to include_text("Available until "\
                                                    "#{format_date_for_view(@lock_at_a, :short)}")
     end
@@ -52,11 +52,11 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
       get "/courses/#{@course.id}/quizzes"
     end
 
-    it 'shows the due dates for Section B', priority: "1", test_id: 282166 do
+    it 'shows the due dates for Section B', priority: "1" do
       expect(f('.date-due')).to include_text("Due #{format_time_for_view(@due_at_b)}")
     end
 
-    it 'shows the availability dates for Section B', priority: "1", test_id: 282391 do
+    it 'shows the availability dates for Section B', priority: "1" do
       expect(f('.date-available')).to include_text("Not available until "\
                                                    "#{format_date_for_view(@unlock_at_b, :short)}")
     end

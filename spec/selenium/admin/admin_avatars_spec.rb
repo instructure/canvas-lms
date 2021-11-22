@@ -142,7 +142,7 @@ RSpec.shared_examples "course_files" do
         Gradebook::Cells.student_cell_name_link(@student).click
       end
 
-      it "displays student avatar in tray", priority: "1", test_id: 3299466 do
+      it "displays student avatar in tray", priority: "1" do
         wait_for_student_tray
 
         expect(student_avatar_link).to be_displayed

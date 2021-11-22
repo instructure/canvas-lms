@@ -48,7 +48,7 @@ describe 'creating a quiz' do
         open_quiz_edit_form
       end
 
-      it 'sets availability dates and due dates for each section', priority: 1, test_id: 140670 do
+      it 'sets availability dates and due dates for each section', priority: 1 do
         assign_quiz_to_no_one
 
         # assign to default section
@@ -91,7 +91,7 @@ describe 'creating a quiz' do
       end
     end
 
-    it 'prevents assigning a quiz to no one', priority: 1, test_id: 385155 do
+    it 'prevents assigning a quiz to no one', priority: 1 do
       course_quiz(active: true)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       assign_quiz_to_no_one
@@ -101,7 +101,7 @@ describe 'creating a quiz' do
                                                                             'must have a student or section selected'
     end
 
-    it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785, custom_timeout: 30 do
+    it 'saves and publishes a new quiz', :xbrowser, priority: "1", custom_timeout: 30 do
       @quiz = course_quiz
       open_quiz_edit_form
 
@@ -126,23 +126,23 @@ describe 'creating a quiz' do
         end
       end
 
-      it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
+      it 'creates a quiz directly from the index page', priority: "1" do
         expect do
           create_new_quiz
         end.to change { Quizzes::Quiz.count }.by(1)
       end
 
-      it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
+      it 'redirects to the correct quiz edit form', priority: "2" do
         create_new_quiz
         # check url
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}/edit}
       end
 
       # TODO: remove this from test-rail, this test is redundant
-      it 'creates and previews a new quiz', priority: "1", test_id: 210056
+      it 'creates and previews a new quiz', priority: "1"
     end
 
-    it 'inserts files using the rich content editor', priority: "1", test_id: 132545 do
+    it 'inserts files using the rich content editor', priority: "1" do
       filename = "b_file.txt"
       txt_files = ['some test file', filename]
       txt_files.map do |text_file|

@@ -47,7 +47,7 @@ describe "assignment rubrics" do
       wait_for_ajaximations
     end
 
-    it "adds a new rubric", priority: "2", test_id: 56587 do
+    it "adds a new rubric", priority: "2" do
       get "/courses/#{@course.id}/rubrics"
 
       expect do
@@ -72,7 +72,7 @@ describe "assignment rubrics" do
         .to include_text('rating 1')
     end
 
-    it "adds a new rubric to assignment and verify points", priority: "1", test_id: 114341 do
+    it "adds a new rubric to assignment and verify points", priority: "1" do
       initial_points = 2.5
       rubric_name = 'new rubric'
       create_assignment_with_points(initial_points)
@@ -93,7 +93,7 @@ describe "assignment rubrics" do
       expect(f('#rubrics .rubric .rubric_title .displaying .title')).to include_text(rubric_name)
     end
 
-    it "verifies existing rubrics", priority: "2", test_id: 114342 do
+    it "verifies existing rubrics", priority: "2" do
       outcome_with_rubric(title: 'Course Rubric')
       @rubric.associate_with(@course, @course, :purpose => 'grading')
       assignment_with_rubric(10, 'Assignment Rubric ')
@@ -102,7 +102,7 @@ describe "assignment rubrics" do
       expect(fln('Assignment Rubric')).to be_present
     end
 
-    it "uses an existing rubric to use for grading", priority: "2", test_id: 114344 do
+    it "uses an existing rubric to use for grading", priority: "2" do
       skip_if_safari(:alert)
       assignment_with_rubric(10)
       course_rubric = outcome_with_rubric
@@ -136,7 +136,7 @@ describe "assignment rubrics" do
       expect(association2.rubric.id).to eq course_rubric.id
     end
 
-    it "carries decimal values through rubric to grading", priority: "2", test_id: 220315 do
+    it "carries decimal values through rubric to grading", priority: "2" do
       student_in_course
       assignment_with_rubric(2.5)
 
@@ -149,7 +149,7 @@ describe "assignment rubrics" do
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text '2.5'
     end
 
-    it "imports rubric to assignment", priority: "1", test_id: 220317 do
+    it "imports rubric to assignment", priority: "1" do
       create_assignment_with_points(2)
 
       outcome_with_rubric
@@ -211,7 +211,7 @@ describe "assignment rubrics" do
       end
     end
 
-    it "does not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do
+    it "does not adjust points when importing an outcome to an assignment", priority: "1" do
       skip_if_safari(:alert)
       create_assignment_with_points(2)
 
@@ -239,7 +239,7 @@ describe "assignment rubrics" do
       expect(f('#rubric_new .learning_outcome_criterion .points_form .displaying').displayed?).to be_truthy
     end
 
-    it "does not adjust assignment points possible for grading rubric", priority: "1", test_id: 220324 do
+    it "does not adjust assignment points possible for grading rubric", priority: "1" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -254,7 +254,7 @@ describe "assignment rubrics" do
       expect(f("#assignment_show .points_possible").text).to eq '2'
     end
 
-    it "adjusts assignment points possible for grading rubric", priority: "1", test_id: 220326 do
+    it "adjusts assignment points possible for grading rubric", priority: "1" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -270,7 +270,7 @@ describe "assignment rubrics" do
       expect(f("#assignment_show .points_possible").text).to eq '5'
     end
 
-    it "follows learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do
+    it "follows learning outcome ignore_for_scoring", priority: "2" do
       student_in_course(active_all: true)
       outcome_with_rubric
       @assignment = @course.assignments.create(name: 'assignment with rubric')
@@ -293,7 +293,7 @@ describe "assignment rubrics" do
       expect(f('.grading_value')).to have_attribute(:value, '5')
     end
 
-    it "properly manages rubric focus on submission preview page", priority: "2", test_id: 220329 do
+    it "properly manages rubric focus on submission preview page", priority: "2" do
       student_in_course(:active_all => true)
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
@@ -316,7 +316,7 @@ describe "assignment rubrics" do
       check_element_has_focus(f(".assess_submission_link"))
     end
 
-    it "allows multiple rubric associations for grading", priority: "1", test_id: 220330 do
+    it "allows multiple rubric associations for grading", priority: "1" do
       outcome_with_rubric
       @assignment1 = @course.assignments.create!(name: "assign 1", points_possible: @rubric.points_possible)
       @assignment2 = @course.assignments.create!(name: "assign 2", points_possible: @rubric.points_possible)
@@ -336,7 +336,7 @@ describe "assignment rubrics" do
       expect(@association2.rubric.id).to eq @rubric.id
     end
 
-    it "shows status of 'use_for_grading' properly", priority: "1", test_id: 220331 do
+    it "shows status of 'use_for_grading' properly", priority: "1" do
       outcome_with_rubric
       @assignment1 = @course.assignments.create!(
         name: "assign 1",
@@ -355,7 +355,7 @@ describe "assignment rubrics" do
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy
     end
 
-    it "allows user to set a long description", priority: "1", test_id: 220341 do
+    it "allows user to set a long description", priority: "1" do
       assignment_with_editable_rubric(10, 'Assignment Rubric')
 
       get "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}"
@@ -376,7 +376,7 @@ describe "assignment rubrics" do
       expect(fj('.criterion:visible .rating_long_description')).to include_text "long description"
     end
 
-    it "deletes new criterion when user cancels creation", priority: "1", test_id: 220342 do
+    it "deletes new criterion when user cancels creation", priority: "1" do
       assignment_with_editable_rubric(10, 'Assignment Rubric')
 
       get "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}"
@@ -403,7 +403,7 @@ describe "assignment rubrics" do
         @rubric.associate_with(@assignment, @course, purpose: 'grading')
       end
 
-      it "hides range option when using custom ratings", priority: "1", test_id: 220336 do
+      it "hides range option when using custom ratings", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(' .rubric_title .icon-edit').click
@@ -416,7 +416,7 @@ describe "assignment rubrics" do
         expect(f(".rubric_container")).not_to contain_jqcss(".criterion_use_range:visible")
       end
 
-      it "hides range option when using learning outcomes", priority: "1", test_id: 220336 do
+      it "hides range option when using learning outcomes", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(' .rubric_title .icon-edit').click
@@ -425,7 +425,7 @@ describe "assignment rubrics" do
         expect(f('.criterion:nth-of-type(1) .criterion_use_range_div').css_value('display')).to eq 'none'
       end
 
-      it "shows min points when range is selected", priority: "1", test_id: 220337 do
+      it "shows min points when range is selected", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(' .rubric_title .icon-edit').click
@@ -437,7 +437,7 @@ describe "assignment rubrics" do
         expect(ffj(".range_rating:visible").count).to eq 2
       end
 
-      it "adjusts the min points of a rating and the neighboring max points", priority: "1", test_id: 220338 do
+      it "adjusts the min points of a rating and the neighboring max points", priority: "1" do
         @rubric.data[1][:criterion_use_range] = true
         @rubric.save!
 
@@ -512,7 +512,7 @@ describe "assignment rubrics" do
         expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[200 100 40]
       end
 
-      it "displays explicit rating when range is infinitely small", priority: "1", test_id: 220339 do
+      it "displays explicit rating when range is infinitely small", priority: "1" do
         @rubric.data[1][:criterion_use_range] = true
         @rubric.save!
 
@@ -536,7 +536,7 @@ describe "assignment rubrics" do
         expect(f(range_rating_element).css_value('display')).to eq 'none'
       end
 
-      it "caps the range expansion based on neighboring cells", priority: "1", test_id: 220340 do
+      it "caps the range expansion based on neighboring cells", priority: "1" do
         @rubric.data[1][:criterion_use_range] = true
         @rubric.save!
 
@@ -626,7 +626,7 @@ describe "assignment rubrics" do
         @rubric.associate_with(@assignment, @course, purpose: 'grading')
       end
 
-      it "copies an existing criterion", priority: "1", test_id: 220342 do
+      it "copies an existing criterion", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(' .rubric_title .icon-edit').click
@@ -642,7 +642,7 @@ describe "assignment rubrics" do
         expect(ffj('.criterion:visible .description_title')[2]).to include_text "no outcome row"
       end
 
-      it "copies an existing learning outcome", priority: "1", test_id: 220343 do
+      it "copies an existing learning outcome", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(' .rubric_title .icon-edit').click
@@ -662,7 +662,7 @@ describe "assignment rubrics" do
       course_with_student_logged_in
     end
 
-    it "properly shows rubric criterion details for learning outcomes", priority: "2", test_id: 220332 do
+    it "properly shows rubric criterion details for learning outcomes", priority: "2" do
       @assignment = @course.assignments.create(name: 'assignment with rubric')
       outcome_with_rubric
 
@@ -675,7 +675,7 @@ describe "assignment rubrics" do
       expect(f(".criterion_description .long_description").text).to eq "This is awesome."
     end
 
-    it "shows criterion comments and only render when necessary", priority: "2", test_id: 220333 do
+    it "shows criterion comments and only render when necessary", priority: "2" do
       # given
       comment = 'a comment'
       teacher_in_course(course: @course)
@@ -701,7 +701,7 @@ describe "assignment rubrics" do
       expect(comments.first).to include_text(comment)
     end
 
-    it "does not show 'update description' button in long description dialog", priority: "2", test_id: 220334 do
+    it "does not show 'update description' button in long description dialog", priority: "2" do
       @assignment = @course.assignments.create(name: 'assignment with rubric')
       rubric_for_course
       @rubric.associate_with(@assignment, @course, purpose: 'grading')
@@ -719,7 +719,7 @@ describe "assignment rubrics" do
       course_with_designer_logged_in
     end
 
-    it "allows a designer to create a course rubric", priority: "2", test_id: 220335 do
+    it "allows a designer to create a course rubric", priority: "2" do
       rubric_name = 'this is a new rubric'
       get "/courses/#{@course.id}/rubrics"
 

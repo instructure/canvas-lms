@@ -46,35 +46,35 @@ describe 'editing a quiz' do
     end
 
     context 'when the quiz is published' do
-      it 'indicates the quiz is published', priority: "1", test_id: 351924 do
+      it 'indicates the quiz is published', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         expect(f('#quiz-draft-state').text.strip).to match accessible_variant_of 'Published'
       end
 
-      it 'hides the |Save and Publish| button', priority: "1", test_id: 255478 do
+      it 'hides the |Save and Publish| button', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         expect(f("#content")).not_to contain_css('.save_and_publish')
       end
 
-      it 'shows the speedgrader link', priority: "1", test_id: 351926 do
+      it 'shows the speedgrader link', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(f('.icon-speed-grader')).to be_displayed
       end
 
-      it 'remains published after saving changes', priority: "1", test_id: 210059 do
+      it 'remains published after saving changes', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         type_in_tiny('#quiz_description', 'changed description')
         click_save_settings_button
         expect(f('#quiz-publish-link')).to include_text 'Published'
       end
 
-      it 'deletes the quiz', priority: "1", test_id: 351921 do
+      it 'deletes the quiz', priority: "1" do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         delete_quiz
       end
 
-      it 'saves question changes with the |Save it now| button', priority: "1", test_id: 140647 do
+      it 'saves question changes with the |Save it now| button', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         # add new question without saving changes
         click_questions_tab
@@ -106,28 +106,28 @@ describe 'editing a quiz' do
         @quiz.save!
       end
 
-      it 'indicates the quiz is unpublished', priority: "1", test_id: 351925 do
+      it 'indicates the quiz is unpublished', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         expect(f('#quiz-draft-state').text.strip).to match accessible_variant_of 'Not Published'
       end
 
-      it 'hides the speedgrader link', priority: "1", test_id: 351927 do
+      it 'hides the speedgrader link', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(f("#content")).not_to contain_css('.icon-speed-grader')
       end
 
-      it 'shows the |Save and Publish| button', priority: "1", test_id: 255479 do
+      it 'shows the |Save and Publish| button', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         expect(f('.save_and_publish')).to be_displayed
       end
 
-      it 'deletes the quiz', priority: "1", test_id: 351922 do
+      it 'deletes the quiz', priority: "1" do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         delete_quiz
       end
 
-      it 'publishes the quiz', priority: "1", test_id: 351928 do
+      it 'publishes the quiz', priority: "1" do
         skip_if_chrome('research')
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         f('#quiz-publish-link.btn-publish').click
@@ -135,7 +135,7 @@ describe 'editing a quiz' do
       end
     end
 
-    it 'hides question form when cancelling edit', priority: "1", test_id: 209956 do
+    it 'hides question form when cancelling edit', priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       wait_for_tiny f('#quiz_description')
       click_questions_tab
@@ -144,7 +144,7 @@ describe 'editing a quiz' do
       expect(f('.question_holder')).not_to contain_css('.question_form')
     end
 
-    it 'changes the quiz\'s description', priority: "1", test_id: 210057 do
+    it 'changes the quiz\'s description', priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
       test_text = 'changed description'
@@ -154,7 +154,7 @@ describe 'editing a quiz' do
       expect { @quiz.reload.description }.to become("<p>#{test_text}</p>")
     end
 
-    it 'loads existing due date', priority: "1", test_id: 209961 do
+    it 'loads existing due date', priority: "1" do
       wait_for_ajaximations
       compare_assignment_times(@quiz.reload)
     end
@@ -168,12 +168,12 @@ describe 'editing a quiz' do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       end
 
-      it 'flashes a warning message', priority: "1", test_id: 140609 do
+      it 'flashes a warning message', priority: "1" do
         message = 'Keep in mind, some students have already taken or started taking this quiz'
         expect(f('#flash_message_holder')).to include_text message
       end
 
-      it 'deletes the quiz', priority: "1", test_id: 210073 do
+      it 'deletes the quiz', priority: "1" do
         skip_if_safari(:alert)
         delete_quiz
       end

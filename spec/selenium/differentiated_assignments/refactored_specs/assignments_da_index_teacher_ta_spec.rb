@@ -26,7 +26,7 @@ describe 'Viewing differentiated assignments' do
     before { login_as(users.teacher) }
 
     context 'on the assignments index page' do
-      it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618802 do
+      it 'shows all quizzes, assignments, and discussions', priority: "1" do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
           *assignments.short_list.map(&:title),
@@ -41,7 +41,7 @@ describe 'Viewing differentiated assignments' do
     before { login_as(users.ta) }
 
     context 'on the assignments index page' do
-      it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618803 do
+      it 'shows all quizzes, assignments, and discussions', priority: "1" do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
           *assignments.short_list.map(&:title),

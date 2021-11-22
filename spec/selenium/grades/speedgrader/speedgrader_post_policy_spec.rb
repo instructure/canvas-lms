@@ -155,7 +155,7 @@ describe 'Speed Grader Post Policy' do
         let(:student) { @second_student }
       end
 
-      it 'Post tray shows unposted count', priority: '1', test_id: 3757535 do
+      it 'Post tray shows unposted count', priority: '1' do
         Speedgrader.click_post_or_hide_grades_button
         Speedgrader.click_post_link
         expect(PostGradesTray.unposted_count).to eq '1'
@@ -168,11 +168,11 @@ describe 'Speed Grader Post Policy' do
         Speedgrader.manually_hide_grades
       end
 
-      it 'header has hidden icon', priority: '1', test_id: 3757537 do
+      it 'header has hidden icon', priority: '1' do
         expect(Speedgrader.grades_hidden_icon).to be_present
       end
 
-      it 'hidden pill displayed in side panel', priority: '1', test_id: 3757537 do
+      it 'hidden pill displayed in side panel', priority: '1' do
         expect(Speedgrader.hidden_pill).to be_displayed
       end
 

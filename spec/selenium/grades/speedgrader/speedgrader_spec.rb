@@ -73,22 +73,22 @@ describe 'Speedgrader' do
         user_session(@teacher)
       end
 
-      it 'letter grades', priority: "1", test_id: 164015 do
+      it 'letter grades', priority: "1" do
         create_assignment_type_and_grade('letter_grade', 'A', 'C')
         grader_speedgrader_assignment('A', 'C')
       end
 
-      it 'percent grades', priority: "1", test_id: 164202 do
+      it 'percent grades', priority: "1" do
         create_assignment_type_and_grade('percent', 15, 10)
         grader_speedgrader_assignment('75', '50')
       end
 
-      it 'points grades', priority: "1", test_id: 164203 do
+      it 'points grades', priority: "1" do
         create_assignment_type_and_grade('points', 15, 10)
         grader_speedgrader_assignment('15', '10')
       end
 
-      it 'gpa scale grades', priority: "1", test_id: 164204 do
+      it 'gpa scale grades', priority: "1" do
         create_assignment_type_and_grade('gpa_scale', 'A', 'D')
         grader_speedgrader_assignment('A', 'D')
       end
@@ -114,20 +114,20 @@ describe 'Speedgrader' do
         expect(page_load_time.real).to be > 0.0
       end
 
-      it 'displays needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
+      it 'displays needs review alert on non-autograde questions', priority: "1" do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_alerts[0]).to include_text('The following questions need review:')
         end
       end
 
-      it 'only displays needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
+      it 'only displays needs review for file_upload and essay questions', priority: "2" do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_questions_need_review[0]).to include_text('Question 2')
           expect(Speedgrader.quiz_questions_need_review[1]).to include_text('Question 3')
         end
       end
 
-      it 'does not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
+      it 'does not display review warning on text only quiz questions', priority: "1" do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_alerts[0]).not_to include_text('Question 4')
         end
@@ -150,18 +150,18 @@ describe 'Speedgrader' do
         Speedgrader.wait_for_grade_input
       end
 
-      it 'complete/incomplete', priority: "1", test_id: 164014 do
+      it 'complete/incomplete', priority: "1" do
         expect(Speedgrader.grade_input).to have_value 'complete'
         Speedgrader.click_next_student_btn
         expect(Speedgrader.grade_input).to have_value 'incomplete'
       end
 
-      it 'allows pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
+      it 'allows pass grade on assignments worth 0 points', priority: "1" do
         expect(Speedgrader.grade_input).to have_value('complete')
         expect(Speedgrader.points_possible_label).to include_text('(0 / 0)')
       end
 
-      it 'displays pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
+      it 'displays pass/fail correctly when total points possible is changed', priority: "1" do
         @assignment.update(points_possible: 1)
         refresh_page
         expect(Speedgrader.grade_input).to have_value('complete')
@@ -207,7 +207,7 @@ describe 'Speedgrader' do
           wait_for_ajax_requests
         end
 
-        it 'speedgrader', priority: "1", test_id: 164016 do
+        it 'speedgrader', priority: "1" do
           expect(Speedgrader.grade_input).to have_value '15'
 
           keep_trying_until(2) do
@@ -217,7 +217,7 @@ describe 'Speedgrader' do
           end
         end
 
-        it 'assignment page', priority: "1", test_id: 217611 do
+        it 'assignment page', priority: "1" do
           StudentGradesPage.visit_as_teacher(@course, @students.first)
 
           f("#submission_#{@assignment.id}  i.icon-rubric").click
@@ -226,7 +226,7 @@ describe 'Speedgrader' do
           expect(ff('.react-rubric-cell.graded-points').second).to include_text '5'
         end
 
-        it 'submissions page', priority: "1", test_id: 217612 do
+        it 'submissions page', priority: "1" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
           f('a.assess_submission_link').click
           wait_for_animations
@@ -363,7 +363,7 @@ describe 'Speedgrader' do
         user_session(@teacher)
       end
 
-      it 'displays correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
+      it 'displays correct grades for student with proper selected ratings', priority: "1" do
         rubric = outcome_with_rubric
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
         @association = rubric.associate_with(
@@ -776,7 +776,7 @@ describe 'Speedgrader' do
   end
 
   context 'assignment group' do
-    it 'updates grades for all students in group', priority: "1", test_id: 164017 do
+    it 'updates grades for all students in group', priority: "1" do
       skip "Skipped because this spec fails if not run in foreground\nThis is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
       init_course_with_students 5
       user_session(@teacher)
@@ -836,7 +836,7 @@ describe 'Speedgrader' do
       Speedgrader.visit(@course.id, quiz.assignment_id)
     end
 
-    it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
+    it 'displays question navigation bar when setting is enabled', priority: "1" do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
         expect(Speedgrader.quiz_header).to include_text quiz.title
         expect(Speedgrader.quiz_nav).to be_displayed
@@ -844,7 +844,7 @@ describe 'Speedgrader' do
       end
     end
 
-    it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
+    it 'scrolls nav bar and to questions', priority: "1" do
       skip_if_chrome('broken')
 
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
@@ -865,7 +865,7 @@ describe 'Speedgrader' do
       end
     end
 
-    it 'updates scores', priority: "1", test_id: 164021 do
+    it 'updates scores', priority: "1" do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
         replace_content Speedgrader.quiz_point_inputs[1], "1", tab_out: true
         replace_content Speedgrader.quiz_fudge_points, "7", tab_out: true
@@ -898,7 +898,7 @@ describe 'Speedgrader' do
       expect(Speedgrader.selected_student).to include_text(@students[0].name)
     end
 
-    it 'has working next and previous arrows', priority: "1", test_id: 164018 do
+    it 'has working next and previous arrows', priority: "1" do
       # click next to second student
       Speedgrader.click_next_student_btn
       expect(Speedgrader.selected_student).to include_text(@students[1].name)
@@ -915,7 +915,7 @@ describe 'Speedgrader' do
       expect(Speedgrader.student_x_of_x_label).to include_text "2/5"
     end
 
-    it 'arrows wrap around to start when you reach the last student', priority: "1", test_id: 272512 do
+    it 'arrows wrap around to start when you reach the last student', priority: "1" do
       # click next to third student
       Speedgrader.click_next_student_btn
       Speedgrader.click_next_student_btn
@@ -930,12 +930,12 @@ describe 'Speedgrader' do
       expect(Speedgrader.student_x_of_x_label).to include_text "1/5"
     end
 
-    it 'list all students', priority: "1", test_id: 164206 do
+    it 'list all students', priority: "1" do
       Speedgrader.click_students_dropdown
       (0..2).each { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
     end
 
-    it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
+    it 'list alias when hide student name is selected', priority: "2" do
       Speedgrader.click_settings_link
       Speedgrader.click_options_link
       Speedgrader.select_hide_student_names
@@ -946,7 +946,7 @@ describe 'Speedgrader' do
     end
 
     # speedgrader student dropdown shows assignment submission status symbols next to student names
-    it 'has symbols indicating assignment submission status', priority: "1", test_id: 283502 do
+    it 'has symbols indicating assignment submission status', priority: "1" do
       # grade 2 out of 3 assignments; student3 wont be submitting and wont be graded as well
       @assignment.grade_student(@students[0], grade: 15, grader: @teacher)
       @assignment.grade_student(@students[1], grade: 10, grader: @teacher)
@@ -993,7 +993,7 @@ describe 'Speedgrader' do
       )
     end
 
-    it 'deleted comment is not visible', priority: "1", test_id: 961674 do
+    it 'deleted comment is not visible', priority: "1" do
       submit_with_attachment
       @comment_text = "First comment"
       @comment = @submission_for_student.add_comment(author: @teacher, comment: @comment_text)
@@ -1012,7 +1012,7 @@ describe 'Speedgrader' do
       expect(SubmissionDetails.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
     end
 
-    it 'displays the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
+    it 'displays the correct file submission in the right sidebar', priority: "1" do
       submit_with_attachment
       user_session(@teacher)
 
@@ -1020,7 +1020,7 @@ describe 'Speedgrader' do
       expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
     end
 
-    it 'displays submissions in order in the submission dropdown', priority: "1", test_id: 525189 do
+    it 'displays submissions in order in the submission dropdown', priority: "1" do
       Timecop.freeze(1.hour.ago) { submit_with_attachment }
       resubmit_with_text
       user_session(@teacher)
@@ -1045,7 +1045,7 @@ describe 'Speedgrader' do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
+    it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2" do
       Speedgrader.click_settings_link
       expect(Speedgrader.keyboard_shortcuts_link).to be_displayed
 

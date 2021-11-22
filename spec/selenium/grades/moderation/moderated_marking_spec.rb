@@ -56,14 +56,14 @@ describe 'Moderated Marking' do
   end
 
   context 'with a final-grader in a moderated assignment' do
-    it 'moderate option is visible for final-grader', priority: '1', test_id: 3490527 do
+    it 'moderate option is visible for final-grader', priority: '1' do
       user_session(@teacher1)
       AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
 
       expect(AssignmentPage.assignment_content).to contain_css('#moderated_grading_button')
     end
 
-    it 'non-final-grader cannot navigate to moderation page', priority: '1', test_id: 3490530 do
+    it 'non-final-grader cannot navigate to moderation page', priority: '1' do
       user_session(@teacher2)
       ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
 
@@ -81,7 +81,7 @@ describe 'Moderated Marking' do
       AssignmentCreateEditPage.visit_assignment_edit_page(@moderated_course.id, @moderated_assignment.id)
     end
 
-    it 'user without the permission is not displayed in final-grader dropdown', priority: '1', test_id: 3490529 do
+    it 'user without the permission is not displayed in final-grader dropdown', priority: '1' do
       AssignmentCreateEditPage.select_grader_dropdown.click
 
       expect(AssignmentCreateEditPage.select_grader_dropdown).not_to include_text(@ta.name)
@@ -114,7 +114,7 @@ describe 'Moderated Marking' do
       ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
     end
 
-    it 'allows viewing provisional grades and releasing final grade', priority: '1', test_id: 3503385 do
+    it 'allows viewing provisional grades and releasing final grade', priority: '1' do
       # # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
       ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
@@ -132,7 +132,7 @@ describe 'Moderated Marking' do
       expect(Gradebook::Cells.get_grade(@student2, @moderated_assignment)).to eq('12')
     end
 
-    it 'post to student allows viewing final grade as student', priority: '1', test_id: 3513992 do
+    it 'post to student allows viewing final grade as student', priority: '1' do
       # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
       ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
@@ -158,7 +158,7 @@ describe 'Moderated Marking' do
       expect(StudentGradesPage.fetch_assignment_score(@moderated_assignment)).to eq '15'
     end
 
-    it 'displays comments from chosen grader', priority: "1", test_id: 3513994 do
+    it 'displays comments from chosen grader', priority: "1" do
       @submissions2.each do |submission|
         submission.submission_comments.create!(comment: 'Just a comment by teacher 2', author: @teacher2)
         submission.save!
@@ -197,24 +197,24 @@ describe 'Moderated Marking' do
       expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher 2'
     end
 
-    it 'post to students button disabled until grades are released', priority: '1', test_id: 3513991 do
+    it 'post to students button disabled until grades are released', priority: '1' do
       expect(ModeratePage.post_to_students_button).to be_disabled
     end
 
-    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
+    it 'allows viewing provisional grades', priority: '1' do
       # expect to see two students with two provisional grades
       expect(ModeratePage.fetch_student_count).to eq 2
       expect(ModeratePage.fetch_provisional_grade_count_for_student(@student1)).to eq 2
       expect(ModeratePage.fetch_provisional_grade_count_for_student(@student2)).to eq 2
     end
 
-    it 'shows student names in row headers', priority: '1', test_id: 3503464 do
+    it 'shows student names in row headers', priority: '1' do
       # expect student names to be shown
       student_names = ModeratePage.student_table_row_headers.map(&:text)
       expect(student_names).to eql [@student1.name, @student2.name]
     end
 
-    it 'anonymizes students if anonymous grading is enabled', priority: '1', test_id: 3503464 do
+    it 'anonymizes students if anonymous grading is enabled', priority: '1' do
       # enable anonymous grading
       @moderated_assignment.update(anonymous_grading: true)
       refresh_page
@@ -224,13 +224,13 @@ describe 'Moderated Marking' do
       expect(student_names).to eql ['Student 1', 'Student 2']
     end
 
-    it 'shows grader names in table headers', priority: '1', test_id: 3503464 do
+    it 'shows grader names in table headers', priority: '1' do
       # expect teacher names to be shown
       grader_names = ModeratePage.student_table_headers.map(&:text)
       expect(grader_names).to eql [@teacher2.name, @teacher3.name]
     end
 
-    it 'anonymizes graders if grader names visible to final grader is false', priority: '1', test_id: 3503464 do
+    it 'anonymizes graders if grader names visible to final grader is false', priority: '1' do
       # disable grader names visible to final grader
       @moderated_assignment.update(grader_names_visible_to_final_grader: false)
       refresh_page
@@ -246,7 +246,7 @@ describe 'Moderated Marking' do
         wait_for_ajaximations
       end
 
-      it 'selects the custom grade', priority: '1', test_id: 3505170 do
+      it 'selects the custom grade', priority: '1' do
         skip('unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI')
         # the aria-activedescendant will be the id of the selected option
         selected_id = ModeratePage.grade_input(@student1).attribute("aria-activedescendant")
@@ -256,7 +256,7 @@ describe 'Moderated Marking' do
         expect(f("##{selected_id}").text).to eq "4 (Custom)"
       end
 
-      it 'adds the custom grade as an option in the dropdown', priority: '1', test_id: 3505170 do
+      it 'adds the custom grade as an option in the dropdown', priority: '1' do
         ModeratePage.grade_input(@student1).click
         expect(ModeratePage.grade_input_dropdown(@student1)).to include_text "4 (Custom)"
       end

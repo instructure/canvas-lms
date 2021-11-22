@@ -44,7 +44,7 @@ describe "Filter" do
       user_session(@teacher)
     end
 
-    it "allows showing only one module", test_id: 3253290, priority: "1" do
+    it "allows showing only one module", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.module_dropdown_item_click(@modules[0].name)
 
@@ -66,7 +66,7 @@ describe "Filter" do
       show_grading_periods_filter(@teacher)
     end
 
-    it "allows showing only one grading period", test_id: 3253292, priority: "1" do
+    it "allows showing only one grading period", priority: "1" do
       assign1 = @course.assignments.create! title: "Assign1", due_at: 1.week.from_now
       assign2 = @course.assignments.create! title: "Assign2", due_at: 1.week.ago
 
@@ -104,7 +104,7 @@ describe "Filter" do
       expect(meta_cells[0]).to include_text @student_name_1
     end
 
-    it "allows showing only a certain section", priority: "1", test_id: 3253291 do
+    it "allows showing only a certain section", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.select_section("All Sections")
 

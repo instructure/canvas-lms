@@ -29,7 +29,7 @@ describe 'submissions' do
   end
 
   context "Assignment" do
-    it "Create an assignment as a teacher", priority: "1", test_id: 56751 do
+    it "Create an assignment as a teacher", priority: "1" do
       group_test_setup(3, 3, 1)
       expect do
         create_assignment_with_group_category_preparation
@@ -38,7 +38,7 @@ describe 'submissions' do
       expect(Assignment.last.group_category).to be_present
     end
 
-    it "Edit an assignment", priority: "1", test_id: 238864 do
+    it "Edit an assignment", priority: "1" do
       @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', due_at: Time.now.utc + 2.days,
                                                 points_possible: 50, submission_types: 'online_text_entry')
       group_test_setup(3, 3, 1)
@@ -47,7 +47,7 @@ describe 'submissions' do
       validate_and_submit_form
     end
 
-    it 'is able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
+    it 'is able to create a new student group category from the assignment edit page', priority: "1" do
       original_number_of_assignment = Assignment.count
       original_number_of_group = Group.count
       create_assignment_preparation
@@ -65,14 +65,14 @@ describe 'submissions' do
   end
 
   context 'grade a group assignment as a teacher' do
-    it 'Submitting Group Assignments - Speedgrader', priority: "1", test_id: 112170 do
+    it 'Submitting Group Assignments - Speedgrader', priority: "1" do
       create_assignment_for_group('online_text_entry')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       f('.ui-selectmenu-icon').click
       expect(f('.ui-selectmenu-item-header')).to include_text(@testgroup[0].name)
     end
 
-    it 'Submitting Group Assignments - Grade Students Individually', priority: "1", test_id: 70744 do
+    it 'Submitting Group Assignments - Grade Students Individually', priority: "1" do
       create_assignment_for_group('online_text_entry', true)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       f('.ui-selectmenu-icon').click

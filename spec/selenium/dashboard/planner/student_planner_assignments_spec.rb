@@ -43,7 +43,7 @@ describe "student planner" do
                                                })
     end
 
-    it "shows and navigates to assignments page from student planner", priority: "1", test_id: 3259300 do
+    it "shows and navigates to assignments page from student planner", priority: "1" do
       go_to_list_view
       validate_object_displayed(@course_name, 'Assignment')
       validate_link_to_url(@assignment, 'assignments')
@@ -57,14 +57,14 @@ describe "student planner" do
       validate_link_to_submissions(@assignment, @student1, 'assignments')
     end
 
-    it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
+    it "enables the checkbox when an assignment is completed", priority: "1" do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                              body: "Assignment submitted")
       go_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end
 
-    it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
+    it "shows submitted tag for assignments that have submissions", priority: "1" do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
       go_to_list_view
 
@@ -73,20 +73,20 @@ describe "student planner" do
       validate_pill('Submitted')
     end
 
-    it "shows new grades tag for assignments that are graded", priority: "1", test_id: 3263152 do
+    it "shows new grades tag for assignments that are graded", priority: "1" do
       @assignment.grade_student(@student1, grade: 10, grader: @teacher)
       go_to_list_view
       validate_pill('Graded')
       expect(planner_app_div).not_to include_text('Feedback') # graded != feedback
     end
 
-    it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
+    it "shows new feedback tag for assignments that has feedback", priority: "1" do
       @assignment.update_submission(@student1, { comment: 'Good', author: @teacher })
       go_to_list_view
       validate_pill('Feedback')
     end
 
-    it "ensures time zone changes update the planner items", priority: "1", test_id: 3306207 do
+    it "ensures time zone changes update the planner items", priority: "1" do
       go_to_list_view
       time = calendar_time_string(@assignment.due_at).chop
       expect(course_assignment_by_due_at(time)).to be_displayed
@@ -99,7 +99,7 @@ describe "student planner" do
       expect(course_assignment_by_due_at(time)).to be_displayed
     end
 
-    it "shows missing tag for an assignment with missing submissions.", priority: "1", test_id: 3263153 do
+    it "shows missing tag for an assignment with missing submissions.", priority: "1" do
       @assignment.due_at = Time.zone.now - 2.weeks
       @assignment.save!
       @course.assignments.create({
@@ -115,7 +115,7 @@ describe "student planner" do
       validate_pill('Missing')
     end
 
-    it "can follow course link to course", priority: "1", test_id: 3306198 do
+    it "can follow course link to course", priority: "1" do
       go_to_list_view
       element = flnpt(@course[:name].upcase, planner_app_div)
       expect_new_page_load do

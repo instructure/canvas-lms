@@ -37,7 +37,7 @@ describe 'quizzes question creation' do
       @last_quiz = start_quiz_question
     end
 
-    it 'creates a quiz with a variety of quiz questions', priority: "1", test_id: 197489, custom_timeout: 30 do
+    it 'creates a quiz with a variety of quiz questions', priority: "1", custom_timeout: 30 do
       quiz = @last_quiz
 
       create_multiple_choice_question
@@ -58,7 +58,7 @@ describe 'quizzes question creation' do
       expect(questions[2]).to have_class('short_answer_question')
     end
 
-    it 'does not create an extra, blank, correct answer when [answer] is used as a placeholder', priority: "1", test_id: 197490 do
+    it 'does not create an extra, blank, correct answer when [answer] is used as a placeholder', priority: "1" do
       quiz = @last_quiz
 
       # be a multiple dropdown question
@@ -98,7 +98,7 @@ describe 'quizzes question creation' do
       expect(quiz.quiz_questions.first.question_data['answers'].detect { |a| a['text'] == '' }).to be_nil
     end
 
-    it 'respects character limits on short answer questions', priority: "2", test_id: 197493 do
+    it 'respects character limits on short answer questions', priority: "2" do
       skip_if_safari(:alert)
       question = fj('.question_form:visible')
       click_option('.question_form:visible .question_type', 'Fill In the Blank')
@@ -113,7 +113,7 @@ describe 'quizzes question creation' do
       end
     end
 
-    it 'respects character limits on short answer questions- MFIB', priority: "2", test_id: 1160451 do
+    it 'respects character limits on short answer questions- MFIB', priority: "2" do
       skip('Skipping this as there is already an existing bug CNVS-27665 for this')
       question = fj('.question_form:visible')
       click_option('.question_form:visible .question_type', 'Fill In Multiple Blanks')
@@ -160,7 +160,7 @@ describe 'quizzes question creation' do
       quiz_with_new_questions(goto_edit: false)
     end
 
-    it 'shows errors for graded quizzes', priority: "1", test_id: 197491 do
+    it 'shows errors for graded quizzes', priority: "1" do
       open_quiz_edit_form
       click_questions_tab
       edit_first_question
@@ -169,7 +169,7 @@ describe 'quizzes question creation' do
       expect(error_displayed?).to be_truthy
     end
 
-    it 'does not show errors for surveys', priority: "1", test_id: 197491 do
+    it 'does not show errors for surveys', priority: "1" do
       @quiz.update_attribute :quiz_type, "graded_survey"
       open_quiz_edit_form
       click_questions_tab

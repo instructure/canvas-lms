@@ -47,33 +47,33 @@ describe 'publishing a quiz' do
           wait_for_quiz_publish_button_to_populate
         end
 
-        it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do
+        it 'changes the button\'s text to \'Published\'', priority: "1" do
           driver.action.move_to(f('#header')).perform
           expect(f('#quiz-publish-link')).to include_text 'Published'
         end
 
-        it 'changes the button text on hover to |Unpublish|', priority: "1", test_id: 398936 do
+        it 'changes the button text on hover to |Unpublish|', priority: "1" do
           driver.action.move_to(f('#quiz-publish-link')).perform
           expect(f('#quiz-publish-link')).to include_text 'Unpublish'
         end
 
-        it 'removes the \'This quiz is unpublished\' message', priority: "1", test_id: 398937 do
+        it 'removes the \'This quiz is unpublished\' message', priority: "1" do
           expect(f("#content")).not_to contain_css('.alert .unpublished_warning')
         end
 
-        it 'adds links to the right sidebar', priority: "1", test_id: 398938 do
+        it 'adds links to the right sidebar', priority: "1" do
           links = ff('ul.page-action-list li')
 
           expect(links[0]).to include_text 'Moderate This Quiz'
           expect(links[1]).to include_text 'SpeedGrader'
         end
 
-        it 'displays both |Preview| buttons', priority: "1", test_id: 398939 do
+        it 'displays both |Preview| buttons', priority: "1" do
           expect(ff('#preview_quiz_button')).to have_size 2
         end
 
         context 'when clicking the cog menu tool' do
-          it 'shows updated options', priority: "1", test_id: 398940 do
+          it 'shows updated options', priority: "1" do
             f('.header-group-right button.al-trigger').click
             items = ff('ul#toolbar-1 li.ui-menu-item')
             items_text = []

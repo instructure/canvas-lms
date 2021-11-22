@@ -125,7 +125,7 @@ describe "calendar2" do
       expect(assignment2.assignment_group).to eq group2
     end
 
-    it "editing an existing assignment should preserve more options link", priority: "1", test_id: 138854 do
+    it "editing an existing assignment should preserve more options link", priority: "1" do
       assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
       get "/calendar2"
       f('.fc-event').click
@@ -163,7 +163,7 @@ describe "calendar2" do
       expect(f('.undated_event_title')).to include_text("undate me")
     end
 
-    context "event editing", priority: "1", test_id: 138853 do
+    context "event editing", priority: "1" do
       it "allows editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
@@ -278,7 +278,7 @@ describe "calendar2" do
       expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
     end
 
-    it "only considers active enrollments for upcoming events list", priority: "2", test_id: 854796 do
+    it "only considers active enrollments for upcoming events list", priority: "2" do
       make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
       get "/"
       expect(f('.coming_up').text).to include('Test Event')
@@ -289,7 +289,7 @@ describe "calendar2" do
       expect(f('.coming_up')).to include_text('Nothing for the next week')
     end
 
-    it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do
+    it "graded discussion appears on all calendars", priority: "1" do
       skip('LS-1257 - 7/29/2020')
 
       create_graded_discussion
@@ -298,7 +298,7 @@ describe "calendar2" do
       assert_views(@gd.title, @assignment.due_at)
     end
 
-    it "event appears on all calendars", priority: "1", test_id: 138846 do
+    it "event appears on all calendars", priority: "1" do
       skip('LS-1257 - 7/29/2020')
 
       title = 'loom'
@@ -308,7 +308,7 @@ describe "calendar2" do
       assert_views(title, due_time)
     end
 
-    it "assignment appears on all calendars", priority: "1", test_id: 238862 do
+    it "assignment appears on all calendars", priority: "1" do
       skip('LS-1257 - 7/29/2020')
 
       title = 'Zak McKracken'
@@ -318,7 +318,7 @@ describe "calendar2" do
       assert_views(title, due_time)
     end
 
-    it "quiz appears on all calendars", priority: "1", test_id: 238863 do
+    it "quiz appears on all calendars", priority: "1" do
       skip('LS-1257 - 7/29/2020')
 
       create_quiz

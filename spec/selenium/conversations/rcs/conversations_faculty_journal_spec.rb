@@ -47,7 +47,7 @@ describe "conversations new" do
       stub_rcs_config
     end
 
-    it "allows a site admin to enable faculty journal", priority: "2", test_id: 75005 do
+    it "allows a site admin to enable faculty journal", priority: "2" do
       get account_settings_url
       f('#account_enable_user_notes').click
       f('.Button.Button--primary[type="submit"]').click
@@ -62,6 +62,6 @@ describe "conversations new" do
       @course.account.update_attribute(:enable_user_notes, true)
     end
 
-    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518
+    it "should clear the subject and body when cancel is clicked", priority: "1"
   end
 end

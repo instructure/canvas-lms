@@ -114,7 +114,7 @@ describe "master courses - course picker" do
     expect(matches.length).to eq(2)
   end
 
-  it "course search doesn't work with nicknames", priority: "2", test_id: 3178857 do
+  it "course search doesn't work with nicknames", priority: "2" do
     @user.set_preference(:course_nicknames, @course.id, 'nickname')
     matches = test_filter('nickname')
     expect(matches.length).to eq(0)

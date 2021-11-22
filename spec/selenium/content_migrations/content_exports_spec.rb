@@ -39,19 +39,19 @@ describe "content exports" do
       expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
     end
 
-    it "allows course export downloads", priority: "1", test_id: 126678 do
+    it "allows course export downloads", priority: "1" do
       run_export
       expect(@export.export_type).to eq 'common_cartridge'
     end
 
-    it "allows qti export downloads", priority: "1", test_id: 126680 do
+    it "allows qti export downloads", priority: "1" do
       run_export do
         f("input[value=qti]").click
       end
       expect(@export.export_type).to eq 'qti'
     end
 
-    it "selectively creates qti export", priority: "2", test_id: 1341342 do
+    it "selectively creates qti export", priority: "2" do
       q1 = @course.quizzes.create!(:title => 'quiz1')
       q2 = @course.quizzes.create!(:title => 'quiz2')
 

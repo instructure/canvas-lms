@@ -111,43 +111,43 @@ describe 'Late Policies:' do
       Gradebook.visit(@course)
     end
 
-    it 'late policy adjusts grades correctly', test_id: 3196973, priority: '1' do
+    it 'late policy adjusts grades correctly', priority: '1' do
       expect(Gradebook::Cells.get_grade(@student, @a1)).to eq "80"
     end
 
-    it 'missing policy adjusts grades correctly', test_id: 3196972, priority: '1' do
+    it 'missing policy adjusts grades correctly', priority: '1' do
       expect(Gradebook::Cells.get_grade(@student, @a2)).to eq "75"
     end
 
-    it 'late policy with floor adjust the grades correctly', test_id: 3196974, priority: '1' do
+    it 'late policy with floor adjust the grades correctly', priority: '1' do
       expect(Gradebook::Cells.get_grade(@student, @a3)).to eq "5"
     end
 
-    it 'missing/late deductions dont affect paper assignments', test_id: 3354104, priority: '1' do
+    it 'missing/late deductions dont affect paper assignments', priority: '1' do
       expect(Gradebook::Cells.get_grade(@student, @a4)).to eq "–"
     end
 
-    it 'missing policy adjusts pass/fail assignment', test_id: 3354099, priority: '1' do
+    it 'missing policy adjusts pass/fail assignment', priority: '1' do
       expect(Gradebook::Cells.get_grade(@student, @a5)).to eq "Incomplete"
     end
 
-    it 'late & missing policy wont affect no-submission assignment', test_id: 3354106, priority: '2' do
+    it 'late & missing policy wont affect no-submission assignment', priority: '2' do
       expect(Gradebook::Cells.get_grade(@student, @a6)).to eq "–"
     end
 
-    it 'late penalty re-applied if submission graded same as its effective grade', test_id: 3354105, priority: '2' do
+    it 'late penalty re-applied if submission graded same as its effective grade', priority: '2' do
       # re-grade student's @a1 assignment that is late and has previous deductions
       Gradebook::Cells.edit_grade(@student, @a1, "80")
       expect { Gradebook::Cells.get_grade(@student, @a1) }.to become "70"
     end
 
-    it 'updates score when late policy changes', test_id: 3354108, priority: '1' do
+    it 'updates score when late policy changes', priority: '1' do
       @course.late_policy.update(late_submission_deduction: 20.0)
       refresh_page
       expect(Gradebook::Cells.get_grade(@student, @a1)).to eq "70"
     end
 
-    it 'once applied, missing policy change does not re-trigger score change', test_id: 3354107, priority: '2' do
+    it 'once applied, missing policy change does not re-trigger score change', priority: '2' do
       @course.late_policy.update(missing_submission_deduction: 50.0, missing_submission_deduction_enabled: false)
       # disable and then re-enable updated missing policy
       @course.late_policy.update(missing_submission_deduction_enabled: true)
@@ -168,7 +168,7 @@ describe 'Late Policies:' do
       Gradebook.settings_cog_select
     end
 
-    it 'saves late policy', test_id: 3196970, priority: '1' do
+    it 'saves late policy', priority: '1' do
       percentage = 10
       increment = 'Day'
       Gradebook::LatePolicies.create_late_policy(percentage, increment)
@@ -179,7 +179,7 @@ describe 'Late Policies:' do
       expect(@course.late_policy.late_submission_interval).to eq increment.downcase
     end
 
-    it 'saves missing policy', test_id: 3196968, priority: '1' do
+    it 'saves missing policy', priority: '1' do
       percentage = 50
       Gradebook::LatePolicies.create_missing_policy(percentage)
       Gradebook::Settings.click_update_button
@@ -188,7 +188,7 @@ describe 'Late Policies:' do
       expect(@course.late_policy.missing_submission_deduction.to_i).to be percentage
     end
 
-    it 'saves late policy with floor', test_id: 3196971, priority: '1' do
+    it 'saves late policy with floor', priority: '1' do
       percentage = 10
       increment = 'Day'
       lowest_percentage = 50

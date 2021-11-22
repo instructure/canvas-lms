@@ -31,14 +31,14 @@ describe 'Course Grading Periods' do
       course_with_teacher_logged_in
     end
 
-    it 'shows grading periods created at the course-level', priority: "1", test_id: 239998 do
+    it 'shows grading periods created at the course-level', priority: "1" do
       @course_grading_period = period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
       period_title = f("#period_title_#{@course_grading_period.id}")
       expect(period_title).to have_value(@course_grading_period.title)
     end
 
-    it 'allows grading periods to be deleted', priority: "1", test_id: 202320 do
+    it 'allows grading periods to be deleted', priority: "1" do
       grading_period_selector = '.grading-period'
       group = group_helper.legacy_create_for_course(@course)
       period_helper.create_with_weeks_for_group(group, 5, 3)
@@ -51,7 +51,7 @@ describe 'Course Grading Periods' do
       expect(ff(grading_period_selector).length).to be 1
     end
 
-    it 'allows updating grading periods', priority: "1", test_id: 202317 do
+    it 'allows updating grading periods', priority: "1" do
       period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
       expect(f("#update-button")).to be_present
@@ -78,7 +78,7 @@ describe 'Course Grading Periods Inheritance' do
     @account_teacher = @teacher
   end
 
-  it 'reads course grading periods', priority: "1", test_id: 202318 do
+  it 'reads course grading periods', priority: "1" do
     user_session @account_teacher
     course_grading_period = Factories::GradingPeriodHelper.new.create_with_group_for_course(@course)
     get "/courses/#{@account_course.id}/grading_standards"

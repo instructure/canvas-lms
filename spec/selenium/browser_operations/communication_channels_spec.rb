@@ -83,7 +83,7 @@ describe "communication channel selenium tests" do
       expect_logout_link_present
     end
 
-    it 'confirms the communication channels', priority: "2", test_id: 193786 do
+    it 'confirms the communication channels', priority: "2" do
       user_with_pseudonym({ active_user: true })
       create_session(@pseudonym)
 

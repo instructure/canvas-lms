@@ -42,13 +42,13 @@ describe 'quizzes with draft state' do
         @quiz.unpublish!
       end
 
-      it 'shows an error', priority: "1", test_id: 209419 do
+      it 'shows an error', priority: "1" do
         open_quiz_edit_form(false)
         wait_for_ajaximations
         expect(f('#unauthorized_message')).to include_text 'Access Denied'
       end
 
-      it 'can\'t take an unpublished quiz', priority: "1", test_id: 209420 do
+      it 'can\'t take an unpublished quiz', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
         wait_for_ajaximations
         expect(f('#unauthorized_message')).to include_text 'Access Denied'
@@ -61,7 +61,7 @@ describe 'quizzes with draft state' do
         @quiz.publish!
       end
 
-      it 'shows an error', priority: "1", test_id: 209421 do
+      it 'shows an error', priority: "1" do
         open_quiz_show_page
         wait_for_ajaximations
         expect(f('.lock_explanation')).to include_text 'This quiz is locked'

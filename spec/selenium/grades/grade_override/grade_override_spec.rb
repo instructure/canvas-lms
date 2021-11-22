@@ -64,21 +64,21 @@ describe 'Final Grade Override' do
       SRGB.select_student(@student)
     end
 
-    it 'display override percent in individual gradebook', priority: '1', test_id: 3682130 do
+    it 'display override percent in individual gradebook', priority: '1' do
       expect(SRGB.final_grade_override.text).to include "97.1%"
     end
 
-    it 'display override grade in individual gradebook', priority: '1', test_id: 3682130 do
+    it 'display override grade in individual gradebook', priority: '1' do
       expect(SRGB.final_grade_override_input).to have_value "A"
     end
 
-    it 'saves overridden grade in SRGB', priority: '1', test_id: 3682131 do
+    it 'saves overridden grade in SRGB', priority: '1' do
       SRGB.enter_override_grade('D-')
       expect(@enrollment.scores.find_by(course_score: true).override_score).to be 61.0
     end
   end
 
-  it 'displays the override column', priority: '1', test_id: 3682130 do
+  it 'displays the override column', priority: '1' do
     user_session(@teacher)
     Gradebook.visit(@course)
     Gradebook.settings_cog_select
@@ -98,12 +98,12 @@ describe 'Final Grade Override' do
       Gradebook::Cells.edit_override(@students.first, 90.0)
     end
 
-    it 'saves overridden grade in Gradebook', priority: '1', test_id: 3682131 do
+    it 'saves overridden grade in Gradebook', priority: '1' do
       Gradebook.visit(@course)
       expect(Gradebook::Cells.get_override_grade(@students.first)).to eql "A-"
     end
 
-    it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do
+    it 'displays overridden grade for student grades', priority: '1' do
       user_session(@students.first)
       StudentGradesPage.visit_as_student(@course)
       expect(StudentGradesPage.final_grade.text).to eql "90%"

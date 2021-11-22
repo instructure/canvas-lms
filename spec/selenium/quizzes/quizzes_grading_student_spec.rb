@@ -73,13 +73,13 @@ describe 'Viewing graded quizzes' do
         user_session(@student)
       end
 
-      it 'shows a regrade banner on the quiz show page', priority: "1", test_id: 140630 do
+      it 'shows a regrade banner on the quiz show page', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         expect(f(quiz_regrade_banner_css)).to include_text 'This quiz has been regraded; your score was affected.'
       end
 
-      it 'shows the correct quiz score after regrading', priority: "1", test_id: 140631 do
+      it 'shows the correct quiz score after regrading', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         original_score = fj('.ic-Table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(4)')
@@ -89,7 +89,7 @@ describe 'Viewing graded quizzes' do
         expect(regraded_score).to include_text '0 out of 1'
       end
 
-      it 'shows the correct quiz question score after regrading', priority: "1", test_id: 140632 do
+      it 'shows the correct quiz question score after regrading', priority: "1" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         expect(f(quiz_question_regrade_banner_css)).to include_text 'This question has been regraded.'
@@ -97,7 +97,7 @@ describe 'Viewing graded quizzes' do
         expect(quiz_question_points_summary).to include_text 'Regraded Score: 0 / 1 pts'
       end
 
-      it 'hides all regrade banners and regrade info after resubmitting', priority: "1", test_id: 140633 do
+      it 'hides all regrade banners and regrade info after resubmitting', priority: "1" do
         # retake it
         graded_submission(@quiz, @student) do |questions|
           { "question_#{questions[0].id}" => questions[0].question_data["answers"][0]["id"] }

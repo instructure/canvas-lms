@@ -68,7 +68,7 @@ describe "course catalog" do
     expect(course_elements.size).to eql 1
   end
 
-  it "lists a next button when >12 courses are in the index and public", priority: "1", test_id: 2963672 do
+  it "lists a next button when >12 courses are in the index and public", priority: "1" do
     create_courses(Array.new(13) { |i| public_indexed_course_attrs.merge(name: i.to_s) })
     refresh_page
     expect(f('#next-link').displayed?).to be(true)

@@ -28,7 +28,7 @@ describe 'Viewing differentiated assignments' do
     context 'on the assignments index page' do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 618804 do
+      it 'only shows assigned quizzes, assignments, and discussions', priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -54,7 +54,7 @@ describe 'Viewing differentiated assignments' do
     context 'on the assignments index page' do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619042 do
+      it 'only shows assigned quizzes, assignments, and discussions', priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -80,7 +80,7 @@ describe 'Viewing differentiated assignments' do
     context 'on the assignments index page' do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619043 do
+      it 'only shows assigned quizzes, assignments, and discussions', priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -102,7 +102,7 @@ describe 'Viewing differentiated assignments' do
     context 'on the assignments index page' do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619044 do
+      it 'only shows assigned quizzes, assignments, and discussions', priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -124,7 +124,7 @@ describe 'Viewing differentiated assignments' do
     context 'on the assignments index page' do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619046 do
+      it 'only shows assigned quizzes, assignments, and discussions', priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,

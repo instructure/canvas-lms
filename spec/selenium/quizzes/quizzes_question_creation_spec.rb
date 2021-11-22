@@ -35,14 +35,14 @@ describe 'quizzes question creation' do
     end
 
     context 'when the \'+ New Question\' button is clicked' do
-      it 'opens a new question form', priority: "1", test_id: 140627 do
+      it 'opens a new question form', priority: "1" do
         # setup is accomplished in before(:each)
         expect(fj('.question_form:visible')).to be_displayed
       end
     end
 
     # Multiple Choice Question
-    it 'creates a multiple choice question', priority: "1", test_id: 201942 do
+    it 'creates a multiple choice question', priority: "1" do
       quiz = @last_quiz
       create_multiple_choice_question
       quiz.reload
@@ -83,7 +83,7 @@ describe 'quizzes question creation' do
     end
 
     # True/False Question
-    it 'creates a true false question', priority: "1", test_id: 140628 do
+    it 'creates a true false question', priority: "1" do
       quiz = @last_quiz
       create_true_false_question
       quiz.reload
@@ -95,7 +95,7 @@ describe 'quizzes question creation' do
     end
 
     # Fill-in-the-blank Question
-    it 'creates a fill in the blank question', priority: "1", test_id: 197492 do
+    it 'creates a fill in the blank question', priority: "1" do
       quiz = @last_quiz
       create_fill_in_the_blank_question
       quiz.reload
@@ -103,7 +103,7 @@ describe 'quizzes question creation' do
     end
 
     # Multiple Blanks Question
-    it 'creates a fill in multiple blanks question', priority: "1", test_id: 197508 do
+    it 'creates a fill in multiple blanks question', priority: "1" do
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -149,7 +149,7 @@ describe 'quizzes question creation' do
     end
 
     # Multiple Answers Question
-    it 'creates a multiple answers question', priority: "1", test_id: 140629 do
+    it 'creates a multiple answers question', priority: "1" do
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -173,7 +173,7 @@ describe 'quizzes question creation' do
     end
 
     # Multiple Dropdown Question
-    it 'creates a multiple dropdown question', priority: "1", test_id: 197510 do
+    it 'creates a multiple dropdown question', priority: "1" do
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -220,7 +220,7 @@ describe 'quizzes question creation' do
 
     # Matching Question
     context 'when creating a matching question' do
-      it 'creates a basic matching question', priority: "1", test_id: 201943 do
+      it 'creates a basic matching question', priority: "1" do
         quiz = @last_quiz
 
         question = fj('.question_form:visible')
@@ -247,7 +247,7 @@ describe 'quizzes question creation' do
         end
       end
 
-      it 'creates a matching question with distractors', priority: "1", test_id: 220014 do
+      it 'creates a matching question with distractors', priority: "1" do
         quiz = @last_quiz
 
         question = fj('.question_form:visible')
@@ -277,7 +277,7 @@ describe 'quizzes question creation' do
     end
 
     # Numerical Answer
-    it 'creates a basic numerical answer question', priority: "1", test_id: 201944 do
+    it 'creates a basic numerical answer question', priority: "1" do
       quiz = @last_quiz
 
       click_option('.question_form:visible .question_type', 'Numerical Answer')
@@ -300,7 +300,7 @@ describe 'quizzes question creation' do
     end
 
     # Formula Question
-    it 'creates a basic formula question', priority: "1", test_id: 201945 do
+    it 'creates a basic formula question', priority: "1" do
       skip_if_chrome('CNVS-29843')
       quiz = @last_quiz
 
@@ -332,7 +332,7 @@ describe 'quizzes question creation' do
       expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
     end
 
-    it "changes example value on clicking the 'recompute' button when creating formula questions", priority: "2", test_id: 324919 do
+    it "changes example value on clicking the 'recompute' button when creating formula questions", priority: "2" do
       skip('Fails with webpack enabled')
       start_quiz_question
       click_option('.question_form:visible .question_type', 'Formula Question')
@@ -347,7 +347,7 @@ describe 'quizzes question creation' do
     end
 
     # Essay Question
-    it 'creates a basic essay question', priority: "1", test_id: 201946 do
+    it 'creates a basic essay question', priority: "1" do
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -364,7 +364,7 @@ describe 'quizzes question creation' do
     end
 
     # File Upload Question
-    it 'creates a basic file upload question', priority: "1", test_id: 201947 do
+    it 'creates a basic file upload question', priority: "1" do
       quiz = @last_quiz
 
       create_file_upload_question
@@ -376,7 +376,7 @@ describe 'quizzes question creation' do
     end
 
     # Text Answer Question
-    it 'creates a basic text answer question', priority: "1", test_id: 201948 do
+    it 'creates a basic text answer question', priority: "1" do
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -393,7 +393,7 @@ describe 'quizzes question creation' do
     end
 
     # Negative Question Points
-    it 'doesn\'t allow negative question points', priority: "2", test_id: 201953 do
+    it 'doesn\'t allow negative question points', priority: "2" do
       question = fj('.question_form:visible')
       click_option('.question_form:visible .question_type', 'essay_question', :value)
 
@@ -405,7 +405,7 @@ describe 'quizzes question creation' do
       assert_error_box(".question_form:visible input[name='question_points']")
     end
 
-    it "shows an error when the quiz question exceeds character limit", priority: "2", test_id: 140672 do
+    it "shows an error when the quiz question exceeds character limit", priority: "2" do
       start_quiz_question
       chars = [*('a'..'z')]
       value = (0..16385).map { chars.sample }.join
@@ -436,7 +436,7 @@ describe 'quizzes question creation' do
       quiz_questions_creation
     end
 
-    it 'edits quiz questions', priority: "1", test_id: 140578 do
+    it 'edits quiz questions', priority: "1" do
       open_quiz_edit_form
       click_questions_tab
       driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
@@ -454,7 +454,7 @@ describe 'quizzes question creation' do
       course_with_teacher_logged_in
     end
 
-    it 'creates a basic quiz question group', priority: "1", test_id: 140587 do
+    it 'creates a basic quiz question group', priority: "1" do
       quiz_with_new_questions
       create_question_group
 
@@ -499,7 +499,7 @@ describe 'quizzes question creation' do
       course_with_teacher_logged_in
     end
 
-    it 'adds questions from a question bank', priority: "1", test_id: 140671 do
+    it 'adds questions from a question bank', priority: "1" do
       quiz_with_new_questions
       click_questions_tab
       f('.find_question_link').click

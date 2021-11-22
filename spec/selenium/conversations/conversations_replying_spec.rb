@@ -68,7 +68,7 @@ describe "conversations new" do
         Account.default.set_feature_flag! :react_inbox, 'off'
       end
 
-      it "maintains context and subject", priority: "1", test_id: 138696 do
+      it "maintains context and subject", priority: "1" do
         go_to_inbox_and_select_message
         f('#reply-btn').click
         expect(f('#compose-message-course')).to be_disabled
@@ -81,7 +81,7 @@ describe "conversations new" do
         expect(f('.message_subject_ro').text).to eq @convo.subject
       end
 
-      it "adds new messages to the conversation", priority: "1", test_id: 197537 do
+      it "adds new messages to the conversation", priority: "1" do
         initial_message_count = @convo.conversation_messages.length
         go_to_inbox_and_select_message
         f('#reply-btn').click
@@ -93,7 +93,7 @@ describe "conversations new" do
         expect(@convo.conversation_messages.length).to eq initial_message_count + 1
       end
 
-      it "does not allow adding recipients to private messages", priority: "2", test_id: 1089655 do
+      it "does not allow adding recipients to private messages", priority: "2" do
         @convo.update_attribute(:private_hash, '12345')
         go_to_inbox_and_select_message
         f('#reply-btn').click
@@ -101,39 +101,39 @@ describe "conversations new" do
       end
 
       context "reply and reply all" do
-        it "addresses replies to the most recent author by default from the icon at the top of the page", priority: "2", test_id: 197538 do
+        it "addresses replies to the most recent author by default from the icon at the top of the page", priority: "2" do
           go_to_inbox_and_select_message
           f('#reply-btn').click
           assert_number_of_recipients(1)
         end
 
-        it "replies to all users from the reply all icon on the top of the page", priority: "2", test_id: 1070114 do
+        it "replies to all users from the reply all icon on the top of the page", priority: "2" do
           go_to_inbox_and_select_message
           f('#reply-all-btn').click
           assert_number_of_recipients(2)
         end
 
-        it "replies to message from the reply icon next to the message", priority: "2", test_id: 1077516 do
+        it "replies to message from the reply icon next to the message", priority: "2" do
           go_to_inbox_and_select_message
           f('.message-detail-actions .reply-btn').click
           assert_number_of_recipients(1)
         end
 
-        it "replies to all users from the settings icon next to the message", priority: "2", test_id: 86606 do
+        it "replies to all users from the settings icon next to the message", priority: "2" do
           go_to_inbox_and_select_message
           f('.message-detail-actions .icon-settings').click
           f('.ui-menu-item .reply-all-btn').click
           assert_number_of_recipients(2)
         end
 
-        it "replies to message from mouse hover", priority: "2", test_id: 1069285 do
+        it "replies to message from mouse hover", priority: "2" do
           go_to_inbox_and_select_message
           driver.action.move_to(f('.message-content .message-item-view')).perform
           f('.message-info .reply-btn').click
           assert_number_of_recipients(1)
         end
 
-        it "replies to all from mouse hover", priority: "2", test_id: 1069836 do
+        it "replies to all from mouse hover", priority: "2" do
           go_to_inbox_and_select_message
           driver.action.move_to(f('.message-content .message-item-view')).perform
           f('.message-info .icon-settings').click

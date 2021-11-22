@@ -56,13 +56,13 @@ describe "account admin outcomes" do
       import_account_level_outcomes
     end
 
-    it "has state standards available for outcomes through find", priority: "2", test_id: 250008 do
+    it "has state standards available for outcomes through find", priority: "2" do
       state_outcome_setup
       goto_state_outcomes
       expect(ffj(".outcome-level:last .outcome-group .ellipsis")[0]).to have_attribute("title", 'CCSS.ELA-Literacy.CCRA.R - Reading')
     end
 
-    it "imports state standards to course groups and all nested outcomes", priority: "2", test_id: 56584 do
+    it "imports state standards to course groups and all nested outcomes", priority: "2" do
       skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       el1 = fj(".outcome-level:first .outcome-group .ellipsis")
@@ -71,7 +71,7 @@ describe "account admin outcomes" do
       expect(el2).to have_attribute("title", 'CCSS.ELA-Literacy.CCRA.R.4')
     end
 
-    it "imports a state standard into account level", priority: "2", test_id: 56017 do
+    it "imports a state standard into account level", priority: "2" do
       skip_if_safari(:alert)
       outcome = ['CCSS.ELA-Literacy.CCRA.R - Reading']
       import_state_standards_to_account(outcome)
@@ -79,7 +79,7 @@ describe "account admin outcomes" do
       expect(el).to have_attribute("title", 'CCSS.ELA-Literacy.CCRA.R - Reading')
     end
 
-    it "imports account outcomes into course", priority: "1", test_id: 56585 do
+    it "imports account outcomes into course", priority: "1" do
       skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       outcome = ['Default Account', 'Craft and Structure']
@@ -88,7 +88,7 @@ describe "account admin outcomes" do
       import_account_level_outcomes
     end
 
-    it "deletes state standards outcome groups from course listing", priority: "2", test_id: 250009 do
+    it "deletes state standards outcome groups from course listing", priority: "2" do
       skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       f(".ellipsis[title='Craft and Structure']").click
@@ -166,7 +166,7 @@ describe "account admin outcomes" do
     end
 
     describe "state standard pagination" do
-      it "does not fail while filtering the common core group", priority: "2", test_id: 250010 do
+      it "does not fail while filtering the common core group", priority: "2" do
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
         root_group.child_outcome_groups.create!(:title => "Fake Common Core")

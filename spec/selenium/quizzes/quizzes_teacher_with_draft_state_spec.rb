@@ -35,7 +35,7 @@ describe 'quizzes with draft state' do
   end
 
   context 'when there is a single due date' do
-    it 'doesn\'t display "Multiple Dates"', priority: "1", test_id: 474291 do
+    it 'doesn\'t display "Multiple Dates"', priority: "1" do
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
       expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'
@@ -45,7 +45,7 @@ describe 'quizzes with draft state' do
   context 'when there are multiple due dates' do
     before { add_due_date_override(@quiz) }
 
-    it 'shows a due date summary', priority: "2", test_id: 210053 do
+    it 'shows a due date summary', priority: "2" do
       # verify page
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).to include_text 'Multiple Dates'

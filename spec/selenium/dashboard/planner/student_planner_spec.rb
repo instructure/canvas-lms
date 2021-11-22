@@ -36,12 +36,12 @@ describe "student planner" do
     user_session(@student1)
   end
 
-  it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
+  it "shows no due date assigned when no assignments are created.", priority: "1" do
     go_to_list_view
     validate_no_due_dates_assigned
   end
 
-  it "navigates to the dashcard view from no due dates assigned page.", priority: "1", test_id: 3281739 do
+  it "navigates to the dashcard view from no due dates assigned page.", priority: "1" do
     go_to_list_view
     switch_to_dashcard_view
 
@@ -49,14 +49,14 @@ describe "student planner" do
     expect(dashboard_card_header_content).to contain_css("h3[title='#{@course.name}']")
   end
 
-  it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do
+  it "shows and navigates to announcements page from student planner", priority: "1" do
     announcement = @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
     go_to_list_view
     validate_object_displayed(@course.name, 'Announcement')
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
-  it "shows and navigates to the calendar events page", priority: "1", test_id: 3488530 do
+  it "shows and navigates to the calendar events page", priority: "1" do
     event = CalendarEvent.new(title: "New event", start_at: 1.minute.from_now)
     event.context = @course
     event.save!
@@ -65,7 +65,7 @@ describe "student planner" do
     validate_link_to_calendar(event)
   end
 
-  it "shows course images", priority: "1", test_id: 3306206 do
+  it "shows course images", priority: "1" do
     @course_root = Folder.root_folders(@course).first
     @course_attachment = @course_root.attachments.create!(:context => @course,
                                                           :uploaded_data => jpeg_data_frd, :filename => 'course.jpg',
@@ -126,27 +126,27 @@ describe "student planner" do
       @quiz.save!
     end
 
-    it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
+    it "shows and navigates to quizzes page from student planner", priority: "1" do
       go_to_list_view
       validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
-    it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
+    it "shows and navigates to graded surveys with due dates", priority: "1" do
       @quiz.update(quiz_type: "graded_survey")
       go_to_list_view
       validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
-    it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
+    it "shows and navigates to ungraded surveys with due dates", priority: "1" do
       @quiz.update(quiz_type: "survey")
       go_to_list_view
       validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
-    it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
+    it "shows and navigates to practice quizzes with due dates", priority: "1" do
       @quiz.update(quiz_type: "practice_quiz")
       go_to_list_view
       validate_object_displayed(@course.name, 'Quiz')
@@ -199,13 +199,13 @@ describe "student planner" do
       user_session(@student1)
     end
 
-    it "opens the sidebar to create a new To-Do item.", priority: "1", test_id: 3263157 do
+    it "opens the sidebar to create a new To-Do item.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       expect(todo_save_button).to be_displayed
     end
 
-    it "closes the sidebar tray with the 'X' button.", priority: "1", test_id: 3263163 do
+    it "closes the sidebar tray with the 'X' button.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       expect(todo_sidebar_modal).to contain_jqcss("button:contains('Save')")
@@ -213,14 +213,14 @@ describe "student planner" do
       expect(f('body')).not_to contain_css("[aria-label = 'Add To Do']")
     end
 
-    it "adds text to the details field.", priority: "1", test_id: 3263161 do
+    it "adds text to the details field.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       todo_details.send_keys("https://imgs.xkcd.com/comics/code_quality_3.png\n")
       expect(todo_details[:value]).to include("https://imgs.xkcd.com/comics/code_quality_3.png")
     end
 
-    it "adds text to the title field.", priority: "1", test_id: 3263158 do
+    it "adds text to the title field.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       modal = todo_sidebar_modal
@@ -229,7 +229,7 @@ describe "student planner" do
       expect(element[:value]).to include("Title Text")
     end
 
-    it "adds a new date with the date picker.", priority: "1", test_id: 3263159 do
+    it "adds a new date with the date picker.", priority: "1" do
       # sets up the date to compare against
       current_month = Time.zone.today.month
       test_month = Date::MONTHNAMES[(current_month % 12) + 1]
@@ -252,7 +252,7 @@ describe "student planner" do
       expect(modal).not_to include_text("Invalid date")
     end
 
-    it "saves new ToDos properly.", priority: "1", test_id: 3263162 do
+    it "saves new ToDos properly.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       create_new_todo
@@ -265,7 +265,7 @@ describe "student planner" do
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
     end
 
-    it "edits a To Do", priority: "1", test_id: 3281714 do
+    it "edits a To Do", priority: "1" do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
@@ -319,7 +319,7 @@ describe "student planner" do
       expect(f('input[type=checkbox]:checked')).to be_displayed
     end
 
-    it "deletes a To Do", priority: "1", test_id: 3281715 do
+    it "deletes a To Do", priority: "1" do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       expect(f('body')).not_to contain_jqcss("h2:contains('No Due Dates Assigned')")
@@ -337,7 +337,7 @@ describe "student planner" do
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
     end
 
-    it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
+    it "groups the to-do item with other course items", priority: "1" do
       @assignment = @course.assignments.create({
                                                  name: 'Assignment 1',
                                                  due_at: Time.zone.now + 1.day,
@@ -350,7 +350,7 @@ describe "student planner" do
       expect(group_items.count).to eq(2)
     end
 
-    it "allows date of a to-do item to be edited.", priority: "1", test_id: 3402913 do
+    it "allows date of a to-do item to be edited.", priority: "1" do
       view_todo_item
       element = ff('input', @modal)[1]
       element.click
@@ -369,7 +369,7 @@ describe "student planner" do
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
     end
 
-    it "adds date and time to a to-do item.", priority: "1", test_id: 3482559 do
+    it "adds date and time to a to-do item.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       modal = todo_sidebar_modal
@@ -384,7 +384,7 @@ describe "student planner" do
       expect(ff('.planner-item').last).to include_text 'DUE: 9:00 AM'
     end
 
-    it "updates the sidebar when clicking on mutiple to-do items", priority: "1", test_id: 3426619 do
+    it "updates the sidebar when clicking on mutiple to-do items", priority: "1" do
       student_to_do2 = @student1.planner_notes.create!(todo_date: Time.zone.now + 5.minutes,
                                                        title: "Student to do 2")
       view_todo_item
@@ -400,7 +400,7 @@ describe "student planner" do
       expect(course_name_dropdown[:value]).to eq("Optional: Add Course")
     end
 
-    it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
+    it "allows editing the course of a to-do item", priority: "1" do
       skip('Flaky, LS-2359')
       view_todo_item
       todo_tray_select_course_from_dropdown
@@ -409,7 +409,7 @@ describe "student planner" do
       expect(@student_to_do.course_id).to be nil
     end
 
-    it "has courses in the course combo box.", priority: "1", test_id: 3263160 do
+    it "has courses in the course combo box.", priority: "1" do
       go_to_list_view
       todo_modal_button.click
       todo_tray_course_selector.click
@@ -428,7 +428,7 @@ describe "student planner" do
     end
   end
 
-  it "shows and navigates to wiki pages with todo dates from student planner", priority: "1", test_id: 3259304 do
+  it "shows and navigates to wiki pages with todo dates from student planner", priority: "1" do
     page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
     go_to_list_view
     validate_object_displayed(@course.name, 'Page')
@@ -443,7 +443,7 @@ describe "student planner" do
                                                             due_at: Time.zone.now - 2.days)
     end
 
-    it "closes the opportunities dropdown.", priority: "1", test_id: 3281711 do
+    it "closes the opportunities dropdown.", priority: "1" do
       skip("Flaky: skip for now LS-2135 to fix")
       go_to_list_view
       open_opportunities_dropdown
@@ -452,7 +452,7 @@ describe "student planner" do
       expect(f('body')).not_to contain_jqcss(close_opportunities_selector)
     end
 
-    it "links opportunity to the correct assignment page.", priority: "1", test_id: 3281712 do
+    it "links opportunity to the correct assignment page.", priority: "1" do
       go_to_list_view
       open_opportunities_dropdown
       click_opportunity(@assignment_opportunity.name)
@@ -461,7 +461,7 @@ describe "student planner" do
       expect(AssignmentPage.assignment_description.text).to eq @assignment_opportunity.description
     end
 
-    it "dismisses assignment from opportunity dropdown.", priority: "1", test_id: 3281713 do
+    it "dismisses assignment from opportunity dropdown.", priority: "1" do
       go_to_list_view
       open_opportunities_dropdown
       dismiss_opportunity_button(@assignment_opportunity.name).click
@@ -471,7 +471,7 @@ describe "student planner" do
       expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
     end
 
-    it "shows missing pill in the opportunities dropdown.", priority: "1", test_id: 3281710 do
+    it "shows missing pill in the opportunities dropdown.", priority: "1" do
       go_to_list_view
       open_opportunities_dropdown
       expect(opportunities_parent).to contain_jqcss('span:contains("Missing")')
@@ -488,7 +488,7 @@ describe "student planner" do
       user_session(@student1)
     end
 
-    it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
+    it "scrolls to the next new activity", priority: "1" do
       skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
       expect(items_displayed.count).to eq 1
@@ -506,7 +506,7 @@ describe "student planner" do
       expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
     end
 
-    it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
+    it "shows any new activity above the current scroll position", priority: "1" do
       skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
 
@@ -518,7 +518,7 @@ describe "student planner" do
       expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
     end
 
-    it "collapses an item when marked as complete", priority: "1", test_id: 3263155 do
+    it "collapses an item when marked as complete", priority: "1" do
       go_to_list_view
 
       planner_item_status_checkbox('Discussion', @future_discussion.title).click
@@ -603,7 +603,7 @@ describe "student planner" do
       @todo_item = @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Some Todo Item")
     end
 
-    it "completes planner item when dismissed from card view sidebar", prirority: "1", test_id: 3659078 do
+    it "completes planner item when dismissed from card view sidebar", prirority: "1" do
       go_to_dashcard_view
       # dismiss the item
       dismiss_todo_item(@todo_item.title)
