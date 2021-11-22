@@ -66,7 +66,7 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
         progress: progress,
         submission_ids: submissions_scope.pluck(:id)
       )
-      return { assignment: assignment, progress: progress, sections: sections }
+      { assignment: assignment, progress: progress, sections: sections }
     else
       raise GraphQL::ExecutionError, "Error hiding assignment grades"
     end

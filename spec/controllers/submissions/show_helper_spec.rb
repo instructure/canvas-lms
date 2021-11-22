@@ -58,7 +58,7 @@ describe 'Submissions::ShowHelper' do
 
         it 'render json with errors key' do
           json = JSON.parse(response.body)
-          expect(json.key?('errors')).to be_truthy
+          expect(json).to have_key('errors')
         end
       end
 

@@ -20,7 +20,7 @@
 module CC
   module GradingStandards
     def add_referenced_grading_standards
-      @course.assignments.active.where('grading_standard_id IS NOT NULL').each do |assignment|
+      @course.assignments.active.where.not(grading_standard_id: nil).each do |assignment|
         next unless export_object?(assignment) ||
                     (assignment.quiz && export_object?(assignment.quiz)) ||
                     (assignment.discussion_topic && export_object?(assignment.discussion_topic))
@@ -33,7 +33,7 @@ module CC
     def create_grading_standards(document = nil)
       add_referenced_grading_standards if for_course_copy
       standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact.uniq(&:id).select { |s| export_object?(s) }
-      return nil unless standards_to_copy.size > 0
+      return nil if standards_to_copy.empty?
 
       if document
         standards_file = nil
@@ -59,7 +59,7 @@ module CC
         end
       end
 
-      standards_file.close if standards_file
+      standards_file&.close
       rel_path
     end
   end

@@ -1923,7 +1923,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state, null: false, limit: 255
       t.text :raw_data, null: false
       t.timestamps null: true
-      # Note: I think the original migration didn't want this to remain the
+      # NOTE: I think the original migration didn't want this to remain the
       # default, but they didn't remove it properly, so it still is.
       t.string :context_type, null: false, default: 'Account', limit: 255
       t.string :name, limit: 255
@@ -2804,7 +2804,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index "stream_item_instances", ["stream_item_id"]
-    add_index :stream_item_instances, %w(user_id hidden id stream_item_id), :name => "index_stream_item_instances_global"
+    add_index :stream_item_instances, %w[user_id hidden id stream_item_id], :name => "index_stream_item_instances_global"
     add_index :stream_item_instances, [:context_type, :context_id]
     add_index :stream_item_instances, [:stream_item_id, :user_id], :unique => true
 
@@ -2919,7 +2919,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submissions, :group_id, where: "group_id IS NOT NULL"
     add_index :submissions, :quiz_submission_id, where: "quiz_submission_id IS NOT NULL"
     add_index :submissions, [:assignment_id, :user_id]
-    add_index :submissions, :assignment_id, where: <<-SQL
+    add_index :submissions, :assignment_id, where: <<~SQL.squish
       submission_type IS NOT NULL
       AND (workflow_state = 'pending_review'
         OR (workflow_state = 'submitted'
@@ -3223,109 +3223,111 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     change_column :schema_migrations, :version, :string, limit: 255
 
-    self.connection.execute %Q(CREATE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
-      SELECT DISTINCT a.id as assignment_id,
-      e.user_id as user_id,
-      c.id as course_id
+    connection.execute <<~SQL.squish
+      CREATE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+        SELECT DISTINCT a.id as assignment_id,
+        e.user_id as user_id,
+        c.id as course_id
 
-      FROM #{Assignment.quoted_table_name} a
+        FROM #{Assignment.quoted_table_name} a
 
-      JOIN #{Course.quoted_table_name} c
-        ON a.context_id = c.id
-        AND a.context_type = 'Course'
+        JOIN #{Course.quoted_table_name} c
+          ON a.context_id = c.id
+          AND a.context_type = 'Course'
 
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = c.id
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state != 'deleted'
+        JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = c.id
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state != 'deleted'
 
-      JOIN #{CourseSection.quoted_table_name} cs
-        ON cs.course_id = c.id
-        AND e.course_section_id = cs.id
+        JOIN #{CourseSection.quoted_table_name} cs
+          ON cs.course_id = c.id
+          AND e.course_section_id = cs.id
 
-      LEFT JOIN #{GroupMembership.quoted_table_name} gm
-        ON gm.user_id = e.user_id
-        AND gm.workflow_state = 'accepted'
+        LEFT JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
 
-      LEFT JOIN #{Group.quoted_table_name} g
-        ON g.context_type = 'Course'
-        AND g.context_id = c.id
-        AND g.workflow_state = 'available'
-        AND gm.group_id = g.id
+        LEFT JOIN #{Group.quoted_table_name} g
+          ON g.context_type = 'Course'
+          AND g.context_id = c.id
+          AND g.workflow_state = 'available'
+          AND gm.group_id = g.id
 
-      LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON aos.assignment_id = a.id
-        AND aos.user_id = e.user_id
+        LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+          ON aos.assignment_id = a.id
+          AND aos.user_id = e.user_id
 
-      LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON ao.assignment_id = a.id
-        AND ao.workflow_state = 'active'
-        AND (
-          (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
-          OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
-          OR (ao.set_type = 'Group' AND ao.set_id = g.id)
-        )
+        LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON ao.assignment_id = a.id
+          AND ao.workflow_state = 'active'
+          AND (
+            (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
+            OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
+            OR (ao.set_type = 'Group' AND ao.set_id = g.id)
+          )
 
-      LEFT JOIN #{Submission.quoted_table_name} s
-        ON s.user_id = e.user_id
-        AND s.assignment_id = a.id
-        AND s.score IS NOT NULL
+        LEFT JOIN #{Submission.quoted_table_name} s
+          ON s.user_id = e.user_id
+          AND s.assignment_id = a.id
+          AND s.score IS NOT NULL
 
-      WHERE a.workflow_state NOT IN ('deleted','unpublished')
-        AND(
-          ( a.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
-          OR (COALESCE(a.only_visible_to_overrides, 'false') = 'false')
-        )
-      )
+        WHERE a.workflow_state NOT IN ('deleted','unpublished')
+          AND(
+            ( a.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
+            OR (COALESCE(a.only_visible_to_overrides, 'false') = 'false')
+          )
+    SQL
 
-    self.connection.execute %Q(CREATE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
-      SELECT DISTINCT q.id as quiz_id,
-      e.user_id as user_id,
-      c.id as course_id
+    connection.execute <<~SQL.squish
+      CREATE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
+        SELECT DISTINCT q.id as quiz_id,
+        e.user_id as user_id,
+        c.id as course_id
 
-      FROM #{Quizzes::Quiz.quoted_table_name} q
+        FROM #{Quizzes::Quiz.quoted_table_name} q
 
-      JOIN #{Course.quoted_table_name} c
-        ON q.context_id = c.id
-        AND q.context_type = 'Course'
+        JOIN #{Course.quoted_table_name} c
+          ON q.context_id = c.id
+          AND q.context_type = 'Course'
 
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = c.id
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state != 'deleted'
+        JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = c.id
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state != 'deleted'
 
-      JOIN #{CourseSection.quoted_table_name} cs
-        ON cs.course_id = c.id
-        AND e.course_section_id = cs.id
+        JOIN #{CourseSection.quoted_table_name} cs
+          ON cs.course_id = c.id
+          AND e.course_section_id = cs.id
 
-      LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON aos.quiz_id = q.id
-        AND aos.user_id = e.user_id
+        LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+          ON aos.quiz_id = q.id
+          AND aos.user_id = e.user_id
 
-      LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON ao.quiz_id = q.id
-        AND ao.workflow_state = 'active'
-        AND (
-          (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
-          OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
-        )
+        LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON ao.quiz_id = q.id
+          AND ao.workflow_state = 'active'
+          AND (
+            (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
+            OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
+          )
 
-      LEFT JOIN #{Assignment.quoted_table_name} a
-        ON a.context_id = q.context_id
-        AND a.submission_types LIKE 'online_quiz'
-        AND a.id = q.assignment_id
+        LEFT JOIN #{Assignment.quoted_table_name} a
+          ON a.context_id = q.context_id
+          AND a.submission_types LIKE 'online_quiz'
+          AND a.id = q.assignment_id
 
-      LEFT JOIN #{Submission.quoted_table_name} s
-        ON s.user_id = e.user_id
-        AND s.assignment_id = a.id
-        AND s.score IS NOT NULL
+        LEFT JOIN #{Submission.quoted_table_name} s
+          ON s.user_id = e.user_id
+          AND s.assignment_id = a.id
+          AND s.score IS NOT NULL
 
-      WHERE q.workflow_state NOT IN ('deleted','unpublished')
-        AND(
-          ( q.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
-          OR (COALESCE(q.only_visible_to_overrides, 'false') = 'false')
-        )
-      )
+        WHERE q.workflow_state NOT IN ('deleted','unpublished')
+          AND(
+            ( q.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
+            OR (COALESCE(q.only_visible_to_overrides, 'false') = 'false')
+          )
+    SQL
 
     add_foreign_key :abstract_courses, :accounts
     add_foreign_key :abstract_courses, :accounts, :column => :root_account_id

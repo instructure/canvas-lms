@@ -42,15 +42,15 @@ def create_user_task
   user_login = ask("User's login: ")
   user_password = ask("User's password: ") { |q| q.default = 'useruser' }
 
-  puts %Q{
+  puts <<~TEXT
 
-  Shard: #{shard.name}[#{shard.id}]
-  Account: #{account.name}[#{account.id}]
-  Admin User: #{user_first_name} #{user_last_name}
-  Username: #{user_login}
-  Password: #{user_password}
+    Shard: #{shard.name}[#{shard.id}]
+    Account: #{account.name}[#{account.id}]
+    Admin User: #{user_first_name} #{user_last_name}
+    Username: #{user_login}
+    Password: #{user_password}
 
-  }
+  TEXT
 
   create_user_task unless agree("Does this look correct?") { |q| q.default = 'yes' }
 

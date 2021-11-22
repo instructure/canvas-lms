@@ -25,9 +25,9 @@ class Progress < ActiveRecord::Base
        { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :tag
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :tag, presence: true
 
   serialize :results
   attr_reader :total
@@ -50,12 +50,12 @@ class Progress < ActiveRecord::Base
     self.results = nil
     self.workflow_state = 'queued'
     self.completion = 0
-    GuardRail.activate(:primary) { self.save! }
+    GuardRail.activate(:primary) { save! }
   end
 
   def set_results(results)
     self.results = results
-    self.save
+    save
   end
 
   def update_completion!(value)
@@ -94,7 +94,7 @@ class Progress < ActiveRecord::Base
   # so that you can update the completion percentage on it as the job runs.
   def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
-    method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
+    method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
     work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
@@ -111,7 +111,7 @@ class Progress < ActiveRecord::Base
     end
 
     def perform
-      self.args[0] = @progress if self.args[0] == @progress # maintain the same object reference
+      args[0] = @progress if args[0] == @progress # maintain the same object reference
       @progress.start
       super
       @progress.reload

@@ -87,7 +87,7 @@ module Pact::Canvas
     )
 
     def self.seed!(opts: {})
-      self.new(opts)
+      new(opts)
     end
 
     private

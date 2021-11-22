@@ -29,15 +29,15 @@ module Api::V1::AssignmentOverride
     api_json(override, @current_user, session, :only => fields).tap do |json|
       case override.set_type
       when 'ADHOC'
-        if override.preloaded_student_ids
-          json[:student_ids] = override.preloaded_student_ids
-        else
-          json[:student_ids] = if visible_users.present?
+        json[:student_ids] = if override.preloaded_student_ids
+                               override.preloaded_student_ids
+                             else
+                               if visible_users.present?
                                  override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
                                else
                                  override.assignment_override_students.pluck(:user_id)
                                end
-        end
+                             end
       when 'Group'
         json[:group_id] = override.set_id
       when 'CourseSection'
@@ -91,7 +91,7 @@ module Api::V1::AssignmentOverride
   end
 
   def find_group(assignment, group_id, group_category_id = nil)
-    scope = Group.active.where(:context_type => 'Course').where("group_category_id IS NOT NULL")
+    scope = Group.active.where(:context_type => 'Course').where.not(group_category_id: nil)
     if assignment
       scope = scope.where(
         context_id: assignment.context_id,
@@ -158,10 +158,7 @@ module Api::V1::AssignmentOverride
 
     if !set_type && data.key?(:group_id)
       group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
-      if !group_category_id
-        # don't recognize group_id for non-group assignments
-        errors << "group_id is not valid for non-group assignments"
-      else
+      if group_category_id
         set_type = 'Group'
         # look up the group
         begin
@@ -170,6 +167,9 @@ module Api::V1::AssignmentOverride
           errors << "unknown group id #{data[:group_id].inspect}"
         end
         override_data[:group] = group
+      else
+        # don't recognize group_id for non-group assignments
+        errors << "group_id is not valid for non-group assignments"
       end
     end
 
@@ -192,7 +192,7 @@ module Api::V1::AssignmentOverride
 
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
 
-    if %w(ADHOC Noop).include?(set_type) && data.key?(:title)
+    if %w[ADHOC Noop].include?(set_type) && data.key?(:title)
       override_data[:title] = data[:title]
     end
 
@@ -215,7 +215,7 @@ module Api::V1::AssignmentOverride
     end
 
     errors = nil if errors.empty?
-    return override_data, errors
+    [override_data, errors]
   end
 
   def check_property(object, prop, present, errors, message)
@@ -290,9 +290,11 @@ module Api::V1::AssignmentOverride
       override.set = nil
       override.set_type = 'ADHOC'
 
-      defunct_student_ids = override.new_record? ?
-        Set.new :
-        override.assignment_override_students.map(&:user_id).to_set
+      defunct_student_ids = if override.new_record?
+                              Set.new
+                            else
+                              override.assignment_override_students.map(&:user_id).to_set
+                            end
 
       override.changed_student_ids = Set.new
 
@@ -393,7 +395,7 @@ module Api::V1::AssignmentOverride
       ov.set_type == 'ADHOC' &&
         !ov.visible_student_overrides(visible_user_ids)
     }.map(&:id)
-    return invisible_user_ids, invisible_override_ids
+    [invisible_user_ids, invisible_override_ids]
   end
 
   def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
@@ -453,13 +455,13 @@ module Api::V1::AssignmentOverride
       assignment.errors.add(:base, error)
     end
 
-    raise ActiveRecord::RecordInvalid.new(assignment) if assignment.errors.any?
+    raise ActiveRecord::RecordInvalid, assignment if assignment.errors.any?
 
     if prepared_overrides[:overrides_to_delete].any?
       assignment.assignment_overrides.where(id: prepared_overrides[:overrides_to_delete]).destroy_all
     end
 
-    raise ActiveRecord::RecordInvalid.new(assignment) unless assignment.valid?
+    raise ActiveRecord::RecordInvalid, assignment unless assignment.valid?
 
     prepared_overrides[:overrides_to_create].each(&:save!)
     prepared_overrides[:overrides_to_update].each(&:save!)

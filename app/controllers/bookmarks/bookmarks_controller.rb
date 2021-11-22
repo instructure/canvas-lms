@@ -162,7 +162,7 @@ class Bookmarks::BookmarksController < ApplicationController
 
   def find_bookmark
     unless (@bookmark = Bookmarks::Bookmark.where(id: params[:id], user_id: user_id).first)
-      head 404
+      head :not_found
     end
   end
 

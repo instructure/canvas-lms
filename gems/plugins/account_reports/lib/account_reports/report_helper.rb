@@ -134,14 +134,16 @@ module AccountReports::ReportHelper
   end
 
   def add_course_sub_account_scope(scope, table = 'courses')
-    if account != root_account
-      scope.where("EXISTS (SELECT course_id
-                           FROM #{CourseAccountAssociation.quoted_table_name} caa
-                           WHERE caa.account_id = ?
-                           AND caa.course_id=#{table}.id
-                           AND caa.course_section_id IS NULL)", account)
-    else
+    if account == root_account
       scope
+    else
+      scope.where(<<~SQL.squish, account)
+        EXISTS (SELECT course_id
+                FROM #{CourseAccountAssociation.quoted_table_name} caa
+                WHERE caa.account_id = ?
+                AND caa.course_id=#{table}.id
+                AND caa.course_section_id IS NULL)
+      SQL
     end
   end
 
@@ -154,20 +156,24 @@ module AccountReports::ReportHelper
   end
 
   def add_user_sub_account_scope(scope, table = 'users')
-    if account != root_account
+    if account == root_account
+      scope
+    else
       scope.where("EXISTS (SELECT user_id
                            FROM #{UserAccountAssociation.quoted_table_name} uaa
                            WHERE uaa.account_id = ?
                            AND uaa.user_id=#{table}.id)", account)
-    else
-      scope
     end
   end
 
   def term_name
-    term ? term.name : I18n.t(
-      'account_reports.default.all_terms', "All Terms"
-    )
+    if term
+      term.name
+    else
+      I18n.t(
+        'account_reports.default.all_terms', "All Terms"
+      )
+    end
   end
 
   def extra_text_term(account_report = @account_report)
@@ -220,7 +226,7 @@ module AccountReports::ReportHelper
     shards = root_account.trusted_account_ids.map { |id| Shard.shard_for(id) }
     shards << root_account.shard
     User.preload_shard_associations(users)
-    shards = shards & users.map(&:associated_shards).flatten
+    shards &= users.map(&:associated_shards).flatten
     pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users.map(&:id))
     pseudonyms = pseudonyms.active unless include_deleted
     pseudonyms.each do |p|
@@ -272,7 +278,7 @@ module AccountReports::ReportHelper
   end
 
   def valid_enrollment_workflow_states
-    %w(invited creation_pending active completed inactive deleted rejected).freeze &
+    %w[invited creation_pending active completed inactive deleted rejected].freeze &
       Api.value_to_array(@account_report.parameters["enrollment_states"])
   end
 
@@ -419,7 +425,7 @@ module AccountReports::ReportHelper
       end
     rescue => e
       report_runner.fail
-      self.fail_with_error(e)
+      fail_with_error(e)
     ensure
       update_parallel_progress(account_report: @account_report, report_runner: report_runner)
       compile_parallel_report(headers, files: files) if last_account_report_runner?(@account_report)
@@ -456,7 +462,7 @@ module AccountReports::ReportHelper
     csvs = {}
     activate_report_db(replica: replica) do
       files.each do |file, headers_for_file|
-        csvs[file] = if @account_report.account_report_rows.exists?(file: file)
+        csvs[file] = if @account_report.account_report_rows.where(file: file).exists?
                        generate_and_run_report(headers_for_file) do |csv|
                          @account_report.account_report_rows.where(file: file)
                                         .order(:account_report_runner_id, :row_number)
@@ -531,7 +537,7 @@ module AccountReports::ReportHelper
     def <<(row)
       if lineno % 1_000 == 0
         GuardRail.activate(:primary) do
-          report = self.instance_variable_get(:@account_report).reload
+          report = instance_variable_get(:@account_report).reload
           updates = {}
           updates[:current_line] = lineno
           updates[:progress] = (lineno.to_f / (report.total_lines + 1) * 100).to_i if report.total_lines
@@ -550,7 +556,7 @@ module AccountReports::ReportHelper
   def read_csv_in_chunks(filename, chunk_size = 1000)
     CSV.open(filename) do |csv|
       rows = []
-      while !(row = csv.readline).nil?
+      until (row = csv.readline).nil?
         rows << row
         if rows.size == chunk_size
           yield rows

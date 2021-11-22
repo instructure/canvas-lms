@@ -59,7 +59,7 @@ describe ContentExportsController do
   describe 'GET xml_schema' do
     describe 'with a valid file' do
       let(:filename) { 'cccv1p0' }
-      let(:full_path) { Rails.root + "lib/cc/xsd/#{filename}.xsd" }
+      let(:full_path) { Rails.root.join("lib/cc/xsd/#{filename}.xsd") }
 
       before { get 'xml_schema', params: { :version => filename } }
 

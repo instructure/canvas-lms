@@ -16,7 +16,7 @@
 # Preceding Specs section from a Jenkins failure report
 
 specs = File.readlines(ARGV[0]).each do |line|
-  line.gsub!(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC: bin\/rspec)?/, '').strip!
+  line.gsub!(%r{^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC: bin/rspec)?}, '').strip!
 end
 specs = specs.reverse if specs.first.end_with?(' (failed)')
 specs.each do |line|

@@ -22,7 +22,7 @@ module ContextExternalToolsHelper
     markup = tools.map do |tool|
       external_tool_menu_item_tag(tool, options)
     end
-    raw(markup.join(''))
+    raw(markup.join)
   end
 
   def external_tool_menu_item_tag(tool, options = {})

@@ -93,14 +93,14 @@ describe Quizzes::QuizQuestionBuilder do
 
         # verify the correct questions were pulled:
         source_aq_ids = aqs.map(&:id)
-        pulled_aq_ids = questions.map { |q| q[:assessment_question_id] }
+        pulled_aq_ids = questions.pluck(:assessment_question_id)
         expect((pulled_aq_ids | source_aq_ids).sort).to eq(source_aq_ids.sort)
 
         # it generates quiz questions for every AQ it pulls out of the bank:
         expect(@quiz.quiz_questions.count).to eq(2)
         expect(@quiz.quiz_questions.generated.count).to eq(2)
         expect(@quiz.quiz_questions.pluck(:id).sort)
-          .to eq(questions.map { |q| q[:id] }.sort)
+          .to eq(questions.pluck(:id).sort)
       end
 
       it 'duplicates questions to fill the group' do
@@ -117,13 +117,13 @@ describe Quizzes::QuizQuestionBuilder do
         expect(questions.count).to eq(5)
 
         # verify the correct questions were pulled:
-        expect(questions.map { |q| q[:assessment_question_id] }).to eq [aq.id] * 5
+        expect(questions.pluck(:assessment_question_id)).to eq [aq.id] * 5
 
         # it generates quiz questions for every AQ it pulls out of the bank:
         expect(@quiz.quiz_questions.count).to eq(5)
         expect(@quiz.quiz_questions.generated.count).to eq(5)
         expect(@quiz.quiz_questions.pluck(:id).sort)
-          .to eq(questions.map { |q| q[:id] }.sort)
+          .to eq(questions.pluck(:id).sort)
       end
 
       it "duplicates questions from a bank" do
@@ -212,12 +212,12 @@ describe Quizzes::QuizQuestionBuilder do
             @group.update_attribute(:pick_count, 3)
 
             expect(questions.count).to eq(3)
-            expect(questions.map { |q| q[:question_text] }.sort.uniq).to eq([
-                                                                              'bq1', 'bq2'
-                                                                            ])
+            expect(questions.pluck(:question_text).sort.uniq).to eq([
+                                                                      'bq1', 'bq2'
+                                                                    ])
 
-            expect(questions.map { |q| q[:id] }.uniq.count).to eq(3),
-                                                               "it links to 3 distinct QuizQuestion objects"
+            expect(questions.pluck(:id).uniq.count).to eq(3),
+                                                       "it links to 3 distinct QuizQuestion objects"
 
             expect(@quiz.quiz_questions.generated.count).to eq(3)
           end
@@ -272,7 +272,7 @@ describe Quizzes::QuizQuestionBuilder do
         expect([
                  ['bank question 1', 'bank question 1', 'bank question 2', 'group question'],
                  ['bank question 1', 'bank question 2', 'group question', 'group question'],
-               ]).to include(questions.map { |q| q[:question_text] }.sort)
+               ]).to include(questions.pluck(:question_text).sort)
       end
     end
   end

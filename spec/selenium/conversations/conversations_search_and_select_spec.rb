@@ -94,13 +94,13 @@ describe "conversations index page" do
         expect(f('.messages')).not_to contain_css('li')
       end
 
-      # TODO reimplement per CNVS-29601, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29601, but make sure we're testing at the right level
       it "should mark multiple conversations as unread"
 
-      # TODO reimplement per CNVS-29602, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29602, but make sure we're testing at the right level
       it "should mark multiple conversations as unread"
 
-      # TODO reimplement per CNVS-29603, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29603, but make sure we're testing at the right level
       it "should star multiple conversations"
     end
   end

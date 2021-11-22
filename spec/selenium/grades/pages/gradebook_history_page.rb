@@ -113,7 +113,7 @@ class GradeBookHistory
     def check_current_col_for_history(assignment_name)
       row_elements = results_table_rows
       current_grade_arr = Array.[]
-      for index in 1...row_elements.size
+      (1...row_elements.size).each do |index|
         if results_table_assignment_col(index).text == assignment_name
           current_grade_arr[index] = results_table_current_col(index).text
         end
@@ -124,7 +124,7 @@ class GradeBookHistory
     def check_table_for_assignment_name(string_in_row)
       row_elements = results_table_rows
       test_passed = true
-      for index in 1...row_elements.size
+      (1...row_elements.size).each do |index|
         if results_table_assignment_col(index).text != string_in_row
           test_passed = false
         end
@@ -143,7 +143,7 @@ class GradeBookHistory
     def check_table_for_grader_name(string_in_row)
       row_elements = results_table_rows
       test_passed = true
-      for index in 1...row_elements.size
+      (1...row_elements.size).each do |index|
         if results_table_grader_col(index).text != string_in_row
           test_passed = false
         end
@@ -154,7 +154,7 @@ class GradeBookHistory
     def check_table_for_student_name(string_in_row)
       row_elements = results_table_rows
       test_passed = true
-      for index in 1...row_elements.size
+      (1...row_elements.size).each do |index|
         if results_table_student_col(index).text != string_in_row
           test_passed = false
         end

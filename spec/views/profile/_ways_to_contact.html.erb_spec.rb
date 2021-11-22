@@ -86,8 +86,8 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).to match(/<div.*>For All Devices<\/div>/)
-    expect(response.body).to_not match(/<a.*>For All Devices<\/a>/)
+    expect(response.body).to match(%r{<div.*>For All Devices</div>})
+    expect(response.body).to_not match(%r{<a.*>For All Devices</a>})
   end
 
   it "shows the default email channel even when its position is greater than one" do

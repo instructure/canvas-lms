@@ -176,13 +176,13 @@ describe AuthenticationProvider::SAML do
     end
 
     it "interprets relative paths from the config dir" do
-      expect(AuthenticationProvider::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config', 'initializers').to_s
+      expect(AuthenticationProvider::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config/initializers').to_s
     end
   end
 
   describe '#user_logout_redirect' do
     it "sends you to the logout landing page if the IdP doesn't support SLO" do
-      controller = double()
+      controller = double
       allow(controller).to receive(:session).and_return({})
       expect(controller).to receive(:logout_url).and_return("bananas")
 
@@ -192,7 +192,7 @@ describe AuthenticationProvider::SAML do
     end
 
     it "sends you to the login page if the IdP doesn't support SLO, but Canvas auth is default" do
-      controller = double()
+      controller = double
       allow(controller).to receive(:session).and_return({})
       expect(controller).to receive(:login_url).and_return("bananas")
 

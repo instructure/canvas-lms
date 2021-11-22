@@ -46,7 +46,7 @@ class WikiPagesController < ApplicationController
   end
 
   def set_pandapub_read_token
-    if @page && @page.grants_right?(@current_user, session, :read)
+    if @page&.grants_right?(@current_user, session, :read)
       if CanvasPandaPub.enabled?
         channel = "/private/wiki_page/#{@page.global_id}/update"
         js_env :WIKI_PAGE_PANDAPUB => {
@@ -93,15 +93,15 @@ class WikiPagesController < ApplicationController
       if @page.new_record?
         if @page.grants_any_right?(@current_user, session, :update, :update_content)
           flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
-          encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
+          encoded_name = @page_name && CGI.escape(@page_name).tr("+", " ")
           redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
           wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
-          if wiki_page && wiki_page.deleted?
-            flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-          else
-            flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
-          end
+          flash[:warning] = if wiki_page && wiki_page.deleted?
+                              t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+                            else
+                              t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+                            end
           redirect_to polymorphic_url([@context, :wiki_pages])
         end
         return

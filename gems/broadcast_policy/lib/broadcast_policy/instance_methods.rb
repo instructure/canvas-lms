@@ -63,11 +63,11 @@ module BroadcastPolicy
               other_attributes.instance_variable_get(:@attributes).delete(key)
               next
             end
-            if value.value != other_attributes[key].value
+            if value.value == other_attributes[key].value
+              other_attributes.write_from_database(key, value.value)
+            else
               other_attributes[key].instance_variable_set(:@original_attribute, nil)
               other_attributes.write_from_user(key, value.value)
-            else
-              other_attributes.write_from_database(key, value.value)
             end
           end
           @mutations_before_last_save = ActiveModel::AttributeMutationTracker.new(other_attributes)
@@ -99,14 +99,14 @@ module BroadcastPolicy
 
     def save_without_broadcasting
       @skip_broadcasts = true
-      self.save
+      save
     ensure
       @skip_broadcasts = false
     end
 
     def save_without_broadcasting!
       @skip_broadcasts = true
-      self.save!
+      save!
     ensure
       @skip_broadcasts = false
     end

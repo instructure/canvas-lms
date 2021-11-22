@@ -38,6 +38,11 @@ export const CONVERSATIONS_QUERY = gql`
             ...ConversationParticipant
             conversation {
               ...Conversation
+              conversationMessagesConnection(first: 1) {
+                nodes {
+                  ...ConversationMessage
+                }
+              }
             }
           }
         }
@@ -46,7 +51,26 @@ export const CONVERSATIONS_QUERY = gql`
   }
   ${ConversationParticipant.fragment}
   ${Conversation.fragment}
+  ${ConversationMessage.fragment}
 `
+
+export const CONVERSATION_MESSAGES_QUERY = gql`
+  query GetConversationMessagesQuery($conversationID: ID!) {
+    legacyNode(_id: $conversationID, type: Conversation) {
+      ... on Conversation {
+        ...Conversation
+        conversationMessagesConnection {
+          nodes {
+            ...ConversationMessage
+          }
+        }
+      }
+    }
+  }
+  ${Conversation.fragment}
+  ${ConversationMessage.fragment}
+`
+
 export const COURSES_QUERY = gql`
   query GetUserCourses($userID: ID!) {
     legacyNode(_id: $userID, type: User) {

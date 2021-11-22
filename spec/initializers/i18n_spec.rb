@@ -25,7 +25,7 @@ describe I18n do
     end
 
     it 'does underscore conversion' do
-      I18n.locale = :'en-GB'
+      I18n.locale = :"en-GB"
       expect(I18n.bigeasy_locale).to eq 'en_GB'
     end
   end
@@ -37,7 +37,7 @@ describe I18n do
     end
 
     it 'does lowercase conversion' do
-      I18n.locale = :'en-GB'
+      I18n.locale = :"en-GB"
       expect(I18n.moment_locale).to eq 'en-gb'
     end
   end
@@ -49,7 +49,7 @@ describe I18n do
     end
 
     it 'does lowercase conversion' do
-      I18n.locale = :'en-GB'
+      I18n.locale = :"en-GB"
       expect(I18n.fullcalendar_locale).to eq 'en-gb'
     end
   end
@@ -89,9 +89,9 @@ describe I18n do
         precision: 3,
         format: '%n %'
       }
-      allow(I18n).to receive(:translate).with(:'number.format', anything).and_return(format)
-      allow(I18n).to receive(:translate).with(:'number.percentage.format', anything).and_return(format)
-      allow(I18n).to receive(:translate).with(:'number.precision.format', anything).and_return(format)
+      allow(I18n).to receive(:translate).with(:"number.format", anything).and_return(format)
+      allow(I18n).to receive(:translate).with(:"number.percentage.format", anything).and_return(format)
+      allow(I18n).to receive(:translate).with(:"number.precision.format", anything).and_return(format)
     end
 
     context "without precision" do

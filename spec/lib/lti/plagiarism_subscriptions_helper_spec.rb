@@ -59,11 +59,11 @@ describe Lti::PlagiarismSubscriptionsHelper do
   describe '#create_subscription' do
     let(:subscription_helper) { Lti::PlagiarismSubscriptionsHelper.new(tool_proxy) }
     let(:event_types) do
-      %w(submission_created
+      %w[submission_created
          plagiarism_resubmit
          submission_updated
          assignment_created
-         assignment_updated).freeze
+         assignment_updated].freeze
     end
 
     it 'creates a subscription and returns the id' do

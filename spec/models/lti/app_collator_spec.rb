@@ -28,6 +28,7 @@ module Lti
     include LtiSpecHelper
 
     subject { described_class.new(account, mock_reregistration_url_builder) }
+
     let(:account) { Account.create }
     let(:mock_reregistration_url_builder) { ->(_c, _id) { "mock_url" } }
 

@@ -55,11 +55,11 @@ class CreateNewGradeHistoryBatchTable < ActiveRecord::Migration[4.2]
   end
 
   def self.table_exists?(cassandra, table)
-    cql = %{
+    cql = <<~SQL.squish
       SELECT *
       FROM #{table}
       LIMIT 1
-    }
+    SQL
     cassandra.execute(cql)
     true
   rescue CassandraCQL::Error::InvalidRequestException

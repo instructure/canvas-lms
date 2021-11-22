@@ -24,7 +24,7 @@ describe "reply attachment" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  before() do
+  before do
     @topic_title = 'discussion topic'
     course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')

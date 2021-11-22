@@ -40,7 +40,7 @@ describe 'Late Policies:' do
         late_submission_deduction: 10.0,
         late_submission_interval: 'day',
         late_submission_minimum_percent_enabled: true,
-        late_submission_minimum_percent: 50.0,
+        late_submission_minimum_percent: 50.0
       )
 
       # create 3 assignments due in the past

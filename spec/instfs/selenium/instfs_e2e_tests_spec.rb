@@ -84,12 +84,12 @@ describe "instfs file uploads" do
 
   def compare_md5s(image_element_src, original_file_path)
     downloaded_data = download_file(image_element_src)
-    if downloaded_data != false
+    if downloaded_data == false
+      false
+    else
       temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
-      return temp_md5 == original_md5
-    else
-      return false
+      temp_md5 == original_md5
     end
   end
 
@@ -128,17 +128,17 @@ describe "instfs file uploads" do
   end
 
   def check_file_link(file_link)
-    downloaded_data = open(file_link)
-    downloaded_data.size > 0
+    downloaded_data = URI.parse(file_link).open
+    !downloaded_data.empty?
   end
 
   def download_file(file_link)
     # if a file is less than 10K, it will return a StringIO, not a file object.
     # in that case get the string from the StringIO
-    downloaded_data = open(file_link)
-    if downloaded_data.class == StringIO
+    downloaded_data = URI.parse(file_link).open
+    if downloaded_data.instance_of?(StringIO)
       downloaded_data = downloaded_data.string
-    elsif downloaded_data.size > 0
+    elsif !downloaded_data.empty?
       downloaded_data = File.read(downloaded_data)
     else
       return false
@@ -185,7 +185,7 @@ describe "instfs file uploads" do
       thumbnail_link = f(".media-object")["style"]
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
       file_link = get_file_link_from_bg_image(thumbnail_link)
-      downloaded_file = open(file_link)
+      downloaded_file = URI.parse(file_link).open
       expect(downloaded_file.size).to be > 0
     end
 
@@ -420,7 +420,7 @@ describe "instfs file uploads" do
       file_link = get_file_link_from_bg_image(image_link)
       thumbnail_link = get_link_redirect_path(file_link)
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
-      downloaded_file = open(file_link)
+      downloaded_file = URI.parse(file_link).open
       expect(downloaded_file.size).to be > 0
     end
   end

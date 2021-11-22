@@ -31,9 +31,9 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
 
-    field :root_id, ID, <<~DESC, method: :id, null: false
+    field :root_id, ID, <<~MD, method: :id, null: false
       The canvas legacy id of the root submission this history belongs to
-    DESC
+    MD
 
     # Only the current (non-versionable) submission should return a submission
     # draft, even if there are drafts for submission histories in the database

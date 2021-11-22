@@ -397,7 +397,7 @@ describe "conversations new" do
         button_text = f('.filter-option', course_filter).text
         expect(button_text).not_to eq @course.name
         expect(button_text[0...5]).to eq @course.name[0...5]
-        expect(button_text[-5..-1]).to eq @course.name[-5..-1]
+        expect(button_text[-5..]).to eq @course.name[-5..]
       end
 
       it "filters by course", priority: "1", test_id: 197529 do

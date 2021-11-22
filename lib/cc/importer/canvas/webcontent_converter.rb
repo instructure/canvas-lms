@@ -74,10 +74,10 @@ module CC::Importer::Canvas
             if (usage_rights = file.at_css("usage_rights"))
               rights_hash = { :use_justification => usage_rights.attr('use_justification') }
               if (legal_copyright = usage_rights.at_css('legal_copyright'))
-                rights_hash.merge!(:legal_copyright => legal_copyright.text)
+                rights_hash[:legal_copyright] = legal_copyright.text
               end
               if (license = usage_rights.at_css('license'))
-                rights_hash.merge!(:license => license.text)
+                rights_hash[:license] = license.text
               end
               file_map[id][:usage_rights] = rights_hash
             end

@@ -25,11 +25,11 @@ module Lti
     end
 
     SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'
-    EVENT_TYPES = %w(submission_created
+    EVENT_TYPES = %w[submission_created
                      plagiarism_resubmit
                      submission_updated
                      assignment_updated
-                     assignment_created).freeze
+                     assignment_created].freeze
 
     def initialize(tool_proxy)
       @tool_proxy = tool_proxy

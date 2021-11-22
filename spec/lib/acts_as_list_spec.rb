@@ -47,19 +47,19 @@ describe "acts_as_list" do
       expect(@modules.map(&:position)).to eq [1, 2, 3]
 
       expect(@module_1.insert_at(3)).to eq true
-      @modules.each { |m| m.reload }
+      @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [3, 1, 2]
 
       expect(@module_2.insert_at(2)).to eq true
-      @modules.each { |m| m.reload }
+      @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [3, 2, 1]
 
       expect(@module_3.insert_at(3)).to eq true
-      @modules.each { |m| m.reload }
+      @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [2, 1, 3]
 
       expect(@module_1.insert_at(1)).to eq true
-      @modules.each { |m| m.reload }
+      @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [1, 2, 3]
     end
   end

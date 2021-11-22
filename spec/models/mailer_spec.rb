@@ -26,14 +26,14 @@ describe Mailer do
     end
 
     it 'has defaults for critical fields' do
-      message = message_model()
+      message = message_model
       mail = Mailer.create_message(message)
       expect(mail.header['From'].to_s).to eq "#{HostUrl.outgoing_email_default_name} <#{HostUrl.outgoing_email_address}>"
       expect(mail.header['Reply-To'].to_s).to eq IncomingMail::ReplyToAddress.new(message).address
     end
 
     it 'allows overrides for critical fields' do
-      message = message_model()
+      message = message_model
       message.from_name = "Handy Randy"
       message.reply_to_name = "Stan Theman"
       mail = Mailer.create_message(message)
@@ -51,7 +51,7 @@ describe Mailer do
     end
 
     it 'truncates the message body if it exceeds the maximum text length' do
-      message = message_model()
+      message = message_model
       message.body = 'a' * 300.kilobytes
       message.html_body = 'a' * 300.kilobytes
       mail = Mailer.create_message(message)

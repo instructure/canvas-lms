@@ -72,7 +72,7 @@ describe Api::V1::GradeChangeEvent do
     }
 
     allow(PageView).to receive_messages(
-      :find_by_id => @page_view,
+      :find_by => @page_view,
       :find_all_by_id => [@page_view]
     )
 

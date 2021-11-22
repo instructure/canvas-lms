@@ -1725,7 +1725,7 @@ describe Submission do
 
       it "does not create a message for a soft-concluded student" do
         @course.start_at = 2.weeks.ago
-        @course.conclude_at = 1.weeks.ago
+        @course.conclude_at = 1.week.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
 
@@ -2350,7 +2350,7 @@ describe Submission do
         end
 
         OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.each do |state|
-          context " and both reports have a workflow_state of #{state}" do
+          context "and both reports have a workflow_state of #{state}" do
             let(:preferred_state) { state }
             let(:other_state) { state }
 
@@ -2917,7 +2917,7 @@ describe Submission do
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false))
         @submission.submit_to_turnitin
-        expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
+        expect(Delayed::Job.list_jobs(:future, 100).count { |j| j.tag == 'Submission#submit_to_turnitin' }).to eq 2
       end
 
       it "sets status as failed if something fails on a retry" do
@@ -4126,7 +4126,7 @@ describe Submission do
       it "loads attachments for many submissions at once" do
         attachments = []
 
-        submissions = 3.times.map do |i|
+        submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
           attachments << [
             attachment_model(filename: "submission#{i}-a.doc", :context => @student),
@@ -4172,13 +4172,13 @@ describe Submission do
       it "handles submission histories with different attachments" do
         student_in_course(active_all: true)
         attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
-        Timecop.freeze(10.second.ago) do
+        Timecop.freeze(10.seconds.ago) do
           @assignment.submit_homework(@student, submission_type: 'online_upload',
                                                 attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", :context => @student)
-        Timecop.freeze(5.second.ago) do
+        Timecop.freeze(5.seconds.ago) do
           @assignment.submit_homework @student, attachments: [attachments[1]]
         end
 
@@ -4200,7 +4200,7 @@ describe Submission do
       it "loads attachments for many submissions at once and returns a hash" do
         expected_attachments_for_submissions = {}
 
-        submissions = 3.times.map do |i|
+        submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
           attachment = [attachment_model(filename: "submission#{i}.doc", :context => @student)]
           sub = @assignment.submit_homework @student, attachments: attachment
@@ -4406,7 +4406,7 @@ describe Submission do
       end
 
       context "preferred_plugins" do
-        it "does not send o365  as preferred plugins by default" do
+        it "does not send o365 as preferred plugins by default" do
           @assignment.submit_homework(@student1,
                                       submission_type: "online_upload",
                                       attachments: [@attachment])
@@ -4507,7 +4507,7 @@ describe Submission do
     before(:once) do
       course_with_teacher active_all: true
       @u1, @u2 = n_students_in_course(2)
-      @a1, @a2 = 2.times.map {
+      @a1, @a2 = Array.new(2) {
         @course.assignments.create! points_possible: 10
       }
       @progress = Progress.create!(context: @course, tag: "submissions_update")
@@ -5835,7 +5835,7 @@ describe Submission do
 
   describe '#ensure_grader_can_grade' do
     before do
-      @submission = Submission.new()
+      @submission = Submission.new
     end
 
     context 'when #grader_can_grade? returns true' do
@@ -5873,7 +5873,7 @@ describe Submission do
 
   describe '#grader_can_grade?' do
     before do
-      @submission = Submission.new()
+      @submission = Submission.new
     end
 
     it "returns true if grade hasn't been changed" do
@@ -7478,7 +7478,7 @@ describe Submission do
       # to the database, we can't call submit_homework multiple times. We are
       # instead just updating the submitted_at time, which triggers the before_save
       # callback.
-      submission.update!(submitted_at: 2.hour.ago)
+      submission.update!(submitted_at: 2.hours.ago)
       submission.update!(submitted_at: 1.hour.ago)
       expect(submission.attempt).to eq 3
     end
@@ -7739,6 +7739,15 @@ describe Submission do
         <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
       expect(submission.word_count).to eq 18
     end
+
+    it "sums word counts of attachments if there are any" do
+      student_in_course(active_all: true)
+      submission_text = "Text based submission with some words"
+      attachment1 = attachment_model(uploaded_data: stub_file_data('submission.txt', submission_text, 'text/plain'), context: @student)
+      attachment2 = attachment_model(uploaded_data: stub_file_data('submission.txt', submission_text, 'text/plain'), context: @student)
+      sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
+      expect(sub.word_count).to eq 12
+    end
   end
 
   context "Assignment Cache" do
@@ -7814,6 +7823,71 @@ describe Submission do
         subject.run_callbacks :create
         expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
       end
+    end
+  end
+
+  describe "#observer?" do
+    before do
+      @student = user_factory
+      course_with_observer(
+        course: @course,
+        associated_user_id: @student.id,
+        active_all: true,
+        active_cc: true
+      )
+      @submission = @assignment.submission_for_student(@student)
+    end
+
+    it "is true for observer" do
+      expect(@submission.observer?(@observer)).to eq true
+    end
+
+    it "is false for student" do
+      expect(@submission.observer?(@student)).to eq false
+    end
+
+    it "is false for teacher" do
+      expect(@submission.observer?(@teacher)).to eq false
+    end
+
+    it "is false for others" do
+      expect(@submission.observer?(user_factory)).to eq false
+    end
+  end
+
+  describe "#peer_reviewer?" do
+    before do
+      student_in_course(active_all: true)
+      @peer_reviewer = user_factory
+      @course.enroll_student(@peer_reviewer).accept!
+      @assignment = @course.assignments.build(
+        title: 'Peer Reviews',
+        submission_types: 'online_text_entry',
+        peer_reviews: true
+      )
+      @assignment.save!
+      @submission = @assignment.submission_for_student(@student)
+      @submission.assessment_requests.create!(
+        user: @student,
+        assessor: @peer_reviewer,
+        assessor_asset: @submission
+      )
+    end
+
+    it "is true for reviewer" do
+      expect(@submission.peer_reviewer?(@peer_reviewer)).to eq true
+    end
+
+    it "is false for student" do
+      expect(@submission.peer_reviewer?(@student)).to eq false
+    end
+
+    it "is false for teacher" do
+      expect(@submission.peer_reviewer?(@teacher)).to eq false
+    end
+
+    it "is false for others" do
+      expect(@submission.peer_reviewer?(user_factory)).to eq false
     end
   end
 end

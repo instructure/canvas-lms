@@ -67,8 +67,8 @@ describe UserList do
   end
 
   it "processes a list of irregular emails" do
-    ul = UserList.new(%{ Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
-          guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>})
+    ul = UserList.new(%( Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
+          guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>))
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw \"Ryan\"", "ryankshaw@gmail.com"],
                                                                       ["whoopsies", "stuff@stuff.stuff"],
@@ -90,7 +90,7 @@ describe UserList do
   end
 
   it "works with a mixed entry list" do
-    ul = UserList.new regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
+    ul = UserList.new regular + "," + %(otherryankshaw@gmail.com, otherlastfirst@gmail.com)
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw, Ryan", "ryankshaw@gmail.com"],
                                                                       ["Last, First", "lastfirst@gmail.com"],
@@ -180,7 +180,7 @@ describe UserList do
     p.sis_user_id = '9001'
     p.save!
 
-    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, 9001, "walsh, thomas" <test3@example.com>}, :root_account => @account
+    ul = UserList.new regular + "," + %(user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, 9001, "walsh, thomas" <test3@example.com>), :root_account => @account
     expect(ul.addresses.map { |x| [x[:name], x[:address], x[:type]] }).to eql([
                                                                                 ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
                                                                                 ["Last, First", "lastfirst@gmail.com", :email],
@@ -200,7 +200,7 @@ describe UserList do
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
     user.pseudonyms.create!(:unique_id => "user1", :account => @account)
-    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454}, :root_account => @account
+    ul = UserList.new regular + "," + %(user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454), :root_account => @account
     expect(ul.addresses.map { |x| [x[:name], x[:address], x[:type]] }).to eql([
                                                                                 ["Shaw, Ryan", "ryankshaw@gmail.com", :email],
                                                                                 ["Last, First", "lastfirst@gmail.com", :email],
@@ -569,9 +569,9 @@ describe UserList do
 end
 
 def regular
-  %{"Shaw, Ryan" <ryankshaw@gmail.com>, "Last, First" <lastfirst@gmail.com>}
+  %("Shaw, Ryan" <ryankshaw@gmail.com>, "Last, First" <lastfirst@gmail.com>)
 end
 
 def without_brackets
-  %{ryankshaw@gmail.com, lastfirst@gmail.com}
+  %(ryankshaw@gmail.com, lastfirst@gmail.com)
 end

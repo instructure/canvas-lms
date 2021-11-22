@@ -89,7 +89,7 @@ module Lti
         expect(lti_link.originality_report).to eq report
       end
 
-      it 'returns nil if linkable is not an OriginalityReport ' do
+      it 'returns nil if linkable is not an OriginalityReport' do
         lti_link = Lti::Link.new
         expect(lti_link.originality_report).to be_nil
       end

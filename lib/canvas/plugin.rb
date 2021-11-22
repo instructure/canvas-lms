@@ -48,7 +48,7 @@ module Canvas
 
     # custom serialization, since the meta can containt procs
     def _dump(_depth)
-      self.id.to_s
+      id.to_s
     end
 
     def self._load(str)
@@ -56,7 +56,7 @@ module Canvas
     end
 
     def encode_with(coder)
-      coder['id'] = self.id.to_s
+      coder['id'] = id.to_s
     end
 
     Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
@@ -70,7 +70,7 @@ module Canvas
     end
 
     def saved_settings
-      PluginSetting.settings_for_plugin(self.id, self)
+      PluginSetting.settings_for_plugin(id, self)
     end
 
     def settings
@@ -78,7 +78,7 @@ module Canvas
     end
 
     def enabled?
-      ps = PluginSetting.cached_plugin_setting(self.id)
+      ps = PluginSetting.cached_plugin_setting(id)
       return false unless ps
 
       ps.valid_settings? && ps.enabled?
@@ -89,11 +89,11 @@ module Canvas
     end
 
     [:name, :description, :website, :author, :author_website].each do |method|
-      class_eval <<-METHOD
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}
           t_if_proc(@meta[:#{method}]) || ''
         end
-      METHOD
+      RUBY
     end
 
     def setting(name)
@@ -117,7 +117,7 @@ module Canvas
     end
 
     def has_settings_partial?
-      !meta[:settings_partial].blank?
+      meta[:settings_partial].present?
     end
 
     def test_cluster_inherit?
@@ -135,8 +135,8 @@ module Canvas
     end
 
     def translate(key, default, options = {})
-      key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
-      I18n.translate(key, default, options)
+      key = "canvas.plugins.#{@id}.#{key}" unless key.start_with?('#')
+      I18n.t(key, default, options)
     end
     alias_method :t, :translate
 
@@ -156,12 +156,12 @@ module Canvas
         end
         res = validator_module.validate(settings, plugin_setting)
         if res.is_a?(Hash)
-          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+          plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(res || {})
         else
           false
         end
       else
-        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 
@@ -199,7 +199,7 @@ module Canvas
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized
 
-      return value.to_i != 0
+      value.to_i != 0
     end
   end
 

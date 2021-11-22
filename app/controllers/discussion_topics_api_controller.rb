@@ -63,7 +63,7 @@ class DiscussionTopicsApiController < ApplicationController
                                             include_all_dates: include_params.include?('all_dates'),
                                             :include_sections => include_params.include?('sections'),
                                             :include_sections_user_count => include_params.include?('sections_user_count'),
-                                            :include_overrides => include_params.include?('overrides'),).first)
+                                            :include_overrides => include_params.include?('overrides')).first)
   end
 
   # @API Get the full topic
@@ -139,16 +139,14 @@ class DiscussionTopicsApiController < ApplicationController
       # we assume that json_structure will typically be served to users requesting string IDs
       if !stringify_json_ids? || mobile_brand_config
         entries = JSON.parse(structure)
-        StringifyIds.recursively_stringify_ids(entries, reverse: true) if !stringify_json_ids?
+        StringifyIds.recursively_stringify_ids(entries, reverse: true) unless stringify_json_ids?
         DiscussionTopic::MaterializedView.include_mobile_overrides(entries, mobile_brand_config.css_and_js_overrides) if mobile_brand_config
         structure = entries.to_json
       end
 
-      if new_entries
-        new_entries.each do |e|
-          e["message"] = resolve_placeholders(e["message"]) if e["message"]
-          e["attachments"].each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
-        end
+      new_entries&.each do |e|
+        e["message"] = resolve_placeholders(e["message"]) if e["message"]
+        e["attachments"]&.each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] }
       end
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
@@ -197,7 +195,7 @@ class DiscussionTopicsApiController < ApplicationController
 
       if @topic.allow_rating?
         entry_ratings  = DiscussionEntryParticipant.entry_ratings(entry_ids, @current_user)
-        entry_ratings  = Hash[entry_ratings.map { |k, v| [k.to_s, v] }] if stringify_json_ids?
+        entry_ratings  = entry_ratings.transform_keys(&:to_s) if stringify_json_ids?
       end
 
       # as an optimization, the view structure is pre-serialized as a json
@@ -214,7 +212,7 @@ class DiscussionTopicsApiController < ApplicationController
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"
     else
-      head 503
+      head :service_unavailable
     end
   end
 
@@ -268,7 +266,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
     # People that can't moderate don't have power to publish separately, so
     # just publish their topics straightaway.
-    if !@context.grants_right?(@current_user, session, :moderate_forum)
+    unless @context.grants_right?(@current_user, session, :moderate_forum)
       new_topic.publish
     end
     if new_topic.save!
@@ -675,7 +673,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def require_topic
     @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    return authorized_action(@topic, @current_user, :read)
+    authorized_action(@topic, @current_user, :read)
   end
 
   def require_entry
@@ -683,12 +681,12 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def require_initial_post
-    return true if !@topic.initial_post_required?(@current_user, session)
+    return true unless @topic.initial_post_required?(@current_user, session)
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
     render :json => 'require_initial_post', :status => :forbidden
-    return false
+    false
   end
 
   def build_entry(association)
@@ -698,7 +696,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def save_entry
-    has_attachment = params[:attachment].present? && params[:attachment].size > 0 &&
+    has_attachment = params[:attachment].present? && !params[:attachment].empty? &&
                      @entry.grants_right?(@current_user, session, :attach)
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
@@ -726,7 +724,7 @@ class DiscussionTopicsApiController < ApplicationController
     context = (@current_user || @context)
     attachment_params = {}
     if @topic.for_assignment?
-      attachment_params.merge!(:folder_id => @current_user.submissions_folder(@context))
+      attachment_params[:folder_id] = @current_user.submissions_folder(@context)
       context = @current_user
     end
     attachment = context.attachments.new(attachment_params)
@@ -763,9 +761,9 @@ class DiscussionTopicsApiController < ApplicationController
     render_state_change_result @topic.change_read_state(new_state, @current_user)
   end
 
-  def get_forced_option()
+  def get_forced_option
     opts = {}
-    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.has_key?(:forced_read_state)
+    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.key?(:forced_read_state)
     opts
   end
 

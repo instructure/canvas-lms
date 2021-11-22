@@ -34,7 +34,7 @@ module Alerts
       alerts_cache = {}
       Course.where(id: course_ids).find_each do |course|
         alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.to_a }.flatten
-        self.evaluate_for_course(course, alerts_cache[course.account_id])
+        evaluate_for_course(course, alerts_cache[course.account_id])
       end
     end
 

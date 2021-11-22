@@ -50,7 +50,7 @@ module CC
         end
       end
 
-      feed_file.close if feed_file
+      feed_file&.close
       rel_path
     end
   end

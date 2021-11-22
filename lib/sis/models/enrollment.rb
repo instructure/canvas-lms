@@ -52,11 +52,11 @@ module SIS
       end
 
       def valid_context?
-        !course_id.blank? || !section_id.blank?
+        course_id.present? || section_id.present?
       end
 
       def valid_user?
-        !user_id.blank? || !user_integration_id.blank?
+        user_id.present? || user_integration_id.present?
       end
 
       def valid_status?

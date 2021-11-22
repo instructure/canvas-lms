@@ -34,7 +34,7 @@ class SentryProxy
   #  configure the sentry client in an initializer).  This allows plugins and extensions
   # to register their own errors that they don't want to get reported to sentry
   def self.register_ignorable_error(error_class)
-    @ignorable_errors = (self.ignorable_errors << error_class.to_s).uniq
+    @ignorable_errors = (ignorable_errors << error_class.to_s).uniq
   end
 
   def self.ignorable_errors

@@ -21,11 +21,11 @@ require 'active_support/all'
 
 module CanvasTime
   module ClassMethods
-    def _load args
+    def _load(args)
       return super unless args.starts_with?("pre1900:")
 
       # 8 puts us after the colon in "pre1900:"
-      iso8601(args[8..-1])
+      iso8601(args[8..])
     end
   end
 
@@ -49,7 +49,7 @@ module CanvasTime
   end
 
   def utc_datetime
-    timestamp = self.getutc
+    timestamp = getutc
     DateTime.civil(timestamp.year,
                    timestamp.month,
                    timestamp.day,

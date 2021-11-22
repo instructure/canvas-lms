@@ -33,7 +33,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   REPORTS = %w[student_analysis item_analysis].freeze
 
-  validates_inclusion_of :report_type, :in => REPORTS
+  validates :report_type, inclusion: { :in => REPORTS }
 
   after_initialize do
     self.includes_all_versions ||= false
@@ -114,10 +114,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def abort_csv_generation
-    self.progress.destroy
-    self.reload
+    progress.destroy
+    reload
 
-    Delayed::Job.where({ strand: self.csv_job_strand_id }).destroy_all
+    Delayed::Job.where({ strand: csv_job_strand_id }).destroy_all
   end
 
   def self.csv_job_tag
@@ -125,7 +125,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def csv_job_strand_id
-    Shard.birth.activate { "quiz_statistics_#{quiz_id}_#{self.id}" }
+    Shard.birth.activate { "quiz_statistics_#{quiz_id}_#{id}" }
   end
 
   def update_progress(i, n)
@@ -144,9 +144,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     end
   end
 
-  def readable_type
-    report.readable_type
-  end
+  delegate :readable_type, to: :report
 
   set_policy do
     given do |user, session|

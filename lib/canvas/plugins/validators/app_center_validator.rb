@@ -28,11 +28,11 @@ module Canvas::Plugins::Validators::AppCenterValidator
         false
       else
         uri = URI.parse(settings[:base_url].strip) rescue nil
-        if !uri
+        if uri
+          settings.slice(:base_url, :token, :apps_index_endpoint, :app_reviews_endpoint).to_h.with_indifferent_access
+        else
           plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.invalid_url', 'Invalid URL'))
           false
-        else
-          settings.slice(:base_url, :token, :apps_index_endpoint, :app_reviews_endpoint).to_h.with_indifferent_access
         end
       end
     end

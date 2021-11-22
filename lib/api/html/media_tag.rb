@@ -32,7 +32,7 @@ module Api
       end
 
       def has_media_comment?
-        !media_id.blank?
+        media_id.present?
       end
 
       # (outgoing) turn anchor tags with media comments into html5 elements
@@ -79,8 +79,8 @@ module Api
 
       def media_id
         if tag_is_an_anchor?
-          media_comment_regex = %r{^media_comment_}
-          return '' unless tag['id'] && tag['id'].match(media_comment_regex)
+          media_comment_regex = /^media_comment_/
+          return '' unless tag['id']&.match(media_comment_regex)
 
           tag['id'].sub(media_comment_regex, '')
         else

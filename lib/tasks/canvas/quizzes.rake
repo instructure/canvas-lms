@@ -63,7 +63,7 @@ namespace :canvas do
     desc 'Create partition tables for the current and upcoming months.'
     task :create_event_partitions => :environment do
       Shard.with_each_shard do
-        Quizzes::QuizSubmissionEventPartitioner.logger = Logger.new(STDOUT)
+        Quizzes::QuizSubmissionEventPartitioner.logger = Logger.new($stdout)
         Quizzes::QuizSubmissionEventPartitioner.process
       end
     end

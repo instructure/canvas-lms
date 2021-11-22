@@ -32,12 +32,12 @@ class CreateNotificationPolicyOverrides < ActiveRecord::Migration[5.2]
       t.timestamps
     end
 
-    add_index :notification_policy_overrides, %i(communication_channel_id notification_id),
+    add_index :notification_policy_overrides, %i[communication_channel_id notification_id],
               name: 'index_notification_policies_overrides_on_cc_id_and_notification'
-    add_index :notification_policy_overrides, %i(context_id context_type communication_channel_id notification_id),
+    add_index :notification_policy_overrides, %i[context_id context_type communication_channel_id notification_id],
               where: 'notification_id IS NOT NULL',
               unique: true, name: 'index_notification_policies_overrides_uniq_context_notification'
-    add_index :notification_policy_overrides, %i(context_id context_type communication_channel_id),
+    add_index :notification_policy_overrides, %i[context_id context_type communication_channel_id],
               where: 'notification_id IS NULL',
               unique: true, name: 'index_notification_policies_overrides_uniq_context_and_cc'
   end

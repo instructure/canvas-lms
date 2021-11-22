@@ -303,7 +303,7 @@ class AccountsController < ApplicationController
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
 
-  INTEGER_REGEX = /\A[+-]?\d+\z/
+  INTEGER_REGEX = /\A[+-]?\d+\z/.freeze
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
 
   # @API List accounts
@@ -325,11 +325,11 @@ class AccountsController < ApplicationController
         @accounts = (@current_user&.all_paginatable_accounts || []).paginate(per_page: 100)
       end
       format.json do
-        if @current_user
-          @accounts = Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
-        else
-          @accounts = []
-        end
+        @accounts = if @current_user
+                      Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
+                    else
+                      []
+                    end
         ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
 
         # originally had 'includes' instead of 'include' like other endpoints
@@ -461,22 +461,22 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
 
     recursive = value_to_boolean(params[:recursive])
-    if recursive
-      @accounts = PaginatedCollection.build do |pager|
-        per_page = pager.per_page
-        current_page = [pager.current_page.to_i, 1].max
-        sub_accounts = Account.active.offset((current_page - 1) * per_page).limit(per_page + 1).sub_accounts_recursive(@account.id)
+    @accounts = if recursive
+                  PaginatedCollection.build do |pager|
+                    per_page = pager.per_page
+                    current_page = [pager.current_page.to_i, 1].max
+                    sub_accounts = Account.active.offset((current_page - 1) * per_page).limit(per_page + 1).sub_accounts_recursive(@account.id)
 
-        if sub_accounts.length > per_page
-          sub_accounts.pop
-          pager.next_page = current_page + 1
-        end
+                    if sub_accounts.length > per_page
+                      sub_accounts.pop
+                      pager.next_page = current_page + 1
+                    end
 
-        pager.replace sub_accounts
-      end
-    else
-      @accounts = @account.sub_accounts.order(:id)
-    end
+                    pager.replace sub_accounts
+                  end
+                else
+                  @account.sub_accounts.order(:id)
+                end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              :total_entries => recursive ? nil : @accounts.count)
@@ -491,7 +491,7 @@ class AccountsController < ApplicationController
   #
   # @returns TermsOfService
   def terms_of_service
-    keys = %w(id terms_type passive account_id)
+    keys = %w[id terms_type passive account_id]
     tos = @account.root_account.terms_of_service
     res = tos.attributes.slice(*keys)
     res['content'] = tos.terms_of_service_content&.content
@@ -614,21 +614,22 @@ class AccountsController < ApplicationController
     starts_before = CanvasTime.try_parse(params[:starts_before])
     ends_after = CanvasTime.try_parse(params[:ends_after])
 
-    params[:state] ||= %w{created claimed available completed}
-    params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
+    params[:state] ||= %w[created claimed available completed]
+    params[:state] = %w[created claimed available completed deleted] if Array(params[:state]).include?('all')
     if value_to_boolean(params[:published])
-      params[:state] -= %w{created claimed completed deleted}
+      params[:state] -= %w[created claimed completed deleted]
     elsif !params[:published].nil? && !value_to_boolean(params[:published])
-      params[:state] -= %w{available}
+      params[:state] -= %w[available]
     end
 
     sortable_name_col = User.sortable_name_order_by_clause('users')
 
-    order = if params[:sort] == 'course_name'
+    order = case params[:sort]
+            when 'course_name'
               Course.best_unicode_collation_key('courses.name').to_s
-            elsif params[:sort] == 'sis_course_id'
+            when 'sis_course_id'
               "courses.sis_source_id"
-            elsif params[:sort] == 'teacher'
+            when 'teacher'
               "(SELECT #{sortable_name_col} FROM #{User.quoted_table_name}
                 JOIN #{Enrollment.quoted_table_name} on users.id = enrollments.user_id
                 WHERE enrollments.workflow_state <> 'deleted'
@@ -636,10 +637,10 @@ class AccountsController < ApplicationController
                 AND enrollments.course_id = courses.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
             # leaving subaccount as an option for backwards compatibility
-            elsif params[:sort] == 'subaccount' || params[:sort] == 'account_name'
+            when 'subaccount', 'account_name'
               "(SELECT #{Account.best_unicode_collation_key('accounts.name')} FROM #{Account.quoted_table_name}
                 WHERE accounts.id = courses.account_id)"
-            elsif params[:sort] == 'term'
+            when 'term'
               "(SELECT #{EnrollmentTerm.best_unicode_collation_key('enrollment_terms.name')}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"
@@ -825,8 +826,8 @@ class AccountsController < ApplicationController
             account_settings[:settings].slice!(*permitted_api_account_settings)
             ensure_sis_max_name_length_value!(account_settings)
           end
-          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
-          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
+          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.key?(:name) && account_params[:name].blank?
+          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
           account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
           unauthorized = true
@@ -843,14 +844,14 @@ class AccountsController < ApplicationController
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
-            next unless quota_settings.has_key?(quota_type)
+            next unless quota_settings.key?(quota_type)
 
             quota_value = quota_settings[quota_type].to_s.strip
-            if INTEGER_REGEX !~ quota_value.to_s
-              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
-            else
+            if INTEGER_REGEX.match?(quota_value.to_s)
               @account.errors.add(quota_type, t(:quota_must_be_positive, 'Value must be positive')) if quota_value.to_i < 0
               @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= (2**62) / 1.megabytes
+            else
+              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
             end
           end
         else
@@ -1050,7 +1051,7 @@ class AccountsController < ApplicationController
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
              @account.root_account? &&
              !@account.site_admin?
-            @account.settings[:google_docs_domain] = google_docs_domain.present? ? google_docs_domain : nil
+            @account.settings[:google_docs_domain] = google_docs_domain.presence
           end
 
           @account.enable_user_notes = enable_user_notes if enable_user_notes
@@ -1078,7 +1079,7 @@ class AccountsController < ApplicationController
           end
         end
 
-        if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
+        if params[:account][:settings]&.key?(:trusted_referers)
           if (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
              @account.root_account?
             @account.trusted_referers = trusted_referers
@@ -1087,7 +1088,7 @@ class AccountsController < ApplicationController
 
         # privacy settings
         unless @account.grants_right?(@current_user, :manage_privacy_settings)
-          %w{enable_fullstory enable_google_analytics}.each do |setting|
+          %w[enable_fullstory enable_google_analytics].each do |setting|
             params[:account][:settings].try(:delete, setting)
           end
         end
@@ -1100,11 +1101,11 @@ class AccountsController < ApplicationController
 
         if (sis_id = params[:account].delete(:sis_source_id))
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
-            if sis_id == ''
-              @account.sis_source_id = nil
-            else
-              @account.sis_source_id = sis_id
-            end
+            @account.sis_source_id = if sis_id == ''
+                                       nil
+                                     else
+                                       sis_id
+                                     end
           end
         end
 
@@ -1241,7 +1242,7 @@ class AccountsController < ApplicationController
   # => Add/Change Quota
   # = Restoring Content
   def admin_tools
-    if !@account.can_see_admin_tools_tab?(@current_user)
+    unless @account.can_see_admin_tools_tab?(@current_user)
       return render_unauthorized_action
     end
 
@@ -1270,7 +1271,7 @@ class AccountsController < ApplicationController
                      Account.site_admin.grants_right?(@current_user, :read_messages),
       logging: logging
     }
-    js_env enhanced_grade_change_query: Auditors::read_from_postgres?
+    js_env enhanced_grade_change_query: Auditors.read_from_postgres?
     js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
 
@@ -1433,10 +1434,11 @@ class AccountsController < ApplicationController
   end
 
   def avatars
-    # multi-line ternary is not ideal, but is a clean solution for temp granular check
-    is_authorized = @domain_root_account.feature_enabled?(:granular_permissions_manage_users) ?
-      authorized_action(@account, @current_user, :allow_course_admin_actions) :
-      authorized_action(@account, @current_user, :manage_admin_users)
+    is_authorized = if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
+                      authorized_action(@account, @current_user, :allow_course_admin_actions)
+                    else
+                      authorized_action(@account, @current_user, :manage_admin_users)
+                    end
 
     if is_authorized
       @users = @account.all_users(nil)
@@ -1564,12 +1566,11 @@ class AccountsController < ApplicationController
       courses_to_fetch_users_for = courses_to_fetch_users_for.reject { |c| @master_template_index[c.id] } # don't fetch the counts for the master/blueprint courses
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w{rejected deleted} })
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w[rejected deleted] })
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
-    courses_to_teachers = teachers.inject({}) do |result, teacher|
+    courses_to_teachers = teachers.each_with_object({}) do |teacher, result|
       result[teacher.course_id] ||= []
       result[teacher.course_id] << teacher
-      result
     end
     courses_to_fetch_users_for.each do |course|
       course.student_count = course_to_student_counts[course.id] || 0
@@ -1579,7 +1580,7 @@ class AccountsController < ApplicationController
   end
   protected :build_course_stats
 
-  # TODO Refactor add_account_user and remove_account_user actions into
+  # TODO: Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
     if (role_id = params[:role_id])
@@ -1701,11 +1702,11 @@ class AccountsController < ApplicationController
     return if sis_name_length_setting.nil?
 
     value = sis_name_length_setting[:value]
-    if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
-      sis_name_length_setting[:value] = value
-    else
-      sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
-    end
+    sis_name_length_setting[:value] = if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
+                                        value
+                                      else
+                                        SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
+                                      end
   end
 
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,

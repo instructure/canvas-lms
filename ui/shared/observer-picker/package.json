@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/observer-picker",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Jackson Howe",
+  "main": "./react/ObserverOptions.js"
+}

@@ -79,7 +79,7 @@ class AccessToken < ActiveRecord::Base
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
-    token = self.not_deleted.where(token_key => hashed_tokens).first
+    token = not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
       token.send("#{token_key}=", hashed_tokens.first)
@@ -90,7 +90,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.authenticate_refresh_token(token_string)
-    self.authenticate(token_string, :crypted_refresh_token)
+    authenticate(token_string, :crypted_refresh_token)
   end
 
   def self.hashed_token(token)
@@ -136,7 +136,7 @@ class AccessToken < ActiveRecord::Base
   def used!
     if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
       self.last_used_at = Time.now.utc
-      self.save
+      save
     end
   end
 
@@ -159,7 +159,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def generate_token(overwrite = false)
-    if overwrite || !self.crypted_token
+    if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
       self.expires_at = Time.now.utc + 1.hour if developer_key&.auto_expire_tokens
@@ -208,11 +208,11 @@ class AccessToken < ActiveRecord::Base
 
   def url_scopes_for_method(method)
     re = /^url:#{method}\|/
-    scopes.select { |scope| re =~ scope }.map do |scope|
+    scopes.grep(re).map do |scope|
       path = scope.split('|').last
       # build up the scope matching regexp from the route path
-      path = path.gsub(/:[^\/)]+/, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
-      path = path.gsub(/\*[^\/)]+/, '.+') # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(%r{:[^/)]+}, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(%r{\*[^/)]+}, '.+') # handle glob segments /files/*path -> /files/.+
       path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
       path = "#{path}(?:\\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
@@ -225,11 +225,11 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.scopes_match?(scopes, req_scopes)
-    return req_scopes.size == 0 if scopes.nil?
+    return req_scopes.empty? if scopes.nil?
 
     scopes.size == req_scopes.size &&
       scopes.all? do |scope|
-        req_scopes.any? { |req_scope| scope[/(^|\/)#{req_scope}$/] }
+        req_scopes.any? { |req_scope| scope[%r{(^|/)#{req_scope}$}] }
       end
   end
 

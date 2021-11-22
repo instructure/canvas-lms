@@ -101,10 +101,10 @@ describe "enhanceable_content" do
 
       @attachment = @course.attachments.create!(:uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @page = @course.wiki_pages.build(:title => 'title')
-      @page.body = %{
+      @page.body = <<~HTML
         <a id="media_comment_0_deadbeef" class="instructure_file_link instructure_video_link" title="Video.mp4"
           href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">Video</a>
-      }
+      HTML
       @page.save!
     end
 

@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {AUTO_MARK_AS_READ_DELAY, PER_PAGE, SearchContext} from '../../utils/constants'
+import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
@@ -119,7 +119,8 @@ export const DiscussionTopicRepliesContainer = props => {
         <ThreadPagination
           setPage={setPage}
           selectedPage={Math.ceil(
-            atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
+            atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) /
+              ENV.per_page
           )}
           totalPages={props.discussionTopic.entriesTotalPages}
         />

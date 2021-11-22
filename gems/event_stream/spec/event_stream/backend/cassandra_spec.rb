@@ -28,7 +28,7 @@ describe EventStream::Backend::Cassandra do
       yield
     end
 
-    def database.update_record(*args); end
+    def database.update_record(*); end
 
     def database.insert_record(*args)
       @inserted ||= []
@@ -41,7 +41,7 @@ describe EventStream::Backend::Cassandra do
     end
     # rubocop:enable Style/TrivialAccessors
 
-    def database.update(*args); end
+    def database.update(*); end
 
     def database.available?
       true

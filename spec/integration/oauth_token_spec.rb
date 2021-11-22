@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-%w{Twitter}.each do |integration|
+%w[Twitter].each do |integration|
   describe integration do
     before do
       course_with_student_logged_in(:active_all => true)

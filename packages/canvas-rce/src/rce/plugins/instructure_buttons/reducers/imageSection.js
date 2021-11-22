@@ -20,7 +20,17 @@ import formatMessage from '../../../../format-message'
 
 export const initialState = {
   mode: 'course', // TODO: Update to 'upload' once we support it
-  currentImage: ''
+  image: '',
+  imageName: '',
+  loading: false,
+  error: undefined
+}
+
+export const actions = {
+  SET_IMAGE: {type: 'SetImage'},
+  SET_IMAGE_NAME: {type: 'SetImageName'},
+  START_LOADING: {type: 'StartLoading'},
+  STOP_LOADING: {type: 'StopLoading'}
 }
 
 export const modes = {
@@ -32,6 +42,14 @@ export const modes = {
 
 const imageSection = (state, action) => {
   switch (action.type) {
+    case actions.START_LOADING.type:
+      return {...state, loading: true}
+    case actions.STOP_LOADING.type:
+      return {...state, loading: false}
+    case actions.SET_IMAGE.type:
+      return {...state, image: action.payload}
+    case actions.SET_IMAGE_NAME.type:
+      return {...state, imageName: action.payload}
     case modes.uploadImages.type:
       return {...state, mode: modes.uploadImages.type}
     case modes.singleColorImages.type:

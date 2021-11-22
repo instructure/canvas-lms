@@ -502,26 +502,26 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
 
     context 'content insertion buttons' do
       before do
-        body = <<-HTML
-        <p><span id="ok">i am OK!</span></p>
-        <p><span id="ifr">cannot link <iframe>me</iframe></span></p>
-        <p><span id="vid">nor <video>me</video></span></p>
+        body = <<~HTML
+          <p><span id="ok">i am OK!</span></p>
+          <p><span id="ifr">cannot link <iframe>me</iframe></span></p>
+          <p><span id="vid">nor <video>me</video></span></p>
         HTML
         @course.wiki_pages.create!(title: 'title', body: body)
         visit_existing_wiki_edit(@course, 'title')
 
-        driver.execute_script(<<-JS)
-        window.selectNodeById = function(nid) {
-          const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-          const rng = win.document.createRange()
-          rng.selectNode(win.document.getElementById(nid))
-          const rng2 = win.document.createRange()
-          rng2.setStart(win.document.getElementById(nid).firstChild, 0) // put the text cursor w/in the selection
-          const sel = win.getSelection()
-          sel.removeAllRanges()
-          sel.addRange(rng)
-          sel.addRange(rng2)
-        }
+        driver.execute_script(<<~JS)
+          window.selectNodeById = function(nid) {
+            const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+            const rng = win.document.createRange()
+            rng.selectNode(win.document.getElementById(nid))
+            const rng2 = win.document.createRange()
+            rng2.setStart(win.document.getElementById(nid).firstChild, 0) // put the text cursor w/in the selection
+            const sel = win.getSelection()
+            sel.removeAllRanges()
+            sel.addRange(rng)
+            sel.addRange(rng2)
+          }
         JS
       end
 

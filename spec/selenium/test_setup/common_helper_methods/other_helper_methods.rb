@@ -124,7 +124,7 @@ module OtherHelperMethods
     # encrypted session cookie, each gets a new (different) session cookie in
     # the response, meaning the authenticity token on your new page might
     # already be invalid.
-    driver.execute_script <<-JS
+    driver.execute_script <<~JS
       var highest = setTimeout(function(){}, 1000);
       for (var i = 0; i < highest; i++) {
         clearTimeout(i);

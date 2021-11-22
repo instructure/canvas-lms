@@ -155,8 +155,8 @@ module AttachmentFu # :nodoc:
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || (Rails.root + 'config/amazon_s3.yml')
-        YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        s3_config_path = path || Rails.root.join('config/amazon_s3.yml')
+        YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
       # Overwrites the base filename writer in order to store the old filename
@@ -166,14 +166,13 @@ module AttachmentFu # :nodoc:
       end
 
       def sanitize_filename(filename)
-        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
-          filename = self.root_attachment.filename
+        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
+          root_attachment.filename
         else
-          filename = Attachment.truncate_filename(filename, 255) do |component, len|
+          Attachment.truncate_filename(filename, 255) do |component, len|
             CanvasTextHelper.cgi_escape_truncate(component, len)
           end
         end
-        filename
       end
 
       # The attachment ID used in the full path of a file
@@ -183,7 +182,7 @@ module AttachmentFu # :nodoc:
 
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
-        obj = (respond_to?(:root_attachment) && self.root_attachment) || self
+        obj = (respond_to?(:root_attachment) && root_attachment) || self
         if (namespace = obj.read_attribute(:namespace))
           File.join(namespace, obj.attachment_options[:path_prefix])
         else
@@ -202,7 +201,7 @@ module AttachmentFu # :nodoc:
       def full_filename(thumbnail = nil)
         # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
         # them as spaces. Continue that behavior.
-        basename = thumbnail_name_for(thumbnail).gsub('+', ' ')
+        basename = thumbnail_name_for(thumbnail).tr('+', ' ')
         File.join(base_path, basename)
       end
 

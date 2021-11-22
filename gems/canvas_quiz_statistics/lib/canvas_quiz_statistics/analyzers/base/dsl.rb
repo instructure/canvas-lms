@@ -58,7 +58,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
       deps, key = key.values.flatten, key.keys.first
     end
 
-    self.metrics[question_type] << {
+    metrics[question_type] << {
       key: key.to_sym,
       context: deps,
       calculator: calculator
@@ -78,7 +78,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
   #   end
   #
   def inherit_metrics(question_type)
-    self.metrics[self.question_type] += self.metrics_for(question_type).clone
+    metrics[self.question_type] += metrics_for(question_type).clone
   end
 
   # Inherit one or more metrics from another question type.
@@ -99,7 +99,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
   #   end
   #
   def inherit(*metric_keys, options)
-    metrics = self.metrics_for(options[:from])
+    metrics = metrics_for(options[:from])
 
     return inherit_metrics(options[:from]) if metric_keys.first == :all
 
@@ -110,7 +110,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
         raise "Metric #{metric_key} could not be found in #{options[:from]}"
       end
 
-      self.metrics[self.question_type] << metric
+      self.metrics[question_type] << metric
     end
   end
 
@@ -122,8 +122,8 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
 
   def metrics_for(question_type)
     target = question_type.to_s
-    target = "#{target}_question" unless target =~ /_question$/
+    target = "#{target}_question" unless /_question$/.match?(target)
 
-    self.metrics[target.to_sym]
+    metrics[target.to_sym]
   end
 end

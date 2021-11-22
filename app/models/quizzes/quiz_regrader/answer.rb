@@ -35,7 +35,7 @@ class Quizzes::QuizRegrader::Answer
     @regrade_option = question_regrade.regrade_option
 
     unless REGRADE_OPTIONS.include?(regrade_option)
-      raise ArgumentError.new("Regrade option not valid!")
+      raise ArgumentError, "Regrade option not valid!"
     end
   end
 
@@ -85,7 +85,7 @@ class Quizzes::QuizRegrader::Answer
 
       # update points_possible if we are part of a quiz group
       group = question.quiz_group
-      if group && group.pick_count
+      if group&.pick_count
         @question_data[:points_possible] = group.question_points
       end
     end

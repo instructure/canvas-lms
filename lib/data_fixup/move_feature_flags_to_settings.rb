@@ -59,9 +59,11 @@ module DataFixup::MoveFeatureFlagsToSettings
   private_class_method :migrate_ff_overrides_to_inherited_recurse
 
   def self.figure_setting_from_override(context, feature_flag_name, setting_name, inherited:)
-    override = context.feature_flags.loaded? ?
-      context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s } :
-      context.feature_flags.where(:feature => feature_flag_name.to_s).take
+    override = if context.feature_flags.loaded?
+                 context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s }
+               else
+                 context.feature_flags.where(:feature => feature_flag_name.to_s).take
+               end
     override_value = nil
     if override
       case override.state

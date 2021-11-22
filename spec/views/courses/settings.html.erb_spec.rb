@@ -216,7 +216,7 @@ describe "courses/settings.html.erb" do
         .search('option')
         .map do |c|
           c.attributes['value'].value.to_i
-        rescue StandardError
+        rescue
           c.to_s
         end
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort

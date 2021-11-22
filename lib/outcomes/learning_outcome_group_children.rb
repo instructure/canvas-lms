@@ -151,7 +151,7 @@ module Outcomes
     end
 
     def add_search_order(relation, search_query)
-      select_query = ContentTag.sanitize_sql_array([<<-SQL.squish, search_query, search_query])
+      select_query = ContentTag.sanitize_sql_array([<<~SQL.squish, search_query, search_query])
         "content_tags".*,
         GREATEST(public.word_similarity(?, #{SHORT_DESCRIPTION}), public.word_similarity(?, #{DESCRIPTION})) as sim
       SQL
@@ -164,7 +164,7 @@ module Outcomes
     end
 
     def children_ids_with_self(learning_outcome_group_id)
-      sql = <<-SQL.squish
+      sql = <<~SQL.squish
         WITH RECURSIVE levels AS (
           SELECT id, id AS parent_id
             FROM (#{LearningOutcomeGroup.active.where(id: learning_outcome_group_id).to_sql}) AS data

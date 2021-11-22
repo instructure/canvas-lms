@@ -43,7 +43,7 @@ module Turnitin
       Dir.mktmpdir do |dirname|
         turnitin_client.original_submission do |response|
           content_disposition = response.headers['content-disposition']
-          fail Errors::ScoreStillPendingError if content_disposition.nil?
+          raise Errors::ScoreStillPendingError if content_disposition.nil?
 
           filename = content_disposition.match(/filename=("?)(.+)\1/)[2]
           filename.tr!('/', '-')

@@ -111,7 +111,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   end
 
   def self.events_for_submission(assignment_id:, submission_id:)
-    self.where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
+    where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
   end
 
   EVENT_TYPES.each do |event_type|

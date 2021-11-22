@@ -24,7 +24,7 @@ module Importers
     self.item_class = WikiPage
 
     def self.process_migration_course_outline(data, migration)
-      outline = data['course_outline'] ? data['course_outline'] : nil
+      outline = data['course_outline'] || nil
       return unless outline
       return unless migration.import_object?('course_outline', outline['migration_id'])
 
@@ -32,7 +32,7 @@ module Importers
 
       outline['root_folder'] = true
       begin
-        self.import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
+        import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
       rescue
         migration.add_warning("Error importing the course outline.", $!)
       end
@@ -44,7 +44,7 @@ module Importers
         migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
       end
 
-      wikis = data['wikis'] ? data['wikis'] : []
+      wikis = data['wikis'] || []
       wikis.each do |wiki|
         unless wiki
           message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"
@@ -54,7 +54,7 @@ module Importers
         next unless wiki_page_migration?(migration, wiki)
 
         begin
-          self.import_from_migration(wiki, migration.context, migration) if wiki
+          import_from_migration(wiki, migration.context, migration) if wiki
         rescue
           migration.add_import_warning(t('#migration.wiki_page_type', "Wiki Page"), wiki[:title], $!)
         end
@@ -82,7 +82,7 @@ module Importers
       end
       if hash[:root_folder].present? && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
         front_page = context.wiki.front_page
-        if front_page && front_page.id
+        if front_page&.id
           hash[:root_folder] = false
         else
           item.url ||= Wiki::DEFAULT_FRONT_PAGE_URL
@@ -90,7 +90,7 @@ module Importers
           item.set_as_front_page!
         end
       end
-      hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
+      hide_from_students = hash[:hide_from_students] unless hash[:hide_from_students].nil?
       state = hash[:workflow_state]
       if state && migration.for_master_course_import?
         item.workflow_state = state
@@ -138,11 +138,11 @@ module Importers
         item.title = hash[:title] unless hash[:root_folder]
         description = ""
         if hash[:header]
-          if hash[:header][:is_html]
-            description += migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
-          else
-            description += migration.convert_text(hash[:header][:body] || [""])
-          end
+          description += if hash[:header][:is_html]
+                           migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
+                         else
+                           migration.convert_text(hash[:header][:body] || [""])
+                         end
         end
 
         if hash[:description]
@@ -157,7 +157,7 @@ module Importers
             obj = context.wiki_pages.where(migration_id: sub_item[:migration_id]).first
             contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
           elsif sub_item[:type] == 'embedded_content'
-            if contents && contents.length > 0
+            if contents.present?
               description += "<ul>\n#{contents}\n</ul>"
               contents = ""
             end
@@ -188,26 +188,26 @@ module Importers
               obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
               contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
             when 'URL_TYPE'
-              if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
-                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
-              else
-                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
-              end
+              contents += if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
+                            " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
+                          else
+                            " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+                          end
             end
           end
         end
-        description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
+        description += "<ul>\n#{contents}\n</ul>" if contents.present?
 
         if hash[:footer]
-          if hash[:footer][:is_html]
-            description += migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
-          else
-            description += migration.convert_text(hash[:footer][:body] || "")
-          end
+          description += if hash[:footer][:is_html]
+                           migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
+                         else
+                           migration.convert_text(hash[:footer][:body] || "")
+                         end
         end
 
         item.body = description
-        allow_save = false if !description || description.empty?
+        allow_save = false if description.blank?
       elsif hash[:page_type] == 'module_toc'
       elsif hash[:topics]
         item.title = t('title_for_topics_category', '%{category} Topics', :category => hash[:category_name])
@@ -227,7 +227,7 @@ module Importers
         description += "</ul>"
         item.body = description
         return nil if topic_count == 0
-      elsif hash[:title] and hash[:text]
+      elsif hash[:title] && hash[:text]
         # it's an actual wiki page
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH
@@ -239,7 +239,7 @@ module Importers
         item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
-        item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
+        item.notify_of_update = hash[:notify_of_update] unless hash[:notify_of_update].nil?
       else # rubocop:disable Lint/DuplicateBranch
         allow_save = false
       end
@@ -257,7 +257,7 @@ module Importers
         end
         item.save_without_broadcasting!
         migration.add_imported_item(item)
-        return item
+        item
       end
     end
   end

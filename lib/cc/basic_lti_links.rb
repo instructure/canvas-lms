@@ -143,12 +143,10 @@ module CC
           end
         end
 
-        if tool.settings[:vendor_extensions]
-          tool.settings[:vendor_extensions].each do |extension|
-            blti_node.blti(:extensions, :platform => extension[:platform]) do |ext_node|
-              extension[:custom_fields].each_pair do |key, val|
-                ext_node.lticm :property, val, 'name' => key
-              end
+        tool.settings[:vendor_extensions]&.each do |extension|
+          blti_node.blti(:extensions, :platform => extension[:platform]) do |ext_node|
+            extension[:custom_fields].each_pair do |key, val|
+              ext_node.lticm :property, val, 'name' => key
             end
           end
         end

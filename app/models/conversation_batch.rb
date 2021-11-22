@@ -28,8 +28,8 @@ class ConversationBatch < ActiveRecord::Base
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 
-  validates_presence_of :user_id, :workflow_state, :root_conversation_message_id
-  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
+  validates :user_id, :workflow_state, :root_conversation_message_id, presence: true
+  validates :subject, length: { :maximum => maximum_string_length, :allow_nil => true }
 
   scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
 
@@ -38,13 +38,13 @@ class ConversationBatch < ActiveRecord::Base
   attr_reader :conversations
 
   def deliver(update_progress = true)
-    self.shard.activate do
+    shard.activate do
       chunk_size = 25
 
       @conversations = []
       self.user = user_map[user_id]
-      existing_conversations = Conversation.find_all_private_conversations(self.user, recipient_ids.map { |id| user_map[id] },
-                                                                           context_type: self.context_type, context_id: self.context_id)
+      existing_conversations = Conversation.find_all_private_conversations(user, recipient_ids.map { |id| user_map[id] },
+                                                                           context_type: context_type, context_id: context_id)
       update_attribute :workflow_state, 'sending'
 
       ModelCache.with_cache(:conversations => existing_conversations, :users => { :id => user_map }) do
@@ -52,12 +52,12 @@ class ConversationBatch < ActiveRecord::Base
 
         recipient_ids.each_slice(chunk_size) do |ids|
           ids.each do |id|
-            is_group = self.group?
+            is_group = group?
             conversation = user.initiate_conversation([user_map[id]], !is_group,
                                                       subject: subject, context_type: context_type, context_id: context_id)
             @conversations << conversation
             message = root_conversation_message.clone
-            message.generate_user_note = self.generate_user_note
+            message.generate_user_note = generate_user_note
             conversation.add_message(message, update_for_sender: false, tags: tags, cc_author: should_cc_author)
             conversation_message_ids << message.id
 
@@ -101,7 +101,7 @@ class ConversationBatch < ActiveRecord::Base
   attr_writer :user_map
 
   def user_map
-    @user_map ||= self.shard.activate { User.where(id: recipient_ids + [user_id]).index_by(&:id) }
+    @user_map ||= shard.activate { User.where(id: recipient_ids + [user_id]).index_by(&:id) }
   end
 
   def recipient_ids

@@ -44,18 +44,18 @@ class Quizzes::QuizQuestion::Base
 
   # override to change the name of the question type, defaults to the underscore-ized class name
   def self.question_type
-    self.name.demodulize.underscore
+    name.demodulize.underscore
   end
 
   def initialize(question_data)
     # currently all the attributes are synthesized from @question_data
     # since questions are stored in this format anyway, it prevents us from
     # having to do a bunch of translation to some other format
-    unless question_data.is_a? Quizzes::QuizQuestion::QuestionData
-      @question_data = Quizzes::QuizQuestion::QuestionData.new(question_data)
-    else
-      @question_data = question_data
-    end
+    @question_data = if question_data.is_a? Quizzes::QuizQuestion::QuestionData
+                       question_data
+                     else
+                       Quizzes::QuizQuestion::QuestionData.new(question_data)
+                     end
   end
 
   def question_id
@@ -118,7 +118,7 @@ class Quizzes::QuizQuestion::Base
   end
 
   def score_question(answer_data, user_answer = nil)
-    user_answer ||= Quizzes::QuizQuestion::UserAnswer.new(self.question_id, self.points_possible, answer_data)
+    user_answer ||= Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
     user_answer.total_parts = total_answer_parts
     correct_parts = correct_answer_parts(user_answer)
     if !correct_parts.nil?

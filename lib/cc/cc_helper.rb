@@ -83,6 +83,7 @@ module CC
     EXTERNAL_FEEDS = "external_feeds.xml"
     GRADING_STANDARDS = "grading_standards.xml"
     EVENTS = "events.xml"
+    LATE_POLICY = "late_policy.xml"
     LEARNING_OUTCOMES = "learning_outcomes.xml"
     MANIFEST = 'imsmanifest.xml'
     MODULE_META = "module_meta.xml"
@@ -109,13 +110,13 @@ module CC
     end
 
     def self.create_key(object, prepend = "", global: false)
-      if object.is_a? ActiveRecord::Base
-        key = global ? object.global_asset_string : object.asset_string
-      elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
-        key = "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
-      else
-        key = object.to_s
-      end
+      key = if object.is_a? ActiveRecord::Base
+              global ? object.global_asset_string : object.asset_string
+            elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
+              "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
+            else
+              object.to_s
+            end
       # make it obvious if we're using new identifiers now
       (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
     end
@@ -167,12 +168,12 @@ module CC
       doc = Nokogiri::XML.fragment(content)
       doc.css('a, img', 'iframe').each do |node|
         source = node['href'] || node['src']
-        next unless source =~ SPECIAL_REFERENCE_REGEX
+        next unless SPECIAL_REFERENCE_REGEX.match?(source)
 
-        if source =~ WEB_CONTENT_REFERENCE_REGEX
+        if WEB_CONTENT_REFERENCE_REGEX.match?(source)
           attachment_key = CGI.unescape(source.sub(WEB_CONTENT_REFERENCE_REGEX, ''))
           if node['data-media-type']
-            if attachment_key =~ MEDIAHREF_REGEX
+            if MEDIAHREF_REGEX.match?(attachment_key)
               # e.g. "/media_objects_iframe?mediahref=/foo.mp3?canvas_download&amp;type=audio=1&canvas_qs_type=audio"
               attachment_key = attachment_key.split('?').second
               attachment_key = "/" + attachment_key.split('/').second
@@ -187,7 +188,7 @@ module CC
           linked_objects.push({ local_path: attachment_key, type: 'Attachment' })
         else
           type, object_key = source.split('/').last 2
-          if type =~ SPECIAL_REFERENCE_REGEX
+          if SPECIAL_REFERENCE_REGEX.match?(type)
             type = object_key
             object_key = nil
           end
@@ -240,11 +241,11 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            if @course && match.obj_class == Attachment
-              obj = @course.attachments.find_by_id(match.obj_id)
-            else
-              obj = match.obj_class.where(id: match.obj_id).first
-            end
+            obj = if @course && match.obj_class == Attachment
+                    @course.attachments.find_by(id: match.obj_id)
+                  else
+                    match.obj_class.where(id: match.obj_id).first
+                  end
             next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
 
             @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
@@ -262,7 +263,7 @@ module CC
             end
           end
         end
-        wiki_handler = Proc.new do |match|
+        wiki_handler = proc do |match|
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
@@ -327,10 +328,10 @@ module CC
         meta_fields.each_pair do |k, v|
           next unless v.present?
 
-          meta_html += %{<meta name="#{HtmlTextHelper.escape_html(k.to_s)}" content="#{HtmlTextHelper.escape_html(v.to_s)}"/>\n}
+          meta_html += %(<meta name="#{HtmlTextHelper.escape_html(k.to_s)}" content="#{HtmlTextHelper.escape_html(v.to_s)}"/>\n)
         end
 
-        %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n<title>#{HtmlTextHelper.escape_html(title)}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
+        %(<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n<title>#{HtmlTextHelper.escape_html(title)}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>)
       end
 
       def html_content(html)
@@ -386,7 +387,7 @@ module CC
           end
         end
 
-        return doc.to_s
+        doc.to_s
       end
     end
 
@@ -402,7 +403,7 @@ module CC
       else
         asset = client.flavorAssetGetOriginalAsset(obj.media_id)
       end
-      attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by_id(obj.attachment_id)
+      attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by(id: obj.attachment_id)
       path = if attachment
                # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
                attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, '')
@@ -425,7 +426,7 @@ module CC
       begin
         uri = URI.parse(sub_path)
         unless uri.path == "/preview" # defaults to preview, so no qs added
-          qs << "canvas_#{Rack::Utils.escape(uri.path[1..-1])}=1"
+          qs << "canvas_#{Rack::Utils.escape(uri.path[1..])}=1"
         end
 
         Rack::Utils.parse_query(uri.query).each do |k, v|

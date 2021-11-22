@@ -86,7 +86,7 @@ module Lti
 
         it 'returns a tool_proxy id object' do
           course_with_teacher_logged_in(:active_all => true)
-          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
           json[:account_id] = @course.account.id
@@ -98,7 +98,7 @@ module Lti
 
         it 'has the correct content-type' do
           course_with_teacher_logged_in(:active_all => true)
-          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           headers = { 'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolproxy+json',
                       'ACCEPT' => 'application/vnd.ims.lti.v2.toolproxy.id+json' }.merge(oauth1_header)
           post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tool_proxy_fixture, headers: headers
@@ -107,7 +107,7 @@ module Lti
 
         it 'returns an error message' do
           course_with_teacher_logged_in(:active_all => true)
-          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
           headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }.merge(oauth1_header)
@@ -118,8 +118,8 @@ module Lti
 
         it 'accepts split secret' do
           course_with_teacher_logged_in(:active_all => true)
-          # tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-          tool_proxy_fixture = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')))
+          # tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
+          tool_proxy_fixture = JSON.parse(Rails.root.join("spec/fixtures/lti/tool_proxy.json").read)
           tool_proxy_fixture[:enabled_capability] = ['OAuth.splitSecret']
           tool_proxy_fixture["security_contract"].delete("shared_secret")
           tool_proxy_fixture["security_contract"]["tp_half_shared_secret"] = SecureRandom.hex(128)
@@ -154,7 +154,7 @@ module Lti
 
           it 'supports using a specified custom TCP' do
             course_with_teacher_logged_in(:active_all => true)
-            tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+            tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
             tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
             tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
             message = tp.tool_profile.resource_handlers.first.messages.first
@@ -183,7 +183,7 @@ module Lti
                                                            reg_password: 'password',
                                                            registration_url: 'http://example.com/register'
                                                          })
-          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tp.to_json, headers: request_headers
@@ -192,7 +192,7 @@ module Lti
 
         it 'returns a 401 if the reg_key is not valid' do
           course_with_teacher_logged_in(:active_all => true)
-          tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
           json[:account_id] = @course.account.id
@@ -231,8 +231,8 @@ module Lti
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
 
-          fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
-          tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+          fixture_file = Rails.root.join('spec/fixtures/lti/tool_proxy.json')
+          tool_proxy_fixture = JSON.parse(fixture_file.read)
 
           tcp_url = polymorphic_url([@course.account, :tool_consumer_profile])
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url

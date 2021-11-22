@@ -75,8 +75,8 @@ module ConditionalRelease
 
     def clear_caches
       self.class.connection.after_transaction_commit do
-        self.trigger_assignment.clear_cache_key(:conditional_release)
-        self.course.clear_cache_key(:conditional_release)
+        trigger_assignment.clear_cache_key(:conditional_release)
+        course.clear_cache_key(:conditional_release)
       end
     end
 
@@ -84,7 +84,7 @@ module ConditionalRelease
       # i'm only using the cache key currently for this one case but i figure it can be extended to handle caching around all rule data fetching
       RequestCache.cache('conditional_release_is_trigger', assignment) do
         Rails.cache.fetch_with_batched_keys('conditional_release_is_trigger', batch_object: assignment, batched_keys: :conditional_release) do
-          assignment.shard.activate { self.active.where(:trigger_assignment_id => assignment).exists? }
+          assignment.shard.activate { active.where(:trigger_assignment_id => assignment).exists? }
         end
       end
     end

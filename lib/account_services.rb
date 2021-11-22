@@ -88,7 +88,7 @@ module AccountServices
   end
 
   def self.default_allowable_services
-    res = self.allowable_services.dup
+    res = allowable_services.dup
     res.reject! { |_, info| info[:default] == false }
     res
   end

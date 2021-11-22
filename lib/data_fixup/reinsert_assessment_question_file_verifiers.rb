@@ -20,13 +20,13 @@
 module DataFixup::ReinsertAssessmentQuestionFileVerifiers
   def self.links_to_change(data)
     links = Set.new
-    data.scan(/\/assessment_questions\/\d+\/files\/\d+[^'">]+/) do |link|
+    data.scan(%r{/assessment_questions/\d+/files/\d+[^'">]+}) do |link|
       links << link unless link.include?("verifier=")
     end
     updates = {}
     if links.any?
-      att_id_map = Hash[links.map { |l| [l, l.match(/\/assessment_questions\/\d+\/files\/(\d+)/)[1].to_i] }]
-      uuid_map = Hash[Attachment.where(:id => att_id_map.values, :context_type => "AssessmentQuestion").pluck(:id, :uuid)]
+      att_id_map = links.index_with { |l| l.match(%r{/assessment_questions/\d+/files/(\d+)})[1].to_i }
+      uuid_map = Attachment.where(:id => att_id_map.values, :context_type => "AssessmentQuestion").pluck(:id, :uuid).to_h
       links.each do |link|
         uuid = uuid_map[att_id_map[link]]
         next unless uuid # just in case somehow the attachment disappeared

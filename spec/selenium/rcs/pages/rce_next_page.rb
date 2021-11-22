@@ -1009,12 +1009,12 @@ module RCENextPage
     if text
       linktext = f('input[name="linktext')
 
-      linktext.send_keys(:backspace) while linktext.property('value').length > 0
+      linktext.send_keys(:backspace) until linktext.property('value').empty?
       linktext.send_keys(text) if text
     end
     if href
       linklink = f('input[name="linklink"]')
-      linklink.send_keys(:backspace) while linklink.property('value').length > 0
+      linklink.send_keys(:backspace) until linklink.property('value').empty?
       linklink.send_keys(href)
     end
     fj('[role="dialog"] button:contains("Done")').click
@@ -1086,15 +1086,15 @@ module RCENextPage
   end
 
   def select_text_of_element_by_id(id)
-    script = <<-JS
-    const id = arguments[0]
-    const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-    const rng = win.document.createRange()
-    rng.setStart(win.document.getElementById(id).firstChild, 0)
-    rng.setEnd(win.document.getElementById(id).firstChild, 9)
-    const sel = win.getSelection()
-    sel.removeAllRanges()
-    sel.addRange(rng)
+    script = <<~JS
+      const id = arguments[0]
+      const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+      const rng = win.document.createRange()
+      rng.setStart(win.document.getElementById(id).firstChild, 0)
+      rng.setEnd(win.document.getElementById(id).firstChild, 9)
+      const sel = win.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(rng)
     JS
 
     driver.execute_script script, id

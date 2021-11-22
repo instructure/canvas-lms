@@ -376,7 +376,7 @@ describe "Outcome Reports" do
       let(:user1_rubric_score) { 3 }
 
       it 'includes correct mastery and ratings for different scores' do
-        user1_row = report.select { |row| row['student name'] == @user1.sortable_name }.first
+        user1_row = report.find { |row| row['student name'] == @user1.sortable_name }
         expect(user1_row['learning outcome rating']).to eq 'Rockin'
         expect(user1_row['learning outcome rating points']).to eq '3.0'
       end

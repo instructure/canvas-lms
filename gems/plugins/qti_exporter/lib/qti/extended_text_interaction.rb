@@ -43,7 +43,7 @@ module Qti
     def process_response_conditions
       fib_map = {}
       if @question[:is_vista_fib]
-        # todo: refactor Blackboard FIB stuff into FillInTheBlank class
+        # TODO: refactor Blackboard FIB stuff into FillInTheBlank class
         # if it's a vista fill in the blank we need to change the FIB01 labels to the blank name in the question text
         regex = /\[([^\]]*)\]/
         count = 0
@@ -58,7 +58,7 @@ module Qti
         # the python tool "fixes" IDs that aren't quite legal QTI (e.g., "1a" becomes "RESPONSE_1a")
         # but does not update the question text, breaking fill-in-multiple-blanks questions.
         # fortunately it records what it does in an XML comment at the top of the doc, so we can undo it.
-        if (comment = @doc.children.find { |el| el.class == Nokogiri::XML::Comment })
+        if (comment = @doc.children.find { |el| el.instance_of?(Nokogiri::XML::Comment) })
           regex = /Warning: replacing bad NMTOKEN "([^"]+)" with "([^"]+)"/
           match_data = regex.match(comment.text)
           while match_data
@@ -93,7 +93,7 @@ module Qti
               @question[:question_text].gsub!("[#{answer[:blank_id]}]", "[#{cleaned}]")
               answer[:blank_id] = cleaned
             end
-            if !@question[:question_text].include?("[#{cleaned}]")
+            unless @question[:question_text].include?("[#{cleaned}]")
               @question[:question_text] += " [#{cleaned}]"
             end
           end

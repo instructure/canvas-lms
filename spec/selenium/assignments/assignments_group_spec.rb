@@ -387,7 +387,7 @@ describe "assignment groups" do
 
   it "is able to delete assignments when deleting assignment Groups", priority: "2", test_id: 56007 do
     group0 = @course.assignment_groups.create!(name: "Guybrush Group")
-    assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0,)
+    assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0)
     get "/courses/#{@course.id}/assignments"
     expect(f('#ag-list')).to include_text(assignment.name)
 

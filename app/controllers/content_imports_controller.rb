@@ -26,10 +26,10 @@ class ContentImportsController < ApplicationController
   include Api::V1::Course
   include ContentImportsHelper
 
-  COPY_TYPES = %w{assignment_groups assignments context_modules
+  COPY_TYPES = %w[assignment_groups assignments context_modules
                   learning_outcomes quizzes assessment_question_banks folders
                   attachments wiki_pages discussion_topics calendar_events
-                  context_external_tools learning_outcome_groups rubrics}.freeze
+                  context_external_tools learning_outcome_groups rubrics].freeze
 
   # these are deprecated, but leaving them for a while so existing links get redirected
   def index
@@ -137,7 +137,11 @@ class ContentImportsController < ApplicationController
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
                                     :migration_type => 'course_copy_importer',
-                                    :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual)
+                                    :initiated_source => if api_request?
+                                                           in_app? ? :api_in_app : :api
+                                                         else
+                                                           :manual
+                                                         end)
       cm.queue_migration
       cm.workflow_state = 'created'
       render :json => copy_status_json(cm, @context, @current_user, session)
@@ -151,7 +155,7 @@ class ContentImportsController < ApplicationController
       params[:copy] ||= {}
       params[:items_to_copy].each_pair do |key, vals|
         params[:copy][key] ||= {}
-        if vals && !vals.empty?
+        if vals.present?
           vals.each do |val|
             params[:copy][key][val] = true
           end

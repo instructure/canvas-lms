@@ -77,7 +77,7 @@ module SIS
       end
 
       def any_left_to_process?
-        return @batched_users.size > 0
+        !@batched_users.empty?
       end
 
       def infer_user_name(user_row, prior_name = nil)
@@ -275,12 +275,12 @@ module SIS
 
           # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
           # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-          if !user_row.password.blank? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
+          if user_row.password.present? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
             pseudo.password = user_row.password
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true
           end
-          pseudo.sis_ssha = user_row.ssha_password if !user_row.ssha_password.blank?
+          pseudo.sis_ssha = user_row.ssha_password unless user_row.ssha_password.blank?
           pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
           user_touched = false
 
@@ -290,7 +290,7 @@ module SIS
             User.transaction(:requires_new => true) do
               if user.changed?
                 user_touched = true
-                if !user.save && user.errors.size > 0
+                if !user.save && !user.errors.empty?
                   message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
@@ -303,7 +303,7 @@ module SIS
                 if pseudo.save_without_broadcasting
                   p_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: pseudo)
                   @roll_back_data << p_data if p_data
-                elsif pseudo.errors.size > 0
+                elsif !pseudo.errors.empty?
                   message = generate_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
@@ -503,12 +503,11 @@ module SIS
       private
 
       def generate_user_warning(message, user_id, login_id)
-        user_message = generate_readable_error_message(
+        generate_readable_error_message(
           message: message,
           user_id: user_id,
           login_id: login_id
         )
-        user_message
       end
 
       ERRORS_TO_REASONS = {
@@ -519,9 +518,8 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        result = "Could not save the user with user_id: '#{options[:user_id]}'." +
-                 " #{reason}"
-        result
+        "Could not save the user with user_id: '#{options[:user_id]}'." +
+          " #{reason}"
       end
     end
   end

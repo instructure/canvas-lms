@@ -24,7 +24,7 @@ module Importers
     self.item_class = ContextExternalTool
 
     def self.process_migration(data, migration)
-      tools = data['external_tools'] ? data['external_tools'] : []
+      tools = data['external_tools'] || []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin
@@ -82,7 +82,7 @@ module Importers
       end
 
       item.save! if persist
-      migration.add_imported_item(item) if migration
+      migration&.add_imported_item(item)
       item
     end
 
@@ -109,18 +109,19 @@ module Importers
     end
 
     def self.check_for_compatible_tool_translation(hash, migration)
-      if migration.migration_settings[:prefer_existing_tools] && (tool = self.check_for_existing_tool(hash, migration))
+      if migration.migration_settings[:prefer_existing_tools] && (tool = check_for_existing_tool(hash, migration))
         return tool
       end
-      if migration.migration_type == "common_cartridge_importer" && (tool = self.check_for_tool_compaction(hash, migration))
-        return tool
+
+      if migration.migration_type == "common_cartridge_importer" && (tool = check_for_tool_compaction(hash, migration))
+        tool
       end
     end
 
     def self.check_for_tool_compaction(hash, migration)
       # rather than making a thousand separate tools, try to combine into other tools if we can
 
-      url, domain, settings = self.extract_for_translation(hash)
+      url, domain, settings = extract_for_translation(hash)
       return if url && ContextModuleImporter.add_custom_fields_to_url(url, hash[:custom_fields] || {}).nil?
 
       return unless url || domain
@@ -164,7 +165,7 @@ module Importers
     end
 
     def self.check_for_existing_tool(hash, migration)
-      url, domain, settings = self.extract_for_translation(hash)
+      url, domain, settings = extract_for_translation(hash)
       return unless domain
 
       tool_contexts = ContextExternalTool.contexts_to_search(migration.context)
@@ -174,7 +175,7 @@ module Importers
 
       tools.each do |tool|
         # check if tool is compatible
-        next unless self.matching_settings?(migration, hash, tool, settings, true)
+        next unless matching_settings?(migration, hash, tool, settings, true)
 
         if tool.url.blank? && tool.domain.present?
           if domain && domain == tool.domain

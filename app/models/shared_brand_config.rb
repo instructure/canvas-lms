@@ -24,7 +24,7 @@ class SharedBrandConfig < ActiveRecord::Base
   validates :brand_config, presence: true
 
   set_policy do
-    given { |user, session| self.account.grants_right?(user, session, :manage_account_settings) }
+    given { |user, session| account.grants_right?(user, session, :manage_account_settings) }
     can :create and can :update and can :delete
   end
 end

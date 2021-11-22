@@ -148,7 +148,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   PROFILE_CLAIMS = ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username',
                     'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale', 'updated_at'].freeze
   def scope_for_options
-    result = (scope || '').split(' ')
+    result = (scope || '').split
 
     result.unshift('openid')
     claims = requested_claims

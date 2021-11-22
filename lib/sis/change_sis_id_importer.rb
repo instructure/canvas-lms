@@ -140,7 +140,7 @@ module SIS
         if data_change.old_id.blank? && data_change.old_integration_id.present?
           raise ImportError, "An old_integration_id, '#{data_change.old_integration_id}', referenced a non-existent #{type} and was not changed." unless old_int_item
 
-          return old_int_item
+          old_int_item
         end
       end
     end

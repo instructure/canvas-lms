@@ -26,9 +26,13 @@ class TestUserApi
   include Api::V1::User
   attr_accessor :services_enabled, :context, :current_user, :params, :request
 
-  def service_enabled?(service); @services_enabled.include? service; end
+  def service_enabled?(service)
+    @services_enabled.include? service
+  end
 
-  def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
+  def avatar_image_url(*args)
+    "avatar_image_url(#{args.first})"
+  end
 
   def course_student_grades_url(_course_id, _user_id)
     ""
@@ -76,10 +80,10 @@ describe Api::V1::User do
     it 'supports optionally providing the avatar if avatars are enabled' do
       @student.account.set_service_availability(:avatars, false)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)).not_to have_key("avatar_url")
       @student.account.set_service_availability(:avatars, true)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("avatar_url")
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"]).to match("h:/images/messages/avatar-50.png")
     end
 
@@ -95,7 +99,7 @@ describe Api::V1::User do
     it 'supports optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("group_ids")
       expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
     end
 
@@ -371,12 +375,12 @@ describe Api::V1::User do
     end
 
     it 'supports manually passing the context' do
-      mock_context = double()
+      mock_context = double
       test_context(mock_context, mock_context)
     end
 
     it 'supports loading the context as a member var' do
-      @test_api.context = double()
+      @test_api.context = double
       test_context(@test_api.context, nil)
     end
 
@@ -649,7 +653,7 @@ describe Api::V1::User do
 
   context 'user_json_is_admin?' do
     it 'supports manually passing the current user' do
-      @test_api.context = double()
+      @test_api.context = double
       expect(@test_api.context).to receive(:global_id).and_return(42)
       expect(@test_api.context).to receive(:account).and_return(@test_api.context)
       expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
@@ -658,7 +662,7 @@ describe Api::V1::User do
     end
 
     it 'supports loading the current user as a member var' do
-      mock_context = double()
+      mock_context = double
       expect(mock_context).to receive(:global_id).and_return(42)
       expect(mock_context).to receive(:account).and_return(mock_context)
       expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
@@ -990,7 +994,7 @@ describe "Users API", type: :request do
 
     it "returns a list of users filtered by search_term" do
       @account = Account.default
-      expected_keys = %w{id name sortable_name short_name}
+      expected_keys = %w[id name sortable_name short_name]
 
       users = []
       [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
@@ -1813,7 +1817,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile" do
-        Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
+        Account.default.tap { |a|
+          a.settings[:enable_profiles] = true
+          a.save!
+        }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         json = api_call(:put, @path, @path_options, {
@@ -1833,7 +1840,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile with email" do
-        Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
+        Account.default.tap { |a|
+          a.settings[:enable_profiles] = true
+          a.save!
+        }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         email = 'dudd@example.com'
@@ -2019,7 +2029,8 @@ describe "Users API", type: :request do
 
     context "an admin user" do
       it "is able to view other users' settings" do
-        @student.preferences[:collapse_global_nav] = true; @student.save!
+        @student.preferences[:collapse_global_nav] = true
+        @student.save!
         json = api_call(:get, path, path_options)
         expect(json['manual_mark_as_read']).to eq false
         expect(json['collapse_global_nav']).to eq true
@@ -2906,14 +2917,14 @@ describe "Users API", type: :request do
       expect(json['props_token']).to be_present
       expect(json['expires_at']).to be_present
 
-      public_key = OpenSSL::PKey::EC.new(<<~PUBLIC)
+      public_key = OpenSSL::PKey::EC.new(<<~PEM)
         -----BEGIN PUBLIC KEY-----
         MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAl7Lj7fG0+JySG4NPsBqUyYBhazI0
         fbIPPioXwGOEaDzRUDoBs7S3ppDwt3aMotMCRJT0dBVj7ZRTIm0KpJcfy5gAsHh9
         qmWGlRyEJlGTMvXD6DkJAFfZcQqc66tmY1vEREbaDGOjGWeWegmkHjJoj+ZyJkE1
         tSz8dIduYbgQ9SrJRsE=
         -----END PUBLIC KEY-----
-      PUBLIC
+      PEM
       body = Canvas::Security.decode_jwt(json['auth_token'], [public_key])
       expect(body[:iss]).to eq "IOS_key"
     end

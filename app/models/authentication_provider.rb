@@ -24,7 +24,7 @@ NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
-  validates :auth_filter, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
   workflow do
     state :active
@@ -107,7 +107,7 @@ class AuthenticationProvider < ActiveRecord::Base
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
-  has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
+  has_many :pseudonyms, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
   def self.valid_auth_types
@@ -151,9 +151,9 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def destroy
-    self.send(:remove_from_list_for_destroy)
+    send(:remove_from_list_for_destroy)
     self.workflow_state = 'deleted'
-    self.save!
+    save!
     enable_canvas_authentication
     delay_if_production.soft_delete_pseudonyms
     true
@@ -167,9 +167,9 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def auth_decrypted_password
-    return nil unless self.auth_password_salt && self.auth_crypted_password
+    return nil unless auth_password_salt && auth_crypted_password
 
-    ::Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
+    ::Canvas::Security.decrypt_password(auth_crypted_password, auth_password_salt, 'instructure_auth')
   end
 
   def auth_provider_filter
@@ -235,7 +235,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w[
     admin_roles
     display_name
     email
@@ -247,7 +247,7 @@ class AuthenticationProvider < ActiveRecord::Base
     sortable_name
     surname
     time_zone
-  }.freeze
+  ].freeze
 
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
@@ -290,9 +290,9 @@ class AuthenticationProvider < ActiveRecord::Base
         role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
         account = pseudonym.account
         existing_account_users = account.account_users.merge(user.account_users).preload(:role).to_a
-        roles = role_names.map do |role_name|
+        roles = role_names.filter_map do |role_name|
           account.get_account_role_by_name(role_name)
-        end.compact
+        end
         roles_to_add = roles - existing_account_users.map(&:role)
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }
@@ -368,7 +368,7 @@ class AuthenticationProvider < ActiveRecord::Base
   protected
 
   def statsd_prefix
-    "auth.account_#{Shard.global_id_for(account_id)}.config_#{self.global_id}"
+    "auth.account_#{Shard.global_id_for(account_id)}.config_#{global_id}"
   end
 
   private
@@ -432,7 +432,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_key(key)
-    ['auth_provider_debugging', self.global_id, key.to_s].cache_key
+    ['auth_provider_debugging', global_id, key.to_s].cache_key
   end
 
   def debug_expire

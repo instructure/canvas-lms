@@ -25,7 +25,7 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -64,7 +64,7 @@ describe "calendar2" do
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
       ]
-      student1, student2 = 2.times.map do
+      student1, student2 = Array.new(2) do
         student_in_course :course => @course, :active_all => true
         @student
       end
@@ -216,7 +216,7 @@ describe "calendar2" do
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         @course.assignments.create!(
           title: 'test assignment',
-          due_at: event_start,
+          due_at: event_start
         )
         get "/calendar2"
         f('.fc-event').click

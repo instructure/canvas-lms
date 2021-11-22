@@ -34,7 +34,7 @@ class Conversation < ActiveRecord::Base
 
   before_save :update_root_account_ids
 
-  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
+  validates :subject, length: { :maximum => maximum_string_length, :allow_nil => true }
 
   attr_accessor :latest_messages_from_stream_item
 
@@ -61,11 +61,11 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.private_hash_for(users_or_user_ids, context_code = nil)
-    if users_or_user_ids.first.is_a?(User)
-      user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
-    else
-      user_ids = users_or_user_ids
-    end
+    user_ids = if users_or_user_ids.first.is_a?(User)
+                 Shard.birth.activate { users_or_user_ids.map(&:id) }
+               else
+                 users_or_user_ids
+               end
     str = user_ids.uniq.sort.join(',')
     str += "|#{context_code}" if context_code
     Digest::SHA1.hexdigest(str)
@@ -73,7 +73,7 @@ class Conversation < ActiveRecord::Base
 
   def bulk_insert_participants(user_ids, options = {})
     options = {
-      :conversation_id => self.id,
+      :conversation_id => id,
       :workflow_state => 'read',
       :has_attachments => has_attachments?,
       :has_media_objects => has_media_objects?,
@@ -142,7 +142,7 @@ class Conversation < ActiveRecord::Base
 
   def add_participants(current_user, users, options = {})
     message = nil
-    self.shard.activate do
+    shard.activate do
       user_ids = users.map(&:id).uniq
       raise "can't add participants to a private conversation" if private?
 
@@ -155,7 +155,7 @@ class Conversation < ActiveRecord::Base
           bulk_insert_options = {
             :workflow_state => 'unread',
             :message_count => 0,
-            :private_hash => self.private_hash
+            :private_hash => private_hash
           }
         else
           last_message_at = conversation_messages.human.first.try(:created_at)
@@ -167,7 +167,7 @@ class Conversation < ActiveRecord::Base
             :workflow_state => 'unread',
             :last_message_at => last_message_at,
             :message_count => num_messages,
-            :private_hash => self.private_hash
+            :private_hash => private_hash
           }
         end
 
@@ -179,7 +179,7 @@ class Conversation < ActiveRecord::Base
             end
           end
 
-          next if Shard.current == self.shard
+          next if Shard.current == shard
 
           bulk_insert_participants(shard_user_ids, bulk_insert_options)
         end
@@ -189,7 +189,7 @@ class Conversation < ActiveRecord::Base
         unless options[:no_messages]
           # give them all messages
           # NOTE: individual messages in group conversations don't have tags
-          self.class.connection.execute(sanitize_sql([<<~SQL, self.id, current_user.id, user_ids]))
+          self.class.connection.execute(sanitize_sql([<<~SQL.squish, id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state)
             SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
@@ -203,7 +203,7 @@ class Conversation < ActiveRecord::Base
           # announce their arrival
           message = add_event_message(current_user, { :event_type => :users_added, :user_ids => user_ids }, options)
         end
-        self.touch
+        touch
         Canvas::LiveEvents.conversation_forwarded(self)
       end
     end
@@ -242,17 +242,19 @@ class Conversation < ActiveRecord::Base
       options = { :generated => false,
                   :update_for_sender => true,
                   :only_existing => false }.update(options)
-      options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
-      options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
+      options[:update_participants] = !options[:generated]         unless options.key?(:update_participants)
+      options[:update_for_skips]    = options[:update_for_sender]  unless options.key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
-      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
+      options[:reset_unread_counts] = options[:update_participants] unless options.key?(:reset_unread_counts)
 
-      message = body_or_obj.is_a?(ConversationMessage) ?
-        body_or_obj :
-        Conversation.build_message(current_user, body_or_obj, options)
+      message = if body_or_obj.is_a?(ConversationMessage)
+                  body_or_obj
+                else
+                  Conversation.build_message(current_user, body_or_obj, options)
+                end
       message.conversation = self
-      message.relativize_attachment_ids(from_shard: message.shard, to_shard: self.shard)
-      message.shard = self.shard
+      message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
+      message.shard = shard
 
       if options[:cc_author]
         message.cc_author = options[:cc_author]
@@ -298,7 +300,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def reset_unread_counts
-    Shard.partition_by_shard(self.conversation_participants.pluck(:user_id)) do |shard_user_ids|
+    Shard.partition_by_shard(conversation_participants.pluck(:user_id)) do |shard_user_ids|
       shard_user_ids.compact.sort.each_slice(1000) do |sliced_ids|
         counts_by_user_id = ConversationParticipant.visible.unread.where(:user_id => sliced_ids).group(:user_id).count
         User.where(id: sliced_ids).select(:id, :unread_conversations_count).each do |user|
@@ -359,13 +361,13 @@ class Conversation < ActiveRecord::Base
       skip_participants = message.conversation_message_participants.active.select(:user_id).to_a
     end
 
-    self.conversation_participants.shard(self).activate do |cps|
+    conversation_participants.shard(self).activate do |cps|
       cps.update_all(:root_account_ids => options[:root_account_ids]) if options[:root_account_ids].present?
 
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
-        cps = cps.where("user_id NOT IN (?)", skip_participants.map(&:user_id)) if skip_participants.present?
+        cps = cps.where.not(user_id: skip_participants.map(&:user_id)) if skip_participants.present?
       end
 
       cps = cps.where(:user_id => (options[:only_users] + [message.author]).map(&:id)) if options[:only_users]
@@ -374,13 +376,13 @@ class Conversation < ActiveRecord::Base
 
       cps.update_all("message_count = message_count + 1") unless options[:generated]
 
-      if self.shard == Shard.current
+      if shard == Shard.current
         users = options[:preloaded_users] || preload_users_and_context_codes
         current_context_strings(nil, users)
 
         all_new_tags = options[:tags] || []
         message_participant_data = []
-        ConversationMessage.preload_latest(cps) if private? && !all_new_tags.present?
+        ConversationMessage.preload_latest(cps) if private? && all_new_tags.blank?
         cps.each do |cp|
           cp.user = users[cp.user_id]
           next unless cp.user
@@ -394,7 +396,7 @@ class Conversation < ActiveRecord::Base
                            end
 
             cp.update_attribute(:tags, updated_tags)
-            if cp.user.shard != self.shard
+            if cp.user.shard != shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id)
                                        .update_all(:tags => serialized_tags(cp.tags))
@@ -412,7 +414,7 @@ class Conversation < ActiveRecord::Base
         # some of the participants we're about to insert may have been soft-deleted,
         # so we'll hard-delete them before reinserting. It would probably be better
         # to update them instead, but meh.
-        inserting_user_ids = message_participant_data.map { |d| d[:user_id] }
+        inserting_user_ids = message_participant_data.pluck(:user_id)
         ConversationMessageParticipant.unique_constraint_retry do
           ConversationMessageParticipant.where(
             :conversation_message_id => message.id, :user_id => inserting_user_ids
@@ -451,21 +453,17 @@ class Conversation < ActiveRecord::Base
 
   def infer_new_tags_for(participant, all_new_tags)
     active_tags   = participant.user.conversation_context_codes(false)
-    context_codes = active_tags.present? ? active_tags : participant.user.conversation_context_codes
+    context_codes = active_tags.presence || participant.user.conversation_context_codes
     visible_codes = all_new_tags & context_codes
 
-    new_tags = if visible_codes.present?
-                 # limit available codes to codes the user can see
-                 visible_codes
-               else
-                 # otherwise, use all of the available tags.
-                 current_context_strings & context_codes
-               end
+    # limit available codes to codes the user can see
+    # otherwise, use all of the available tags
+    new_tags = visible_codes.presence || (current_context_strings & context_codes)
 
-    message_tags = if self.private?
+    message_tags = if private?
                      if new_tags.present?
                        new_tags
-                     elsif participant.message_count > 0 and (last_message = participant.last_message)
+                     elsif participant.message_count > 0 && (last_message = participant.last_message)
                        last_message.tags
                      end
                    end
@@ -475,7 +473,7 @@ class Conversation < ActiveRecord::Base
 
   def update_participants(message, options = {})
     updated = false
-    self.conversation_participants.shard(self).activate do |conversation_participants|
+    conversation_participants.shard(self).activate do |conversation_participants|
       conversation_participants = conversation_participants.where(:user_id =>
         (options[:only_users]).map(&:id)) if options[:only_users]
 
@@ -495,7 +493,7 @@ class Conversation < ActiveRecord::Base
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
-      conversation_participants.where("user_id IN (?)", skip_ids).update_all(updates.join(", "))
+      conversation_participants.where(user_id: skip_ids).update_all(updates.join(", "))
 
       if message.has_attachments?
         self.has_attachments = true
@@ -508,25 +506,25 @@ class Conversation < ActiveRecord::Base
         updated = true
       end
     end
-    self.save if updated
+    save if updated
   end
 
   def subscribed_participants
     ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
-    conversation_participants.select(&:subscribed?).map(&:user).compact
+    conversation_participants.select(&:subscribed?).filter_map(&:user)
   end
 
   def reply_from(opts)
     user = opts.delete(:user)
     message = opts.delete(:text).to_s.strip
-    participant = self.conversation_participants.where(user_id: user).first
+    participant = conversation_participants.where(user_id: user).first
     user = nil unless user && participant
-    if !user
-      raise IncomingMail::Errors::InvalidParticipant
-    else
+    if user
       participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
       message = truncate_message(message)
       add_message(user, message, opts)
+    else
+      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 
@@ -563,10 +561,10 @@ class Conversation < ActiveRecord::Base
     return unless private?
 
     self.private_hash = Conversation.private_hash_for(user_ids ||
-      Shard.birth.activate { self.conversation_participants.reload.map(&:user_id) })
+      Shard.birth.activate { conversation_participants.reload.map(&:user_id) })
     return unless private_hash_changed?
 
-    existing = self.shard.activate do
+    existing = shard.activate do
       ConversationParticipant.unscoped do
         ConversationParticipant.where(private_hash: private_hash).take&.conversation
       end
@@ -575,8 +573,8 @@ class Conversation < ActiveRecord::Base
       merge_into(existing)
     else
       save!
-      Shard.with_each_shard(self.associated_shards) do
-        ConversationParticipant.where(:conversation_id => self).update_all(:private_hash => self.private_hash)
+      Shard.with_each_shard(associated_shards) do
+        ConversationParticipant.where(:conversation_id => self).update_all(:private_hash => private_hash)
       end
     end
   end
@@ -605,7 +603,7 @@ class Conversation < ActiveRecord::Base
             # remove the duplicate participant
             cp.destroy
 
-            if cp.user.shard != self.shard
+            if cp.user.shard != shard
               # remove the duplicate secondary CP on the user's shard
               cp.user.shard.activate do
                 ConversationParticipant.where(conversation_id: self, :user_id => cp.user_id).delete_all
@@ -615,14 +613,14 @@ class Conversation < ActiveRecord::Base
             # keep the cp, with updated conversation, iff the source
             # conversation shared a shard with the user OR the target
             # conversation
-            if self.shard == other.shard || self.shard == cp.user.shard
+            if shard == other.shard || shard == cp.user.shard
               ConversationParticipant.where(id: cp).update_all(conversation_id: other.id)
             else
               cp.destroy
             end
             # update the duplicate cp on the user's shard if it's a different
             # shard
-            if cp.user.shard != self.shard
+            if cp.user.shard != shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id)
                                        .update_all(conversation_id: other.id)
@@ -631,7 +629,7 @@ class Conversation < ActiveRecord::Base
             # create a new duplicate cp on the target conversation's shard
             # if neither the user nor source conversation were there
             # already.
-            if self.shard != other.shard && cp.user.shard != other.shard
+            if shard != other.shard && cp.user.shard != other.shard
               new_cp = cp.clone
               new_cp.shard = other.shard
               new_cp.conversation = other
@@ -640,14 +638,14 @@ class Conversation < ActiveRecord::Base
           end
         end
       end
-      if other.shard == self.shard
+      if other.shard == shard
         conversation_messages.update_all(conversation_id: other.id)
       else
         # move messages and participants over to new shard
         conversation_messages.find_each do |message|
           new_message = message.clone
           new_message.conversation = other
-          message.relativize_attachment_ids(from_shard: self.shard, to_shard: other.shard)
+          message.relativize_attachment_ids(from_shard: shard, to_shard: other.shard)
           new_message.shard = other.shard
           new_message.save!
           message.conversation_message_participants.find_each do |cmp|
@@ -657,11 +655,11 @@ class Conversation < ActiveRecord::Base
             new_cmp.save!
           end
         end
-        self.shard.activate do
+        shard.activate do
           ConversationMessageParticipant.joins(:conversation_message)
-                                        .where(:conversation_messages => { :conversation_id => self.id })
+                                        .where(:conversation_messages => { :conversation_id => id })
                                         .delete_all
-          self.conversation_messages.delete_all
+          conversation_messages.delete_all
         end
       end
 
@@ -678,7 +676,7 @@ class Conversation < ActiveRecord::Base
       # ids must be sorted for the scope to work
       latest_ids = read_attribute(:root_account_ids)
       %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
-        scope = self.send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
+        scope = send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
         until scope.update_all(root_account_ids: latest_ids) < 1_000; end
       end
     end
@@ -763,17 +761,17 @@ class Conversation < ActiveRecord::Base
   end
 
   def replies_locked_for?(user)
-    return false unless %w{Course Group}.include?(self.context_type)
+    return false unless %w[Course Group].include?(context_type)
 
-    course = self.context.is_a?(Course) ? self.context : self.context.context
+    course = context.is_a?(Course) ? context : context.context
 
     # can still reply if a teacher is involved
-    if (course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?) ||
+    if (course.is_a?(Course) && conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?) ||
        # can still reply if observing all the other participants
        (course.is_a?(Course) && observing_all_other_participants(user, course))
       false
     else
-      !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
+      !context.grants_any_right?(user, :send_messages, :send_messages_all)
     end
   end
 

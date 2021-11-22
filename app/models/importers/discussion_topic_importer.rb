@@ -37,7 +37,7 @@ module Importers
         event[:type] = 'announcement'
 
         begin
-          self.import_from_migration(event, migration.context, migration)
+          import_from_migration(event, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
@@ -67,7 +67,7 @@ module Importers
     end
 
     def self.import_from_migration(hash, context, migration, item = nil)
-      importer = self.new(hash, context, migration, item)
+      importer = new(hash, context, migration, item)
       importer.run
     end
 
@@ -85,7 +85,7 @@ module Importers
 
       topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id)
                              .where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
-      topic ||= if options[:type] =~ /announcement/i
+      topic ||= if /announcement/i.match?(options[:type])
                   context.announcements.temp_record
                 else
                   context.discussion_topics.temp_record
@@ -107,11 +107,11 @@ module Importers
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
-      if options.message
-        item.message = migration.convert_html(options.message, type, options[:migration_id], :message)
-      else
-        item.message = I18n.t('#discussion_topic.empty_message', 'No message')
-      end
+      item.message = if options.message
+                       migration.convert_html(options.message, type, options[:migration_id], :message)
+                     else
+                       I18n.t('#discussion_topic.empty_message', 'No message')
+                     end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       if options[:assignment]
@@ -195,7 +195,7 @@ module Importers
     class DiscussionTopicOptions
       attr_reader :options
 
-      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked]
+      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked].freeze
 
       def initialize(options = {})
         @options = options.with_indifferent_access

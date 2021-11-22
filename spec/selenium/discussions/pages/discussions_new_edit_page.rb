@@ -67,11 +67,11 @@ class DiscussionNewEdit
 
     def select_a_section(section_name)
       fj(section_autocomplete_css).click
-      if !section_name.empty?
+      if section_name.empty?
+        driver.action.send_keys(:backspace).perform
+      else
         set_value(fj(section_autocomplete_css), section_name)
         driver.action.send_keys(:enter).perform
-      else
-        driver.action.send_keys(:backspace).perform
       end
       wait_for_ajax_requests
     end

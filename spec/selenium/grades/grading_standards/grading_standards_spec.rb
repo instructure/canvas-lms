@@ -58,14 +58,14 @@ describe "grading standards" do
     @standard = @course.grading_standards.create!(title: "some standard", standard_data: { a: { name: 'A', value: '95' }, b: { name: 'B', value: '80' }, f: { name: 'F', value: '' } })
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-    f("#assignment_points_possible").clear()
+    f("#assignment_points_possible").clear
     f("#assignment_points_possible").send_keys("1")
     click_option('#assignment_grading_type', "Letter Grade")
     expect(f('.edit_letter_grades_link')).to be_displayed
     f('.edit_letter_grades_link').click
 
     dialog = f("#edit_letter_grades_form")
-    expect(dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length).to eq 12
+    expect(dialog.find_elements(:css, ".grading_standard_row").count(&:displayed?)).to eq 12
     expect(dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
 
     dialog.find_element(:css, ".find_grading_standard_link").click
@@ -107,7 +107,7 @@ describe "grading standards" do
     form.find_element(:css, ".edit_letter_grades_link").click
 
     dialog = f("#edit_letter_grades_form")
-    expect(dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length).to eq(12)
+    expect(dialog.find_elements(:css, ".grading_standard_row").count(&:displayed?)).to eq(12)
     expect(dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map { |e| e.find_element(:css, ".name").text }).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
 
     dialog.find_element(:css, ".find_grading_standard_link").click

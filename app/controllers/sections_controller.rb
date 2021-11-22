@@ -197,7 +197,7 @@ class SectionsController < ApplicationController
   def crosslist_check
     course_id = params[:new_course_id]
     # cross-listing should only be allowed within the same root account
-    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
+    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if Api::ID_REGEX.match?(course_id)
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
     res = { :allowed => !!allowed }
@@ -318,7 +318,7 @@ class SectionsController < ApplicationController
           add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
           @enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'active').count
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
-          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
+          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w[invited pending]).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
           js_env
           if @context.grants_right?(@current_user, session, :manage)

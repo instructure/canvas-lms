@@ -298,7 +298,7 @@ describe "Gradebook" do
       f('[data-menu-item-id="reupload-submissions"]').click
 
       # When I attach a submissions zip file
-      fixture_file = Rails.root.join('spec', 'fixtures', 'files', 'submissions.zip')
+      fixture_file = Rails.root.join('spec/fixtures/files/submissions.zip')
       f('input[name=submissions_zip]').send_keys(fixture_file)
 
       # And I upload it
@@ -337,7 +337,7 @@ describe "Gradebook" do
 
   context 'grading quiz submissions' do
     # set up course and users
-    let(:test_course) { course_factory() }
+    let(:test_course) { course_factory }
     let(:teacher)     { user_factory(active_all: true) }
     let(:student)     { user_factory(active_all: true) }
     let!(:enroll_teacher_and_students) do

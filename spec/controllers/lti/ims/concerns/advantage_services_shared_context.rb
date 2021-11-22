@@ -32,7 +32,7 @@ shared_context 'advantage services context' do
     dk
   end
   let(:access_token_scopes) do
-    %w(
+    %w[
       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
       https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
@@ -50,7 +50,7 @@ shared_context 'advantage services context' do
       https://canvas.instructure.com/lti/account_external_tools/scope/list
       https://canvas.instructure.com/lti/account_external_tools/scope/show
       https://canvas.instructure.com/lti/account_external_tools/scope/destroy
-    ).join(' ')
+    ].join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
   let(:test_request_host) { 'test.host' }
@@ -124,7 +124,7 @@ shared_context 'advantage services context' do
   def remove_access_token_scope(default_scopes, to_remove)
     scopes_to_remove = [to_remove].flatten
     default_scopes
-      .split(' ')
+      .split
       .reject { |s| scopes_to_remove.include? s }
       .join(' ')
   end

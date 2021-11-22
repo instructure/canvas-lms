@@ -116,7 +116,7 @@ describe "master courses - child courses - module item locking" do
       @page_tag = @template.create_content_tag_for!(@page, restrictions: { all: true })
 
       @topic = @course.discussion_topics.create!(title: "topic blah", message: "bloo")
-      # note the lack of a content tag
+      # NOTE: the lack of a content tag
 
       @mod = @course.context_modules.create!(name: "modle")
       @assmt_mod_tag = @mod.add_item(id: @assmt.id, type: "assignment")

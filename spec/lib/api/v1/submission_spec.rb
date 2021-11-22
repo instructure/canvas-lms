@@ -476,12 +476,12 @@ describe Api::V1::Submission do
       end
 
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00
           https://abcdef.com/uuurrrlll01
           https://abcdef.com/uuurrrlll02
           https://abcdef.com/uuurrrlll03
-        )
+        ]
       end
 
       let(:url_grades) do
@@ -592,7 +592,7 @@ describe Api::V1::Submission do
     end
 
     it "does not blow up when a quiz has a prior attachment" do
-      qsub = quiz_with_submission()
+      qsub = quiz_with_submission
       quiz = qsub.quiz
       quiz.attachments.create!(
         display_name: "submissions.zip",

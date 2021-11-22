@@ -398,7 +398,7 @@ describe "people" do
       expect(f("#content")).not_to contain_css('.reset_course_content_button')
     end
 
-    # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29609, but make sure we're testing at the right level
     it "should validate that a TA cannot rename a teacher"
 
     it "includes login id column if the user has :view_user_logins, even if they don't have :manage_students" do
@@ -555,8 +555,10 @@ describe "people" do
     end
 
     it "removes students linked to an observer" do
-      @student1 = user_factory; @course.enroll_student(@student1, enrollment_state: :active)
-      @student2 = user_factory; @course.enroll_student(@student2, enrollment_state: :active)
+      @student1 = user_factory
+      @course.enroll_student(@student1, enrollment_state: :active)
+      @student2 = user_factory
+      @course.enroll_student(@student2, enrollment_state: :active)
       @observer = user_factory
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student1.id, allow_multiple_enrollments: true)
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student2.id, allow_multiple_enrollments: true)

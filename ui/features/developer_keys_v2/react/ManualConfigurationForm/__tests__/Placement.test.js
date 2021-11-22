@@ -117,7 +117,7 @@ const couldBeEither = [
   'link_selection',
   'course_assignments_menu',
   'collaboration',
-  'module_index_menu'
+  'module_index_menu_modal'
 ]
 
 couldBeEither.forEach(placementName => {
@@ -132,14 +132,14 @@ couldBeEither.forEach(placementName => {
     })
   }
 
-  if (placementName === 'module_index_menu') {
+  if (placementName === 'module_index_menu_modal') {
     beforeAll(() => {
       global.ENV.FEATURES ||= {}
-      global.ENV.FEATURES.lti_deep_linking_module_index_menu = true
+      global.ENV.FEATURES.lti_deep_linking_module_index_menu_modal = true
     })
 
     afterAll(() => {
-      global.ENV.FEATURES.lti_deep_linking_module_index_menu = false
+      global.ENV.FEATURES.lti_deep_linking_module_index_menu_modal = false
     })
   }
 

@@ -26,7 +26,7 @@ module CC::Importer::Standard
       topics = []
 
       resources_by_type("imsdt").each do |res|
-        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         resource_dir = File.dirname(path) if path
         if (doc = get_node_or_open_file(res, TOPIC_NODE))
           topic = { :migration_id => res[:migration_id] }

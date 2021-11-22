@@ -33,16 +33,16 @@ module StreamItemsHelper
     categorized_items = {}
     return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
 
-    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic DiscussionEntry AssessmentRequest)
+    supported_categories = %w[Announcement Conversation Assignment DiscussionTopic DiscussionEntry AssessmentRequest]
     supported_categories.each { |category| categorized_items[category] = [] }
 
-    topic_types = %w{DiscussionTopic Announcement}
+    topic_types = %w[DiscussionTopic Announcement]
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| topic_types.include?(i.asset_type) }.map { |item| item.data }, :context
+      stream_items.select { |i| topic_types.include?(i.asset_type) }.map(&:data), :context
     )
 
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map { |item| item.data }, discussion_topic: :context
+      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map(&:data), discussion_topic: :context
     )
     topic_types << 'DiscussionEntry'
 
@@ -52,7 +52,8 @@ module StreamItemsHelper
 
       next unless supported_categories.include?(category)
 
-      if category == "Conversation"
+      case category
+      when "Conversation"
         participant = user.conversation_participant(item.asset_id)
 
         next if participant.nil? || participant.last_message.nil? || participant.last_author?
@@ -63,7 +64,7 @@ module StreamItemsHelper
         # the workflow_state on the stream_item_instance, that workflow_state
         # may be out of sync with the underlying conversation.
         item.unread = participant.unread?
-      elsif category == "AssessmentRequest"
+      when "AssessmentRequest"
         next unless item.data.asset.grants_right?(user, :read)
       end
 
@@ -157,7 +158,7 @@ module StreamItemsHelper
     when "Assignment"
       asset.subject
     when "AssessmentRequest"
-      # TODO I18N should use placeholders, not concatenation
+      # TODO: I18N should use placeholders, not concatenation
       asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
     when "DiscussionEntry"
       I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title'] })

@@ -23,7 +23,7 @@ class ObserverAlert < ActiveRecord::Base
   belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
   belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification, :submission]
 
-  ALERT_TYPES = %w(
+  ALERT_TYPES = %w[
     assignment_missing
     assignment_grade_high
     assignment_grade_low
@@ -31,7 +31,7 @@ class ObserverAlert < ActiveRecord::Base
     course_grade_low
     course_announcement
     institution_announcement
-  ).freeze
+  ].freeze
   validates :alert_type, inclusion: { in: ALERT_TYPES }
   validates :user_id, :observer_id, :observer_alert_threshold_id, :alert_type, :action_date, :title, presence: true
   validate :validate_users_link

@@ -72,7 +72,11 @@ describe SubmissionList do
 
     @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
-    subs.each { |s| s.created_at = 3.days.ago; s.updated_at = 3.days.ago; s.save }
+    subs.each { |s|
+      s.created_at = 3.days.ago
+      s.updated_at = 3.days.ago
+      s.save
+    }
     @some_assignment.grade_student(@student, { excuse: true, grader: @teacher })
     @days = SubmissionList.days(@course)
     submissions = @days[0].graders[0].assignments[0].submissions
@@ -259,7 +263,7 @@ describe SubmissionList do
         assignment.grade_student student, { grade: 3, grader: grader }
       end
 
-      it "remembers the 'Before' grade " do
+      it "remembers the 'Before' grade" do
         expect(submission.previous_grade).to eq "5"
       end
 

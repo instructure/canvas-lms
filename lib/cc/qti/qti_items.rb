@@ -19,6 +19,9 @@
 #
 require 'bigdecimal'
 
+# rubocop:disable comments of Style/SymbolProc in this file are because the
+# builder DSL uses method_missing and blocks to define nested XML elements, and
+# a symbol proc confuses that use of the block
 module CC
   module Qti
     module QtiItems
@@ -26,7 +29,7 @@ module CC
                             'multiple_answers_question',
                             'true_false_question',
                             'short_answer_question',
-                            'essay_question']
+                            'essay_question'].freeze
 
       CC_TYPE_PROFILES = {
         'multiple_choice_question' => 'cc.multiple_choice.v0p1',
@@ -34,13 +37,13 @@ module CC
         'true_false_question' => 'cc.true_false.v0p1',
         'short_answer_question' => 'cc.fib.v0p1',
         'essay_question' => 'cc.essay.v0p1'
-      }
+      }.freeze
 
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
       MULTI_ANSWER_TYPES = ['matching_question',
                             'multiple_dropdowns_question',
-                            'fill_in_multiple_blanks_question']
+                            'fill_in_multiple_blanks_question'].freeze
 
       def add_ref_or_question(node, question)
         aq = nil
@@ -81,7 +84,7 @@ module CC
 
       def qq_mig_id(question)
         qq_id = question['id']
-        if @manifest && @manifest.exporter.for_master_migration
+        if @manifest&.exporter&.for_master_migration
           create_key("quizzes/quiz_question_#{Shard.global_id_for(qq_id)}") # curse you namespacing
         else
           create_key("quiz_question_#{qq_id}")
@@ -90,7 +93,7 @@ module CC
 
       def aq_mig_id(question)
         aq_id = question['assessment_question_id']
-        if @manifest && @manifest.exporter.for_master_migration
+        if @manifest&.exporter&.for_master_migration
           aq_id = Shard.global_id_for(aq_id)
         end
         create_key("assessment_question_#{aq_id}")
@@ -266,7 +269,7 @@ module CC
       ## question resprocessing methods
 
       def resprocessing(node, question)
-        if !question['neutral_comments'].blank? || !question['neutral_comments_html'].blank?
+        if question['neutral_comments'].present? || question['neutral_comments_html'].present?
           other_respcondition(node, 'Yes', 'general_fb')
         end
 
@@ -293,7 +296,7 @@ module CC
           numerical_resprocessing(node, question)
         end
 
-        if (!question['incorrect_comments'].blank? || !question['incorrect_comments_html'].blank?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
+        if (question['incorrect_comments'].present? || question['incorrect_comments_html'].present?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
@@ -447,14 +450,16 @@ module CC
 
       def calculated_resprocessing(node, _question)
         node.respcondition(:title => 'correct') do |r_node|
-          r_node.conditionvar do |c_node|
+          r_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end
           r_node.setvar(100, :varname => 'SCORE', :action => 'Set')
         end
         node.respcondition(:title => 'incorrect') do |r_node|
           r_node.conditionvar do |c_node|
-            c_node.not { |n_node| n_node.other }
+            c_node.not do |n_node| # rubocop:disable Style/SymbolProc
+              n_node.other
+            end
           end
           r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
         end
@@ -485,7 +490,7 @@ module CC
 
       def other_respcondition(node, continue = 'No', feedback_ref = nil)
         node.respcondition(:continue => continue) do |res_node|
-          res_node.conditionvar do |c_node|
+          res_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end # c_node
           res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => feedback_ref) if feedback_ref

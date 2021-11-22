@@ -24,7 +24,7 @@ describe Canvas::LockExplanation do
       Class.new {
         include Rails.application.routes.url_helpers
         include Canvas::LockExplanation
-        def js_bundle(*args); end
+        def js_bundle(*); end
       }
     }
     let(:host) { klass.new }
@@ -41,6 +41,7 @@ describe Canvas::LockExplanation do
         end
       end
     end
+
     context "with no :unlock_at or :lock_at in the hash" do
       context "with a context module in the hash" do
         let(:hash) { { context_module: object, asset_string: 'course_1' } }

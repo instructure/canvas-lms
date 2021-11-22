@@ -22,11 +22,14 @@ require 'nokogiri'
 
 describe "assignments" do
   def multiple_section_submissions
-    course_with_student(:active_all => true); @student1 = @student
-    @s2enrollment = student_in_course(:active_all => true); @student2 = @user
+    course_with_student(:active_all => true)
+    @student1 = @student
+    @s2enrollment = student_in_course(:active_all => true)
+    @student2 = @user
 
     @section = @course.course_sections.create!
-    @s2enrollment.course_section = @section; @s2enrollment.save!
+    @s2enrollment.course_section = @section
+    @s2enrollment.save!
 
     @assignment = @course.assignments.create!(:title => "Test 1", :submission_types => "online_upload")
 
@@ -476,7 +479,7 @@ describe "assignments_2 feature flag and parameter" do
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: true))
       course = course_factory(
         active_all: true,
-        is_public: true,
+        is_public: true
       )
       assignment = assignment_model(
         course: course,

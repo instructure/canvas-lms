@@ -45,17 +45,17 @@ class Types::MutationType < Types::ApplicationObjectType
   field :hide_assignment_grades_for_sections, mutation: Mutations::HideAssignmentGradesForSections
   field :post_assignment_grades, mutation: Mutations::PostAssignmentGrades
   field :post_assignment_grades_for_sections, mutation: Mutations::PostAssignmentGradesForSections
-  field :set_override_score, <<~DESC, mutation: Mutations::SetOverrideScore
+  field :set_override_score, <<~MD, mutation: Mutations::SetOverrideScore
     Sets the overridden final score for the associated enrollment, optionally limited to a specific
     grading period. This will supersede the computed final score/grade if present.
-  DESC
-  field :set_assignment_post_policy, <<~DESC, mutation: Mutations::SetAssignmentPostPolicy
+  MD
+  field :set_assignment_post_policy, <<~MD, mutation: Mutations::SetAssignmentPostPolicy
     Sets the post policy for the assignment.
-  DESC
-  field :set_course_post_policy, <<~DESC, mutation: Mutations::SetCoursePostPolicy
+  MD
+  field :set_course_post_policy, <<~MD, mutation: Mutations::SetCoursePostPolicy
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
-  DESC
+  MD
   field :create_learning_outcome, mutation: Mutations::CreateLearningOutcome
   field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome
   field :create_outcome_proficiency, mutation: Mutations::CreateOutcomeProficiency
@@ -100,7 +100,7 @@ class Types::MutationType < Types::ApplicationObjectType
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.
-  field :create_submission, <<~DESC, mutation: Mutations::CreateSubmission
+  field :create_submission, <<~MD, mutation: Mutations::CreateSubmission
     IN ACTIVE DEVELOPMENT, USE AT YOUR OWN RISK: Submit homework on an assignment.
-  DESC
+  MD
 end

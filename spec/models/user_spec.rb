@@ -1357,9 +1357,9 @@ describe User do
       end
 
       it "optionally shows pending enrollments in unpublished courses" do
-        course_factory()
+        course_factory
         teacher_in_course(:active_all => true)
-        student_in_course()
+        student_in_course
         expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string).map(&:id)).to include @student.id
       end
     end
@@ -1375,7 +1375,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
 
     it "includes configured external tools" do
@@ -1385,7 +1385,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:href]).to eq :user_external_tool_path
       expect(tab[:args]).to eq [@user.id, tool.id]
@@ -1439,7 +1439,7 @@ describe User do
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "does not allow external  urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
+    it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'https://3510111291#sdf.instructure.com/image' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
@@ -2090,9 +2090,9 @@ describe User do
       end
 
       it "doesn't show unpublished assignments" do
-        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.day.from_now)
         assignment.unpublish
-        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.day.from_now)
         assignment2.publish
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2
@@ -2224,12 +2224,13 @@ describe User do
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
 
-    it " should return '0' for an invalid user id" do
+    it "returns '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
       expect(User.avatar_key(0)).to eq "0"
     end
   end
+
   describe "user_id_from_avatar_key" do
     it "returns a valid user id for a valid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0, 10]}")).to eq '1'
@@ -2291,7 +2292,7 @@ describe User do
     end
 
     it "breaks ties with user id" do
-      ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
+      ids = Array.new(5) { User.create!(:name => "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
     end
 
@@ -2976,7 +2977,7 @@ describe User do
 
       it "checks for associated accounts on shards the user shares with the seeker" do
         # create target user on defualt shard
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -2988,7 +2989,7 @@ describe User do
       end
 
       it 'checks all shards, even if not actually associated' do
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -3002,7 +3003,7 @@ describe User do
 
       it 'falls back to user shard for callsite, if no account associations found for target user' do
         account = Account.default
-        target = user_factory()
+        target = user_factory
         seeker = account_admin_user(
           account: account,
           role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id)

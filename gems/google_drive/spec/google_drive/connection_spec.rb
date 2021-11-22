@@ -288,7 +288,6 @@ describe GoogleDrive::Connection do
     describe "#authorized?" do
       it "returns false when there ConnectionException" do
         GoogleDrive::Connection.config = GoogleDrive::Connection.config = proc do
-          nil
         end
 
         expect(connection.authorized?).to be false

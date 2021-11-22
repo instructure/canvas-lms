@@ -36,13 +36,15 @@ module Factories
       course: course,
       points_possible: li_result_overrides.fetch(:result_maximum, 10),
       submission_types: li_result_overrides[:tool] ? 'external_tool' : nil,
-      external_tool_tag_attributes: li_result_overrides[:tool] ?
-        {
-          url: li_result_overrides[:tool].url,
-          content_type: 'context_external_tool',
-          content_id: li_result_overrides[:tool].id
-        } :
-        nil
+      external_tool_tag_attributes: if li_result_overrides[:tool]
+                                      {
+                                        url: li_result_overrides[:tool].url,
+                                        content_type: 'context_external_tool',
+                                        content_id: li_result_overrides[:tool].id
+                                      }
+                                    else
+                                      nil
+                                    end
     }.compact
 
     li_result_overrides[:line_item] ||

@@ -91,7 +91,7 @@ module Factories
 
   def generate_quiz(course)
     quiz = course.quizzes.create(workflow_state: 'available')
-    quiz.quiz_questions.create!(question_data: test_quiz_data().first)
+    quiz.quiz_questions.create!(question_data: test_quiz_data.first)
     quiz.save!
 
     quiz
@@ -99,7 +99,7 @@ module Factories
 
   def generate_quiz_submission(quiz, student:, finished_at: nil)
     qsub = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(student)
-    qsub.quiz_data = test_quiz_data()
+    qsub.quiz_data = test_quiz_data
     qsub.started_at = 1.minute.ago
     qsub.attempt = 1
 

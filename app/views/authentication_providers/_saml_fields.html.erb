@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<p><%= mt(<<-TEXT, metadata_url: link_to(aac.entity_id, aac.entity_id))
+<p><%= mt(<<~TEXT, metadata_url: link_to(aac.entity_id, aac.entity_id))
 The Canvas SAML Entity ID is %{metadata_url}, and the Service Provider metadata
 is available at that URL.
 TEXT
 %></p>
 <% css_bundle :saml_fields %>
-<p><%= t(<<-TEXT)
+<p><%= t(<<~TEXT)
 Provide a URI to your IdP's metadata to automatically populate the other
 fields. If your school is part of InCommon or the UK Access Management
 Federation, specify urn:mace:incommon or http://ukfederation.org.uk,

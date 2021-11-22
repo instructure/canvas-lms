@@ -36,9 +36,6 @@
 .outcome-details, .outcome-details-dialog {
   .title {
     @include fontSize(14px);
-    padding-bottom: 10px;
-    border-bottom: 1px solid #b0afaf;
-    margin-bottom: 10px;
   }
   .chart {
     @include fontSize(11px);
@@ -105,7 +102,16 @@
       font-weight: 200;
     }
   }
+  .friendly-description {
+    background-color: $ic-color-medium-light;
+    padding: 8px;
+    margin-top: 10px;
+    .friendly-description-info {
+      font-weight: 200;
+    }
+  }
   .mastery {
+    clear: both;
     color: #555;
   }
   .last-assessment {

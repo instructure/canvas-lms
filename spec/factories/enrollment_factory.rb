@@ -53,9 +53,11 @@ module Factories
     sis_batch_id = options[:sis_batch_id]
     associated_user_id = options[:associated_user_id]
     limit_privileges_to_course_section = options[:limit_privileges_to_course_section] || false
-    user_ids = users.first.is_a?(User) ?
-      users.map(&:id) :
-      users
+    user_ids = if users.first.is_a?(User)
+                 users.map(&:id)
+               else
+                 users
+               end
 
     now = Time.now.utc
     if options[:account_associations]

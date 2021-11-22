@@ -26,12 +26,12 @@ describe UserProfile do
       student_in_course(:active_all => true)
       tabs = @student.profile
                      .tabs_available(@user, :root_account => account)
-      expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_PROFILE
+      expect(tabs.pluck(:id)).not_to include UserProfile::TAB_PROFILE
 
       account.update_attribute :settings, :enable_profiles => true
       tabs = @student.reload.profile
                      .tabs_available(@user, :root_account => account)
-      expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PROFILE
+      expect(tabs.pluck(:id)).to include UserProfile::TAB_PROFILE
     end
 
     describe "shared content tab" do
@@ -39,20 +39,20 @@ describe UserProfile do
         teacher_in_course(:active_all => true)
         tabs = @teacher.profile
                        .tabs_available(@teacher, :root_account => account)
-        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
+        expect(tabs.pluck(:id)).to include UserProfile::TAB_CONTENT_SHARES
       end
 
       it "shows shared content tab when user has account membership" do
         account_admin_user(account: account)
         tabs = @admin.profile.tabs_available(@admin, :root_account => account)
-        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
+        expect(tabs.pluck(:id)).to include UserProfile::TAB_CONTENT_SHARES
       end
 
       it "does not show shared content tab when user has only student enrollments" do
         student_in_course(:active_all => true)
         tabs = @student.profile
                        .tabs_available(@student, :root_account => account)
-        expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_CONTENT_SHARES
+        expect(tabs.pluck(:id)).not_to include UserProfile::TAB_CONTENT_SHARES
       end
     end
 
@@ -86,7 +86,7 @@ describe UserProfile do
           )
           tabs = @student.reload.profile
                          .tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).to include(
+          expect(tabs.pluck(:id)).to include(
             account.context_external_tools.first.asset_string
           )
         end
@@ -113,7 +113,7 @@ describe UserProfile do
             )
             tabs = @student.reload.profile
                            .tabs_available(@user, :root_account => account)
-            expect(tabs.map { |t| t[:id] }).not_to include(
+            expect(tabs.pluck(:id)).not_to include(
               account.context_external_tools.first.asset_string
             )
           end
@@ -129,7 +129,7 @@ describe UserProfile do
           )
           tabs = @admin.reload.profile
                        .tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).to include(
+          expect(tabs.pluck(:id)).to include(
             account.context_external_tools.first.asset_string
           )
         end
@@ -147,7 +147,7 @@ describe UserProfile do
             )
             tabs = @student.reload.profile
                            .tabs_available(@user, :root_account => account)
-            expect(tabs.map { |t| t[:id] }).not_to include(
+            expect(tabs.pluck(:id)).not_to include(
               account.context_external_tools.first.asset_string
             )
           end
@@ -162,7 +162,7 @@ describe UserProfile do
             )
             tabs = @admin.reload.profile
                          .tabs_available(@user, :root_account => account)
-            expect(tabs.map { |t| t[:id] }).to include(
+            expect(tabs.pluck(:id)).to include(
               account.context_external_tools.first.asset_string
             )
           end
@@ -191,7 +191,7 @@ describe UserProfile do
           )
           tabs = @admin.reload.profile
                        .tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).to include(
+          expect(tabs.pluck(:id)).to include(
             account.context_external_tools.first.asset_string
           )
         end
@@ -202,7 +202,7 @@ describe UserProfile do
       student_in_course(active_all: true)
       tabs = @student.profile
                      .tabs_available(@student, root_account: account)
-      expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PAST_GLOBAL_ANNOUNCEMENTS
+      expect(tabs.pluck(:id)).to include UserProfile::TAB_PAST_GLOBAL_ANNOUNCEMENTS
     end
 
     describe "QR mobile login" do
@@ -215,7 +215,7 @@ describe UserProfile do
           account.settings[:mobile_qr_login_is_enabled] = true
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
           tabs = @user.profile.tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_QR_MOBILE_LOGIN
+          expect(tabs.pluck(:id)).to include UserProfile::TAB_QR_MOBILE_LOGIN
         end
       end
 
@@ -224,7 +224,7 @@ describe UserProfile do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
           account.settings[:mobile_qr_login_is_enabled] = false
           tabs = @user.profile.tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
+          expect(tabs.pluck(:id)).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
         end
       end
 
@@ -233,7 +233,7 @@ describe UserProfile do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(false)
           account.settings[:mobile_qr_login_is_enabled] = true
           tabs = @user.profile.tabs_available(@user, :root_account => account)
-          expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
+          expect(tabs.pluck(:id)).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
         end
       end
     end

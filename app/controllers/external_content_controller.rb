@@ -42,8 +42,8 @@ class ExternalContentController < ApplicationController
     @retrieved_data = {}
     if params[:service] == 'equella'
       params.each do |key, value|
-        if key.to_s.match(/\Aeq_/)
-          @retrieved_data[key.to_s.gsub(/\Aeq_/, "")] = value
+        if key.to_s.start_with?('eq_')
+          @retrieved_data[key.to_s.delete_prefix('eq_')] = value
         end
       end
     elsif params[:return_type] == 'oembed'
@@ -101,7 +101,7 @@ class ExternalContentController < ApplicationController
       res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
       content_item = Lti::ContentItemConverter.convert_oembed(data)
-    rescue StandardError
+    rescue
       content_item = {}
     end
     render :json => [content_item]
@@ -151,13 +151,13 @@ class ExternalContentController < ApplicationController
       message = IMS::LTI::Models::Messages::Message.generate(request.GET && request.POST)
       message.content_items
     else
-      filtered_params = params.permit(*%w(url text title return_type content_type height width))
+      filtered_params = params.permit(*%w[url text title return_type content_type height width])
       [Lti::ContentItemConverter.convert_resource_selection(filtered_params)]
     end
   end
 
   def lti_response_messages
-    @lti_response_messages ||= (
+    @lti_response_messages ||= begin
       response_messages = {}
 
       lti_msg = param_if_set "lti_msg"
@@ -170,11 +170,11 @@ class ExternalContentController < ApplicationController
       response_messages[:lti_errormsg] = lti_errormsg if lti_errormsg
       response_messages[:lti_errorlog] = lti_errorlog if lti_errorlog
       response_messages
-    )
+    end
   end
 
   def param_if_set(param_key)
-    param_value = params[param_key] && !params[param_key].empty? && params[param_key]
+    param_value = params[param_key].present? && params[param_key]
     param_value = param_value.to_s if param_value
     if param_value && block_given?
       yield param_value

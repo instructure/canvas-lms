@@ -24,7 +24,7 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 begin
-  require '../../spec/coverage_tool.rb'
+  require '../../spec/coverage_tool'
   CoverageTool.start("activesupport-suspend-callback-gem")
 rescue LoadError => e
   puts "Error: #{e}"

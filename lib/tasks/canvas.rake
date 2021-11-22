@@ -53,7 +53,7 @@ unless $canvas_tasks_loaded
 
         task 'i18n:generate_js' => [
           ('js:yarn_install' if npm_install)
-        ].compact if build_i18n && build_js
+        ].compact if build_i18n
 
         task 'js:webpack_development' => [
           'js:gulp_rev',
@@ -73,7 +73,7 @@ unless $canvas_tasks_loaded
             name, runner = if task.is_a?(Hash)
                              task.values_at(:name, :runner)
                            else
-                             [task, ->() { Rake::Task[task].invoke }]
+                             [task, -> { Rake::Task[task].invoke }]
                            end
 
             log_time(name, &runner)
@@ -81,7 +81,7 @@ unless $canvas_tasks_loaded
         end
       end
 
-      combined_time = batch_times.reduce(:+)
+      combined_time = batch_times.sum
 
       puts(
         "Finished compiling assets in #{real_time.round(2)}s. " +
@@ -103,7 +103,7 @@ unless $canvas_tasks_loaded
       def load_tree(root, tree)
         tree.each do |node, subtree|
           key = [root, node].compact.join('/')
-          if Hash === subtree
+          if subtree.is_a?(Hash)
             load_tree(key, subtree)
           else
             Diplomat::Kv.put(key, subtree.to_s, { cas: 0 })
@@ -132,10 +132,10 @@ unless $canvas_tasks_loaded
       output = `script/render_json_lint`
       exit_status = $?.exitstatus
       puts output
-      if exit_status != 0
-        raise "lint:render_json test failed"
-      else
+      if exit_status == 0
         puts "lint:render_json test succeeded"
+      else
+        raise "lint:render_json test failed"
       end
     end
   end
@@ -206,7 +206,7 @@ unless $canvas_tasks_loaded
       method = :select!
       if region[0] == '-'
         method = :reject!
-        region = region[1..-1]
+        region = region[1..]
       end
       if region == 'self'
         servers.send(method, &:in_current_region?)
@@ -217,7 +217,7 @@ unless $canvas_tasks_loaded
     block.call(servers)
   end
 
-  %w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
+  %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
     Switchman::Rake.shardify_task(task_name, categories: -> { Shard.categories })
   end
 

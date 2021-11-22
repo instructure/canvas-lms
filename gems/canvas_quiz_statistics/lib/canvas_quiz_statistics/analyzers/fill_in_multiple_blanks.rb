@@ -152,7 +152,7 @@ module CanvasQuizStatistics::Analyzers
     private
 
     def question_blanks
-      @question_data[:answers].map { |a| a[:blank_id] }.uniq
+      @question_data[:answers].pluck(:blank_id).uniq
     end
 
     def build_context(responses)

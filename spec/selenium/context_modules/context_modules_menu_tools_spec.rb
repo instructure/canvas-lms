@@ -141,7 +141,7 @@ describe "context modules" do
         gear = f("#context_module_item_#{tag.id} .al-trigger")
         gear.click
 
-        type_to_tag.keys.each do |other_type|
+        type_to_tag.each_key do |other_type|
           next if other_type == type
 
           expect(f("#content")).not_to contain_css("#context_module_item_#{tag.id} li.#{other_type} a.menu_tool_link")

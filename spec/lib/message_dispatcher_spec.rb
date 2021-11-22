@@ -57,7 +57,7 @@ describe 'MessageDispatcher' do
       job = created_jobs.first
       @messages[0].cancel
 
-      am_message = double()
+      am_message = double
       expect(am_message).to receive(:deliver_now).and_return(true)
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error).ordered
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error).and_return(am_message).ordered

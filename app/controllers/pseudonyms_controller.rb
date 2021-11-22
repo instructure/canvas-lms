@@ -100,9 +100,7 @@ class PseudonymsController < ApplicationController
     end
 
     @ccs = @ccs.flatten.compact.uniq.select do |cc|
-      if !cc.user
-        false
-      else
+      if cc.user
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
         found = false
@@ -115,6 +113,8 @@ class PseudonymsController < ApplicationController
           end
         end
         found
+      else
+        false
       end
     end
     respond_to do |format|
@@ -122,9 +122,7 @@ class PseudonymsController < ApplicationController
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
       flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", :email => email
-      @ccs.each do |cc|
-        cc.forgot_password!
-      end
+      @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
       format.json { render :json => { :requested => true } }
       format.js { render :json => { :requested => true } }
@@ -148,7 +146,7 @@ class PseudonymsController < ApplicationController
       end
       @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
-             :PASSWORD_POLICIES => Hash[@password_pseudonyms.map { |p| [p.id, p.account.password_policy] }]
+             :PASSWORD_POLICIES => @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
     end
   end
 
@@ -264,7 +262,7 @@ class PseudonymsController < ApplicationController
     return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
-    @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
+    @pseudonym.generate_temporary_password unless params[:pseudonym][:password]
     if Pseudonym.unique_constraint_retry { @pseudonym.save_without_session_maintenance }
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
@@ -286,12 +284,7 @@ class PseudonymsController < ApplicationController
 
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
-    @user = case
-            when user_id
-              api_find(User, user_id)
-            else
-              @current_user
-            end
+    @user = user_id ? api_find(User, user_id) : @current_user
     true
   end
   protected :get_user
@@ -420,9 +413,11 @@ class PseudonymsController < ApplicationController
       @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors, :status => :bad_request
     elsif @pseudonym.destroy
-      api_request? ?
-        render(:json => pseudonym_json(@pseudonym, @current_user, session)) :
+      if api_request?
+        render(:json => pseudonym_json(@pseudonym, @current_user, session))
+      else
         render(:json => @pseudonym)
+      end
     else
       render :json => @pseudonym.errors, :status => :bad_request
     end

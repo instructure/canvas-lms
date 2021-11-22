@@ -324,7 +324,7 @@ describe RoleOverridesController do
 
       it 'does not load the manage_developer_keys role on sub account' do
         get 'index', params: { :account_id => @account.id }
-        expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to_not include(:manage_developer_keys)
+        expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to_not include(:manage_developer_keys)
         expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq false
       end
 
@@ -333,7 +333,7 @@ describe RoleOverridesController do
 
         it 'does load the manage_developer_keys role on root account' do
           get 'index', params: { :account_id => @account.id }
-          expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to include(:manage_developer_keys)
+          expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to include(:manage_developer_keys)
           expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq true
         end
       end
@@ -356,8 +356,8 @@ describe RoleOverridesController do
             end
           end
 
-          expect(wiki_permissions.map { |p| p[:granular_permission_group] }.uniq).to eq ['manage_wiki']
-          expect(wiki_permissions.map { |p| p[:granular_permission_group_label] }.uniq).to eq ['Manage Pages']
+          expect(wiki_permissions.pluck(:granular_permission_group).uniq).to eq ['manage_wiki']
+          expect(wiki_permissions.pluck(:granular_permission_group_label).uniq).to eq ['Manage Pages']
         end
       end
     end

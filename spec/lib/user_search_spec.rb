@@ -88,6 +88,7 @@ describe UserSearch do
 
         describe 'filtering by role' do
           subject { names }
+
           describe 'to a single role' do
             let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student').to_a }
 

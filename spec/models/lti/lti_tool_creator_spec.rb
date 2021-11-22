@@ -29,7 +29,7 @@ describe(Lti::LtiToolCreator) do
   end
 
   it "converts a ContextExternalTool to an LTITool" do
-    lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+    lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
     expect(lti_tool.name).to eq "tool"
     expect(lti_tool.consumer_key).to eq '12345'
     expect(lti_tool.shared_secret).to eq 'secret'
@@ -38,31 +38,31 @@ describe(Lti::LtiToolCreator) do
 
   describe "privacy level" do
     it "defaults to anonymous" do
-      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
       expect(lti_tool.privacy_level).to eq LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
     end
 
     it "maps public privacy" do
       context_external_tool.privacy_level = 'public'
-      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
       expect(lti_tool.privacy_level).to eq LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
     end
 
     it "maps name only privacy" do
       context_external_tool.privacy_level = 'name_only'
-      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
       expect(lti_tool.privacy_level).to eq LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
     end
 
     it "maps email only privacy" do
       context_external_tool.privacy_level = 'email_only'
-      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
       expect(lti_tool.privacy_level).to eq LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
     end
 
     it "maps anynomous privacy" do
       context_external_tool.privacy_level = 'anonymous'
-      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert()
+      lti_tool = Lti::LtiToolCreator.new(context_external_tool).convert
       expect(lti_tool.privacy_level).to eq LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
     end
   end

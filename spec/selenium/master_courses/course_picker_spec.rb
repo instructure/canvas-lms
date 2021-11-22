@@ -73,8 +73,8 @@ describe "master courses - course picker" do
   let(:term_filter) { '#termsFilter' }
   let(:sub_account_filter) { '#subAccountsFilter' }
 
-  def wait_for_spinner
-    wait_for_transient_element(loading) { yield }
+  def wait_for_spinner(&block)
+    wait_for_transient_element(loading, &block)
   end
 
   # enter search term into the filter text box and wait for the response
@@ -96,7 +96,7 @@ describe "master courses - course picker" do
     open_associations
     open_courses_list
     expect(available_courses_table).to be_displayed
-    expect(available_courses().length).to eq(5)
+    expect(available_courses.length).to eq(5)
   end
 
   it "filters the course list by name", priority: "1", test_id: "3265699" do
@@ -125,7 +125,7 @@ describe "master courses - course picker" do
     open_associations
     open_courses_list
     wait_for_spinner { click_INSTUI_Select_option(term_filter, 'fall term') }
-    expect(available_courses().length).to eq(4)
+    expect(available_courses.length).to eq(4)
   end
 
   it "filters the course list by sub-account", priority: "1", test_id: "3279950" do
@@ -133,6 +133,6 @@ describe "master courses - course picker" do
     open_associations
     open_courses_list
     wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, 'sub-account 1') }
-    expect(available_courses().length).to eq(1)
+    expect(available_courses.length).to eq(1)
   end
 end

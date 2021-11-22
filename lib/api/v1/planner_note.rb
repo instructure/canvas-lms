@@ -29,7 +29,7 @@ module Api::V1::PlannerNote
   }.freeze
 
   API_JSON_OPTS = {
-    :only => %w(id todo_date title details user_id course_id workflow_state created_at updated_at)
+    :only => %w[id todo_date title details user_id course_id workflow_state created_at updated_at]
   }.freeze
 
   def planner_note_json(note, user, session, opts = {})

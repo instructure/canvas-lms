@@ -330,7 +330,7 @@ describe "student planner" do
       fj("button:contains('Delete')").click
       alert = driver.switch_to.alert
       expect(alert.text).to eq("Are you sure you want to delete this planner item?")
-      alert.accept()
+      alert.accept
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
       refresh_page
 
@@ -354,7 +354,7 @@ describe "student planner" do
       view_todo_item
       element = ff('input', @modal)[1]
       element.click
-      date = format_date_for_view(Time.zone.now, :long).split(" ")
+      date = format_date_for_view(Time.zone.now, :long).split
       day =
         if date[1] == '15'
           date[1] = '20'

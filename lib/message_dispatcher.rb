@@ -20,7 +20,7 @@
 
 class MessageDispatcher < Delayed::PerformableMethod
   def self.dispatch(message)
-    Delayed::Job.enqueue(self.new(message.for_queue, :deliver),
+    Delayed::Job.enqueue(new(message.for_queue, :deliver),
                          run_at: message.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -30,11 +30,11 @@ class MessageDispatcher < Delayed::PerformableMethod
     return if messages.empty?
 
     if messages.size == 1
-      self.dispatch(messages.first)
+      dispatch(messages.first)
       return
     end
 
-    Delayed::Job.enqueue(self.new(self, :deliver_batch, args: [messages.map(&:for_queue)]),
+    Delayed::Job.enqueue(new(self, :deliver_batch, args: [messages.map(&:for_queue)]),
                          run_at: messages.first.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -81,7 +81,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       message.deliver
     rescue
       # this delivery failed, we'll have to make an individual job to retry
-      self.dispatch(message)
+      dispatch(message)
     end
   end
 end

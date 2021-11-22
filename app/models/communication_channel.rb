@@ -40,7 +40,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :set_root_account_ids
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  validates_presence_of :path, :path_type, :user, :workflow_state
+  validates :path, :path_type, :user, :workflow_state, presence: true
   validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
@@ -68,13 +68,13 @@ class CommunicationChannel < ActiveRecord::Base
 
   def under_user_cc_limit
     max_ccs = Setting.get('max_ccs_per_user', '100').to_i
-    if self.user.communication_channels.limit(max_ccs + 1).count > max_ccs
-      self.errors.add(:user_id, 'user communication_channels limit exceeded')
+    if user.communication_channels.limit(max_ccs + 1).count > max_ccs
+      errors.add(:user_id, 'user communication_channels limit exceeded')
     end
   end
 
   def clear_user_email_cache
-    self.user.clear_email_cache! if self.path_type == TYPE_EMAIL
+    user.clear_email_cache! if path_type == TYPE_EMAIL
   end
 
   def self.country_codes
@@ -196,16 +196,16 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record|
       @send_confirmation and
         (record.workflow_state == 'active' ||
-          (record.workflow_state == 'unconfirmed' and (self.user.pre_registered? || self.user.creation_pending?))) and
-        self.path_type == TYPE_EMAIL
+          (record.workflow_state == 'unconfirmed' and (user.pre_registered? || user.creation_pending?))) and
+        path_type == TYPE_EMAIL
     }
 
     p.dispatch :confirm_email_communication_channel
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
-        record.workflow_state == 'unconfirmed' and self.user.registered? and
-        self.path_type == TYPE_EMAIL
+        record.workflow_state == 'unconfirmed' and user.registered? and
+        path_type == TYPE_EMAIL
     }
     p.data {
       {
@@ -216,15 +216,15 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
-    p.whenever { @send_merge_notification && self.path_type == TYPE_EMAIL }
+    p.whenever { @send_merge_notification && path_type == TYPE_EMAIL }
 
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
         record.workflow_state == 'unconfirmed' and
-        (self.path_type == TYPE_SMS or self.path_type == TYPE_SLACK) and
-        !self.user.creation_pending?
+        (path_type == TYPE_SMS or path_type == TYPE_SLACK) and
+        !user.creation_pending?
     }
     p.data {
       {
@@ -239,7 +239,7 @@ class CommunicationChannel < ActiveRecord::Base
     return if retired?
     return unless user_id
 
-    self.shard.activate do
+    shard.activate do
       # ^ if we create a new CC record while on another shard
       # and try to check the validity OUTSIDE the save path
       # (cc.valid?) this needs to switch to the shard where we'll
@@ -249,7 +249,7 @@ class CommunicationChannel < ActiveRecord::Base
         scope = scope.where("id<>?", id)
       end
       if scope.exists?
-        self.errors.add(:path, :taken, :value => path)
+        errors.add(:path, :taken, :value => path)
       end
     end
   end
@@ -257,11 +257,11 @@ class CommunicationChannel < ActiveRecord::Base
   def validate_email
     # this is not perfect and will allow for invalid emails, but it mostly works.
     # This pretty much allows anything with an "@"
-    self.errors.add(:email, :invalid, value: path) unless EmailAddressValidator.valid?(path)
+    errors.add(:email, :invalid, value: path) unless EmailAddressValidator.valid?(path)
   end
 
   def not_otp_communication_channel
-    self.errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if self.id == self.user.otp_communication_channel_id
+    errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if id == user.otp_communication_channel_id
   end
 
   # Public: Build the url where this record can be confirmed.
@@ -289,53 +289,54 @@ class CommunicationChannel < ActiveRecord::Base
   # Return the 'path' for simple communication channel types like email and sms.
   # For Twitter, return the user's configured user_name for the service.
   def path_description
-    if self.path_type == TYPE_TWITTER
-      res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
+    case path_type
+    when TYPE_TWITTER
+      res = user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
       res
-    elsif self.path_type == TYPE_PUSH
+    when TYPE_PUSH
       t 'For All Devices'
     else
-      self.path
+      path
     end
   end
 
   def forgot_password!
-    return if Rails.cache.read(['recent_password_reset', self.global_id].cache_key) == true
+    return if Rails.cache.read(['recent_password_reset', global_id].cache_key) == true
 
     @request_password = true
-    Rails.cache.write(['recent_password_reset', self.global_id].cache_key, true, expires_in: Setting.get('resend_password_reset_time', 5).to_f.minutes)
+    Rails.cache.write(['recent_password_reset', global_id].cache_key, true, expires_in: Setting.get('resend_password_reset_time', 5).to_f.minutes)
     set_confirmation_code(true, Setting.get('password_reset_token_expiration_minutes', '120').to_i.minutes.from_now)
-    self.save!
+    save!
     @request_password = false
   end
 
   def confirmation_limit_reached
-    self.confirmation_sent_count > 2
+    confirmation_sent_count > 2
   end
 
   def send_confirmation!(root_account)
-    if self.confirmation_limit_reached || bouncing?
+    if confirmation_limit_reached || bouncing?
       return
     end
 
-    self.confirmation_sent_count = self.confirmation_sent_count + 1
+    self.confirmation_sent_count = confirmation_sent_count + 1
     @send_confirmation = true
     @root_account = root_account
-    self.save!
+    save!
     @root_account = nil
     @send_confirmation = false
   end
 
   def send_merge_notification!
     @send_merge_notification = true
-    self.save!
+    save!
     @send_merge_notification = false
   end
 
   def send_otp_via_sms_gateway!(message)
-    m = self.messages.temp_record
-    m.to = self.path
+    m = messages.temp_record
+    m.to = path
     m.body = message
     Mailer.deliver(Mailer.create_message(m))
   end
@@ -367,11 +368,11 @@ class CommunicationChannel < ActiveRecord::Base
   # confirmation code in place.
   def set_confirmation_code(reset = false, expires_at = nil)
     self.confirmation_code = nil if reset
-    if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= CanvasSlug.generate(nil, 25)
-    else
-      self.confirmation_code ||= CanvasSlug.generate
-    end
+    self.confirmation_code ||= if path_type == TYPE_EMAIL || path_type.nil?
+                                 CanvasSlug.generate(nil, 25)
+                               else
+                                 CanvasSlug.generate
+                               end
     self.confirmation_code_expires_at = expires_at if reset
     true
   end
@@ -397,14 +398,14 @@ class CommunicationChannel < ActiveRecord::Base
     # Add communication channel for users that already had Twitter
     # integrated before we started offering it as a cc
     twitter_service = user.user_services.for_service(CommunicationChannel::TYPE_TWITTER).first
-    twitter_service.assert_communication_channel if twitter_service
+    twitter_service&.assert_communication_channel
 
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
     rank_order << TYPE_SLACK if user.associated_root_accounts.any? { |a| a.settings[:encrypted_slack_key] }
-    self.unretired.where('communication_channels.path_type IN (?)', rank_order)
-        .order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
+    unretired.where(communication_channels: { path_type: rank_order })
+             .order(Arel.sql("#{rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
@@ -416,10 +417,10 @@ class CommunicationChannel < ActiveRecord::Base
   # only ever true for Account.default
   # see build_pseudonym_for_email in app/views/profile/_ways_to_contact.html.erb
   def consider_building_pseudonym
-    if self.build_pseudonym_on_confirm && self.active?
+    if build_pseudonym_on_confirm && active?
       self.build_pseudonym_on_confirm = false
-      pseudonym = Account.default.pseudonyms.build(unique_id: self.path, user: self.user)
-      existing_pseudonym = Account.default.pseudonyms.active.where(user_id: self.user).take
+      pseudonym = Account.default.pseudonyms.build(unique_id: path, user: user)
+      existing_pseudonym = Account.default.pseudonyms.active.where(user_id: user).take
       if existing_pseudonym
         pseudonym.password_salt = existing_pseudonym.password_salt
         pseudonym.crypted_password = existing_pseudonym.crypted_password
@@ -432,13 +433,13 @@ class CommunicationChannel < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'retired'
-    self.save
+    save
   end
 
   workflow do
     state :unconfirmed do
       event :confirm, :transitions_to => :active do
-        self.set_confirmation_code
+        set_confirmation_code
       end
       event :retire, :transitions_to => :retired
     end
@@ -472,7 +473,9 @@ class CommunicationChannel < ActiveRecord::Base
   end
   protected :assert_path_type
 
-  def self.serialization_excludes; [:confirmation_code]; end
+  def self.serialization_excludes
+    [:confirmation_code]
+  end
 
   def self.associated_shards(_path)
     [Shard.default]
@@ -481,12 +484,12 @@ class CommunicationChannel < ActiveRecord::Base
   def merge_candidates(break_on_first_found = false)
     return [] if path_type == 'push'
 
-    shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
-    shards ||= [self.shard]
-    scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
+    shards = self.class.associated_shards(path) if Enrollment.cross_shard_invitations?
+    shards ||= [shard]
+    scope = CommunicationChannel.active.by_path(path).of_type(path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
-      scope = scope.shard(Shard.current).where("user_id<>?", self.user_id)
+      scope = scope.shard(Shard.current).where("user_id<>?", user_id)
 
       limit = Setting.get("merge_candidate_search_limit", "100").to_i
       ccs = scope.preload(:user).limit(limit + 1).to_a
@@ -494,7 +497,7 @@ class CommunicationChannel < ActiveRecord::Base
 
       ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
-          merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
+          merge_candidates[u.global_id] = !u.all_active_pseudonyms.empty?
         end
         return [u] if result && break_on_first_found
 
@@ -508,32 +511,32 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def bouncing?
-    self.bounce_count >= RETIRE_THRESHOLD
+    bounce_count >= RETIRE_THRESHOLD
   end
 
   def was_bouncing?
-    old_bounce_count = self.previous_changes[:bounce_count].try(:first)
-    old_bounce_count ||= self.bounce_count
+    old_bounce_count = previous_changes[:bounce_count].try(:first)
+    old_bounce_count ||= bounce_count
     old_bounce_count >= RETIRE_THRESHOLD
   end
 
   def reset_bounce_count!
     self.bounce_count = 0
-    self.save!
+    save!
   end
 
   def was_retired?
-    old_workflow_state = self.previous_changes[:workflow_state].try(:first)
-    old_workflow_state ||= self.workflow_state
+    old_workflow_state = previous_changes[:workflow_state].try(:first)
+    old_workflow_state ||= workflow_state
     old_workflow_state.to_s == 'retired'
   end
 
   def check_if_bouncing_changed
     if retired?
-      self.user.update_bouncing_channel_message!(self) if !was_retired? && was_bouncing?
+      user.update_bouncing_channel_message!(self) if !was_retired? && was_bouncing?
     else
       if (was_retired? && bouncing?) || (was_bouncing? != bouncing?)
-        self.user.update_bouncing_channel_message!(self)
+        user.update_bouncing_channel_message!(self)
       end
     end
   end
@@ -553,7 +556,13 @@ class CommunicationChannel < ActiveRecord::Base
       # or the ones that have NOT been bounced in the last hour, to make sure
       # we aren't doing un-helpful overwork.
       debounce_window = Setting.get("comm_channel_bounce_debounce_window_in_min", "60").to_i
-      bounce_field = suppression_bounce ? "last_suppression_bounce_at" : (permanent_bounce ? "last_bounce_at" : "last_transient_bounce_at")
+      bounce_field = if suppression_bounce
+                       "last_suppression_bounce_at"
+                     elsif permanent_bounce
+                       "last_bounce_at"
+                     else
+                       "last_transient_bounce_at"
+                     end
       bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.minutes.ago)
       bouncable_scope.find_in_batches do |batch|
         update = if suppression_bounce
@@ -601,7 +610,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def e164_path
-    return path if path =~ /^\+\d+$/
+    return path if /^\+\d+$/.match?(path)
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
 
