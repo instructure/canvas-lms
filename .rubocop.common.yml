@@ -129,6 +129,8 @@ Rails/IndexWith:
   Severity: error
 Rails/MatchRoute:
   Severity: error
+Rails/NegateInclude:
+  Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Pluck:
   Severity: error
 Rails/PluralizationGrammar:
