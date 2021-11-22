@@ -823,6 +823,18 @@ describe('K-5 Dashboard', () => {
       document.cookie = `${observedUserCookieName}=4;path=/`
     })
 
+    const opportunities2 = [
+      {
+        id: '3',
+        course_id: '23',
+        name: 'A new Assignment',
+        points_possible: 10,
+        html_url: '/courses/23/assignments/3',
+        due_at: '2021-02-15T05:59:00Z',
+        submission_types: ['online_text_entry']
+      }
+    ]
+
     const getLastRequest = async () => {
       const request = {}
       await waitFor(() => {
@@ -907,6 +919,60 @@ describe('K-5 Dashboard', () => {
         })
         done()
       })
+    })
+
+    it('shows the observee missing items on dashboard cards', async () => {
+      const {getByText, findByRole, getByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['user', 'observer', 'teacher']}
+          parentSupportEnabled
+          canAddObservee
+          plannerEnabled
+        />
+      )
+      moxios.uninstall()
+      moxios.install()
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
+        status: 200,
+        response: MOCK_CARDS
+      })
+
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
+        status: 200,
+        response: MOCK_CARDS_2
+      })
+
+      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=4.*/, {
+        status: 200,
+        headers: {link: 'url; rel="current"'},
+        response: opportunities
+      })
+
+      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
+        status: 200,
+        headers: {link: 'url; rel="current"'},
+        response: opportunities2
+      })
+
+      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
+      act(() => observerSelect.click())
+      act(() => getByText('Student 4').click())
+      expect(
+        await findByRole('link', {
+          name: 'View 2 missing items for course Economics 101',
+          timeout: 5000
+        })
+      ).toBeInTheDocument()
+
+      act(() => observerSelect.click())
+      act(() => getByText('Student 2').click())
+      expect(
+        await findByRole('link', {
+          name: 'View 1 missing items for course Economics 203',
+          timeout: 5000
+        })
+      ).toBeInTheDocument()
     })
   })
 })
