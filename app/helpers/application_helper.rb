@@ -275,10 +275,12 @@ module ApplicationHelper
       #
       # preloading works similarily for window.deferredBundles only that their
       # execution is delayed until the DOM is ready.
-      concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
-                              container = defer ? 'window.deferredBundles' : 'window.bundles'
-                              "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
-                            }.join("\n") if new_js_bundles.present?
+      if new_js_bundles.present?
+        concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
+                                container = defer ? 'window.deferredBundles' : 'window.bundles'
+                                "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
+                              }.join("\n")
+      end
     end
   end
 
@@ -1017,10 +1019,12 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url =
-      @domain_root_account.settings[
-        "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
-      ] if ApplicationController.test_cluster_name
+    if ApplicationController.test_cluster_name
+      url =
+        @domain_root_account.settings[
+          "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
+        ]
+    end
     url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user

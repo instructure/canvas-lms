@@ -211,20 +211,22 @@ module Api::V1::Submission
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
-      hash['attachments'] = attachments.filter_map do |attachment|
-        includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
-        options = {
-          anonymous_instructor_annotations: assignment.anonymous_instructor_annotations?,
-          enable_annotations: true,
-          enrollment_type: user_type(context, user),
-          include: includes,
-          moderated_grading_allow_list: attempt.moderated_grading_allow_list(user),
-          skip_permission_checks: true,
-          submission_id: attempt.id
-        }
+      unless attachments.blank?
+        hash['attachments'] = attachments.filter_map do |attachment|
+          includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
+          options = {
+            anonymous_instructor_annotations: assignment.anonymous_instructor_annotations?,
+            enable_annotations: true,
+            enrollment_type: user_type(context, user),
+            include: includes,
+            moderated_grading_allow_list: attempt.moderated_grading_allow_list(user),
+            skip_permission_checks: true,
+            submission_id: attempt.id
+          }
 
-        attachment_json(attachment, user, {}, options)
-      end unless attachments.blank?
+          attachment_json(attachment, user, {}, options)
+        end
+      end
     end
 
     # include the discussion topic entries

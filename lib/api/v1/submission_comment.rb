@@ -48,9 +48,11 @@ module Api::V1::SubmissionComment
       )
     end
 
-    sc_hash['attachments'] = submission_comment.attachments.map do |a|
-      attachment_json(a, user)
-    end unless submission_comment.attachments.blank?
+    unless submission_comment.attachments.blank?
+      sc_hash['attachments'] = submission_comment.attachments.map do |a|
+        attachment_json(a, user)
+      end
+    end
     if @current_user && submission_comment.grants_right?(@current_user, :read_author)
       sc_hash['author'] = user_display_json(submission_comment.author, submission_comment.context)
     else

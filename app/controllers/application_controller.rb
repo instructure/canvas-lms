@@ -323,8 +323,10 @@ class ApplicationController < ActionController::Base
       real_user: @real_current_user,
       context: @context
     )
-    rce_env_hash[:RICH_CONTENT_FILES_TAB_DISABLED] = !@context.grants_right?(@current_user, session, :read_as_admin) &&
-                                                     !tab_enabled?(@context.class::TAB_FILES, :no_render => true) if @context.is_a?(Course)
+    if @context.is_a?(Course)
+      rce_env_hash[:RICH_CONTENT_FILES_TAB_DISABLED] = !@context.grants_right?(@current_user, session, :read_as_admin) &&
+                                                       !tab_enabled?(@context.class::TAB_FILES, :no_render => true)
+    end
     account = Context.get_account(@context)
     rce_env_hash[:RICH_CONTENT_INST_RECORD_TAB_DISABLED] = account ? account.disable_rce_media_uploads? : false
     js_env(rce_env_hash, true) # Allow overriding in case this gets called more than once

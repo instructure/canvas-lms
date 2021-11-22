@@ -60,11 +60,13 @@ module LtiSpecHelper
                                               :consumer_key => "key",
                                               :shared_secret => "secret")
     tool.url = "http://www.example.com/basic_lti"
-    tool.resource_selection = {
-      :url => "http://example.com/selection_test",
-      :selection_width => 400,
-      :selection_height => 400
-    } if resource_selection
+    if resource_selection
+      tool.resource_selection = {
+        :url => "http://example.com/selection_test",
+        :selection_width => 400,
+        :selection_height => 400
+      }
+    end
     tool.save!
     tool
   end

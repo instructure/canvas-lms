@@ -227,13 +227,15 @@ module Api::V1::CalendarEvent
     end
 
     hash['participant_count'] = group.appointments_participants.count if include.include?('participant_count')
-    hash['reserved_times'] = group.reservations_for(user).map { |event|
-      {
-        :id => event.id,
-        :start_at => event.start_at,
-        :end_at => event.end_at
+    if include.include?('reserved_times')
+      hash['reserved_times'] = group.reservations_for(user).map { |event|
+        {
+          :id => event.id,
+          :start_at => event.start_at,
+          :end_at => event.end_at
+        }
       }
-    } if include.include?('reserved_times')
+    end
     hash['context_codes'] = group.context_codes_for_user(user)
     hash['all_context_codes'] = group.context_codes if include.include?('all_context_codes') && group.grants_right?(user, session, :manage)
     hash['requiring_action'] = group.requiring_action?(user)

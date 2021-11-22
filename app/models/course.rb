@@ -745,9 +745,11 @@ class Course < ActiveRecord::Base
       end
       Course.clear_cache_keys(course_ids_to_update_user_account_associations, :account_associations)
 
-      user_ids_to_update_account_associations = Enrollment
-                                                .where("course_id IN (?) AND workflow_state<>'deleted'", course_ids_to_update_user_account_associations)
-                                                .group(:user_id).pluck(:user_id) unless course_ids_to_update_user_account_associations.empty?
+      unless course_ids_to_update_user_account_associations.empty?
+        user_ids_to_update_account_associations = Enrollment
+                                                  .where("course_id IN (?) AND workflow_state<>'deleted'", course_ids_to_update_user_account_associations)
+                                                  .group(:user_id).pluck(:user_id)
+      end
     end
     User.update_account_associations(user_ids_to_update_account_associations, :account_chain_cache => account_chain_cache) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
     user_ids_to_update_account_associations
@@ -2301,10 +2303,12 @@ class Course < ActiveRecord::Base
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil
         end
-        e.attributes = {
-          :course_section => section,
-          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state
-        } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
+        if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
+          e.attributes = {
+            :course_section => section,
+            :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state
+          }
+        end
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
       e.limit_privileges_to_course_section = limit_privileges_to_course_section if e

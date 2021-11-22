@@ -87,9 +87,11 @@ module Api::V1::Outcome
             hash['calculation_int'] = outcome.calculation_int
           end
         end
-        hash['ratings']&.each_with_index do |rating, i|
-          rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
-        end if opts[:rating_percents]
+        if opts[:rating_percents]
+          hash['ratings']&.each_with_index do |rating, i|
+            rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
+          end
+        end
         hash['assessed'] = if opts[:assessed_outcomes] && outcome.context_type != "Account"
                              opts[:assessed_outcomes].include?(outcome.id)
                            else

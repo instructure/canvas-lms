@@ -22,9 +22,11 @@ require "json"
 module LuckySneaks
   module Unidecoder
     # Contains Unicode codepoints, loading as needed from JSON files
-    CODEPOINTS = Hash.new { |h, k|
-      h[k] = JSON.parse(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
-    } unless defined?(CODEPOINTS)
+    unless defined?(CODEPOINTS)
+      CODEPOINTS = Hash.new { |h, k|
+        h[k] = JSON.parse(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
+      }
+    end
 
     class << self
       # Returns string with its UTF-8 characters transliterated to ASCII ones

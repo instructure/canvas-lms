@@ -51,8 +51,10 @@ module PermissionsHelper
       unpublished, published = sharded_courses.partition(&:unpublished?)
       all_applicable_enrollments = []
       enrollment_scope = Enrollment.not_inactive_by_date.for_user(self).select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished)
-                                                    .where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]).to_a if unpublished.any?
+      if unpublished.any?
+        all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished)
+                                                      .where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]).to_a
+      end
       all_applicable_enrollments += enrollment_scope.where(:course_id => published).to_a if published.any?
 
       grouped_enrollments = all_applicable_enrollments.group_by(&:course_id)

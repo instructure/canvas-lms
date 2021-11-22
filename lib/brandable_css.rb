@@ -346,12 +346,14 @@ module BrandableCSS
       file = APP_ROOT.join(CONFIG.dig('paths', 'rev_manifest'))
 
       # in reality, if the rev-manifest.json file is missing you won't get this far, but let's be careful anyway
-      return(
-        @decorated_font_paths =
-          JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
-            memo["/#{k}"] = "/dist/#{v}" if /^fonts.*woff2/.match?(k)
-          end.freeze
-      ) if file.exist?
+      if file.exist?
+        return(
+          @decorated_font_paths =
+            JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
+              memo["/#{k}"] = "/dist/#{v}" if /^fonts.*woff2/.match?(k)
+            end.freeze
+        )
+      end
 
       # the file does not exist in production, we have a problem
       if defined?(Rails) && Rails.env.production?

@@ -2577,8 +2577,10 @@ class CoursesController < ApplicationController
         enrollment_term_id =
           params[:course].delete(:term_id).presence ||
           params[:course].delete(:enrollment_term_id).presence
-        args[:enrollment_term] =
-          root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
+        if enrollment_term_id
+          args[:enrollment_term] =
+            root_account.enrollment_terms.where(id: enrollment_term_id).first
+        end
       end
       # :manage will be false for teachers in concluded courses
       args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage)

@@ -131,31 +131,33 @@ module AttachmentFu # :nodoc:
       storage_mod = AttachmentFu::Backends.const_get("#{options[:storage].to_s.classify}Backend")
       include storage_mod unless included_modules.include?(storage_mod)
 
-      case attachment_options[:processor]
-      when :none, nil
-        processors = AttachmentFu.default_processors.dup
-        begin
-          if processors.any?
-            attachment_options[:processor] = "#{processors.first}Processor"
-            processor_mod = AttachmentFu::Processors.const_get(attachment_options[:processor])
-            prepend processor_mod unless included_modules.include?(processor_mod)
+      unless parent_options[:processor]
+        case attachment_options[:processor]
+        when :none, nil
+          processors = AttachmentFu.default_processors.dup
+          begin
+            if processors.any?
+              attachment_options[:processor] = "#{processors.first}Processor"
+              processor_mod = AttachmentFu::Processors.const_get(attachment_options[:processor])
+              prepend processor_mod unless included_modules.include?(processor_mod)
+            end
+          rescue Object
+            raise unless load_related_exception?($!)
+
+            processors.shift
+            retry
           end
-        rescue Object
-          raise unless load_related_exception?($!)
+        else
+          begin
+            processor_mod = AttachmentFu::Processors.const_get("#{attachment_options[:processor].to_s.classify}Processor")
+            include processor_mod unless included_modules.include?(processor_mod)
+          rescue Object
+            raise unless load_related_exception?($!)
 
-          processors.shift
-          retry
+            puts "Problems loading #{options[:processor]}Processor: #{$!}"
+          end
         end
-      else
-        begin
-          processor_mod = AttachmentFu::Processors.const_get("#{attachment_options[:processor].to_s.classify}Processor")
-          include processor_mod unless included_modules.include?(processor_mod)
-        rescue Object
-          raise unless load_related_exception?($!)
-
-          puts "Problems loading #{options[:processor]}Processor: #{$!}"
-        end
-      end unless parent_options[:processor] # Don't let child override processor
+      end # Don't let child override processor
     end
 
     def load_related_exception?(e) # :nodoc: implementation specific

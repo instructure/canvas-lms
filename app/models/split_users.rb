@@ -250,8 +250,10 @@ class SplitUsers
     max_position = restored_user.communication_channels.last&.position&.+(1) || 0
     scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: restored_user).pluck(:context_id))
     # passing the array to update_all so we can get postgres to add the position for us.
-    scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
-                      restored_user.id, max_position, restored_user.root_account_ids]) unless scope.empty?
+    unless scope.empty?
+      scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
+                        restored_user.id, max_position, restored_user.root_account_ids])
+    end
 
     cc_records.where.not(previous_workflow_state: 'non existent').each do |cr|
       CommunicationChannel.where(id: cr.context_id).update_all(workflow_state: cr.previous_workflow_state)

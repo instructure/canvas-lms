@@ -68,22 +68,26 @@ module Lti
             validate_access_token!
             reg_key = access_token.reg_key
             reg_info = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
-            render_new_tool_proxy(
-              context: context,
-              tool_proxy_guid: reg_key,
-              dev_key: developer_key,
-              registration_url: reg_info[:registration_url]
-            ) and return if reg_info.present?
+            if reg_info.present?
+              render_new_tool_proxy(
+                context: context,
+                tool_proxy_guid: reg_key,
+                dev_key: developer_key,
+                registration_url: reg_info[:registration_url]
+              ) and return
+            end
           rescue Lti::OAuth2::InvalidTokenError
             render_unauthorized and return
           end
         elsif request.authorization.present?
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
-          render_new_tool_proxy(
-            context: context,
-            tool_proxy_guid: oauth_consumer_key,
-            registration_url: secret[:registration_url]
-          ) and return if secret.present? && oauth_authenticated_request?(secret[:reg_password])
+          if secret.present? && oauth_authenticated_request?(secret[:reg_password])
+            render_new_tool_proxy(
+              context: context,
+              tool_proxy_guid: oauth_consumer_key,
+              registration_url: secret[:registration_url]
+            ) and return
+          end
         end
         render_unauthorized
       end
