@@ -30,6 +30,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :assignment, inverse_of: :assignment_overrides
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
@@ -427,7 +428,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def root_account_id
-    # Use the attribute if availible, otherwise fall back to getting it from a parent entity
+    # Use the attribute if available, otherwise fall back to getting it from a parent entity
     super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
   end
 
