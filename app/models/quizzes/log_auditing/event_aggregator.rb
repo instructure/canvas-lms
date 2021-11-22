@@ -89,11 +89,11 @@ module Quizzes::LogAuditing
       answers.each do |question_id, answer|
         question = quiz.quiz_questions.find { |qq| qq.id == question_id.to_i }
         question ||= Quizzes::QuizQuestion.where(id: question_id).first
-        if question.question_data["question_type"] != "text_only_question"
-          serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
-          thing = serializer.serialize(answer).answer
-          submission_data.merge! thing
-        end
+        next unless question.question_data["question_type"] != "text_only_question"
+
+        serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
+        thing = serializer.serialize(answer).answer
+        submission_data.merge! thing
       end
       submission_data
     end

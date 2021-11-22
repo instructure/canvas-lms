@@ -26,12 +26,12 @@ module Importers
     def self.process_migration(data, migration)
       tools = data['external_tools'] || []
       tools.each do |tool|
-        if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-          begin
-            import_from_migration(tool, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
-          end
+        next unless migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
+
+        begin
+          import_from_migration(tool, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
         end
       end
       migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|

@@ -39,16 +39,16 @@ module I18nTasks
         [missing_keys, "missing translations"],
         [unexpected_keys, "unexpected translations"]
       ].each do |keys, description|
-        if keys.present?
-          case (action = yield(keys.sort, description))
-          when :abort
-            throw(:abort)
-          when :discard,
-               :accept
-            :ok # <-discard and accept are the same in this case
-          else
-            raise "don't know how to handle #{action}"
-          end
+        next unless keys.present?
+
+        case (action = yield(keys.sort, description))
+        when :abort
+          throw(:abort)
+        when :discard,
+             :accept
+          :ok # <-discard and accept are the same in this case
+        else
+          raise "don't know how to handle #{action}"
         end
       end
     end
@@ -61,19 +61,19 @@ module I18nTasks
         [@placeholder_mismatches, "placeholder mismatches"],
         [@markdown_mismatches, "markdown/wrapper mismatches"],
       ].each do |mismatches, description|
-        unless mismatches.empty?
-          case (action = yield(mismatches, description))
-          when :abort
-            throw(:abort)
-          when :discard
-            @new_translations.delete_if do |k, _v|
-              mismatches.any? { |m| m.key == k }
-            end
-          when :accept
-            :ok
-          else
-            raise "don't know how to handle #{action}"
+        next if mismatches.empty?
+
+        case (action = yield(mismatches, description))
+        when :abort
+          throw(:abort)
+        when :discard
+          @new_translations.delete_if do |k, _v|
+            mismatches.any? { |m| m.key == k }
           end
+        when :accept
+          :ok
+        else
+          raise "don't know how to handle #{action}"
         end
       end
     end

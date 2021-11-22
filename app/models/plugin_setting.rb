@@ -68,14 +68,14 @@ class PluginSetting < ActiveRecord::Base
     if plugin.encrypted_settings
       was_dirty = changed?
       plugin.encrypted_settings.each do |key|
-        if settings["#{key}_enc".to_sym]
-          begin
-            settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
-          rescue
-            @valid_settings = false
-          end
-          settings[key] = DUMMY_STRING
+        next unless settings["#{key}_enc".to_sym]
+
+        begin
+          settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
+        rescue
+          @valid_settings = false
         end
+        settings[key] = DUMMY_STRING
       end
       # We shouldn't consider a plugin setting to be dirty if all that changed were the decrypted/placeholder attributes
       clear_changes_information unless was_dirty
@@ -89,17 +89,17 @@ class PluginSetting < ActiveRecord::Base
   def encrypt_settings
     if settings && plugin && plugin.encrypted_settings
       plugin.encrypted_settings.each do |key|
-        unless settings[key].blank?
-          value = settings.delete(key)
-          settings.delete("#{key}_dec".to_sym)
-          if value == DUMMY_STRING # no change, use what was there previously
-            unless settings_was.nil? # we wont have setting_was if we are a new plugin
-              settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
-              settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
-            end
-          else
-            settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
+        next if settings[key].blank?
+
+        value = settings.delete(key)
+        settings.delete("#{key}_dec".to_sym)
+        if value == DUMMY_STRING # no change, use what was there previously
+          unless settings_was.nil? # we wont have setting_was if we are a new plugin
+            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
+            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
           end
+        else
+          settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
         end
       end
     end

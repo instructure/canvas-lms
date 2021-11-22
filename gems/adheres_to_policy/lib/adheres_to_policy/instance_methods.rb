@@ -264,16 +264,15 @@ module AdheresToPolicy
             condition.rights.each do |condition_right|
               # Skip the condition_right if its the one we are looking for.
               # The Rails.cache.fetch will take care of caching it for us.
-              if condition_right != sought_right
+              next unless condition_right != sought_right
 
-                Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
-                # Cache the condition_right since we already know they have access.
-                Cache.write(
-                  permission_cache_key_for(user, session, condition_right),
-                  true,
-                  use_rails_cache: config.cache_permissions && config.cache_related_permissions
-                )
-              end
+              Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
+              # Cache the condition_right since we already know they have access.
+              Cache.write(
+                permission_cache_key_for(user, session, condition_right),
+                true,
+                use_rails_cache: config.cache_permissions && config.cache_related_permissions
+              )
             end
 
             true

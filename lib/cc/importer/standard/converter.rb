@@ -81,16 +81,16 @@ module CC::Importer::Standard
     def process_variants
       @resources.values.select { |r| r[:preferred_resource_id] }.each do |res|
         preferred = @resources[res[:preferred_resource_id]]
-        if preferred && preferred != res
-          if SUPPORTED_TYPES.match?(preferred[:type])
-            # The preferred resource is supported, use it instead
-            @resources[res[:migration_id]] = preferred
-          else
-            # The preferred resource isn't supported, don't try to import it
-            @resources[preferred[:migration_id]] = res
-          end
-          res.delete :preferred_resource_id
+        next unless preferred && preferred != res
+
+        if SUPPORTED_TYPES.match?(preferred[:type])
+          # The preferred resource is supported, use it instead
+          @resources[res[:migration_id]] = preferred
+        else
+          # The preferred resource isn't supported, don't try to import it
+          @resources[preferred[:migration_id]] = res
         end
+        res.delete :preferred_resource_id
       end
     end
 
@@ -163,25 +163,25 @@ module CC::Importer::Standard
       attrs = ['rel', 'href', 'src', 'data', 'value']
       doc.search("*").each do |node|
         attrs.each do |attr|
-          if node[attr]
-            val = URI.unescape(node[attr])
-            begin
-              if FILEBASE_REGEX.match?(val)
-                val.gsub!(FILEBASE_REGEX, '')
-                if (new_url = get_canvas_att_replacement_url(val, resource_dir))
-                  node[attr] = URI.escape(new_url)
+          next unless node[attr]
 
-                  if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
-                    node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
-                  end
-                end
-              elsif ImportedHtmlConverter.relative_url?(val) &&
-                    (new_url = get_canvas_att_replacement_url(val))
+          val = URI.unescape(node[attr])
+          begin
+            if FILEBASE_REGEX.match?(val)
+              val.gsub!(FILEBASE_REGEX, '')
+              if (new_url = get_canvas_att_replacement_url(val, resource_dir))
                 node[attr] = URI.escape(new_url)
+
+                if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
+                  node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
+                end
               end
-            rescue URI::Error
-              Rails.logger.warn "attempting to translate invalid url: #{val}"
+            elsif ImportedHtmlConverter.relative_url?(val) &&
+                  (new_url = get_canvas_att_replacement_url(val))
+              node[attr] = URI.escape(new_url)
             end
+          rescue URI::Error
+            Rails.logger.warn "attempting to translate invalid url: #{val}"
           end
         end
       end
@@ -195,12 +195,12 @@ module CC::Importer::Standard
     def convert_blti_links_with_flat(lti_converter)
       tools = []
       resources_by_type("imsbasiclti").each do |res|
-        if (doc = get_node_or_open_file(res))
-          tool = lti_converter.convert_blti_link(doc)
-          tool[:migration_id] = res[:migration_id]
-          res[:url] = tool[:url] # for the organization item to reference
-          tools << tool
-        end
+        next unless (doc = get_node_or_open_file(res))
+
+        tool = lti_converter.convert_blti_link(doc)
+        tool[:migration_id] = res[:migration_id]
+        res[:url] = tool[:url] # for the organization item to reference
+        tools << tool
       end
 
       tools

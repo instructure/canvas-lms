@@ -2291,11 +2291,11 @@ class Assignment < ActiveRecord::Base
     end
     homeworks.each do |homework|
       context_module_action(homework.student, homework.workflow_state.to_sym)
-      if comment && (group_comment || homework == primary_homework)
-        hash = { :comment => comment, :author => original_student }
-        hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
-        homework.add_comment(hash)
-      end
+      next unless comment && (group_comment || homework == primary_homework)
+
+      hash = { :comment => comment, :author => original_student }
+      hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
+      homework.add_comment(hash)
     end
     touch_context
     primary_homework
@@ -3181,12 +3181,12 @@ class Assignment < ActiveRecord::Base
     return if copying
 
     FREEZABLE_ATTRIBUTES.each do |att|
-      if changes[att] && att_frozen?(att, @updating_user)
-        errors.add(att,
-                   t('errors.cannot_save_att',
-                     "You don't have permission to edit the locked attribute %{att_name}",
-                     :att_name => att))
-      end
+      next unless changes[att] && att_frozen?(att, @updating_user)
+
+      errors.add(att,
+                 t('errors.cannot_save_att',
+                   "You don't have permission to edit the locked attribute %{att_name}",
+                   :att_name => att))
     end
   end
 

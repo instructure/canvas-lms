@@ -22,19 +22,19 @@ require_relative '../../import_helper'
 
 describe "Importing wikis" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'wiki'
-      it "imports for #{system}" do
-        data = get_import_data(system, 'wiki')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, 'wiki'
 
-        Importers::WikiPageImporter.import_from_migration(data, context, migration)
-        Importers::WikiPageImporter.import_from_migration(data, context, migration)
-        expect(context.wiki_pages.count).to eq 1
+    it "imports for #{system}" do
+      data = get_import_data(system, 'wiki')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        wiki = WikiPage.where(migration_id: data[:migration_id]).first
-        expect(wiki.title).to eq data[:title]
-      end
+      Importers::WikiPageImporter.import_from_migration(data, context, migration)
+      Importers::WikiPageImporter.import_from_migration(data, context, migration)
+      expect(context.wiki_pages.count).to eq 1
+
+      wiki = WikiPage.where(migration_id: data[:migration_id]).first
+      expect(wiki.title).to eq data[:title]
     end
   end
 

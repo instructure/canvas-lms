@@ -70,12 +70,12 @@ module QuizMathDataFixup
       %i[html comments_html].each do |key|
         # if there's html, the text field is used as the title attribute/tooltip
         # clear it out if we updated the html because it's probably hosed.
-        if answer[key].present?
-          answer[key] = fixup_html(answer[key])
+        next unless answer[key].present?
 
-          text_key = key.to_s.sub(/html/, 'text')
-          answer[text_key] = '' if answer[text_key].present?
-        end
+        answer[key] = fixup_html(answer[key])
+
+        text_key = key.to_s.sub(/html/, 'text')
+        answer[text_key] = '' if answer[text_key].present?
       end
       data[:answers][index] = answer
     end

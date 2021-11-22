@@ -422,22 +422,22 @@ class ContextModulesController < ApplicationController
     tags = mod.content_tags_visible_to(@current_user)
     pres = []
     tags.each do |tag|
-      if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
-        progression.requirements_met ||= []
-        if progression.requirements_met.none? { |r| r[:id] == req[:id] && r[:type] == req[:type] } &&
-           (!before_tag || tag.position <= before_tag.position)
-          pre = {
-            :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
-            :id => tag.id,
-            :context_module_id => mod.id,
-            :title => tag.title
-          }
-          pre[:requirement] = req
-          pre[:requirement_description] = ContextModule.requirement_description(req)
-          pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
-          pres << pre
-        end
-      end
+      next unless (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
+
+      progression.requirements_met ||= []
+      next unless progression.requirements_met.none? { |r| r[:id] == req[:id] && r[:type] == req[:type] } &&
+                  (!before_tag || tag.position <= before_tag.position)
+
+      pre = {
+        :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
+        :id => tag.id,
+        :context_module_id => mod.id,
+        :title => tag.title
+      }
+      pre[:requirement] = req
+      pre[:requirement_description] = ContextModule.requirement_description(req)
+      pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
+      pres << pre
     end
     pres
   end
@@ -552,11 +552,11 @@ class ContextModulesController < ApplicationController
       items.each_with_index do |item, idx|
         item.position = idx + 1
         item.context_module_id = @module.id
-        if item.changed?
-          item.skip_touch = true
-          item.save
-          affected_items << item
-        end
+        next unless item.changed?
+
+        item.skip_touch = true
+        item.save
+        affected_items << item
       end
       ContentTag.touch_context_modules(affected_module_ids)
       ContentTag.update_could_be_locked(affected_items)

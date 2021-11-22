@@ -214,11 +214,11 @@ module Canvas::Migration
         next unless m[:items]
 
         m[:items].each do |i|
-          if /assessment|quiz/i.match?(i[:linked_resource_type]) &&
-             should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
-            i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
-            i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
-          end
+          next unless /assessment|quiz/i.match?(i[:linked_resource_type]) &&
+                      should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
+
+          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
         end
       end
     end

@@ -98,27 +98,27 @@ module Lti
           placements: {}
         }
         placements.each do |p|
-          if tool.has_placement?(p)
-            definition[:placements][p.to_sym] = {
-              message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
-              url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
-              title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
-            }
+          next unless tool.has_placement?(p)
 
-            message_type = definition.dig(:placements, p.to_sym, :message_type)
+          definition[:placements][p.to_sym] = {
+            message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
+            url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
+            title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
+          }
 
-            if (width = selection_property_value(:selection_width, tool, p, message_type))
-              definition[:placements][p.to_sym][:selection_width] = width
-            end
+          message_type = definition.dig(:placements, p.to_sym, :message_type)
 
-            if (height = selection_property_value(:selection_height, tool, p, message_type))
-              definition[:placements][p.to_sym][:selection_height] = height
-            end
+          if (width = selection_property_value(:selection_width, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_width] = width
+          end
 
-            %i[launch_width launch_height].each do |property|
-              if tool.extension_setting(p, property)
-                definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
-              end
+          if (height = selection_property_value(:selection_height, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_height] = height
+          end
+
+          %i[launch_width launch_height].each do |property|
+            if tool.extension_setting(p, property)
+              definition[:placements][p.to_sym][property] = tool.extension_setting(p, property)
             end
           end
         end

@@ -136,12 +136,12 @@ class UserListV2
 
     @addresses.each do |a|
       address = @lowercase ? a[:address].downcase : a[:address]
-      unless grouped_results.key?(address)
-        if (name = a.delete(:name))
-          a[:user_name] = name
-        end
-        @missing_results << a
+      next if grouped_results.key?(address)
+
+      if (name = a.delete(:name))
+        a[:user_name] = name
       end
+      @missing_results << a
     end
   end
 

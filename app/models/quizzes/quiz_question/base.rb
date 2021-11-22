@@ -148,21 +148,21 @@ class Quizzes::QuizQuestion::Base
       end
 
       answers.each do |answer|
-        if answer[:id] == response[:answer_id] || answer[:id] == answer_md5
-          found = true
-          answer[:responses] += 1
-          answer[:user_ids] << response[:user_id]
-        end
+        next unless answer[:id] == response[:answer_id] || answer[:id] == answer_md5
+
+        found = true
+        answer[:responses] += 1
+        answer[:user_ids] << response[:user_id]
       end
 
-      if !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
-        answers << {
-          :id => answer_md5,
-          :responses => 1,
-          :user_ids => [response[:user_id]],
-          :text => response[:text]
-        }
-      end
+      next unless !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
+
+      answers << {
+        :id => answer_md5,
+        :responses => 1,
+        :user_ids => [response[:user_id]],
+        :text => response[:text]
+      }
     end
     @question_data.answers = answers
     @question_data.to_hash

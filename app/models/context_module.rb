@@ -524,12 +524,12 @@ class ContextModule < ActiveRecord::Base
     unless new_record?
       old_requirements = completion_requirements || []
       validated_reqs.each do |req|
-        if req[:type] == 'must_contribute' && !old_requirements.detect { |r| r[:id] == req[:id] && r[:type] == req[:type] } # new requirement
-          tag = tags[req[:id]]
-          if tag.content_type == "DiscussionTopic"
-            @discussion_topics_to_recalculate ||= []
-            @discussion_topics_to_recalculate << tag.content
-          end
+        next unless req[:type] == 'must_contribute' && !old_requirements.detect { |r| r[:id] == req[:id] && r[:type] == req[:type] } # new requirement
+
+        tag = tags[req[:id]]
+        if tag.content_type == "DiscussionTopic"
+          @discussion_topics_to_recalculate ||= []
+          @discussion_topics_to_recalculate << tag.content
         end
       end
     end

@@ -227,11 +227,10 @@ class WimbaConference < WebConference
 
           active = true
         end
-        if key == 'roomlock'
-          return :closed if value.to_i == 1
+        next unless key == 'roomlock'
+        return :closed if value.to_i == 1
 
-          active = true
-        end
+        active = true
       end
     end
     active ? :active : :closed

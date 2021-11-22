@@ -77,17 +77,17 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
     answer_keys = {}
     answers = []
     @question_data.answers.each do |answer|
-      unless answer_keys[answer[:blank_id]]
-        answers << {
-          :id => answer[:blank_id],
-          :text => answer[:blank_id],
-          :blank_id => answer[:blank_id],
-          :answer_matches => [],
-          :responses => 0,
-          :user_ids => []
-        }
-        answer_keys[answer[:blank_id]] = answers.length - 1
-      end
+      next if answer_keys[answer[:blank_id]]
+
+      answers << {
+        :id => answer[:blank_id],
+        :text => answer[:blank_id],
+        :blank_id => answer[:blank_id],
+        :answer_matches => [],
+        :responses => 0,
+        :user_ids => []
+      }
+      answer_keys[answer[:blank_id]] = answers.length - 1
     end
     answers.each do |found_answer|
       @question_data.answers.select { |a|
@@ -115,21 +115,21 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
           end
           answer[:responses] += 1 if response[:correct]
           answer[:answer_matches].each do |right|
-            if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
-              found = true
-              right[:responses] += 1
-              right[:user_ids] << response[:user_id]
-            end
+            next unless response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
+
+            found = true
+            right[:responses] += 1
+            right[:user_ids] << response[:user_id]
           end
-          if !found && answer_md5
-            match = {
-              :id => answer_md5,
-              :responses => 1,
-              :user_ids => [response[:user_id]],
-              :text => response["answer_for_#{answer[:blank_id]}".to_sym]
-            }
-            answer[:answer_matches] << match
-          end
+          next unless !found && answer_md5
+
+          match = {
+            :id => answer_md5,
+            :responses => 1,
+            :user_ids => [response[:user_id]],
+            :text => response["answer_for_#{answer[:blank_id]}".to_sym]
+          }
+          answer[:answer_matches] << match
         end
       end
     end

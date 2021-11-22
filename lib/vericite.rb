@@ -130,17 +130,17 @@ module VeriCite
         attachments = submission.attachments.select { |a| a.vericiteable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
           # do not resubmit if the score already exists
-          if submission.vericite_data_hash[a.asset_string][:similarity_score].blank?
-            paper_id = a.id
-            paper_title = File.basename(a.display_name, ".*")
-            paper_ext = a.extension
-            paper_type = a.content_type
-            if paper_ext.nil?
-              paper_ext = ""
-            end
-            paper_size = 100 # File.size(
-            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open }.merge!(opts))
+          next unless submission.vericite_data_hash[a.asset_string][:similarity_score].blank?
+
+          paper_id = a.id
+          paper_title = File.basename(a.display_name, ".*")
+          paper_ext = a.extension
+          paper_type = a.content_type
+          if paper_ext.nil?
+            paper_ext = ""
           end
+          paper_size = 100 # File.size(
+          responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open }.merge!(opts))
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
         paper_id = Digest::SHA1.hexdigest submission.plaintext_body
@@ -305,12 +305,12 @@ module VeriCite
             end
             # create the user scores map and cache it
             data.each do |reportScoreReponse|
-              if reportScoreReponse.score.is_a?(Integer) && reportScoreReponse.score >= 0 &&
-                 (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
-                # keep track of this user's report scores
-                users_score_map[reportScoreReponse.user] ||= {}
-                users_score_map[reportScoreReponse.user][reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
-              end
+              next unless reportScoreReponse.score.is_a?(Integer) && reportScoreReponse.score >= 0 &&
+                          (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
+
+              # keep track of this user's report scores
+              users_score_map[reportScoreReponse.user] ||= {}
+              users_score_map[reportScoreReponse.user][reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
             end
             # cache the user score map for a short period of time
             users_score_map.each_key do |key|

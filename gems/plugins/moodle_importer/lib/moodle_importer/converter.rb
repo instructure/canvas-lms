@@ -54,11 +54,11 @@ module Moodle
       @course[:assessment_questions][:assessment_questions].each do |q_hash|
         qb_ident = q_hash['question_bank_id'] || q_hash['question_bank_name'] || :default
 
-        if q_hash['question_type'] == 'multiple_dropdowns_question' || q_hash['question_type'] == 'calculated_question'
-          warning_map[qb_ident] ||= {}
-          warning_map[qb_ident][q_hash['question_type']] ||= []
-          warning_map[qb_ident][q_hash['question_type']] << q_hash
-        end
+        next unless q_hash['question_type'] == 'multiple_dropdowns_question' || q_hash['question_type'] == 'calculated_question'
+
+        warning_map[qb_ident] ||= {}
+        warning_map[qb_ident][q_hash['question_type']] ||= []
+        warning_map[qb_ident][q_hash['question_type']] << q_hash
       end
 
       add_warnings_to_map(warning_map)

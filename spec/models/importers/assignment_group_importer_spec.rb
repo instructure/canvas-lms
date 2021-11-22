@@ -22,26 +22,26 @@ require_relative '../../import_helper'
 
 describe "Importing Assignment Groups" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'assignment_group'
-      it "imports from #{system}" do
-        data = get_import_data(system, 'assignment_group')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, 'assignment_group'
 
-        data[:assignment_groups_to_import] = {}
-        expect {
-          expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
-        }.to change(AssignmentGroup, :count).by(0)
+    it "imports from #{system}" do
+      data = get_import_data(system, 'assignment_group')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        data[:assignment_groups_to_import][data[:migration_id]] = true
-        expect {
-          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-        }.to change(AssignmentGroup, :count).by(1)
-        g = AssignmentGroup.where(migration_id: data[:migration_id]).first
+      data[:assignment_groups_to_import] = {}
+      expect {
+        expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
+      }.to change(AssignmentGroup, :count).by(0)
 
-        expect(g.name).to eq data[:title]
-      end
+      data[:assignment_groups_to_import][data[:migration_id]] = true
+      expect {
+        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+      }.to change(AssignmentGroup, :count).by(1)
+      g = AssignmentGroup.where(migration_id: data[:migration_id]).first
+
+      expect(g.name).to eq data[:title]
     end
   end
 

@@ -28,10 +28,10 @@ module Importers
 
       data.each do |file_id, track_list|
         file = migration.context.attachments.where(migration_id: file_id).first
-        if file&.media_object
-          track_list.each do |track|
-            import_from_migration(file.media_object, track, migration)
-          end
+        next unless file&.media_object
+
+        track_list.each do |track|
+          import_from_migration(file.media_object, track, migration)
         end
       end
     end

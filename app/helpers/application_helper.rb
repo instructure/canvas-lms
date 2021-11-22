@@ -691,16 +691,16 @@ module ApplicationHelper
     folders.each do |folder|
       opts[:options_so_far] <<
         "<option value=\"#{folder.id}\" #{'selected' if opts[:selected_folder_id] == folder.id}>#{'&nbsp;' * opts[:indent_width] * opts[:depth]}#{'- ' if opts[:depth] > 0}#{html_escape folder.name}</option>"
-      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
-        child_folders =
-          if opts[:sub_folders]
-            opts[:sub_folders][folder.id] || []
-          else
-            folder.active_sub_folders.by_position
-          end
-        if child_folders.any?
-          folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
+      next unless opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+
+      child_folders =
+        if opts[:sub_folders]
+          opts[:sub_folders][folder.id] || []
+        else
+          folder.active_sub_folders.by_position
         end
+      if child_folders.any?
+        folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil

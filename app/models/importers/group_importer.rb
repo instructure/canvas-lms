@@ -26,12 +26,12 @@ module Importers
     def self.process_migration(data, migration)
       groups = data['groups'] || []
       groups.each do |group|
-        if migration.import_object?("groups", group['migration_id'])
-          begin
-            import_from_migration(group, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
-          end
+        next unless migration.import_object?("groups", group['migration_id'])
+
+        begin
+          import_from_migration(group, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
         end
       end
     end

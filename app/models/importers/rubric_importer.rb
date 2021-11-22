@@ -28,12 +28,12 @@ module Importers
       migration.outcome_to_id_map ||= {}
       migration.copied_external_outcome_map ||= {}
       rubrics.each do |rubric|
-        if migration.import_object?("rubrics", rubric['migration_id'])
-          begin
-            import_from_migration(rubric, migration)
-          rescue
-            migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
-          end
+        next unless migration.import_object?("rubrics", rubric['migration_id'])
+
+        begin
+          import_from_migration(rubric, migration)
+        rescue
+          migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
         end
       end
     end

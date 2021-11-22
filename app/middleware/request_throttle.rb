@@ -289,11 +289,11 @@ class RequestThrottle
           hash = RequestThrottle.dynamic_settings['up_front_cost_by_path_regex'] || {}
           hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
-            unless k.is_a?(Regexp) && v.is_a?(Numeric)
-              ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")
-              hash.clear
-              break
-            end
+            next if k.is_a?(Regexp) && v.is_a?(Numeric)
+
+            ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")
+            hash.clear
+            break
           end
           hash
         end

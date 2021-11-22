@@ -71,11 +71,11 @@ module Qti
       @question[:answers].each do |answer|
         answer[:left] = answer[:text] if answer[:text].present?
         answer[:left_html] = answer[:html] if answer[:html].present?
-        if answer[:match_id] &&
-           @question[:matches] &&
-           (match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] })
-          answer[:right] = match[:text]
-        end
+        next unless answer[:match_id] &&
+                    @question[:matches] &&
+                    (match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] })
+
+        answer[:right] = match[:text]
       end
 
       if @question[:answers].any? { |a| Nokogiri::HTML5(a[:right].to_s).at_css('img') }
@@ -141,11 +141,11 @@ module Qti
           answer_mig_id = get_node_att(match, 'variable', 'identifier')
           match_mig_id = match.at_css('baseValue[baseType=identifier]').text rescue nil
         end
-        if (answer = answer_map[answer_mig_id])
-          answer[:feedback_id] = get_feedback_id(r_if)
-          if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && (match = match_map[match_mig_id])
-            answer[:match_id] = match[:match_id]
-          end
+        next unless (answer = answer_map[answer_mig_id])
+
+        answer[:feedback_id] = get_feedback_id(r_if)
+        if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && (match = match_map[match_mig_id])
+          answer[:match_id] = match[:match_id]
         end
       end
     end
@@ -165,16 +165,16 @@ module Qti
     def get_respondus_matches
       @question[:answers].each do |answer|
         @doc.css('responseIf, responseElseIf').each do |r_if|
-          if r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
-            match = {}
-            @question[:matches] << match
-            migration_id = r_if.at_css('match baseValue').text
-            match[:text] = clear_html((@doc.at_css("simpleChoice[identifier=#{migration_id}] p") || @doc.at_css("simpleChoice[identifier=#{migration_id}] div")).text)
-            match[:match_id] = unique_local_id
-            answer[:match_id] = match[:match_id]
-            answer.delete :migration_id
-            break
-          end
+          next unless r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+
+          match = {}
+          @question[:matches] << match
+          migration_id = r_if.at_css('match baseValue').text
+          match[:text] = clear_html((@doc.at_css("simpleChoice[identifier=#{migration_id}] p") || @doc.at_css("simpleChoice[identifier=#{migration_id}] div")).text)
+          match[:match_id] = unique_local_id
+          answer[:match_id] = match[:match_id]
+          answer.delete :migration_id
+          break
         end
       end
       all_matches = @doc.css('simpleChoice p, simpleChoice div').map { |e| clear_html(e.text) }
@@ -285,11 +285,11 @@ module Qti
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
-            if /response(Else)?If/.match?(response_if.name) && response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
-              match_id = get_node_val(match, 'baseValue', '').strip
-              answer[:match_id] = match_map[match_id]
-              break
-            end
+            next unless /response(Else)?If/.match?(response_if.name) && response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+
+            match_id = get_node_val(match, 'baseValue', '').strip
+            answer[:match_id] = match_map[match_id]
+            break
           end
         end
       end
@@ -300,11 +300,11 @@ module Qti
         match_id, answer_id = pair.text.split
         match = @question[:matches].detect { |m| m[:match_id] == match_map[match_id.strip] }
         answer = @question[:matches].detect { |m| m[:match_id] == match_map[answer_id.strip] }
-        if answer && match
-          @question[:matches].delete(answer)
-          answer[:match_id] = match[:match_id]
-          @question[:answers] << answer
-        end
+        next unless answer && match
+
+        @question[:matches].delete(answer)
+        answer[:match_id] = match[:match_id]
+        @question[:answers] << answer
       end
     end
 

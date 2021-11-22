@@ -27,12 +27,12 @@ module Importers
       tools = data['external_feeds'] || []
       to_import = migration.to_import 'external_feeds'
       tools.each do |tool|
-        if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-          begin
-            import_from_migration(tool, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
-          end
+        next unless tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
+
+        begin
+          import_from_migration(tool, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
         end
       end
     end
