@@ -65,7 +65,8 @@ const editView = function (opts = {}, discussOpts = {}) {
     lockedItems: opts.lockedItems || {},
     isEditing: false,
     anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
-    react_discussions_post: ENV.REACT_DISCUSSIONS_POST
+    react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
+    allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics
   })
   ;(app.assignmentGroupCollection = new AssignmentGroupCollection()).contextAssetString =
     ENV.context_asset_string
@@ -311,6 +312,14 @@ test('renders anonymous section if able to moderate', function () {
   const view = this.editView({
     permissions: {CAN_MODERATE: true}
   })
+  equal(view.$el.find('#anonymous_section_header').length, 1)
+})
+
+test('renders anonymous section if student can create', function () {
+  ENV.ANONYMOUS_DISCUSSIONS = true
+  ENV.REACT_DISCUSSIONS_POST = true
+  ENV.allow_student_anonymous_discussion_topics = true
+  const view = this.editView({})
   equal(view.$el.find('#anonymous_section_header').length, 1)
 })
 

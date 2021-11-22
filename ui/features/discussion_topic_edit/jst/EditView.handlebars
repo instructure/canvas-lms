@@ -131,7 +131,7 @@
           {{/unless}}
           {{#if react_discussions_post}}
             {{#if anonymous_discussion_enabled}}
-              {{#if canModerate}}
+              {{#ifAny canModerate allow_student_anonymous_discussion_topics}}
                 <h4 id="anonymous_section_header">Anonymous Discussion</h4>
                 <div style="margin: 0 0 20px 0;">
                   <label class="radio" style="display: block;">
@@ -143,7 +143,7 @@
                     {{#t}}Full: student names and profile pictures will be hidden{{/t}}
                   </label>
                 </div>
-              {{/if}}
+              {{/ifAny}}
             {{/if}}
           {{/if}}
         {{/if}}
