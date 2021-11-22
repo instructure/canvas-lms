@@ -24,6 +24,30 @@ import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
 
+export const ADDRESS_BOOK_RECIPIENTS = gql`
+  query GetAddressBookRecipients($userID: ID!, $context: String, $search: String) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        recipients(context: $context, search: $search) {
+          contextsConnection(first: 20) {
+            nodes {
+              id
+              name
+            }
+          }
+          usersConnection(first: 20) {
+            nodes {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery($userID: ID!, $course: String, $scope: String = "") {
     legacyNode(_id: $userID, type: User) {
