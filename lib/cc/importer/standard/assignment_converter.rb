@@ -24,7 +24,7 @@ module CC::Importer::Standard
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
         if (doc = get_node_or_open_file(res, 'assignment'))
-          path = res[:href] || (res[:files]&.first && res[:files].first[:href])
+          path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
 
           asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
@@ -33,7 +33,7 @@ module CC::Importer::Standard
           end
           parse_cc_assignment_data(asmnt, doc, resource_dir)
 
-          # FIXME: check the XML namespace to make sure it's actually a canvas assignment
+          # FIXME check the XML namespace to make sure it's actually a canvas assignment
           # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
           if (assgn_node = doc.at_css('extensions > assignment'))
             parse_canvas_assignment_data(assgn_node, nil, asmnt)
@@ -56,7 +56,7 @@ module CC::Importer::Standard
         asmnt[:grading_type] = 'points'
         asmnt[:points_possible] = points_possible.to_f
       end
-      unless doc.css('submission_formats format').empty?
+      if doc.css('submission_formats format').length > 0
         asmnt[:submission_types] = []
         doc.css('submission_formats format').each do |format|
           type = format['type']
@@ -72,7 +72,7 @@ module CC::Importer::Standard
       if doc.css('attachment')
         asmnt[:description] += "\n<ul>"
         doc.css('attachment').each do |att_node|
-          # TODO: next if type is teachers
+          # todo next if type is teachers
           att_path = att_node['href']
           url = @canvas_converter ? att_path : (get_canvas_att_replacement_url(att_path, resource_dir) || att_path)
           asmnt[:description] += "\n<li><a href=\"#{url}\">#{File.basename att_path}</a>"
@@ -110,7 +110,7 @@ module CC::Importer::Standard
       end
       if meta_doc.at_css("similarity_detection_tool")
         node = meta_doc.at_css("similarity_detection_tool")
-        similarity_settings = node.attributes.transform_values(&:value)
+        similarity_settings = node.attributes.each_with_object({}) { |(k, v), h| h[k] = v.value }
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
@@ -184,12 +184,14 @@ module CC::Importer::Standard
     private
 
     def get_tool_setting(meta_doc)
-      {
+      tool_setting = {
         product_code: meta_doc.at_css('tool_setting tool_proxy').attribute('product_code').value,
         vendor_code: meta_doc.at_css('tool_setting tool_proxy').attribute('vendor_code').value,
         custom: meta_doc.css("tool_setting custom property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text },
         custom_parameters: meta_doc.css("tool_setting custom_parameters property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text }
       }
+
+      tool_setting
     end
   end
 end

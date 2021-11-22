@@ -207,11 +207,11 @@ describe AccountsController do
       post 'add_account_user', params: { :account_id => @account.id, :role_id => role.id, :user_list => 'testadmin@example.com' }
       expect(response).to be_successful
 
-      new_admin = CommunicationChannel.find_by(path: 'testadmin@example.com').user
+      new_admin = CommunicationChannel.find_by_path('testadmin@example.com').user
       expect(new_admin).to_not be_nil
       @account.reload
       expect(@account.account_users.map(&:user)).to be_include(new_admin)
-      expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
+      expect(@account.account_users.find_by_role_id(role.id).user).to eq new_admin
     end
 
     it "allows adding an existing user to a sub account" do
@@ -446,9 +446,9 @@ describe AccountsController do
         }
       } }
       @account.reload
-      expect(@account.allowed_services).to match(/\+test1/)
-      expect(@account.allowed_services).not_to match(/\+test2/)
-      expect(@account.allowed_services).to match(/\+test3/)
+      expect(@account.allowed_services).to match(%r{\+test1})
+      expect(@account.allowed_services).not_to match(%r{\+test2})
+      expect(@account.allowed_services).to match(%r{\+test3})
     end
 
     it "updates 'default_dashboard_view'" do
@@ -998,9 +998,9 @@ describe AccountsController do
         expect(response).to be_successful
 
         external_integration_keys = assigns[:external_integration_keys]
-        expect(external_integration_keys).to have_key(:external_key0)
-        expect(external_integration_keys).to have_key(:external_key1)
-        expect(external_integration_keys).to have_key(:external_key2)
+        expect(external_integration_keys.key?(:external_key0)).to be_truthy
+        expect(external_integration_keys.key?(:external_key1)).to be_truthy
+        expect(external_integration_keys.key?(:external_key2)).to be_truthy
         expect(external_integration_keys[:external_key0]).to eq @eik
       end
 
@@ -1164,7 +1164,7 @@ describe AccountsController do
       expect(response.body).to match(/"help_link_icon":"paperclip"/)
       expect(response.body).to match(/"id":"link1"/)
       expect(response.body).to match(/"type":"custom"/)
-      expect(response.body).to match(%r{"url":"https://canvas.instructure.com/guides"})
+      expect(response.body).to match(/"url":"https:\/\/canvas.instructure.com\/guides"/)
     end
 
     it "returns the help links as student" do
@@ -1433,7 +1433,7 @@ describe AccountsController do
     end
 
     context "sorting by term" do
-      let(:letters_in_random_order) { 'daqwds'.chars }
+      let(:letters_in_random_order) { 'daqwds'.split('') }
 
       before do
         @account = Account.create!

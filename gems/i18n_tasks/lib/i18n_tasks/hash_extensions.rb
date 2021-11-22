@@ -40,9 +40,10 @@ module I18nTasks
     end
 
     def to_ordered
-      keys.sort_by(&:to_s).each_with_object ActiveSupport::OrderedHash.new do |k, h|
+      keys.sort_by(&:to_s).inject ActiveSupport::OrderedHash.new do |h, k|
         v = fetch(k)
         h[k] = v.is_a?(Hash) ? v.to_ordered : v
+        h
       end
     end
 

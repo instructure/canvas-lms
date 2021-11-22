@@ -28,13 +28,7 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   let(:test_notification) { double(:test_notification) }
-  let(:test_connection_class) {
-    Class.new {
-      def after_transaction_commit
-        yield
-      end
-    }
-  }
+  let(:test_connection_class) { Class.new { def after_transaction_commit; yield; end } }
 
   before do
     BroadcastPolicy.notifier = MockNotifier.new
@@ -69,14 +63,14 @@ describe BroadcastPolicy::NotificationPolicy do
 
   it "does not send if there is not a recipient list" do
     record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
-    subject.to = ->(_) {}
+    subject.to = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
   it "sends even if there isn't data" do
     record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
-    subject.data = ->(_) {}
+    subject.data = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end

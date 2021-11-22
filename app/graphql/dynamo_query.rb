@@ -67,8 +67,8 @@ class DynamoQuery
     self
   end
 
-  def each(&block)
-    query.items.each(&block)
+  def each
+    query.items.each { |item| yield item }
   end
 
   def map

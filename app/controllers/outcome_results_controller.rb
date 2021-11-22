@@ -328,7 +328,7 @@ class OutcomeResultsController < ApplicationController
         send_data(
           outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
           :type => "text/csv",
-          :filename => t('outcomes_filename', "Outcomes").tr(' ', "_") + "-" + @context.name.to_s.tr(' ', "_") + ".csv",
+          :filename => t('outcomes_filename', "Outcomes").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
           :disposition => "attachment"
         )
       end
@@ -384,7 +384,7 @@ class OutcomeResultsController < ApplicationController
 
     rollups = user_rollups
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
-    rollups = @users.filter_map { |u| rollups.find { |r| r.context.id == u.id } } if params[:sort_by] == 'student'
+    rollups = @users.map { |u| rollups.find { |r| r.context.id == u.id } }.compact if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
@@ -419,15 +419,16 @@ class OutcomeResultsController < ApplicationController
     filter_users_by_excludes(true)
     @results = find_results(all_users: false).preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
-    aggregate_outcome_results_rollups_json(aggregate_rollups)
+    json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
+    json
   end
 
   def linked_include_collections
     linked = {}
     includes = Api.value_to_array(params[:include])
     includes.uniq.each do |include_name|
-      linked[include_name] = send(include_method_name(include_name))
+      linked[include_name] = self.send(include_method_name(include_name))
     end
     linked
   end
@@ -487,13 +488,13 @@ class OutcomeResultsController < ApplicationController
 
   def verify_aggregate_parameter
     aggregate = params[:aggregate]
-    reject! "invalid aggregate parameter value" if aggregate && !%w[course].include?(aggregate)
+    reject! "invalid aggregate parameter value" if aggregate && !%w(course).include?(aggregate)
     true
   end
 
   def verify_aggregate_stat_parameter
     aggregate_stat = params[:aggregate_stat]
-    reject! "invalid aggregate_stat parameter value" if aggregate_stat && !%w[mean median].include?(aggregate_stat)
+    reject! "invalid aggregate_stat parameter value" if aggregate_stat && !%w(mean median).include?(aggregate_stat)
     true
   end
 
@@ -501,14 +502,14 @@ class OutcomeResultsController < ApplicationController
     return true unless params[:sort_by]
 
     sort_by = params[:sort_by]
-    reject! "invalid sort_by parameter value" if sort_by && !%w[student outcome].include?(sort_by)
+    reject! "invalid sort_by parameter value" if sort_by && !%w(student outcome).include?(sort_by)
     if sort_by == 'outcome'
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
-      reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
+      reject! "invalid sort_outcome_id parameter value" unless sort_outcome_id =~ /\A\d+\z/
     end
     sort_order = params[:sort_order]
-    reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w[asc desc].include?(sort_order)
+    reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)
     true
   end
 
@@ -520,7 +521,7 @@ class OutcomeResultsController < ApplicationController
       when 'users'
         reject! "can't include users unless aggregate is not set" if params[:aggregate].present?
       else
-        reject! "invalid include: #{include_name}" unless respond_to? include_method_name(include_name), :include_private
+        reject! "invalid include: #{include_name}" unless self.respond_to? include_method_name(include_name), :include_private
       end
     end
     true
@@ -578,7 +579,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def outcome_group_prefix(group)
-    unless group.parent_outcome_group
+    if !group.parent_outcome_group
       return []
     end
 

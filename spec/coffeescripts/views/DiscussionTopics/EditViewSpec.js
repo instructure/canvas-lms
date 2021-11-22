@@ -62,10 +62,7 @@ const editView = function (opts = {}, discussOpts = {}) {
         views: {}
       })
     },
-    lockedItems: opts.lockedItems || {},
-    isEditing: false,
-    anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
-    react_discussions_post: ENV.REACT_DISCUSSIONS_POST
+    lockedItems: opts.lockedItems || {}
   })
   ;(app.assignmentGroupCollection = new AssignmentGroupCollection()).contextAssetString =
     ENV.context_asset_string
@@ -303,15 +300,6 @@ test('does not save todo date if discussion is graded', function () {
   view.renderGroupCategoryOptions()
   const formData = view.getFormData()
   equal(formData.todo_date, null)
-})
-
-test('renders anonymous section if able to moderate', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
-  ENV.REACT_DISCUSSIONS_POST = true
-  const view = this.editView({
-    permissions: {CAN_MODERATE: true}
-  })
-  equal(view.$el.find('#anonymous_section_header').length, 1)
 })
 
 QUnit.module(

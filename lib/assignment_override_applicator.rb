@@ -36,9 +36,9 @@ module AssignmentOverrideApplicator
       return setup_overridden_clone(assignment_or_quiz)
     end
 
-    overrides = overrides_for_assignment_and_user(assignment_or_quiz, user)
+    overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
 
-    result_assignment_or_quiz = assignment_with_overrides(assignment_or_quiz, overrides)
+    result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides)
     result_assignment_or_quiz.overridden_for_user = user
 
     # students get the last overridden date that applies to them, but teachers
@@ -64,11 +64,9 @@ module AssignmentOverrideApplicator
             result_assignment_or_quiz.without_overrides.due_at,
             result_assignment_or_quiz.due_at
           ]
-          if potential_due_dates.include?(nil)
-            nil
-          else
+          potential_due_dates.include?(nil) ?
+            nil :
             potential_due_dates.max
-          end
         end
     end
 
@@ -94,7 +92,7 @@ module AssignmentOverrideApplicator
         ["overrides_for_assignment_and_user3", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
         batch_object: user, batched_keys: [:enrollments, :groups]
       ) do
-        next [] if has_invalid_args?(assignment_or_quiz, user)
+        next [] if self.has_invalid_args?(assignment_or_quiz, user)
 
         context = assignment_or_quiz.context
 
@@ -122,7 +120,7 @@ module AssignmentOverrideApplicator
             end
 
             unless ConditionalRelease::Service.enabled_in_context?(assignment_or_quiz.context)
-              overrides = overrides.reject { |override| override.try(:set_type) == 'Noop' }
+              overrides = overrides.select { |override| override.try(:set_type) != 'Noop' }
             end
 
             return overrides
@@ -158,7 +156,7 @@ module AssignmentOverrideApplicator
     if adhoc_overrides.any?
       override_ids_to_student_ids = {}
       scope = AssignmentOverrideStudent.where(assignment_override_id: adhoc_overrides).active
-      scope = if visible_user_ids.is_a?(ActiveRecord::Relation)
+      scope = if ActiveRecord::Relation === visible_user_ids
                 return adhoc_overrides if visible_user_ids.is_a?(ActiveRecord::NullRelation)
 
                 scope
@@ -200,11 +198,11 @@ module AssignmentOverrideApplicator
     group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
     return nil unless group_category_id
 
-    group = if assignment_or_quiz.context.user_has_been_student?(user)
-              user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
-            else
-              assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
-            end
+    if assignment_or_quiz.context.user_has_been_student?(user)
+      group = user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
+    else
+      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
+    end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
@@ -237,7 +235,7 @@ module AssignmentOverrideApplicator
           excluded_workflows: ['deleted', 'completed']
         ).select { |v|
           ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
-        }.pluck(:course_section_id).uniq
+        }.map { |v| v[:course_section_id] }.uniq
     end
 
     if assignment_or_quiz.assignment_overrides.loaded?
@@ -249,7 +247,9 @@ module AssignmentOverrideApplicator
 
   def self.current_override_version(assignment_or_quiz, all_overrides)
     all_overrides.map do |override|
-      if override.versions.exists?
+      if !override.versions.exists?
+        override
+      else
         override_version = override.versions.detect do |version|
           model_version = assignment_or_quiz.is_a?(Quizzes::Quiz) ? version.model.quiz_version : version.model.assignment_version
           next if model_version.nil?
@@ -257,8 +257,6 @@ module AssignmentOverrideApplicator
           model_version <= assignment_or_quiz.version_number
         end
         override_version ? override_version.model : nil
-      else
-        override
       end
     end
   end
@@ -287,7 +285,7 @@ module AssignmentOverrideApplicator
     [:id, :updated_at, :created_at].each { |attr|
       clone[attr] = assignment.send(attr)
     }
-    copy_preloaded_associations_to_clone(assignment, clone)
+    self.copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
 
     clone.applied_overrides = overrides
@@ -307,13 +305,13 @@ module AssignmentOverrideApplicator
   def self.assignment_with_overrides(assignment_or_quiz, overrides)
     unoverridden_assignment_or_quiz = assignment_or_quiz.without_overrides
 
-    setup_overridden_clone(unoverridden_assignment_or_quiz,
-                           overrides) do |cloned_assignment_or_quiz|
-      if overrides&.any?
-        collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
+    self.setup_overridden_clone(unoverridden_assignment_or_quiz,
+                                overrides) do |cloned_assignment_or_quiz|
+      if overrides && overrides.any?
+        self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
-          value = value.in_time_zone if value.respond_to?(:in_time_zone) && !value.is_a?(Date)
+          value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
           cloned_assignment_or_quiz.write_attribute(field, value)
         end
       end
@@ -321,7 +319,7 @@ module AssignmentOverrideApplicator
   end
 
   def self.copy_preloaded_associations_to_clone(orig, clone)
-    orig.class.reflections.each_key do |association|
+    orig.class.reflections.keys.each do |association|
       association = association.to_sym
       clone.send(:association_instance_set, association, orig.send(:association_instance_get, association))
     end
@@ -337,18 +335,18 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)].cache_key
+    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
     RequestCache.cache('collapsed_overrides', cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
         # clone the assignment_or_quiz, apply overrides, and freeze
         [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
           if assignment_or_quiz.respond_to?(field)
-            value = send("overridden_#{field}", assignment_or_quiz, overrides)
+            value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
             # force times to un-zoned UTC -- this will be a cached value and should
             # not care about the TZ of the user that cached it. the user's TZ will
             # be applied before it's returned.
-            value = value.utc if value.respond_to?(:utc) && !value.is_a?(Date)
+            value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
             overridden_data[field] = value
           end
         end
@@ -359,7 +357,7 @@ module AssignmentOverrideApplicator
 
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
-    canonical = overrides.map(&:cache_key).inspect
+    canonical = overrides.map { |override| override.cache_key }.inspect
     Digest::MD5.hexdigest(canonical)
   end
 
@@ -371,7 +369,7 @@ module AssignmentOverrideApplicator
     elsif (override = applicable_overrides.detect { |o| o.due_at.nil? })
       override
     else
-      applicable_overrides.max_by(&:due_at)
+      applicable_overrides.sort_by(&:due_at).last
     end
   end
 
@@ -398,7 +396,7 @@ module AssignmentOverrideApplicator
     elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
       nil
     else
-      applicable_overrides.min_by(&:unlock_at).unlock_at
+      applicable_overrides.sort_by(&:unlock_at).first.unlock_at
     end
   end
 
@@ -409,7 +407,7 @@ module AssignmentOverrideApplicator
     elsif applicable_overrides.detect { |o| o.lock_at.nil? }
       nil
     else
-      applicable_overrides.max_by(&:lock_at).lock_at
+      applicable_overrides.sort_by(&:lock_at).last.lock_at
     end
   end
 

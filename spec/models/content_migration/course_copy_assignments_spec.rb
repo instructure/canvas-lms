@@ -204,7 +204,7 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
-        if @assignment[attr].instance_of?(Hash)
+        if @assignment[attr].class == Hash
           expect(@assignment[attr].stringify_keys).to eq new_assignment[attr].stringify_keys
         else
           expect(@assignment[attr]).to eq new_assignment[attr]
@@ -760,7 +760,7 @@ describe ContentMigration do
         assign.save!
         @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
         run_course_copy
-        expect(@copy_to.grading_standards.map(&:title)).to eql %w[Two]
+        expect(@copy_to.grading_standards.map(&:title)).to eql %w(Two)
         expect(@copy_to.assignments.first.grading_standard.title).to eql 'Two'
       end
 
@@ -985,7 +985,7 @@ describe ContentMigration do
         let(:assignment) do
           @course.assignments.create!(
             name: 'test assignment',
-            submission_types: 'none'
+            submission_types: 'none',
           )
         end
 

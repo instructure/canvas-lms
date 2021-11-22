@@ -109,7 +109,7 @@ describe AssignmentGroupsController do
             only_visible_to_overrides: true,
             workflow_state: 'published'
           )
-          get :index, **index_params
+          get :index, index_params
           assignment_group_response = json_parse(response.body).first
           expect(assignment_group_response['integration_data']).to eq({})
         end
@@ -123,7 +123,7 @@ describe AssignmentGroupsController do
             only_visible_to_overrides: true,
             workflow_state: 'published'
           )
-          get 'index', **index_params
+          get 'index', index_params
           assignment_group_response = json_parse(response.body).last
           expect(assignment_group_response['integration_data']).to eq({ 'something' => 'else' })
         end
@@ -473,7 +473,7 @@ describe AssignmentGroupsController do
 
     it 'reorders assignment groups' do
       user_session(@teacher)
-      groups = Array.new(3) { course_group }
+      groups = 3.times.map { course_group }
       expect(groups.map(&:position)).to eq [1, 2, 3]
       g1, g2, _ = groups
       post 'reorder', params: { :course_id => @course.id, :order => "#{g2.id},#{g1.id}" }
@@ -827,7 +827,7 @@ describe AssignmentGroupsController do
       course_group
     end
 
-    it 'requires authorization' do
+    it 'requires  authorization' do
       delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       assert_unauthorized
     end

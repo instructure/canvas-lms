@@ -20,7 +20,7 @@
 
 module Canvas::MessageHelper
   def self.default_message_path(filename)
-    Rails.root.join('app/messages', filename).to_s
+    File.join(Rails.root.to_s, 'app', 'messages', filename)
   end
 
   def self.add_message_path(path)
@@ -32,11 +32,13 @@ module Canvas::MessageHelper
 
   def self.find_message_path(filename)
     path = nil
-    @message_paths&.each do |mp|
-      test_path = File.join(mp, filename)
-      if File.exist?(test_path)
-        path = test_path
-        break
+    if @message_paths
+      @message_paths.each do |mp|
+        test_path = File.join(mp, filename)
+        if File.exist?(test_path)
+          path = test_path
+          break
+        end
       end
     end
     path || default_message_path(filename)
@@ -73,7 +75,7 @@ module Canvas::MessageHelper
     # 'txt' is the legacy message body. Pull name from first line.
     if args[4].present?
       # txt
-      split_txt = args[4].strip.split("\n").map(&:strip)
+      split_txt = args[4].strip.split("\n").map { |line| line.strip }
       using[:name] ||= split_txt[0]
     end
     raise 'Name is required' unless using[:name]

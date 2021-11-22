@@ -57,11 +57,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to be absent but was instead present.
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -73,11 +73,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to be present but was instead blank.
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -95,19 +95,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to include "#{text}".
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text not to include "#{text}".
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -131,19 +131,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      TEXT
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} not to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -251,19 +251,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect}'s aria-disabled attribute to be true.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}".
-      TEXT
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect}'s aria-disabled attribute to be false.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}"
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -423,10 +423,10 @@ module CustomSeleniumRSpecMatchers
     failure_message do |actual|
       actual_value = actual.call
 
-      if defined? @operator
-        "expected #{actual_value} to become #{@operator} #{@value}"
-      else
+      unless defined? @operator
         "expected #{actual_value} to become #{expected}"
+      else
+        "expected #{actual_value} to become #{@operator} #{@value}"
       end
     end
 
@@ -435,10 +435,10 @@ module CustomSeleniumRSpecMatchers
 
       wait_for(method: :become) do
         disable_implicit_wait do
-          if defined? @operator
-            actual.call.__send__ @operator, @value
-          else
+          unless defined? @operator
             actual.call == expected
+          else
+            actual.call.__send__ @operator, @value
           end
         end
       end
@@ -454,10 +454,7 @@ module CustomSeleniumRSpecMatchers
       raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
 
       wait_for(method: :become) do
-        disable_implicit_wait {
-          a = actual.call
-          min < a && a < max
-        }
+        disable_implicit_wait { a = actual.call; min < a && a < max }
       end
     end
   end

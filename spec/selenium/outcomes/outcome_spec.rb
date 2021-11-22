@@ -86,7 +86,7 @@ describe "outcomes" do
         end
 
         it "retains the settings after saving", priority: "1", test_id: 261710 do
-          save_without_error(rand(1..99), 'Decaying Average')
+          save_without_error(rand(99) + 1, 'Decaying Average')
           expect(f('#calculation_method').text).to include('Decaying Average')
         end
       end
@@ -173,7 +173,7 @@ describe "outcomes" do
     context "actions" do
       it "does not render an HTML-escaped title in outcome directory while editing", priority: "2", test_id: 250554 do
         title = 'escape & me <<->> if you dare'
-        @context = who_to_login == 'teacher' ? @course : account
+        who_to_login == 'teacher' ? @context = @course : @context = account
         outcome_model
         get outcome_url
         wait_for_ajaximations
@@ -325,43 +325,6 @@ describe "outcomes" do
         course_outcomes = LearningOutcomeGroup.find_by(context_id: @course.id, context_type: 'Course', title: 'group 0').child_outcome_links
         # Since the outcomes existed already and are just imported into a new group, we're checking the new content tags
         expect(course_outcomes[0].title).to eq(outcome0_title)
-      end
-
-      describe 'with friendly_description enabled' do
-        before do
-          enable_friendly_description
-        end
-
-        it 'creates an outcome with a friendly description present' do
-          get outcome_url
-          create_outcome_with_friendly_desc('Outcome', 'Standard Desc', 'Friendly Desc')
-          # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
-          outcome = LearningOutcome.find_by(context: @course, short_description: 'Outcome', description: '<p>Standard Desc</p>')
-          # Small delay between button click and model population in db
-          keep_trying_until {
-            fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: 'Friendly Desc')
-            expect(fd).to be_truthy
-          }
-        end
-
-        it 'edits an outcome\'s friendly description' do
-          create_bulk_outcomes_groups(@course, 1, 1)
-          outcome_title = 'outcome 0'
-          outcome = LearningOutcome.find_by(context: @course, short_description: outcome_title)
-          outcome.update!(description: 'long description')
-          OutcomeFriendlyDescription.find_or_create_by!(learning_outcome_id: outcome, context: @course, description: 'FD')
-          get outcome_url
-          select_outcome_group_with_text(@course.name).click
-          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-          individual_outcome_kabob_menu(0).click
-          edit_outcome_button.click
-          insert_friendly_description('FD - Edited')
-          click_save_edit_modal
-          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-          expect(nth_individual_outcome_text(0)).not_to match(/Friendly Description.*FD/m)
-          expand_outcome_description_button(0).click
-          expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
-        end
       end
     end
   end

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'active_support/core_ext/enumerable'
-
 module AdheresToPolicy
   module InstanceMethods
     # Public: Gets the requested rights granted to a user.
@@ -70,8 +68,9 @@ module AdheresToPolicy
       session, sought_rights = parse_args(args)
       sought_rights ||= []
       sought_rights = self.class.policy.available_rights if sought_rights.empty?
-      sought_rights.index_with do |r|
-        check_right?(user, session, r)
+      sought_rights.inject({}) do |h, r|
+        h[r] = check_right?(user, session, r)
+        h
       end
     end
 
@@ -197,13 +196,13 @@ module AdheresToPolicy
     # of the sought rights.
     def parse_args(args)
       session = nil
-      unless args[0].is_a? Symbol
+      if !args[0].is_a? Symbol
         session = args.shift
       end
       args.compact!
       args.uniq!
 
-      [session, args]
+      return session, args
     end
 
     # Internal: Checks the right for a user based on session.

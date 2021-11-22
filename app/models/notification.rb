@@ -93,7 +93,7 @@ class Notification < Switchman::UnshardedRecord
     "Web Conference Invitation"
   ].freeze
 
-  NON_CONFIGURABLE_TYPES = %w[Migration Registration Summaries Alert].freeze
+  NON_CONFIGURABLE_TYPES = %w(Migration Registration Summaries Alert).freeze
 
   COURSE_TYPES = [
     # Course Activities
@@ -139,7 +139,7 @@ class Notification < Switchman::UnshardedRecord
 
   scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
 
-  validates :name, uniqueness: true
+  validates_uniqueness_of :name
 
   after_create { self.class.reset_cache! }
 
@@ -154,7 +154,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def self.all_cached
-    @all ||= all.to_a.each(&:readonly!)
+    @all ||= self.all.to_a.each(&:readonly!)
   end
 
   def self.valid_configurable_types
@@ -166,9 +166,9 @@ class Notification < Switchman::UnshardedRecord
     #  we have a deprecated type that we consider invalid
     # graphql types cannot have spaces we have used underscores
     # and we don't allow editing system notification types
-    @configurable_types ||= YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
+    @configurable_types ||= YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
                                 .map(&:first).map(&:last)
-                                .reject { |type| type.include?('DEPRECATED') }
+                                .select { |type| !type.include?('DEPRECATED') }
                                 .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end
 
@@ -186,8 +186,8 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def duplicate
-    notification = clone
-    notification.id = id
+    notification = self.clone
+    notification.id = self.id
     notification.send(:remove_instance_variable, :@new_record)
     notification
   end
@@ -212,7 +212,7 @@ class Notification < Switchman::UnshardedRecord
 
   TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
   def preload_asset_roles_if_needed(asset)
-    if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(name)
+    if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(self.name)
       case asset
       when Assignment
         ActiveRecord::Associations::Preloader.new.preload(asset, :assignment_overrides)
@@ -258,31 +258,31 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def show_in_feed?
-    category == "TestImmediately" || Notification.types_to_show_in_feed.include?(name)
+    self.category == "TestImmediately" || Notification.types_to_show_in_feed.include?(self.name)
   end
 
   def is_course_type?
-    COURSE_TYPES.include? category
+    COURSE_TYPES.include? self.category
   end
 
   def registration?
-    category == "Registration"
+    self.category == "Registration"
   end
 
   def migration?
-    category == "Migration"
+    self.category == "Migration"
   end
 
   def summarizable?
-    !registration? && !migration?
+    !self.registration? && !self.migration?
   end
 
   def dashboard?
-    NON_CONFIGURABLE_TYPES.exclude?(category)
+    NON_CONFIGURABLE_TYPES.exclude?(self.category)
   end
 
   def category_slug
-    (category || "").tr(' ', "_").gsub(/[^\w]/, "").downcase
+    (self.category || "").gsub(/ /, "_").gsub(/[^\w]/, "").downcase
   end
 
   # if user is given, categories that aren't relevant to that user will be
@@ -301,15 +301,15 @@ class Notification < Switchman::UnshardedRecord
 
   # Return a hash with information for a related user option if one exists.
   def related_user_setting(user, root_account)
-    if user.present? && category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
+    if user.present? && self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
       {
         name: :send_scores_in_emails,
         value: user.preferences[:send_scores_in_emails],
-        label: t(<<~TEXT),
+        label: t(<<-EOS),
           Include scores when alerting about grades.
           If your email is not an institution email this means sensitive content will be sent outside of the institution.
-        TEXT
-        id: "cat_#{id}_option",
+        EOS
+        id: "cat_#{self.id}_option",
       }
     end
   end
@@ -362,7 +362,7 @@ class Notification < Switchman::UnshardedRecord
     end
   end
 
-  # TODO: i18n: show the localized notification name in the dashboard (or
+  # TODO i18n: show the localized notification name in the dashboard (or
   # wherever), even if we continue to store the english string in the db
   # (it's actually just the titleized message template filename)
   def names
@@ -555,18 +555,18 @@ class Notification < Switchman::UnshardedRecord
     when 'Announcement'
       t(:announcement_description, 'New Announcement in your course')
     when 'Announcement Created By You'
-      mt(:announcement_created_by_you_description, <<~MD)
+      mt(:announcement_created_by_you_description, <<~EOS)
         * Announcements created by you
         * Replies to announcements you've created
-      MD
+      EOS
     when 'Course Content'
-      mt(:course_content_description, <<~MD)
+      mt(:course_content_description, <<~EOS)
         Change to course content:
 
         * Page content
         * Quiz content
         * Assignment content
-      MD
+      EOS
     when 'Files'
       t(:files_description, 'New file added to your course')
     when 'Discussion'
@@ -580,39 +580,39 @@ class Notification < Switchman::UnshardedRecord
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'
-      mt(:grading_description, <<~MD)
+      mt(:grading_description, <<~EOS)
         Includes:
 
         * Assignment/submission grade entered/changed
         * Grade weight changed
-      MD
+      EOS
     when 'Late Grading'
-      mt(:late_grading_description, <<~MD)
+      mt(:late_grading_description, <<~EOS)
         *Instructor and Admin only:*
 
         Late assignment submission
-      MD
+      EOS
     when 'All Submissions'
-      mt(:all_submissions_description, <<~MD)
+      mt(:all_submissions_description, <<~EOS)
         *Instructor and Admin only:*
 
         Assignment (except quizzes) submission/resubmission
-      MD
+      EOS
     when 'Submission Comment'
       t(:submission_comment_description, "Assignment submission comment")
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
     when 'Invitation'
-      mt(:invitation_description, <<~MD)
+      mt(:invitation_description, <<~EOS)
         Invitation for:
 
         * Web conference
         * Group
         * Collaboration
         * Peer Review & reminder
-      MD
+      EOS
     when 'Other'
-      mt(:other_description, <<~MD)
+      mt(:other_description, <<~EOS)
         *Instructor and Admin only:*
 
         * Course enrollment
@@ -621,15 +621,15 @@ class Notification < Switchman::UnshardedRecord
         * Migration report
         * New account user
         * New student group
-      MD
+      EOS
     when 'Calendar'
       t(:calendar_description, 'New and changed items on your course calendar')
     when 'Student Appointment Signups'
-      mt(:student_appointment_description, <<~MD)
+      mt(:student_appointment_description, <<~EOS)
         *Instructor and Admin only:*
 
         Student appointment sign-up
-      MD
+      EOS
     when 'Appointment Availability'
       t('New appointment timeslots are available for signup')
     when 'Appointment Signups'
@@ -645,28 +645,28 @@ class Notification < Switchman::UnshardedRecord
     when 'Recording Ready'
       t(:web_conference_recording_ready, 'A conference recording is ready')
     when 'Membership Update'
-      mt(:membership_update_description, <<~MD)
+      mt(:membership_update_description, <<~EOS)
         *Admin only: pending enrollment activated*
 
         * Group enrollment
         * accepted/rejected
-      MD
+      EOS
     when 'Blueprint'
-      mt(:blueprint_description, <<~MD)
+      mt(:blueprint_description, <<~BPDESC)
         *Instructor and Admin only:*
 
         Content was synced from a blueprint course to associated courses
-      MD
+      BPDESC
     when 'Content Link Error'
-      mt(:content_link_error_description, <<~MD)
+      mt(:content_link_error_description, <<~CONTLINK)
         *Instructor and Admin only:*
 
         Location and content of a failed link that a student has interacted with
-      MD
+      CONTLINK
     when 'Account Notification'
-      mt(:account_notification_description, <<~MD)
+      mt(:account_notification_description, <<~EOS)
         Institution-wide announcements (also displayed on Dashboard pages)
-      MD
+      EOS
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end
@@ -683,7 +683,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def type_name
-    category
+    return category
   end
 
   def relevant_to_user?(user)

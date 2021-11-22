@@ -20,7 +20,7 @@
 module CustomValidators
   def validate_breadcrumb_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
-    unless breadcrumb_text.nil?
+    if breadcrumb_text != nil
       breadcrumb = f('#breadcrumbs')
       expect(breadcrumb).to include_text(breadcrumb_text)
     end
@@ -37,7 +37,7 @@ module CustomValidators
     require 'open-uri'
     expect(element).to be_displayed
     expect(element.tag_name).to eq 'img'
-    temp_file = URI.parse(element.attribute('src')).open
+    temp_file = open(element.attribute('src'))
     expect(temp_file.size).to be > 0
   end
 
@@ -45,7 +45,7 @@ module CustomValidators
     require 'open-uri'
     expect(element).to be_displayed
     expect(element.tag_name).to eq 'a'
-    temp_file = URI.parse(element.attribute('href')).open
+    temp_file = open(element.attribute('href'))
     expect(temp_file.size).to be > 0
     temp_file
   end
@@ -106,7 +106,7 @@ module CustomValidators
   end
 
   def assert_error_box(selector)
-    box = driver.execute_script <<~JS, selector
+    box = driver.execute_script <<-JS, selector
       var $result = $(arguments[0]).data('associated_error_box');
       return $result ? $result.toArray() : []
     JS
@@ -129,8 +129,10 @@ module CustomValidators
     true
   end
 
-  def expect_new_page_load(accept_alert = false, &block)
-    success = wait_for_new_page_load(accept_alert, &block)
+  def expect_new_page_load(accept_alert = false)
+    success = wait_for_new_page_load(accept_alert) do
+      yield
+    end
     expect(success).to be, "expected new page load, none happened"
   end
 end

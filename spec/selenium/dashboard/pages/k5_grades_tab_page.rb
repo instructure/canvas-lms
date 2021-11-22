@@ -177,7 +177,9 @@ module K5GradesTabPageObject
 
   #------------------------------Retrieve Text----------------------#
 
-  delegate :text, to: :grades_total, prefix: true
+  def grades_total_text
+    grades_total.text
+  end
 
   #----------------------------Element Management---------------------#
 end

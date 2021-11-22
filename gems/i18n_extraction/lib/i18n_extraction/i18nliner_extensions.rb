@@ -38,7 +38,7 @@ module I18nExtraction::Extensions
   module TranslateCall
     def validate_default
       if @default.is_a?(String)
-        if %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
+        if @default =~ /<[a-z][a-z0-9]*[> \/]/i
           raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
         end
       end
@@ -156,7 +156,7 @@ module I18nExtraction::Extensions
       end
 
       if key && default
-        key = "labels.#{key}" unless I18nliner::Scope::ABSOLUTE_KEY.match?(key)
+        key = "labels.#{key}" unless key =~ I18nliner::Scope::ABSOLUTE_KEY
         process_translate_call(nil, :t, [key, default])
       end
     end
@@ -174,11 +174,11 @@ module I18nExtraction::Extensions
 
     def scope_for(filename)
       scope = case filename
-              when %r{app/controllers/}
-                scope = filename.gsub(%r{.*app/controllers/|_controller\.rb}, '').gsub(%r{/_?}, '.')
+              when /app\/controllers\//
+                scope = filename.gsub(/.*app\/controllers\/|_controller\.rb/, '').gsub(/\/_?/, '.')
                 scope == 'application.' ? '' : scope
-              when %r{app/models/}
-                scope = filename.gsub(%r{.*app/models/|\.rb}, '')
+              when /app\/models\//
+                scope = filename.gsub(/.*app\/models\/|\.rb/, '')
                 STI_SUPERCLASSES.include?(scope) ? '' : scope
               end
       I18nliner::Scope.new scope
@@ -189,11 +189,11 @@ module I18nExtraction::Extensions
     def scope_for(filename)
       remove_whitespace = true
       scope = case filename
-              when %r{app/messages/}
+              when /app\/messages\//
                 remove_whitespace = false unless filename.include?('html')
-                filename.gsub(%r{.*app/|\.erb}, '').gsub(%r{/_?}, '.')
-              when %r{app/views/}
-                filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, '').gsub(%r{/_?}, '.')
+                filename.gsub(/.*app\/|\.erb/, '').gsub(/\/_?/, '.')
+              when /app\/views\//
+                filename.gsub(/.*app\/views\/|\.(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
               end
       I18nliner::Scope.new scope, remove_whitespace: remove_whitespace
     end

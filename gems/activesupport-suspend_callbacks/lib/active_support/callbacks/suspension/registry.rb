@@ -45,11 +45,9 @@ module ActiveSupport::Callbacks
       end
 
       def [](kind, type)
-        if @callbacks.key?(kind) && @callbacks[kind].key?(type)
-          @callbacks[kind][type]
-        else
+        @callbacks.has_key?(kind) && @callbacks[kind].has_key?(type) ?
+          @callbacks[kind][type] :
           []
-        end
       end
 
       def []=(kind, type, value)

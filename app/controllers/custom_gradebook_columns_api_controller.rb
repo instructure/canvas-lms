@@ -77,11 +77,9 @@ class CustomGradebookColumnsApiController < ApplicationController
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
-      scope = if value_to_boolean(params[:include_hidden])
-                @context.custom_gradebook_columns.not_deleted
-              else
-                @context.custom_gradebook_columns.active
-              end
+      scope = value_to_boolean(params[:include_hidden]) ?
+        @context.custom_gradebook_columns.not_deleted :
+        @context.custom_gradebook_columns.active
       columns = Api.paginate(scope, self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 
@@ -146,7 +144,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   # <b>200 OK</b> is returned if successful
   def reorder
     @context.custom_gradebook_columns.build.update_order(params[:order])
-    render :status => :ok, :json => {}
+    render :status => 200, :json => {}
   end
 
   private

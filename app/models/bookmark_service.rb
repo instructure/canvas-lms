@@ -31,10 +31,9 @@ class BookmarkService < UserService
     description = opts[:comments] || ""
     tags = opts[:tags] || ['instructure']
     begin
-      case service
-      when 'delicious'
+      if self.service == 'delicious'
         delicious_post_bookmark(self, url, title, description, tags)
-      when 'diigo'
+      elsif self.service == 'diigo'
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
     rescue
@@ -43,7 +42,7 @@ class BookmarkService < UserService
   end
 
   def find_bookmarks(query)
-    if service == 'diigo'
+    if self.service == 'diigo'
       last_get = Rails.cache.fetch('last_diigo_lookup') { Time.now - 60 }
       if Time.now - last_get < 8
         Rails.cache.write('last_diigo_lookup', Time.now)
@@ -56,10 +55,9 @@ class BookmarkService < UserService
 
   def bookmark_search(service, query)
     bookmarks = []
-    case service.service
-    when 'diigo'
+    if service.service == 'diigo'
       data = Diigo::Connection.diigo_get_bookmarks(service)
-      if data.instance_of?(Array) && data.first.is_a?(Hash)
+      if data.class == Array and data.first.is_a?(Hash)
         data.each do |bookmark|
           bookmarks << {
             :title => bookmark['title'],
@@ -71,7 +69,7 @@ class BookmarkService < UserService
       else
         bookmarks
       end
-    when 'delicious'
+    elsif service.service == 'delicious'
       # This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
       url = "https://api.del.icio.us/v1/posts/all?tag=#{query}"
       http, request = delicious_generate_request(url, 'GET', service.service_user_name, service.decrypted_password)

@@ -36,14 +36,14 @@ class OpenObject < OpenStruct
   end
 
   def id
-    table[:id]
+    self.table[:id]
   end
 
   def asset_string
-    return table[:asset_string] if table[:asset_string]
-    return nil unless type && id
+    return self.table[:asset_string] if self.table[:asset_string]
+    return nil unless self.type && self.id
 
-    "#{type.underscore}_#{id}"
+    "#{self.type.underscore}_#{self.id}"
   end
 
   def as_json(options = {})
@@ -60,18 +60,17 @@ class OpenObject < OpenStruct
       new_list
     elsif pre
       pre.each do |name, value|
-        case value
-        when Array
+        if value.is_a? Array
           new_list = []
           value.each do |obj|
-            new_list << if obj.is_a? Hash
-                          OpenObject.process(obj)
-                        else
-                          obj
-                        end
+            if obj.is_a? Hash
+              new_list << OpenObject.process(obj)
+            else
+              new_list << obj
+            end
           end
           pre[name] = new_list
-        when Hash
+        elsif value.is_a? Hash
           pre[name] = OpenObject.process(value)
         end
       end

@@ -50,8 +50,8 @@ class SubmissionComment < ActiveRecord::Base
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :viewed_submission_comments, dependent: :destroy
 
-  validates :comment, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :comment, length: { :minimum => 1, :allow_nil => true, :allow_blank => true }
+  validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
   validates_each :attempt do |record, attr, value|
     next if value.nil?
 
@@ -137,38 +137,38 @@ class SubmissionComment < ActiveRecord::Base
   has_a_broadcast_policy
 
   def provisional
-    !!provisional_grade_id
+    !!self.provisional_grade_id
   end
 
   def read?(current_user)
-    submission.read?(current_user) || viewed_submission_comments.where(user: current_user).exists?
+    self.submission.read?(current_user) || self.viewed_submission_comments.where(user: current_user).exists?
   end
 
   def mark_read!(current_user)
     ViewedSubmissionComment.unique_constraint_retry do
-      viewed_submission_comments.where(user: current_user).first_or_create!
+      self.viewed_submission_comments.where(user: current_user).first_or_create!
     end
   end
 
   def media_comment?
-    media_comment_id && media_comment_type
+    self.media_comment_id && self.media_comment_type
   end
 
   def check_for_media_object
-    if media_comment? && saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(media_comment_id,
-                                      user: author,
-                                      context: author)
+    if self.media_comment? && self.saved_change_to_media_comment_id?
+      MediaObject.ensure_media_object(self.media_comment_id,
+                                      user: self.author,
+                                      context: self.author)
     end
   end
 
   on_create_send_to_streams do
-    if submission && provisional_grade_id.nil?
-      if author_id == submission.user_id
-        submission.context.instructors_in_charge_of(author_id)
+    if self.submission && self.provisional_grade_id.nil?
+      if self.author_id == self.submission.user_id
+        self.submission.context.instructors_in_charge_of(self.author_id)
       else
         # self.submission.context.instructors.map(&:id) + [self.submission.user_id] - [self.author_id]
-        submission.user_id
+        self.submission.user_id
       end
     end
   end
@@ -177,14 +177,14 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| can_view_comment?(user, session) }
     can :read
 
-    given { |user| author == user }
+    given { |user| self.author == user }
     can :read and can :delete and can :update
 
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
 
     given { |user, session|
-      can_read_author?(user, session)
+      self.can_read_author?(user, session)
     }
     can :read_author
   end
@@ -281,40 +281,40 @@ class SubmissionComment < ActiveRecord::Base
 
   def can_read_author?(user, session)
     RequestCache.cache('user_can_read_author', self, user, session) do
-      return false if user.nil? || (author_id != user.id && submission.assignment.anonymize_students?)
+      return false if user.nil? || (self.author_id != user.id && self.submission.assignment.anonymize_students?)
 
-      author_id == user.id ||
-        (!anonymous? && !submission.assignment.anonymous_peer_reviews?) ||
-        submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        submission.assignment.context.grants_right?(author, session, :view_all_grades)
+      self.author_id == user.id ||
+        (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
     end
   end
 
   def reply_from(opts)
-    raise IncomingMail::Errors::UnknownAddress if context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
 
     user = opts[:user]
     message = opts[:text].strip
-    user = nil unless user && submission.grants_right?(user, :comment)
-    if user
-      shard.activate do
-        submission.add_comment(
+    user = nil unless user && self.submission.grants_right?(user, :comment)
+    if !user
+      raise IncomingMail::Errors::InvalidParticipant
+    else
+      self.shard.activate do
+        self.submission.add_comment(
           author: user,
           comment: message,
-          provisional: provisional_grade_id.present?
+          provisional: self.provisional_grade_id.present?
         )
       end
-    else
-      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 
   def context
-    read_attribute(:context) || submission.assignment.context rescue nil
+    read_attribute(:context) || self.submission.assignment.context rescue nil
   end
 
   def parse_attachment_ids
-    (attachment_ids || "").split(",").map(&:to_i)
+    (self.attachment_ids || "").split(",").map(&:to_i)
   end
 
   def attachment_ids=(ids)
@@ -332,14 +332,14 @@ class SubmissionComment < ActiveRecord::Base
       old_ids.include?(a.id) ||
       a.recently_created ||
       a.ok_for_submission_comment
-    }.map(&:id).join(","))
+    }.map { |a| a.id }.join(","))
   end
 
   def infer_details
-    self.anonymous = submission.assignment.anonymous_peer_reviews
-    self.author_name ||= author.short_name rescue t(:unknown_author, "Someone")
-    self.cached_attachments = attachments.map { |a| OpenObject.build('attachment', a.attributes) }
-    self.context = read_attribute(:context) || submission.assignment.context rescue nil
+    self.anonymous = self.submission.assignment.anonymous_peer_reviews
+    self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
+    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
+    self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
 
     self.workflow_state ||= "active"
   end
@@ -349,8 +349,8 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def force_reload_cached_attachments
-    self.cached_attachments = attachments.map { |a| OpenObject.build('attachment', a.attributes) }
-    save
+    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
+    self.save
   end
 
   def attachments
@@ -390,11 +390,11 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def context_code
-    "#{context_type.downcase}_#{context_id}"
+    "#{self.context_type.downcase}_#{self.context_id}"
   end
 
   def avatar_path
-    "/images/users/#{User.avatar_key(author_id)}"
+    "/images/users/#{User.avatar_key(self.author_id)}"
   end
 
   def serialization_methods

@@ -36,7 +36,7 @@ module Importers
       standards.each do |standard|
         if migration.import_object?('grading_standards', standard['migration_id'])
           begin
-            import_from_migration(standard, migration.context, migration)
+            self.import_from_migration(standard, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
           end
@@ -56,7 +56,7 @@ module Importers
       begin
         item.data = GradingStandard.upgrade_data(JSON.parse(hash[:data]), hash[:version] || 1)
       rescue
-        # TODO: add to message to display to user
+        # todo - add to message to display to user
       end
 
       item.save!

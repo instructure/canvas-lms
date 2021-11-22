@@ -31,7 +31,7 @@ class ApiRouteSet
   def self.draw(router, prefix = self.prefix, &block)
     @@prefixes ||= Set.new
     @@prefixes << prefix
-    route_set = new(prefix)
+    route_set = self.new(prefix)
     route_set.mapper = router
     route_set.instance_eval(&block)
   ensure
@@ -55,7 +55,7 @@ class ApiRouteSet
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    @routes ||= prefixes.map { |pfx| routes_for(pfx) }.flatten
+    @routes ||= self.prefixes.map { |pfx| self.routes_for(pfx) }.flatten
     @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
   end
 
@@ -65,7 +65,7 @@ class ApiRouteSet
 
   def method_missing(m, *a, &b)
     mapper.__send__(m, *a) {
-      instance_eval(&b) if b
+      self.instance_eval(&b) if b
     }
   end
 
@@ -125,8 +125,8 @@ class ApiRouteSet
     # unfortunately, this means that api v1 can't match a sis id that ends with
     # .json -- but see the api docs for info on sending hex-encoded sis ids,
     # which allows any string.
-    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}.freeze
-    ID_PARAM = /^:(id|\w+_id)$/.freeze
+    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
+    ID_PARAM = %r{^:(id|[\w]+_id)$}
 
     def self.prefix
       "/api/v1"
@@ -138,7 +138,7 @@ class ApiRouteSet
 
     def route(method, path, opts)
       opts[:constraints] ||= {}
-      path.split('/').each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      path.split('/').each { |segment| opts[:constraints][segment[1..-1].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
       super(method, path, opts)
     end
   end

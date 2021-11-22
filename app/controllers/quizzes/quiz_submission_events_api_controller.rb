@@ -123,7 +123,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
         reject! "quiz log auditing must be enabled", 400
       end
 
-      if params.key?(:attempt)
+      if params.has_key?(:attempt)
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 

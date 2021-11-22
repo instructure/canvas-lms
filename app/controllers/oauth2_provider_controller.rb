@@ -29,10 +29,10 @@ class OAuth2ProviderController < ApplicationController
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
-      return render
+      return render()
     end
 
-    scopes = (params[:scope] || params[:scopes] || '').split
+    scopes = (params[:scope] || params[:scopes] || '').split(' ')
 
     provider = Canvas::OAuth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
     unless provider.has_valid_key?
@@ -109,14 +109,14 @@ class OAuth2ProviderController < ApplicationController
   end
 
   def accept
-    return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
+    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
 
     redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
   end
 
   def deny
-    return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
+    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
 
     params = { error: "access_denied" }
     params[:state] = session[:oauth2][:state] if session[:oauth2].key? :state
@@ -128,12 +128,11 @@ class OAuth2ProviderController < ApplicationController
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass
 
-    granter = case grant_type
-              when "authorization_code"
+    granter = if grant_type == "authorization_code"
                 Canvas::OAuth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
-              when "refresh_token"
+              elsif grant_type == "refresh_token"
                 Canvas::OAuth::GrantTypes::RefreshToken.new(client_id, secret, params)
-              when 'client_credentials'
+              elsif grant_type == 'client_credentials'
                 Canvas::OAuth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
               else
                 Canvas::OAuth::GrantTypes::BaseType.new(client_id, secret, params)
@@ -163,7 +162,7 @@ class OAuth2ProviderController < ApplicationController
       end
       logout_current_user
     end
-    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => :bad_request unless @access_token
+    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
 
     @access_token.destroy
     response = {}
@@ -176,15 +175,17 @@ class OAuth2ProviderController < ApplicationController
   def oauth_error(exception)
     if @should_not_redirect || params[:redirect_uri] == Canvas::OAuth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
       response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
-      render(exception.to_render_data)
+      return render(exception.to_render_data)
     else
       redirect_to exception.redirect_uri(params[:redirect_uri])
     end
   end
 
   def grant_type
-    @grant_type ||= params[:grant_type] || (
+    @grant_type ||= (
+      params[:grant_type] || (
         !params[:grant_type] && params[:code] ? "authorization_code" : "__UNSUPPORTED_PLACEHOLDER__"
       )
+    )
   end
 end

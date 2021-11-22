@@ -16,42 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import FilterNav from './FilterNav'
 
 export default {
   title: 'Examples/Evaluate/Gradebook/FilterNav',
   component: FilterNav,
-  args: {
-    filters: [],
-    onChange: () => {},
-    modules: [
-      {id: '1', name: 'Module 1'},
-      {id: '2', name: 'Module 2'},
-      {id: '3', name: 'Module 3'}
-    ],
-    assignmentGroups: [
-      {id: '4', name: 'Assignment Group 4'},
-      {id: '5', name: 'Assignment Group 5'},
-      {id: '6', name: 'Assignment Group 6'}
-    ],
-    sections: [
-      {id: '7', name: 'Section 7'},
-      {id: '8', name: 'Section 8'},
-      {id: '9', name: 'Section 9'}
-    ]
-  }
+  args: {}
 }
 
-const Wrapper = props => {
-  const [filters, setFilters] = useState(props.filters)
-  return (
-    <>
-      <FilterNav {...props} filters={filters} onChange={f => setFilters(f)} />
-      <pre>{JSON.stringify(filters, null, 2)}</pre>
-    </>
-  )
-}
-
-const Template = args => <Wrapper {...args} />
+const Template = args => <FilterNav {...args} />
 export const Default = Template.bind({})

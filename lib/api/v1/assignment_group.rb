@@ -23,20 +23,20 @@ module Api::V1::AssignmentGroup
   include Api::V1::Assignment
   include Api::V1::Submission
 
-  API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS = %w[
+  API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS = %w(
     name
     position
     group_weight
     rules
     sis_source_id
     integration_data
-  ].freeze
+  ).freeze
 
   def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
     opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
-    hash = api_json(group, user, session, :only => %w[id name position group_weight sis_source_id integration_data])
+    hash = api_json(group, user, session, :only => %w(id name position group_weight sis_source_id integration_data))
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
@@ -53,11 +53,8 @@ module Api::V1::AssignmentGroup
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
 
-      needs_grading_course_proxy = if group.context.grants_right?(user, session, :manage_grades)
-                                     Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user)
-                                   else
-                                     nil
-                                   end
+      needs_grading_course_proxy = group.context.grants_right?(user, session, :manage_grades) ?
+        Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user) : nil
 
       unless includes.include?('module_ids') || group.context.grants_right?(user, session, :read_as_admin)
         Assignment.preload_context_module_tags(assignments) # running this again is fine
@@ -129,7 +126,7 @@ module Api::V1::AssignmentGroup
     assignment_ids = assignments.pluck(:id).join(",")
     last_grading_period = grading_periods.order(end_date: :desc).first
 
-    submissions = ActiveRecord::Base.connection.select_all(<<~SQL.squish)
+    submissions = ActiveRecord::Base.connection.select_all(<<~SQL)
       SELECT DISTINCT ON (assignment_id) assignment_id, user_id
       FROM #{Submission.quoted_table_name}
       WHERE

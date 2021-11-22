@@ -28,19 +28,16 @@ module FeatureFlags
 
     def self.wrap_translate_text(value)
       return -> { "" } if value.empty?
-
-      case value
-      when String
-        -> { I18n.send(:t, value) }
-      when Hash
+      if value.is_a?(String)
+        return -> { I18n.send(:t, value) }
+      elsif value.is_a?(Hash)
         wrapper = value.delete(:wrapper)
         keys = value.keys
         raise "invalid i18n settings while translating: #{value}" if keys.size != 1
-
         if wrapper
-          -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { '*' => wrapper }) }
+          return -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { '*' => wrapper }) }
         else
-          -> { I18n.send(:t, keys[0], value[keys[0]]) }
+          return -> { I18n.send(:t, keys[0], value[keys[0]]) }
         end
       else
         raise "unable to handle translation: #{value}"
@@ -55,19 +52,19 @@ module FeatureFlags
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end
-      definition[:enable_at] = Date.parse(definition[:enable_at]) if definition[:enable_at]
+      definition[:enable_at] = eval(definition[:enable_at]) if definition[:enable_at]
       definition[:state] = ensure_state_if_boolean(definition[:state]) if definition.key? :state
       definition[:environments]&.each do |_env_name, env|
         env[:state] = ensure_state_if_boolean(env[:state]) if env.key? :state
-        env[:enable_at] = Date.parse(env[:enable_at]) if env.key? :enable_at
+        env[:enable_at] = eval(env[:enable_at]) if env.key? :enable_at
       end
       Feature.register({ name => definition })
     end
 
     def self.load_yaml_files
       result = {}
-      (Dir.glob(Rails.root.join('config/feature_flags/*.yml')) +
-        Dir.glob(Rails.root.join('gems/plugins/*/config/feature_flags/*.yml'))).sort.each do |path|
+      (Dir.glob(Rails.root.join('config', 'feature_flags', '*.yml')) +
+        Dir.glob(Rails.root.join('gems', 'plugins', '*', 'config', 'feature_flags', '*.yml'))).sort.each do |path|
         result.merge!(YAML.load_file(path))
       end
       result.each do |_name, definition|
@@ -77,9 +74,9 @@ module FeatureFlags
     end
 
     def self.load_feature_flags
-      definitions = load_yaml_files
+      definitions = self.load_yaml_files
       definitions.each do |name, definition|
-        load_definition(name, definition)
+        self.load_definition(name, definition)
       end
     end
 
@@ -91,7 +88,7 @@ module FeatureFlags
         return value ? "on" : "off"
       end
 
-      value
+      return value
     end
   end
 end

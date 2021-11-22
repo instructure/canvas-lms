@@ -19,15 +19,14 @@
 #
 
 require 'net/pop'
+require File.expand_path('../configurable_timeout', __FILE__)
 require 'zlib'
-
-require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class Pop3Mailbox
     include ConfigurableTimeout
 
-    UsedPopMethods = [:start, :mails, :finish].freeze
+    UsedPopMethods = [:start, :mails, :finish]
 
     attr_accessor :server, :port, :ssl, :username, :password
 
@@ -54,7 +53,7 @@ module IncomingMailProcessor
 
     def each_message(opts = {})
       mails = @pop.mails
-      # NOTE: stride and offset require the pop server to support the optional UIDL command
+      # note that stride and offset require the pop server to support the optional UIDL command
       mails = mails.select { |mail| Zlib.crc32(with_timeout { mail.uidl }) % opts[:stride] == opts[:offset] } if opts[:stride] && opts[:offset]
       mails.each do |message|
         yield message, message.pop

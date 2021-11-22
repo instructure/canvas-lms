@@ -177,11 +177,9 @@ class ConferencesController < ApplicationController
     return unless @current_user
 
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = if @context.grants_right?(@current_user, :manage_content)
-                    @context.web_conferences.active
-                  else
-                    @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
-                  end
+    conferences = @context.grants_right?(@current_user, :manage_content) ?
+      @context.web_conferences.active :
+      @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
     conferences = conferences.with_config_for(context: @context).order("created_at DESC, id DESC")
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
   end
@@ -334,7 +332,7 @@ class ConferencesController < ApplicationController
           return redirect_to(urls.first[:url])
         end
       end
-      redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
+      return redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
     end
   end
 
@@ -406,7 +404,7 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
       end
     end
-  rescue => e
+  rescue StandardError => e
     Canvas::Errors.capture(e)
     flash[:error] = t("There was an error joining the conference.")
     redirect_to named_context_url(@context, :context_conferences_url)

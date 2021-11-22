@@ -83,7 +83,7 @@ module CanvasErrors
   # convenience method, use this if you want to apply the 'type' tag without
   # having to pass in a whole hash
   def self.capture_exception(type, exception, level = :error)
-    capture(exception, { tags: { type: type.to_s } }, level)
+    self.capture(exception, { tags: { type: type.to_s } }, level)
   end
 
   # This is really just for clearing out the registry during tests,
@@ -107,8 +107,8 @@ module CanvasErrors
   end
 
   def self.run_callbacks(exception, extra, level = :error)
-    registry.transform_values do |callback|
-      callback.call(exception, extra, level)
+    registry.each_with_object({}) do |(key, callback), outputs|
+      outputs[key] = callback.call(exception, extra, level)
     end
   end
   private_class_method :run_callbacks

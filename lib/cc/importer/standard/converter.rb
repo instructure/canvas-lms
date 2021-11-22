@@ -30,7 +30,7 @@ module CC::Importer::Standard
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
-    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/.freeze
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
 
     attr_accessor :resources
 
@@ -42,7 +42,7 @@ module CC::Importer::Standard
       @resources = {}
       @file_path_migration_id = {}
       @resource_nodes_for_flat_manifest = {}
-      @convert_html_to_pages = content_migration&.context&.feature_enabled?(:common_cartridge_page_conversion)
+      @convert_html_to_pages = self.content_migration&.context&.feature_enabled?(:common_cartridge_page_conversion)
     end
 
     # exports the package into the intermediary json
@@ -82,7 +82,7 @@ module CC::Importer::Standard
       @resources.values.select { |r| r[:preferred_resource_id] }.each do |res|
         preferred = @resources[res[:preferred_resource_id]]
         if preferred && preferred != res
-          if SUPPORTED_TYPES.match?(preferred[:type])
+          if preferred[:type] =~ SUPPORTED_TYPES
             # The preferred resource is supported, use it instead
             @resources[res[:migration_id]] = preferred
           else
@@ -121,7 +121,7 @@ module CC::Importer::Standard
           return url
         end
       end
-      path = path[1..] if path.start_with?('/')
+      path = path[1..-1] if path.start_with?('/')
       mig_id = nil
       if resource_dir && resource_dir != "."
         mig_id = find_file_migration_id(File.join(resource_dir, path))
@@ -146,7 +146,7 @@ module CC::Importer::Standard
       return unless file[:path_name]
 
       file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
-      file[:path_name] = file[:path_name][1..] if file[:path_name].start_with?('/')
+      file[:path_name] = file[:path_name][1..-1] if file[:path_name].start_with?('/')
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]
@@ -156,7 +156,7 @@ module CC::Importer::Standard
       add_file(file)
     end
 
-    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/.freeze
+    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
     def replace_urls(html, resource_dir = nil)
       return "" if html.blank?
 
@@ -167,10 +167,10 @@ module CC::Importer::Standard
           if node[attr]
             val = URI.unescape(node[attr])
             begin
-              if FILEBASE_REGEX.match?(val)
+              if val =~ FILEBASE_REGEX
                 val.gsub!(FILEBASE_REGEX, '')
                 if (new_url = get_canvas_att_replacement_url(val, resource_dir))
-                  node[attr] = URI.escape(new_url)
+                  node[attr] = URI::escape(new_url)
 
                   if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
                     node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
@@ -179,7 +179,7 @@ module CC::Importer::Standard
               else
                 if ImportedHtmlConverter.relative_url?(val)
                   if (new_url = get_canvas_att_replacement_url(val))
-                    node[attr] = URI.escape(new_url)
+                    node[attr] = URI::escape(new_url)
                   end
                 end
               end

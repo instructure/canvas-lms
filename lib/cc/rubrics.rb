@@ -44,7 +44,7 @@ module CC
           rubric = assoc.rubric
           next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
 
-          unless export_object?(rubric)
+          if !export_object?(rubric)
             next if assoc.association_type != "Assignment"
 
             assignment = assoc.association_object
@@ -65,12 +65,12 @@ module CC
               r_node.external_identifier rubric.id
             end
             atts.each do |att|
-              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || rubric.send(att).present?
+              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || !rubric.send(att).blank?
             end
             r_node.description rubric.description if rubric.description
 
             r_node.criteria do |c_node|
-              if rubric.data.present?
+              if rubric.data && rubric.data.length > 0
                 rubric.data.each do |crit|
                   add_criterion(c_node, crit)
                 end
@@ -80,7 +80,7 @@ module CC
         end
       end
 
-      rubrics_file&.close
+      rubrics_file.close if rubrics_file
       rel_path
     end
 
@@ -103,7 +103,7 @@ module CC
           end
         end
 
-        if criterion[:ratings].present?
+        if criterion[:ratings] && criterion[:ratings].length > 0
           c_node.ratings do |ratings_node|
             criterion[:ratings].each do |rating|
               ratings_node.rating do |rating_node|

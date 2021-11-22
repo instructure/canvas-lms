@@ -31,7 +31,7 @@ describe "assignments sync to sis" do
   include CustomScreenActions
   include CustomSeleniumActions
 
-  # NOTE: due date testing can be found in assignments_overrides_spec
+  # note: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
     before(:once) do

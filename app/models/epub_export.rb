@@ -43,7 +43,7 @@ class EpubExport < ActiveRecord::Base
   def update_progress_from_content_export!(val)
     multiplier = PERCENTAGE_COMPLETE[:exported].to_f / 100
     n = val * multiplier
-    job_progress.update_completion!(n.to_i)
+    self.job_progress.update_completion!(n.to_i)
   end
 
   workflow do
@@ -56,7 +56,9 @@ class EpubExport < ActiveRecord::Base
     state :deleted
   end
 
-  delegate :broadcast_data, to: :course, prefix: true
+  def course_broadcast_data
+    course.broadcast_data
+  end
 
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
@@ -104,7 +106,7 @@ class EpubExport < ActiveRecord::Base
 
     given do |user|
       ['generated', 'failed'].include?(workflow_state) &&
-        grants_right?(user, :create)
+        self.grants_right?(user, :create)
     end
     can :regenerate
   end
@@ -158,7 +160,7 @@ class EpubExport < ActiveRecord::Base
 
   # Epub Exportable overrides
   def content_cartridge
-    content_export.attachment
+    self.content_export.attachment
   end
 
   def self.fail_stuck_epub_exports(exports)
@@ -190,7 +192,7 @@ class EpubExport < ActiveRecord::Base
       file_path,
       mime_type.try(:content_type)
     )
-    attachment = attachments.new
+    attachment = self.attachments.new
     attachment.filename = File.basename(file_path)
     Attachments::Storage.store_for_attachment(attachment, file)
     attachment.save!
@@ -206,7 +208,7 @@ class EpubExport < ActiveRecord::Base
   end
 
   def sort_by_content_type?
-    course.organize_epub_by_content_type
+    self.course.organize_epub_by_content_type
   end
 
   private

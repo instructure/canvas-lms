@@ -23,7 +23,7 @@ require 'attachment_fu/backends/file_system_backend'
 require 'attachment_fu/backends/s3_backend'
 
 module AttachmentFu # :nodoc:
-  @@default_processors = %w[MiniMagick]
+  @@default_processors = %w(MiniMagick)
   # Instructure: I (ryan shaw) just copied and pasted this from http://github.com/technoweenie/attachment_fu/blob/master/lib/technoweenie/attachment_fu.rb
   @@content_types      = [
     'image/jpeg',
@@ -121,7 +121,7 @@ module AttachmentFu # :nodoc:
       if attachment_options[:path_prefix].nil?
         attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
       end
-      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == '/'
+      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..-1] if options[:path_prefix].first == '/'
 
       with_options :foreign_key => 'parent_id' do |m|
         m.has_many   :thumbnails, :class_name => "::#{attachment_options[:thumbnail_class]}"
@@ -159,9 +159,14 @@ module AttachmentFu # :nodoc:
     end
 
     def load_related_exception?(e) # :nodoc: implementation specific
-      # We can't rescue CompilationError directly, as it is part of the RubyInline library.
-      # We must instead rescue RuntimeError, and check the class' name.
-      e.is_a?(LoadError) || e.is_a?(MissingSourceFile) || e.instance_of?(CompilationError)
+      case
+      when e.kind_of?(LoadError), e.kind_of?(MissingSourceFile), $!.class.name == "CompilationError"
+        # We can't rescue CompilationError directly, as it is part of the RubyInline library.
+        # We must instead rescue RuntimeError, and check the class' name.
+        true
+      else
+        false
+      end
     end
     private :load_related_exception?
   end
@@ -247,8 +252,7 @@ module AttachmentFu # :nodoc:
 
       ext = nil
       basename = filename.gsub(/\.\w+$/) do |s|
-        ext = s
-        ''
+        ext = s; ''
       end
       # ImageScience doesn't create gif thumbnails, only pngs
       ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
@@ -261,7 +265,7 @@ module AttachmentFu # :nodoc:
 
     # Creates or updates the thumbnail for the current attachment.
     def create_or_update_thumbnail(temp_file, file_name_suffix, *size)
-      thumbnailable? || raise(ThumbnailError, "Can't create a thumbnail if the content type is not an image or there is no parent_id column")
+      thumbnailable? || raise(ThumbnailError.new("Can't create a thumbnail if the content type is not an image or there is no parent_id column"))
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
           :content_type => content_type,
@@ -277,18 +281,18 @@ module AttachmentFu # :nodoc:
     end
 
     def create_thumbnail_size(target_size)
-      actual_size = attachment_options[:thumbnails][target_size]
+      actual_size = self.attachment_options[:thumbnails][target_size]
       raise "this class doesn't have a thubnail size for #{target_size}" if actual_size.nil?
 
       begin
-        tmp = create_temp_file
-        res = create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
+        tmp = self.create_temp_file
+        res = self.create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
       rescue Aws::S3::Errors::NoSuchKey => e
-        logger.warn("error when trying to make thumbnail for attachment_id: #{id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
+        logger.warn("error when trying to make thumbnail for attachment_id: #{self.id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
       rescue ThumbnailError => e
-        logger.warn("error creating thumbnail for attachment_id #{id}: #{e.inspect}")
+        logger.warn("error creating thumbnail for attachment_id #{self.id}: #{e.inspect}")
       ensure
-        tmp&.unlink
+        tmp.unlink if tmp
       end
 
       res
@@ -306,26 +310,24 @@ module AttachmentFu # :nodoc:
 
     # Returns the width/height in a suitable format for the image_tag helper: (100x100)
     def image_size
-      [width.to_s, height.to_s].join('x')
+      [width.to_s, height.to_s] * 'x'
     end
 
     # Returns true if the attachment data will be written to the storage system on the next save
     def save_attachment?
-      if is_a?(Attachment)
-        if root_attachment_id && new_record?
+      if self.is_a?(Attachment)
+        if self.root_attachment_id && self.new_record?
           return false
         end
 
-        filename && File.file?(temp_path.to_s)
+        self.filename && File.file?(temp_path.to_s)
       else
         File.file?(temp_path.to_s)
       end
     end
 
     # nil placeholder in case this field is used in a form.
-    def uploaded_data
-      nil
-    end
+    def uploaded_data() nil; end
 
     # This method handles the uploaded file object.  If you set the field name to uploaded_data, you don't need
     # any special code in your controller.
@@ -339,31 +341,31 @@ module AttachmentFu # :nodoc:
     #
     # TODO: Allow it to work with Merb tempfiles too.
     def uploaded_data=(file_data)
-      return if file_data.blank?
+      if self.is_a?(Attachment)
+        return if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
 
-      if is_a?(Attachment)
         # glean information from the file handle
         self.content_type = detect_mimetype(file_data)
         self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
         file_from_path = true
-        if file_data.respond_to?(:path) && file_data.path.present?
-          temp_paths.unshift file_data
-        else
+        unless file_data.respond_to?(:path) && file_data.path.present?
           file_data.rewind
           self.temp_data = file_data.read
           file_from_path = false
+        else
+          self.temp_paths.unshift file_data
         end
         # If we're overwriting an existing file, we need to take serious
         # precautions, since other Attachment records could be using this file.
         # We first remove any root references for this file, and then we generate
         # a new unique filename for this file so anybody children of this attachment
         # will still be able to get at the original.
-        unless new_record?
+        if !self.new_record?
           self.root_attachment = nil
           self.root_attachment_id = nil
           self.workflow_state = nil
           self.filename = filename.sub(/\A\d+_\d+__/, "")
-          self.filename = "#{Time.now.to_i}_#{rand(999)}__#{filename}" if filename
+          self.filename = "#{Time.now.to_i}_#{rand(999)}__#{self.filename}" if self.filename
         end
         unless attachment_options[:skip_sis]
           read_bytes = false
@@ -371,7 +373,7 @@ module AttachmentFu # :nodoc:
           begin
             io = file_data
             if file_from_path
-              io = File.open(temp_path, 'rb')
+              io = File.open(self.temp_path, 'rb')
             end
             io.rewind
             io.each_line do |line|
@@ -393,23 +395,25 @@ module AttachmentFu # :nodoc:
         end
         file_data
       else
+        return if file_data.nil? || file_data.size == 0
+
         self.content_type = file_data.content_type
         self.filename     = file_data.original_filename if respond_to?(:filename)
-        if file_data.respond_to?(:path)
-          self.temp_path = file_data
-        else
+        unless file_data.respond_to?(:path)
           file_data.rewind
           self.temp_data = file_data.read
+        else
+          self.temp_path = file_data
         end
       end
     end
 
     def find_existing_attachment_for_md5
-      shard.activate do
+      self.shard.activate do
         GuardRail.activate(:secondary) do
-          if md5.present? && (ns = infer_namespace)
+          if self.md5.present? && (ns = self.infer_namespace)
             scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
-            scope = scope.where.not(filename: nil)
+            scope = scope.where("filename IS NOT NULL")
             scope = scope.where("id<>?", self) unless new_record?
             scope.detect { |a| a.store.exists? }
           end
@@ -418,14 +422,14 @@ module AttachmentFu # :nodoc:
     end
 
     def detect_mimetype(file_data)
-      if file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
+      if file_data && file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
         res = nil
         res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
         res ||= File.mime_type?(file_data)
-        res ||= "text/plain" unless file_data.respond_to?(:path)
+        res ||= "text/plain" if !file_data.respond_to?(:path)
         res || 'unknown/unknown'
       elsif file_data.respond_to?(:content_type)
-        file_data.content_type
+        return file_data.content_type
       else
         'unknown/unknown'
       end
@@ -443,11 +447,8 @@ module AttachmentFu # :nodoc:
     # Gets an array of the currently used temp paths.  Defaults to a copy of #full_filename.
     def temp_paths
       # INSTRUCTURE: was "@temp_paths ||= (new_record? || !respond_to?(:full_filename) || !File.exist?(full_filename) ?"
-      @temp_paths ||= if new_record? || !respond_to?(:full_filename) || !full_filename || !File.exist?(full_filename)
-                        []
-                      else
-                        [copy_to_temp_file(full_filename)]
-                      end
+      @temp_paths ||= (new_record? || !respond_to?(:full_filename) || !full_filename || !File.exist?(full_filename) ?
+        [] : [copy_to_temp_file(full_filename)])
     end
 
     # Adds a new temp_path to the array.  This should take a string or a Tempfile.  This class makes no
@@ -495,14 +496,14 @@ module AttachmentFu # :nodoc:
 
     # Generates a unique filename for a Tempfile.
     def random_tempfile_filename
-      "#{rand Time.now.to_i}#{filename&.last(50) || 'attachment'}"
+      "#{rand Time.now.to_i}#{(filename && filename.last(50)) || 'attachment'}"
     end
 
     def sanitize_filename(filename)
       filename.strip.tap do |name|
         # NOTE: File.basename doesn't work right with Windows paths on Unix
         # get only the filename, not the whole path
-        name.gsub!(%r{^.*(\\|/)}, '')
+        name.gsub!(/^.*(\\|\/)/, '')
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
         name.gsub!(/[^\w.\-]/, '_')
@@ -532,7 +533,7 @@ module AttachmentFu # :nodoc:
     # Stub for a #process_attachment method in a processor
     def process_attachment
       @saved_attachment = save_attachment?
-      run_before_attachment_saved if @saved_attachment && respond_to?(:run_before_attachment_saved)
+      run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
       @saved_attachment
     end
 
@@ -563,12 +564,12 @@ module AttachmentFu # :nodoc:
           save_to_storage
           @temp_paths.clear
           @saved_attachment = nil
-          run_after_attachment_saved if respond_to?(:run_after_attachment_saved)
+          run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
           run_callbacks(:save_and_attachment_processing)
         end
 
         if Rails.env.test?
-          save_and_callbacks.call
+          save_and_callbacks.call()
         else
           self.class.connection.after_transaction_commit(&save_and_callbacks)
         end
@@ -588,7 +589,7 @@ module AttachmentFu # :nodoc:
 
     # Removes the thumbnails for the attachment, if it has any
     def destroy_thumbnails
-      thumbnails.each(&:destroy) if thumbnailable?
+      self.thumbnails.each { |thumbnail| thumbnail.destroy } if thumbnailable?
     end
   end
 end

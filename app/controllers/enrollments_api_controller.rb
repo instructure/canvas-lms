@@ -422,17 +422,11 @@ class EnrollmentsApiController < ApplicationController
   # @returns [Enrollment]
   def index
     GuardRail.activate(:secondary) do
-      endpoint_scope = if @context.is_a?(Course)
-                         @section.present? ? "section" : "course"
-                       else
-                         "user"
-                       end
+      endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
-      return unless (enrollments = if @context.is_a?(Course)
-                                     course_index_enrollments
-                                   else
-                                     user_index_enrollments
-                                   end)
+      return unless (enrollments = @context.is_a?(Course) ?
+                                    course_index_enrollments :
+                                    user_index_enrollments)
 
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
@@ -449,11 +443,11 @@ class EnrollmentsApiController < ApplicationController
 
       if params[:sis_user_id].present?
         pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        enrollments = if value_to_boolean(params[:created_for_sis_id])
-                        enrollments.where(sis_pseudonym: pseudonyms)
-                      else
-                        enrollments.where(user_id: pseudonyms.pluck(:user_id))
-                      end
+        if value_to_boolean(params[:created_for_sis_id])
+          enrollments = enrollments.where(sis_pseudonym: pseudonyms)
+        else
+          enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
+        end
       end
 
       if params[:sis_section_id].present?
@@ -473,13 +467,13 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if params[:grading_period_id].present?
-        grading_period = if @context.is_a? User
-                           @context.courses.lazy.map do |course|
-                             GradingPeriod.for(course).find_by(id: params[:grading_period_id])
-                           end.detect(&:present?)
-                         else
-                           GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
-                         end
+        if @context.is_a? User
+          grading_period = @context.courses.lazy.map do |course|
+            GradingPeriod.for(course).find_by(id: params[:grading_period_id])
+          end.detect(&:present?)
+        else
+          grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
+        end
 
         unless grading_period
           render(:json => { error: "invalid grading_period_id" }, :status => :bad_request)
@@ -637,7 +631,7 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
-      if role&.course_role? && !role.deleted?
+      if role && role.course_role? && !role.deleted?
         type = role.base_role_type if type.blank?
         if role.inactive?
           errors << @@errors[:inactive_role]
@@ -677,18 +671,16 @@ class EnrollmentsApiController < ApplicationController
       end
     end
 
-    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].key?(:limit_privileges_to_course_section)
+    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].has_key?(:limit_privileges_to_course_section)
     params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
     DueDateCacher.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     end
 
-    if @enrollment.valid?
-      render(:json => enrollment_json(@enrollment, @current_user, session))
-    else
+    @enrollment.valid? ?
+      render(:json => enrollment_json(@enrollment, @current_user, session)) :
       render(:json => @enrollment.errors, :status => :bad_request)
-    end
   end
 
   def create_self_enrollment
@@ -879,7 +871,7 @@ class EnrollmentsApiController < ApplicationController
       # if you pass in your own id, you can see if you are enrolled in the
       # course, regardless of whether you have read_roster
       scope = user_index_enrollments
-      return scope&.where(course_id: @context.id)
+      return scope && scope.where(course_id: @context.id)
     end
 
     if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
@@ -914,20 +906,20 @@ class EnrollmentsApiController < ApplicationController
     if user == @current_user
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
-      enrollments = if params[:state].present?
-                      user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
-                          .where(enrollment_states: { state: enrollment_states_for_state_param })
-                    else
-                      user.enrollments.current_and_invited.where(enrollment_index_conditions)
+      if params[:state].present?
+        enrollments = user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
+                          .where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
+      else
+        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
-                    end
+      end
     else
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
-      approved_accounts = user.associated_root_accounts.filter_map do |ra|
+      approved_accounts = user.associated_root_accounts.map do |ra|
         ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
-      end
+      end.compact
 
       # if there aren't any ids in approved_accounts, then the user doesn't have
       # permissions.
@@ -939,7 +931,7 @@ class EnrollmentsApiController < ApplicationController
       # by default, return active and invited courses. don't use the existing
       # current_and_invited_enrollments scope because it won't return enrollments
       # on unpublished courses.
-      enrollments = enrollments.where(workflow_state: %w[active invited]) if params[:state].blank?
+      enrollments = enrollments.where(workflow_state: %w{active invited}) if params[:state].blank?
     end
 
     terms = @domain_root_account.enrollment_terms.active
@@ -963,7 +955,7 @@ class EnrollmentsApiController < ApplicationController
     clauses = []
     replacements = {}
 
-    if role_ids.blank? && role_names.present?
+    if !role_ids.present? && role_names.present?
       role_ids = Array(role_names).map { |name| @context.account.get_course_role_by_name(name).id }
     end
 
@@ -979,7 +971,7 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       if use_course_state
-        conditions = state.filter_map { |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }
+        conditions = state.map { |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }.compact
         clauses << "(#{conditions.join(' OR ')})"
       else
         clauses << 'enrollments.workflow_state IN (:workflow_state)'
@@ -997,14 +989,14 @@ class EnrollmentsApiController < ApplicationController
 
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
-    states.concat(%w[active invited]) if states.delete 'current_and_invited'
-    states.concat(%w[active invited creation_pending pending_active pending_invited]) if states.delete 'current_and_future'
-    states.concat(%w[active completed]) if states.delete 'current_and_concluded'
+    states.concat(%w(active invited)) if states.delete 'current_and_invited'
+    states.concat(%w(active invited creation_pending pending_active pending_invited)) if states.delete 'current_and_future'
+    states.concat(%w(active completed)) if states.delete 'current_and_concluded'
     states.uniq
   end
 
   def check_sis_permissions(sis_context)
-    sis_filters = %w[sis_account_id sis_course_id sis_section_id sis_user_id]
+    sis_filters = %w(sis_account_id sis_course_id sis_section_id sis_user_id)
     if (params.keys & sis_filters).present?
       unless sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
         return false

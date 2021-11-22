@@ -23,9 +23,9 @@ class DockerUtils
   class << self
     def compose_config(*compose_files)
       merger = proc do |_, v1, v2|
-        if v1.is_a?(Hash) && v2.is_a?(Hash)
+        if Hash === v1 && Hash === v2
           v1.merge(v2, &merger)
-        elsif v1.is_a?(Array) && v2.is_a?(Array)
+        elsif Array === v1 && Array === v2
           v1.concat(v2)
         else
           v2

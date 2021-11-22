@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SortsAssignments
-  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :unsubmitted, :upcoming, :future].freeze
+  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :unsubmitted, :upcoming, :future]
   AssignmentsSortedByDueDate = Struct.new(*VALID_BUCKETS)
 
   class << self
@@ -49,12 +49,12 @@ class SortsAssignments
 
     def dated(assignments)
       assignments ||= []
-      assignments.reject { |assignment| assignment.due_at.nil? }
+      assignments.reject { |assignment| assignment.due_at == nil }
     end
 
     def undated(assignments)
       assignments ||= []
-      assignments.select { |assignment| assignment.due_at.nil? }
+      assignments.select { |assignment| assignment.due_at == nil }
     end
 
     def unsubmitted_for_user_and_session(course, assignments, user, current_user, session)
@@ -94,9 +94,11 @@ class SortsAssignments
     end
 
     def without_graded_submission(assignments, submissions)
-      assignments ||= []
-      submissions ||= []
-      submissions_by_assignment = submissions.index_by(&:assignment_id)
+      assignments ||= []; submissions ||= [];
+      submissions_by_assignment = submissions.inject({}) do |memo, sub|
+        memo[sub.assignment_id] = sub
+        memo
+      end
       assignments.select do |assignment|
         match = submissions_by_assignment[assignment.id]
         !match || match.without_graded_submission?
@@ -127,7 +129,7 @@ class SortsAssignments
                            user
                          end
 
-      sorted_assignments = by_due_date(
+      sorted_assignments = self.by_due_date(
         :course => context,
         :assignments => overridden_assignments,
         :user => user_for_sorting,

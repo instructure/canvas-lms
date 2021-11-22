@@ -185,7 +185,7 @@ class MediaObjectsController < ApplicationController
         )
       end
 
-      extend TextHelper
+      self.extend TextHelper
       @media_object.user_entered_title =
         CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
       @media_object.save!
@@ -198,7 +198,7 @@ class MediaObjectsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
-        extend TextHelper
+        self.extend TextHelper
 
         # The MediaObject will be created on the current shard,
         # not the @context's shard.
@@ -212,7 +212,7 @@ class MediaObjectsController < ApplicationController
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title].present?
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
       render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
@@ -232,7 +232,7 @@ class MediaObjectsController < ApplicationController
 
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
-    mo&.viewed!
+    mo.viewed! if mo
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
@@ -257,7 +257,7 @@ class MediaObjectsController < ApplicationController
                                                             :width => width,
                                                             :height => height,
                                                             :type => type),
-                  :status => :moved_permanently
+                  :status => 301
     else
       render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end

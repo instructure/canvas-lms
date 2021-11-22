@@ -24,10 +24,10 @@ describe "Gradebook - group weights" do
   include_context "in-process server selenium tests"
   include GradebookCommon
 
-  def student_totals
+  def student_totals()
     totals = ff('.total-cell')
     points = []
-    totals.each do |i|
+    for i in totals do
       points.push(i.text)
     end
     points

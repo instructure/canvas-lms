@@ -46,7 +46,7 @@ module Importers
       return if migration.import_everything?
 
       (data['modules'] || []).each do |mod|
-        select_linked_module_items(mod, migration)
+        self.select_linked_module_items(mod, migration)
       end
     end
 
@@ -55,7 +55,7 @@ module Importers
         (mod['items'] || []).each do |item|
           if item['type'] == 'submodule'
             # recursively select content in submodules
-            select_linked_module_items(item, migration, true)
+            self.select_linked_module_items(item, migration, true)
           elsif (resource_class = linked_resource_type_class(item['linked_resource_type']))
             migration.import_object!(resource_class.table_name, item['linked_resource_id'])
           end
@@ -63,18 +63,18 @@ module Importers
       else
         (mod['items'] || []).each do |item|
           if item['type'] == 'submodule'
-            select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
+            self.select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
           end
         end
       end
     end
 
     def self.process_migration(data, migration)
-      modules = data['modules'] || []
+      modules = data['modules'] ? data['modules'] : []
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
 
       modules.each do |mod|
-        process_module(mod, migration)
+        self.process_module(mod, migration)
       end
       migration.context.context_modules.first.try(:fix_position_conflicts)
       migration.context.touch
@@ -83,7 +83,7 @@ module Importers
     def self.process_module(mod, migration)
       if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
         begin
-          import_from_migration(mod, migration.context, migration)
+          self.import_from_migration(mod, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
         end
@@ -92,7 +92,7 @@ module Importers
         (mod['items'] || []).each do |item|
           next unless item['type'] == 'submodule'
 
-          process_module(item, migration)
+          self.process_module(item, migration)
         end
       end
     end
@@ -101,7 +101,7 @@ module Importers
       if item['type'] == 'submodule'
         sub_items = []
         sub_items << { :type => 'heading', :title => item['title'], :indent => indent, :migration_id => item['migration_id'] }.with_indifferent_access
-        sub_items += (item['items'] || []).map { |i| flatten_item(i, indent + 1) }
+        sub_items += (item['items'] || []).map { |i| self.flatten_item(i, indent + 1) }
         sub_items
       else
         item[:indent] = (item[:indent] || 0) + indent
@@ -139,12 +139,12 @@ module Importers
       item.position = position
       item.context = context
 
-      if hash.key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
+      if hash.has_key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
         item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at])
       end
 
-      item.require_sequential_progress = hash[:require_sequential_progress] if hash.key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash.key?(:requirement_count)
+      item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
+      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []
@@ -155,19 +155,19 @@ module Importers
             end
           end
         end
-        item.prerequisites = preqs if !preqs.empty? || migration.for_master_course_import?
+        item.prerequisites = preqs if preqs.length > 0 || migration.for_master_course_import?
       end
       item.save!
 
       item_map = {}
       item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
-      items = items.map { |i| flatten_item(i, 0) }.flatten
+      items = items.map { |i| self.flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
 
       items.each do |tag_hash|
-        tags = add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+        tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
         imported_migration_ids.concat tags.map(&:migration_id)
       rescue
         migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
@@ -190,7 +190,7 @@ module Importers
             c_reqs << req
           end
         end
-        if !c_reqs.empty? || migration.for_master_course_import? # allow clearing requirements on sync
+        if c_reqs.length > 0 || migration.for_master_course_import? # allow clearing requirements on sync
           item.completion_requirements = c_reqs
           item.save
         end
@@ -246,14 +246,14 @@ module Importers
                                            :indent => hash[:indent].to_i
                                          }, existing_item, :assignment => ass, :position => context_module.migration_position)
         end
-      elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
+      elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
         # just a snippet of text
         item = context_module.add_item({
                                          :title => hash[:title] || hash[:linked_resource_title],
                                          :type => 'context_module_sub_header',
                                          :indent => hash[:indent].to_i
                                        }, existing_item, :position => context_module.migration_position)
-      elsif /url/i.match?(hash[:linked_resource_type])
+      elsif hash[:linked_resource_type] =~ /url/i
         # external url
         if (url = hash[:url])
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)
@@ -292,7 +292,7 @@ module Importers
           external_tool_url = migration.process_domain_substitutions(external_tool_url)
           if external_tool_id.nil?
             migration.add_warning(t(:foreign_lti_tool,
-                                    'The account External Tool for module item "%{title}" must be configured before the item can be launched',
+                                    %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
                                     :title => title))
           end
 
@@ -326,7 +326,7 @@ module Importers
         end
       elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
-        if topic&.is_announcement
+        if topic && topic.is_announcement
           migration.add_warning(t("The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"", :title => hash[:title], :mod_title => context_module.name))
         elsif topic
           item = context_module.add_item({
@@ -367,8 +367,10 @@ module Importers
         item.save!
         items << item
       end
-      hash[:sub_items]&.each do |tag_hash|
-        items.concat add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
+      if hash[:sub_items]
+        hash[:sub_items].each do |tag_hash|
+          items.concat self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
+        end
       end
       items
     end
@@ -381,9 +383,9 @@ module Importers
       new_url = uri.to_s
 
       if new_url.length < MAX_URL_LENGTH
-        new_url
+        return new_url
       else
-        nil
+        return nil
       end
     end
   end

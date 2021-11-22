@@ -29,7 +29,7 @@ module CC::Exporter::Epub::Converters
         cc_path = @package_root.item_path res.at_css('file')['href']
 
         canvas_id = get_node_att(res, 'dependency', 'identifierref')
-        if canvas_id && (meta_res = @manifest.at_css(%(resource[identifier="#{canvas_id}"])))
+        if canvas_id && (meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]}))
           canvas_path = @package_root.item_path meta_res.at_css('file')['href']
           meta_node = open_file_xml(canvas_path)
         else
@@ -39,10 +39,10 @@ module CC::Exporter::Epub::Converters
 
         next unless include_item?(meta_node, "active")
 
-        if get_node_val(meta_node, 'type') == "announcement"
-          announcements << convert_announcement(cc_doc, meta_node)
-        else
+        if get_node_val(meta_node, 'type') != "announcement"
           topics << convert_topic(cc_doc, meta_node)
+        else
+          announcements << convert_announcement(cc_doc, meta_node)
         end
       end
 

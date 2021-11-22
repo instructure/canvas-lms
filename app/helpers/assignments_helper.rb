@@ -58,7 +58,7 @@ module AssignmentsHelper
       multiple_due_dates
     else
       assignment = assignment.overridden_for(user)
-      due_date = assignment.due_at || assignment.applied_overrides.filter_map(&:due_at).first
+      due_date = assignment.due_at || assignment.applied_overrides.map(&:due_at).compact.first
       due_date ? datetime_string(due_date) : I18n.t('No Due Date')
     end
   end
@@ -101,7 +101,7 @@ module AssignmentsHelper
   end
 
   def i18n_grade(grade, grading_type = nil)
-    if grading_type == "pass_fail" && %w[complete incomplete].include?(grade)
+    if grading_type == "pass_fail" && %w{complete incomplete}.include?(grade)
       return grade == "complete" ? I18n.t("Complete") : I18n.t("Incomplete")
     end
 

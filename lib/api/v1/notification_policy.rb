@@ -23,8 +23,8 @@ module Api::V1::NotificationPolicy
   include Api::V1::Json
 
   JSON_OPTS = {
-    :only => %w[frequency]
-  }.freeze
+    :only => %w{frequency}
+  }
 
   def notification_policy_json(policy, user, session)
     api_json(policy, user, session, JSON_OPTS).tap do |json|

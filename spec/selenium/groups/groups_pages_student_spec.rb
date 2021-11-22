@@ -175,7 +175,7 @@ describe "groups" do
           message: 'The Force Awakens',
           user: @user
         )
-        # NOTE: announcement_url includes a leading '/'
+        # note announcement_url includes a leading '/'
         AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload
@@ -403,7 +403,7 @@ describe "groups" do
         skip_if_safari(:alert)
         get files_page
         add_folder
-        delete_file(0, :cog_icon)
+        delete(0, :cog_icon)
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
@@ -422,11 +422,11 @@ describe "groups" do
         skip_if_safari(:alert)
         add_test_files(false)
         get files_page
-        delete_file(0, :cog_icon)
+        delete(0, :cog_icon)
         wait_for_ajaximations
         expect(all_files_folders.count).to eq 1
         # Now try to delete the other one using toolbar menu
-        delete_file(0, :toolbar_menu)
+        delete(0, :toolbar_menu)
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
 
@@ -482,7 +482,6 @@ describe "groups" do
       end
     end
     #-------------------------------------------------------------------------------------------------------------------
-
     describe "collaborations page" do
       before do
         setup_google_drive

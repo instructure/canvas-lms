@@ -141,7 +141,7 @@ describe CalendarEventsApiController do
       s2 = @course.course_sections.create!(:name => 's2')
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
       factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
-      get 'public_feed', params: { :feed_code => "course_#{@course.uuid}", :format => 'ics' }
+      get 'public_feed', :feed_code => "course_#{@course.uuid}", :format => 'ics'
       expect(response).to be_successful
       expect(assigns[:events]).to be_present
       expect(assigns[:events]).to eq [c1]
@@ -168,7 +168,7 @@ describe CalendarEventsApiController do
         feed = Atom::Feed.load_feed(response.body) rescue nil
         expect(feed).not_to be_nil
         expect(feed.links.first.rel).to match(/self/)
-        expect(feed.links.first.href).to match(%r{http://})
+        expect(feed.links.first.href).to match(/http:\/\//)
       end
 
       it "includes an author for each entry" do

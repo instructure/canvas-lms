@@ -150,10 +150,10 @@ class GroupsController < ApplicationController
   include Context
   include K5Mode
 
-  SETTABLE_GROUP_ATTRIBUTES = %w[
+  SETTABLE_GROUP_ATTRIBUTES = %w(
     name description join_level is_public group_category avatar_attachment
     storage_quota_mb max_membership leader
-  ].freeze
+  ).freeze
 
   include TextHelper
 
@@ -170,11 +170,11 @@ class GroupsController < ApplicationController
 
     page = (params[:page] || 1).to_i rescue 1
     per_page = Api.per_page_for(self, default: 15, max: 100)
-    groups = if category && !category.student_organized?
-               category.groups.active
-             else
-               []
-             end
+    if category && !category.student_organized?
+      groups = category.groups.active
+    else
+      groups = []
+    end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
                     .paginate(page: page, per_page: per_page)
@@ -330,7 +330,7 @@ class GroupsController < ApplicationController
         end
       end
 
-      format.atom { render :xml => @groups.map(&:to_atom).to_xml }
+      format.atom { render :xml => @groups.map { |group| group.to_atom }.to_xml }
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
@@ -368,7 +368,7 @@ class GroupsController < ApplicationController
     find_group
     respond_to do |format|
       format.html do
-        if @group&.context
+        if @group && @group.context
           add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
           add_crumb @group.short_name, named_context_url(@group, :context_url)
         elsif @group
@@ -395,13 +395,14 @@ class GroupsController < ApplicationController
             return
           end
           @group.request_user(@current_user)
-          if @group.grants_right?(@current_user, session, :read)
+          if !@group.grants_right?(@current_user, session, :read)
+            render :membership_pending
+            return
+          else
             flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
             redirect_to named_context_url(@group.context, :context_groups_url)
-          else
-            render :membership_pending
+            return
           end
-          return
         end
         if params[:leave] && @group.grants_right?(@current_user, :leave)
           membership = @group.membership_for_user(@current_user)
@@ -576,7 +577,7 @@ class GroupsController < ApplicationController
     group_params = api_request? ? params : params.require(:group)
     attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
                                 :leader => strong_anything, :members => strong_anything)
-    attrs[:leader] = nil if group_params.key?(:leader) && group_params[:leader].blank?
+    attrs[:leader] = nil if group_params.has_key?(:leader) && !group_params[:leader].present?
 
     if !api_request? && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id
@@ -610,16 +611,16 @@ class GroupsController < ApplicationController
           @group.update(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
           if attrs[:members]
             user_ids = Api.value_to_array(attrs[:members]).map(&:to_i).uniq
-            users = if @group.context
-                      @group.context.users.where(id: user_ids)
-                    else
-                      User.where(id: user_ids)
-                    end
+            if @group.context
+              users = @group.context.users.where(id: user_ids)
+            else
+              users = User.where(id: user_ids)
+            end
             @memberships = @group.set_users(users)
           end
         end
 
-        if @group.errors.none?
+        if !@group.errors.any?
           @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
@@ -760,11 +761,11 @@ class GroupsController < ApplicationController
 
     include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
 
-    users = if search_term
-              UserSearch.for_user_in_context(search_term, @context, @current_user, session, { include_inactive_enrollments: include_inactive })
-            else
-              UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
-            end
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, { include_inactive_enrollments: include_inactive })
+    else
+      users = UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
+    end
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
@@ -779,7 +780,7 @@ class GroupsController < ApplicationController
     end
 
     if (includes.include? 'active_status') && (@context.context.is_a? Course)
-      enrollments = Enrollment.where(user_id: json_users.pluck(:id), course_id: @context.context_id)
+      enrollments = Enrollment.where(user_id: json_users.map { |u| u[:id] }, course_id: @context.context_id)
 
       inactive_students = enrollments.group_by(&:user_id).select { |_id, es| es.all?(&:hard_inactive?) }.map(&:first)
       json_users.each do |user|
@@ -805,7 +806,7 @@ class GroupsController < ApplicationController
       dt.locked_for?(@current_user, :check_policies => true)
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
-    @entries = @entries.sort_by(&:updated_at)
+    @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)
     end

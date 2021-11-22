@@ -36,7 +36,7 @@ class Sanitize
       #
       # http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#embedding-custom-non-visible-data-with-the-data-*-attributes
       remove_const(:REGEX_DATA_ATTR)
-      REGEX_DATA_ATTR = /\Adata-(?!xml|kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title)[a-z_][\w.\u00E0-\u00F6\u00F8-\u017F\u01DD-\u02AF-]*\z/u.freeze
+      REGEX_DATA_ATTR = /\Adata-(?!xml|kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title)[a-z_][\w.\u00E0-\u00F6\u00F8-\u017F\u01DD-\u02AF-]*\z/u
     end
   end
 end
@@ -76,7 +76,7 @@ module CanvasSanitize # :nodoc:
                'role',
                'lang',
                'dir',
-               :data, # NOTE: the symbol :data allows for arbitrary HTML5 data-* attributes
+               :data, # Note: the symbol :data allows for arbitrary HTML5 data-* attributes
                'aria-labelledby',
                'aria-atomic',
                'aria-busy',
@@ -317,18 +317,18 @@ module CanvasSanitize # :nodoc:
         'visibility', 'white-space', 'width',
         'z-index', 'zoom'
       ] +
-      %w[area auto-columns auto-flow auto-rows column gap row template].map { |i| "grid-#{i}" } +
-      %w[areas columns rows].map { |i| "grid-template-#{i}" } +
-      %w[end gap start].map { |i| "grid-column-#{i}" } +
-      %w[end gap start].map { |i| "grid-row-#{i}" } +
-      %w[attachment color image position repeat].map { |i| "background-#{i}" } +
-      %w[x y].map { |i| "background-position-#{i}" } +
-      %w[bottom collapse color left right spacing style top width].map { |i| "border-#{i}" } +
-      %w[bottom left right top].map { |i| %w[color style width].map { |j| "border-#{i}-#{j}" } }.flatten +
-      %w[family size stretch style variant width].map { |i| "font-#{i}" } +
-      %w[image position type].map { |i| "list-style-#{i}" } +
-      %w[bottom left right top offset].map { |i| "margin-#{i}" } +
-      %w[bottom left right top].map { |i| "padding-#{i}" }
+      %w{area auto-columns auto-flow auto-rows column gap row template}.map { |i| "grid-#{i}" } +
+      %w{areas columns rows}.map { |i| "grid-template-#{i}" } +
+      %w{end gap start}.map { |i| "grid-column-#{i}" } +
+      %w{end gap start}.map { |i| "grid-row-#{i}" } +
+      %w{attachment color image position repeat}.map { |i| "background-#{i}" } +
+      %w{x y}.map { |i| "background-position-#{i}" } +
+      %w{bottom collapse color left right spacing style top width}.map { |i| "border-#{i}" } +
+      %w{bottom left right top}.map { |i| %w{color style width}.map { |j| "border-#{i}-#{j}" } }.flatten +
+      %w{family size stretch style variant width}.map { |i| "font-#{i}" } +
+      %w{image position type}.map { |i| "list-style-#{i}" } +
+      %w{bottom left right top offset}.map { |i| "margin-#{i}" } +
+      %w{bottom left right top}.map { |i| "padding-#{i}" }
                   ).to_set.freeze,
       protocols: DEFAULT_PROTOCOLS
     }
@@ -384,17 +384,17 @@ module CanvasSanitize # :nodoc:
     def fully_sanitize_fields
       fields_hash = self.class.fully_sanitize_fields_config || {}
       fields_hash.each do |field, config|
-        next unless attribute_changed?(field)
+        next unless self.attribute_changed?(field)
 
         config ||= Sanitize::Config::RESTRICTED
         config = Sanitize::Config::RESTRICTED if config.empty?
         # Doesn't try to sanitize nil
-        f = send(field)
+        f = self.send(field)
         next unless f
-        next unless f.is_a?(String) || f.is_a?(IO)
+        next unless f.is_a?(String) or f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
-        send((field.to_s + "="), val)
+        self.send((field.to_s + "="), val)
       end
     end
   end # InstanceMethods

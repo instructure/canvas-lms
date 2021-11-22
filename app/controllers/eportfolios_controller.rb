@@ -107,6 +107,7 @@ class EportfoliosController < ApplicationController
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { :title => t('titles.feed', "Eportfolio Atom Feed") })
       end
+      js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
     end
   end
 
@@ -186,7 +187,15 @@ class EportfoliosController < ApplicationController
         @attachment = nil
       end
 
-      if @attachment
+      if !@attachment
+        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.file_state = '0'
+        @attachment.user = @current_user
+        @attachment.save!
+        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
+        render :json => @attachment
+      else
         respond_to do |format|
           if @attachment.zipped?
             if @attachment.stored_locally?
@@ -206,14 +215,6 @@ class EportfoliosController < ApplicationController
             format.json { render :json => @attachment }
           end
         end
-      else
-        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
-        @attachment.workflow_state = 'to_be_zipped'
-        @attachment.file_state = '0'
-        @attachment.user = @current_user
-        @attachment.save!
-        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
-        render :json => @attachment
       end
     end
   end
@@ -254,6 +255,6 @@ class EportfoliosController < ApplicationController
 
   def stale_zip_file?
     @attachment.created_at < 1.hour.ago ||
-      @attachment.created_at < (@portfolio.eportfolio_entries.filter_map(&:updated_at).max || @attachment.created_at)
+      @attachment.created_at < (@portfolio.eportfolio_entries.map(&:updated_at).compact.max || @attachment.created_at)
   end
 end

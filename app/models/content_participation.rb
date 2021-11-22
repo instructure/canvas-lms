@@ -29,7 +29,7 @@ class ContentParticipation < ActiveRecord::Base
   before_create :set_root_account_id
   after_save :update_participation_count
 
-  validates :content_type, :content_id, :user_id, :workflow_state, presence: true
+  validates_presence_of :content_type, :content_id, :user_id, :workflow_state
 
   workflow do
     state :unread
@@ -64,6 +64,6 @@ class ContentParticipation < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id = content.assignment.root_account_id
+    self.root_account_id = self.content.assignment.root_account_id
   end
 end

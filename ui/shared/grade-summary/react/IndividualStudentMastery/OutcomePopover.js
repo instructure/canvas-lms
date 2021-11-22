@@ -117,9 +117,7 @@ class OutcomePopover extends React.Component {
             <Flex.Item grow shrink>
               {/* word-wrap used for IE support */}
               <div style={{wordWrap: 'break-word', overflowWrap: 'break-word'}}>
-                <Text size="small" weight="bold">
-                  {outcome.title}
-                </Text>
+                {outcome.title}
               </div>
               <div>
                 {isVertical && <div>{this.renderSelectedRating()}</div>}

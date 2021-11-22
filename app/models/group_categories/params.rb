@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GroupCategories
-  Params = Struct.new(:name, :group_limit) do
+  class Params < Struct.new(:name, :group_limit)
     attr_reader :raw_params
 
     def initialize(args, opts = {})
@@ -29,7 +29,7 @@ module GroupCategories
 
     def self_signup
       return _self_signup if _self_signup
-      return nil unless enable_self_signup
+      return nil if !enable_self_signup
       return 'restricted' if restrict_self_signup
 
       'enabled'
@@ -114,7 +114,7 @@ module GroupCategories
       return nil unless raw_value
 
       raw_value = raw_value.to_s.downcase
-      %w[enabled restricted].include?(raw_value) ? raw_value : nil
+      %w(enabled restricted).include?(raw_value) ? raw_value : nil
     end
 
     def _auto_leader
@@ -122,7 +122,7 @@ module GroupCategories
       return nil unless raw_value
 
       raw_value = raw_value.to_s.downcase
-      %w[random first].include?(raw_value) ? raw_value : nil
+      %w(random first).include?(raw_value) ? raw_value : nil
     end
 
     def auto_leader_type

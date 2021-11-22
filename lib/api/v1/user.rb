@@ -24,8 +24,8 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w[id name created_at].freeze,
-    :methods => %w[sortable_name short_name].freeze
+    :only => %w(id name created_at).freeze,
+    :methods => %w(sortable_name short_name).freeze
   }.freeze
 
   def user_json_preloads(users, preload_email = false, opts = {})
@@ -71,8 +71,8 @@ module Api::V1::User
         # that's called sis_source_id.
 
         if user_can_read_sis_data?(current_user, context)
-          json[:sis_user_id] = pseudonym&.sis_user_id
-          json[:integration_id] = pseudonym&.integration_id
+          json.merge! :sis_user_id => pseudonym&.sis_user_id,
+                      :integration_id => pseudonym&.integration_id
         end
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
@@ -116,7 +116,7 @@ module Api::V1::User
 
       if includes.include?('sections')
         json[:sections] = user.enrollments
-                              .filter_map(&:course_section).uniq
+                              .map(&:course_section).compact.uniq
                               .map(&:name).join(", ")
       end
 
@@ -238,7 +238,7 @@ module Api::V1::User
     return false if context.nil? || current_user.nil?
 
     @user_json_is_admin ||= {}
-    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= begin
+    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= (
       if context.is_a?(::UserProfile)
         permissions_context = permissions_account = @domain_root_account
       else
@@ -250,7 +250,7 @@ module Api::V1::User
         permissions_account.membership_for_user(current_user) ||
         permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )
-    end
+    )
   end
 
   API_ENROLLMENT_JSON_OPTS = [:id,
@@ -265,7 +265,7 @@ module Api::V1::User
                               :created_at,
                               :start_at,
                               :end_at,
-                              :type].freeze
+                              :type]
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup
@@ -298,7 +298,7 @@ module Api::V1::User
         json[:sis_user_id] = pseudonym.try(:sis_user_id)
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
-      user_includes = includes & %w[avatar_url group_ids uuid]
+      user_includes = includes & %w{avatar_url group_ids uuid}
 
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
       if includes.include?('locked')
@@ -378,11 +378,9 @@ module Api::V1::User
 
   def get_context_groups(context)
     # make sure to preload groups if using this
-    if context.is_a?(Group)
-      [context.id]
-    else
+    context.is_a?(Group) ?
+      [context.id] :
       context.groups.map(&:id)
-    end
   end
 
   def sis_id_context(context)

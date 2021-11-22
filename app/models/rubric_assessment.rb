@@ -37,7 +37,7 @@ class RubricAssessment < ActiveRecord::Base
 
   simply_versioned
 
-  validates :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id, presence: true
+  validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments
@@ -47,9 +47,9 @@ class RubricAssessment < ActiveRecord::Base
   after_save :track_outcomes
 
   def track_outcomes
-    outcome_ids = (data || []).filter_map { |r| r[:learning_outcome_id] }.uniq
-    peer_review = assessment_type == "peer_review"
-    provisional_grade = artifact_type == "ModeratedGrading::ProvisionalGrade"
+    outcome_ids = (self.data || []).map { |r| r[:learning_outcome_id] }.compact.uniq
+    peer_review = self.assessment_type == "peer_review"
+    provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
     delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
@@ -58,14 +58,14 @@ class RubricAssessment < ActiveRecord::Base
     return if outcome_ids.empty?
 
     alignments = if active_rubric_association?
-                   rubric_association.association_object.learning_outcome_alignments.where({
-                                                                                             learning_outcome_id: outcome_ids
-                                                                                           })
+                   self.rubric_association.association_object.learning_outcome_alignments.where({
+                                                                                                  learning_outcome_id: outcome_ids
+                                                                                                })
                  else
                    []
                  end
 
-    (data || []).each do |rating|
+    (self.data || []).each do |rating|
       if rating[:learning_outcome_id]
         alignments.each do |alignment|
           if alignment.learning_outcome_id == rating[:learning_outcome_id]
@@ -93,7 +93,7 @@ class RubricAssessment < ActiveRecord::Base
 
     # mastery
     criterion = rubric_association.rubric.data.find { |c| c[:learning_outcome_id] == alignment.learning_outcome_id }
-    criterion_result = data.find { |c| c[:criterion_id] == criterion[:id] }
+    criterion_result = self.data.find { |c| c[:criterion_id] == criterion[:id] }
     if criterion
       result.possible = criterion[:points]
       result.score = criterion_result && criterion_result[:points]
@@ -105,11 +105,11 @@ class RubricAssessment < ActiveRecord::Base
     end
 
     # attempt
-    if artifact.is_a?(Submission)
-      result.attempt = artifact.attempt || 1
-      result.submitted_at = artifact.submitted_at
+    if self.artifact && self.artifact.is_a?(Submission)
+      result.attempt = self.artifact.attempt || 1
+      result.submitted_at = self.artifact.submitted_at
     else
-      result.attempt = version_number
+      result.attempt = self.version_number
     end
 
     # title
@@ -119,8 +119,8 @@ class RubricAssessment < ActiveRecord::Base
     )
 
     # non-scoring rubrics
-    result.hide_points = hide_points
-    result.hidden = rubric_association.hide_outcome_results
+    result.hide_points = self.hide_points
+    result.hidden = self.rubric_association.hide_outcome_results
 
     result.assessed_at = Time.zone.now
     result.save_to_version(result.attempt)
@@ -128,14 +128,14 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def update_artifact_parameters
-    if artifact_type == 'Submission' && artifact
-      self.artifact_attempt = artifact.attempt
+    if self.artifact_type == 'Submission' && self.artifact
+      self.artifact_attempt = self.artifact.attempt
     end
   end
 
   def htmlify_rating_comments
-    if data_changed? && data.present?
-      data.each do |rating|
+    if self.data_changed? && self.data.present?
+      self.data.each do |rating|
         if rating.is_a?(Hash) && rating[:comments].present?
           rating[:comments_html] = format_message(rating[:comments]).first
         end
@@ -156,23 +156,23 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def update_assessment_requests
-    requests = assessment_requests
+    requests = self.assessment_requests
     if active_rubric_association?
-      requests += rubric_association.assessment_requests.where({
-                                                                 assessor_id: assessor_id,
-                                                                 asset_id: artifact_id,
-                                                                 asset_type: artifact_type
-                                                               })
+      requests += self.rubric_association.assessment_requests.where({
+                                                                      assessor_id: self.assessor_id,
+                                                                      asset_id: self.artifact_id,
+                                                                      asset_type: self.artifact_type
+                                                                    })
     end
     requests.each { |a|
-      a.attributes = { :rubric_assessment => self, :assessor => assessor }
+      a.attributes = { :rubric_assessment => self, :assessor => self.assessor }
       a.complete
     }
   end
   protected :update_assessment_requests
 
   def attempt
-    artifact_type == 'Submission' ? artifact.attempt : nil
+    self.artifact_type == 'Submission' ? self.artifact.attempt : nil
   end
 
   def set_graded_anonymously
@@ -202,35 +202,36 @@ class RubricAssessment < ActiveRecord::Base
   protected :update_artifact
 
   set_policy do
-    given { |user| user && assessor_id == user.id }
+    given { |user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
 
-    given { |user| user && user_id == user.id }
+    given { |user| user && self.user_id == user.id }
     can :read
 
     given { |user|
       user &&
         self.user &&
-        rubric_association &&
-        rubric_association.context.is_a?(Course) &&
-        rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
+        self.rubric_association &&
+        self.rubric_association.context.is_a?(Course) &&
+        self.rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
     }
     can :read
 
-    given { |user, session| rubric_association&.grants_right?(user, session, :manage) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
-    given { |user, session| rubric_association&.grants_right?(user, session, :view_rubric_assessments) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
     can :read
 
     given { |user, session|
-      rubric_association&.grants_right?(user, session, :manage) &&
-        (rubric_association.association_object.context.grants_right?(assessor, :manage_rubrics) rescue false)
+      self.rubric_association &&
+        self.rubric_association.grants_right?(user, session, :manage) &&
+        (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update
 
     given { |user, session|
-      can_read_assessor_name?(user, session)
+      self.can_read_assessor_name?(user, session)
     }
     can :read_assessor
   end
@@ -257,18 +258,18 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def assessor_name
-    assessor.short_name rescue t('unknown_user', "Unknown User")
+    self.assessor.short_name rescue t('unknown_user', "Unknown User")
   end
 
   def assessment_url
-    artifact.url rescue nil
+    self.artifact.url rescue nil
   end
 
   def can_read_assessor_name?(user, session)
-    assessment_type == 'grading' ||
-      !considered_anonymous? ||
-      assessor_id == user.id ||
-      rubric_association.association_object.context.grants_right?(
+    self.assessment_type == 'grading' ||
+      !self.considered_anonymous? ||
+      self.assessor_id == user.id ||
+      self.rubric_association.association_object.context.grants_right?(
         user, session, :view_all_grades
       )
   end
@@ -276,19 +277,19 @@ class RubricAssessment < ActiveRecord::Base
   def considered_anonymous?
     return false unless active_rubric_association?
 
-    rubric_association.association_type == 'Assignment' &&
-      rubric_association.association_object.anonymous_peer_reviews?
+    self.rubric_association.association_type == 'Assignment' &&
+      self.rubric_association.association_object.anonymous_peer_reviews?
   end
 
   def ratings
-    data
+    self.data
   end
 
   def related_group_submissions_and_assessments
-    if active_rubric_association? && rubric_association.association_object.is_a?(Assignment) && !artifact.is_a?(ModeratedGrading::ProvisionalGrade) && !rubric_association.association_object.grade_group_students_individually
-      students = rubric_association.association_object.group_students(user).last
+    if active_rubric_association? && self.rubric_association.association_object.is_a?(Assignment) && !self.artifact.is_a?(ModeratedGrading::ProvisionalGrade) && !self.rubric_association.association_object.grade_group_students_individually
+      students = self.rubric_association.association_object.group_students(self.user).last
       students.map do |student|
-        submission = rubric_association.association_object.find_asset_for_assessment(rubric_association, student).first
+        submission = self.rubric_association.association_object.find_asset_for_assessment(self.rubric_association, student).first
         { submission: submission,
           rubric_assessments: submission.rubric_assessments
                                         .where.not(rubric_association: nil)
@@ -300,10 +301,10 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= rubric&.root_account_id
+    self.root_account_id ||= self.rubric&.root_account_id
   end
 
   def active_rubric_association?
-    !!rubric_association&.active?
+    !!self.rubric_association&.active?
   end
 end

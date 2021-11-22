@@ -31,7 +31,7 @@ class StreamItem < ActiveRecord::Base
     :collaboration, :conversation, :discussion_entry,
     :discussion_topic, :message, :submission, :web_conference, :assessment_request
   ]
-  validates :asset_type, :data, presence: true
+  validates_presence_of :asset_type, :data
 
   after_destroy :destroy_stream_item_instances
   attr_accessor :unread, :participant, :invalidate_immediately
@@ -39,13 +39,13 @@ class StreamItem < ActiveRecord::Base
   before_save :ensure_notification_category
 
   def ensure_notification_category
-    if asset_type == 'Message'
+    if self.asset_type == 'Message'
       self.notification_category ||= get_notification_category
     end
   end
 
   def get_notification_category
-    read_attribute(:data)['notification_category'] || data.notification_category
+    self.read_attribute(:data)['notification_category'] || self.data.notification_category
   end
 
   def self.reconstitute_ar_object(type, data)
@@ -68,19 +68,19 @@ class StreamItem < ActiveRecord::Base
     when 'Submission'
       data['body'] = nil
     end
-    if data.key?('users')
+    if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.association(:users).target = users
     end
-    if data.key?('participants')
+    if data.has_key?('participants')
       users = data.delete('participants')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.instance_variable_set(:@participants, users)
     end
 
     # unnecessary after old stream items have expired
-    if res.is_a?(Conversation) && !data.key?('updated_at')
+    if res.is_a?(Conversation) && !data.has_key?('updated_at')
       data['updated_at'] = Time.now.utc
     end
 
@@ -100,7 +100,7 @@ class StreamItem < ActiveRecord::Base
 
   def data(viewing_user_id = nil)
     # reconstitute AR objects
-    @ar_data ||= shard.activate do
+    @ar_data ||= self.shard.activate do
       self.class.reconstitute_ar_object(asset_type, read_attribute(:data))
     end
     res = @ar_data
@@ -148,14 +148,14 @@ class StreamItem < ActiveRecord::Base
 
   def regenerate!(obj = nil)
     obj ||= asset
-    return nil if asset_type == 'Message' && asset_id.nil?
+    return nil if self.asset_type == 'Message' && self.asset_id.nil?
 
     if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == 'deleted')
-      destroy
+      self.destroy
       return nil
     end
     res = generate_data(obj)
-    save
+    self.save
     res
   end
 
@@ -216,8 +216,8 @@ class StreamItem < ActiveRecord::Base
     else
       raise "Unexpected stream item type: #{object.class}"
     end
-    if context_type
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{context_type.underscore}_#{context_id}"].cache_key) do
+    if self.context_type
+      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{self.context_type.underscore}_#{self.context_id}"].cache_key) do
         self.context.short_name rescue ''
       end
     end
@@ -243,7 +243,7 @@ class StreamItem < ActiveRecord::Base
       return item if item
     end
 
-    item = new
+    item = self.new
     item.generate_data(object)
     StreamItem.unique_constraint_retry do |retry_count|
       retry_count == 0 ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
@@ -313,7 +313,7 @@ class StreamItem < ActiveRecord::Base
       end
     end
 
-    [res]
+    return [res]
   end
 
   def self.root_object(object)
@@ -414,10 +414,10 @@ class StreamItem < ActiveRecord::Base
   def associated_shards
     if self.context.try(:respond_to?, :associated_shards)
       self.context.associated_shards
-    elsif data.respond_to?(:associated_shards)
-      data.associated_shards
+    elsif self.data.respond_to?(:associated_shards)
+      self.data.associated_shards
     else
-      [shard]
+      [self.shard]
     end
   end
 
@@ -460,7 +460,9 @@ class StreamItem < ActiveRecord::Base
         end
       end
     when Conversation
-      res.latest_messages_from_stream_item&.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
+      if res.latest_messages_from_stream_item
+        res.latest_messages_from_stream_item.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
+      end
     end
 
     res
@@ -469,13 +471,13 @@ class StreamItem < ActiveRecord::Base
   public
 
   def destroy_stream_item_instances
-    stream_item_instances.shard(self).activate do |scope|
+    self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
-      if !invalidate_immediately && user_ids.count > 100
+      if !self.invalidate_immediately && user_ids.count > 100
         StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY)
-                       .invalidate_all_recent_stream_items(user_ids, context_type, context_id)
+                       .invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       else
-        StreamItemCache.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
+        StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       end
       scope.delete_all
       nil

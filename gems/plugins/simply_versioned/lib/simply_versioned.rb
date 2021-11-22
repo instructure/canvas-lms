@@ -44,7 +44,7 @@ module SimplyVersioned
     :on_create => nil,
     :on_update => nil,
     :on_load => nil
-  }.freeze
+  }
 
   module ClassMethods
     # Marks this ActiveRecord model as being versioned. Calls to +create+ or +save+ will,
@@ -78,7 +78,7 @@ module SimplyVersioned
 
     def simply_versioned(options = {})
       bad_keys = options.keys - SimplyVersioned::DEFAULTS.keys
-      raise SimplyVersioned::BadOptions, bad_keys unless bad_keys.empty?
+      raise SimplyVersioned::BadOptions.new(bad_keys) unless bad_keys.empty?
 
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
@@ -103,13 +103,13 @@ module SimplyVersioned
 
       class_eval do
         def versioning_enabled=(enabled)
-          instance_variable_set(:@simply_versioned_enabled, enabled)
+          self.instance_variable_set(:@simply_versioned_enabled, enabled)
         end
 
         def versioning_enabled?
-          enabled = instance_variable_get(:@simply_versioned_enabled)
+          enabled = self.instance_variable_get(:@simply_versioned_enabled)
           if enabled.nil?
-            enabled = instance_variable_set(:@simply_versioned_enabled, simply_versioned_options[:automatic])
+            enabled = self.instance_variable_set(:@simply_versioned_enabled, self.simply_versioned_options[:automatic])
           end
           enabled
         end
@@ -131,25 +131,24 @@ module SimplyVersioned
                                :except => [:created_at, :updated_at]
                              })
 
-      version = case version
-                when Version
+      version = if version.kind_of?(Version)
                   version
-                when Integer
-                  versions.where(number: version).first
+                elsif version.kind_of?(Integer)
+                  self.versions.where(number: version).first
                 end
 
       raise "Invalid version (#{version.inspect}) specified!" unless version
 
       options[:except] = options[:except].map(&:to_s)
 
-      update(YAML.load(version.yaml).except(*options[:except]))
+      self.update(YAML::load(version.yaml).except(*options[:except]))
     end
 
     # Invoke the supplied block passing the receiver as the sole block argument with
     # versioning enabled or disabled depending upon the value of the +enabled+ parameter
     # for the duration of the block.
     def with_versioning(enabled = true)
-      versioning_was_enabled = versioning_enabled?
+      versioning_was_enabled = self.versioning_enabled?
       explicit_versioning_was_enabled = @simply_versioned_explicit_enabled
       explicit_enabled = false
       if enabled.is_a?(Hash)
@@ -175,7 +174,7 @@ module SimplyVersioned
     end
 
     def unversioned?
-      versions.nil? || !versions.exists?
+      self.versions.nil? || !self.versions.exists?
     end
 
     def versioned?
@@ -195,7 +194,7 @@ module SimplyVersioned
       elsif @preloaded_current_version_number
         @preloaded_current_version_number
       else
-        versions.maximum(:number) || 0
+        self.versions.maximum(:number) || 0
       end
     end
 
@@ -217,30 +216,28 @@ module SimplyVersioned
     # on the before_save to see if the changes are worth
     # creating a new version for
     def check_if_changes_are_worth_versioning
-      @changes_are_worth_versioning = if simply_versioned_options[:when]
-                                        simply_versioned_options[:when].call(self)
-                                      else
-                                        (changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
-                                      end
+      @changes_are_worth_versioning = simply_versioned_options[:when] ?
+        simply_versioned_options[:when].call(self) :
+        (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
       true
     end
 
     def simply_versioned_create_version
-      if versioning_enabled?
+      if self.versioning_enabled?
         # INSTRUCTURE
         if @versioning_explicitly_enabled || @changes_are_worth_versioning
           @changes_are_worth_versioning = nil
           if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
-            version = versions.current
-            version.yaml = attributes.except(*simply_versioned_options[:exclude]).to_yaml
+            version = self.versions.current
+            version.yaml = self.attributes.except(*simply_versioned_options[:exclude]).to_yaml
             if version.save
               simply_versioned_options[:on_update].try(:call, self, version)
             end
           else
-            version = versions.create(:yaml => attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+            version = self.versions.create(:yaml => self.attributes.except(*simply_versioned_options[:exclude]).to_yaml)
             if version.valid?
               simply_versioned_options[:on_create].try(:call, self, version)
-              versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]
+              self.versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]
             end
           end
         end
@@ -255,9 +252,9 @@ module SimplyVersioned
     # ActiveRecord doesn't have a polymorphic :inverse_of option.
     def method_missing(method, *a, &b)
       case method
-      when :minimum, :maximum, :exists?, :all, :find_all, :each
+      when :minimum, :maximum, :exists?, :all, :find_all, :each then
         populate_versionables(super)
-      when :find
+      when :find then
         case a.first
         when :all          then populate_versionables(super)
         when :first, :last then populate_versionable(super)
@@ -300,7 +297,9 @@ module SimplyVersioned
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where('number <= ?', maximum(:number) - versions_to_keep).each(&:destroy)
+      where('number <= ?', self.maximum(:number) - versions_to_keep).each do |version|
+        version.destroy
+      end
     end
     alias_method :purge, :clean_old_versions
 

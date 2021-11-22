@@ -43,7 +43,7 @@ module AlignmentsHelper
           context, outcome, alignment
         )
       }.delete_if { |_, v|
-        v.blank?
+        !v.present?
       }
     }
     options[:style] = hidden unless alignment

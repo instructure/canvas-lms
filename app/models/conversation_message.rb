@@ -64,7 +64,7 @@ class ConversationMessage < ActiveRecord::Base
       # crunch in ruby (generally none, unless a conversation has multiple
       # most-recent messages, i.e. same created_at)
       unless connection.adapter_name == 'PostgreSQL'
-        base_conditions += <<~SQL.squish
+        base_conditions += <<~SQL
           AND conversation_messages.created_at = (
             SELECT MAX(created_at)
             FROM conversation_messages cm2
@@ -81,8 +81,8 @@ class ConversationMessage < ActiveRecord::Base
               .select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags")
               .order('conversation_id DESC, user_id DESC, created_at DESC')
               .distinct_on(:conversation_id, :user_id).to_a
-        map = ret.index_by { |m| [m.conversation_id, m.user_id] }
-        backmap = ret.index_by(&:conversation_participant_id)
+        map = Hash[ret.map { |m| [[m.conversation_id, m.user_id], m] }]
+        backmap = Hash[ret.map { |m| [m.conversation_participant_id, m] }]
         if author
           shard_participants.each { |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
         else
@@ -92,25 +92,25 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  validates :body, length: { :maximum => maximum_text_length }
+  validates_length_of :body, :maximum => maximum_text_length
 
   has_a_broadcast_policy
   set_broadcast_policy do |p|
     p.dispatch :conversation_message
-    p.to { recipients }
+    p.to { self.recipients }
     p.whenever { |record| (record.just_created || @re_send_message) && !record.generated && !record.submission }
 
     p.dispatch :added_to_conversation
-    p.to { new_recipients }
+    p.to { self.new_recipients }
     p.whenever { |record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added }
 
     p.dispatch :conversation_created
-    p.to { [author] }
+    p.to { [self.author] }
     p.whenever { |record| record.cc_author && ((record.just_created || @re_send_message) && !record.generated && !record.submission) }
   end
 
   on_create_send_to_streams do
-    recipients unless skip_broadcasts || submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
+    self.recipients unless skip_broadcasts || submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
   end
 
   def after_participants_created_broadcast
@@ -125,13 +125,13 @@ class ConversationMessage < ActiveRecord::Base
   before_destroy :delete_from_participants
 
   def infer_values
-    self.media_comment_id = nil if media_comment_id && media_comment_id.strip.empty?
-    if media_comment_id && media_comment_id_changed?
-      @media_comment = MediaObject.by_media_id(media_comment_id).first
+    self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
+    if self.media_comment_id && self.media_comment_id_changed?
+      @media_comment = MediaObject.by_media_id(self.media_comment_id).first
       self.media_comment_id = nil unless @media_comment
       self.media_comment_type = @media_comment.media_type if @media_comment
     end
-    self.media_comment_type = nil unless media_comment_id
+    self.media_comment_type = nil unless self.media_comment_id
     self.has_attachments = attachment_ids.present? || forwarded_messages.any?(&:has_attachments?)
     self.has_media_objects = media_comment_id.present? || forwarded_messages.any?(&:has_media_objects?)
     true
@@ -152,17 +152,19 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def attachments
-    attachment_associations.map(&:attachment)
+    self.attachment_associations.map(&:attachment)
   end
 
   def update_attachment_associations
-    previous_attachment_ids = attachment_associations.pluck(:attachment_id)
+    previous_attachment_ids = self.attachment_associations.pluck(:attachment_id)
     deleted_attachment_ids = previous_attachment_ids - attachment_ids
     new_attachment_ids = attachment_ids - previous_attachment_ids
-    attachment_associations.where(attachment_id: deleted_attachment_ids).find_each(&:destroy)
+    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each do |association|
+      association.destroy
+    end
     if new_attachment_ids.any?
       author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
-        attachment_associations.create!(attachment: attachment)
+        self.attachment_associations.create!(attachment: attachment)
       end
     end
   end
@@ -174,8 +176,8 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def media_comment
-    if !@media_comment && media_comment_id
-      @media_comment = MediaObject.by_media_id(media_comment_id).first
+    if !@media_comment && self.media_comment_id
+      @media_comment = MediaObject.by_media_id(self.media_comment_id).first
     end
     @media_comment
   end
@@ -189,7 +191,7 @@ class ConversationMessage < ActiveRecord::Base
   def recipients
     return [] unless conversation
 
-    subscribed = subscribed_participants.reject { |u| u.id == author_id }.map { |x| x.becomes(User) }
+    subscribed = subscribed_participants.reject { |u| u.id == self.author_id }.map { |x| x.becomes(User) }
     ActiveRecord::Associations::Preloader.new.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
@@ -197,7 +199,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def new_recipients
     return [] unless conversation
-    return [] unless generated? && event_data[:event_type] == :users_added
+    return [] unless generated? and event_data[:event_type] == :users_added
 
     recipients.select { |u| event_data[:user_ids].include?(u.id) }
   end
@@ -205,7 +207,7 @@ class ConversationMessage < ActiveRecord::Base
   # for developer use on console only
   def resend_message!
     @re_send_message = true
-    save!
+    self.save!
     @re_send_message = false
   end
 
@@ -220,7 +222,7 @@ class ConversationMessage < ActiveRecord::Base
   def event_data
     return {} unless generated?
 
-    @event_data ||= YAML.safe_load(read_attribute(:body))
+    @event_data ||= YAML.load(read_attribute(:body))
   end
 
   def format_event_message
@@ -237,7 +239,7 @@ class ConversationMessage < ActiveRecord::Base
     return if skip_broadcasts
     return unless @generate_user_note
 
-    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?(&:enable_user_notes) }
+    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any? { |a| a.enable_user_notes } }
     return unless valid_recipients.any?
 
     valid_recipients = User.where(:id => valid_recipients) # need to reload to get all the attributes needed for User#save
@@ -285,14 +287,14 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::Errors::UnknownAddress if context.try(:root_account).try(:deleted?)
+    raise IncomingMail::Errors::UnknownAddress if self.context.try(:root_account).try(:deleted?)
 
     # It would be nice to have group conversations via e-mail, but if so, we need to make it much more obvious
     # that replies to the e-mail will be sent to multiple recipients.
     recipients = [author]
     tags = conversation.conversation_participants.where(user_id: author.id).pluck(:tags)
     opts = opts.merge(
-      :root_account_id => root_account_id,
+      :root_account_id => self.root_account_id,
       :only_users => recipients,
       :tags => tags
     )
@@ -325,21 +327,21 @@ class ConversationMessage < ActiveRecord::Base
     extend ApplicationHelper
     extend ConversationsHelper
 
-    title = ERB::Util.h(CanvasTextHelper.truncate_text(body, :max_words => 8, :max_length => 80))
+    title = ERB::Util.h(CanvasTextHelper.truncate_text(self.body, :max_words => 8, :max_length => 80))
 
     # build content, should be:
     # message body
     # [list of attachments]
     # -----
     # context
-    content = "<div>#{ERB::Util.h(body)}</div>"
-    unless attachments.empty?
+    content = "<div>#{ERB::Util.h(self.body)}</div>"
+    if !self.attachments.empty?
       content += "<ul>"
-      attachments.each do |attachment|
+      self.attachments.each do |attachment|
         href = file_download_url(attachment, :verifier => attachment.uuid,
                                              :download => '1',
                                              :download_frd => '1',
-                                             :host => HostUrl.context_host(context))
+                                             :host => HostUrl.context_host(self.context))
         content += "<li><a href='#{href}'>#{ERB::Util.h(attachment.display_name)}</a></li>"
       end
       content += "</ul>"
@@ -349,18 +351,18 @@ class ConversationMessage < ActiveRecord::Base
 
     Atom::Entry.new do |entry|
       entry.title = title
-      entry.authors << Atom::Person.new(:name => author.name)
-      entry.updated   = created_at.utc
-      entry.published = created_at.utc
-      entry.id        = "tag:#{HostUrl.context_host(context)},#{created_at.strftime("%Y-%m-%d")}:/conversations/#{feed_code}"
+      entry.authors << Atom::Person.new(:name => self.author.name)
+      entry.updated   = self.created_at.utc
+      entry.published = self.created_at.utc
+      entry.id        = "tag:#{HostUrl.context_host(self.context)},#{self.created_at.strftime("%Y-%m-%d")}:/conversations/#{self.feed_code}"
       entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
-      attachments.each do |attachment|
+                                    :href => "http://#{HostUrl.context_host(self.context)}/conversations/#{self.conversation.id}")
+      self.attachments.each do |attachment|
         entry.links << Atom::Link.new(:rel => 'enclosure',
                                       :href => file_download_url(attachment, :verifier => attachment.uuid,
                                                                              :download => '1',
                                                                              :download_frd => '1',
-                                                                             :host => HostUrl.context_host(context)))
+                                                                             :host => HostUrl.context_host(self.context)))
       end
       entry.content = Atom::Content::Html.new(content)
     end

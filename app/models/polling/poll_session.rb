@@ -24,22 +24,22 @@ module Polling
     belongs_to :course_section
     belongs_to :poll, class_name: 'Polling::Poll'
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
-    validates :poll, :course, presence: true
+    validates_presence_of :poll, :course
     validate :section_belongs_to_course
 
     set_policy do
       given do |user, session|
-        poll.grants_right?(user, session, :update)
+        self.poll.grants_right?(user, session, :update)
       end
       can :read and can :create and can :delete and can :publish
 
       given do |user, session|
-        visible_to?(user, session)
+        self.visible_to?(user, session)
       end
       can :read
 
       given do |user, session|
-        visible_to?(user, session) && is_published?
+        self.visible_to?(user, session) && self.is_published?
       end
       can :submit
     end
@@ -69,15 +69,15 @@ module Polling
     end
 
     def visible_to?(user, session)
-      course.grants_right?(user, session, :read) &&
-        (course_section ? course_section.grants_right?(user, session, :read) : true)
+      self.course.grants_right?(user, session, :read) &&
+        (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
     end
 
     private
 
     def section_belongs_to_course
-      if course && course_section
-        unless course.course_sections.include?(course_section)
+      if self.course && self.course_section
+        unless self.course.course_sections.include?(course_section)
           errors.add(:base, I18n.t('polling.poll_sessions.validations.section_belongs_to_course',
                                    'That course section does not belong to the existing course.'))
         end

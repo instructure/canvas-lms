@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
-    unless request.format.html?
+    if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -253,7 +253,7 @@ class AssignmentsController < ApplicationController
           # If this is a group assignment and we had previously filtered by a
           # group that isn't part of this assignment's group set, behave as if
           # no group is selected.
-          if selected_group_id.present? && Group.active.where(group_category_id: eligible_categories.pluck(:id), id: selected_group_id).exists?
+          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
             env[:selected_student_group_id] = selected_group_id
           end
         end
@@ -310,11 +310,11 @@ class AssignmentsController < ApplicationController
           @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
 
-        @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-                            ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
-                          else
-                            []
-                          end
+        if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+          @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
+        else
+          @external_tools = []
+        end
 
         context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
         if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
@@ -346,7 +346,7 @@ class AssignmentsController < ApplicationController
         @can_grade = @assignment.grants_right?(@current_user, session, :grade)
         if @can_view_grades || @can_grade
           visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
-          @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(:user_id => visible_student_ids).to_a
+          @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
         end
 
         # this will set @user_has_google_drive
@@ -483,11 +483,12 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
+          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => @request }
         else
+          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => { :errors => { :base => t('errors.reminder_failed', "Reminder failed") } }, :status => :bad_request }
         end
-        format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
     end
   end
@@ -498,11 +499,12 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
+          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => @request }
         else
+          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => { :errors => { :base => t('errors.delete_reminder_failed', "Delete failed") } }, :status => :bad_request }
         end
-        format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
     end
   end
@@ -510,7 +512,7 @@ class AssignmentsController < ApplicationController
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      unless @assignment.has_peer_reviews?
+      if !@assignment.has_peer_reviews?
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
@@ -572,7 +574,7 @@ class AssignmentsController < ApplicationController
     @assignment.updating_user = @current_user
 
     respond_to do |format|
-      if @assignment&.send(method)
+      if @assignment && @assignment.send(method)
         format.json { render json: @assignment.as_json(methods: :anonymize_students) }
       else
         format.json { render :json => @assignment, :status => :bad_request }
@@ -662,7 +664,7 @@ class AssignmentsController < ApplicationController
 
       assignment_groups = @context.assignment_groups.active
       group_categories = @context.group_categories
-                                 .reject(&:student_organized?)
+                                 .select { |c| !c.student_organized? }
                                  .map { |c| { :id => c.id, :name => c.name } }
 
       # if assignment has student submissions and is attached to a deleted group category,
@@ -719,7 +721,7 @@ class AssignmentsController < ApplicationController
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
       hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
-      hash[:MAX_NAME_LENGTH] = try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+      hash[:MAX_NAME_LENGTH] = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
 
       selected_tool = @assignment.tool_settings_tool
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil

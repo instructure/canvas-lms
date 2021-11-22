@@ -480,10 +480,10 @@ class Quizzes::QuizzesApiController < ApplicationController
       return render_create_error(:forbidden) unless grading_periods_allow_submittable_create?(@quiz, quiz_params)
 
       update_api_quiz(@quiz, params)
-      if @quiz.new_record?
-        render_create_error(:bad_request)
-      else
+      unless @quiz.new_record?
         render_json
+      else
+        render_create_error(:bad_request)
       end
     end
   end

@@ -414,7 +414,7 @@ describe 'quizzes question creation' do
       f('.submit_button').click
       wait_for_ajaximations
       error_boxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      visboxes, _hidboxes = error_boxes.partition(&:displayed?)
+      visboxes, _hidboxes = error_boxes.partition { |eb| eb.displayed? }
       expect(visboxes.first.text).to eq "question text is too long, max length is 16384 characters"
     end
   end
@@ -468,7 +468,7 @@ describe 'quizzes question creation' do
       @quiz = @course.quizzes.create!(title: 'new quiz')
     end
 
-    def create_quiz_question(question_data)
+    def create_quiz_question question_data
       @quiz.quiz_questions.create!(question_data: question_data)
 
       @quiz.generate_quiz_data

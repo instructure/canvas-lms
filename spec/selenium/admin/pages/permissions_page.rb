@@ -127,10 +127,9 @@ class PermissionsIndex
     def role_tray_permission_state(permission, role)
       icon = fj("##{permission}_#{role} svg:first").attribute('name')
       state = ""
-      case icon
-      when "IconTrouble"
+      if icon == "IconTrouble"
         state = "Disabled"
-      when "IconPublish"
+      elsif icon == "IconPublish"
         state = "Enabled"
       end
       state
@@ -150,12 +149,11 @@ class PermissionsIndex
       state = ""
       icons = ff('svg', permission_cell(permission_name, role))
       icons.each do |icon|
-        case icon.name
-        when "IconPublish"
+        if icon.name == "IconPublish"
           state = "Enabled" + state
-        when "IconTrouble"
+        elsif icon.name == "IconTrouble"
           state = "Disabled" + state
-        when "IconLock"
+        elsif icon.name == "IconLock"
           state += " Locked"
         end
       end

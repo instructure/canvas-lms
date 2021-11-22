@@ -173,10 +173,6 @@ export const handlers = [
     return res(ctx.data(data))
   }),
 
-  graphql.query('GetConversationMessagesQuery', (req, res, ctx) => {
-    return res(ctx.data({legacyNode: Conversation.mock()}))
-  }),
-
   graphql.query('GetUserCourses', (req, res, ctx) => {
     const data = {
       legacyNode: {

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "active_support/core_ext/module/delegation"
-
 class EventStream::Stream
   include EventStream::AttrConfig
 
@@ -40,7 +38,17 @@ class EventStream::Stream
     attr_config_validate
   end
 
-  delegate :available?, :database_name, :database_fingerprint, to: :current_backend
+  def available?
+    current_backend.available?
+  end
+
+  def database_name
+    current_backend.database_name
+  end
+
+  def database_fingerprint
+    current_backend.database_fingerprint
+  end
 
   def on_insert(&callback)
     add_callback(:insert, callback)
