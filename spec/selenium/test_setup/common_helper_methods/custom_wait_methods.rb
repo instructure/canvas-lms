@@ -255,8 +255,8 @@ module CustomWaitMethods
   # * returns false (rather than raising) if the block never returns true
   # * doesn't rescue :allthethings: like keep_trying_until
   # * prevents nested waiting, cuz that's terrible
-  def wait_for(*args, &block)
-    ::SeleniumExtensions::FinderWaiting.wait_for(*args, &block)
+  def wait_for(...)
+    ::SeleniumExtensions::FinderWaiting.wait_for(...)
   end
 
   def wait_for_no_such_element(method: nil, timeout: SeleniumExtensions::FinderWaiting.timeout)
