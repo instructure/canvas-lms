@@ -264,6 +264,9 @@ Style/EachWithObject:
   Severity: error
 Style/EmptyCaseCondition:
   Severity: error
+Style/EmptyElse:
+  EnforcedStyle: empty # explicit nil indicates programmer intent
+  Severity: error
 Style/EmptyLiteral:
   Severity: error
 Style/EmptyMethod:
@@ -503,9 +506,6 @@ Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/EmptyElse: # TODO: autocorrect
-  Enabled: false
-  EnforcedStyle: empty # explicit nil indicates programmer intent
 Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
 Style/GuardClause: # TODO

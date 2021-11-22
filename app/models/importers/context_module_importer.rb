@@ -339,7 +339,7 @@ module Importers
       elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
         # We know what this is and that we don't support it
       else
-        # We don't know what this is
+        nil # We don't know what this is
       end
       items = []
       if item

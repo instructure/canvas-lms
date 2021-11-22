@@ -1005,7 +1005,7 @@ class Attachment < ActiveRecord::Base
                                                 :height => options[:height] || 100,
                                                 :vid_sec => options[:video_seconds] || 5)
     else
-      # "still need to handle things that are not images with thumbnails or kaltura docs"
+      nil # "still need to handle things that are not images with thumbnails or kaltura docs"
     end
   end
 
