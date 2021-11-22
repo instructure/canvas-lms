@@ -910,11 +910,11 @@ describe Enrollment do
         end
 
         it 'returns no score when given an invalid grading period id' do
-          expect(@enrollment.find_score(grading_period_id: 99999)).to be nil
+          expect(@enrollment.find_score(grading_period_id: 99_999)).to be nil
         end
 
         it 'returns no score when given an invalid assignment group id' do
-          expect(@enrollment.find_score(assignment_group_id: 8888888)).to be nil
+          expect(@enrollment.find_score(assignment_group_id: 8_888_888)).to be nil
         end
 
         it 'returns no score when given unrecognized id keys' do

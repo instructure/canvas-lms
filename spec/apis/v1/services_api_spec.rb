@@ -90,7 +90,7 @@ describe "Services API", type: :request do
                                                                       'kaltura_setting' => {
                                                                         'domain' => 'kaltura.example.com',
                                                                         'kcw_ui_conf' => '1',
-                                                                        "max_file_size_bytes" => 534773760,
+                                                                        "max_file_size_bytes" => 534_773_760,
                                                                         'partner_id' => '100',
                                                                         'player_ui_conf' => '1',
                                                                         'resource_domain' => 'cdn.kaltura.example.com',

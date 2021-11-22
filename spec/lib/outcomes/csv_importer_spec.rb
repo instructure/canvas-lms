@@ -232,7 +232,7 @@ describe Outcomes::CSVImporter do
                       ]) { nil }
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
-      expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123456.5678)
+      expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123_456.5678)
     end
 
     it 'automatically detects column separator from header' do

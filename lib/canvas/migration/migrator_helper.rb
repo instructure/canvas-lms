@@ -75,7 +75,7 @@ module Canvas::Migration
                 content_migration.id.to_s
               end
             else
-              "data_#{rand(10000)}" # should only happen in testing
+              "data_#{rand(10_000)}" # should only happen in testing
             end
       "#{QUIZ_FILE_DIRECTORY}/#{key}"
     end
@@ -104,7 +104,7 @@ module Canvas::Migration
       slug = if @settings[:content_migration_id] && @settings[:user_id]
                "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
              else
-               "export_#{rand(10000)}"
+               "export_#{rand(10_000)}"
              end
 
       path = create_export_dir(slug)

@@ -1112,7 +1112,7 @@ describe 'Submissions API', type: :request do
     expect(mock_kaltura).to receive(:media_sources).and_return([{ :height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
                                                                   :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size => "204", :fileExt => "mp4" }])
 
-    submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54321, media_comment_type: "video")
+    submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54_321, media_comment_type: "video")
     stub_kaltura
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
@@ -4548,41 +4548,41 @@ describe 'Submissions API', type: :request do
 
       it "allows a teacher to upload files for a student" do
         @user = @teacher
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "allows any filetype when there are no restrictions on type" do
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "rejects uploading files when file extension is not given" do
         @assignment.update(allowed_extensions: ['jpg'])
-        preflight(name: 'name', size: 12345)
+        preflight(name: 'name', size: 12_345)
         assert_status(400)
       end
 
       it "rejects uploading files when filetype is not allowed" do
         @assignment.update(:allowed_extensions => ['doc'])
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
         @assignment.update(:allowed_extensions => ['txt'])
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "falls back to parsing the extension when an unknown type" do
         @assignment.update(:allowed_extensions => ['beepboop'])
-        preflight(name: 'test.beepboop', size: 12345)
+        preflight(name: 'test.beepboop', size: 12_345)
         assert_status(200)
       end
 
       it "uploads to a student's Submissions folder" do
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
       end

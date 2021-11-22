@@ -137,7 +137,7 @@ module MobileQuizQuestionData
       "name" => "Question",
       "correct_comments" => "",
       "question_type" => "true_false_question",
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "neutral_comments" => "",
       "incorrect_comments" => "",
       "question_name" => "Question",

@@ -38,7 +38,7 @@ describe 'Anonymous Moderated Marking' do
       expect(AssignmentCreateEditPage.assignment_form).to contain_css '#enable-anonymous-grading'
     end
 
-    it 'Anonymous Grading option is hidden if Anonymous Marking Flag is OFF' do # test_id: 3496269
+    it 'Anonymous Grading option is hidden if Anonymous Marking Flag is OFF' do
       Account.default.disable_feature!(:anonymous_marking)
       user_session(@teacher)
       AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
@@ -56,7 +56,7 @@ describe 'Anonymous Moderated Marking' do
       expect(AssignmentCreateEditPage.assignment_form).to contain_css '.ModeratedGrading__Container'
     end
 
-    it 'Moderated Grading option is hidden if Moderated Marking Flag is OFF' do # test_id: 3496270
+    it 'Moderated Grading option is hidden if Moderated Marking Flag is OFF' do
       Account.default.disable_feature!(:moderated_grading)
       user_session(@teacher)
       AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)

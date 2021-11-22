@@ -126,7 +126,7 @@ describe Mutations::DeleteOutcomeLinks do
     end
 
     it 'fails to delete outcome link if link id is invalid' do
-      result = execute_with_input(variables({ ids: [123456789] }))
+      result = execute_with_input(variables({ ids: [123_456_789] }))
       data = result.dig('data', 'deleteOutcomeLinks', 'deletedOutcomeLinkIds')
       expect_error(result, 'Could not find outcome link')
       expect(data).to be_empty

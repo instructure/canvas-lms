@@ -716,7 +716,7 @@ describe GradingPeriod do
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
-       test_id: 2528634, priority: "2" do
+       priority: "2" do
       grading_period.assign_attributes(
         start_date: 1.month.ago(now),
         end_date: 1.month.from_now(now)

@@ -111,7 +111,7 @@ module CanvasSecurity
         it "expires in an hour" do
           Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
             jwt = ServicesJwt.new(jwt_string, false)
-            expect(jwt.expires_at).to eq(1363169520)
+            expect(jwt.expires_at).to eq(1_363_169_520)
           end
         end
 

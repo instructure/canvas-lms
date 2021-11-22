@@ -220,7 +220,7 @@ describe "users" do
     it "shows an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
       expect_no_flash_message :error
-      f('#manual_user_id').send_keys(1234567809)
+      f('#manual_user_id').send_keys(1_234_567_809)
       expect_new_page_load { f('button[type="submit"]').click }
       expect_flash_message :error, "No active user with that ID was found."
     end

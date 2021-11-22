@@ -34,7 +34,7 @@ describe Quizzes::QuizSubmission do
 
       it "validates extra time is not too long" do
         qs = Quizzes::QuizSubmission.new
-        qs.extra_time = 10081
+        qs.extra_time = 10_081
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10,080"]
       end
@@ -55,7 +55,7 @@ describe Quizzes::QuizSubmission do
 
       it "validates quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
-        qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
+        qs.quiz = Quizzes::Quiz.new(:points_possible => 2_000_000_001)
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end

@@ -41,7 +41,7 @@ class ReportSnapshot < ActiveRecord::Base
     report['weekly'].each do |week|
       next unless week[key]
 
-      stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
+      stamp = (week['week'] * 604_800) + ((week['year'] - 1970) * 31_556_926)
       next if stamp > now
 
       items << [stamp * 1000, week[key]]

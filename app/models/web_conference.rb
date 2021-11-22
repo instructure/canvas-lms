@@ -34,7 +34,7 @@ class WebConference < ActiveRecord::Base
   validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 
-  MAX_DURATION = 99999999
+  MAX_DURATION = 99_999_999
   validates :duration, numericality: { :less_than_or_equal_to => MAX_DURATION, :allow_nil => true }
 
   before_validation :infer_conference_details

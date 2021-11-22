@@ -63,7 +63,7 @@ class Quizzes::QuizExtension
 
     if ext_params[:extra_time]
       # limit to a week
-      quiz_submission.extra_time = [ext_params[:extra_time].to_i.abs, 10080].min
+      quiz_submission.extra_time = [ext_params[:extra_time].to_i.abs, 10_080].min
     end
 
     # false is a valid value, so explicitly check nil

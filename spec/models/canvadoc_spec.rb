@@ -20,7 +20,7 @@
 
 describe 'Canvadoc' do
   def stub_upload
-    expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"
+    expectation = receive(:upload).and_return "id" => 123_456, "status" => "pending"
     allow_any_instance_of(Canvadocs::API).to expectation
     expectation
   end
@@ -63,7 +63,7 @@ describe 'Canvadoc' do
     end
 
     it "doesn't upload again" do
-      @doc.update_attribute :document_id, 999999
+      @doc.update_attribute :document_id, 999_999
       @doc.upload
       expect(@doc.document_id.to_s).to eq "999999"  # not 123456
     end

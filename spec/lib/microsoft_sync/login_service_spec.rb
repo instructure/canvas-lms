@@ -113,7 +113,7 @@ describe MicrosoftSync::LoginService do
               "error" => "invalid_request",
               "error_description" =>
                  "AADSTS90002: Tenant 'a.b.c' not found. This may happen if there are no active subscriptions for the tenant. Check to make sure you have the correct tenant ID. Check with your subscription administrator.\r\nTrace ID: etc.",
-              "error_codes" => [90002],
+              "error_codes" => [90_002],
               "timestamp" => "2021-04-28 23:20:12Z",
               "error_uri" => "https://login.microsoftonline.com/error?code=90002"
             }
@@ -129,7 +129,7 @@ describe MicrosoftSync::LoginService do
         context '(400 status code, Tenant not valid domain)' do
           let(:response_status) { 400 }
           let(:response_body) do
-            { "error_description" => "AADSTS900023: Specified tenant identifier '---' is neither a valid DNS name, nor a valid external domain.\r\nTrace ID: etc", "error_codes" => [900023], "timestamp" => "2021-04-28 23:20:23Z", "error_uri" => "https://login.microsoftonline.com/error?code=900023" }
+            { "error_description" => "AADSTS900023: Specified tenant identifier '---' is neither a valid DNS name, nor a valid external domain.\r\nTrace ID: etc", "error_codes" => [900_023], "timestamp" => "2021-04-28 23:20:23Z", "error_uri" => "https://login.microsoftonline.com/error?code=900023" }
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do

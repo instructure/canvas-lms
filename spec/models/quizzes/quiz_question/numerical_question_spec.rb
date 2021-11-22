@@ -51,7 +51,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it 'works for inputs of type Float' do
-      expect(question.i18n_decimal(123456e-2)).to eq BigDecimal('1234.56')
+      expect(question.i18n_decimal(123_456e-2)).to eq BigDecimal('1234.56')
     end
   end
 

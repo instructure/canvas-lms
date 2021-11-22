@@ -131,7 +131,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     create_table :failed_jobs do |t|
       t.integer  "priority",    :default => 0
       t.integer  "attempts",    :default => 0
-      t.string   "handler",     :limit => 512000
+      t.string   "handler",     :limit => 512_000
       t.text     "last_error"
       t.string   "queue", limit: 255
       t.datetime "run_at"

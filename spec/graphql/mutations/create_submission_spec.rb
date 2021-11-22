@@ -295,7 +295,7 @@ RSpec.describe Mutations::CreateSubmission do
   end
 
   it 'returns a graceful error if the assignment is not found' do
-    result = run_mutation(assignment_id: 12345)
+    result = run_mutation(assignment_id: 12_345)
     expect(result.dig(:errors, 0, :message)).to eq 'not found'
   end
 

@@ -446,9 +446,6 @@ Style/ModuleFunction:
 Style/MultipleComparison:
   Severity: convention
   AutoCorrect: false
-Style/NumericLiterals:
-  Enabled: false
-  AutoCorrect: false
 Style/OptionalArguments:
   Severity: convention
 Style/OptionalBooleanParameter:

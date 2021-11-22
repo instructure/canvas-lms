@@ -233,7 +233,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.comment_citation.first.text).to eq 'Teacher3'
     end
 
-    it "graders can view other grader's comments when `grader_comments_visible_to_graders = true`" do # test_id: 3512445
+    it "graders can view other grader's comments when `grader_comments_visible_to_graders = true`" do
       @moderated_assignment.update!(grader_comments_visible_to_graders: true)
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_assignment.id)

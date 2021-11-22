@@ -1580,7 +1580,7 @@ describe AccountsController do
     end
 
     it "is able to search by course sis id" do
-      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30012)
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30_012)
 
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
 

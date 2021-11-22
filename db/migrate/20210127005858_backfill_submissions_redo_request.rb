@@ -22,7 +22,7 @@ class BackfillSubmissionsRedoRequest < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def self.runnable?
-    connection.postgresql_version < 110000
+    connection.postgresql_version < 11_00_00 # rubocop:disable Style/NumericLiterals
   end
 
   def up

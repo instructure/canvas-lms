@@ -120,7 +120,7 @@ describe ErrorReport do
 
   it "truncates absurdly long messages" do
     report = described_class.new
-    long_message = (0...100000).map { 'a' }.join
+    long_message = (0...100_000).map { 'a' }.join
     report.assign_data(message: long_message)
     expect(report.message.length).to eq long_message.length
     report.save!

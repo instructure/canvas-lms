@@ -5142,7 +5142,7 @@ describe Assignment do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?('DTEND:20080903T115500Z')).not_to be_nil
@@ -5154,7 +5154,7 @@ describe Assignment do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course, :time_zone_edited => 'EST')
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?('DTEND:20080903T115500Z')).not_to be_nil
@@ -5166,7 +5166,7 @@ describe Assignment do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:59pm", :course => @course, :time_zone_edited => 'EST')
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       Time.zone = 'HST'
       res = @assignment.to_ics
       expect(res).not_to be_nil
@@ -5179,7 +5179,7 @@ describe Assignment do
       Time.zone = 'Alaska' # -0800
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+      @assignment.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?('DTEND:20080903T195500Z')).not_to be_nil
@@ -5191,7 +5191,7 @@ describe Assignment do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to eq true
@@ -5206,7 +5206,7 @@ describe Assignment do
       Time.zone = 'Alaska' # -0800
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+      @assignment.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to eq true
@@ -7590,7 +7590,7 @@ describe Assignment do
       end
 
       it "does not allow a 1000000000 value" do
-        assignment = Assignment.new(points_possible: 1000000000)
+        assignment = Assignment.new(points_possible: 1_000_000_000)
         expect(assignment).not_to be_valid
         expect(assignment.errors.keys.include?(:points_possible)).to be_truthy
       end

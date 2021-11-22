@@ -442,7 +442,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "assignments", :force => true do |t|
       t.string   "title", limit: 255
-      t.text     "description", :limit => 16777215
+      t.text     "description", :limit => 16_777_215
       t.datetime "due_at"
       t.datetime "unlock_at"
       t.datetime "lock_at"
@@ -569,7 +569,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "calendar_events", :force => true do |t|
       t.string   "title", limit: 255
-      t.text     "description", :limit => 16777215
+      t.text     "description", :limit => 16_777_215
       t.string   "location_name", limit: 255
       t.string   "location_address", limit: 255
       t.datetime "start_at"
@@ -1041,7 +1041,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "created_at"
       t.datetime "updated_at"
       t.boolean  "show_public_context_messages"
-      t.text     "syllabus_body", :limit => 16777215
+      t.text     "syllabus_body", :limit => 16_777_215
       t.boolean  "allow_student_forum_attachments", :default => false
       t.string   "default_wiki_editing_roles", limit: 255
       t.integer  "wiki_id", :limit => 8
@@ -1225,7 +1225,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "discussion_topics", :force => true do |t|
       t.string   "title", limit: 255
-      t.text     "message", :limit => 16777215
+      t.text     "message", :limit => 16_777_215
       t.integer  "context_id", :limit => 8, :null => false
       t.string   "context_type", :null => false, limit: 255
       t.string   "type", limit: 255
@@ -1424,7 +1424,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "allow_comments"
       t.boolean  "show_comments"
       t.string   "slug", limit: 255
-      t.text     "content", :limit => 16777215
+      t.text     "content", :limit => 16_777_215
       t.datetime "created_at"
       t.datetime "updated_at"
     end
@@ -1467,7 +1467,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "during_tests", :default => false
       t.text     "user_agent"
       t.string   "request_method", limit: 255
-      t.text     "http_env", :limit => 16777215
+      t.text     "http_env", :limit => 16_777_215
       t.string   "subject", limit: 255
       t.string   "request_context_id", limit: 255
       t.integer  "account_id", :limit => 8
@@ -2515,11 +2515,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "quiz_id", :limit => 8, :null => false
       t.integer  "quiz_version"
       t.integer  "user_id", :limit => 8
-      t.text     "submission_data",      :limit => 16777215
+      t.text     "submission_data",      :limit => 16_777_215
       t.integer  "submission_id", :limit => 8
       t.float    "score"
       t.float    "kept_score"
-      t.text     "quiz_data", :limit => 16777215
+      t.text     "quiz_data", :limit => 16_777_215
       t.datetime "started_at"
       t.datetime "end_at"
       t.datetime "finished_at"
@@ -2552,8 +2552,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "quizzes", :force => true do |t|
       t.string   "title", limit: 255
-      t.text     "description",                :limit => 16777215
-      t.text     "quiz_data",                  :limit => 16777215
+      t.text     "description",                :limit => 16_777_215
+      t.text     "quiz_data",                  :limit => 16_777_215
       t.float    "points_possible"
       t.integer  "context_id", :limit => 8, :null => false
       t.string   "context_type", :null => false, limit: 255
@@ -2602,7 +2602,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table "report_snapshots", :force => true do |t|
       t.string   "report_type", limit: 255
-      t.text     "data",        :limit => 16777215
+      t.text     "data",        :limit => 16_777_215
       t.datetime "created_at"
       t.datetime "updated_at"
       t.integer  "account_id", :limit => 8
@@ -2763,8 +2763,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "updated_at"
       t.integer  "attachment_id", :limit => 8
       t.integer  "progress"
-      t.text     "processing_errors",   :limit => 16777215
-      t.text     "processing_warnings", :limit => 16777215
+      t.text     "processing_errors",   :limit => 16_777_215
+      t.text     "processing_warnings", :limit => 16_777_215
       t.boolean  "batch_mode"
       t.integer  "batch_mode_term_id", :limit => 8
       t.text     "options"
@@ -2876,7 +2876,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :unique => true
 
     create_table "submissions", :force => true do |t|
-      t.text     "body", :limit => 16777215
+      t.text     "body", :limit => 16_777_215
       t.string   "url", limit: 255
       t.integer  "attachment_id", :limit => 8
       t.string   "grade", limit: 255
@@ -3063,7 +3063,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "show_user_services", :default => true
       t.string   "gender", limit: 255
       t.integer  "page_views_count",            :default => 0
-      t.integer  "reminder_time_for_due_dates", :default => 172800
+      t.integer  "reminder_time_for_due_dates", :default => 172_800
       t.integer  "reminder_time_for_grading",   :default => 0
       t.integer  "storage_quota", :limit => 8
       t.string   "visible_inbox_types", limit: 255
@@ -3137,7 +3137,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "versionable_id", :limit => 8
       t.string   "versionable_type", limit: 255
       t.integer  "number"
-      t.text     "yaml", :limit => 16777215
+      t.text     "yaml", :limit => 16_777_215
       t.datetime "created_at"
     end
 
@@ -3185,7 +3185,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table "wiki_pages", :force => true do |t|
       t.integer  "wiki_id", :limit => 8, :null => false
       t.string   "title", limit: 255
-      t.text     "body", :limit => 16777215
+      t.text     "body", :limit => 16_777_215
       t.string   "workflow_state", :null => false, limit: 255
       t.integer  "user_id", :limit => 8
       t.datetime "created_at"

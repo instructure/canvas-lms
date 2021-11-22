@@ -1192,9 +1192,9 @@ describe CoursesController, type: :request do
         it "sets the storage quota" do
           json = api_call(:post, @resource_path,
                           @resource_params,
-                          { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } })
+                          { :account_id => @account.id, :course => { :storage_quota_mb => 12_345 } })
           new_course = Course.find(json['id'])
-          expect(new_course.storage_quota_mb).to eq 12345
+          expect(new_course.storage_quota_mb).to eq 12_345
         end
 
         context "without :manage_storage_quotas" do
@@ -1210,7 +1210,7 @@ describe CoursesController, type: :request do
           it "ignores storage_quota" do
             json = api_call(:post, @resource_path,
                             @resource_params,
-                            { :account_id => @account.id, :course => { :storage_quota => 12345 } })
+                            { :account_id => @account.id, :course => { :storage_quota => 12_345 } })
             new_course = Course.find(json['id'])
             expect(new_course.storage_quota).to eq @account.default_storage_quota
           end
@@ -1218,7 +1218,7 @@ describe CoursesController, type: :request do
           it "ignores storage_quota_mb" do
             json = api_call(:post, @resource_path,
                             @resource_params,
-                            { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } })
+                            { :account_id => @account.id, :course => { :storage_quota_mb => 12_345 } })
             new_course = Course.find(json['id'])
             expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
           end
@@ -1237,7 +1237,7 @@ describe CoursesController, type: :request do
           it "ignores storage_quota" do
             json = api_call(:post, @resource_path,
                             @resource_params,
-                            { :account_id => @account.id, :course => { :storage_quota => 12345 } })
+                            { :account_id => @account.id, :course => { :storage_quota => 12_345 } })
             new_course = Course.find(json['id'])
             expect(new_course.storage_quota).to eq @account.default_storage_quota
           end
@@ -1245,7 +1245,7 @@ describe CoursesController, type: :request do
           it "ignores storage_quota_mb" do
             json = api_call(:post, @resource_path,
                             @resource_params,
-                            { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } })
+                            { :account_id => @account.id, :course => { :storage_quota_mb => 12_345 } })
             new_course = Course.find(json['id'])
             expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
           end

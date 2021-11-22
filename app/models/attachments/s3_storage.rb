@@ -113,10 +113,10 @@ class Attachments::S3Storage
 
     if block_given?
       File.open(tempfile.path, 'rb') do |file|
-        chunk = file.read(64000)
+        chunk = file.read(64_000)
         while chunk
           yield chunk
-          chunk = file.read(64000)
+          chunk = file.read(64_000)
         end
       end
     end

@@ -39,7 +39,6 @@ describe "collaborations" do
       end
 
       it 'displays the new collaboration form if there are no existing collaborations', priority: "1" do
-        # was tied to test_id: 162302 - this seems incorrect.
         new_collaborations_form(type)
       end
 

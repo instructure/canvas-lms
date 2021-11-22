@@ -41,7 +41,7 @@ module SIS
       create_user
       expect do
         GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process do |importer|
-          importer.add_group_membership(12345, 54321, 'accepted')
+          importer.add_group_membership(12_345, 54_321, 'accepted')
         end
       end.to_not raise_error
     end
@@ -63,7 +63,7 @@ module SIS
         importer = GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! })
         expect do
           importer.process do |work|
-            work.add_group_membership(12345, group.sis_source_id, 'accepted')
+            work.add_group_membership(12_345, group.sis_source_id, 'accepted')
           end
         end.to raise_error(SIS::ImportError)
       end

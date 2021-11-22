@@ -659,7 +659,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'requires the current attempt index' do
         qs_api_complete true, {
-          attempt: 123123123
+          attempt: 123_123_123
         }
 
         assert_status(400)

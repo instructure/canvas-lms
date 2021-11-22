@@ -38,13 +38,13 @@ describe "report helper" do
     # default min
     expect(report.number_of_items_per_runner(1)).to eq 25
     # divided by 99 to make for 100 jobs except for when exactly divisible by 99
-    expect(report.number_of_items_per_runner(13001)).to eq 131
+    expect(report.number_of_items_per_runner(13_001)).to eq 131
     # default max
-    expect(report.number_of_items_per_runner(1801308213)).to eq 1000
+    expect(report.number_of_items_per_runner(1_801_308_213)).to eq 1000
     # override min
     expect(report.number_of_items_per_runner(100, min: 10)).to eq 10
     # override max
-    expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
+    expect(report.number_of_items_per_runner(109_213_081, max: 100)).to eq 100
   end
 
   it 'creates report runners with a single trip' do

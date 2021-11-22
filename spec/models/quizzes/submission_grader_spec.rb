@@ -536,7 +536,7 @@ describe Quizzes::SubmissionGrader do
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "6994", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "5988", "question_1630873_78635a3709b540a59678c806b102d038" => "9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "3353", "question_1630873_69d0969351d989767d7096f28daf7461" => "3390" })
         expect(user_answer.delete(:points)).to be_within(0.01).of(0.44)
         expect(user_answer).to eq({
-                                    :question_id => 1630873, :correct => "partial", :text => "",
+                                    :question_id => 1_630_873, :correct => "partial", :text => "",
                                     :answer_for_structure1 => 4390,
                                     :answer_id_for_structure1 => 4390,
                                     :answer_for_event1 => 3390,
@@ -559,7 +559,7 @@ describe Quizzes::SubmissionGrader do
 
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "1883", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "5988", "question_1630873_78635a3709b540a59678c806b102d038" => "878", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "9570", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "1522", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "9532", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "1228", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "599", "question_1630873_69d0969351d989767d7096f28daf7461" => "5498" })
         expect(user_answer).to eq({
-                                    :question_id => 1630873, :correct => false, :points => 0, :text => "",
+                                    :question_id => 1_630_873, :correct => false, :points => 0, :text => "",
                                     :answer_for_structure1 => 1522,
                                     :answer_id_for_structure1 => 1522,
                                     :answer_for_event1 => 5498,
@@ -582,7 +582,7 @@ describe Quizzes::SubmissionGrader do
 
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "6994", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "7676", "question_1630873_78635a3709b540a59678c806b102d038" => "9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "3353", "question_1630873_69d0969351d989767d7096f28daf7461" => "3390" })
         expect(user_answer).to eq({
-                                    :question_id => 1630873, :correct => true, :points => 0.5, :text => "",
+                                    :question_id => 1_630_873, :correct => true, :points => 0.5, :text => "",
                                     :answer_for_structure1 => 4390,
                                     :answer_id_for_structure1 => 4390,
                                     :answer_for_event1 => 3390,

@@ -188,7 +188,7 @@ describe UnzipAttachment do
       end
 
       it "lets incorrect central directory size slide if the quota isn't exceeded" do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 15000, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 15_000, :quota_used => 0 })
         expect { unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end

@@ -2646,7 +2646,7 @@ describe CoursesController do
       end
 
       it "rejects non-course ids" do
-        put 'update', params: { :id => @course.id, :course => { :image_id => 1234134123 } }
+        put 'update', params: { :id => @course.id, :course => { :image_id => 1_234_134_123 } }
         @course.reload
         expect(@course.settings[:image_id]).to be_nil
       end

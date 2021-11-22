@@ -1939,7 +1939,7 @@ describe Account do
     specs_require_sharding
 
     describe ".find_cached" do
-      let(:nonsense_id) { 987654321 }
+      let(:nonsense_id) { 987_654_321 }
 
       it "works relative to a different shard" do
         @shard1.activate do

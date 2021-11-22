@@ -24,7 +24,7 @@ describe CanvasSecurity::PageViewJwt do
   describe ".generate" do
     it "generates and decodes a valid jwt token" do
       created_at = DateTime.now
-      uid = 1065040302011
+      uid = 1_065_040_302_011
       attributes = {
         request_id: "abcdefg-1234566",
         user_id: uid,

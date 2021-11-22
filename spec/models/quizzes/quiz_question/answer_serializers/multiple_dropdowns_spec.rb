@@ -45,7 +45,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
     include_examples 'Id Answer Serializers'
 
     it 'rejects an answer for an unknown blank' do
-      rc = subject.serialize({ foobar: 123456 })
+      rc = subject.serialize({ foobar: 123_456 })
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/unknown blank/i)
     end

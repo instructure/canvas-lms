@@ -20,7 +20,7 @@
 module CanvasDynamoDB
   class Database
     DEFAULT_MIN_CAPACITY = 5
-    DEFAULT_MAX_CAPACITY = 10000
+    DEFAULT_MAX_CAPACITY = 10_000
 
     attr_reader :client, :fingerprint, :logger
 

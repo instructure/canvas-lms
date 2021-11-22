@@ -24,7 +24,7 @@ describe LearningOutcomeGroup do
     @root = @course.root_outcome_group
   end
 
-  def long_text(max = 65535)
+  def long_text(max = 65_535)
     text = +''
     (0...max + 1).each do |num|
       text.concat(num.to_s)

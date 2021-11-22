@@ -888,7 +888,7 @@ module Lti::IMS
           # into 10 Oct 3022, which is not desired behavior. it's also further in
           # the future than the current time, which returns a different exception
           # and obscures this behavior
-          let(:timestamp) { 3022101316 }
+          let(:timestamp) { 3_022_101_316 }
           let(:params_overrides) { super().merge(timestamp: timestamp) }
 
           it_behaves_like 'a bad request'
@@ -897,7 +897,7 @@ module Lti::IMS
         context 'when submitted_at extension is a timestamp, but not an is08601 timestamp' do
           # this is an epoch timestamp that correctly parses using Time.zone.parse
           # into 10 Oct 1637, which is not desired behavior
-          let(:timestamp) { 1637101316 }
+          let(:timestamp) { 1_637_101_316 }
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: timestamp })
           end

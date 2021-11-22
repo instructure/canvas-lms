@@ -99,7 +99,7 @@ describe 'Grade Detail Tray:' do
 
     it 'late submission has late-by days/hours', priority: '1' do
       late_by_days_value = (@course.students.first.submissions.find_by(assignment_id: @a1.id)
-        .seconds_late / 86400.to_f).round(2)
+        .seconds_late / 86_400.to_f).round(2)
 
       expect(Gradebook::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end
@@ -154,7 +154,7 @@ describe 'Grade Detail Tray:' do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         button = Gradebook::GradeDetailTray.next_assignment_button
         # have to wait for InstUI animations
-keep_trying_until do
+        keep_trying_until do
           button.click
           true
         end
@@ -191,7 +191,7 @@ keep_trying_until do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         button = Gradebook::GradeDetailTray.next_student_button
         # have to wait for instUI Tray animation
-keep_trying_until do
+        keep_trying_until do
           button.click
           true
         end
@@ -202,7 +202,7 @@ keep_trying_until do
         Gradebook::Cells.open_tray(@course.students.second, @a1)
         button = Gradebook::GradeDetailTray.previous_student_button
         # have to wait for instUI Tray animation
-keep_trying_until do
+        keep_trying_until do
           button.click
           true
         end
@@ -244,7 +244,7 @@ keep_trying_until do
         Gradebook::Cells.open_tray(@course.students.first, @a4)
         button = Gradebook::GradeDetailTray.previous_assignment_button
         # have to wait for instUI Tray animation
-keep_trying_until do
+        keep_trying_until do
           button.click
           true
         end

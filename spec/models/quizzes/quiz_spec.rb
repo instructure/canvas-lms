@@ -1321,7 +1321,7 @@ describe Quizzes::Quiz do
   context "custom validations" do
     context "changinging quiz points" do
       it "does not allow quiz points higher than allowable by postgres" do
-        q = Quizzes::Quiz.new(:points_possible => 2000000001)
+        q = Quizzes::Quiz.new(:points_possible => 2_000_000_001)
         expect(q.valid?).to eq false
         expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end

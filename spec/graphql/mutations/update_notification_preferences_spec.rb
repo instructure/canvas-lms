@@ -359,7 +359,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     it 'errors when given an account_id for an account that does not exist' do
       result = run_mutation(
         context_type: 'Account',
-        account_id: 987654321,
+        account_id: 987_654_321,
         enabled: false
       )
       expect(result.dig(:errors, 0, :message)).to eq 'not found'
@@ -368,7 +368,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     it 'errors when given a course_id for a course that does not exist' do
       result = run_mutation(
         context_type: 'Course',
-        course_id: 987654321,
+        course_id: 987_654_321,
         enabled: false
       )
       expect(result.dig(:errors, 0, :message)).to eq 'not found'

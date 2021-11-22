@@ -243,8 +243,7 @@ describe "speed grader submissions" do
       expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "5")
     end
 
-    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
-                                                                                                test_id: 283502
+    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1"
 
     it "displays image submission in browser", priority: "1" do
       filename, fullpath, _data = get_file("graded.png")
@@ -346,11 +345,11 @@ describe "speed grader submissions" do
         @user = user_with_pseudonym({ active_user: true, username: 'student@example.com', password: 'qwertyuiop' })
         attachment1 = @user.attachments.new filename: "homework1.doc"
         attachment1.content_type = "application/msword"
-        attachment1.size = 10093
+        attachment1.size = 10_093
         attachment1.save!
         attachment2 = @user.attachments.new filename: "homework2.doc"
         attachment2.content_type = "application/msword"
-        attachment2.size = 10093
+        attachment2.size = 10_093
         attachment2.save!
 
         create_enrollments @course, [@user]

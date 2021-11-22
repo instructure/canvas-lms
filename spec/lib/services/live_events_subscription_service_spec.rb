@@ -58,20 +58,20 @@ module Services
 
       let(:developer_key) do
         developer_key = double
-        allow(developer_key).to receive(:global_id).and_return(10000000000003)
+        allow(developer_key).to receive(:global_id).and_return(10_000_000_000_003)
         developer_key
       end
 
       let(:non_root_account_context) do
         non_root_account = double
-        allow(non_root_account).to receive(:global_root_account_id).and_return(10000000000007)
+        allow(non_root_account).to receive(:global_root_account_id).and_return(10_000_000_000_007)
         non_root_account
       end
 
       let(:root_account_context) do
         root_account = double
         allow(root_account).to receive(:global_root_account_id).and_return(nil)
-        allow(root_account).to receive(:global_id).and_return(10000000000004)
+        allow(root_account).to receive(:global_id).and_return(10_000_000_000_004)
         root_account
       end
 

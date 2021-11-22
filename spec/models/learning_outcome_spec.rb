@@ -889,7 +889,7 @@ describe LearningOutcome do
             @outcome.reload
             expect(@outcome.calculation_method).to eq(method)
             expect(@outcome.calculation_int).to eq(int)
-            @outcome.calculation_int = 15000
+            @outcome.calculation_int = 15_000
             @outcome.save
             expect(@outcome).to have(1).error_on(:calculation_int)
             expect(@outcome).to have(1).errors

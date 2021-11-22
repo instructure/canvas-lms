@@ -189,7 +189,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
     end
 
     it "requires outcome group to exist" do
-      result = execute_query(mutation_str(id: 99999), context)
+      result = execute_query(mutation_str(id: 99_999), context)
       expect_error(result, "Group not found")
     end
 
@@ -197,7 +197,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
       result = execute_query(
         mutation_str(
           id: @group.id,
-          parent_outcome_group_id: 99999
+          parent_outcome_group_id: 99_999
         ),
         context
       )

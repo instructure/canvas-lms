@@ -31,8 +31,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
         { question_5: 25e-6 }.with_indifferent_access,
         { question_5: 0.12 }.with_indifferent_access,
         { question_5: 3.0 }.with_indifferent_access,
-        { question_5: 17000.0 }.with_indifferent_access,
-        { question_5: 6200000.13 }.with_indifferent_access
+        { question_5: 17_000.0 }.with_indifferent_access,
+        { question_5: 6_200_000.13 }.with_indifferent_access
       ]
     end
 
@@ -70,8 +70,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
         { question_5: 0.000025 }.with_indifferent_access,
         { question_5: 0.12 }.with_indifferent_access,
         { question_5: 3.0 }.with_indifferent_access,
-        { question_5: 17000.0 }.with_indifferent_access,
-        { question_5: 6200000.13 }.with_indifferent_access
+        { question_5: 17_000.0 }.with_indifferent_access,
+        { question_5: 6_200_000.13 }.with_indifferent_access
       ]
     end
 
@@ -93,8 +93,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
         { question_5: 0.000025 }.with_indifferent_access,
         { question_5: 0.12 }.with_indifferent_access,
         { question_5: 3.0 }.with_indifferent_access,
-        { question_5: 17000.0 }.with_indifferent_access,
-        { question_5: 6200000.13 }.with_indifferent_access
+        { question_5: 17_000.0 }.with_indifferent_access,
+        { question_5: 6_200_000.13 }.with_indifferent_access
       ]
     end
 

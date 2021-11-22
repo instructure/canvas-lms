@@ -408,7 +408,7 @@ describe 'quizzes question creation' do
     it "shows an error when the quiz question exceeds character limit", priority: "2" do
       start_quiz_question
       chars = [*('a'..'z')]
-      value = (0..16385).map { chars.sample }.join
+      value = (0..16_385).map { chars.sample }.join
       type_in_tiny 'textarea#question_content_0', value
       wait_for_ajaximations
       f('.submit_button').click

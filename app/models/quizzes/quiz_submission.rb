@@ -33,12 +33,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   validates :quiz_id, presence: true
   validates :extra_time, numericality: { greater_than_or_equal_to: 0,
-                                         less_than_or_equal_to: 10080, # one week
+                                         less_than_or_equal_to: 10_080, # one week
                                          allow_nil: true }
   validates :extra_attempts, numericality: { greater_than_or_equal_to: 0,
                                              less_than_or_equal_to: 1000,
                                              allow_nil: true }
-  validates :quiz_points_possible, numericality: { less_than_or_equal_to: 2000000000,
+  validates :quiz_points_possible, numericality: { less_than_or_equal_to: 2_000_000_000,
                                                    allow_nil: true }
 
   before_validation :update_quiz_points_possible

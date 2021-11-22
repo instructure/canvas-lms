@@ -218,7 +218,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def reasonable_points_possible?
-    return if points_possible.to_i < 1000000000
+    return if points_possible.to_i < 1_000_000_000
     return unless points_possible_changed?
 
     errors.add(

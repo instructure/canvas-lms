@@ -161,7 +161,7 @@ describe Mutations::MoveOutcomeLinks do
     end
 
     it "validates group not exist" do
-      response = execute_query(mutation_str(group_id: 123123, outcome_link_ids: []), {})
+      response = execute_query(mutation_str(group_id: 123_123, outcome_link_ids: []), {})
       expect(response["errors"][0]["message"]).to eql(
         "Group not found"
       )
@@ -193,7 +193,7 @@ describe Mutations::MoveOutcomeLinks do
       response = execute_query(
         mutation_str(
           group_id: @destination_group.id,
-          outcome_link_ids: [123123]
+          outcome_link_ids: [123_123]
         ),
         {
           current_user: @teacher

@@ -115,8 +115,8 @@ describe "Importing assignments" do
       "peer_reviews" => false,
       "automatic_peer_reviews" => false,
       "muted" => false,
-      "due_at" => 1401947999000,
-      "peer_reviews_due_at" => 1401947999000,
+      "due_at" => 1_401_947_999_000,
+      "peer_reviews_due_at" => 1_401_947_999_000,
       "position" => 6,
       "peer_review_count" => 0
     }
@@ -137,8 +137,8 @@ describe "Importing assignments" do
       "submission_types" => "none",
       "peer_reviews" => true,
       "automatic_peer_reviews" => true,
-      "due_at" => 1401947999000,
-      "peer_reviews_due_at" => 1401947999000
+      "due_at" => 1_401_947_999_000,
+      "peer_reviews_due_at" => 1_401_947_999_000
     }
     expects_job_with_tag('Assignment#do_auto_peer_review') do
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
@@ -156,8 +156,8 @@ describe "Importing assignments" do
       "submission_types" => "none",
       "peer_reviews" => true,
       "automatic_peer_reviews" => true,
-      "due_at" => 1401947999000,
-      "peer_reviews_due_at" => 1401947999000
+      "due_at" => 1_401_947_999_000,
+      "peer_reviews_due_at" => 1_401_947_999_000
     }
     migration = @course.content_migrations.create!
     allow(migration).to receive(:date_shift_options).and_return(true)
@@ -184,8 +184,8 @@ describe "Importing assignments" do
       "peer_reviews" => false,
       "automatic_peer_reviews" => false,
       "muted" => false,
-      "due_at" => 1401947999000,
-      "peer_reviews_due_at" => 1401947999000,
+      "due_at" => 1_401_947_999_000,
+      "peer_reviews_due_at" => 1_401_947_999_000,
       "position" => 6,
       "peer_review_count" => 0,
       "turnitin_enabled" => true,
@@ -422,10 +422,10 @@ describe "Importing assignments" do
           end
 
           context 'when score_maximum is given' do
-            let(:extra_line_item_params) { super().merge(score_maximum: 98765) }
+            let(:extra_line_item_params) { super().merge(score_maximum: 98_765) }
 
             it "sets score_maximum on the line item but doesn't affect the assignment points_possible" do
-              expect(subject.score_maximum).to eq(98765)
+              expect(subject.score_maximum).to eq(98_765)
               expect(assignment.points_possible).to eq(assignment_hash[:points_possible])
             end
           end
