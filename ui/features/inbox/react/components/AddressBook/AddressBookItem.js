@@ -64,6 +64,7 @@ export const AddressBookItem = ({
       elementRef={el => {
         itemRef.current = el
       }}
+      data-testid="address-book-item"
     >
       <li
         role="menuitem"
