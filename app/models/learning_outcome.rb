@@ -385,9 +385,11 @@ class LearningOutcome < ActiveRecord::Base
   scope(:has_result_for_user,
         lambda do |user|
           joins(:learning_outcome_results)
-            .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
-                   "AND learning_outcome_results.workflow_state <> 'deleted' " \
-                   "AND learning_outcome_results.user_id=?", user)
+            .where(<<~SQL.squish, user)
+              learning_outcomes.id=learning_outcome_results.learning_outcome_id
+              AND learning_outcome_results.workflow_state <> 'deleted'
+              AND learning_outcome_results.user_id=?
+            SQL
             .order(best_unicode_collation_key('short_description'))
         end)
 

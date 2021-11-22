@@ -197,10 +197,12 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:primary] &= restrict_to_codes
     end
     distinct
-      .joins("JOIN #{AppointmentGroupContext.quoted_table_name} agc " \
-             "ON appointment_groups.id = agc.appointment_group_id " \
-             "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
-             "ON appointment_groups.id = sc.appointment_group_id")
+      .joins(<<~SQL.squish)
+        JOIN #{AppointmentGroupContext.quoted_table_name} agc
+          ON appointment_groups.id = agc.appointment_group_id
+        LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc
+          ON appointment_groups.id = sc.appointment_group_id
+      SQL
       .where(<<~SQL.squish, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
@@ -221,10 +223,12 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:limited] &= restrict_to_codes
     end
     distinct
-      .joins("JOIN #{AppointmentGroupContext.quoted_table_name} agc " \
-             "ON appointment_groups.id = agc.appointment_group_id " \
-             "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
-             "ON appointment_groups.id = sc.appointment_group_id")
+      .joins(<<~SQL.squish)
+        JOIN #{AppointmentGroupContext.quoted_table_name} agc
+          ON appointment_groups.id = agc.appointment_group_id
+        LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc
+          ON appointment_groups.id = sc.appointment_group_id
+      SQL
       .where(<<~SQL.squish, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
@@ -531,9 +535,11 @@ class AppointmentGroup < ActiveRecord::Base
 
   def users_with_reservations_through_group
     appointments_participants
-      .joins("INNER JOIN #{GroupMembership.quoted_table_name} " \
-             "ON group_memberships.group_id = calendar_events.context_id " \
-             "and calendar_events.context_type = 'Group'")
+      .joins(<<~SQL.squish)
+        INNER JOIN #{GroupMembership.quoted_table_name}
+          ON group_memberships.group_id = calendar_events.context_id
+             AND calendar_events.context_type = 'Group'
+      SQL
       .where("group_memberships.workflow_state <> 'deleted'")
       .pluck("group_memberships.user_id")
   end
