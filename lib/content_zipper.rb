@@ -147,7 +147,6 @@ class ContentZipper
       submissions_hash[s.id] = s
       if s.submission_type == 'online_upload'
         static_attachments += s.attachments
-      else
       end
     end
     static_attachments = static_attachments.uniq.map do |a|

@@ -222,7 +222,6 @@ module Qti
         points = questions.first ? (questions.first[:points_possible] || 0) : 0
         if points > 0 && questions.size == group[:questions].size && questions.all? { |q| q[:points_possible] == points }
           group[:question_points] = points
-        else
         end
       end
 
