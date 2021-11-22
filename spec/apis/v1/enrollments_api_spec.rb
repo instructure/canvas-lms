@@ -1621,22 +1621,28 @@ describe EnrollmentsApiController, type: :request do
             }
           }
           # should display the user's own grades
-          h['grades'] = {
-            'html_url' => course_student_grades_url(@course, e.user),
-            'final_score' => nil,
-            'current_score' => nil,
-            'final_grade' => nil,
-            'current_grade' => nil,
-          } if e.student? && e.user_id == @user.id
+          if e.student? && e.user_id == @user.id
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+            }
+          end
           # should not display grades for other users.
-          h['grades'] = {
-            'html_url' => course_student_grades_url(@course, e.user)
-          } if e.student? && e.user_id != @user.id
-          h.merge!(
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0
-          ) if e.user == @user
+          if e.student? && e.user_id != @user.id
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user)
+            }
+          end
+          if e.user == @user
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            )
+          end
 
           h
         end)
@@ -1994,17 +2000,19 @@ describe EnrollmentsApiController, type: :request do
             'sis_user_id' => nil,
             'section_integration_id' => nil
           }
-          h['grades'] = {
-            'html_url' => course_student_grades_url(@course, e.user),
-            'final_score' => nil,
-            'current_score' => nil,
-            'final_grade' => nil,
-            'current_grade' => nil,
-            "unposted_current_score" => nil,
-            "unposted_current_grade" => nil,
-            "unposted_final_score" => nil,
-            "unposted_final_grade" => nil
-          } if e.student?
+          if e.student?
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+              "unposted_current_score" => nil,
+              "unposted_current_grade" => nil,
+              "unposted_final_score" => nil,
+              "unposted_final_grade" => nil
+            }
+          end
           h
         end)
       end
@@ -2314,18 +2322,22 @@ describe EnrollmentsApiController, type: :request do
               'start_at' => nil,
               'end_at' => nil,
             }
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user),
-              'final_score' => nil,
-              'current_score' => nil,
-              'final_grade' => nil,
-              'current_grade' => nil,
-            } if e.student?
-            h.merge!(
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
-            ) if e.user == @user
+            if e.student?
+              h['grades'] = {
+                'html_url' => course_student_grades_url(@course, e.user),
+                'final_score' => nil,
+                'current_score' => nil,
+                'final_grade' => nil,
+                'current_grade' => nil,
+              }
+            end
+            if e.user == @user
+              h.merge!(
+                'last_activity_at' => nil,
+                'last_attended_at' => nil,
+                'total_activity_time' => 0
+              )
+            end
             h
           end
 
@@ -2377,18 +2389,22 @@ describe EnrollmentsApiController, type: :request do
               'start_at' => nil,
               'end_at' => nil,
             }
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user),
-              'final_score' => nil,
-              'current_score' => nil,
-              'final_grade' => nil,
-              'current_grade' => nil,
-            } if e.student?
-            h.merge!(
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
-            ) if e.user == @user
+            if e.student?
+              h['grades'] = {
+                'html_url' => course_student_grades_url(@course, e.user),
+                'final_score' => nil,
+                'current_score' => nil,
+                'final_grade' => nil,
+                'current_grade' => nil,
+              }
+            end
+            if e.user == @user
+              h.merge!(
+                'last_activity_at' => nil,
+                'last_attended_at' => nil,
+                'total_activity_time' => 0
+              )
+            end
             h
           end
           link_header = response.headers['Link'].split(',')
@@ -2775,18 +2791,22 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.user.created_at.iso8601
             }
           }
-          h['grades'] = {
-            'html_url' => course_student_grades_url(@course, e.user),
-            'final_score' => nil,
-            'current_score' => nil,
-            'final_grade' => nil,
-            'current_grade' => nil,
-          } if e.student?
-          h.merge!(
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0
-          ) if e.user == @user
+          if e.student?
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+            }
+          end
+          if e.user == @user
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            )
+          end
           h
         })
       end

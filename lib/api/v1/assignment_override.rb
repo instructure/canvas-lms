@@ -243,10 +243,12 @@ module Api::V1::AssignmentOverride
 
     grouped = assignment_overrides_data.group_by { |o| o['assignment_id'] }
     assignments = course.active_assignments.where(id: grouped.keys).preload(:assignment_overrides)
-    overrides = grouped.map do |assignment_id, overrides_data|
-      assignment = assignments.find { |a| a.id.to_s == assignment_id.to_s }
-      find_assignment_overrides(assignment, overrides_data.map { |o| o['id'] }) if assignment
-    end.flatten.compact if for_update
+    if for_update
+      overrides = grouped.map do |assignment_id, overrides_data|
+        assignment = assignments.find { |a| a.id.to_s == assignment_id.to_s }
+        find_assignment_overrides(assignment, overrides_data.map { |o| o['id'] }) if assignment
+      end.flatten.compact
+    end
 
     interpreted = assignment_overrides_data.each_with_index.map do |override_data, i|
       assignment = assignments.find { |a| a.id.to_s == override_data['assignment_id'].to_s }

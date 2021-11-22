@@ -54,18 +54,22 @@ module Importers
     end
 
     def self.find_or_initialize_from_migration(hash, context)
-      item = ExternalFeed.where(
-        context_id: context,
-        context_type: context.class.to_s,
-        migration_id: hash[:migration_id]
-      ).first if hash[:migration_id]
-      item ||= ExternalFeed.where(
-        context_id: context,
-        context_type: context.class.to_s,
-        url: hash[:url],
-        header_match: hash[:header_match].presence,
-        verbosity: hash[:verbosity]
-      ).first if hash[:url]
+      if hash[:migration_id]
+        item = ExternalFeed.where(
+          context_id: context,
+          context_type: context.class.to_s,
+          migration_id: hash[:migration_id]
+        ).first
+      end
+      if hash[:url]
+        item ||= ExternalFeed.where(
+          context_id: context,
+          context_type: context.class.to_s,
+          url: hash[:url],
+          header_match: hash[:header_match].presence,
+          verbosity: hash[:verbosity]
+        ).first
+      end
       item ||= context.external_feeds.temp_record
       item
     end

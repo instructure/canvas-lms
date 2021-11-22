@@ -368,8 +368,10 @@ class ContextModulesController < ApplicationController
                                                   .having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
                                    end
                                  end
-      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard)
-                                        .completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
+      if @current_user && quiz_ids.any?
+        submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard)
+                                          .completed.where(:quiz_id => quiz_ids).pluck(:quiz_id)
+      end
       submitted_assignment_ids ||= []
       submitted_quiz_ids ||= []
       all_tags.each do |tag|
@@ -474,12 +476,14 @@ class ContextModulesController < ApplicationController
       valid_previous_modules.reverse!
       valid_previous_modules.each do |mod|
         prog = mod.evaluate_for(@current_user)
+        next if prog.completed?
+
         res[:modules] << {
           :id => mod.id,
           :name => mod.name,
           :prerequisites => prerequisites_needing_finishing_for(mod, prog),
           :locked => prog.locked?
-        } unless prog.completed?
+        }
       end
     elsif @module.require_sequential_progress && @progression.current_position && @tag && @tag.position && @progression.current_position < @tag.position
       res[:locked] = true

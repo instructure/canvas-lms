@@ -627,8 +627,10 @@ class User < ActiveRecord::Base
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
         shard_enrollments.each { |e| course_section_ids << e.course_section_id }
-        data[:sections] += shard_sections = CourseSection.select(%i[id course_id nonxlist_course_id])
-                                                         .where(:id => course_section_ids.to_a).to_a unless course_section_ids.empty?
+        unless course_section_ids.empty?
+          data[:sections] += shard_sections = CourseSection.select(%i[id course_id nonxlist_course_id])
+                                                           .where(:id => course_section_ids.to_a).to_a
+        end
         shard_sections ||= []
         course_ids = Set.new
         shard_sections.each do |s|

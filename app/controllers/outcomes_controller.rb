@@ -334,13 +334,17 @@ class OutcomesController < ApplicationController
   def proficiency_roles_js_env
     if @context.is_a?(Account) && @context.root_account.feature_enabled?(:account_level_mastery_scales)
       proficiency_calculation_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
-        proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_calculations
+      if @context.grants_right? @current_user, :manage_proficiency_calculations
+        @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
+          proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       proficiency_scales_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
-        proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_scales
+      if @context.grants_right? @current_user, :manage_proficiency_scales
+        @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
+          proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       js_env(
         PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
         PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles

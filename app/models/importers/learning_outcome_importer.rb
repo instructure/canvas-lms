@@ -100,8 +100,10 @@ module Importers
             return
           end
         else
-          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s)
-                                  .where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+          if hash[:migration_id]
+            item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s)
+                                    .where(migration_id: hash[:migration_id]).first
+          end
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
           item.mark_as_importing!(migration)

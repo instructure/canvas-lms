@@ -51,19 +51,25 @@ unless $canvas_tasks_loaded
           ('js:yarn_install' if npm_install)
         ].compact
 
-        task 'i18n:generate_js' => [
-          ('js:yarn_install' if npm_install)
-        ].compact if build_i18n
+        if build_i18n
+          task 'i18n:generate_js' => [
+            ('js:yarn_install' if npm_install)
+          ].compact
+        end
 
-        task 'js:webpack_development' => [
-          'js:gulp_rev',
-          ('i18n:generate_js' if build_i18n),
-        ] if build_js && build_dev_js
+        if build_js && build_dev_js
+          task 'js:webpack_development' => [
+            'js:gulp_rev',
+            ('i18n:generate_js' if build_i18n),
+          ]
+        end
 
-        task 'js:webpack_production' => [
-          'js:gulp_rev',
-          ('i18n:generate_js' if build_i18n),
-        ] if build_js && build_prod_js
+        if build_js && build_prod_js
+          task 'js:webpack_production' => [
+            'js:gulp_rev',
+            ('i18n:generate_js' if build_i18n),
+          ]
+        end
       end
 
       batch_times = []
