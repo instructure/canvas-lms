@@ -348,6 +348,8 @@ Style/NestedParenthesizedCalls:
   Severity: error
 Style/NestedTernaryOperator:
   Severity: error
+Style/Next:
+  Severity: error
 Style/NilComparison:
   Severity: error
 Style/NilLambda:

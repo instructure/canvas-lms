@@ -199,19 +199,19 @@ class GradebookImporter
         submission['original_grade'] = assignment.fetch(:score, nil)
         submission['gradeable'] = assignment.fetch(:gradable, nil)
 
-        if submission.fetch('gradeable').nil?
-          assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
-          new_submission = Submission.new
-          new_submission.user = student
-          new_submission.assignment = assignment
-          edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
-          new_submission.cached_due_date = edd.fetch(:due_at, nil)
-          new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
-          submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
-            submission: new_submission,
-            is_admin: is_admin
-          )
-        end
+        next unless submission.fetch('gradeable').nil?
+
+        assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
+        new_submission = Submission.new
+        new_submission.user = student
+        new_submission.assignment = assignment
+        edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
+        new_submission.cached_due_date = edd.fetch(:due_at, nil)
+        new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
+        submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
+          submission: new_submission,
+          is_admin: is_admin
+        )
       end
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
         custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }

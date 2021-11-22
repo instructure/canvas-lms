@@ -43,15 +43,15 @@ module Api::V1::ExternalTools
     json['version'] = tool.use_1_3? ? '1.3' : '1.1'
     json['developer_key_id'] = tool.developer_key_id if tool.developer_key_id
     extension_types.each do |type|
-      if json[type]
-        json[type]['label'] = tool.label_for(type, I18n.locale)
-        json[type].delete 'labels'
-        json.delete 'labels'
+      next unless json[type]
 
-        [:selection_width, :selection_height, :icon_url].each do |key|
-          value = tool.extension_setting type, key
-          json[type][key] = value if value
-        end
+      json[type]['label'] = tool.label_for(type, I18n.locale)
+      json[type].delete 'labels'
+      json.delete 'labels'
+
+      [:selection_width, :selection_height, :icon_url].each do |key|
+        value = tool.extension_setting type, key
+        json[type][key] = value if value
       end
     end
 

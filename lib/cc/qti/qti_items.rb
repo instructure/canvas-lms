@@ -416,15 +416,15 @@ module CC
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
 
-          unless answer['comments'].blank? && answer['comments_html'].blank?
-            node.respcondition do |r_node|
-              r_node.conditionvar do |c_node|
-                c_node.not do
-                  c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
-                end
+          next if answer['comments'].blank? && answer['comments_html'].blank?
+
+          node.respcondition do |r_node|
+            r_node.conditionvar do |c_node|
+              c_node.not do
+                c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
               end
-              r_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
             end
+            r_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
           end
         end
       end
@@ -435,13 +435,13 @@ module CC
         correct_points = "%.2f" % correct_points
 
         groups.each_pair do |id, answers|
-          if (answer = answers.find { |a| a['weight'].to_i > 0 })
-            node.respcondition do |r_node|
-              r_node.conditionvar do |c_node|
-                c_node.varequal(answer['id'], :respident => "response_#{id}")
-              end
-              r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
+          next unless (answer = answers.find { |a| a['weight'].to_i > 0 })
+
+          node.respcondition do |r_node|
+            r_node.conditionvar do |c_node|
+              c_node.varequal(answer['id'], :respident => "response_#{id}")
             end
+            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
         end
       end
@@ -467,21 +467,21 @@ module CC
 
       def answer_feedback_respconditions(node, question)
         question['answers'].each do |answer|
-          unless answer['comments'].blank? && answer['comments_html'].blank?
-            respident = 'response1'
-            if MULTI_ANSWER_TYPES.member? question['question_type']
-              respident = "response_#{answer['blank_id']}"
-            end
-            node.respcondition(:continue => 'Yes') do |res_node|
-              res_node.conditionvar do |c_node|
-                if question[:question_type] == 'short_answer_question'
-                  c_node.varequal answer['text'], :respident => respident
-                else
-                  c_node.varequal answer['id'], :respident => respident
-                end
-              end # c_node
-              node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
-            end
+          next if answer['comments'].blank? && answer['comments_html'].blank?
+
+          respident = 'response1'
+          if MULTI_ANSWER_TYPES.member? question['question_type']
+            respident = "response_#{answer['blank_id']}"
+          end
+          node.respcondition(:continue => 'Yes') do |res_node|
+            res_node.conditionvar do |c_node|
+              if question[:question_type] == 'short_answer_question'
+                c_node.varequal answer['text'], :respident => respident
+              else
+                c_node.varequal answer['id'], :respident => respident
+              end
+            end # c_node
+            node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
           end
         end
       end

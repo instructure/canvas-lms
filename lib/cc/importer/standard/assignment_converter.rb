@@ -23,24 +23,24 @@ module CC::Importer::Standard
 
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
-        if (doc = get_node_or_open_file(res, 'assignment'))
-          path = res[:href] || (res[:files]&.first && res[:files].first[:href])
-          resource_dir = File.dirname(path) if path
+        next unless (doc = get_node_or_open_file(res, 'assignment'))
 
-          asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
-          if res[:intended_user_role] == 'Instructor'
-            asmnt[:workflow_state] = 'unpublished'
-          end
-          parse_cc_assignment_data(asmnt, doc, resource_dir)
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
+        resource_dir = File.dirname(path) if path
 
-          # FIXME: check the XML namespace to make sure it's actually a canvas assignment
-          # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
-          if (assgn_node = doc.at_css('extensions > assignment'))
-            parse_canvas_assignment_data(assgn_node, nil, asmnt)
-          end
-
-          asmnts << asmnt
+        asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
+        if res[:intended_user_role] == 'Instructor'
+          asmnt[:workflow_state] = 'unpublished'
         end
+        parse_cc_assignment_data(asmnt, doc, resource_dir)
+
+        # FIXME: check the XML namespace to make sure it's actually a canvas assignment
+        # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
+        if (assgn_node = doc.at_css('extensions > assignment'))
+          parse_canvas_assignment_data(assgn_node, nil, asmnt)
+        end
+
+        asmnts << asmnt
       end
 
       asmnts

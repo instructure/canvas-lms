@@ -155,10 +155,10 @@ class ContentImportsController < ApplicationController
       params[:copy] ||= {}
       params[:items_to_copy].each_pair do |key, vals|
         params[:copy][key] ||= {}
-        if vals.present?
-          vals.each do |val|
-            params[:copy][key][val] = true
-          end
+        next unless vals.present?
+
+        vals.each do |val|
+          params[:copy][key][val] = true
         end
       end
     end

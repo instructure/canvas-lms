@@ -183,11 +183,11 @@ module Importers
       if hash[:completion_requirements]
         c_reqs = []
         hash[:completion_requirements].each do |req|
-          if (item_ref = item_map[req[:item_migration_id]])
-            req[:id] = item_ref.id
-            req.delete :item_migration_id
-            c_reqs << req
-          end
+          next unless (item_ref = item_map[req[:item_migration_id]])
+
+          req[:id] = item_ref.id
+          req.delete :item_migration_id
+          c_reqs << req
         end
         if !c_reqs.empty? || migration.for_master_course_import? # allow clearing requirements on sync
           item.completion_requirements = c_reqs

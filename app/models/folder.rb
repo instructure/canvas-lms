@@ -289,17 +289,17 @@ class Folder < ActiveRecord::Base
     if options[:include_subcontent] != false
       dup.save!
       subcontent.each do |item|
-        if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
-          case item
-          when Attachment
-            file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
-            file.folder_id = dup.id
-            file.save_without_broadcasting!
-          when Folder
-            sub = item.clone_for(context, nil, options)
-            sub.parent_folder_id = dup.id
-            sub.save!
-          end
+        next unless options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
+
+        case item
+        when Attachment
+          file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
+          file.folder_id = dup.id
+          file.save_without_broadcasting!
+        when Folder
+          sub = item.clone_for(context, nil, options)
+          sub.parent_folder_id = dup.id
+          sub.save!
         end
       end
     end

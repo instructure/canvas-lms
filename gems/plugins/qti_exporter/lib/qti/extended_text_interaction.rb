@@ -97,13 +97,13 @@ module Qti
               @question[:question_text] += " [#{cleaned}]"
             end
           end
-          unless existing || answer[:text] == ""
-            @question[:answers] << answer
-            answer[:weight] = 100
-            answer[:comments] = ""
-            bv = match.at_css('baseValue')
-            answer[:id] = get_or_generate_answer_id(bv && bv['identifier'])
-          end
+          next if existing || answer[:text] == ""
+
+          @question[:answers] << answer
+          answer[:weight] = 100
+          answer[:comments] = ""
+          bv = match.at_css('baseValue')
+          answer[:id] = get_or_generate_answer_id(bv && bv['identifier'])
         end
       end
       # Check if there are correct answers explicitly specified

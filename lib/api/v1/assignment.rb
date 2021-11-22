@@ -617,12 +617,12 @@ module Api::V1::Assignment
   # validate that date and times are iso8601
   def assignment_dates_valid?(assignment, assignment_params)
     errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
-      if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
-        assignment.errors.add("assignment[#{v}]",
-                              I18n.t("assignments_api.invalid_date_time",
-                                     'Invalid datetime for %{attribute}',
-                                     attribute: v))
-      end
+      next unless assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
+
+      assignment.errors.add("assignment[#{v}]",
+                            I18n.t("assignments_api.invalid_date_time",
+                                   'Invalid datetime for %{attribute}',
+                                   attribute: v))
     end
 
     errors.compact.empty?

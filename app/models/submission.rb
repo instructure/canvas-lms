@@ -1342,12 +1342,12 @@ class Submission < ActiveRecord::Base
 
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
-      if (a.context_type == 'User' && a.context_id == user_id) ||
-         (a.context_type == 'Group' && a.context_id == group_id) ||
-         (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
-         attachment_fake_belongs_to_group(a)
-        attachment_associations.where(attachment: a).first_or_create
-      end
+      next unless (a.context_type == 'User' && a.context_id == user_id) ||
+                  (a.context_type == 'Group' && a.context_id == group_id) ||
+                  (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
+                  attachment_fake_belongs_to_group(a)
+
+      attachment_associations.where(attachment: a).first_or_create
     end
   end
 
@@ -1379,23 +1379,23 @@ class Submission < ActiveRecord::Base
           end
         end
 
-        if submit_to_canvadocs
-          opts = {
-            preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-            wants_annotation: true,
-          }
+        next unless submit_to_canvadocs
 
-          if context.root_account.settings[:canvadocs_prefer_office_online]
-            # Office 365 should take priority over pdfjs
-            opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
-          end
+        opts = {
+          preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+          wants_annotation: true,
+        }
 
-          a.delay(
-            n_strand: 'canvadocs',
-            priority: Delayed::LOW_PRIORITY
-          )
-           .submit_to_canvadocs(1, opts)
+        if context.root_account.settings[:canvadocs_prefer_office_online]
+          # Office 365 should take priority over pdfjs
+          opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
         end
+
+        a.delay(
+          n_strand: 'canvadocs',
+          priority: Delayed::LOW_PRIORITY
+        )
+         .submit_to_canvadocs(1, opts)
       end
     end
   end
@@ -2748,24 +2748,24 @@ class Submission < ActiveRecord::Base
             end
 
             comment = user_data.slice(:text_comment, :file_ids, :media_comment_id, :media_comment_type, :group_comment)
-            if comment.present?
-              comment = {
-                comment: comment[:text_comment],
-                author: grader,
-                hidden: assignment.post_manually? && !submission.posted?
-              }.merge(
-                comment
-              ).with_indifferent_access
+            next unless comment.present?
 
-              if (file_ids = user_data[:file_ids])
-                attachments = Attachment.where(id: file_ids).to_a.select { |a|
-                  a.grants_right?(grader, :attach_to_submission_comment)
-                }
-                attachments.each { |a| a.ok_for_submission_comment = true }
-                comment[:attachments] = attachments if attachments.any?
-              end
-              assignment.update_submission(user, comment)
+            comment = {
+              comment: comment[:text_comment],
+              author: grader,
+              hidden: assignment.post_manually? && !submission.posted?
+            }.merge(
+              comment
+            ).with_indifferent_access
+
+            if (file_ids = user_data[:file_ids])
+              attachments = Attachment.where(id: file_ids).to_a.select { |a|
+                a.grants_right?(grader, :attach_to_submission_comment)
+              }
+              attachments.each { |a| a.ok_for_submission_comment = true }
+              comment[:attachments] = attachments if attachments.any?
             end
+            assignment.update_submission(user, comment)
           end
         end
       end

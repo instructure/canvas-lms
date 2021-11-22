@@ -325,43 +325,43 @@ class RubricAssociation < ActiveRecord::Base
     rubric.criteria_object.each do |criterion|
       data = params["criterion_#{criterion.id}".to_sym]
       rating = {}
-      if data
-        replace_ratings = true
-        has_score = (data[:points]).present?
-        rating[:id] = data[:rating_id]
-        rating[:points] = assessment_points(criterion, data) if has_score
-        rating[:criterion_id] = criterion.id
-        rating[:learning_outcome_id] = criterion.learning_outcome_id
-        if criterion.ignore_for_scoring
-          rating[:ignore_for_scoring] = true
-        elsif has_score
-          score ||= 0
-          score += rating[:points]
-        end
-        rating[:description] = data[:description]
-        rating[:comments_enabled] = true
-        rating[:comments] = data[:comments]
-        rating[:above_threshold] = rating[:points] > criterion.mastery_points if criterion.mastery_points && rating[:points]
-        criterion.ratings.each_with_index do |r, index|
-          next unless ((r.points.to_f - rating[:points].to_f).abs < Float::EPSILON) ||
-                      (criterion.criterion_use_range && r.points.to_f > rating[:points].to_f && criterion.ratings[index + 1].try(:points).to_f < rating[:points].to_f)
+      next unless data
 
-          rating[:description] ||= r.description
-          rating[:id] ||= r.id
-        end
-        save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
-        if rating[:comments].present? && save_comment
-          self.summary_data ||= {}
-          self.summary_data[:saved_comments] ||= {}
-          self.summary_data[:saved_comments][criterion.id.to_s] ||= []
-          self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
-          # TODO: i18n
-          self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc.present? && desc != "No Details" }.uniq.sort
-          save
-        end
-        rating[:description] = t('no_details', "No details") if rating[:description].blank?
-        ratings << rating
+      replace_ratings = true
+      has_score = (data[:points]).present?
+      rating[:id] = data[:rating_id]
+      rating[:points] = assessment_points(criterion, data) if has_score
+      rating[:criterion_id] = criterion.id
+      rating[:learning_outcome_id] = criterion.learning_outcome_id
+      if criterion.ignore_for_scoring
+        rating[:ignore_for_scoring] = true
+      elsif has_score
+        score ||= 0
+        score += rating[:points]
       end
+      rating[:description] = data[:description]
+      rating[:comments_enabled] = true
+      rating[:comments] = data[:comments]
+      rating[:above_threshold] = rating[:points] > criterion.mastery_points if criterion.mastery_points && rating[:points]
+      criterion.ratings.each_with_index do |r, index|
+        next unless ((r.points.to_f - rating[:points].to_f).abs < Float::EPSILON) ||
+                    (criterion.criterion_use_range && r.points.to_f > rating[:points].to_f && criterion.ratings[index + 1].try(:points).to_f < rating[:points].to_f)
+
+        rating[:description] ||= r.description
+        rating[:id] ||= r.id
+      end
+      save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
+      if rating[:comments].present? && save_comment
+        self.summary_data ||= {}
+        self.summary_data[:saved_comments] ||= {}
+        self.summary_data[:saved_comments][criterion.id.to_s] ||= []
+        self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
+        # TODO: i18n
+        self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc.present? && desc != "No Details" }.uniq.sort
+        save
+      end
+      rating[:description] = t('no_details', "No details") if rating[:description].blank?
+      ratings << rating
     end
     assessment_to_return = nil
     artifacts_to_assess.each do |artifact|

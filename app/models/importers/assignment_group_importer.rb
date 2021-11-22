@@ -28,12 +28,12 @@ module Importers
         add_groups_for_imported_assignments(data, migration)
         groups = data['assignment_groups'] || []
         groups.each do |group|
-          if migration.import_object?("assignment_groups", group['migration_id'])
-            begin
-              import_from_migration(group, migration.context, migration)
-            rescue
-              migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
-            end
+          next unless migration.import_object?("assignment_groups", group['migration_id'])
+
+          begin
+            import_from_migration(group, migration.context, migration)
+          rescue
+            migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
           end
         end
         migration.context.assignment_groups.first.try(:fix_position_conflicts)

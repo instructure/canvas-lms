@@ -30,12 +30,12 @@ module Importers
         attachments = data['file_map'] || {}
         attachments = attachments.with_indifferent_access
         attachments.each_value do |att|
-          if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
-            begin
-              import_from_migration(att, migration.context, migration, nil, created_usage_rights_map)
-            rescue
-              migration.add_import_warning(I18n.t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
-            end
+          next unless !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
+
+          begin
+            import_from_migration(att, migration.context, migration, nil, created_usage_rights_map)
+          rescue
+            migration.add_import_warning(I18n.t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
           end
         end
 

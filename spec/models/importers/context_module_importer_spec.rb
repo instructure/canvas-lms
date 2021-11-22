@@ -22,24 +22,24 @@ require_relative '../../import_helper'
 
 describe "Importing modules" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'module'
-      it "imports from #{system}" do
-        data = get_import_data(system, 'module')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
-        data[:modules_to_import] = {}
-        expect(Importers::ContextModuleImporter.import_from_migration(data, context, migration)).to be_nil
-        expect(context.context_modules.count).to eq 0
+    next unless import_data_exists? system, 'module'
 
-        data[:modules_to_import][data[:migration_id]] = true
-        Importers::ContextModuleImporter.import_from_migration(data, context, migration)
-        Importers::ContextModuleImporter.import_from_migration(data, context, migration)
-        expect(context.context_modules.count).to eq 1
+    it "imports from #{system}" do
+      data = get_import_data(system, 'module')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
+      data[:modules_to_import] = {}
+      expect(Importers::ContextModuleImporter.import_from_migration(data, context, migration)).to be_nil
+      expect(context.context_modules.count).to eq 0
 
-        mod = ContextModule.where(migration_id: data[:migration_id]).first
-        expect(mod.content_tags.count).to eq(data[:items].count { |m| m[:linked_resource_type] == 'URL_TYPE' })
-        expect(mod.name).to eq data[:title]
-      end
+      data[:modules_to_import][data[:migration_id]] = true
+      Importers::ContextModuleImporter.import_from_migration(data, context, migration)
+      Importers::ContextModuleImporter.import_from_migration(data, context, migration)
+      expect(context.context_modules.count).to eq 1
+
+      mod = ContextModule.where(migration_id: data[:migration_id]).first
+      expect(mod.content_tags.count).to eq(data[:items].count { |m| m[:linked_resource_type] == 'URL_TYPE' })
+      expect(mod.name).to eq data[:title]
     end
   end
 

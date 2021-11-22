@@ -60,12 +60,12 @@ module Importers
 
       # also default question bank name to quiz name
       data['assessment_questions']['assessment_questions'].each do |aq|
-        if aq['question_bank_id'].blank? && aq['question_bank_migration_id'].blank?
-          assmnt_mig_id, assmnt_title = assmnt_map[aq['migration_id']]
-          aq['question_bank_name'] ||= assmnt_title
-          aq['question_bank_migration_id'] = CC::CCHelper.create_key("#{assmnt_mig_id}_#{aq['question_bank_name']}_question_bank")
-          aq['is_quiz_question_bank'] = true
-        end
+        next unless aq['question_bank_id'].blank? && aq['question_bank_migration_id'].blank?
+
+        assmnt_mig_id, assmnt_title = assmnt_map[aq['migration_id']]
+        aq['question_bank_name'] ||= assmnt_title
+        aq['question_bank_migration_id'] = CC::CCHelper.create_key("#{assmnt_mig_id}_#{aq['question_bank_name']}_question_bank")
+        aq['is_quiz_question_bank'] = true
       end
 
       dedup_assessment_questions(data['assessment_questions']['assessment_questions'], references)
@@ -137,25 +137,25 @@ module Importers
       assessments ||= []
       assessments.each do |assessment|
         migration_id = assessment['migration_id'] || assessment['assessment_id']
-        if migration.import_object?("quizzes", migration_id)
-          allow_update = false
-          # allow update if we find an existing item based on this migration setting
-          if (item_id = migration.migration_settings[:quiz_id_to_update])
-            allow_update = true
-            assessment[:id] = item_id.to_i
-            if assessment[:assignment]
-              assessment[:assignment][:id] = Quizzes::Quiz.find(item_id.to_i).try(:assignment_id)
-            end
+        next unless migration.import_object?("quizzes", migration_id)
+
+        allow_update = false
+        # allow update if we find an existing item based on this migration setting
+        if (item_id = migration.migration_settings[:quiz_id_to_update])
+          allow_update = true
+          assessment[:id] = item_id.to_i
+          if assessment[:assignment]
+            assessment[:assignment][:id] = Quizzes::Quiz.find(item_id.to_i).try(:assignment_id)
           end
-          if assessment['assignment_migration_id'] &&
-             (assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] })
-            assignment['quiz_migration_id'] = migration_id
-          end
-          begin
-            Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
-          rescue
-            migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
-          end
+        end
+        if assessment['assignment_migration_id'] &&
+           (assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] })
+          assignment['quiz_migration_id'] = migration_id
+        end
+        begin
+          Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
+        rescue
+          migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
         end
       end
     end

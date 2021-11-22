@@ -85,15 +85,15 @@ class MediaObject < ActiveRecord::Base
     CSV.generate do |csv|
       media_objects.each do |mo|
         mo.retrieve_details unless mo.data[:download_url]
-        if mo.data[:download_url]
-          row = []
-          row << mo.title
-          row << ""
-          row << "old_id_#{mo.media_id}"
-          row << mo.data[:download_url]
-          row << mo.media_type.capitalize
-          csv << row
-        end
+        next unless mo.data[:download_url]
+
+        row = []
+        row << mo.title
+        row << ""
+        row << "old_id_#{mo.media_id}"
+        row << mo.data[:download_url]
+        row << mo.media_type.capitalize
+        csv << row
       end
     end
   end

@@ -73,14 +73,14 @@ module RollupScoreAggregatorHelper
 
   def get_aggregates(result)
     @outcome_results.each_with_object({ total: 0.0, weighted: 0.0 }) do |lor, aggregate|
-      if is_match?(result, lor) && lor.possible
-        aggregate[:total] += lor.possible
-        begin
-          aggregate[:weighted] += lor.possible * lor.percent
-        rescue NoMethodError, TypeError => e
-          Canvas::Errors.capture_exception(:missing_percent_or_points_possible, e)
-          raise e
-        end
+      next unless is_match?(result, lor) && lor.possible
+
+      aggregate[:total] += lor.possible
+      begin
+        aggregate[:weighted] += lor.possible * lor.percent
+      rescue NoMethodError, TypeError => e
+        Canvas::Errors.capture_exception(:missing_percent_or_points_possible, e)
+        raise e
       end
     end
   end

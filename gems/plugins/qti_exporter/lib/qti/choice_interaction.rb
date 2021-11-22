@@ -89,11 +89,11 @@ module Qti
       # instead of added to. So set that answer to correct in that case.
       if correct_answers == 0 && @use_set_var_set_as_correct
         @question[:answers].each do |ans|
-          if ans[:zero_weight_set_not_summed]
-            ans.delete :zero_weight_set_not_summed
-            ans[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
-            correct_answers += 1
-          end
+          next unless ans[:zero_weight_set_not_summed]
+
+          ans.delete :zero_weight_set_not_summed
+          ans[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+          correct_answers += 1
         end
       end
 
@@ -222,11 +222,11 @@ module Qti
                 end
               end
             end
-            unless @question[:points_possible]
-              que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
-              if que_scores.any?
-                @question[:points_possible] = que_scores.map { |q| q.text.to_i }.max
-              end
+            next if @question[:points_possible]
+
+            que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+            if que_scores.any?
+              @question[:points_possible] = que_scores.map { |q| q.text.to_i }.max
             end
           end
           @question[:feedback_id] = get_feedback_id(cond)

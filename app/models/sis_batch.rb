@@ -262,11 +262,11 @@ class SisBatch < ActiveRecord::Base
           batch.process_without_send_later
           return if batch.importing? # we'll requeue afterwards
 
-          if Time.zone.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-            # requeue the job to continue processing more batches
-            queue_job_for_account(account)
-            return
-          end
+          next unless Time.zone.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+
+          # requeue the job to continue processing more batches
+          queue_job_for_account(account)
+          return
         end
       end
     end

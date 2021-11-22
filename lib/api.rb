@@ -445,13 +445,13 @@ module Api
     max_link_headers_size = Setting.get('pagination_max_link_headers_size', '6144').to_i
     link_headers_size = 0
     LINK_PRIORITY.each_with_object({}) do |param, obj|
-      if opts[param].present?
-        link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
-        return obj if link_headers_size + link.size > max_link_headers_size
+      next unless opts[param].present?
 
-        link_headers_size += link.size
-        obj[param] = link
-      end
+      link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
+      return obj if link_headers_size + link.size > max_link_headers_size
+
+      link_headers_size += link.size
+      obj[param] = link
     end
   end
 

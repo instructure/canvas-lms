@@ -48,12 +48,12 @@ module Importers
       AssignmentGroup.suspend_callbacks(:update_student_grades) do
         Assignment.suspend_callbacks(:update_submissions_later) do
           assignments.each do |assign|
-            if migration.import_object?("assignments", assign['migration_id'])
-              begin
-                assignment_records << import_from_migration(assign, context, migration, nil, nil)
-              rescue
-                migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
-              end
+            next unless migration.import_object?("assignments", assign['migration_id'])
+
+            begin
+              assignment_records << import_from_migration(assign, context, migration, nil, nil)
+            rescue
+              migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
             end
           end
         end

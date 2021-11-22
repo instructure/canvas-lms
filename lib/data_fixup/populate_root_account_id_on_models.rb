@@ -251,14 +251,14 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
       end
 
-      if populate_overrides.key?(table)
-        Array(populate_overrides[table]).each do |override_module|
-          next unless override_module.respond_to?(:populate_table) &&
-                      override_module.respond_to?(:run_populate_table?)
-          next unless override_module.run_populate_table?
+      next unless populate_overrides.key?(table)
 
-          send_later_backfill_strand(:populate_root_account_ids_override_table, table, override_module)
-        end
+      Array(populate_overrides[table]).each do |override_module|
+        next unless override_module.respond_to?(:populate_table) &&
+                    override_module.respond_to?(:run_populate_table?)
+        next unless override_module.run_populate_table?
+
+        send_later_backfill_strand(:populate_root_account_ids_override_table, table, override_module)
       end
     end
   end

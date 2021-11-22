@@ -72,12 +72,12 @@ module MicrosoftSync::GraphService::SpecHelper
 
         request_stub[:requests].each_with_index do |request, index|
           response = responses[index]
-          unless validates_with_schema?(request, response, variables)
-            @errors << {
-              body: response.body,
-              url: request.uri.path,
-            }
-          end
+          next if validates_with_schema?(request, response, variables)
+
+          @errors << {
+            body: response.body,
+            url: request.uri.path,
+          }
         end
       end
     end

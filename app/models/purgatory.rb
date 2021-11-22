@@ -30,12 +30,12 @@ class Purgatory < ActiveRecord::Base
   def self.expire_old_purgatories
     Purgatory.active.where("updated_at < ?", days_until_expiration.days.ago).find_in_batches do |batch|
       batch.each do |p|
-        if p.new_instfs_uuid
-          begin
-            InstFS.delete_file(p.new_instfs_uuid)
-          rescue # still expire the record anyway even if we fail removing from instfs
-            ::Rails.logger.warn("error deleting purgatory from instfs: #{$!.inspect}")
-          end
+        next unless p.new_instfs_uuid
+
+        begin
+          InstFS.delete_file(p.new_instfs_uuid)
+        rescue # still expire the record anyway even if we fail removing from instfs
+          ::Rails.logger.warn("error deleting purgatory from instfs: #{$!.inspect}")
         end
       end
       Purgatory.where(:id => batch).update_all(:workflow_state => "expired")

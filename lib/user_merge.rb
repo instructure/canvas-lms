@@ -306,11 +306,11 @@ class UserMerge
       next unless target_cc
 
       to_retire = identify_to_retire(cc, target_cc, max_position)
-      if to_retire
-        keeper = ([target_cc, cc] - [to_retire]).first
-        copy_notificaion_policies(to_retire, keeper)
-        to_retire_ids << to_retire.id
-      end
+      next unless to_retire
+
+      keeper = ([target_cc, cc] - [to_retire]).first
+      copy_notificaion_policies(to_retire, keeper)
+      to_retire_ids << to_retire.id
     end
 
     finish_ccs(max_position, to_retire_ids)

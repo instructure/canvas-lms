@@ -177,11 +177,11 @@ class MethodView < HashView
         # This URL terminates before the selected segment. Store a null value.
         segments[:none] = [url]
       end
-      if url.size > idx
-        # Associate this URL with an entry in the segments map.
-        segments[url[idx]] = [] unless segments[url[idx]]
-        segments[url[idx]] << url
-      end
+      next unless url.size > idx
+
+      # Associate this URL with an entry in the segments map.
+      segments[url[idx]] = [] unless segments[url[idx]]
+      segments[url[idx]] << url
     end
 
     # Do the recursive call based on whether the current segment matches or

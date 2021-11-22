@@ -144,12 +144,12 @@ class OutcomeProficiency < ApplicationRecord
 
   def strictly_decreasing_points
     next_ratings.each_cons(2) do |l, r|
-      if l.points <= r.points
-        errors.add(
-          :outcome_proficiency_ratings,
-          t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points)
-        )
-      end
+      next unless l.points <= r.points
+
+      errors.add(
+        :outcome_proficiency_ratings,
+        t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points)
+      )
     end
   end
 

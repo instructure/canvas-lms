@@ -31,20 +31,20 @@ class ReportSnapshot < ActiveRecord::Base
     items = []
     now = Time.now.utc.to_i
     report['monthly'].each do |month|
-      if month[key]
-        stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
-        next if stamp > now
+      next unless month[key]
 
-        items << [stamp.to_i * 1000, month[key]]
-      end
+      stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
+      next if stamp > now
+
+      items << [stamp.to_i * 1000, month[key]]
     end
     report['weekly'].each do |week|
-      if week[key]
-        stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
-        next if stamp > now
+      next unless week[key]
 
-        items << [stamp * 1000, week[key]]
-      end
+      stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
+      next if stamp > now
+
+      items << [stamp * 1000, week[key]]
     end
     items.sort_by(&:first).uniq(&:first)
   end
