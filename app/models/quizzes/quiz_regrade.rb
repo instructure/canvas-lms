@@ -30,4 +30,5 @@ class Quizzes::QuizRegrade < ActiveRecord::Base
   validates :user_id, presence: true
 
   delegate :teachers, :context, to: :quiz
+  delegate :root_account, to: :quiz
 end
