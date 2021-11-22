@@ -316,6 +316,8 @@ Style/MethodCallWithoutArgsParentheses:
   Severity: error
 Style/MethodDefParentheses:
   Severity: error
+Style/MultilineIfThen:
+  Severity: error
 Style/MultilineMemoization:
   Severity: error
 Style/MultilineTernaryOperator:
