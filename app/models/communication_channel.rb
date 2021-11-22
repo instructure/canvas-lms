@@ -186,10 +186,17 @@ class CommunicationChannel < ActiveRecord::Base
     user.pseudonyms.where(:unique_id => path).first if user
   end
 
+  def broadcast_data
+    return unless @root_account
+
+    { root_account_id: @root_account.global_id, from_host: HostUrl.context_host(@root_account) }
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :forgot_password
     p.to { self }
     p.whenever { @request_password }
+    p.data { broadcast_data }
 
     p.dispatch :confirm_registration
     p.to { self }
@@ -199,6 +206,7 @@ class CommunicationChannel < ActiveRecord::Base
           (record.workflow_state == 'unconfirmed' and (user.pre_registered? || user.creation_pending?))) and
         path_type == TYPE_EMAIL
     end
+    p.data { broadcast_data }
 
     p.dispatch :confirm_email_communication_channel
     p.to { self }
@@ -207,16 +215,12 @@ class CommunicationChannel < ActiveRecord::Base
         record.workflow_state == 'unconfirmed' and user.registered? and
         path_type == TYPE_EMAIL
     end
-    p.data do
-      {
-        root_account_id: @root_account.global_id,
-        from_host: HostUrl.context_host(@root_account)
-      }
-    end
+    p.data { broadcast_data }
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
     p.whenever { @send_merge_notification && path_type == TYPE_EMAIL }
+    p.data { broadcast_data }
 
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
@@ -226,12 +230,7 @@ class CommunicationChannel < ActiveRecord::Base
         (path_type == TYPE_SMS or path_type == TYPE_SLACK) and
         !user.creation_pending?
     end
-    p.data do
-      {
-        root_account_id: @root_account.global_id,
-        from_host: HostUrl.context_host(@root_account)
-      }
-    end
+    p.data { broadcast_data }
   end
 
   def uniqueness_of_path
