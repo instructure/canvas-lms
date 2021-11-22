@@ -329,9 +329,8 @@ describe CommunicationChannel do
       @user.register!
       communication_channel(@user, { username: 'user1@example.com' })
       account = Account.create!
-      allow(HostUrl).to receive(:context_host).with(account).and_return('someserver.com')
-      allow(HostUrl).to receive(:context_host).with(@cc).and_return('someserver.com')
-      allow(HostUrl).to receive(:context_host).with(nil).and_return('default')
+      allow(HostUrl).to receive(:context_host).with(account, any_args).and_return('someserver.com')
+      allow(HostUrl).to receive(:context_host).with(@cc, any_args).and_return('someserver.com')
       @cc.send_confirmation!(account)
       message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
       expect(message).not_to be_nil

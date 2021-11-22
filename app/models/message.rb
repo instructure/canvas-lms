@@ -319,7 +319,7 @@ class Message < ActiveRecord::Base
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
   # it forces option defaults for protocol and host.
   def default_url_options
-    { protocol: HostUrl.protocol, host: HostUrl.context_host(link_root_account) }
+    { protocol: HostUrl.protocol, host: HostUrl.context_host(link_root_account, ApplicationController.test_cluster_name) }
   end
 
   # Public: Helper to generate JSON suitable for publishing via Amazon SNS
