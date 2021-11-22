@@ -19,8 +19,8 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_action :load_account, :only => [:health_check, :readiness, :deep]
-  skip_before_action :load_user, :only => [:health_check, :readiness, :deep, :browserconfig]
+  skip_before_action :load_account, :only => %i[health_check readiness deep]
+  skip_before_action :load_user, :only => %i[health_check readiness deep browserconfig]
 
   def styleguide
     render :layout => "layouts/styleguide"

@@ -79,7 +79,7 @@ describe AuthenticationProvidersPresenter do
         end
 
         it "sorts the gem values" do
-          contexts = presenter.saml_authn_contexts(['abc', 'xyz', 'bcd'])
+          contexts = presenter.saml_authn_contexts(%w[abc xyz bcd])
           expect(contexts.index('bcd') < contexts.index('xyz')).to be(true)
         end
 

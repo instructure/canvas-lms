@@ -25,6 +25,6 @@ module Lti
     belongs_to :developer_key
 
     validates :vendor_code, :product_code, :vendor_name, :root_account, presence: true
-    validates :product_code, uniqueness: { scope: [:vendor_code, :root_account_id, :developer_key] }
+    validates :product_code, uniqueness: { scope: %i[vendor_code root_account_id developer_key] }
   end
 end

@@ -83,7 +83,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         mcourse = Pact::Canvas.base_state.mobile_courses[1]
         mstudent = Pact::Canvas.base_state.mobile_student
         mteacher = Pact::Canvas.base_state.mobile_teacher
-        test_submission_types = ['online_text_entry', 'online_upload', 'online_url']
+        test_submission_types = %w[online_text_entry online_upload online_url]
         # Create a category/group...
         cat = mcourse.group_categories.create!(name: "The Cool Kids")
         g = cat.groups.create(:context => mcourse)

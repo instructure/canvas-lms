@@ -55,14 +55,14 @@ describe Quizzes::QuizSerializer do
     @json = @serializer.as_json[:quiz]
   end
 
-  [
-    :title, :quiz_type, :hide_results, :time_limit,
-    :shuffle_answers, :show_correct_answers, :scoring_policy,
-    :allowed_attempts, :one_question_at_a_time, :question_count,
-    :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
-    :lock_at, :unlock_at, :published, :show_correct_answers_at,
-    :hide_correct_answers_at, :show_correct_answers_last_attempt,
-    :has_access_code, :migration_id
+  %i[
+    title quiz_type hide_results time_limit
+    shuffle_answers show_correct_answers scoring_policy
+    allowed_attempts one_question_at_a_time question_count
+    points_possible cant_go_back access_code ip_filter due_at
+    lock_at unlock_at published show_correct_answers_at
+    hide_correct_answers_at show_correct_answers_last_attempt
+    has_access_code migration_id
   ].each do |attribute|
     it "serializes #{attribute}" do
       expect(json[attribute]).to eq quiz.send(attribute)
@@ -533,7 +533,7 @@ describe Quizzes::QuizSerializer do
     output = serializer.as_json[:quiz]
     expect(output).not_to have_key :all_dates
 
-    [:due_at, :lock_at, :unlock_at].each do |key|
+    %i[due_at lock_at unlock_at].each do |key|
       expect(output[key]).to eq student_overrides[key]
     end
   end
@@ -548,7 +548,7 @@ describe Quizzes::QuizSerializer do
 
     output = serializer.as_json[:quiz]
 
-    [:due_at, :lock_at, :unlock_at].each do |key|
+    %i[due_at lock_at unlock_at].each do |key|
       expect(output[key]).to eq quiz.send(key)
     end
   end

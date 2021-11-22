@@ -22,11 +22,11 @@ class OutcomeCalculationMethod < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
 
-  CALCULATION_METHODS = [
-    'decaying_average',
-    'n_mastery',
-    'highest',
-    'latest'
+  CALCULATION_METHODS = %w[
+    decaying_average
+    n_mastery
+    highest
+    latest
   ].freeze
 
   VALID_CALCULATION_INTS = {
@@ -58,7 +58,7 @@ class OutcomeCalculationMethod < ApplicationRecord
   after_save :clear_cached_methods
 
   def as_json(options = {})
-    super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
+    super(options.reverse_merge(include_root: false, only: %i[id calculation_method calculation_int context_type context_id]))
   end
 
   def self.find_or_create_default!(context)

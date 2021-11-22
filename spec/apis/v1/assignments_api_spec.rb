@@ -311,7 +311,7 @@ describe AssignmentsApiController, type: :request do
                           course_id: @course.to_param,
                           assignment_group_id: @group2.to_param
                         })
-        expect(json.map { |a| a['name'] }).to match_array(['assignment1', 'assignment2', 'assignment6'])
+        expect(json.map { |a| a['name'] }).to match_array(%w[assignment1 assignment2 assignment6])
       end
     end
 
@@ -1125,7 +1125,7 @@ describe AssignmentsApiController, type: :request do
               :format => 'json',
               :course_id => @course.id.to_s
             },
-            :include => ['score_statistics', 'submission', 'observed_users']
+            :include => %w[score_statistics submission observed_users]
           )
           assign = json.first
           expect(assign['score_statistics']).to be_nil
@@ -1159,7 +1159,7 @@ describe AssignmentsApiController, type: :request do
               :format => 'json',
               :course_id => @course.id.to_s
             },
-            :include => ['score_statistics', 'submission', 'observed_users']
+            :include => %w[score_statistics submission observed_users]
           )
           assign = json.first
           expect(assign['score_statistics']).to eq({ 'min' => 10, 'max' => 18, 'mean' => 14 })
@@ -1180,7 +1180,7 @@ describe AssignmentsApiController, type: :request do
               :format => 'json',
               :course_id => @course.id.to_s
             },
-            :include => ['score_statistics', 'submission', 'observed_users']
+            :include => %w[score_statistics submission observed_users]
           )
           assign = json.first
           expect(assign['score_statistics']).to be_nil
@@ -1209,7 +1209,7 @@ describe AssignmentsApiController, type: :request do
               :format => 'json',
               :course_id => @course.id.to_s
             },
-            :include => ['score_statistics', 'submission', 'observed_users']
+            :include => %w[score_statistics submission observed_users]
           )
           assign = json.first
           expect(assign['score_statistics']).to eq({ 'min' => 10, 'max' => 18, 'mean' => 14 })
@@ -1230,7 +1230,7 @@ describe AssignmentsApiController, type: :request do
               :format => 'json',
               :course_id => @course.id.to_s
             },
-            :include => ['score_statistics', 'submission', 'observed_users']
+            :include => %w[score_statistics submission observed_users]
           )
           assign = json.first
           expect(assign['score_statistics']).to be_nil

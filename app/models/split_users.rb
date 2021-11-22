@@ -305,7 +305,7 @@ class SplitUsers
   end
 
   def restore_source_user
-    [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+    %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
       avatar_item = merge_data.items.where.not(user_id: source_user).where(item_type: attr).take&.item
       # we only move avatar items if there were no avatar on the source_user,
       # so now we only restore it if they match what was on the from_user.

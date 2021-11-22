@@ -51,7 +51,7 @@ describe "Exporter" do
 
     it "sorts content by module" do
       expect(exporter.base_template).to eq "../templates/module_sorting_template.html.erb"
-      expect(exporter.templates.keys[0..4]).to eq([:title, :files, :toc, :syllabus, :announcements])
+      expect(exporter.templates.keys[0..4]).to eq(%i[title files toc syllabus announcements])
     end
 
     it "does not contain content type keys" do

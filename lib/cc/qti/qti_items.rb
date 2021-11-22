@@ -25,11 +25,11 @@ require 'bigdecimal'
 module CC
   module Qti
     module QtiItems
-      CC_SUPPORTED_TYPES = ['multiple_choice_question',
-                            'multiple_answers_question',
-                            'true_false_question',
-                            'short_answer_question',
-                            'essay_question'].freeze
+      CC_SUPPORTED_TYPES = %w[multiple_choice_question
+                              multiple_answers_question
+                              true_false_question
+                              short_answer_question
+                              essay_question].freeze
 
       CC_TYPE_PROFILES = {
         'multiple_choice_question' => 'cc.multiple_choice.v0p1',
@@ -41,9 +41,9 @@ module CC
 
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
-      MULTI_ANSWER_TYPES = ['matching_question',
-                            'multiple_dropdowns_question',
-                            'fill_in_multiple_blanks_question'].freeze
+      MULTI_ANSWER_TYPES = %w[matching_question
+                              multiple_dropdowns_question
+                              fill_in_multiple_blanks_question].freeze
 
       def add_ref_or_question(node, question)
         aq = nil
@@ -161,7 +161,7 @@ module CC
       ## question response_str methods
 
       def presentation_options(node, question)
-        if ['multiple_choice_question', 'true_false_question', 'multiple_answers_question'].member? question['question_type']
+        if %w[multiple_choice_question true_false_question multiple_answers_question].member? question['question_type']
           multiple_choice_response_str(node, question)
         elsif ['short_answer_question', 'essay_question'].member? question['question_type']
           short_answer_response_str(node, question)

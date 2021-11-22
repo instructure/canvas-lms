@@ -80,7 +80,7 @@ describe "Screenreader Gradebook" do
       assignment_group: @course.assignment_groups[1]
     )
 
-    @grade_array = ['15', '12', '11', '3']
+    @grade_array = %w[15 12 11 3]
   end
 
   def simple_grade
@@ -302,7 +302,7 @@ describe "Screenreader Gradebook" do
     click_option '#student_select', @students[0].sortable_name
     click_option '#assignment_select', assignment.name
     expect(f('#assignment_information p:nth-of-type(2)')).to include_text 'Graded submissions: 2'
-    expect(ff('#assignment_information table td').map(&:text)).to eq ['20', '10', '15', '5']
+    expect(ff('#assignment_information table td').map(&:text)).to eq %w[20 10 15 5]
   end
 
   context "as a teacher" do
@@ -442,7 +442,7 @@ describe "Screenreader Gradebook" do
 
       assignment_score = SRGB.assignment_scores.text.split
       # assignment avg score, high score, low score
-      scores_as_string = ['13', '20', '8']
+      scores_as_string = %w[13 20 8]
       (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
     end
   end

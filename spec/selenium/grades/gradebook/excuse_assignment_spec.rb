@@ -189,7 +189,7 @@ describe 'Excuse an Assignment' do
           wait_for_ajaximations
           score_values = ff('.canvas_1 .slick-row .slick-cell:first-child').map(& :text)
         end
-        expect(score_values).to eq ['15', 'Excused', '15', '15']
+        expect(score_values).to eq %w[15 Excused 15 15]
       end
 
       it 'excuses assignments on individual basis', priority: "1", test_id: view == 'srgb' ? 209405 : 209384 do
@@ -261,7 +261,7 @@ describe 'Excuse an Assignment' do
                                                    'and will not be considered in the total calculation')
     end
 
-    ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
+    %w[percent letter_grade gpa_scale points].each do |type|
       it "is not included in grade calculations with type '#{type}'", priority: "1", test_id: view == 'srgb' ? 216379 : 1196596 do
         a1 = @course.assignments.create! title: 'Excuse Me', grading_type: type, points_possible: 20
         a2 = @course.assignments.create! title: 'Don\'t Excuse Me', grading_type: type, points_possible: 20
@@ -310,7 +310,7 @@ describe 'Excuse an Assignment' do
       get "/courses/#{@course.id}/grades"
       Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
 
-      ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
+      %w[EX eX Ex ex].each_with_index do |ex, i|
         replace_content f("#student_grading_#{assignment.id}"), ex, press_return: true
         wait_for_ajaximations
         expect(ff('.ic-flash-error').length).to be i + 1
@@ -318,7 +318,7 @@ describe 'Excuse an Assignment' do
       end
     end
 
-    ['EX', 'ex', 'Ex', 'eX'].each do |ex|
+    %w[EX ex Ex eX].each do |ex|
       it "'#{ex}' can be used to excuse assignments", priority: "1", test_id: 225630 do
         assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
 

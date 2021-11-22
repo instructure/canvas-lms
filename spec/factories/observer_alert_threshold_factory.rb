@@ -29,7 +29,7 @@ module Factories
 
     @observation_link = opts[:link] || add_linked_observer(@student, @observer, root_account: (@course || opts[:account])&.root_account)
 
-    valid_attrs = [:alert_type, :threshold, :workflow_state, :student, :observer]
+    valid_attrs = %i[alert_type threshold workflow_state student observer]
     default_attrs = {
       alert_type: 'course_announcement',
       threshold: nil,

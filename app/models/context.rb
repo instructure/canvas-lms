@@ -21,7 +21,7 @@
 # These methods are mixed into the classes that can be considered a "context".
 # See Context::CONTEXT_TYPES below.
 module Context
-  CONTEXT_TYPES = [:Account, :Course, :CourseSection, :User, :Group].freeze
+  CONTEXT_TYPES = %i[Account Course CourseSection User Group].freeze
 
   ASSET_TYPES = {
     Announcement: :Announcement,

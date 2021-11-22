@@ -22,7 +22,7 @@ class WebConference < ActiveRecord::Base
   include SendToStream
   include TextHelper
   attr_readonly :context_id, :context_type
-  belongs_to :context, polymorphic: [:course, :group, :account]
+  belongs_to :context, polymorphic: %i[course group account]
   has_one :calendar_event, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
@@ -124,7 +124,7 @@ class WebConference < ActiveRecord::Base
   def cast_setting(value, type)
     case type
     when :boolean
-      ['1', 'on', 'true'].include?(value.to_s)
+      %w[1 on true].include?(value.to_s)
     else value
     end
   end
@@ -499,7 +499,7 @@ class WebConference < ActiveRecord::Base
     url = options.delete(:url)
     join_url = options.delete(:join_url)
     options.reverse_merge!(:only => %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code])
-    result = super(options.merge(:include_root => false, :methods => [:has_advanced_settings, :long_running, :user_settings, :recordings]))
+    result = super(options.merge(:include_root => false, :methods => %i[has_advanced_settings long_running user_settings recordings]))
     result['url'] = url
     result['join_url'] = join_url
     result

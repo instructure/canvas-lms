@@ -455,6 +455,9 @@ Style/StringChars:
   Severity: error
 Style/StructInheritance:
   Severity: error
+Style/SymbolArray:
+  MinSize: 3
+  Severity: error
 Style/SymbolProc:
   Severity: error
 Style/TernaryParentheses:
@@ -472,6 +475,9 @@ Style/WhenThen:
   Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
+Style/WordArray:
+  MinSize: 3
+  Severity: error
 Style/ZeroLengthPredicate:
   Severity: error
 
@@ -537,11 +543,7 @@ Style/StringConcatenation: # TODO: autocorrect (maybe)
 Style/StringLiterals:
   EnforcedStyle: double_quotes
   Enabled: false # TODO: autocorrect
-Style/SymbolArray: # TODO: autocorrect
-  Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
-  Enabled: false
-Style/WordArray: # TODO: autocorrect
   Enabled: false

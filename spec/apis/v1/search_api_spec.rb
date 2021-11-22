@@ -338,7 +338,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'cletus'
           expect(l['type']).to eq 'user'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'next', 'first']
+        expect(links.pluck(:rel)).to eq %w[current next first]
 
         # get the next page
         json = follow_pagination_link('next', {
@@ -353,7 +353,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'cletus'
           expect(l['type']).to eq 'user'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'first', 'last']
+        expect(links.pluck(:rel)).to eq %w[current first last]
       end
 
       it "paginates contexts and return proper pagination headers" do
@@ -368,7 +368,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'ofcourse'
           expect(l['type']).to eq 'context'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'next', 'first']
+        expect(links.pluck(:rel)).to eq %w[current next first]
 
         # get the next page
         json = follow_pagination_link('next', {
@@ -383,7 +383,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'ofcourse'
           expect(l['type']).to eq 'context'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'first', 'last']
+        expect(links.pluck(:rel)).to eq %w[current first last]
       end
 
       it "ignores invalid per_page" do
@@ -398,7 +398,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'cletus'
           expect(l['type']).to eq 'user'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'next', 'first']
+        expect(links.pluck(:rel)).to eq %w[current next first]
 
         # get the next page
         json = follow_pagination_link('next', {
@@ -413,7 +413,7 @@ describe SearchController, type: :request do
           expect(l['search']).to eq 'cletus'
           expect(l['type']).to eq 'user'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'first', 'last']
+        expect(links.pluck(:rel)).to eq %w[current first last]
       end
 
       it "paginates combined context/user results" do
@@ -434,7 +434,7 @@ describe SearchController, type: :request do
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
           expect(l['search']).to eq 'term'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'next', 'first']
+        expect(links.pluck(:rel)).to eq %w[current next first]
 
         # get the next page
         json = follow_pagination_link('next', {
@@ -449,7 +449,7 @@ describe SearchController, type: :request do
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
           expect(l['search']).to eq 'term'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'next', 'first']
+        expect(links.pluck(:rel)).to eq %w[current next first]
 
         # get the final page
         json = follow_pagination_link('next', {
@@ -464,7 +464,7 @@ describe SearchController, type: :request do
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
           expect(l['search']).to eq 'term'
         end
-        expect(links.pluck(:rel)).to eq ['current', 'first', 'last']
+        expect(links.pluck(:rel)).to eq %w[current first last]
       end
     end
 

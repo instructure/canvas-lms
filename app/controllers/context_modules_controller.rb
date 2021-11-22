@@ -78,7 +78,7 @@ class ContextModulesController < ApplicationController
       end
 
       @menu_tools = {}
-      placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+      placements = %i[assignment_menu discussion_topic_menu file_menu module_menu quiz_menu wiki_page_menu]
       tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
                                                     :root_account => @domain_root_account, :current_user => @current_user).to_a
@@ -586,7 +586,7 @@ class ContextModulesController < ApplicationController
       else
         result[:current_item] = possible_tags.first
         unless result[:current_item]
-          obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
+          obj = @context.find_asset(params[:id], %i[attachment discussion_topic assignment quiz wiki_page content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }
           elsif (obj.is_a?(DiscussionTopic) && obj.assignment_id) ||

@@ -413,7 +413,7 @@ module CustomSeleniumRSpecMatchers
       true
     end
 
-    [:==, :<, :<=, :>=, :>, :===, :=~].each do |operator|
+    %i[== < <= >= > === =~].each do |operator|
       chain operator do |value|
         @operator = operator
         @value = value

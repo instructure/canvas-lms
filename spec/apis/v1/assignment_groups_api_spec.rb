@@ -216,7 +216,7 @@ describe AssignmentGroupsController, type: :request do
                             { :controller => 'assignment_groups',
                               :action => 'index', :format => 'json',
                               :course_id => @course.id,
-                              :include => ["assignments", "observed_users", "submission"] })
+                              :include => %w[assignments observed_users submission] })
 
     expect(json.first['assignments'].first['submission'].map { |s| s['user_id'] }).to eql [@observed_student.id]
   end
@@ -480,7 +480,7 @@ describe AssignmentGroupsController, type: :request do
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates&include[]=can_edit",
                     { controller: 'assignment_groups', action: 'index',
                       format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments', 'all_dates', 'can_edit'] })
+                      include: %w[assignments all_dates can_edit] })
 
     expected = [
       {

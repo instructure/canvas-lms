@@ -155,7 +155,7 @@ class ConferencesController < ApplicationController
   before_action { |c| c.active_tab = "conferences" }
   before_action :require_config, except: [:for_user]
   before_action :reject_student_view_student
-  before_action :get_conference, :except => [:index, :create, :for_user]
+  before_action :get_conference, :except => %i[index create for_user]
 
   # @API List conferences
   # Retrieve the paginated list of conferences for this context

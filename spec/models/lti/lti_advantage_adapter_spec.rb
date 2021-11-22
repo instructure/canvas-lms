@@ -122,13 +122,13 @@ describe Lti::LtiAdvantageAdapter do
     end
 
     it 'creats a login message' do
-      expect(login_message.keys).to match_array [
-        "iss",
-        "login_hint",
-        "target_link_uri",
-        "lti_message_hint",
-        "canvas_region",
-        "client_id"
+      expect(login_message.keys).to match_array %w[
+        iss
+        login_hint
+        target_link_uri
+        lti_message_hint
+        canvas_region
+        client_id
       ]
     end
 

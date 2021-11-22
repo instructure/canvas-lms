@@ -963,7 +963,7 @@ describe 'Speedgrader' do
         Speedgrader.click_students_dropdown
         student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name: 'li')
 
-        graded = ["resubmitted", "graded", "not_submitted"]
+        graded = %w[resubmitted graded not_submitted]
         (0..2).each { |num| expect(student_options[num]).to have_class(graded[num]) }
       end
     end

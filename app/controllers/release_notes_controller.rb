@@ -146,7 +146,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def upsert_params
-    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.index_with { ['title', 'description', 'url'] }, show_ats: allowed_envs).to_h
+    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.index_with { %w[title description url] }, show_ats: allowed_envs).to_h
   end
 
   def allowed_langs

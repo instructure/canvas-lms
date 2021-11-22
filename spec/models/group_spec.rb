@@ -223,7 +223,7 @@ describe Group do
       @group.save!
       user_model
 
-      ['invited', 'requested', 'accepted'].each do |workflow_state|
+      %w[invited requested accepted].each do |workflow_state|
         @group.add_user(@user, workflow_state)
         expect(@group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first).not_to be_nil
       end

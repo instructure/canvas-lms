@@ -70,7 +70,7 @@ module Api::V1::DiscussionTopics
     if opts[:include_sections_user_count] && context
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
-    ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
+    ActiveRecord::Associations::Preloader.new.preload(topics, %i[user attachment root_topic context])
     topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)
@@ -106,7 +106,7 @@ module Api::V1::DiscussionTopics
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    permissions = opts[:skip_permissions] ? [] : [:attach, :update, :reply, :delete]
+    permissions = opts[:skip_permissions] ? [] : %i[attach update reply delete]
     json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, permissions)
 
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
@@ -224,7 +224,7 @@ module Api::V1::DiscussionTopics
   #   Recognized fields: user_name, subentries.
   #
   # Returns an array of hashes ready to be serialized.
-  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries, :display_user])
+  def discussion_entry_api_json(entries, context, user, session, includes = %i[user_name subentries display_user])
     entries.map do |entry|
       serialize_entry(entry, user, context, session, includes)
     end

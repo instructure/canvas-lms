@@ -25,9 +25,9 @@ module AccountReports
     include ReportHelper
     include Pronouns
 
-    SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
-                       "enrollments", "groups", "group_membership",
-                       "group_categories", "xlist", "user_observers", "admins"].freeze
+    SIS_CSV_REPORTS = %w[users accounts terms courses sections
+                         enrollments groups group_membership
+                         group_categories xlist user_observers admins].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -88,9 +88,9 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['user_id', 'integration_id', 'authentication_provider_id',
-                   'login_id', 'password', 'first_name', 'last_name', 'full_name',
-                   'sortable_name', 'short_name', 'email', 'status']
+        headers = %w[user_id integration_id authentication_provider_id
+                     login_id password first_name last_name full_name
+                     sortable_name short_name email status]
         headers << 'pronouns' if should_add_pronouns?
       else # provisioning_report
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
@@ -183,7 +183,7 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['account_id', 'parent_account_id', 'name', 'status']
+        headers = %w[account_id parent_account_id name status]
       else
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
@@ -235,7 +235,7 @@ module AccountReports
     def terms
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['term_id', 'name', 'status', 'start_date', 'end_date']
+        headers = %w[term_id name status start_date end_date]
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
@@ -309,9 +309,9 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
-                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
-                   'blueprint_course_id']
+        headers = %w[course_id integration_id short_name long_name
+                     account_id term_id status start_date end_date course_format
+                     blueprint_course_id]
       else
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
         headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
@@ -402,8 +402,8 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['section_id', 'course_id', 'integration_id', 'name', 'status',
-                   'start_date', 'end_date']
+        headers = %w[section_id course_id integration_id name status
+                     start_date end_date]
       else
         headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
         headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
@@ -587,8 +587,8 @@ module AccountReports
     def enrollment_headers(include_other_roots)
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id',
-                   'status', 'associated_user_id', 'limit_section_privileges']
+        headers = %w[course_id user_id role role_id section_id
+                     status associated_user_id limit_section_privileges]
         headers << 'root_account' if include_other_roots
       else
         headers = []
@@ -615,7 +615,7 @@ module AccountReports
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_id', 'group_category_id', 'account_id', 'course_id', 'name', 'status']
+        headers = %w[group_id group_category_id account_id course_id name status]
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -688,7 +688,7 @@ module AccountReports
     def group_categories
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_category_id', 'account_id', 'course_id', 'category_name', 'status']
+        headers = %w[group_category_id account_id course_id category_name status]
       else
         headers = []
         headers << I18n.t('canvas_group_category_id')
@@ -756,7 +756,7 @@ module AccountReports
     def group_membership
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_id', 'user_id', 'status']
+        headers = %w[group_id user_id status]
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -831,7 +831,7 @@ module AccountReports
     def xlist
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['xlist_course_id', 'section_id', 'status']
+        headers = %w[xlist_course_id section_id status]
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_xlist_course_id', 'canvas_xlist_course_id')
@@ -889,7 +889,7 @@ module AccountReports
     def user_observers
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['observer_id', 'student_id', 'status']
+        headers = %w[observer_id student_id status]
       else
         headers = []
         headers << I18n.t('canvas_observer_id')
@@ -942,7 +942,7 @@ module AccountReports
       include_other_roots = root_account.trust_exists?
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['user_id', 'account_id', 'role_id', 'role', 'status']
+        headers = %w[user_id account_id role_id role status]
         headers << 'root_account' if include_other_roots
       else
         headers = []

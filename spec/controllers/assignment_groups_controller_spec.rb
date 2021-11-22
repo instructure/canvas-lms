@@ -94,7 +94,7 @@ describe AssignmentGroupsController do
             params: {
               course_id: @course.id,
               exclude_response_fields: ['description'],
-              include: ['assignments', 'assignment_visibility', 'overrides']
+              include: %w[assignments assignment_visibility overrides]
             },
             format: :json
           }
@@ -138,7 +138,7 @@ describe AssignmentGroupsController do
           {
             course_id: course.id,
             exclude_response_fields: ['description'],
-            include: ['assignments', 'assignment_visibility', 'overrides']
+            include: %w[assignments assignment_visibility overrides]
           }
         end
 

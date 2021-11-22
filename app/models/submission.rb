@@ -136,7 +136,7 @@ class Submission < ActiveRecord::Base
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :extra_attempts, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
+  validates :late_policy_status, inclusion: %w[none missing late], allow_nil: true
   validates :cached_tardiness, inclusion: ['missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
@@ -295,7 +295,7 @@ class Submission < ActiveRecord::Base
   end
 
   def submitted_changed?
-    submitted? != ['submitted', 'pending_review', 'graded'].include?(send('workflow_state_before_last_save'))
+    submitted? != %w[submitted pending_review graded].include?(send('workflow_state_before_last_save'))
   end
 
   def graded_changed?
@@ -419,13 +419,13 @@ class Submission < ActiveRecord::Base
   after_save :grade_change_audit
 
   def new_version_needed?
-    turnitin_data_changed? || vericite_data_changed? || (changes.keys - [
-      "updated_at",
-      "posted_at",
-      "processed",
-      "grade_matches_current_submission",
-      "published_score",
-      "published_grade"
+    turnitin_data_changed? || vericite_data_changed? || (changes.keys - %w[
+      updated_at
+      posted_at
+      processed
+      grade_matches_current_submission
+      published_score
+      published_grade
     ]).present?
   end
 
@@ -886,7 +886,7 @@ class Submission < ActiveRecord::Base
     turnitin_assets.each do |a|
       asset_data = self.turnitin_data[a.asset_string] || {}
       asset_data[:status] = 'pending'
-      [:error_code, :error_message, :public_error_message].each do |key|
+      %i[error_code error_message public_error_message].each do |key|
         asset_data.delete(key)
       end
       self.turnitin_data[a.asset_string] = asset_data
@@ -1167,7 +1167,7 @@ class Submission < ActiveRecord::Base
   end
 
   def clear_vericite_errors(asset_data)
-    [:error_code, :error_message, :public_error_message].each do |key|
+    %i[error_code error_message public_error_message].each do |key|
       asset_data.delete(key)
     end
     asset_data
@@ -1770,7 +1770,7 @@ class Submission < ActiveRecord::Base
   # use this method to pre-load the versioned_attachments for a bunch of
   # submissions (avoids having O(N) attachment queries)
   # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object, :folder, :attachment_upload_statuses])
+  def self.bulk_load_versioned_attachments(submissions, preloads: %i[thumbnail media_object folder attachment_upload_statuses])
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
@@ -2189,9 +2189,9 @@ class Submission < ActiveRecord::Base
     else
       touch
     end
-    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
-                  :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :provisional_grade_id, :draft, :attempt]
+    valid_keys = %i[comment author media_comment_id media_comment_type
+                    group_comment_id assessment_request attachments
+                    anonymous hidden provisional_grade_id draft attempt]
     if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
@@ -2431,7 +2431,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters = {})
     includes = { :quiz_submission => {} }
-    methods = [:submission_history, :attachments, :entered_score, :entered_grade]
+    methods = %i[submission_history attachments entered_score entered_grade]
     methods << :word_count if Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except

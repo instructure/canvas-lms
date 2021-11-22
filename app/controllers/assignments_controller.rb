@@ -36,7 +36,7 @@ class AssignmentsController < ApplicationController
   include K5Mode
   add_crumb(
     proc { t '#crumbs.assignments', "Assignments" },
-    except: [:destroy, :syllabus, :index, :new, :edit]
+    except: %i[destroy syllabus index new edit]
   ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
   before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
@@ -396,7 +396,7 @@ class AssignmentsController < ApplicationController
   end
 
   def downloadable_submissions?(current_user, context, assignment)
-    types = ["online_upload", "online_url", "online_text_entry"]
+    types = %w[online_upload online_url online_text_entry]
     return unless (assignment.submission_types.split(",") & types).any? && current_user
 
     student_ids =
@@ -736,7 +736,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection, @context,
-                                                                             [:base_title, :external_url, :selection_width, :selection_height])
+                                                                             %i[base_title external_url selection_width selection_height])
 
       append_sis_data(hash)
       if context.is_a?(Course)

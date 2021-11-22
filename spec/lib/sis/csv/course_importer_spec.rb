@@ -368,7 +368,7 @@ describe SIS::CSV::CourseImporter do
       "c2,s1,active",
       "c3,s2,active"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A001').first
       expect(c.name).to eq 'Test Course 1'
       expect(c.course_code).to eq 'TC 101'
@@ -381,7 +381,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,2011-04-12 00:00:00,2011-05-12 00:00:00"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -394,7 +394,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,,"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -466,7 +466,7 @@ describe SIS::CSV::CourseImporter do
       "c2,s1,active",
       "c3,s2,active"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A001').first
       expect(c.name).to eq 'Test Course 1'
       expect(c.course_code).to eq 'TC 101'
@@ -479,7 +479,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,2011-04-12 00:00:00,2011-05-12 00:00:00"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -492,7 +492,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,,"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'

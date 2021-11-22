@@ -540,7 +540,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.manually_scored = true
     end
 
-    update_submission_version(version, [:score, :fudge_points, :manually_scored])
+    update_submission_version(version, %i[score fudge_points manually_scored])
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
@@ -746,7 +746,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # the interaction in here is messy
 
     # first we update the version we've been modifying, so that all versions are current.
-    update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
+    update_submission_version(version, %i[submission_data score fudge_points workflow_state])
 
     if version.model.attempt != attempt || !completed_before_changes
       reload

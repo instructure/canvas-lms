@@ -56,12 +56,12 @@ class UserListsController < ApplicationController
 
   def add_enrollment_permissions
     if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
-      [
-        :add_teacher_to_course,
-        :add_ta_to_course,
-        :add_designer_to_course,
-        :add_student_to_course,
-        :add_observer_to_course,
+      %i[
+        add_teacher_to_course
+        add_ta_to_course
+        add_designer_to_course
+        add_student_to_course
+        add_observer_to_course
       ]
     else
       [

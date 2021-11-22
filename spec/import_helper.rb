@@ -36,7 +36,7 @@ QUESTIONS = [
   ['short_answer'],
   ['true_false'],
 ].freeze
-SYSTEMS = ['vista', 'bb8', 'bb9', 'angel'].freeze
+SYSTEMS = %w[vista bb8 bb9 angel].freeze
 
 def import_data_exists?(sub_folder, hash_name)
   File.exist? File.join(IMPORT_JSON_DIR, sub_folder, "#{hash_name}.json")

@@ -67,7 +67,7 @@ describe Canvas::ICU do
       end
 
       it "ats the least be case insensitive" do
-        results = Canvas::ICU.collate(["b", "a", "A", "B"])
+        results = Canvas::ICU.collate(%w[b a A B])
         expect(results[0..1].sort).to eq ["a", "A"].sort
         expect(results[2..3].sort).to eq ["b", "B"].sort
       end
@@ -89,15 +89,15 @@ describe Canvas::ICU do
   shared_examples_for "ICU Collator" do
     it "sorts several examples correctly" do
       # English sorts ñ as just an n, but after regular n's
-      expect(collate(["ana", "aña", "añb", "anb"])).to eq(
-        ["ana", "aña", "anb", "añb"]
+      expect(collate(%w[ana aña añb anb])).to eq(
+        %w[ana aña anb añb]
       )
 
       # Spanish sorts it as a separate letter
       begin
         original_locale, I18n.locale = I18n.locale, :es
-        expect(collate(["ana", "aña", "añb", "anb"])).to eq(
-          ["ana", "anb", "aña", "añb"]
+        expect(collate(%w[ana aña añb anb])).to eq(
+          %w[ana anb aña añb]
         )
       ensure
         I18n.locale = original_locale
@@ -114,13 +114,13 @@ describe Canvas::ICU do
       )
 
       # capitalization is a secondary sort level
-      expect(collate(["aba", "aBb", "abb", "aBa"])).to eq(
-        ["aba", "aBa", "abb", "aBb"]
+      expect(collate(%w[aba aBb abb aBa])).to eq(
+        %w[aba aBa abb aBb]
       )
 
       # numbers sort naturally
-      expect(collate(["10", "1", "2", "11"])).to eq(
-        ["1", "2", "10", "11"]
+      expect(collate(%w[10 1 2 11])).to eq(
+        %w[1 2 10 11]
       )
 
       # hyphenated last name is not a word separator

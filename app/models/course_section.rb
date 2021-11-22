@@ -32,7 +32,7 @@ class CourseSection < ActiveRecord::Base
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :instructor_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment']) }, class_name: 'Enrollment'
-  has_many :admin_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']) }, class_name: 'Enrollment'
+  has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: 'Enrollment'
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   has_many :calendar_events, :as => :context, :inverse_of => :context

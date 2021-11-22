@@ -21,16 +21,16 @@
 class Role < ActiveRecord::Base
   NULL_ROLE_TYPE = "NoPermissions"
 
-  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"].freeze
+  ENROLLMENT_TYPES = %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment].freeze
 
   DEFAULT_ACCOUNT_TYPE = 'AccountMembership'
   ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership'].freeze
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +
-    ['StudentViewEnrollment',
-     'NilEnrollment',
-     'teacher', 'ta', 'designer', 'student', 'observer']).freeze
+    %w[StudentViewEnrollment
+       NilEnrollment
+       teacher ta designer student observer]).freeze
 
   module AssociationHelper
     # this is an override to take advantage of built-in role caching since those are by far the most common
@@ -271,7 +271,7 @@ class Role < ActiveRecord::Base
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
     end
     if context.grants_right?(user, :manage_admin_users)
-      manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
+      manageable += %w[ObserverEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
     end
     manageable.uniq.sort
   end

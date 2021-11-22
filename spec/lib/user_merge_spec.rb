@@ -113,7 +113,7 @@ describe UserMerge do
       user1.reload
       user2.reload
 
-      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+      %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
         expect(user1[attr]).to eq user2[attr]
       end
     end

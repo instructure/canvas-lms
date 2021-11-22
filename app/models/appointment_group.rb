@@ -421,11 +421,11 @@ class AppointmentGroup < ActiveRecord::Base
     true
   end
 
-  EVENT_ATTRIBUTES = [
-    :title,
-    :description,
-    :location_name,
-    :location_address
+  EVENT_ATTRIBUTES = %i[
+    title
+    description
+    location_name
+    location_address
   ].freeze
 
   def update_appointments

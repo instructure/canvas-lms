@@ -20,7 +20,7 @@
 
 describe "locale_selection" do
   before do
-    allow(I18n).to receive(:available_locales).and_return([:en, :es, :fr])
+    allow(I18n).to receive(:available_locales).and_return(%i[en es fr])
   end
 
   after do

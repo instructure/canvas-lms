@@ -38,7 +38,7 @@ module Qti
 
       # replace any file references with the migration id of the file
       if @path_map
-        attrs = ['rel', 'href', 'src', 'data', 'value']
+        attrs = %w[rel href src data value]
         node.search("*").each do |subnode|
           attrs.each do |attr|
             next unless subnode[attr]
@@ -84,7 +84,7 @@ module Qti
 
             child.remove
           end
-          break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
+          break unless node.children.size == 1 && %w[p div span].include?(node.child.name)
           break if !node.child.attributes.empty? && !has_known_meta_class(node.child)
 
           node = node.child

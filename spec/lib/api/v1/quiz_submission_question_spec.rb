@@ -108,7 +108,7 @@ describe Api::V1::QuizSubmissionQuestion do
       it "shuffles answers when opt is given" do
         expect_any_instance_of(Array).not_to receive(:shuffle!)
         answer_text = subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
-        expect(answer_text).to eq(["a", "b", "c", "d"])
+        expect(answer_text).to eq(%w[a b c d])
       end
     end
   end

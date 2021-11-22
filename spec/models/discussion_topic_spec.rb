@@ -265,44 +265,44 @@ describe DiscussionTopic do
       @entry = @topic.discussion_entries.create!(:user => @teacher1)
       @entry.discussion_topic = @topic
 
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
     end
 
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach, :student_reporting]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting]
     end
 
     it "grants permissions if it not locked" do
       @topic.publish!
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
     end
 
     it "does not grant reply permissions to students if it is locked" do
       @topic.publish!
       @topic.lock!
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
     end
 
     it "does not grant any permissions to students if it is unpublished" do
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
     end
   end
@@ -567,7 +567,7 @@ describe DiscussionTopic do
         end
 
         it "does not grant reply permissions to group if course is concluded" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -580,7 +580,7 @@ describe DiscussionTopic do
         end
 
         it "does not grant reply permissions to group if course is soft-concluded" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -593,7 +593,7 @@ describe DiscussionTopic do
         end
 
         it "grants reply permissions to group members if course is concluded but their section isn't" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -604,11 +604,11 @@ describe DiscussionTopic do
           @topic.save!
 
           expect(@topic.context).to eq(@group)
-          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies, :reply].sort
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq %i[read read_replies reply].sort
         end
 
         it "does not grant reply permissions to group if group isn't active" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -626,7 +626,7 @@ describe DiscussionTopic do
           course.enroll_teacher(@teacher).accept!
           course.enroll_student(@student1)
 
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = course.group_categories.create(:name => "new cat")
           @group = course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -688,7 +688,7 @@ describe DiscussionTopic do
     end
 
     it "grants observers read permission by default" do
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
 
       @topic = @course.discussion_topics.create!(:user => @teacher)
       expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
@@ -700,7 +700,7 @@ describe DiscussionTopic do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
       @topic = @course.discussion_topics.create!(:user => @teacher)
       expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s)).to be_empty
       @entry = @topic.discussion_entries.create!(:user => @teacher)

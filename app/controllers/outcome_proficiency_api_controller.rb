@@ -152,6 +152,6 @@ class OutcomeProficiencyApiController < ApplicationController
   end
 
   def proficiency_params
-    params.permit(ratings: [:description, :points, :mastery, :color])
+    params.permit(ratings: %i[description points mastery color])
   end
 end

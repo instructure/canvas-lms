@@ -127,15 +127,15 @@ module Turnitin
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = 'immediate' unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
         settings[:s_view_report] = determine_student_visibility(settings[:originality_report_visibility])
 
-        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
+        %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end
         exclude_value = settings[:exclude_value].to_i
-        settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
+        settings[:exclude_type] = '0' unless %w[0 1 2].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
                                    when '0' then ''
                                    when '1' then [exclude_value, 1].max.to_s
@@ -276,7 +276,7 @@ module Turnitin
     def request_md5(params)
       keys_used = []
       str = ""
-      keys = [:aid, :assign, :assignid, :cid, :cpw, :ctl, :diagnostic, :dis, :dtdue, :dtstart, :dtpost, :encrypt, :fcmd, :fid, :gmtime, :newassign, :newupw, :oid, :pfn, :pln, :ptl, :ptype, :said, :tem, :uem, :ufn, :uid, :uln, :upw, :utp]
+      keys = %i[aid assign assignid cid cpw ctl diagnostic dis dtdue dtstart dtpost encrypt fcmd fid gmtime newassign newupw oid pfn pln ptl ptype said tem uem ufn uid uln upw utp]
       keys.each do |key|
         keys_used << key if params[key].present?
         str += (params[key] || "")

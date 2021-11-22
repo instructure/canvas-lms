@@ -387,7 +387,7 @@ module CC::Exporter::WebZip
     def map_canvas_objects_to_export_ids
       canvas_object_export_hash = {}
       @discussion_quiz_export_id_map = {}
-      [:wiki_pages, :assignments, :discussion_topics, :quizzes].each do |type|
+      %i[wiki_pages assignments discussion_topics quizzes].each do |type|
         type_export_hash, assignment_export_hash = map_object_type_to_export_ids(type)
         canvas_object_export_hash[type] = type_export_hash
         canvas_object_export_hash[:assignments] ||= {}

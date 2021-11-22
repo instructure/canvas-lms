@@ -326,7 +326,7 @@ describe CanvasKaltura::ClientV3 do
       img = @kaltura.mediaTypeToSymbol(2)
       aud = @kaltura.mediaTypeToSymbol(5)
 
-      expect([vid, img, aud]).to eq [:video, :image, :audio]
+      expect([vid, img, aud]).to eq %i[video image audio]
     end
 
     it "defaults to video" do

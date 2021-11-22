@@ -953,7 +953,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w[course\ files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked]
+        expect(res).to eq ['course files', 'folder1', 'folder2', 'folder2.1', 'folder2.1.1', 'folderhidden', 'folderlocked']
       end
 
       it "does not show hidden and locked files to unauthorized users" do
@@ -961,7 +961,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w[course\ files folder1 folder2 folder2.1 folder2.1.1]
+        expect(res).to eq ['course files', 'folder1', 'folder2', 'folder2.1', 'folder2.1.1']
       end
 
       it "returns a 401 for unauthorized users" do
@@ -1012,7 +1012,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :user_id => @user.id.to_param })
         res = json.map { |f| f['name'] }
-        expect(res).to eq %w[folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked my\ files]
+        expect(res).to eq ['folder1', 'folder2', 'folder2.1', 'folder2.1.1', 'folderhidden', 'folderlocked', 'my files']
       end
     end
   end

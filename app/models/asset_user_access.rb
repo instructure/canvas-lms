@@ -24,7 +24,7 @@
 class AssetUserAccess < ActiveRecord::Base
   extend RootAccountResolver
 
-  belongs_to :context, polymorphic: [:account, :course, :group, :user], polymorphic_prefix: true
+  belongs_to :context, polymorphic: %i[account course group user], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
 
@@ -251,7 +251,7 @@ class AssetUserAccess < ActiveRecord::Base
     change_hash = changes_to_save
     updated_key_set = changes_to_save.keys.to_set
     return false unless updated_key_set.include?('view_score')
-    return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
+    return false unless (updated_key_set - Set.new(%w[updated_at last_access view_score])).empty?
 
     # ASSUMPTION: All view_score updates are a single increment.
     # If this is violated, rather than failing to capture, we should accept the

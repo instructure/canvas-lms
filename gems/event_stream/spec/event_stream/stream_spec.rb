@@ -426,7 +426,7 @@ describe EventStream::Stream do
 
       it "can fetch batch one-by-one" do
         expect(database).to receive(:execute).exactly(3).times.and_return(@results)
-        @stream.fetch(['asdf', 'sdfg', 'dfgh'], strategy: :serial)
+        @stream.fetch(%w[asdf sdfg dfgh], strategy: :serial)
       end
     end
 

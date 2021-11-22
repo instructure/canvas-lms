@@ -73,7 +73,7 @@
 #     }
 #
 class GroupMembershipsController < ApplicationController
-  before_action :find_group, :only => [:index, :show, :create, :update, :destroy]
+  before_action :find_group, :only => %i[index show create update destroy]
 
   include Api::V1::Group
 

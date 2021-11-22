@@ -82,7 +82,7 @@ class EpubExport < ActiveRecord::Base
   delegate :downloadable?, to: :attachment, allow_nil: true
   delegate :completion, :running?, to: :job_progress, allow_nil: true
 
-  scope :running, -> { where(workflow_state: ['created', 'exporting', 'exported', 'generating']) }
+  scope :running, -> { where(workflow_state: %w[created exporting exported generating]) }
   scope :visible_to, ->(user) { where(user_id: user) }
 
   set_policy do

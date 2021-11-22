@@ -242,7 +242,7 @@ class AccessToken < ActiveRecord::Base
   # It's encrypted, but end users still shouldn't see this.
   # The hint is only returned in visible_token, if protected_token is false.
   def self.serialization_excludes
-    [:crypted_token, :token_hint, :crypted_refresh_token]
+    %i[crypted_token token_hint crypted_refresh_token]
   end
 
   def dev_key_account_id

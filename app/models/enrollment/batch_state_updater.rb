@@ -158,7 +158,7 @@ class Enrollment::BatchStateUpdater
   def self.touch_all_graders_if_needed(students)
     courses_to_touch_admins = students.map(&:course_id).uniq
     admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
-                                 type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'])
+                                 type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment])
                           .active.distinct.order(:user_id).pluck(:user_id)
     User.clear_cache_keys(admin_ids, :todo_list)
   end

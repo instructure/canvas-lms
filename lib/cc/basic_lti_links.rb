@@ -100,18 +100,18 @@ module CC
 
           if (cm_settings = tool.settings[:content_migration]&.with_indifferent_access)
             ext_node.lticm(:options, 'name' => 'content_migration') do |cm_node|
-              [:export_start_url, :import_start_url, :export_format, :import_format].each do |key|
+              %i[export_start_url import_start_url export_format import_format].each do |key|
                 cm_node.lticm(:property, cm_settings[key], 'name' => key.to_s) if cm_settings[key].present?
               end
             end
           end
 
-          extension_exclusions = [
-            :custom_fields,
-            :vendor_extensions,
-            :selection_width,
-            :selection_height,
-            :icon_url
+          extension_exclusions = %i[
+            custom_fields
+            vendor_extensions
+            selection_width
+            selection_height
+            icon_url
           ] + Lti::ResourcePlacement::PLACEMENTS
 
           tool.settings.keys.reject { |i| extension_exclusions.include?(i) }.each do |key|

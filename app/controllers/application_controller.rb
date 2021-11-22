@@ -264,16 +264,16 @@ class ApplicationController < ActionController::Base
 
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
-  JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links,
-    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage,
-    :scale_equation_images
+  JS_ENV_SITE_ADMIN_FEATURES = %i[
+    cc_in_rce_video_tray featured_help_links
+    strip_origin_from_quiz_answer_file_references rce_buttons_and_icons important_dates feature_flag_filters k5_parent_support
+    conferencing_in_planner remember_settings_tab word_count_in_speed_grader observer_picker lti_platform_storage
+    scale_equation_images
   ].freeze
-  JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
-    :inline_math_everywhere, :granular_permissions_manage_users, :create_course_subaccount_picker,
-    :lti_deep_linking_module_index_menu_modal, :lti_multiple_assignment_deep_linking
+  JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
+    responsive_awareness responsive_misc product_tours files_dnd usage_rights_discussion_topics
+    inline_math_everywhere granular_permissions_manage_users create_course_subaccount_picker
+    lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -2938,7 +2938,7 @@ class ApplicationController < ActionController::Base
         next false if check_disabled && k5_disabled?
 
         # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: [:k5_user, :enrollments, :account_users], expires_in: 12.hours) do
+        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
           uncached_k5_user?
         end
       else

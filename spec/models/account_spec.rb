@@ -376,17 +376,17 @@ describe Account do
 
     context "fast list" do
       it "lists associated courses" do
-        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq [
-          "C001", "C005", "C006", "C007", "C008", "C009",
+        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
+          C001 C005 C006 C007 C008 C009
 
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S",
+          C001S C005S C006S C007S C008S C009S
         ].sort
       end
 
       it "lists associated courses by term" do
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
+        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005 C006 C007 C008 C009 C005S C006S C007S C008S C009S].sort
       end
 
       it "counting cross-listed courses only if requested" do
@@ -411,13 +411,13 @@ describe Account do
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.fast_all_courses({ :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C005", "C007", "C001S", "C005S", "C007S"].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.fast_all_courses({ :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C001 C005 C007 C001S C005S C007S].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C005", "C007", "C005S", "C007S"].sort
+        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C005 C007 C005S C007S].sort
       end
 
       it "orders list by specified parameter" do
@@ -429,19 +429,19 @@ describe Account do
 
     context "name searching" do
       it "lists associated courses" do
-        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq [
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S"
+        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq %w[
+          C001S C005S C006S C007S C008S C009S
         ]
       end
 
       it "lists associated courses by term" do
         expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001S"]
         expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005S", "C006S", "C007S", "C008S", "C009S"]
+        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005S C006S C007S C008S C009S]
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.courses_name_like("search", { :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001S", "C005S", "C007S"] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.courses_name_like("search", { :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C001S C005S C007S] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
@@ -744,7 +744,7 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = [:read, :read_as_admin, :manage, :update, :delete, :read_outcomes, :read_terms]
+    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     conditional_access += [:view_bounced_emails] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
@@ -2100,7 +2100,7 @@ describe Account do
       end
 
       def cached_account_users
-        [:@account_users_cache, :@account_chain_ids, :@account_chain].each do |iv|
+        %i[@account_users_cache @account_chain_ids @account_chain].each do |iv|
           @account.instance_variable_set(iv, nil)
         end
         @account.cached_account_users_for(@user)

@@ -207,7 +207,7 @@ describe CanvasCache::Redis do
 
         it "returns a non-nil structure for mget" do
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.mget(['k1', 'k2', 'k3'])).to eq []
+          expect(redis_client.mget(%w[k1 k2 k3])).to eq []
         end
 
         it "distinguishes between failure and not exists for set nx" do

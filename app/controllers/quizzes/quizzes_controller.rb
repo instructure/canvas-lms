@@ -33,24 +33,24 @@ class Quizzes::QuizzesController < ApplicationController
   attr_reader :lock_results_if_needed
 
   before_action :require_context
-  before_action :rce_js_env, only: [:show, :new, :edit]
+  before_action :rce_js_env, only: %i[show new edit]
 
   include K5Mode
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
-  before_action :require_quiz, :only => [
-    :statistics,
-    :edit,
-    :show,
-    :history,
-    :update,
-    :destroy,
-    :moderate,
-    :read_only,
-    :managed_quiz_data,
-    :submission_versions,
-    :submission_html
+  before_action :require_quiz, :only => %i[
+    statistics
+    edit
+    show
+    history
+    update
+    destroy
+    moderate
+    read_only
+    managed_quiz_data
+    submission_versions
+    submission_html
   ]
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
   after_action :lock_results, only: [:show, :submission_html]

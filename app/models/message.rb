@@ -224,7 +224,7 @@ class Message < ActiveRecord::Base
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, -> { where(:workflow_state => ['created', 'staged', 'sending']) }
+  scope :cancellable, -> { where(:workflow_state => %w[created staged sending]) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
@@ -998,7 +998,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(**)
-    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :from_name, :to, :reply_to, :subject, :body, :html_body])['message']
+    super(:only => %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])['message']
   end
 
   protected

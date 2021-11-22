@@ -155,14 +155,14 @@ class CourseLinkValidator
     # Assessment/Quiz Questions
 
     links = []
-    [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
+    %i[question_text correct_comments_html incorrect_comments_html neutral_comments_html more_comments_html].each do |field|
       find_invalid_links(question.question_data[field]) do |field_links|
         links += field_links
       end
     end
 
     (question.question_data[:answers] || []).each do |answer|
-      [:html, :comments_html, :left_html].each do |field|
+      %i[html comments_html left_html].each do |field|
         find_invalid_links(answer[field]) do |field_links|
           links += field_links
         end
@@ -187,7 +187,7 @@ class CourseLinkValidator
   def find_invalid_links(html)
     links = []
     doc = Nokogiri::HTML5(html || "")
-    attrs = ['href', 'src', 'data', 'value']
+    attrs = %w[href src data value]
 
     doc.search("*").each do |node|
       attrs.each do |attr|

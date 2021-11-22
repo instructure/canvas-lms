@@ -53,8 +53,8 @@ describe "context modules" do
       expect(query_params["launch_type"]).to eq "module_index_menu"
       expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "true"
       expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "module"
-      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array([
-                                                                                                   "assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(%w[
+                                                                                                   assignment audio discussion_topic document image module quiz page video
                                                                                                  ])
       expect(query_params["com_instructure_course_available_canvas_resources"].values).to eq [{
         "course_id" => @course.id.to_s, "type" => "module"
@@ -76,8 +76,8 @@ describe "context modules" do
       expect(query_params["launch_type"]).to eq "module_group_menu"
       expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
       expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "module"
-      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array([
-                                                                                                   "assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(%w[
+                                                                                                   assignment audio discussion_topic document image module quiz page video
                                                                                                  ])
       module_data = [@module2].map { |m| { "id" => m.id.to_s, "name" => m.name } } # just @module2
       expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(module_data)

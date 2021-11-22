@@ -203,7 +203,7 @@ describe Mutations::ImportOutcomes do
       expect(errors).not_to be_nil
       expect(errors.length).to eq 1
       expect(
-        errors.select { |e| e['path'] == ["mutation", "importOutcomes", "input", "targetGroupId"] }
+        errors.select { |e| e['path'] == %w[mutation importOutcomes input targetGroupId] }
       ).not_to be_nil
     end
 

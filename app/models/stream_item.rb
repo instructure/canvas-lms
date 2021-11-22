@@ -26,10 +26,10 @@ class StreamItem < ActiveRecord::Base
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
-  belongs_to :context, polymorphic: [:course, :account, :group, :assignment_override, :assignment]
-  belongs_to :asset, polymorphic: [
-    :collaboration, :conversation, :discussion_entry,
-    :discussion_topic, :message, :submission, :web_conference, :assessment_request
+  belongs_to :context, polymorphic: %i[course account group assignment_override assignment]
+  belongs_to :asset, polymorphic: %i[
+    collaboration conversation discussion_entry
+    discussion_topic message submission web_conference assessment_request
   ]
   validates :asset_type, :data, presence: true
 

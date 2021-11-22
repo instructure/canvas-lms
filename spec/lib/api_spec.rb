@@ -412,7 +412,7 @@ describe Api do
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
-      expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
+      expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq %w[thing1 thing2 thing3]
     end
 
     it 'tries and make params when non-ar_id columns have returned without ar_id columns' do
@@ -511,22 +511,22 @@ describe Api do
 
     it 'handles a list of ar_ids' do
       expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(["1", "2", "3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids(%w[1 2 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
 
     it 'handles a list of sis ids' do
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
     end
 
     it 'removes duplicates' do
       expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => [1, 2, 3] })
       expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
     end
 
     it 'works with mixed sis id types' do
-      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
+      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => %w[U1 U2 U3], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
     it 'skips invalid things' do
@@ -586,7 +586,7 @@ describe Api do
     end
 
     it 'works with a few different column types and account scopings' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => ["a", "b", "c"], "id3" => ["s1", "s2", "s3"] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "scopes to accounts by default if :is_not_scoped_to_account doesn't exist" do
@@ -1079,11 +1079,11 @@ describe Api do
 
   describe ".value_to_array" do
     it "splits comma delimited strings" do
-      expect(Api.value_to_array('1,2,3')).to eq ['1', '2', '3']
+      expect(Api.value_to_array('1,2,3')).to eq %w[1 2 3]
     end
 
     it "does nothing to arrays" do
-      expect(Api.value_to_array(['1', '2', '3'])).to eq ['1', '2', '3']
+      expect(Api.value_to_array(%w[1 2 3])).to eq %w[1 2 3]
     end
 
     it "returns an empty array for nil" do

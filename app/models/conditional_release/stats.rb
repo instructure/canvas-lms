@@ -26,7 +26,7 @@ module ConditionalRelease
         assignment_ids = [rule.trigger_assignment_id]
         assignment_ids += rule.assignment_set_associations.pluck(:assignment_id) if include_trend_data
 
-        sub_attrs = [:id, :user_id, :assignment_id, :score]
+        sub_attrs = %i[id user_id assignment_id score]
         all_submission_data = rule.course.submissions.where(:assignment_id => assignment_ids)
                                   .pluck(*sub_attrs).map { |r| sub_attrs.zip(r).to_h }.sort_by { |s| s[:user_id] } # turns plucked rows into hashes
 

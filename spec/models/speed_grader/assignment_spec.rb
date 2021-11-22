@@ -633,7 +633,7 @@ describe SpeedGrader::Assignment do
                                              })
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-            students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
             StringifyIds.recursively_stringify_ids(students)
             expect(json_students).to match_array(students)
           end
@@ -651,7 +651,7 @@ describe SpeedGrader::Assignment do
           it 'returns only students that belong to the first group' do
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-            group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
             StringifyIds.recursively_stringify_ids(group_students)
             expect(json_students).to match_array(group_students)
           end
@@ -665,7 +665,7 @@ describe SpeedGrader::Assignment do
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
               group_students = group.users.where.not(id: first_student)
-                                    .as_json(include_root: false, only: [:id, :name, :sortable_name])
+                                    .as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -680,7 +680,7 @@ describe SpeedGrader::Assignment do
                                                })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-              group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -697,7 +697,7 @@ describe SpeedGrader::Assignment do
 
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-              course_students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              course_students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(course_students)
               expect(json_students).to match_array(course_students)
             end
@@ -1933,7 +1933,7 @@ describe SpeedGrader::Assignment do
 
       it "adds anonymous ids to student enrollments" do
         anonymous_ids = json['context']['enrollments'].map { |enrollment| enrollment['anonymous_id'] }
-        expect(anonymous_ids.uniq).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids.uniq).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids from student enrollments" do
@@ -1946,7 +1946,7 @@ describe SpeedGrader::Assignment do
 
       it "adds anonymous ids to students" do
         anonymous_ids = json['context']['students'].map { |student| student['anonymous_id'] }
-        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids from submissions" do
@@ -1955,7 +1955,7 @@ describe SpeedGrader::Assignment do
 
       it "includes anonymous ids on submissions" do
         anonymous_ids = json['submissions'].map { |submission| submission['anonymous_id'] }
-        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids on rubrics" do

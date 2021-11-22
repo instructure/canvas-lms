@@ -198,7 +198,7 @@ describe "Importing assignments" do
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
 
-    ["s_paper_check", "journal_check", "exclude_biblio", "exclude_type", "submit_papers_to", "s_view_report"].each do |field|
+    %w[s_paper_check journal_check exclude_biblio exclude_type submit_papers_to s_view_report].each do |field|
       expect(settings[field]).to eq("1")
     end
 

@@ -7035,25 +7035,25 @@ describe Assignment do
     it "accepts a string as input" do
       a = Assignment.new
       a.allowed_extensions = "doc,xls,txt"
-      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
 
     it "accepts an array as input" do
       a = Assignment.new
-      a.allowed_extensions = ["doc", "xls", "txt"]
-      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
+      a.allowed_extensions = %w[doc xls txt]
+      expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
 
     it "sanitizes the string" do
       a = Assignment.new
       a.allowed_extensions = ".DOC, .XLS, .TXT"
-      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
 
     it "sanitizes the array" do
       a = Assignment.new
       a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
-      expect(a.allowed_extensions).to eq ["doc", "xls", "txt"]
+      expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
   end
 
@@ -7642,11 +7642,11 @@ describe Assignment do
       expect(assignment).not_to be_a2_enabled
     end
 
-    [
-      'discussion_topic',
-      'external_tool',
-      'online_quiz',
-      'wiki_page'
+    %w[
+      discussion_topic
+      external_tool
+      online_quiz
+      wiki_page
     ].each do |type|
       it "returns false if submission type is set to #{type}" do
         assignment.build_wiki_page

@@ -397,7 +397,7 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.assessment_questions.first
-      ["correct_comments_html", "incorrect_comments_html", "neutral_comments_html", "more_comments_html"].each do |k|
+      %w[correct_comments_html incorrect_comments_html neutral_comments_html more_comments_html].each do |k|
         expect(q2.question_data.keys).not_to include(k)
       end
       q2.question_data["answers"].each do |a|

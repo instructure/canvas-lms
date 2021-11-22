@@ -44,7 +44,7 @@
 #
 class UserPastLtiId < ActiveRecord::Base
   belongs_to :user
-  belongs_to :context, polymorphic: [:account, :course, :group]
+  belongs_to :context, polymorphic: %i[account course group]
 
   # regular pre-loaders will not work because they will load past_lti_ids for
   # the user in all contexts instead of just the context we want.

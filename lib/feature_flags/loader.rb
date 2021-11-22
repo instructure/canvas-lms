@@ -48,7 +48,7 @@ module FeatureFlags
     end
 
     def self.load_definition(name, definition)
-      [:custom_transition_proc, :after_state_change_proc, :visible_on].each do |check|
+      %i[custom_transition_proc after_state_change_proc visible_on].each do |check|
         definition[check] = wrap_hook_method(definition[check]) if definition[check]
       end
       definition[:type] ||= 'feature_option'

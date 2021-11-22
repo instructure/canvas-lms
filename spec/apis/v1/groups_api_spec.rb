@@ -336,7 +336,7 @@ describe "Groups API", type: :request do
   it 'includes tabs if requested' do
     json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["tabs"]))
     expect(json).to have_key 'tabs'
-    expect(json['tabs'].map { |tab| tab['id'] }).to eq(["home", "announcements", "pages", "people", "discussions", "files"])
+    expect(json['tabs'].map { |tab| tab['id'] }).to eq(%w[home announcements pages people discussions files])
   end
 
   it "allows searching by SIS ID" do

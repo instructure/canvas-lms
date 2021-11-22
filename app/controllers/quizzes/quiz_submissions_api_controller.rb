@@ -147,8 +147,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   before_action :require_user, :require_context, :require_quiz
   before_action :require_overridden_quiz, :except => [:index]
-  before_action :require_quiz_submission, :except => [:index, :submission, :create]
-  before_action :prepare_service, :only => [:create, :update, :complete]
+  before_action :require_quiz_submission, :except => %i[index submission create]
+  before_action :prepare_service, :only => %i[create update complete]
   before_action :validate_ldb_status!, :only => [:create, :complete]
 
   # @API Get all quiz submissions.

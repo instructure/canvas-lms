@@ -69,7 +69,7 @@ class Pseudonym < ActiveRecord::Base
                         length: { within: 1..MAX_UNIQUE_ID_LENGTH },
                         uniqueness: {
                           case_sensitive: false,
-                          scope: [:account_id, :workflow_state, :authentication_provider_id],
+                          scope: %i[account_id workflow_state authentication_provider_id],
                           if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
                         }
 
@@ -536,7 +536,7 @@ class Pseudonym < ActiveRecord::Base
   scope :deleted, -> { where(workflow_state: 'deleted') }
 
   def self.serialization_excludes
-    [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]
+    %i[crypted_password password_salt reset_password_token persistence_token single_access_token perishable_token sis_ssha]
   end
 
   def self.associated_shards(_unique_id_or_sis_user_id)

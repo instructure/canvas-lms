@@ -47,7 +47,7 @@ module Polling
     end
 
     def student_keys
-      [:id, :question, :description, :created_at]
+      %i[id question description created_at]
     end
   end
 end

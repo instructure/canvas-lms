@@ -293,7 +293,7 @@ require 'csv'
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, :only => [:index, :help_links, :manually_created_courses_account]
+  before_action :require_user, :only => %i[index help_links manually_created_courses_account]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -751,7 +751,7 @@ class AccountsController < ApplicationController
     includes = Set.new(Array(params[:include]))
     # We only want to return the permissions for single courses and not lists of courses.
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
-    includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
+    includes -= %w[permissions sections needs_grading_count total_scores]
 
     page_opts = {}
     # don't calculate a total count for this endpoint.
@@ -841,7 +841,7 @@ class AccountsController < ApplicationController
                                             :default_group_storage_quota_mb)
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
-          [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
+          %i[default_storage_quota_mb default_user_storage_quota_mb default_group_storage_quota_mb].each do |quota_type|
             next unless quota_settings.key?(quota_type)
 
             quota_value = quota_settings[quota_type].to_s.strip
@@ -1027,9 +1027,9 @@ class AccountsController < ApplicationController
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
-          [:storage_quota, :default_storage_quota, :default_storage_quota_mb,
-           :default_user_storage_quota, :default_user_storage_quota_mb,
-           :default_group_storage_quota, :default_group_storage_quota_mb].each { |key| params[:account].delete key }
+          %i[storage_quota default_storage_quota default_storage_quota_mb
+             default_user_storage_quota default_user_storage_quota_mb
+             default_group_storage_quota default_group_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
@@ -1063,17 +1063,17 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          [:admins_can_change_passwords,
-           :admins_can_view_notifications,
-           :enable_alerts,
-           :enable_eportfolios,
-           :enable_profiles,
-           :enable_turnitin,
-           :include_integration_ids_in_gradebook_exports,
-           :show_scheduler,
-           :global_includes,
-           :gmail_domain,
-           :limit_parent_app_web_access,].each do |key|
+          %i[admins_can_change_passwords
+             admins_can_view_notifications
+             enable_alerts
+             enable_eportfolios
+             enable_profiles
+             enable_turnitin
+             include_integration_ids_in_gradebook_exports
+             show_scheduler
+             global_includes
+             gmail_domain
+             limit_parent_app_web_access].each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end
@@ -1361,7 +1361,7 @@ class AccountsController < ApplicationController
       @eportfolios = Eportfolio.active.preload(:user)
                                .joins(:user)
                                .joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}")
-                               .where(spam_status: ["flagged_as_possible_spam", "marked_as_spam", "marked_as_safe"])
+                               .where(spam_status: %w[flagged_as_possible_spam marked_as_spam marked_as_safe])
                                .where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam']))
                                .merge(User.active)
                                .order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc)
@@ -1758,11 +1758,11 @@ class AccountsController < ApplicationController
   end
 
   def permitted_api_account_settings
-    [:restrict_student_past_view,
-     :restrict_student_future_view,
-     :restrict_student_future_listing,
-     :lock_all_announcements,
-     :sis_assignment_name_length_input]
+    %i[restrict_student_past_view
+       restrict_student_future_view
+       restrict_student_future_listing
+       lock_all_announcements
+       sis_assignment_name_length_input]
   end
 
   def strong_account_params
@@ -1785,12 +1785,12 @@ class AccountsController < ApplicationController
 
   def add_enrollment_permissions(context)
     if context.root_account.feature_enabled?(:granular_permissions_manage_users)
-      [
-        :add_teacher_to_course,
-        :add_ta_to_course,
-        :add_designer_to_course,
-        :add_student_to_course,
-        :add_observer_to_course,
+      %i[
+        add_teacher_to_course
+        add_ta_to_course
+        add_designer_to_course
+        add_student_to_course
+        add_observer_to_course
       ]
     else
       [

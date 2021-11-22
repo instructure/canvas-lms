@@ -94,7 +94,7 @@ class PlannerOverride < ActiveRecord::Base
       end
     elsif plannable.respond_to?(:workflow_state)
       workflow_state = plannable.workflow_state.to_s
-      if ['active', 'available', 'published'].include?(workflow_state)
+      if %w[active available published].include?(workflow_state)
         'active'
       elsif ['unpublished', 'deleted'].include?(workflow_state)
         workflow_state

@@ -199,7 +199,7 @@ module SpeedGrader
         # attachments again via the submission method that creates a
         # new query.
         json['attachments'] = attachments_for_submission[sub].map do |att|
-          att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id])
+          att.as_json(:only => %i[mime_class comment_id id submitter_id])
         end
 
         sub_attachments = []

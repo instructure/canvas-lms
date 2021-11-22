@@ -587,7 +587,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = [:eula_agreement_timestamp, :submitted_at, :resource_link_lookup_uuid].freeze
+    always_permitted_params = %i[eula_agreement_timestamp submitted_at resource_link_lookup_uuid].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params

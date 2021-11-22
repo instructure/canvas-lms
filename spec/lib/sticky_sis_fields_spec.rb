@@ -68,7 +68,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.reload
     expect(ac.stuck_sis_fields).to eq [].to_set
-    ac.stuck_sis_fields = [:name, :short_name, :crap]
+    ac.stuck_sis_fields = %i[name short_name crap]
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
     ac.save!
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
@@ -108,7 +108,7 @@ describe StickySisFields do
     ac.save!
     expect(ac.stuck_sis_fields).to eq [].to_set
     expect(ac.stuck_sis_fields).to eq [].to_set
-    ac.stuck_sis_fields = [:name, :short_name, :crap]
+    ac.stuck_sis_fields = %i[name short_name crap]
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
     ac.save!
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
@@ -153,7 +153,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac = AbstractCourse.find(ac.id)
     expect(ac.stuck_sis_fields).to eq [].to_set
-    ac.stuck_sis_fields = [:name, :short_name, :crap]
+    ac.stuck_sis_fields = %i[name short_name crap]
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
     ac.save!
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
@@ -414,11 +414,11 @@ describe StickySisFields do
       ac.reload
       expect(ac.stuck_sis_fields).to eq [].to_set
       AbstractCourse.are_sis_sticky :name, :short_name, :sis_source_id
-      expect(AbstractCourse.sticky_sis_fields).to eq [:name, :short_name, :sis_source_id].to_set
+      expect(AbstractCourse.sticky_sis_fields).to eq %i[name short_name sis_source_id].to_set
       ac.name = "name 5"
       ac.short_name = "name 6"
       ac.sis_source_id = "name 7"
-      expect(ac.stuck_sis_fields).to eq [:name, :short_name, :sis_source_id].to_set
+      expect(ac.stuck_sis_fields).to eq %i[name short_name sis_source_id].to_set
     ensure
       AbstractCourse.sticky_sis_fields = old_sticky_sis_fields
       expect(AbstractCourse.sticky_sis_fields).to eq old_sticky_sis_fields
@@ -430,7 +430,7 @@ describe StickySisFields do
     begin
       ac = create_abstract_course
       AbstractCourse.are_sis_sticky :name, :short_name, :sis_source_id
-      expect(AbstractCourse.sticky_sis_fields).to eq [:name, :short_name, :sis_source_id].to_set
+      expect(AbstractCourse.sticky_sis_fields).to eq %i[name short_name sis_source_id].to_set
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.save!
       ac.reload
@@ -442,7 +442,7 @@ describe StickySisFields do
       ac.reload
       expect(ac.stuck_sis_fields).to eq [:name, :sis_source_id].to_set
       ac.short_name = "name 2"
-      expect(ac.stuck_sis_fields).to eq [:name, :short_name, :sis_source_id].to_set
+      expect(ac.stuck_sis_fields).to eq %i[name short_name sis_source_id].to_set
       ac.clear_sis_stickiness :name
       expect(ac.stuck_sis_fields).to eq [:short_name, :sis_source_id].to_set
       ac.save!

@@ -85,8 +85,8 @@ module Importers
     end
 
     QUIZ_QUESTION_KEYS = ['position', 'points_possible'].freeze
-    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + ['answers', 'assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
-                                                    'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
+    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + %w[answers assessment_question_migration_id migration_id question_bank_migration_id
+                                                      question_bank_id is_quiz_question_bank question_bank_name]
 
     def self.check_question_equality(question1, question2)
       stripped_q1 = question1.except(*IGNORABLE_QUESTION_KEYS)

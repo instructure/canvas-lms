@@ -151,7 +151,7 @@ class RubricAssessmentsController < ApplicationController
               [:artifact, :rubric_association]
             end
           json = @assessment.as_json(
-            methods: [:ratings, :assessor_name, :related_group_submissions_and_assessments],
+            methods: %i[ratings assessor_name related_group_submissions_and_assessments],
             include: artifact_includes,
             include_root: false
           )

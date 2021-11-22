@@ -79,12 +79,12 @@ describe QuizzesNext::QuizSerializer do
     allow(context).to receive(:grants_any_right?).at_least(:once).and_return true
   end
 
-  [
-    :id, :title, :description, :due_at, :lock_at, :unlock_at,
-    :points_possible,
-    :assignment_group_id, :migration_id, :only_visible_to_overrides,
-    :post_to_sis, :allowed_attempts,
-    :workflow_state
+  %i[
+    id title description due_at lock_at unlock_at
+    points_possible
+    assignment_group_id migration_id only_visible_to_overrides
+    post_to_sis allowed_attempts
+    workflow_state
   ].each do |attribute|
     it "serializes #{attribute}" do
       expect(subject[attribute]).to eq assignment.send(attribute)

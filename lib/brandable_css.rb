@@ -257,7 +257,7 @@ module BrandableCSS
 
     def save_default_files!
       [true, false].each do |high_contrast|
-        ['js', 'css', 'json'].each { |type| save_default!(type, high_contrast) }
+        %w[js css json].each { |type| save_default!(type, high_contrast) }
       end
     end
 

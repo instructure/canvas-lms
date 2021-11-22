@@ -88,7 +88,7 @@ module Canvas
       @meta[:encrypted_settings]
     end
 
-    [:name, :description, :website, :author, :author_website].each do |method|
+    %i[name description website author author_website].each do |method|
       class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}
           t_if_proc(@meta[:#{method}]) || ''
@@ -193,8 +193,8 @@ module Canvas
 
     def self.value_to_boolean(value, ignore_unrecognized: false)
       if value.is_a?(String) || value.is_a?(Symbol)
-        return true if ["yes", "y", "true", "t", "on", "1"].include?(value.to_s.downcase)
-        return false if ["no", "n", "false", "f", "off", "0"].include?(value.to_s.downcase)
+        return true if %w[yes y true t on 1].include?(value.to_s.downcase)
+        return false if %w[no n false f off 0].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized

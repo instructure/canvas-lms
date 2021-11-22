@@ -508,12 +508,12 @@ namespace :i18n do
   end
 
   desc "Download language files from Transifex and import them"
-  task :transifeximport, [:user, :password, :languages, :source_file] => :environment do |_t, args|
+  task :transifeximport, %i[user password languages source_file] => :environment do |_t, args|
     import_languages(:transifex, args)
   end
 
   desc "Download language files from s3 and import them"
-  task :s3import, [:s3_bucket, :languages, :source_file] => :environment do |_t, args|
+  task :s3import, %i[s3_bucket languages source_file] => :environment do |_t, args|
     import_languages(:s3, args)
   end
 

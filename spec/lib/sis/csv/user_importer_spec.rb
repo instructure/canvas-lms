@@ -1482,7 +1482,7 @@ describe SIS::CSV::UserImporter do
       batch: batch1
     )
     expect(batch1.roll_back_data.count).to eq 4
-    expect(batch1.roll_back_data.pluck(:context_type).sort).to eq ["CommunicationChannel", "Enrollment", "GroupMembership", "Pseudonym"]
+    expect(batch1.roll_back_data.pluck(:context_type).sort).to eq %w[CommunicationChannel Enrollment GroupMembership Pseudonym]
     batch1.restore_states_for_batch
     expect(p.reload.workflow_state).to eq 'active'
     expect(u.communication_channels.active.count).to eq 1

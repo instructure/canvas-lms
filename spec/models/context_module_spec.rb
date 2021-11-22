@@ -1628,8 +1628,8 @@ describe ContextModule do
       tags = @module.content_tags.not_deleted.ordered.to_a
       expect(tags.size).to eq 4
       expect(tags.map(&:content_id)).to eq([0, @a1.id, @a2.id, @p2.id])
-      expect(tags.map(&:title)).to eq(['foo', 'a1', 'a2', 'p2-renamed'])
-      expect(tags.map(&:workflow_state)).to eq(['unpublished', 'unpublished', 'active', 'active'])
+      expect(tags.map(&:title)).to eq(%w[foo a1 a2 p2-renamed])
+      expect(tags.map(&:workflow_state)).to eq(%w[unpublished unpublished active active])
     end
   end
 

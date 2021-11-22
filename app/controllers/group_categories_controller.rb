@@ -96,7 +96,7 @@ require 'csv'
 #
 class GroupCategoriesController < ApplicationController
   before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import, :export]
+  before_action :get_category_context, :only => %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory

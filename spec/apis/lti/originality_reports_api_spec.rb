@@ -105,21 +105,21 @@ module Lti
       end
 
       it "returns an originality report in the response" do
-        expected_keys = [
-          'id',
-          'file_id',
-          'originality_score',
-          'originality_report_file_id',
-          'originality_report_url',
-          'originality_report_lti_url',
-          'created_at',
-          'updated_at',
-          'submission_id',
-          'workflow_state',
-          'link_id',
-          'error_message',
-          'submission_time',
-          'root_account_id'
+        expected_keys = %w[
+          id
+          file_id
+          originality_score
+          originality_report_file_id
+          originality_report_url
+          originality_report_lti_url
+          created_at
+          updated_at
+          submission_id
+          workflow_state
+          link_id
+          error_message
+          submission_time
+          root_account_id
         ].freeze
 
         get @endpoints[:show], headers: request_headers
@@ -197,21 +197,21 @@ module Lti
         end
 
         it "returns an originality report in the response" do
-          expected_keys = [
-            'id',
-            'file_id',
-            'originality_score',
-            'originality_report_file_id',
-            'originality_report_url',
-            'originality_report_lti_url',
-            'created_at',
-            'updated_at',
-            'submission_id',
-            'workflow_state',
-            'link_id',
-            'error_message',
-            'submission_time',
-            'root_account_id'
+          expected_keys = %w[
+            id
+            file_id
+            originality_score
+            originality_report_file_id
+            originality_report_url
+            originality_report_lti_url
+            created_at
+            updated_at
+            submission_id
+            workflow_state
+            link_id
+            error_message
+            submission_time
+            root_account_id
           ].freeze
           get @endpoints[:alt_show], headers: request_headers
           expect(response).to be_successful
@@ -633,21 +633,21 @@ module Lti
       end
 
       it "includes expected keys in JSON response" do
-        expected_keys = [
-          'id',
-          'file_id',
-          'originality_score',
-          'originality_report_file_id',
-          'originality_report_url',
-          'originality_report_lti_url',
-          'created_at',
-          'updated_at',
-          'submission_id',
-          'workflow_state',
-          'link_id',
-          'error_message',
-          'submission_time',
-          'root_account_id'
+        expected_keys = %w[
+          id
+          file_id
+          originality_score
+          originality_report_file_id
+          originality_report_url
+          originality_report_lti_url
+          created_at
+          updated_at
+          submission_id
+          workflow_state
+          link_id
+          error_message
+          submission_time
+          root_account_id
         ].freeze
 
         post @endpoints[:create], params: { originality_report: { file_id: @attachment.id, originality_score: 0.4 } }, headers: request_headers

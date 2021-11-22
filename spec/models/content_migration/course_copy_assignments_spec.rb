@@ -195,10 +195,10 @@ describe ContentMigration do
       expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
       expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
 
-      attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
-               :automatic_peer_reviews, :anonymous_peer_reviews,
-               :grade_group_students_individually, :allowed_extensions,
-               :position, :peer_review_count, :omit_from_final_grade, :post_to_sis, :allowed_attempts]
+      attrs = %i[turnitin_enabled vericite_enabled turnitin_settings peer_reviews
+                 automatic_peer_reviews anonymous_peer_reviews
+                 grade_group_students_individually allowed_extensions
+                 position peer_review_count omit_from_final_grade post_to_sis allowed_attempts]
 
       run_course_copy
 
@@ -325,9 +325,9 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment.reload
-      [:moderated_grading, :grader_count, :grader_comments_visible_to_graders,
-       :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-       :anonymous_instructor_annotations].each do |attr|
+      %i[moderated_grading grader_count grader_comments_visible_to_graders
+         anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+         anonymous_instructor_annotations].each do |attr|
         expect(new_assignment.send(attr)).to eq @assignment.send(attr)
       end
     end

@@ -19,7 +19,7 @@
 #
 
 class ContentParticipationCount < ActiveRecord::Base
-  ACCESSIBLE_ATTRIBUTES = [:context, :user, :content_type, :unread_count].freeze
+  ACCESSIBLE_ATTRIBUTES = %i[context user content_type unread_count].freeze
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :user

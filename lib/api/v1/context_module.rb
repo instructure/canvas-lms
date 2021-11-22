@@ -172,7 +172,7 @@ module Api::V1::ContextModule
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    attrs = [:usage_rights, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
+    attrs = %i[usage_rights locked hidden lock_explanation display_name due_at unlock_at lock_at points_possible]
 
     attrs.each do |attr|
       if (val = item.try(attr))

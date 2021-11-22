@@ -253,19 +253,19 @@ module Api::V1::User
     end
   end
 
-  API_ENROLLMENT_JSON_OPTS = [:id,
-                              :root_account_id,
-                              :user_id,
-                              :course_id,
-                              :course_section_id,
-                              :associated_user_id,
-                              :limit_privileges_to_course_section,
-                              :workflow_state,
-                              :updated_at,
-                              :created_at,
-                              :start_at,
-                              :end_at,
-                              :type].freeze
+  API_ENROLLMENT_JSON_OPTS = %i[id
+                                root_account_id
+                                user_id
+                                course_id
+                                course_section_id
+                                associated_user_id
+                                limit_privileges_to_course_section
+                                workflow_state
+                                updated_at
+                                created_at
+                                start_at
+                                end_at
+                                type].freeze
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup

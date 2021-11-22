@@ -102,7 +102,7 @@ describe RoleOverridesController do
     describe 'grouped permissions' do
       before do
         @grouped_permission = 'manage_wiki'
-        @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
+        @granular_permissions = %w[manage_wiki_create manage_wiki_delete manage_wiki_update]
       end
 
       it 'updates all permissions in a group' do
@@ -341,7 +341,7 @@ describe RoleOverridesController do
       context 'with granular permissions' do
         before do
           @grouped_permission = 'manage_wiki'
-          @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
+          @granular_permissions = %w[manage_wiki_create manage_wiki_delete manage_wiki_update]
         end
 
         it 'sets granular permissions information in the js_env' do

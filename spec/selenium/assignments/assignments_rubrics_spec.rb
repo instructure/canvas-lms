@@ -500,7 +500,7 @@ describe "assignment rubrics" do
         @rubric.update_criteria(rubric_params)
         @rubric.reload
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["100", "50", "20"]
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[100 50 20]
 
         f(' .rubric_title .icon-edit').click
         wait_for_ajaximations
@@ -509,7 +509,7 @@ describe "assignment rubrics" do
         set_value(criterion_points, '200')
         fj(".save_button:visible").click
         wait_for_ajaximations
-        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["200", "100", "40"]
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[200 100 40]
       end
 
       it "displays explicit rating when range is infinitely small", priority: "1", test_id: 220339 do

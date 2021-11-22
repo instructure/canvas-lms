@@ -32,7 +32,7 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics, :update_final_grade_overrides]
+  before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
   include K5Mode
 
@@ -481,7 +481,7 @@ class GradebooksController < ApplicationController
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    ag_includes = [:assignments, :assignment_visibility, :grades_published]
+    ag_includes = %i[assignments assignment_visibility grades_published]
 
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
@@ -694,7 +694,7 @@ class GradebooksController < ApplicationController
           end
         end
         begin
-          if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+          if %i[grade score excuse excused].any? { |k| submission.key? k }
             # if it's a percentage graded assignment, we need to ensure there's a
             # percent sign on the end. eventually this will probably be done in
             # the javascript.
@@ -708,7 +708,7 @@ class GradebooksController < ApplicationController
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
-          if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+          if %i[comment media_comment_id comment_attachments].any? { |k| submission.key? k }
             submission[:commenter] = @current_user
             submission[:hidden] = submission_record&.hide_grade_from_student?
 

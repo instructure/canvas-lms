@@ -975,13 +975,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       # User-context event doesn't have root account id so we use the user's account
       event = CalendarEvent.create!(context: user_model)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+               CalendarEvent, %i[context_course context_group context_appointment_group context_course_section]
              )).to be true
 
       # manually adding makes the check method think it does, though
       event.update_columns(root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+               CalendarEvent, %i[context_course context_group context_appointment_group context_course_section]
              )).to be true
 
       # adding another User-context event should make it return false,
@@ -989,7 +989,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       CalendarEvent.create(context: user_model)
       CalendarEvent.create(context: @course, root_account_id: @course.root_account_id)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(
-               CalendarEvent, [:context_course, :context_group, :context_appointment_group, :context_course_section]
+               CalendarEvent, %i[context_course context_group context_appointment_group context_course_section]
              )).to be true
     end
 
