@@ -329,11 +329,10 @@ class ContextController < ApplicationController
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
       type = 'all_group_category' if type == 'group_category'
-      if %w[all_group_category group].include?(type)
-        unless @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
-          return render_unauthorized_action
-        end
+      if %w[all_group_category group].include?(type) && !@context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+        return render_unauthorized_action
       end
+
       type = type.pluralize
       type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
       unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)

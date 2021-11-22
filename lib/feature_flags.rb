@@ -176,13 +176,11 @@ module FeatureFlags
       if is_root_account
         # create a virtual feature flag in corresponding default state state
         retval = feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?
-      else
+      elsif inherited_only
         # the feature doesn't exist beneath the root account until the root account opts in
-        if inherited_only
-          return nil
-        else
-          return @feature_flag_cache[feature] = nil
-        end
+        return nil
+      else
+        return @feature_flag_cache[feature] = nil
       end
     end
 

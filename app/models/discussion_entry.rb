@@ -450,10 +450,8 @@ class DiscussionEntry < ActiveRecord::Base
     # because the creation of this object will also create a stream item which
     # takes care of clearing the cache
     self.class.connection.after_transaction_commit do
-      if root_entry_id.present?
-        if discussion_topic.for_assignment? || discussion_topic.todo_date.present?
-          User.where(:id => discussion_topic.discussion_topic_participants.select(:user_id)).touch_all
-        end
+      if root_entry_id.present? && (discussion_topic.for_assignment? || discussion_topic.todo_date.present?)
+        User.where(:id => discussion_topic.discussion_topic_participants.select(:user_id)).touch_all
       end
     end
   end

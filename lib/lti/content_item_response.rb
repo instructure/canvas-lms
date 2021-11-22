@@ -68,10 +68,8 @@ module Lti
     end
 
     def tag
-      unless @tag
-        if @media_types.include? :module_items
-          @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
-        end
+      if !@tag && @media_types.include?(:module_items)
+        @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
       end
       @tag
     end

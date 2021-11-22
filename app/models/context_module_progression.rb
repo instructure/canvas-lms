@@ -381,8 +381,8 @@ class ContextModuleProgression < ActiveRecord::Base
   def check_prerequisites
     return false if context_module.to_be_unlocked
 
-    if locked?
-      self.workflow_state = 'unlocked' if prerequisites_satisfied?
+    if locked? && prerequisites_satisfied?
+      self.workflow_state = 'unlocked'
     end
     !locked?
   end

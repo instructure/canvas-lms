@@ -287,8 +287,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     res = save!
-    if for_assignment?
-      assignment.destroy unless assignment.deleted?
+    if for_assignment? && !assignment.deleted?
+      assignment.destroy
     end
     res
   end
@@ -454,37 +454,38 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     delay_if_production.update_existing_submissions if @update_existing_submissions
-    if (assignment || @assignment_to_set) && (@assignment_id_set || for_assignment?) && @saved_by != :assignment
-      unless !graded? && @old_assignment_id
-        Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if assignment_id
-        self.assignment = @assignment_to_set if @assignment_to_set && !assignment
-        a = assignment
-        a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
-        a.points_possible = points_possible
-        a.description = description
-        a.title = title
-        a.due_at = due_at
-        a.lock_at = lock_at
-        a.unlock_at = unlock_at
-        a.only_visible_to_overrides = only_visible_to_overrides
-        a.submission_types = "online_quiz"
-        a.assignment_group_id = self.assignment_group_id
-        a.saved_by = :quiz
-        if saved_by == :migration
-          a.needs_update_cached_due_dates = true if a.update_cached_due_dates?
-        end
-        unless deleted?
-          a.workflow_state = published? ? 'published' : 'unpublished'
-        end
-        @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
-        a.notify_of_update = @notify_of_update
-        a.mark_as_importing!(@importing_migration) if @importing_migration
-        a.with_versioning(false) do
-          @notify_of_update ? a.save : a.save_without_broadcasting!
-        end
-        self.assignment_id = a.id
-        Quizzes::Quiz.where(id: self).update_all(assignment_id: a.id)
+    if (assignment || @assignment_to_set) &&
+       (@assignment_id_set || for_assignment?) &&
+       @saved_by != :assignment &&
+       (graded? || !@old_assignment_id)
+      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if assignment_id
+      self.assignment = @assignment_to_set if @assignment_to_set && !assignment
+      a = assignment
+      a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
+      a.points_possible = points_possible
+      a.description = description
+      a.title = title
+      a.due_at = due_at
+      a.lock_at = lock_at
+      a.unlock_at = unlock_at
+      a.only_visible_to_overrides = only_visible_to_overrides
+      a.submission_types = "online_quiz"
+      a.assignment_group_id = self.assignment_group_id
+      a.saved_by = :quiz
+      if saved_by == :migration && a.update_cached_due_dates?
+        a.needs_update_cached_due_dates = true
       end
+      unless deleted?
+        a.workflow_state = published? ? 'published' : 'unpublished'
+      end
+      @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
+      a.notify_of_update = @notify_of_update
+      a.mark_as_importing!(@importing_migration) if @importing_migration
+      a.with_versioning(false) do
+        @notify_of_update ? a.save : a.save_without_broadcasting!
+      end
+      self.assignment_id = a.id
+      Quizzes::Quiz.where(id: self).update_all(assignment_id: a.id)
     end
   end
 

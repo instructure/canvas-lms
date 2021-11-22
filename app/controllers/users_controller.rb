@@ -2940,9 +2940,7 @@ class UsersController < ApplicationController
       cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
-      if cc_type == CommunicationChannel::TYPE_EMAIL
-        cc_addr = nil unless EmailAddressValidator.valid?(cc_addr)
-      end
+      cc_addr = nil if cc_type == CommunicationChannel::TYPE_EMAIL && !EmailAddressValidator.valid?(cc_addr)
 
       can_manage_students = [Account.site_admin, @context].any? do |role|
         role.grants_right?(@current_user, :manage_students)
@@ -2952,8 +2950,8 @@ class UsersController < ApplicationController
         skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
       end
 
-      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
-        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
+      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL && value_to_boolean(cc_params[:confirmation_url])
+        includes << 'confirmation_url'
       end
 
       if CommunicationChannel.trusted_confirmation_redirect?(@domain_root_account, cc_params[:confirmation_redirect])

@@ -82,11 +82,9 @@ class ReleaseNotesController < ApplicationController
       }
     end
 
-    unless @current_user.nil? || transformed_notes.empty?
-      if transformed_notes.first[:date] > last_seen_release_note
-        @current_user.last_seen_release_note = transformed_notes.first[:date]
-        @current_user.save!
-      end
+    if !(@current_user.nil? || transformed_notes.empty?) && (transformed_notes.first[:date] > last_seen_release_note)
+      @current_user.last_seen_release_note = transformed_notes.first[:date]
+      @current_user.save!
     end
 
     render json: transformed_notes

@@ -124,11 +124,10 @@ class TermsController < ApplicationController
   def save_and_render_response
     params.require(:enrollment_term)
     overrides = params[:enrollment_term][:overrides]&.to_unsafe_h
-    if overrides.present?
-      unless (overrides.keys.map(&:classify) - %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-        return render :json => { :message => 'Invalid enrollment type in overrides' }, :status => :bad_request
-      end
+    if overrides.present? && !(overrides.keys.map(&:classify) - %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+      return render :json => { :message => 'Invalid enrollment type in overrides' }, :status => :bad_request
     end
+
     sis_id = params[:enrollment_term][:sis_source_id] || params[:enrollment_term][:sis_term_id]
     if sis_id && !(sis_id.is_a?(String) || sis_id.is_a?(Numeric))
       return render :json => { :message => "Invalid SIS ID" }, :status => :bad_request

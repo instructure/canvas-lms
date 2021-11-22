@@ -265,8 +265,8 @@ class ContentZipper
         @files_added ||= 0
         @files_added += 1
         update_progress(@zip_attachment, @files_added, @file_count) if @zip_attachment
-      else
-        @files_added = false if @files_added.nil?
+      elsif @files_added.nil?
+        @files_added = false
       end
     end
     folder.active_sub_folders.select do |f|

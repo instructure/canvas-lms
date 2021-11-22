@@ -194,8 +194,8 @@ class CourseLinkValidator
         url = node[attr]
         next unless url.present?
 
-        if attr == 'value'
-          next unless node['name'] && node['name'] == 'src'
+        if attr == 'value' && !(node['name'] && node['name'] == 'src')
+          next
         end
 
         find_invalid_link(url) do |invalid_link|

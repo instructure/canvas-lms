@@ -284,10 +284,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #
   # [Transient:CNVS-10071]
   def validate_ldb_status!(quiz = @quiz)
-    if quiz.require_lockdown_browser?
-      unless ldb_plugin.authorized?(self)
-        reject! 'this quiz requires the lockdown browser', 403
-      end
+    if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
+      reject! 'this quiz requires the lockdown browser', 403
     end
   end
 

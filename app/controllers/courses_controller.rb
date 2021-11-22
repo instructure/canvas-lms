@@ -2868,9 +2868,9 @@ class CoursesController < ApplicationController
       event = params[:course][:event].to_s
       # check permissions on processable events
       # allow invalid and non_events to pass through
-      if %w[offer claim conclude delete undelete].include?(event)
-        return unless authorized_action(@course, @current_user, permission_for_event(event))
-      end
+      return if %w[offer claim conclude delete undelete].include?(event) &&
+                !authorized_action(@course, @current_user, permission_for_event(event))
+
       # authorized, invalid, and non_events are processed
       if process_course_event
         render_update_success
@@ -2960,21 +2960,16 @@ class CoursesController < ApplicationController
         params_for_update.delete :storage_quota
         params_for_update.delete :storage_quota_mb
       end
-      unless @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
-        if @course.root_account.settings[:prevent_course_renaming_by_teachers]
-          params_for_update.delete :name
-          params_for_update.delete :course_code
-        end
+      if !@course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
+         @course.root_account.settings[:prevent_course_renaming_by_teachers]
+        params_for_update.delete :name
+        params_for_update.delete :course_code
       end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
-      if (sis_id = params[:course].delete(:sis_source_id))
-        if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
-          @course.sis_source_id = if sis_id == ''
-                                    nil
-                                  else
-                                    sis_id
-                                  end
-        end
+      if (sis_id = params[:course].delete(:sis_source_id)) &&
+         sis_id != @course.sis_source_id &&
+         @course.root_account.grants_right?(@current_user, session, :manage_sis)
+        @course.sis_source_id = sis_id.presence
       end
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
@@ -3001,9 +2996,9 @@ class CoursesController < ApplicationController
         event = params[:course][:event].to_s
         # check permissions on processable events
         # allow invalid and non_events to pass through
-        if %w[offer claim conclude delete undelete].include?(event)
-          return unless authorized_action(@course, @current_user, permission_for_event(event))
-        end
+        return if %w[offer claim conclude delete undelete].include?(event) &&
+                  !authorized_action(@course, @current_user, permission_for_event(event))
+
         # authorized, invalid, and non_events are processed
         unless process_course_event
           render_update_failure
@@ -3030,11 +3025,14 @@ class CoursesController < ApplicationController
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
 
       # Remove enrollment dates if "Term" enrollment is specified
-      if @course.enrollment_term
-        unless params_for_update.key?(:restrict_enrollments_to_course_dates) ? value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates]) : @course.restrict_enrollments_to_course_dates
-          params_for_update[:start_at] = nil if @course.unpublished?
-          params_for_update[:conclude_at] = nil
-        end
+      restrict_enrollments_to_course_dates = if params_for_update.key?(:restrict_enrollments_to_course_dates)
+                                               value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates])
+                                             else
+                                               @course.restrict_enrollments_to_course_dates
+                                             end
+      if @course.enrollment_term && !restrict_enrollments_to_course_dates
+        params_for_update[:start_at] = nil if @course.unpublished?
+        params_for_update[:conclude_at] = nil
       end
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"

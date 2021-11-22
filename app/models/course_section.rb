@@ -300,8 +300,8 @@ class CourseSection < ActiveRecord::Base
     EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
                    .invalidate_states_for_course_or_section(self, invalidate_access: true)
     User.delay_if_production.update_account_associations(user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
-    if old_course.id != course_id && old_course.id != nonxlist_course_id
-      old_course.delay_if_production.update_account_associations unless Course.skip_updating_account_associations?
+    if old_course.id != course_id && old_course.id != nonxlist_course_id && !Course.skip_updating_account_associations?
+      old_course.delay_if_production.update_account_associations
     end
 
     DueDateCacher.recompute_users_for_course(

@@ -376,12 +376,10 @@ class GroupCategoriesController < ApplicationController
           flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
           render :json => { :deleted => true }
         end
+      elsif api_request?
+        render :json => @group_category.errors, :status => :bad_request
       else
-        if api_request?
-          render :json => @group_category.errors, :status => :bad_request
-        else
-          render :json => { :deleted => false }
-        end
+        render :json => { :deleted => false }
       end
     end
   end

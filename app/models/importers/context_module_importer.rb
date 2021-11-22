@@ -149,10 +149,9 @@ module Importers
       if hash[:prerequisites]
         preqs = []
         hash[:prerequisites].each do |prereq|
-          if prereq[:module_migration_id]
-            if (ref_mod = ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: prereq[:module_migration_id]).first)
-              preqs << { :type => "context_module", :name => ref_mod.name, :id => ref_mod.id }
-            end
+          if prereq[:module_migration_id] &&
+             (ref_mod = ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: prereq[:module_migration_id]).first)
+            preqs << { :type => "context_module", :name => ref_mod.name, :id => ref_mod.id }
           end
         end
         item.prerequisites = preqs if !preqs.empty? || migration.for_master_course_import?

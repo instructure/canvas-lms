@@ -798,9 +798,7 @@ class GradebookImporter
 
     return false unless current_value.present? && new_value.present?
 
-    if consider_excused
-      return false if new_value.to_s.casecmp('EX') == 0 || current_value.casecmp('EX') == 0
-    end
+    return false if consider_excused && (new_value.to_s.casecmp?('EX') || current_value.casecmp?('EX'))
 
     # The exporter exports scores rounded to two decimal places (which is also
     # the maximum level of precision shown in the gradebook), so 123.456 will

@@ -407,8 +407,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     end
 
     # These rows can be filled with zeros. If they aren't filled, the table isn't filled
-    if (zeros_criteria = fill_with_zeros_criteria[table])
-      return false if empty_root_account_column_scope(table).where(*zeros_criteria).any?
+    if (zeros_criteria = fill_with_zeros_criteria[table]) &&
+       empty_root_account_column_scope(table).where(*zeros_criteria).any?
+      return false
     end
 
     true

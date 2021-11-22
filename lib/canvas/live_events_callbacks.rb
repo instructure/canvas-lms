@@ -95,10 +95,8 @@ module Canvas::LiveEventsCallbacks
   def self.after_update(obj, changes)
     case obj
     when ContentExport
-      if obj.quizzes2_export? && changes["workflow_state"]
-        if obj.workflow_state == "exported"
-          Canvas::LiveEvents.quiz_export_complete(obj)
-        end
+      if obj.quizzes2_export? && changes["workflow_state"] && obj.workflow_state == "exported"
+        Canvas::LiveEvents.quiz_export_complete(obj)
       end
     when ContentMigration
       if changes["workflow_state"] && obj.workflow_state == "imported"

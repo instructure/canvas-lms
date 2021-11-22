@@ -194,9 +194,10 @@ class Quizzes::QuizzesController < ApplicationController
 
       setup_headless
 
-      if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
-        return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
-      end
+      return if (@quiz.require_lockdown_browser? &
+                @quiz.require_lockdown_browser_for_results?) &&
+                params[:viewing] &&
+                !check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
 
       if @quiz.require_lockdown_browser? && value_to_boolean(params.delete(:refresh_ldb))
         return render(:action => "refresh_quiz_after_popup")
@@ -389,9 +390,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       overrides = delete_override_params
 
-      if overrides
-        return render_forbidden unless grading_periods_allow_assignment_overrides_batch_create?(@quiz, overrides)
-      end
+      return render_forbidden if overrides && !grading_periods_allow_assignment_overrides_batch_create?(@quiz, overrides)
 
       quiz_params = get_quiz_params
       quiz_params[:title] = nil if quiz_params[:title] == "undefined"
@@ -749,9 +748,11 @@ class Quizzes::QuizzesController < ApplicationController
 
         log_asset_access(@quiz, "quizzes", 'quizzes')
 
-        if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
-          return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
-        end
+        return if @quiz.require_lockdown_browser? &&
+                  @quiz.require_lockdown_browser_for_results? &&
+                  params[:viewing] &&
+                  !check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
+
         js_bundle :quiz_history
         @google_analytics_page_title = @quiz.survey? ? "User's Survey History" : "User's Quiz History"
         render stream: can_stream_template?

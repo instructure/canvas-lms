@@ -44,12 +44,10 @@ module Stats
       @items << item
       if @max.nil? || @min.nil?
         @max = @min = item
-      else
-        if item > @max
-          @max = item
-        elsif item < @min
-          @min = item
-        end
+      elsif item > @max
+        @max = item
+      elsif item < @min
+        @min = item
       end
       @sum += item
       @sum_of_squares += item**2

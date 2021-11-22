@@ -175,10 +175,8 @@ class ContextModulesApiController < ApplicationController
         opts[:search_term] = params[:search_term]
       end
 
-      if includes.include?('items')
-        if @context.user_has_been_observer?(@student || @current_user)
-          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
-        end
+      if includes.include?('items') && @context.user_has_been_observer?(@student || @current_user)
+        opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
       end
 
       render :json => modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }

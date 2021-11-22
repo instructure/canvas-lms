@@ -35,11 +35,9 @@ module AccountReports
       # force the window of time to be limited to 2 weeks
 
       # if both dates are specified use them or change the start date if range is over 2 week
-      if start_at && end_at
-        if end_at - start_at > 2.weeks.to_i
-          @start = end_at - 2.weeks
-          @account_report.parameters["start_at"] = @start
-        end
+      if start_at && end_at && end_at - start_at > 2.weeks.to_i
+        @start = end_at - 2.weeks
+        @account_report.parameters["start_at"] = @start
       end
 
       # if no end date is specified, make one 2 weeks after the start date

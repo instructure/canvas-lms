@@ -68,10 +68,8 @@ module Api
       end
 
       def scope_link_to_context(local_link)
-        if local_link.start_with?('/files')
-          if attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type)
-            return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
-          end
+        if local_link.start_with?('/files') && (attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type))
+          return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
         end
 
         local_link

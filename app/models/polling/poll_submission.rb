@@ -53,20 +53,16 @@ module Polling
     private
 
     def poll_is_published
-      if poll_session
-        unless poll_session.is_published?
-          errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_is_published',
-                                   'This poll session is not open for submissions.'))
-        end
+      if poll_session && !poll_session.is_published?
+        errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_is_published',
+                                 'This poll session is not open for submissions.'))
       end
     end
 
     def poll_choices_belong_to_poll
-      if poll
-        unless poll.poll_choices.include?(poll_choice)
-          errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_choice_belongs_to_poll',
-                                   'That poll choice does not belong to the existing poll.'))
-        end
+      if poll && !poll.poll_choices.include?(poll_choice)
+        errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_choice_belongs_to_poll',
+                                 'That poll choice does not belong to the existing poll.'))
       end
     end
   end

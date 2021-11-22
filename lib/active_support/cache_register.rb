@@ -46,19 +46,17 @@ module ActiveSupport
              defined?(::ActiveSupport::Cache::RedisCacheStore) && is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
              batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
             fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
+          elsif skip_cache_if_disabled
+            yield # use for new caches that we're not already using updated_at+touch for
           else
-            if skip_cache_if_disabled # use for new caches that we're not already using updated_at+touch for
-              yield
-            else
-              if batch_object # just fall back to the usual after appending to the key if needed
-                key += (if Canvas::CacheRegister.enabled?
-                          "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}"
-                        else
-                          "/#{batch_object.cache_key}"
-                        end)
-              end
-              fetch(key, opts, &block)
+            if batch_object # just fall back to the usual after appending to the key if needed
+              key += (if Canvas::CacheRegister.enabled?
+                        "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}"
+                      else
+                        "/#{batch_object.cache_key}"
+                      end)
             end
+            fetch(key, opts, &block)
           end
         end
 

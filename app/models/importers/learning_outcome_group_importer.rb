@@ -82,11 +82,9 @@ module Importers
       # model validation fails that requires a title.  Since "ENG" is
       # always from the UK, we can safely set the title here to avoid
       # the breakage and make imports of UK standards work again
-      unless item.title
-        if item.vendor_guid == "ENG"
-          item.title = "United Kingdom"
-          item.description = "United Kingdom Authority"
-        end
+      if !item.title && item.vendor_guid == "ENG"
+        item.title = "United Kingdom"
+        item.description = "United Kingdom Authority"
       end
 
       item.save!

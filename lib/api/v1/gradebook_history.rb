@@ -114,16 +114,15 @@ module Api::V1
       versions_hash.inject([]) do |memo, (submission_id, submission_versions)|
         prior = HashWithIndifferentAccess.new
         filtered_versions = submission_versions.each_with_object([]) do |version, new_array|
-          if version[:score]
-            if prior[:id].nil? || prior[:score] != version[:score]
-              if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
-                PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
-              elsif prior[:score] != version[:score]
-                PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
-              end
-              NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
-              new_array << version
+          if version[:score] &&
+             (prior[:id].nil? || prior[:score] != version[:score])
+            if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
+              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
+            elsif prior[:score] != version[:score]
+              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
             end
+            NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
+            new_array << version
           end
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))
         end.reverse

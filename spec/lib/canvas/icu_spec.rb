@@ -140,8 +140,8 @@ describe Canvas::ICU do
         if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
           raise "ICU appears to be installed, but we didn't load it correctly"
         end
-      else
-        skip "ICU is not installed" if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+      elsif Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+        skip "ICU is not installed"
       end
     end
 

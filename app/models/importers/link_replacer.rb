@@ -229,10 +229,8 @@ module Importers
       end
 
       quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where.not(quiz_data: nil).first
-      if quiz
-        if recursively_sub_placeholders!(quiz['quiz_data'], links)
-          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
-        end
+      if quiz && recursively_sub_placeholders!(quiz['quiz_data'], links)
+        Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
       end
     end
   end

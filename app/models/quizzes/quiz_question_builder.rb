@@ -60,11 +60,9 @@ class Quizzes::QuizQuestionBuilder
         end
 
       # A normal question:
-      else
-        if val[:answers]
-          val[:answers] = shuffle_answers(val)
-          val[:matches] = shuffle_matches(val) if val[:matches]
-        end
+      elsif val[:answers]
+        val[:answers] = shuffle_answers(val)
+        val[:matches] = shuffle_matches(val) if val[:matches]
       end
     end
   end

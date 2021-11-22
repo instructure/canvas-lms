@@ -165,12 +165,10 @@ module SIS
           end
 
           user = pseudo.user
-          if root_account != @root_account
-            unless SisPseudonym.for(user, @root_account, type: :implicit, require_sis: false)
-              err = "User #{enrollment_info.root_account_id}:#{enrollment_info.user_id} does not have a usable login for this account"
-              @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
-              next
-            end
+          if root_account != @root_account && !SisPseudonym.for(user, @root_account, type: :implicit, require_sis: false)
+            err = "User #{enrollment_info.root_account_id}:#{enrollment_info.user_id} does not have a usable login for this account"
+            @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
+            next
           end
 
           @course ||= @root_account.all_courses.where(sis_source_id: enrollment_info.course_id).take unless enrollment_info.course_id.blank?

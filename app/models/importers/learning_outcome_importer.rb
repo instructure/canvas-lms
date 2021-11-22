@@ -61,10 +61,10 @@ module Importers
         end
 
         outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if hash[:vendor_guid].present?
-        if outcome
+        if outcome && outcome.short_description != hash[:title]
           # Help prevent linking to the wrong outcome if copying into a different install of canvas
           # (using older migration packages that lack the root account uuid)
-          outcome = nil if outcome.short_description != hash[:title]
+          outcome = nil
         end
 
         unless outcome

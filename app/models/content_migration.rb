@@ -524,9 +524,8 @@ class ContentMigration < ActiveRecord::Base
 
     return false unless to_import(asset_type).present?
 
-    if (orig_id = original_id_for(mig_id))
-      return true if is_set?(to_import(asset_type)[orig_id])
-    end
+    return true if (orig_id = original_id_for(mig_id)) && is_set?(to_import(asset_type)[orig_id])
+
     is_set?(to_import(asset_type)[mig_id])
   end
 
@@ -1048,14 +1047,14 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def check_for_blocked_migration
-    if saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
-      if context && (next_cm = context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
-        job_id = next_cm.job_progress.try(:delayed_job_id)
-        if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)
-          job.run_at = Time.now # it's okay to try it again now
-          job.save
-        end
-      end
+    if saved_change_to_workflow_state? &&
+       %w[pre_process_error exported imported failed].include?(workflow_state) &&
+       context &&
+       (next_cm = context.content_migrations.where(:workflow_state => 'queued').order(:id).first) &&
+       (job_id = next_cm.job_progress.try(:delayed_job_id)) &&
+       (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)
+      job.run_at = Time.now # it's okay to try it again now
+      job.save
     end
   end
 

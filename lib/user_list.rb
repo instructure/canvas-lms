@@ -306,13 +306,11 @@ class UserList
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
       elsif address[:type] == :email && @search_method == :open
         (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
+      elsif @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
+        address.delete :user_id
+        (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
       else
-        if @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
-          address.delete :user_id
-          (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
-        else
-          @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
-        end
+        @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
       end
     end
   end

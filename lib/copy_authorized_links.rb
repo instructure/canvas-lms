@@ -65,9 +65,7 @@ module CopyAuthorizedLinks
           end
         else
           html = read_attribute(column) rescue nil
-          if html.present?
-            write_attribute(column, html) if html.present?
-          end
+          write_attribute(column, html) if html.present?
         end
       end
       true

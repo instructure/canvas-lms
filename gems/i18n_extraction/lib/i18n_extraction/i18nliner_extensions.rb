@@ -37,11 +37,10 @@ module I18nExtraction; end
 module I18nExtraction::Extensions
   module TranslateCall
     def validate_default
-      if @default.is_a?(String)
-        if %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
-          raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
-        end
+      if @default.is_a?(String) && %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
+        raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
       end
+
       super
     end
 

@@ -48,8 +48,8 @@ class SisPseudonym
     result = nil if exclude_deleted?(result)
     result ||= find_in_home_account
     result ||= find_in_other_accounts
-    if result
-      result.account = root_account if result.account_id == root_account.id
+    if result && result.account_id == root_account.id
+      result.account = root_account
     end
     result
   end
@@ -108,12 +108,10 @@ class SisPseudonym
     # try the user's home shard first if it's fast
     # the default shard has a replica in every region, so is always fast
     user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
-    if user_shard_is_in_region
-      if type != :trusted || (account_ids = trusted_account_ids[user.shard])
-        user.shard.activate do
-          result = find_in_trusted_accounts(account_ids)
-          return result if result
-        end
+    if user_shard_is_in_region && (type != :trusted || (account_ids = trusted_account_ids[user.shard]))
+      user.shard.activate do
+        result = find_in_trusted_accounts(account_ids)
+        return result if result
       end
     end
 

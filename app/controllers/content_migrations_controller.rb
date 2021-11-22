@@ -366,11 +366,13 @@ class ContentMigrationsController < ApplicationController
     end
 
     settings = @plugin.settings || {}
-    if settings[:requires_file_upload]
-      if params.dig(:pre_attachment, :name).blank? && params.dig(:settings, :file_url).blank? && params.dig(:settings, :content_export_id).blank?
-        return render(:json => { :message => t("File upload, file_url, or content_export_id is required") }, :status => :bad_request)
-      end
+    if settings[:requires_file_upload] &&
+       params.dig(:pre_attachment, :name).blank? &&
+       params.dig(:settings, :file_url).blank? &&
+       params.dig(:settings, :content_export_id).blank?
+      return render(:json => { :message => t("File upload, file_url, or content_export_id is required") }, :status => :bad_request)
     end
+
     source_course = lookup_sis_source_course
     if (validator = settings[:required_options_validator]) &&
        (res = validator.has_error(params[:settings], @current_user, @context))
@@ -568,9 +570,7 @@ class ContentMigrationsController < ApplicationController
         @content_migration.save!
         @content_migration.reset_job_progress
       else
-        if params.dig(:settings, :content_export_id).present?
-          return false unless link_content_export_attachment
-        end
+        return false if params.dig(:settings, :content_export_id).present? && !link_content_export_attachment
 
         if !params.key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
           @content_migration.shard.activate do

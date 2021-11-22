@@ -64,17 +64,17 @@ class ContextModule < ActiveRecord::Base
         # if any of these changed while we were unpublished, then we also need to trigger
         @relock_warning = true if prerequisites.any? || completion_requirements.any? || unlock_at.present?
       end
-      if saved_change_to_completion_requirements?
+      if saved_change_to_completion_requirements? && (completion_requirements.to_a - completion_requirements_before_last_save.to_a).present?
         # removing a requirement shouldn't trigger
-        @relock_warning = true if (completion_requirements.to_a - completion_requirements_before_last_save.to_a).present?
+        @relock_warning = true
       end
-      if saved_change_to_prerequisites?
+      if saved_change_to_prerequisites? && (prerequisites.to_a - prerequisites_before_last_save.to_a).present?
         # ditto with removing a prerequisite
-        @relock_warning = true if (prerequisites.to_a - prerequisites_before_last_save.to_a).present?
+        @relock_warning = true
       end
-      if saved_change_to_unlock_at?
+      if saved_change_to_unlock_at? && unlock_at.present? && unlock_at_before_last_save.blank?
         # adding a unlock_at date should trigger
-        @relock_warning = true if unlock_at.present? && unlock_at_before_last_save.blank?
+        @relock_warning = true
       end
     end
   end
@@ -871,8 +871,8 @@ class ContextModule < ActiveRecord::Base
   def evaluate_for(user_or_progression)
     if user_or_progression.is_a?(ContextModuleProgression)
       progression, user = [user_or_progression, user_or_progression.user]
-    else
-      progression, user = [find_or_create_progression(user_or_progression), user_or_progression] if user_or_progression
+    elsif user_or_progression
+      progression, user = [find_or_create_progression(user_or_progression), user_or_progression]
     end
     return nil unless progression && user
 

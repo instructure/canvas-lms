@@ -97,11 +97,11 @@ module Importers
       elsif state || !hide_from_students.nil?
         if state == 'active' && !item.unpublished? && Canvas::Plugin.value_to_boolean(hide_from_students) == false
           item.workflow_state = 'active'
-        else
-          item.workflow_state = 'unpublished' if item.new_record? || item.deleted?
+        elsif item.new_record? || item.deleted?
+          item.workflow_state = 'unpublished'
         end
-      else
-        item.workflow_state = 'unpublished' if item.deleted?
+      elsif item.deleted?
+        item.workflow_state = 'unpublished'
       end
 
       if migration.for_master_course_import?
@@ -112,10 +112,8 @@ module Importers
             context.wiki.unset_front_page!
           end
         end
-      else
-        if !!hash[:front_page] && context.wiki.has_no_front_page
-          item.set_as_front_page!
-        end
+      elsif !!hash[:front_page] && context.wiki.has_no_front_page
+        item.set_as_front_page!
       end
       item.migration_id = hash[:migration_id]
       item.todo_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:todo_date])

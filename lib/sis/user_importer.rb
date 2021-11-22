@@ -177,40 +177,38 @@ module SIS
             unless user.stuck_sis_fields.include?(:sortable_name)
               user.sortable_name = infer_sortable_name(user_row, user.sortable_name)
             end
-            unless user.stuck_sis_fields.include?(:short_name)
-              user.short_name = user_row.short_name if user_row.short_name.present?
+            if !user.stuck_sis_fields.include?(:short_name) && user_row.short_name.present?
+              user.short_name = user_row.short_name
+            end
+          elsif login_only
+            if user_row.root_account_id.present?
+              root_account = root_account_from_id(user_row.root_account_id, user_row)
+              next unless root_account
+            else
+              root_account = @root_account
+            end
+            pseudo = existing_login(user_row, root_account)
+            if pseudo.nil?
+              message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+              next
+            elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
+              message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+              next
+            else
+              user = pseudo.user
+              pseudo = Pseudonym.new
             end
           else
-            if login_only
-              if user_row.root_account_id.present?
-                root_account = root_account_from_id(user_row.root_account_id, user_row)
-                next unless root_account
-              else
-                root_account = @root_account
-              end
-              pseudo = existing_login(user_row, root_account)
-              if pseudo.nil?
-                message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-                next
-              elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
-                message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-                next
-              else
-                user = pseudo.user
-                pseudo = Pseudonym.new
-              end
-            else
-              user = nil
-              pseudo = Pseudonym.new
-              user = other_user(user_row, pseudo) if user_row.integration_id.present?
-              unless user
-                user = User.new
-                user.name = infer_user_name(user_row)
-                user.sortable_name = infer_sortable_name(user_row)
-                user.short_name = user_row.short_name if user_row.short_name.present?
-              end
+            user = nil
+            pseudo = Pseudonym.new
+            user = other_user(user_row, pseudo) if user_row.integration_id.present?
+            unless user
+              user = User.new
+              user.name = infer_user_name(user_row)
+              user.sortable_name = infer_sortable_name(user_row)
+              user.short_name = user_row.short_name if user_row.short_name.present?
             end
           end
 

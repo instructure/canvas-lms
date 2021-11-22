@@ -1420,16 +1420,14 @@ class DiscussionTopicsController < ApplicationController
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    unless @topic.lock_at_changed?
-      if params.key?(:locked) && !params[:locked].is_a?(Hash)
-        should_lock = value_to_boolean(params[:locked])
-        if should_lock != @topic.locked?
-          if should_lock
-            @topic.lock(without_save: true)
-          else
-            discussion_topic_hash[:lock_at] = nil
-            @topic.unlock(without_save: true)
-          end
+    if !@topic.lock_at_changed? && (params.key?(:locked) && !params[:locked].is_a?(Hash))
+      should_lock = value_to_boolean(params[:locked])
+      if should_lock != @topic.locked?
+        if should_lock
+          @topic.lock(without_save: true)
+        else
+          discussion_topic_hash[:lock_at] = nil
+          @topic.unlock(without_save: true)
         end
       end
     end

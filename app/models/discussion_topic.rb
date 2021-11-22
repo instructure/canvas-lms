@@ -268,11 +268,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def sync_attachment_with_publish_state
-    if (saved_change_to_workflow_state? || saved_change_to_locked? || saved_change_to_attachment_id?) && attachment
-      unless attachment.hidden? # if it's already hidden leave alone
-        locked = !!(unpublished? || not_available_yet? || not_available_anymore?)
-        attachment.update_attribute(:locked, locked)
-      end
+    if (saved_change_to_workflow_state? || saved_change_to_locked? || saved_change_to_attachment_id?) &&
+       attachment && !attachment.hidden? # if it's already hidden leave alone
+      locked = !!(unpublished? || not_available_yet? || not_available_anymore?)
+      attachment.update_attribute(:locked, locked)
     end
   end
 
@@ -1079,8 +1078,8 @@ class DiscussionTopic < ActiveRecord::Base
     discussion_topic_section_visibilities&.update_all(:workflow_state => "deleted")
     save
 
-    if for_assignment? && root_topic_id.blank?
-      assignment.destroy unless assignment.deleted?
+    if for_assignment? && root_topic_id.blank? && !assignment.deleted?
+      assignment.destroy
     end
 
     child_topics.each(&:destroy)

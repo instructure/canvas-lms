@@ -1492,8 +1492,8 @@ class ApplicationController < ActionController::Base
       log_participation(user)
       log_gets
       finalize_page_view
-    else
-      @page_view.destroy if @page_view && !@page_view.new_record?
+    elsif @page_view && !@page_view.new_record?
+      @page_view.destroy
     end
   rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
     Canvas::Errors.capture_exception(:page_view, e)

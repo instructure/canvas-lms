@@ -305,6 +305,8 @@ Style/HashTransformValues:
   Severity: error
 Style/IdenticalConditionalBranches:
   Severity: error
+Style/IfInsideElse:
+  Severity: error
 Style/InverseMethods:
   Severity: error
 Style/IfUnlessModifier:
@@ -440,6 +442,8 @@ Style/SingleArgumentDig:
 Style/SingleLineMethods:
   Severity: error
 Style/SlicingWithRange:
+  Severity: error
+Style/SoleNestedConditional:
   Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine

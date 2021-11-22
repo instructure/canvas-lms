@@ -185,13 +185,13 @@ module Importers
         migration.update_import_progress(90)
 
         # be very explicit about draft state courses, but be liberal toward legacy courses
-        if course.wiki.has_no_front_page
-          if migration.for_course_copy? && !migration.for_master_course_import? &&
-             (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
-            mig_id = migration.content_export.create_key(source.wiki.front_page)
-            if (new_front_page = course.wiki_pages.where(migration_id: mig_id).first)
-              course.wiki.set_front_page_url!(new_front_page.url)
-            end
+        if course.wiki.has_no_front_page &&
+           migration.for_course_copy? &&
+           !migration.for_master_course_import? &&
+           (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
+          mig_id = migration.content_export.create_key(source.wiki.front_page)
+          if (new_front_page = course.wiki_pages.where(migration_id: mig_id).first)
+            course.wiki.set_front_page_url!(new_front_page.url)
           end
         end
         front_page = course.wiki.front_page
@@ -230,11 +230,11 @@ module Importers
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
 
-        if migration.for_master_course_import? && migration.migration_settings[:publish_after_completion]
-          if course.unpublished?
-            # i could just do it directly but this way preserves the audit trail
-            course.update_one({ :event => 'offer' }, migration.user, :blueprint_sync)
-          end
+        if migration.for_master_course_import? &&
+           migration.migration_settings[:publish_after_completion] &&
+           course.unpublished?
+          # i could just do it directly but this way preserves the audit trail
+          course.update_one({ :event => 'offer' }, migration.user, :blueprint_sync)
         end
 
         if course.changed?
@@ -560,11 +560,11 @@ module Importers
         new_date = new_start_date + new_event_diff
         options[:day_substitutions] ||= {}
         options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
-        if options[:day_substitutions] && options[:day_substitutions][old_date.wday.to_s]
-          if new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
-            new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
-            new_date -= 7 unless new_date - 7 < new_start_date
-          end
+        if options[:day_substitutions] &&
+           options[:day_substitutions][old_date.wday.to_s] &&
+           new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
+          new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
+          new_date -= 7 unless new_date - 7 < new_start_date
         end
 
         new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone

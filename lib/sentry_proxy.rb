@@ -23,8 +23,8 @@ class SentryProxy
   def self.capture(exception, data, level = :error)
     if exception.is_a?(String) || exception.is_a?(Symbol)
       Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s, level)
-    else
-      Raven.capture_exception(exception, data) if reportable?(exception, level)
+    elsif reportable?(exception, level)
+      Raven.capture_exception(exception, data)
     end
   end
 

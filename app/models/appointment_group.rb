@@ -165,15 +165,13 @@ class AppointmentGroup < ActiveRecord::Base
 
     # contexts
     @new_contexts -= contexts if @new_contexts
-    if @new_contexts.present?
-      unless (appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
+    if @new_contexts.present? && !((appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
              (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
-             !new_record?
-        self.appointment_group_contexts += @new_contexts.map { |c|
-          AppointmentGroupContext.new :context => c, :appointment_group => self
-        }
-        @contexts_changed = true
-      end
+             !new_record?)
+      self.appointment_group_contexts += @new_contexts.map { |c|
+        AppointmentGroupContext.new :context => c, :appointment_group => self
+      }
+      @contexts_changed = true
     end
 
     if new_sub_contexts.present?
