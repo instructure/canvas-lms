@@ -241,10 +241,10 @@ class Quizzes::QuizQuestionBuilder
 
   def shuffleable_question_type?(question_type)
     # TODO: constantize
-    ![
-      "true_false_question",
-      "matching_question",
-      "fill_in_multiple_blanks_question"
+    !%w[
+      true_false_question
+      matching_question
+      fill_in_multiple_blanks_question
     ].include?(question_type)
   end
 

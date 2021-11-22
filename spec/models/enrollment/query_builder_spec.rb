@@ -274,7 +274,7 @@ describe "Enrollment::QueryBuilder" do
       it_should_behave_like "enforce_course_workflow_state"
     end
 
-    [:deleted, :rejected, :completed, :creation_pending, :inactive].each do |state|
+    %i[deleted rejected completed creation_pending inactive].each do |state|
       context "with #{state.inspect}" do
         let(:state) { state }
 

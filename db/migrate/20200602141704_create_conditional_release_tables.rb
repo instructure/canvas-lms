@@ -81,8 +81,8 @@ class CreateConditionalReleaseTables < ActiveRecord::Migration[5.2]
       t.datetime :deleted_at
       t.index :assignment_set_id, where: 'deleted_at IS NULL',
                                   name: 'index_cr_assignment_set_actions_on_assignment_set_id'
-      t.index [:assignment_set_id, :student_id, :created_at], order: { created_at: :desc }, where: 'deleted_at IS NULL',
-                                                              name: 'index_cr_assignment_set_actions_on_set_and_student'
+      t.index %i[assignment_set_id student_id created_at], order: { created_at: :desc }, where: 'deleted_at IS NULL',
+                                                           name: 'index_cr_assignment_set_actions_on_set_and_student'
 
       t.references :root_account, foreign_key: { to_table: 'accounts' }, limit: 8, null: false,
                                   index: { name: 'index_cr_assignment_set_actions_on_root_account_id' }

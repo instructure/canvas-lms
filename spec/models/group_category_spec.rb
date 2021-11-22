@@ -467,7 +467,7 @@ describe GroupCategory do
 
     it "calculates correctly for a clean split" do
       # 10 "users"
-      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
+      allow(@category).to receive(:unassigned_users) { %w[u u u u u u u u u u] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership
@@ -477,7 +477,7 @@ describe GroupCategory do
 
     it "rounds up for an uneven split" do
       # 11 "users"
-      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
+      allow(@category).to receive(:unassigned_users) { %w[u u u u u u u u u u u] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership

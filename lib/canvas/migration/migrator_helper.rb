@@ -28,7 +28,7 @@ module Canvas::Migration
     OVERVIEW_JSON = "overview.json"
     ALL_FILES_ZIP = "all_files.zip"
 
-    COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :tab_configuration, :syllabus_body, :storage_quota].freeze
+    COURSE_NO_COPY_ATTS = %i[name course_code start_at conclude_at grading_standard_id tab_configuration syllabus_body storage_quota].freeze
 
     QUIZ_FILE_DIRECTORY = "Quiz Files"
 

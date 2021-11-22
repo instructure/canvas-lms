@@ -79,7 +79,7 @@ describe "Outcome Reports" do
         header: true
       }
       admin = account_admin_user(account: account)
-      expected_headers = ['vendor_guid', 'object_type', 'title']
+      expected_headers = %w[vendor_guid object_type title]
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 
       preparsed_report = run_report('outcome_export_csv', preparsed_report_options)

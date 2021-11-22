@@ -249,7 +249,7 @@ module Canvas::Migration::Helpers
         elsif (mig_id = item['page_migration_id'])
           hash[:linked_resource] = { :type => 'wiki_pages', :migration_id => mig_id }
         end
-      elsif ['discussion_topics', 'quizzes', 'wiki_pages'].include?(type) &&
+      elsif %w[discussion_topics quizzes wiki_pages].include?(type) &&
             (mig_id = item['assignment_migration_id'])
         hash[:linked_resource] = { :type => 'assignments', :migration_id => mig_id }
       end

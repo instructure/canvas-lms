@@ -37,7 +37,7 @@ module Api::V1::ContentMigration
       json[:workflow_state] = 'failed'
     elsif json[:workflow_state] == 'exported' && !migration.import_immediately?
       json[:workflow_state] = 'waiting_for_select'
-    elsif ['exporting', 'importing', 'exported'].member?(json[:workflow_state])
+    elsif %w[exporting importing exported].member?(json[:workflow_state])
       json[:workflow_state] = 'running'
     elsif json[:workflow_state] == 'imported'
       json[:workflow_state] = 'completed'

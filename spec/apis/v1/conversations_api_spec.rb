@@ -1283,7 +1283,7 @@ describe ConversationsController, type: :request do
                             "subscribed" => true,
                             "private" => true,
                             "starred" => false,
-                            "properties" => ["last_author", "attachments", "media_objects"],
+                            "properties" => %w[last_author attachments media_objects],
                             "visible" => true,
                             "audience" => [@bob.id],
                             "audience_contexts" => {

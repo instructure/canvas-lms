@@ -160,7 +160,7 @@ module CC::Importer::Standard
       return "" if html.blank?
 
       doc = Nokogiri::HTML5(html || "")
-      attrs = ['rel', 'href', 'src', 'data', 'value']
+      attrs = %w[rel href src data value]
       doc.search("*").each do |node|
         attrs.each do |attr|
           next unless node[attr]

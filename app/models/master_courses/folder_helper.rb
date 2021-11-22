@@ -68,8 +68,8 @@ class MasterCourses::FolderHelper
     updated_folders.each do |source_folder|
       dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
       sync_folder_location(child_course, dest_folder, source_folder) if dest_folder
-      if dest_folder && [:name, :workflow_state, :locked, :lock_at, :unlock_at].any? { |attr| dest_folder.send(attr) != source_folder.send(attr) }
-        [:name, :workflow_state, :locked, :lock_at, :unlock_at].each do |attr|
+      if dest_folder && %i[name workflow_state locked lock_at unlock_at].any? { |attr| dest_folder.send(attr) != source_folder.send(attr) }
+        %i[name workflow_state locked lock_at unlock_at].each do |attr|
           dest_folder.send("#{attr}=", source_folder.send(attr))
         end
       end

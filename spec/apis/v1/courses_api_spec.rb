@@ -1004,11 +1004,11 @@ describe CoursesController, type: :request do
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
-        [:name, :course_code, :start_at, :end_at,
-         :is_public, :public_syllabus, :allow_wiki_comments,
-         :open_enrollment, :self_enrollment, :license, :sis_course_id,
-         :allow_student_forum_attachments, :public_description,
-         :restrict_enrollments_to_course_dates].each do |attr|
+        %i[name course_code start_at end_at
+           is_public public_syllabus allow_wiki_comments
+           open_enrollment self_enrollment license sis_course_id
+           allow_student_forum_attachments public_description
+           restrict_enrollments_to_course_dates].each do |attr|
           expect(new_course.send(attr)).to eq(if [:start_at, :end_at].include?(attr)
                                                 Time.parse(post_params['course'][attr.to_s])
                                               else
@@ -2435,17 +2435,17 @@ describe CoursesController, type: :request do
 
     context "grading period info" do
       let(:grading_period_info_keys) do
-        [
-          'current_grading_period_id',
-          'current_grading_period_title',
-          'has_grading_periods',
-          'multiple_grading_periods_enabled'
+        %w[
+          current_grading_period_id
+          current_grading_period_title
+          has_grading_periods
+          multiple_grading_periods_enabled
         ]
       end
 
       before(:once) do
         create_grading_periods_for(
-          @course2, grading_periods: [:old, :current, :future]
+          @course2, grading_periods: %i[old current future]
         )
       end
 
@@ -2477,18 +2477,18 @@ describe CoursesController, type: :request do
 
     context "include current grading period scores" do
       let(:grading_period_score_keys) do
-        [
-          'totals_for_all_grading_periods_option',
-          'current_period_computed_current_score',
-          'current_period_computed_final_score',
-          'current_period_computed_current_grade',
-          'current_period_computed_final_grade'
+        %w[
+          totals_for_all_grading_periods_option
+          current_period_computed_current_score
+          current_period_computed_final_score
+          current_period_computed_current_grade
+          current_period_computed_final_grade
         ]
       end
 
       before(:once) do
         create_grading_periods_for(
-          @course2, grading_periods: [:old, :current, :future]
+          @course2, grading_periods: %i[old current future]
         )
       end
 
@@ -3071,7 +3071,7 @@ describe CoursesController, type: :request do
         ta_users = json.select { |u| u["name"] == "TAPerson" }
         expect(ta_users).to be_empty
 
-        json = api_call(:get, api_url, api_route, :enrollment_state => ["invited", "active", "completed"], :search_term => "TAP")
+        json = api_call(:get, api_url, api_route, :enrollment_state => %w[invited active completed], :search_term => "TAP")
         ta_users = json.select { |u| u["name"] == "TAPerson" }
         expect(ta_users).not_to be_empty
       end
@@ -3368,7 +3368,7 @@ describe CoursesController, type: :request do
       it "accepts an array of enrollment_types" do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
-                        :enrollment_type => ['student', 'student_view', 'teacher'], :include => ['enrollments'])
+                        :enrollment_type => %w[student student_view teacher], :include => ['enrollments'])
 
         expect(json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort).to eq %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment]
       end
@@ -3699,7 +3699,7 @@ describe CoursesController, type: :request do
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                       { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                      :include => ['email', 'enrollments', 'observed_users'])
+                      :include => %w[email enrollments observed_users])
 
       enrollments1 = json.find { |u| u['id'] == observer1.id }['enrollments']
       expect(enrollments1.map { |e| e['observed_user']['id'] }.sort).to eq [@student1.id, @student2.id]
@@ -3876,10 +3876,10 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=tabs",
                       { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['tabs'] })
       expect(json).to have_key 'tabs'
-      expected_tabs = [
-        "home", "announcements", "assignments", "discussions", "grades", "people",
-        "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings",
-        "rubrics"
+      expected_tabs = %w[
+        home announcements assignments discussions grades people
+        pages files syllabus outcomes quizzes modules settings
+        rubrics
       ]
       expect(json['tabs'].map { |tab| tab['id'] }).to match_array(expected_tabs)
     end
@@ -4696,7 +4696,7 @@ describe CoursesController, type: :request do
     it "returns the effective due at along with grading period information" do
       json = api_call(:get, @effective_due_dates_path, @options)
       due_date_info = json[@assignment1.id.to_s][@student.id.to_s]
-      expected_attributes = ["due_at", "grading_period_id", "in_closed_grading_period"]
+      expected_attributes = %w[due_at grading_period_id in_closed_grading_period]
       expect(due_date_info.keys).to match_array(expected_attributes)
     end
   end

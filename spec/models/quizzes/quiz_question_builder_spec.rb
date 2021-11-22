@@ -279,7 +279,7 @@ describe Quizzes::QuizQuestionBuilder do
 
   describe '#shuffle_answers' do
     let(:question) { { :answers => answers } }
-    let(:answers) { ['a', 'b', 'c'] }
+    let(:answers) { %w[a b c] }
 
     context "on a shuffle answers question" do
       before { quiz_question_builder.options[:shuffle_answers] = true }
@@ -315,7 +315,7 @@ describe Quizzes::QuizQuestionBuilder do
 
   describe '#shuffle_matches' do
     let(:question) { { :matches => matches } }
-    let(:matches) { ['a', 'b', 'c'] }
+    let(:matches) { %w[a b c] }
 
     it "shuffles matches for a matching question" do
       quiz_question_builder.options[:shuffle_answers] = true

@@ -711,7 +711,7 @@ class GradebookImporter
     pseudonyms = root_account.shard.activate do
       root_account.pseudonyms
                   .active
-                  .select([:id, :unique_id, :sis_user_id, :user_id])
+                  .select(%i[id unique_id sis_user_id user_id])
                   .where(:user_id => @all_students.values).to_a
     end
     pseudonyms.each do |pseudonym|
@@ -752,13 +752,13 @@ class GradebookImporter
   end
 
   def valid_context?(context = nil)
-    context && [
-      :students,
-      :assignments,
-      :submissions,
-      :students=,
-      :assignments=,
-      :submissions=
+    context && %i[
+      students
+      assignments
+      submissions
+      students=
+      assignments=
+      submissions=
     ].all? { |m| context.respond_to?(m) }
   end
 

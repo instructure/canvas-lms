@@ -107,7 +107,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       t.send(spec_files_attr, FileList['{gems,vendor}/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*'))
     end
 
-    [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
+    %i[models services controllers views helpers lib selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
       klass.new(sub) do |t|
         t.spec_opts = ['--options', Shellwords.escape(Rails.root.join("spec/spec.opts"))]
@@ -132,13 +132,13 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     # Setup specs for stats
     task :statsetup do
       require 'rails/code_statistics'
-      ::STATS_DIRECTORIES << %w[Model\ specs spec/models] if File.exist?('spec/models')
-      ::STATS_DIRECTORIES << %w[Service\ specs spec/services] if File.exist?('spec/services')
-      ::STATS_DIRECTORIES << %w[View\ specs spec/views] if File.exist?('spec/views')
-      ::STATS_DIRECTORIES << %w[Controller\ specs spec/controllers] if File.exist?('spec/controllers')
-      ::STATS_DIRECTORIES << %w[Helper\ specs spec/helpers] if File.exist?('spec/helpers')
-      ::STATS_DIRECTORIES << %w[Library\ specs spec/lib] if File.exist?('spec/lib')
-      ::STATS_DIRECTORIES << %w[Routing\ specs spec/lib] if File.exist?('spec/routing')
+      ::STATS_DIRECTORIES << ['Model specs', 'spec/models'] if File.exist?('spec/models')
+      ::STATS_DIRECTORIES << ['Service specs', 'spec/services'] if File.exist?('spec/services')
+      ::STATS_DIRECTORIES << ['View specs', 'spec/views'] if File.exist?('spec/views')
+      ::STATS_DIRECTORIES << ['Controller specs', 'spec/controllers'] if File.exist?('spec/controllers')
+      ::STATS_DIRECTORIES << ['Helper specs', 'spec/helpers'] if File.exist?('spec/helpers')
+      ::STATS_DIRECTORIES << ['Library specs', 'spec/lib'] if File.exist?('spec/lib')
+      ::STATS_DIRECTORIES << ['Routing specs', 'spec/lib'] if File.exist?('spec/routing')
       ::CodeStatistics::TEST_TYPES << "Model specs" if File.exist?('spec/models')
       ::CodeStatistics::TEST_TYPES << "Service specs" if File.exist?('spec/services')
       ::CodeStatistics::TEST_TYPES << "View specs" if File.exist?('spec/views')

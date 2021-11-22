@@ -388,7 +388,7 @@ describe "Outcomes API", type: :request do
                 :format => 'json'
               )
               json = controller.outcome_json(@outcome, @account_user.user, session)
-              ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
+              %w[points_possible mastery_points ratings calculation_method calculation_int].each do |key|
                 expect(json).not_to have_key(key)
               end
             end

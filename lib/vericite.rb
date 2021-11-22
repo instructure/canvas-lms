@@ -81,9 +81,9 @@ module VeriCite
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = 'immediate' unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
 
-        [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+        %i[exclude_quoted exclude_self_plag store_in_index].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end

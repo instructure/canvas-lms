@@ -47,7 +47,7 @@ class UserMerge
 
       items = []
       if target_user.avatar_state == :none && from_user.avatar_state != :none
-        [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+        %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
           items << merge_data.items.new(user: from_user, item_type: attr.to_s, item: from_user[attr]) if from_user[attr]
           target_user[attr] = from_user[attr]
         end
@@ -81,7 +81,7 @@ class UserMerge
       end
     end
 
-    [:strong, :weak, :shadow].each do |strength|
+    %i[strong weak shadow].each do |strength|
       from_user.associated_shards(strength).each do |shard|
         target_user.associate_with_shard(shard, strength)
       end
@@ -273,7 +273,7 @@ class UserMerge
   def move_existing_past_lti_ids
     existing_past_ids = target_user.past_lti_ids.select(:context_id, :context_type).shard(target_user).group_by(&:context_type)
     if existing_past_ids.present?
-      ['Group', 'Account', 'Course'].each do |klass|
+      %w[Group Account Course].each do |klass|
         next unless existing_past_ids[klass]
 
         Shard.partition_by_shard(existing_past_ids[klass]) do |shard_past_ids|

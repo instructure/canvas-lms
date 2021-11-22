@@ -947,13 +947,13 @@ describe GradebookImporter do
       end
 
       it "a submission only has specified keys" do
-        keys = ["assignment_id", "grade", "gradeable", "original_grade"]
+        keys = %w[assignment_id grade gradeable original_grade]
         expect(submission.keys.sort).to eql(keys)
       end
 
       it "an assignment only has specified keys" do
-        keys = [:grading_type, :id, :points_possible, :previous_id,
-                :title]
+        keys = %i[grading_type id points_possible previous_id
+                  title]
         expect(assignment.keys.sort).to eql(keys)
       end
     end

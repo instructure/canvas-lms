@@ -26,7 +26,7 @@ describe SharedBrandConfig, type: :model do
     end
 
     it "DOES allow authorized users to delete/modify" do
-      expect(subject.check_policy(account_admin_user)).to eq([:create, :update, :delete])
+      expect(subject.check_policy(account_admin_user)).to eq(%i[create update delete])
     end
   end
 end

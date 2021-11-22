@@ -112,7 +112,7 @@
 #
 class RoleOverridesController < ApplicationController
   before_action :require_context
-  before_action :require_role, :only => [:activate_role, :remove_role, :update, :show]
+  before_action :require_role, :only => %i[activate_role remove_role update show]
   before_action :set_js_env_for_current_account
 
   # @API List roles

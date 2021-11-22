@@ -61,7 +61,7 @@ module Polling
     end
 
     def student_keys
-      [:id, :is_published, :course_id, :course_section_id, :created_at, :poll_id, :has_submitted, :poll_submissions]
+      %i[id is_published course_id course_section_id created_at poll_id has_submitted poll_submissions]
     end
   end
 end

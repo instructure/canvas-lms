@@ -22,7 +22,7 @@ module Api::V1::ModerationGrader
   include Api::V1::Json
 
   def moderation_graders_json(assignment, user, session)
-    states = ['inactive', 'completed', 'deleted', 'invited']
+    states = %w[inactive completed deleted invited]
     active_user_ids = assignment.course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
 
     provisional_graders = assignment.provisional_moderation_graders

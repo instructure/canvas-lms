@@ -74,7 +74,7 @@ module Assignments
 
     def needs_moderated_grading_count
       level = visibility_level
-      return 0 unless [:full, :limited, :sections, :sections_limited].include?(level)
+      return 0 unless %i[full limited sections sections_limited].include?(level)
 
       # ignore submissions this user has graded
       graded_sub_ids = assignment.submissions.joins(:provisional_grades)

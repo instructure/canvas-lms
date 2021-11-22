@@ -48,7 +48,7 @@
 #     }
 class Bookmarks::BookmarksController < ApplicationController
   before_action :require_user
-  before_action :find_bookmark, :only => [:show, :update, :destroy]
+  before_action :find_bookmark, :only => %i[show update destroy]
 
   # @API List bookmarks
   # Returns the paginated list of bookmarks.

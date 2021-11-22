@@ -32,7 +32,7 @@ class ExternalFeed < ActiveRecord::Base
   validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
   validates :url,
-            uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
+            uniqueness: { scope: %i[context_id context_type verbosity header_match] },
             length: { maximum: maximum_string_length }
 
   VERBOSITIES = %w[full link_only truncate].freeze

@@ -172,7 +172,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     # we need to select the quiz_questions from the questions we can know the student has
     # seen.
     def aggregate_quiz_data_from_events(qs, events)
-      question_events = events.select { |e| ["question_answered", "question_viewed", "question_flagged"].include?(e.event_type) }
+      question_events = events.select { |e| %w[question_answered question_viewed question_flagged].include?(e.event_type) }
       seen_question_ids = []
       question_events.each do |event|
         seen_question_ids << if event.event_type == "question_viewed"

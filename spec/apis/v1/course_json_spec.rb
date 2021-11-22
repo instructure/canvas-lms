@@ -522,7 +522,7 @@ module Api
 
         it 'tacks on any includes' do
           includes << :some << :other << :keys
-          expect(course_json.allowed_attributes).to eq(CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys])
+          expect(course_json.allowed_attributes).to eq(CourseJson::BASE_ATTRIBUTES + %i[some other keys])
         end
       end
 
@@ -597,7 +597,7 @@ module Api
       describe '#initialization' do
         let(:enrollments) { double(:enrollments) }
         let(:hash) { { :a => '1', :b => '2' } }
-        let(:includes) { ['these', 'three', 'keys'] }
+        let(:includes) { %w[these three keys] }
 
         before do
           @json = CourseJson.new(course, user, includes, enrollments) { hash }
@@ -620,7 +620,7 @@ module Api
         describe '#includes' do
           subject { super().includes }
 
-          it { is_expected.to eq [:these, :three, :keys] }
+          it { is_expected.to eq %i[these three keys] }
         end
 
         describe '#enrollments' do

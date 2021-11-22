@@ -38,7 +38,7 @@ module Lti
 
     validates :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context, presence: true
     validates :guid, uniqueness: true
-    validates :workflow_state, inclusion: { in: ['active', 'deleted', 'disabled'] }
+    validates :workflow_state, inclusion: { in: %w[active deleted disabled] }
 
     def active_in_context?(context)
       self.class.find_active_proxies_for_context(context).include?(self)

@@ -5759,7 +5759,7 @@ describe 'Submissions API', type: :request do
     end
 
     it 'doesnt show submissions from various inactive types of enrollments' do
-      inactive = ['deleted', 'rejected', 'inactive', 'invited']
+      inactive = %w[deleted rejected inactive invited]
 
       @student4 = student_in_course(:active_all => true).user
       enrollment = @section.enroll_user(@student4, 'StudentEnrollment', 'active')

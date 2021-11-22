@@ -37,11 +37,11 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'emailAddress',
-      'firstName',
-      'id',
-      'lastName',
+    %w[
+      emailAddress
+      firstName
+      id
+      lastName
     ].freeze
   end
 

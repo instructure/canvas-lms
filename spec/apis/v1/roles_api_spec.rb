@@ -450,21 +450,21 @@ describe "Roles API", type: :request do
         @account.root_account.disable_feature!(:granular_permissions_manage_users)
         @account.root_account.disable_feature!(:granular_permissions_manage_courses)
         @account.root_account.disable_feature!(:granular_permissions_manage_groups)
-        @expected_permissions = [
-          "become_user", "change_course_state", "create_collaborations",
-          "create_conferences", "manage_account_memberships",
-          "manage_account_settings", "manage_admin_users", "manage_alerts",
-          "manage_assignments", "manage_calendar", "manage_content",
-          "manage_courses", "manage_files_add", "manage_files_edit", "manage_files_delete",
-          "manage_grades", "manage_groups", "manage_interaction_alerts", "manage_outcomes",
-          "manage_role_overrides", "manage_sections_add", "manage_sections_edit",
-          "manage_sections_delete", "manage_sis", "manage_students", "manage_user_logins",
-          "manage_wiki_create", "manage_wiki_delete", "manage_wiki_update",
-          "moderate_forum", "post_to_forum",
-          "read_course_content", "read_course_list", "read_forum",
-          "read_question_banks", "read_reports", "read_roster",
-          "read_sis", "send_messages", "view_all_grades", "view_group_pages",
-          "view_statistics"
+        @expected_permissions = %w[
+          become_user change_course_state create_collaborations
+          create_conferences manage_account_memberships
+          manage_account_settings manage_admin_users manage_alerts
+          manage_assignments manage_calendar manage_content
+          manage_courses manage_files_add manage_files_edit manage_files_delete
+          manage_grades manage_groups manage_interaction_alerts manage_outcomes
+          manage_role_overrides manage_sections_add manage_sections_edit
+          manage_sections_delete manage_sis manage_students manage_user_logins
+          manage_wiki_create manage_wiki_delete manage_wiki_update
+          moderate_forum post_to_forum
+          read_course_content read_course_list read_forum
+          read_question_banks read_reports read_roster
+          read_sis send_messages view_all_grades view_group_pages
+          view_statistics
         ]
       end
 
@@ -496,18 +496,18 @@ describe "Roles API", type: :request do
 
         # no longer have manage_admin_users or manage_students, instead we have the new ones
         expected_perms = @expected_permissions - ["manage_admin_users", "manage_students"]
-        expected_perms += [
-          "allow_course_admin_actions",
-          "add_teacher_to_course",
-          "add_ta_to_course",
-          "add_designer_to_course",
-          "add_student_to_course",
-          "add_observer_to_course",
-          "remove_teacher_from_course",
-          "remove_ta_from_course",
-          "remove_designer_from_course",
-          "remove_student_from_course",
-          "remove_observer_from_course"
+        expected_perms += %w[
+          allow_course_admin_actions
+          add_teacher_to_course
+          add_ta_to_course
+          add_designer_to_course
+          add_student_to_course
+          add_observer_to_course
+          remove_teacher_from_course
+          remove_ta_from_course
+          remove_designer_from_course
+          remove_student_from_course
+          remove_observer_from_course
         ]
 
         json = api_call_with_settings
@@ -535,12 +535,12 @@ describe "Roles API", type: :request do
       it "returns the expected json format with granular manage courses permission on" do
         @account.root_account.enable_feature!(:granular_permissions_manage_courses)
         expected_perms = @expected_permissions - ["manage_courses", "change_course_state"]
-        expected_perms += [
-          "manage_courses_add",
-          "manage_courses_admin",
-          "manage_courses_publish",
-          "manage_courses_conclude",
-          "manage_courses_delete"
+        expected_perms += %w[
+          manage_courses_add
+          manage_courses_admin
+          manage_courses_publish
+          manage_courses_conclude
+          manage_courses_delete
         ]
 
         json = api_call_with_settings
@@ -568,10 +568,10 @@ describe "Roles API", type: :request do
       it "returns the expected json format with granular manage groups permission on" do
         @account.root_account.enable_feature!(:granular_permissions_manage_groups)
         expected_perms = @expected_permissions - ["manage_groups"]
-        expected_perms += [
-          "manage_groups_add",
-          "manage_groups_manage",
-          "manage_groups_delete"
+        expected_perms += %w[
+          manage_groups_add
+          manage_groups_manage
+          manage_groups_delete
         ]
 
         json = api_call_with_settings

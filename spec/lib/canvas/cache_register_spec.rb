@@ -90,7 +90,7 @@ describe Canvas::CacheRegister do
     context "for a single record" do
       it "updates specified cache types" do
         Timecop.freeze(time1) do
-          [:enrollments, :account_users, :groups].each do |k|
+          %i[enrollments account_users groups].each do |k|
             @user.cache_key(k)
           end
         end

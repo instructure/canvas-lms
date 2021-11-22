@@ -919,7 +919,7 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
       overrides = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
       expect(overrides.class).to eq Hash
-      expect(overrides.keys.to_set).to eq [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].to_set
+      expect(overrides.keys.to_set).to eq %i[due_at all_day all_day_date unlock_at lock_at].to_set
     end
 
     it "uses raw UTC time for datetime fields" do

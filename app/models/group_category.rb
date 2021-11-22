@@ -521,7 +521,7 @@ class GroupCategory < ActiveRecord::Base
     groups.preload(:group_memberships).find_each do |group|
       new_group = group.dup
       new_group.group_category = new_group_category
-      [:sis_batch_id, :sis_source_id, :uuid, :wiki_id].each do |attr|
+      %i[sis_batch_id sis_source_id uuid wiki_id].each do |attr|
         new_group[attr] = nil
       end
       new_group.save!

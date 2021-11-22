@@ -292,7 +292,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   include SubmittablesGradingPeriodProtection
 
   before_action :require_context
-  before_action :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
+  before_action :require_quiz, :only => %i[show update destroy reorder validate_access_code]
   before_action :check_differentiated_assignments, :only => [:show]
 
   # @API List quizzes in a course

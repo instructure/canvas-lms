@@ -98,12 +98,12 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, [
-    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit, :disable_timer_autosubmission,
-    :anonymous_submissions, :scoring_policy, :allowed_attempts, :hide_results,
-    :one_time_results, :show_correct_answers, :show_correct_answers_last_attempt,
-    :show_correct_answers_at, :hide_correct_answers_at, :one_question_at_a_time,
-    :cant_go_back, :access_code, :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results
+  restrict_columns :settings, %i[
+    quiz_type assignment_group_id shuffle_answers time_limit disable_timer_autosubmission
+    anonymous_submissions scoring_policy allowed_attempts hide_results
+    one_time_results show_correct_answers show_correct_answers_last_attempt
+    show_correct_answers_at hide_correct_answers_at one_question_at_a_time
+    cant_go_back access_code ip_filter require_lockdown_browser require_lockdown_browser_for_results
   ]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
@@ -153,11 +153,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     @update_existing_submissions = true if for_assignment? && quiz_type_changed?
     @stored_questions = nil
 
-    [
-      :shuffle_answers, :disable_timer_autosubmission, :could_be_locked, :anonymous_submissions,
-      :require_lockdown_browser, :require_lockdown_browser_for_results,
-      :one_question_at_a_time, :cant_go_back, :require_lockdown_browser_monitor,
-      :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
+    %i[
+      shuffle_answers disable_timer_autosubmission could_be_locked anonymous_submissions
+      require_lockdown_browser require_lockdown_browser_for_results
+      one_question_at_a_time cant_go_back require_lockdown_browser_monitor
+      only_visible_to_overrides one_time_results show_correct_answers_last_attempt
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self[:show_correct_answers] = true if self[:show_correct_answers].nil?
   end
@@ -191,7 +191,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       overrides_params[:assignment_id] = assignment_id
     end
 
-    fields = [:assignment_version, :assignment_id, :quiz_version, :quiz_id]
+    fields = %i[assignment_version assignment_id quiz_version quiz_id]
     overrides.flatten.each do |override|
       fields.each do |field|
         override.send(:"#{field}=", overrides_params[field])
@@ -208,7 +208,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # There is no need to create a new assignment if the quiz being deleted
     return if workflow_state == 'deleted'
 
-    if !assignment_id && graded? && (force || ![:assignment, :clone, :migration].include?(@saved_by))
+    if !assignment_id && graded? && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= context.assignments.build(:title => title, :due_at => due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -1276,7 +1276,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.non_shuffled_questions
-    ["true_false_question", "matching_question", "fill_in_multiple_blanks_question"]
+    %w[true_false_question matching_question fill_in_multiple_blanks_question]
   end
 
   def self.shuffleable_question_type?(question_type)

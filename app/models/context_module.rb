@@ -26,7 +26,7 @@ class ContextModule < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
-  restrict_columns :settings, [:prerequisites, :completion_requirements, :requirement_count, :require_sequential_progress]
+  restrict_columns :settings, %i[prerequisites completion_requirements requirement_count require_sequential_progress]
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, :class_name => 'Account'

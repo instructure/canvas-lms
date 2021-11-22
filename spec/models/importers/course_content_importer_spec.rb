@@ -75,7 +75,7 @@ describe Course do
 
       # discussion topic tests
       expect(@course.discussion_topics.length).to eq(3)
-      migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
+      migration_ids = %w[1864019689002 1865116155002 4488523052421].sort
       added_migration_ids = @course.discussion_topics.map(&:migration_id).uniq.sort
       expect(added_migration_ids).to eq(migration_ids)
       topic = @course.discussion_topics.where(migration_id: "1864019689002").first
@@ -114,7 +114,7 @@ describe Course do
       @course.reload
       expect(@course.assignments.length).to eq 4
       expect(@course.assignments.map(&:migration_id).sort).to(
-        eq(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
+        eq(%w[1865116155002 1865116014002 4407365899221 4469882339231].sort)
       )
       # assignment with due date
       assignment = @course.assignments.where(migration_id: "1865116014002").first

@@ -38,10 +38,10 @@ class GradebookSettingsController < ApplicationController
   def gradebook_settings_params
     gradebook_settings_params = params.require(:gradebook_settings).permit(
       {
-        filter_columns_by: [
-          :context_module_id,
-          :grading_period_id,
-          :assignment_group_id
+        filter_columns_by: %i[
+          context_module_id
+          grading_period_id
+          assignment_group_id
         ],
         filter_rows_by: [
           :section_id,
@@ -60,7 +60,7 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_setting_key,
       :sort_rows_by_direction,
       :view_ungraded_as_zero,
-      { colors: [:late, :missing, :resubmitted, :dropped, :excused] }
+      { colors: %i[late missing resubmitted dropped excused] }
     )
     gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]
     gradebook_settings_params.permit!

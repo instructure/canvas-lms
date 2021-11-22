@@ -406,7 +406,7 @@ describe "admin settings tab" do
 
     it "does not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
       Account.default.save!
 
@@ -417,12 +417,12 @@ describe "admin settings tab" do
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
     end
 
     it "preserves the default help links if the account hasn't been configured with the new ui yet" do
-      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"] }
+      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => %w[user student teacher] }
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
@@ -468,7 +468,7 @@ describe "admin settings tab" do
           "type" => "custom",
           "is_featured" => true,
           "is_new" => false,
-          "available_to" => ["user", "student", "teacher", "admin", "observer", "unenrolled"]
+          "available_to" => %w[user student teacher admin observer unenrolled]
         }
       )
     end
@@ -496,7 +496,7 @@ describe "admin settings tab" do
 
     it "edits a custom link" do
       a = Account.default
-      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => ["user", "student", "teacher", "admin"] }]
+      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => %w[user student teacher admin] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click

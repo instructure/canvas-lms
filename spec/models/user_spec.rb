@@ -1556,12 +1556,12 @@ describe User do
       expect(User.name_parts('John St. Clair')).to eq ['John St.', 'Clair', nil]
       expect(User.name_parts('Jefferson Thomas Cutrer IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Jefferson Thomas Cutrer, IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
-      expect(User.name_parts('Cutrer, Jefferson, IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson, IV')).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts('Cutrer, Jefferson, IV',
-                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
-      expect(User.name_parts('Cutrer, Jefferson IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+                             likely_already_surname_first: true)).to eq %w[Jefferson Cutrer IV]
+      expect(User.name_parts('Cutrer, Jefferson IV')).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts('Cutrer, Jefferson IV',
-                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
+                             likely_already_surname_first: true)).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts(nil)).to eq [nil, nil, nil]
       expect(User.name_parts('Bob')).to eq ['Bob', nil, nil]
       expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]

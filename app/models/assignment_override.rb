@@ -42,9 +42,9 @@ class AssignmentOverride < ActiveRecord::Base
   concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
   validates :set, :set_id, presence: { :if => concrete_set }
-  validates :set_id, uniqueness: { :scope => [:assignment_id, :set_type, :workflow_state],
+  validates :set_id, uniqueness: { :scope => %i[assignment_id set_type workflow_state],
                                    :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) } }
-  validates :set_id, uniqueness: { :scope => [:quiz_id, :set_type, :workflow_state],
+  validates :set_id, uniqueness: { :scope => %i[quiz_id set_type workflow_state],
                                    :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id

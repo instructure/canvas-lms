@@ -129,7 +129,7 @@ module Api
                       'sis_integration_id' => 'integration_id',
                       'lti_context_id' => 'lti_context_id',
                       'uuid' => 'uuid' }.freeze,
-        :is_not_scoped_to_account => ['id', 'lti_context_id', 'uuid'].freeze,
+        :is_not_scoped_to_account => %w[id lti_context_id uuid].freeze,
         :scope => 'root_account_id' }.freeze,
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id',
@@ -418,8 +418,8 @@ module Api
     }
   end
 
-  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
-  LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
+  PAGINATION_PARAMS = %i[current next prev first last].freeze
+  LINK_PRIORITY = %i[next last prev current first].freeze
   EXCLUDE_IN_PAGINATION_LINKS = %w[page per_page access_token api_key].freeze
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)

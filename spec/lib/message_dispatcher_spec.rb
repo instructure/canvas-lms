@@ -66,7 +66,7 @@ describe 'MessageDispatcher' do
       expect(created_jobs.size).to eq 1
       job2 = created_jobs.first
       @messages.each(&:reload)
-      expect(@messages.map(&:state)).to eq [:cancelled, :staged, :sent]
+      expect(@messages.map(&:state)).to eq %i[cancelled staged sent]
       expect(@messages[1].dispatch_at).to be > Time.now.utc + 4.minutes
       # the original job is complete, but the individual message gets re-scheduled in its own job
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)

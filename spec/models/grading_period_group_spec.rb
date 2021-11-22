@@ -278,7 +278,7 @@ describe GradingPeriodGroup do
   end
 
   describe "permissions" do
-    let(:permissions) { [:read, :create, :update, :delete] }
+    let(:permissions) { %i[read create update delete] }
 
     context "course belonging to root account" do
       before :once do

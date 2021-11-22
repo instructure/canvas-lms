@@ -68,7 +68,7 @@ module CanvasErrors
   # to ":error" and (much like log levels), can trigger different
   # reporting outcomes in the callbacks. expected member of ERROR_LEVELS.
   # Registered callbacks can decide what to do about different levels.
-  ERROR_LEVELS = [:info, :warn, :error].freeze
+  ERROR_LEVELS = %i[info warn error].freeze
   def self.capture(exception, data = {}, level = :error)
     unless ERROR_LEVELS.include?(level)
       Rails.logger.warn("[ERRORS] error level #{level} is not supported, defaulting to :error")

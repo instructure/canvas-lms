@@ -42,7 +42,7 @@ module Canvas::ICU
     suffix = ICU::Lib.figure_suffix(ICU::Lib.load_icu)
 
     unless ICU::Lib.respond_to?(:ucol_getSortKey)
-      ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", [:pointer, :pointer, :int, :pointer, :int], :int)
+      ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", %i[pointer pointer int pointer int], :int)
 
       ICU::Collation::Collator.class_eval do
         def collation_key(string)
@@ -56,8 +56,8 @@ module Canvas::ICU
     end
 
     unless ICU::Lib.respond_to?(:ucol_getAttribute)
-      ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
-      ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void)
+      ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", %i[pointer int pointer], :int)
+      ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", %i[pointer int int pointer], :void)
 
       class ICU::Collation::Collator
         def [](attribute)

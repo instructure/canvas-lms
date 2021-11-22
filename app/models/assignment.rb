@@ -276,8 +276,8 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    [:migration_id, :lti_context_id, :turnitin_id,
-     :discussion_topic, :integration_id, :integration_data].each do |attr|
+    %i[migration_id lti_context_id turnitin_id
+       discussion_topic integration_id integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -948,13 +948,13 @@ class Assignment < ActiveRecord::Base
     end
     self.submission_types ||= "none"
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    [
-      :all_day, :could_be_locked, :grade_group_students_individually,
-      :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
-      :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
-      :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
-      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews,
-      :anonymous_grading
+    %i[
+      all_day could_be_locked grade_group_students_individually
+      anonymous_peer_reviews turnitin_enabled vericite_enabled
+      moderated_grading omit_from_final_grade freeze_on_copy
+      copied only_visible_to_overrides post_to_sis peer_reviews_assigned
+      peer_reviews automatic_peer_reviews muted intra_group_peer_reviews
+      anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -3961,7 +3961,7 @@ class Assignment < ActiveRecord::Base
   def instructor_selectable_states
     return {} unless moderated_grading?
 
-    states = ['inactive', 'completed', 'deleted', 'invited']
+    states = %w[inactive completed deleted invited]
     active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)

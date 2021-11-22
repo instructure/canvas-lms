@@ -98,7 +98,7 @@ class ContentExportsController < ApplicationController
   private
 
   def render_export(export)
-    json = export.as_json(:only => [:id, :progress, :workflow_state], :methods => [:error_message])
+    json = export.as_json(:only => %i[id progress workflow_state], :methods => [:error_message])
     json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
     render :json => json
   end

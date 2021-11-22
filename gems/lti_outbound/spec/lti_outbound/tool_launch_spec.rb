@@ -260,7 +260,7 @@ describe LtiOutbound::ToolLaunch do
       } }
       hash = tool_launch.generate
       expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq(
-        ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
+        %w[custom___taa____ custom_bob custom_canvas_enrollment_state custom_fred custom_john]
       )
       expect(hash['custom_bob']).to eql('bob')
       expect(hash['custom_fred']).to eql('fred')
@@ -347,7 +347,7 @@ describe LtiOutbound::ToolLaunch do
     it 'includes role_scope_mentor if user is observer and privacy level is public' do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
       user.current_roles = [LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').last]
-      user.current_observee_ids = ['1', '2', '3']
+      user.current_observee_ids = %w[1 2 3]
       hash = tool_launch.generate
       expect(hash['role_scope_mentor']).to eq '1,2,3'
     end

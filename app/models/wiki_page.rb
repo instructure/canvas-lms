@@ -88,7 +88,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   TITLE_LENGTH = 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = %i[workflow_state editing_roles notify_of_update].freeze
 
   self.ignored_columns = %i[view_count]
 

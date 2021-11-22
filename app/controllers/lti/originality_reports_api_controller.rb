@@ -120,7 +120,7 @@ module Lti
         id: ORIGINALITY_REPORT_SERVICE,
         endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
         format: ['application/json'].freeze,
-        action: ['POST', 'PUT', 'GET'].freeze
+        action: %w[POST PUT GET].freeze
       }.freeze
     ].freeze
 
@@ -283,12 +283,12 @@ module Lti
     end
 
     def update_attributes
-      [
-        :error_message,
-        :originality_report_file_id,
-        :originality_report_url,
-        :originality_score,
-        :workflow_state
+      %i[
+        error_message
+        originality_report_file_id
+        originality_report_url
+        originality_score
+        workflow_state
       ].freeze
     end
 

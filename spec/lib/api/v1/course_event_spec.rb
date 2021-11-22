@@ -79,7 +79,7 @@ describe Api::V1::CourseEvent do
     expect(event[:event_data]).to eq @event.event_data
     expect(event[:event_source]).to eq @event.event_source
 
-    expect(event[:links].keys.sort).to eq [:course, :page_view, :sis_batch, :user]
+    expect(event[:links].keys.sort).to eq %i[course page_view sis_batch user]
 
     expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
     expect(event[:links][:page_view]).to eq @page_view.id
@@ -93,7 +93,7 @@ describe Api::V1::CourseEvent do
   it "is formatted as an array of compound course content event hashes" do
     json_hash = course_events_compound_json(@events, @user, @session)
 
-    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq %i[events linked links]
 
     expect(json_hash[:links]).to eq({
                                       "events.course" => "#{url_root}/api/v1/courses/{events.course}",
@@ -104,7 +104,7 @@ describe Api::V1::CourseEvent do
     expect(json_hash[:events]).to eq course_events_json(@events, @user, @session)
 
     linked = json_hash[:linked]
-    expect(linked.keys.sort).to eq [:courses, :page_views, :users]
+    expect(linked.keys.sort).to eq %i[courses page_views users]
     expect(linked[:courses].size).to eql(1)
     expect(linked[:users].size).to eql(1)
     expect(linked[:page_views].size).to eql(1)
@@ -113,11 +113,11 @@ describe Api::V1::CourseEvent do
   it "handles an empty result set" do
     json_hash = course_events_compound_json([], @user, @session)
 
-    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq %i[events linked links]
     expect(json_hash[:events]).to eq course_events_json([], @user, @session)
 
     linked = json_hash[:linked]
-    expect(linked.keys.sort).to eq [:courses, :page_views, :users]
+    expect(linked.keys.sort).to eq %i[courses page_views users]
     expect(linked[:courses].size).to be_zero
     expect(linked[:users].size).to be_zero
     expect(linked[:page_views].size).to be_zero

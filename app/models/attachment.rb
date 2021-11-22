@@ -34,8 +34,8 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  PERMITTED_ATTRIBUTES = [:filename, :display_name, :locked, :position, :lock_at,
-                          :unlock_at, :uploaded_data, :hidden, :viewed_at].freeze
+  PERMITTED_ATTRIBUTES = %i[filename display_name locked position lock_at
+                            unlock_at uploaded_data hidden viewed_at].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
@@ -50,7 +50,7 @@ class Attachment < ActiveRecord::Base
   include SearchTermHelper
   include MasterCourses::Restrictor
   restrict_columns :content, [:display_name, :uploaded_data]
-  restrict_columns :settings, [:folder_id, :locked, :lock_at, :unlock_at, :usage_rights_id]
+  restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 
   attr_accessor :podcast_associated_asset
@@ -505,7 +505,7 @@ class Attachment < ActiveRecord::Base
     self.folder_id ||= Folder.unfiled_folder(context).id rescue nil
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if root_attachment && new_record?
-      [:md5, :size, :content_type].each do |key|
+      %i[md5 size content_type].each do |key|
         send("#{key}=", root_attachment.send(key))
       end
       self.workflow_state = 'processed'
@@ -1896,7 +1896,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.serialization_methods
-    [:mime_class, :currently_locked, :crocodoc_available?]
+    %i[mime_class currently_locked crocodoc_available?]
   end
   cattr_accessor :skip_thumbnails
 

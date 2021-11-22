@@ -84,7 +84,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def grade_attributes
     as_json(:only => ModeratedGrading::GRADE_ATTRIBUTES_ONLY,
-            :methods => [:provisional_grade_id, :grade_matches_current_submission, :entered_score, :entered_grade],
+            :methods => %i[provisional_grade_id grade_matches_current_submission entered_score entered_grade],
             :include_root => false)
   end
 

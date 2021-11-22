@@ -165,7 +165,7 @@ class ErrorReport < ActiveRecord::Base
     end
   end
 
-  PROTECTED_FIELDS = [:id, :created_at, :updated_at, :data].freeze
+  PROTECTED_FIELDS = %i[id created_at updated_at data].freeze
 
   # assigns data attributes to the column if there's a column with that name,
   # otherwise goes into the general data hash

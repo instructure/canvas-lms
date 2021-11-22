@@ -96,7 +96,7 @@ describe "course rubrics" do
       f('#right-side .edit_rubric_link').click
       replace_content(fj(".criterion_points:visible"), "50")
       fj(".criterion_points:visible").send_keys(:return)
-      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["50", "15", "0"]
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[50 15 0]
 
       replace_content(fj(".criterion_points:visible"), "25")
       fj(".criterion_points:visible").send_keys(:return)
@@ -105,7 +105,7 @@ describe "course rubrics" do
       replace_content(fj(".criterion_points:visible"), "10")
       fj(".criterion_points:visible").send_keys(:return)
       submit_form("#edit_rubric_form")
-      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "3", "0"]
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[10 3 0]
     end
 
     it "does not show an error when adjusting from 0 points" do
@@ -115,7 +115,7 @@ describe "course rubrics" do
       replace_content(fj(".criterion_points:visible"), "10")
       fj(".criterion_points:visible").send_keys(:return)
       submit_form("#edit_rubric_form")
-      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "5", "0"]
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq %w[10 5 0]
     end
 
     it "does not display the edit form more than once" do

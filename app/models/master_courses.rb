@@ -33,7 +33,7 @@ module MasterCourses
 
   MIGRATION_ID_PREFIX = "mastercourse_"
 
-  LOCK_TYPES = [:content, :settings, :points, :due_dates, :availability_dates, :state].freeze
+  LOCK_TYPES = %i[content settings points due_dates availability_dates state].freeze
 
   RESTRICTED_OBJECT_TYPES = %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage].freeze
 end

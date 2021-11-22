@@ -41,7 +41,7 @@
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
 
-  TRACK_SETTABLE_ATTRIBUTES = [:kind, :locale, :content].freeze
+  TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
   # @API List media tracks for a Media Object
   #
@@ -72,7 +72,7 @@ class MediaTracksController < ApplicationController
         :user_id => t.user_id
       }
       if params[:include].present?
-        whitelist = ["content", "webvtt_content", "updated_at", "created_at"]
+        whitelist = %w[content webvtt_content updated_at created_at]
         params[:include].each do |field|
           track[field] = t[field] if whitelist.include? field
         end

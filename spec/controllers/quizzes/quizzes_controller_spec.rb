@@ -299,7 +299,7 @@ describe Quizzes::QuizzesController do
       end
 
       let_once(:workflow_states) do
-        [:unpublished, :published, :unpublished, :published]
+        %i[unpublished published unpublished published]
       end
 
       let_once(:tool) do

@@ -27,10 +27,10 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
 
-  PRELOADS = [:external_tool_tag,
-              :duplicate_of,
-              :rubric,
-              :rubric_association].freeze
+  PRELOADS = %i[external_tool_tag
+                duplicate_of
+                rubric
+                rubric_association].freeze
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w[
@@ -432,7 +432,7 @@ module Api::V1::Assignment
 
   def turnitin_settings_json(assignment)
     settings = assignment.turnitin_settings.with_indifferent_access
-    [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
+    %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
 
@@ -451,7 +451,7 @@ module Api::V1::Assignment
 
   def vericite_settings_json(assignment)
     settings = assignment.vericite_settings.with_indifferent_access
-    [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+    %i[exclude_quoted exclude_self_plag store_in_index].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
 
@@ -616,7 +616,7 @@ module Api::V1::Assignment
 
   # validate that date and times are iso8601
   def assignment_dates_valid?(assignment, assignment_params)
-    errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
+    errors = %w[due_at lock_at unlock_at peer_reviews_assign_at].map do |v|
       next unless assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
 
       assignment.errors.add("assignment[#{v}]",

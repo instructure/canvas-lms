@@ -31,7 +31,7 @@ describe "feature_flag_definition_spec" do
   end
 
   FeatureFlags::Loader.load_yaml_files.each do |name, definition|
-    [:custom_transition_proc, :after_state_change_proc, :visible_on].each do |hook|
+    %i[custom_transition_proc after_state_change_proc visible_on].each do |hook|
       next unless definition[hook]
 
       hook_name = definition[hook]

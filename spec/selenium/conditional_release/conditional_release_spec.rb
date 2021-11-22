@@ -75,10 +75,10 @@ describe 'native canvas conditional release' do
     it 'disables Mastery Paths tab in quizzes for quiz types other than graded' do
       course_quiz
 
-      quiz_types_without_mastery_paths = [
-        :practice_quiz,
-        :graded_survey,
-        :survey
+      quiz_types_without_mastery_paths = %i[
+        practice_quiz
+        graded_survey
+        survey
       ].freeze
 
       quiz_types_without_mastery_paths.each do |type|

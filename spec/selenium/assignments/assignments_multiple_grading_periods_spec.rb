@@ -25,7 +25,7 @@ describe "assignments index grading period filter" do
 
   before(:once) do
     course_with_teacher(:active_all => true, :account => @account, :mgp_flag_enabled => true,
-                        :grading_periods => [:old, :current, :future])
+                        :grading_periods => %i[old current future])
     @assignments = []
     GradingPeriod.for(@course).sort_by(&:start_date).each do |grading_period|
       @assignments << @course.assignments.create!(:name => grading_period.title, :due_at => grading_period.start_date + 1.second)

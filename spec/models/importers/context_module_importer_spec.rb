@@ -199,6 +199,6 @@ describe "Importing modules" do
 
     # new items are appended to the end
     expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4])
-    expect(mod.content_tags.pluck(:title)).to eq(['cats', 'dogs', 'pigs', 'frogs'])
+    expect(mod.content_tags.pluck(:title)).to eq(%w[cats dogs pigs frogs])
   end
 end

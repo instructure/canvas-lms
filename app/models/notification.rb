@@ -42,22 +42,22 @@ class Notification < Switchman::UnshardedRecord
     "Show In Feed",
   ].freeze
 
-  ALLOWED_PUSH_NOTIFICATION_CATEGORIES = [
-    "all_submissions",
-    "announcement",
-    "announcement_created_by_you",
-    "appointment_availability",
-    "appointment_cancelations",
-    "calendar",
-    "conversation_message",
-    "course_content",
-    "discussion_mention",
-    "reported_reply",
-    "due_date",
-    "grading",
-    "invitation",
-    "student_appointment_signups",
-    "submission_comment"
+  ALLOWED_PUSH_NOTIFICATION_CATEGORIES = %w[
+    all_submissions
+    announcement
+    announcement_created_by_you
+    appointment_availability
+    appointment_cancelations
+    calendar
+    conversation_message
+    course_content
+    discussion_mention
+    reported_reply
+    due_date
+    grading
+    invitation
+    student_appointment_signups
+    submission_comment
   ].freeze
 
   ALLOWED_PUSH_NOTIFICATION_TYPES = [

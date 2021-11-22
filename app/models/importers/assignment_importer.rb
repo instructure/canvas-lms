@@ -292,7 +292,7 @@ module Importers
       end
 
       hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
-      [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
+      %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
         if hash.key?(key) && (master_migration || hash[key].present?)
           item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
@@ -310,14 +310,14 @@ module Importers
         item.anonymous_grading = hash[:anonymous_grading]
       end
 
-      [:peer_reviews,
-       :automatic_peer_reviews, :anonymous_peer_reviews,
-       :grade_group_students_individually, :allowed_extensions,
-       :position, :peer_review_count,
-       :omit_from_final_grade, :intra_group_peer_reviews,
-       :grader_count, :grader_comments_visible_to_graders,
-       :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-       :anonymous_instructor_annotations].each do |prop|
+      %i[peer_reviews
+         automatic_peer_reviews anonymous_peer_reviews
+         grade_group_students_individually allowed_extensions
+         position peer_review_count
+         omit_from_final_grade intra_group_peer_reviews
+         grader_count grader_comments_visible_to_graders
+         graders_anonymous_to_graders grader_names_visible_to_final_grader
+         anonymous_instructor_annotations].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 

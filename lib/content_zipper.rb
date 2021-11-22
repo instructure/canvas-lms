@@ -76,7 +76,7 @@ class ContentZipper
     # downloadable submissions below as well as those that can't be
     # downloaded. In that case, only retrieve the ones that can be
     # downloaded.
-    downloadable_submissions = ["online_upload", "online_url", "online_text_entry"]
+    downloadable_submissions = %w[online_upload online_url online_text_entry]
     if @context.completed?
       submissions = assignment.submissions.where(submission_type: downloadable_submissions)
       # This neglects the complexity of group assignments

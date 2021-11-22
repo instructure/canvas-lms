@@ -53,7 +53,7 @@ module Lti
         id: WEBHOOK_SUBSCRIPTION_SERVICE,
         endpoint: 'api/lti/subscriptions',
         format: ['application/json'].freeze,
-        action: ['POST', 'GET', 'PUT', 'DELETE'].freeze
+        action: %w[POST GET PUT DELETE].freeze
       }.freeze
     ].freeze
 

@@ -133,22 +133,22 @@ class FilesController < ApplicationController
   protect_from_forgery :except => [:api_capture, :show_relative], with: :exception
 
   before_action :require_user, only: :create_pending
-  before_action :require_context, except: [
-    :assessment_question_show, :image_thumbnail, :show_thumbnail,
-    :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
-    :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url, :api_capture, :reset_verifier
+  before_action :require_context, except: %i[
+    assessment_question_show image_thumbnail show_thumbnail
+    create_pending s3_success show api_create api_create_success api_create_success_cors
+    api_show api_index destroy api_update api_file_status public_url api_capture reset_verifier
   ]
 
   before_action :check_file_access_flags, only: [:show_relative, :show]
-  before_action :open_cors, only: [
-    :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
+  before_action :open_cors, only: %i[
+    api_create api_create_success api_create_success_cors show_thumbnail
   ]
 
   before_action :open_limited_cors, only: [:show]
 
   skip_before_action :verify_authenticity_token, only: :api_create
-  before_action :verify_api_id, only: [
-    :api_show, :api_create_success, :api_file_status, :api_update, :destroy, :reset_verifier
+  before_action :verify_api_id, only: %i[
+    api_show api_create_success api_file_status api_update destroy reset_verifier
   ]
 
   include Api::V1::Attachment
@@ -164,7 +164,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.temp_record, @current_user, [:create, :update, :delete])
+    if authorized_action(@context.attachments.temp_record, @current_user, %i[create update delete])
       h = ActiveSupport::NumberHelper
       result = {
         :quota => h.number_to_human_size(@quota),
@@ -188,7 +188,7 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, [:create, :update, :delete])
+    if authorized_action(@context.attachments.build, @current_user, %i[create update delete])
       get_quota
       render json: { quota: @quota, quota_used: @quota_used }
     end
@@ -806,7 +806,7 @@ class FilesController < ApplicationController
   # listings.)
   def temporary_file?(asset, intent)
     intent &&
-      !['message', 'attach_discussion_file', 'upload'].include?(intent) &&
+      !%w[message attach_discussion_file upload].include?(intent) &&
       !(asset.is_a?(Assignment) && ['comment', 'submit'].include?(intent))
   end
   protected :temporary_file?
@@ -1086,7 +1086,7 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t 'notices.updated', "File was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render :json => @attachment.as_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => { :user => @current_user, :session => session }), :status => :ok }
+          format.json { render :json => @attachment.as_json(:methods => %i[readable_size mime_class currently_locked], :permissions => { :user => @current_user, :session => session }), :status => :ok }
         else
           format.html { render :edit }
           format.json { render :json => @attachment.errors, :status => :bad_request }

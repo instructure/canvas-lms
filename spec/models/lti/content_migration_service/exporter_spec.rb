@@ -230,7 +230,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     context 'for a partial export' do
       before do
         @options[:selective] = true
-        @exports = @options[:exported_assets] = ['assignment_42', 'learning_outcome_84', 'announcement_21']
+        @exports = @options[:exported_assets] = %w[assignment_42 learning_outcome_84 announcement_21]
         @migrator.start!
       end
 

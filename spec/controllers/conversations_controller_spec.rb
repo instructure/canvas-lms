@@ -370,7 +370,7 @@ describe ConversationsController do
         user_session(@teacher)
       end
 
-      ["1", "true", "yes", "on"].each do |truish|
+      %w[1 true yes on].each do |truish|
         it "creates a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
           post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: truish }
           expect(response).to be_successful

@@ -31,7 +31,7 @@ describe ContentMigration do
 
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
 
-      attrs = [:title, :body, :editing_roles, :todo_date]
+      attrs = %i[title body editing_roles todo_date]
       expect(page.attributes.slice(*attrs)).to eq page_to.attributes.slice(*attrs)
       expect(page_to.body.strip).to eq "<address><ul></ul></address>"
     end

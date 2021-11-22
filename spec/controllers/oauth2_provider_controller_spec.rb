@@ -510,7 +510,7 @@ describe OAuth2ProviderController do
         post :token, params: base_params.merge(code: valid_code)
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
+        expect(json.keys.sort).to match_array %w[access_token refresh_token user expires_in token_type]
         expect(json.dig('user', 'effective_locale')).to eq 'zh-Hant'
       end
 

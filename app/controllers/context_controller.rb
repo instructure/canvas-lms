@@ -70,7 +70,7 @@ class ContextController < ApplicationController
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
       if @context.concluded?
-        sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
+        sections = @context.course_sections.active.select(%i[id course_id name end_at restrict_enrollments_to_section_dates]).preload(:course)
         concluded_sections = sections.select(&:concluded?).map { |s| "section_#{s.id}" }
       else
         sections = @context.course_sections.active.select([:id, :name])
@@ -203,7 +203,7 @@ class ContextController < ApplicationController
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-            render :json => @accesses.map { |a| a.as_json(methods: [:readable_name, :asset_class_name, :icon]) }
+            render :json => @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
           end
         end
       end
@@ -295,9 +295,9 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
-                    :collaborations, :context_modules, :enrollments, :groups,
-                    :quizzes, :rubrics, :wiki_pages, :rubric_associations_with_deleted].freeze
+  WORKFLOW_TYPES = %i[all_discussion_topics assignment_groups assignments
+                      collaborations context_modules enrollments groups
+                      quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
@@ -347,12 +347,12 @@ class ContextController < ApplicationController
 
   def add_enrollment_permissions(context)
     if context.root_account.feature_enabled?(:granular_permissions_manage_users)
-      [
-        :add_teacher_to_course,
-        :add_ta_to_course,
-        :add_designer_to_course,
-        :add_student_to_course,
-        :add_observer_to_course,
+      %i[
+        add_teacher_to_course
+        add_ta_to_course
+        add_designer_to_course
+        add_student_to_course
+        add_observer_to_course
       ]
     else
       [

@@ -111,7 +111,7 @@ describe BrandableCSS do
   end
 
   [true, false].each do |high_contrast|
-    ['js', 'json', 'css'].each do |type|
+    %w[js json css].each do |type|
       describe "save_default!(#{type})" do
         it "writes the default json representation to the default json file" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(false)

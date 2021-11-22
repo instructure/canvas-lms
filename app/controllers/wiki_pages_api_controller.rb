@@ -139,9 +139,9 @@
 class WikiPagesApiController < ApplicationController
   before_action :require_context
   before_action :get_wiki_page, :except => [:create, :index]
-  before_action :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
+  before_action :require_wiki_page, :except => %i[create update update_front_page index]
   before_action :was_front_page, :except => [:index]
-  before_action only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
+  before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
   end
 

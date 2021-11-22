@@ -258,7 +258,7 @@ class Enrollment < ActiveRecord::Base
 
   scope :of_student_type, -> { where(:type => "StudentEnrollment") }
 
-  scope :of_admin_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']) }
+  scope :of_admin_type, -> { where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment]) }
 
   scope :of_instructor_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment']) }
 
@@ -277,7 +277,7 @@ class Enrollment < ActiveRecord::Base
   scope :student_in_claimed_or_available, -> {
                                             select(:course_id)
                                               .joins(:course)
-                                              .where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed', 'created'] })
+                                              .where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => %w[available claimed created] })
                                           }
 
   scope :all_student, -> {
@@ -613,8 +613,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   TYPE_RANKS = {
-    :default => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'],
-    :student => ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
+    :default => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentEnrollment StudentViewEnrollment ObserverEnrollment],
+    :student => %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment ObserverEnrollment]
   }.freeze
   TYPE_RANK_HASHES = TYPE_RANKS.transform_values { |v| rank_hash(v) }
   def self.type_rank_sql(order = :default)
@@ -637,7 +637,7 @@ class Enrollment < ActiveRecord::Base
     STATE_RANK_HASH[state.to_s]
   end
 
-  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted'].freeze
+  STATE_BY_DATE_RANK = ['active', %w[invited creation_pending pending_active pending_invited], 'completed', 'inactive', 'rejected', 'deleted'].freeze
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
     @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state')
@@ -942,7 +942,7 @@ class Enrollment < ActiveRecord::Base
     case type
     when 'ObserverEnrollment',
          'StudentEnrollment'
-      ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'].include?(self.type)
+      %w[TeacherEnrollment TaEnrollment DesignerEnrollment].include?(self.type)
     when 'TaEnrollment'
       ['TeacherEnrollment'].include?(self.type)
     else
@@ -1178,7 +1178,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.typed_enrollment(type)
-    return nil unless ['StudentEnrollment', 'StudentViewEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].include?(type)
+    return nil unless %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment DesignerEnrollment].include?(type)
 
     type.constantize
   end
@@ -1394,7 +1394,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.serialization_excludes
-    [:uuid, :computed_final_score, :computed_current_score]
+    %i[uuid computed_final_score computed_current_score]
   end
 
   # enrollment term per-section is deprecated; a section's term is inherited from the

@@ -75,7 +75,7 @@ module CanvasPartman::Concerns
       attr_reader :partitioning_interval
 
       def partitioning_interval=(value)
-        raise ArgumentError unless [:weeks, :months, :years].include?(value)
+        raise ArgumentError unless %i[weeks months years].include?(value)
 
         @partitioning_interval = value
       end

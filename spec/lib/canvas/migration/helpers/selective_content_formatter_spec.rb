@@ -206,7 +206,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                                      }).to_json)
 
       asgs = @formatter.get_content_list('assignments').second['sub_items']
-      expect(asgs.map { |a| a[:linked_resource][:type] }).to eq ['wiki_pages', 'discussion_topics', 'quizzes']
+      expect(asgs.map { |a| a[:linked_resource][:type] }).to eq %w[wiki_pages discussion_topics quizzes]
       asgs.each do |a|
         asg_mig_id = a[:migration_id]
         linked_mig_id = a[:linked_resource][:migration_id]
@@ -278,11 +278,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       it "lists learning outcomes" do
         outcomes = formatter.get_content_list('learning_outcomes')
         expect(outcomes.pluck(:title)).to match_array(
-          [
-            'alpaca',
-            'moonshine',
-            'speakeasy',
-            'zebra'
+          %w[
+            alpaca
+            moonshine
+            speakeasy
+            zebra
           ]
         )
       end
@@ -302,11 +302,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "lists individual types in expected order" do
         outcomes = formatter.get_content_list('learning_outcomes')
-        expect(outcomes.pluck(:title)).to eq [
-          'beta',
-          'striker',
-          'alpaca',
-          'zebra'
+        expect(outcomes.pluck(:title)).to eq %w[
+          beta
+          striker
+          alpaca
+          zebra
         ]
       end
 
@@ -325,7 +325,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       assignment_quiz([], course: @course, name: "blah").assignment
 
       asgs = formatter.get_content_list('assignments').first[:sub_items]
-      expect(asgs.map { |a| a[:linked_resource][:type] }).to eq ['wiki_pages', 'discussion_topics', 'quizzes']
+      expect(asgs.map { |a| a[:linked_resource][:type] }).to eq %w[wiki_pages discussion_topics quizzes]
       asgs.each do |a|
         asg_mig_id = a[:migration_id]
         linked_mig_id = a[:linked_resource][:migration_id]

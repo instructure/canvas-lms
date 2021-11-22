@@ -2116,7 +2116,7 @@ class Account < ActiveRecord::Base
 
   # Different views are available depending on feature flags
   def dashboard_views
-    ['activity', 'cards', 'planner']
+    %w[activity cards planner]
   end
 
   # Getter/Setter for default_dashboard_view account setting

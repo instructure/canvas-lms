@@ -34,7 +34,7 @@ module Outcomes
     #
     # Returns a relation of the results, suitably ordered.
     def find_outcome_results(user, opts)
-      required_opts = [:users, :context, :outcomes]
+      required_opts = %i[users context outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
       results = LearningOutcomeResult.active.with_active_link.where(

@@ -21,7 +21,7 @@
 module Lti
   class ToolSetting < ActiveRecord::Base
     belongs_to :tool_proxy
-    belongs_to :context, polymorphic: [:course, :account, :attachment_association]
+    belongs_to :context, polymorphic: %i[course account attachment_association]
 
     validates :context, presence: { if: :has_resource_link_id? }
 

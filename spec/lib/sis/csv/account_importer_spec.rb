@@ -81,7 +81,7 @@ describe SIS::CSV::AccountImporter do
     )
     expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
 
-    ['A001', 'A002', 'A003', 'A004'].each do |id|
+    %w[A001 A002 A003 A004].each do |id|
       expect(Account.where(sis_source_id: id).first.parent_account).to eq @account
     end
     expect(Account.where(sis_source_id: 'A002').first.workflow_state).to eq "deleted"

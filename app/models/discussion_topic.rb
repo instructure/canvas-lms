@@ -38,8 +38,8 @@ class DiscussionTopic < ActiveRecord::Base
   include LockedFor
 
   restrict_columns :content, [:title, :message]
-  restrict_columns :settings, [:require_initial_post, :discussion_type, :assignment_id,
-                               :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating, :group_category_id]
+  restrict_columns :settings, %i[require_initial_post discussion_type assignment_id
+                                 pinned locked allow_rating only_graders_can_rate sort_by_rating group_category_id]
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
   restrict_assignment_columns
@@ -206,10 +206,10 @@ class DiscussionTopic < ActiveRecord::Base
     end
     self.lock_at = CanvasTime.fancy_midnight(lock_at&.in_time_zone(context.time_zone))
 
-    [
-      :could_be_locked, :podcast_enabled, :podcast_has_student_posts,
-      :require_initial_post, :pinned, :locked, :allow_rating,
-      :only_graders_can_rate, :sort_by_rating
+    %i[
+      could_be_locked podcast_enabled podcast_has_student_posts
+      require_initial_post pinned locked allow_rating
+      only_graders_can_rate sort_by_rating
     ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values

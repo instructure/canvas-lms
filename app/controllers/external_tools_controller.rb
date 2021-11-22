@@ -29,9 +29,9 @@ class ExternalToolsController < ApplicationController
   before_action :require_context, except: [:all_visible_nav_tools]
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
-  before_action :require_access_to_context, except: [:index, :sessionless_launch, :all_visible_nav_tools]
+  before_action :require_access_to_context, except: %i[index sessionless_launch all_visible_nav_tools]
   before_action :require_user, only: [:generate_sessionless_launch]
-  before_action :get_context, :only => [:retrieve, :show, :resource_selection]
+  before_action :get_context, :only => %i[retrieve show resource_selection]
   before_action :parse_context_codes, :only => [:all_visible_nav_tools]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
@@ -1000,7 +1000,7 @@ class ExternalToolsController < ApplicationController
       if api_request?
         render :json => external_tool_json(@tool, @context, @current_user, session)
       else
-        render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
+        render :json => @tool.as_json(:methods => %i[readable_state custom_fields_string vendor_help_link], :include_root => false)
       end
     else
       render :json => @tool.errors, :status => :bad_request
@@ -1026,14 +1026,14 @@ class ExternalToolsController < ApplicationController
     if authorized_action(@context, @current_user, :update)
       app_api = AppCenter::AppApi.new(@context)
 
-      required_params = [
-        :consumer_key,
-        :shared_secret,
-        :name,
-        :app_center_id,
-        :context_id,
-        :context_type,
-        :config_settings
+      required_params = %i[
+        consumer_key
+        shared_secret
+        name
+        app_center_id
+        context_id
+        context_type
+        config_settings
       ]
 
       # we're ok with an "unsafe" hash because we're filtering via required_params
@@ -1420,9 +1420,9 @@ class ExternalToolsController < ApplicationController
 
   def set_tool_attributes(tool, params)
     attrs = Lti::ResourcePlacement.valid_placements(@domain_root_account)
-    attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
-              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
-              :oauth_compliant, :is_rce_favorite]
+    attrs += %i[name description url icon_url canvas_icon_class domain privacy_level consumer_key shared_secret
+                custom_fields custom_fields_string text config_type config_url config_xml not_selectable app_center_id
+                oauth_compliant is_rce_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|

@@ -218,7 +218,7 @@ describe AccessToken do
     end
 
     it "does not match if token has more scopes then requested" do
-      expect(token.scoped_to?(['user_profile', 'accounts', 'courses'])).to eq false
+      expect(token.scoped_to?(%w[user_profile accounts courses])).to eq false
     end
 
     it "does not match if token has less scopes then requested" do

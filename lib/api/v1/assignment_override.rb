@@ -22,8 +22,8 @@ module Api::V1::AssignmentOverride
   include Api::V1::Json
 
   def assignment_override_json(override, visible_users = nil)
-    fields = [:id, :assignment_id, :title]
-    fields.concat([:due_at, :all_day, :all_day_date]) if override.due_at_overridden
+    fields = %i[id assignment_id title]
+    fields.concat(%i[due_at all_day all_day_date]) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
     fields << :lock_at if override.lock_at_overridden
     api_json(override, @current_user, session, :only => fields).tap do |json|
@@ -195,7 +195,7 @@ module Api::V1::AssignmentOverride
     end
 
     # collect override values
-    [:due_at, :unlock_at, :lock_at].each do |field|
+    %i[due_at unlock_at lock_at].each do |field|
       next unless data.key?(field)
 
       begin
@@ -332,7 +332,7 @@ module Api::V1::AssignmentOverride
                        override.title
     end
 
-    [:due_at, :unlock_at, :lock_at].each do |field|
+    %i[due_at unlock_at lock_at].each do |field|
       if override_data.key?(field)
         override.send("override_#{field}", override_data[field])
       else

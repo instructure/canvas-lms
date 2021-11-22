@@ -26,11 +26,11 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_action :require_context_and_read_access
   before_action :require_topic
-  before_action :require_initial_post, except: [:add_entry, :mark_topic_read,
-                                                :mark_topic_unread, :show,
-                                                :unsubscribe_topic]
-  before_action only: [:replies, :entries, :add_entry, :add_reply, :show,
-                       :view, :entry_list, :subscribe_topic] do
+  before_action :require_initial_post, except: %i[add_entry mark_topic_read
+                                                  mark_topic_unread show
+                                                  unsubscribe_topic]
+  before_action only: %i[replies entries add_entry add_reply show
+                         view entry_list subscribe_topic] do
     check_differentiated_assignments(@topic)
   end
 

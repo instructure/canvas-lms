@@ -170,7 +170,7 @@ if Qti.migration_executable
       matches = q.question_data['matches']
       expect(matches.count).to eq 3
 
-      expect(answers.map { |h| h['text'] }).to eq ["Capulet", "Demetrius", "Lysander", "Prospero"]
+      expect(answers.map { |h| h['text'] }).to eq %w[Capulet Demetrius Lysander Prospero]
       expect(answers.map { |h| h['right'] }).to eq [
         "Romeo and Juliet",
         "A Midsummer-Night's Dream",
@@ -187,12 +187,12 @@ if Qti.migration_executable
     it "imports VE_IP_11" do
       import_fixture('VE_IP_11.zip')
       expect(@course.assessment_questions.count).to eq 5
-      expect(@course.assessment_questions.map { |q| q.question_data['question_type'] }.sort).to eq [
-        "essay_question",
-        "fill_in_multiple_blanks_question",
-        "multiple_answers_question",
-        "multiple_choice_question",
-        "multiple_choice_question"
+      expect(@course.assessment_questions.map { |q| q.question_data['question_type'] }.sort).to eq %w[
+        essay_question
+        fill_in_multiple_blanks_question
+        multiple_answers_question
+        multiple_choice_question
+        multiple_choice_question
       ]
     end
 
@@ -287,9 +287,9 @@ if Qti.migration_executable
       expect(header.question_data['question_text']).to eq "QTI v2.1 Entry Profile Single Section Instance with Multiple Items"
 
       questions = quiz.quiz_questions.sort_by(&:position)
-      expect(questions.map { |q| q.question_data['question_type'] }).to eq [
-        "text_only_question", "multiple_choice_question", "multiple_choice_question",
-        "multiple_answers_question", "fill_in_multiple_blanks_question", "essay_question"
+      expect(questions.map { |q| q.question_data['question_type'] }).to eq %w[
+        text_only_question multiple_choice_question multiple_choice_question
+        multiple_answers_question fill_in_multiple_blanks_question essay_question
       ]
       expect(questions.select { |q| q.position > 1 }.map(&:assessment_question_id).sort).to eq @course.assessment_questions.map(&:id).sort
     end

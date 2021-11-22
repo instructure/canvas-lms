@@ -179,7 +179,7 @@ describe AssignmentGroup do
   end
 
   it "returns never_drop list as strings if `stringify_json_ids` is true" do
-    expected = ['9', '22', '16', '4']
+    expected = %w[9 22 16 4]
     rules = "drop_highest:25\n"
     expected.each do |val|
       rules += "never_drop:#{val}\n"

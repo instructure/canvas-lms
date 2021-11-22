@@ -184,18 +184,18 @@ class UsersController < ApplicationController
   include Api::V1::Submission
   include ObserverEnrollmentsHelper
 
-  before_action :require_user, :only => [:grades, :merge, :kaltura_session,
-                                         :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-                                         :user_dashboard, :toggle_hide_dashcard_color_overlays,
-                                         :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-                                         :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-                                         :user_graded_submissions, :show, :terminate_sessions]
+  before_action :require_user, :only => %i[grades merge kaltura_session
+                                           ignore_item ignore_stream_item close_notification mark_avatar_image
+                                           user_dashboard toggle_hide_dashcard_color_overlays
+                                           masquerade external_tool dashboard_sidebar settings activity_stream
+                                           activity_stream_summary pandata_events_token dashboard_cards
+                                           user_graded_submissions show terminate_sessions]
   before_action :require_registered_user, :only => [:delete_user_service,
                                                     :create_user_service]
-  before_action :reject_student_view_student, :only => [:delete_user_service,
-                                                        :create_user_service, :merge, :user_dashboard, :masquerade]
+  before_action :reject_student_view_student, :only => %i[delete_user_service
+                                                          create_user_service merge user_dashboard masquerade]
   skip_before_action :load_user, :only => [:create_self_registered_user]
-  before_action :require_self_registration, :only => [:new, :create, :create_self_registered_user]
+  before_action :require_self_registration, :only => %i[new create create_self_registered_user]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -605,7 +605,7 @@ class UsersController < ApplicationController
       assignments = upcoming_events.select { |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.active
-                  .select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at])
+                  .select(%i[id assignment_id score grade workflow_state updated_at])
                   .where(:assignment_id => shard_assignments, :user_id => user)
       end
     end
@@ -650,7 +650,7 @@ class UsersController < ApplicationController
         dashboard_view: @current_user.dashboard_view(@context)
       }
     elsif request.put?
-      valid_options = ['activity', 'cards', 'planner']
+      valid_options = %w[activity cards planner]
 
       unless valid_options.include?(params[:dashboard_view])
         return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
@@ -1254,7 +1254,7 @@ class UsersController < ApplicationController
       if params[:service_types]
         @services = @services.of_type(params[:service_types].split(",")) rescue []
       end
-      @services.map { |s| s.as_json(only: [:service_user_id, :service_user_url, :service_user_name, :service, :type, :id]) }
+      @services.map { |s| s.as_json(only: %i[service_user_id service_user_url service_user_name service type id]) }
     end
     render :json => json
   end
@@ -1984,7 +1984,7 @@ class UsersController < ApplicationController
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, :rename)
+    managed_attributes.concat %i[name short_name sortable_name] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
 
@@ -2001,7 +2001,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.concat([:time_zone, :locale, :event])
+      managed_attributes.concat(%i[time_zone locale event])
     end
 
     if @user.grants_right?(@current_user, :update_avatar)

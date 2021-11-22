@@ -1033,13 +1033,13 @@ RSpec.describe ApplicationController do
             end
 
             it 'creates a login message' do
-              expect(assigns[:lti_launch].params.keys).to match_array [
-                "iss",
-                "login_hint",
-                "target_link_uri",
-                "lti_message_hint",
-                "canvas_region",
-                "client_id"
+              expect(assigns[:lti_launch].params.keys).to match_array %w[
+                iss
+                login_hint
+                target_link_uri
+                lti_message_hint
+                canvas_region
+                client_id
               ]
             end
 
@@ -1446,12 +1446,12 @@ RSpec.describe ApplicationController do
       @group = @course.groups.create!(:name => "some group")
       @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
 
-      @tool_settings = [
-        :user_navigation, :course_navigation, :account_navigation, :resource_selection,
-        :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
-        :course_settings_sub_navigation, :global_navigation,
-        :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
-        :tool_configuration, :link_selection, :assignment_selection, :post_grades
+      @tool_settings = %i[
+        user_navigation course_navigation account_navigation resource_selection
+        editor_button homework_submission migration_selection course_home_sub_navigation
+        course_settings_sub_navigation global_navigation
+        assignment_menu file_menu discussion_topic_menu module_menu quiz_menu wiki_page_menu
+        tool_configuration link_selection assignment_selection post_grades
       ]
 
       @tool_settings.each do |setting|
@@ -1467,7 +1467,7 @@ RSpec.describe ApplicationController do
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:id, :base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - %i[id base_url title icon_url canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 
@@ -1545,7 +1545,7 @@ describe ApplicationController do
 
   describe "flash_notices" do
     it 'returns notice text for each type' do
-      [:error, :warning, :info, :notice].each do |type|
+      %i[error warning info notice].each do |type|
         flash[type] = type.to_s
       end
       expect(controller.send(:flash_notices)).to match_array([

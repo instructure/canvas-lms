@@ -679,11 +679,11 @@ describe LearningOutcome do
 
     context "illegal calculation ints" do
       context "per method" do
-        calc_method = [
-          'decaying_average',
-          'n_mastery',
-          'highest',
-          'latest'
+        calc_method = %w[
+          decaying_average
+          n_mastery
+          highest
+          latest
         ]
 
         calc_method.each do |method|

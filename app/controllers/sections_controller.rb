@@ -108,7 +108,7 @@ class SectionsController < ApplicationController
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
+    if authorized_action(@context, @current_user, %i[read read_roster view_all_grades manage_grades])
       if params[:include].present? && !@context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
         params[:include] = nil
       end

@@ -262,7 +262,7 @@ describe 'Account Notification API', type: :request do
     end
 
     it 'returns an error for missing required params' do
-      missing = ['subject', 'message', 'start_at', 'end_at']
+      missing = %w[subject message start_at end_at]
       raw_api_call(:post, @path, @api_params, { :account_notification => { :icon => 'warning' } })
       expect(response.code).to eql '400'
       json = JSON.parse(response.body)

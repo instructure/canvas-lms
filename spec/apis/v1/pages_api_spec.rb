@@ -629,7 +629,7 @@ describe "Pages API", type: :request do
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page',
                                           :editing_roles => 'teachers,students,public' } })
         page = @course.wiki_pages.where(url: json['url']).first!
-        expect(page.editing_roles.split(',')).to match_array(["teachers", "students", "public"])
+        expect(page.editing_roles.split(',')).to match_array(%w[teachers students public])
       end
 
       it 'does not allow students to set editing_roles' do
@@ -1618,7 +1618,7 @@ describe "Pages API", type: :request do
         @user = @observer
         calls_fail(@page_assigned_to_override)
         [@page_assigned_to_all, @page_unassigned].each do |p|
-          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
 
@@ -1626,7 +1626,7 @@ describe "Pages API", type: :request do
         @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
         @user = @observer
         [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
-          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
 
@@ -1635,7 +1635,7 @@ describe "Pages API", type: :request do
         @user = @observer
         [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
           calls_succeed(p,
-                        except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+                        except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
     end
@@ -1668,7 +1668,7 @@ describe "Pages API", type: :request do
         @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
         @user = @observer
         [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
-          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
 
@@ -1676,7 +1676,7 @@ describe "Pages API", type: :request do
         @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
         @user = @observer
         [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
-          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
 
@@ -1685,7 +1685,7 @@ describe "Pages API", type: :request do
         @user = @observer
         [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
           calls_succeed(p,
-                        except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+                        except: %i[post_revert put_update get_revisions get_show_revision])
         end
       end
     end

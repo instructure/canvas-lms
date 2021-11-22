@@ -181,7 +181,7 @@ module SIS
             end
           end
 
-          update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
+          update_enrollments = !course.new_record? && !(course.changes.keys & %w[workflow_state name course_code]).empty?
 
           if course_format
             course_format = nil if course_format == 'not_set'
@@ -210,7 +210,7 @@ module SIS
               templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course_name_stuck
               templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course_course_code_stuck
               templated_course.enrollment_term = course.enrollment_term if !templated_course.stuck_sis_fields.include?(:enrollment_term_id) && !course_enrollment_term_id_stuck
-              if (templated_course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
+              if (templated_course.stuck_sis_fields & %i[start_at conclude_at restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
                 templated_course.start_at = course.start_at
                 templated_course.conclude_at = course.conclude_at
                 templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates

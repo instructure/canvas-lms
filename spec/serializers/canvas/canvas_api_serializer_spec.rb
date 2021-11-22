@@ -30,7 +30,7 @@ describe Canvas::APISerializer do
     expect(serializer.user).to eq serializer.current_user
   end
 
-  [:stringify_json_ids?, :accepts_jsonapi?, :session, :context].each do |method|
+  %i[stringify_json_ids? accepts_jsonapi? session context].each do |method|
     it "delegates #{method} to controller" do
       expect(controller.send(method)).to eq serializer.send(method)
     end

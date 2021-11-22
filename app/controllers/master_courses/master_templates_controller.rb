@@ -241,8 +241,8 @@
 #
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :get_course
-  before_action :get_template, :except => [:import_details, :imports_index, :imports_show, :subscriptions_index]
-  before_action :get_subscription, :only => [:import_details, :imports_index, :imports_show]
+  before_action :get_template, :except => %i[import_details imports_index imports_show subscriptions_index]
+  before_action :get_subscription, :only => %i[import_details imports_index imports_show]
   before_action :require_course_level_manage_rights
   before_action :require_account_level_manage_rights, :only => [:update_associations]
 
@@ -715,7 +715,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     exceptions = get_exceptions_by_subscription(subscriptions)
     updated_syllabus = @mm.export_results[:selective][:updated].delete('syllabus')
 
-    [:created, :updated, :deleted].each do |action|
+    %i[created updated deleted].each do |action|
       migration_ids = @mm.export_results[:selective][action].values.flatten
       tags = tag_association.where(:migration_id => migration_ids).preload(:content).to_a
       restricted_ids = find_restricted_ids(tags)

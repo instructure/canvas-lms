@@ -103,11 +103,11 @@ describe Lti::AppUtil do
     end
 
     it 'allows candidate if present in multi-valued whitelist and not present in multi-valued blacklist' do
-      expect(Lti::AppUtil).to be_allowed('foo', ['bar', 'foo', 'baz'], ['bap', 'bam', 'ban'])
+      expect(Lti::AppUtil).to be_allowed('foo', %w[bar foo baz], %w[bap bam ban])
     end
 
     it 'disallows candidate if present in multi-valued blacklist and not present in multi-valued whitelist' do
-      expect(Lti::AppUtil).to_not be_allowed('foo', ['bap', 'bam', 'ban'], ['bar', 'foo', 'baz'])
+      expect(Lti::AppUtil).to_not be_allowed('foo', %w[bap bam ban], %w[bar foo baz])
     end
   end
 end

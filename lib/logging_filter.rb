@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module LoggingFilter
-  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret, :fb_sig_friends].freeze
+  FILTERED_PARAMETERS = %i[password auth_password access_token api_key client_secret fb_sig_friends].freeze
   def self.filtered_parameters
     FILTERED_PARAMETERS
   end
