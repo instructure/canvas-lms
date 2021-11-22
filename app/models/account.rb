@@ -235,6 +235,10 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def allow_student_anonymous_discussion_topics
+    false
+  end
+
   include ::Account::Settings
   include ::Csp::AccountHelper
 

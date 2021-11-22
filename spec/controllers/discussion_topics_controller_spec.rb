@@ -998,6 +998,20 @@ describe DiscussionTopicsController do
       get 'new', params: { :course_id => @course.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
+
+    it "js_env allow_student_anonymous_discussion_topics defaults to false" do
+      user_session(@teacher)
+      get 'new', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+    end
+
+    it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
+      user_session(@teacher)
+      @course.allow_student_anonymous_discussion_topics = true
+      @course.save!
+      get 'new', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
+    end
   end
 
   describe "GET 'new'" do
@@ -1130,6 +1144,20 @@ describe DiscussionTopicsController do
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get :edit, params: { :course_id => @course.id, :id => @topic.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
+    end
+
+    it "js_env allow_student_anonymous_discussion_topics defaults to false" do
+      user_session(@teacher)
+      get :edit, params: { :course_id => @course.id, :id => @topic.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+    end
+
+    it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
+      user_session(@teacher)
+      @course.allow_student_anonymous_discussion_topics = true
+      @course.save!
+      get :edit, params: { :course_id => @course.id, :id => @topic.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
     end
 
     context 'conditional-release' do
