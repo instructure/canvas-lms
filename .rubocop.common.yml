@@ -312,6 +312,8 @@ Style/IfUnlessModifierOfIfUnless:
   Severity: error
 Style/LambdaCall:
   Severity: error
+Style/LineEndConcatenation:
+  Severity: error
 Style/MethodCallWithoutArgsParentheses:
   Severity: error
 Style/MethodDefParentheses:

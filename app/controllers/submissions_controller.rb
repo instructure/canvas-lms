@@ -468,8 +468,8 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission].slice!(*submission_params)
     if params[:submission].keys.sort != submission_params
       render(:json => {
-               :message => "Invalid parameters for submission_type #{submission_type}. " +
-                 "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
+               :message => "Invalid parameters for submission_type #{submission_type}. " \
+                           "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
              }, :status => :bad_request)
       return false
     end

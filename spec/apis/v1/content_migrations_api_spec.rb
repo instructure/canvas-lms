@@ -458,8 +458,8 @@ describe ContentMigrationsController, type: :request do
         @copy_from = @course
         @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
         @page = @copy_from.wiki_pages.create!(:title => "aaaa")
-        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" +
-          "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&select[pages][]=#{@page.id}",
+        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" \
+                               "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&select[pages][]=#{@page.id}",
                         @params.merge(:course_id => @copy_to.global_id.to_s,
                                       :migration_type => 'course_copy_importer',
                                       :settings => { 'source_course_id' => @copy_from.local_id.to_s },
@@ -482,8 +482,8 @@ describe ContentMigrationsController, type: :request do
         @copy_from = @course
         @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
         @page = @copy_from.wiki_pages.create!(:title => "aaaa")
-        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" +
-          "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&settings[insert_into_module_id]=#{@mod.global_id}&select[pages][]=#{@page.id}",
+        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" \
+                               "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&settings[insert_into_module_id]=#{@mod.global_id}&select[pages][]=#{@page.id}",
                         @params.merge(:course_id => @copy_to.global_id.to_s,
                                       :migration_type => 'course_copy_importer',
                                       :settings => { 'source_course_id' => @copy_from.local_id.to_s, 'insert_into_module_id' => @mod.global_id.to_s },

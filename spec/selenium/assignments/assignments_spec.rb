@@ -202,8 +202,7 @@ describe "assignments" do
       end
     end
 
-    it "only allows an assignment editor to edit points and title if assignment " +
-       "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+    it "only allows an assignment editor to edit points and title if assignment if assignment has multiple due dates", priority: "2", test_id: 622376 do
       skip "DEMO-25 (8/21/20)"
 
       middle_number = '15'
@@ -397,8 +396,7 @@ describe "assignments" do
         expect(f("#assignment_group_category_id")).to be_disabled
       end
 
-      it "should still show deleted group set only on an attached assignment with " +
-         "submissions", priority: "2", test_id: 627149 do
+      it "still shows deleted group set only on an attached assignment with submissions", priority: "2", test_id: 627149 do
         @assignment1.group_category.destroy
         @assignment2.group_category.destroy
 

@@ -2663,7 +2663,7 @@ describe AssignmentsApiController, type: :request do
                                                              frequency: 'immediately')
       end
 
-      it "takes overrides into account in the assignment-created notification " +
+      it "takes overrides into account in the assignment-created notification " \
          "for assignments created with overrides" do
         @ta.register!
         @ta.communication_channels.create(:path => "ta@instructure.com").confirm!

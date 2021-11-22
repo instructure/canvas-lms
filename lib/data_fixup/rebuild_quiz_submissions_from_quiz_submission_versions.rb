@@ -128,9 +128,9 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
         if old_submission_grading_data.first == submission.score
           Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " + "Grading required for quiz_submission: #{persisted_qs.id}"
         else
-          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " +
-                            "score-- #{old_submission_grading_data.first}:#{submission.score} " +
-                            "grader_id-- #{old_submission_grading_data[1]}:#{submission.grader_id} "
+          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " \
+                                         "score-- #{old_submission_grading_data.first}:#{submission.score} " \
+                                         "grader_id-- #{old_submission_grading_data[1]}:#{submission.grader_id} "
         end
       end
       persisted_qs
