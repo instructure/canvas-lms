@@ -44,7 +44,7 @@ module SIS
         raise ImportError, "No sis_id given for a group category" if sis_id.blank?
         raise ImportError, "No name given for group category #{sis_id}" if category_name.blank?
         raise ImportError, "No status given for group category #{sis_id}" if status.blank?
-        raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless /\A(active|deleted)/i.match?(status)
+        raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless status =~ /\A(active|deleted)/i
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         if course_id && account_id
@@ -68,8 +68,8 @@ module SIS
 
         gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
 
-        if gc && gc.groups.active.exists? && !(context.id == gc.context_id && context.class.base_class.name == gc.context_type)
-          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it."
+        if gc && gc.groups.active.exists?
+          raise ImportError, "Cannot move group category #{sis_id} because it has groups in it." unless context.id == gc.context_id && context.class.base_class.name == gc.context_type
         end
 
         gc ||= context.group_categories.new

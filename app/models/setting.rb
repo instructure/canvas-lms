@@ -36,7 +36,7 @@ class Setting < Switchman::UnshardedRecord
         next obj ? obj.value&.to_s : default&.to_s
       end
 
-      fetch = proc { Setting.pluck(:name, :value).to_h }
+      fetch = Proc.new { Setting.pluck(:name, :value).to_h }
       all_settings = if @skip_cache
                        # we want to skip talking to redis, but it's okay to use the in-proc cache
                        @all_settings ||= fetch.call
@@ -58,7 +58,7 @@ class Setting < Switchman::UnshardedRecord
     end
   rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
     # the db may not exist yet
-    Rails.logger&.warn("Unable to read setting: #{e}")
+    Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
     default&.to_s
   end
 

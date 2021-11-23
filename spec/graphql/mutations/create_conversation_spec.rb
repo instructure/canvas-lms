@@ -29,7 +29,7 @@ RSpec.describe Mutations::CreateConversation do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_data = Array.new(num_other_users) { { name: 'User' } }
+    user_data = num_other_users.times.map { { name: 'User' } }
     users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
@@ -131,7 +131,7 @@ RSpec.describe Mutations::CreateConversation do
     enrollment.save
     result = run_mutation(recipients: [new_user.id.to_s], body: 'yo')
 
-    expect(result['errors']).to be nil
+    expect(result.dig('errors')).to be nil
     expect(
       result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationMessagesConnection', 'nodes', 0, 'body')
     ).to eq 'yo'

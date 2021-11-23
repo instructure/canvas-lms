@@ -119,7 +119,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      finalize_report(account_report, error_message)
+      self.finalize_report(account_report, error_message)
       @er = nil
     end
   end
@@ -167,13 +167,13 @@ module AccountReports
       ext = csv !~ /\n/ && File.extname(csv)
       case ext
       when ".csv"
-        filename = File.basename(csv)
+        filename = File.basename(csv);
         filepath = csv
         filetype = 'text/csv'
       when ".zip"
         filetype = 'application/zip'
       when ".txt"
-        filename = File.basename(csv)
+        filename = File.basename(csv);
         filepath = csv
         filetype = 'text/rtf'
       else

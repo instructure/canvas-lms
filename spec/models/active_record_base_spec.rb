@@ -44,7 +44,9 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
+        start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }
+      ]
     end
 
     it "justs do the last 20 days by default" do
@@ -59,7 +61,9 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
+        start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }
+      ]
     end
   end
 
@@ -386,8 +390,8 @@ describe ActiveRecord::Base do
 
   context "distinct_values" do
     before :once do
-      User.create
-      User.create
+      User.create()
+      User.create()
       User.create(:locale => "en")
       User.create(:locale => "en")
       User.create(:locale => "es")
@@ -405,7 +409,7 @@ describe ActiveRecord::Base do
   context "find_ids_in_batches" do
     it "returns ids from the table in batches of specified size" do
       ids = []
-      5.times { ids << User.create!.id }
+      5.times { ids << User.create!().id }
       batches = []
       User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
         batches << found_ids
@@ -417,7 +421,7 @@ describe ActiveRecord::Base do
   describe "find_ids_in_ranges" do
     before :once do
       @ids = []
-      10.times { @ids << User.create!.id }
+      10.times { @ids << User.create!().id }
     end
 
     it "returns ids from the table in ranges" do
@@ -562,7 +566,7 @@ describe ActiveRecord::Base do
     it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
       u1 = User.create!(name: 'a')
       u2 = User.create!(name: 'a')
-      User.from(<<~SQL.squish)
+      User.from(<<-SQL)
         (WITH duplicates AS (
           SELECT users.*,
               ROW_NUMBER() OVER(PARTITION BY users.name
@@ -900,23 +904,23 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections on checkout" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
     conn2 = pool.connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     expect(conn1.runtime).to eq 0
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
 
     expect(conn1.runtime).to eq 60
     pool.checkin(conn1)
@@ -925,12 +929,12 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections if you call flush" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
 
     pool.flush
 

@@ -72,11 +72,7 @@ describe SubmissionList do
 
     @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
-    subs.each { |s|
-      s.created_at = 3.days.ago
-      s.updated_at = 3.days.ago
-      s.save
-    }
+    subs.each { |s| s.created_at = 3.days.ago; s.updated_at = 3.days.ago; s.save }
     @some_assignment.grade_student(@student, { excuse: true, grader: @teacher })
     @days = SubmissionList.days(@course)
     submissions = @days[0].graders[0].assignments[0].submissions
@@ -103,7 +99,7 @@ describe SubmissionList do
     end
 
     it "is able to loop on graders" do
-      available_keys = %i[grader_id assignments name]
+      available_keys = [:grader_id, :assignments, :name]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           expect(grader).to be_is_a(OpenStruct)
@@ -129,7 +125,7 @@ describe SubmissionList do
     end
 
     it "is able to loop on assignments" do
-      available_keys = %i[submission_count name submissions assignment_id]
+      available_keys = [:submission_count, :name, :submissions, :assignment_id]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.assignments.each do |assignment|
@@ -148,16 +144,16 @@ describe SubmissionList do
 
     context "submissions" do
       it "is able to loop on submissions" do
-        available_keys = %i[
-          assignment_id assignment_name attachment_id attachment_ids
-          body course_id created_at current_grade current_graded_at
-          current_grader grade_matches_current_submission graded_at
-          graded_on grader grader_id group_id id new_grade
-          new_graded_at new_grader previous_grade previous_graded_at
-          previous_grader processed published_grade
-          published_score safe_grader_id score student_entered_score
-          student_user_id submission_id student_name submission_type
-          updated_at url user_id workflow_state
+        available_keys = [
+          :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
+          :body, :course_id, :created_at, :current_grade, :current_graded_at,
+          :current_grader, :grade_matches_current_submission, :graded_at,
+          :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
+          :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
+          :previous_grader, :processed, :published_grade,
+          :published_score, :safe_grader_id, :score, :student_entered_score,
+          :student_user_id, :submission_id, :student_name, :submission_type,
+          :updated_at, :url, :user_id, :workflow_state
         ]
 
         SubmissionList.days(@course).each do |day|
@@ -263,7 +259,7 @@ describe SubmissionList do
         assignment.grade_student student, { grade: 3, grader: grader }
       end
 
-      it "remembers the 'Before' grade" do
+      it "remembers the 'Before' grade " do
         expect(submission.previous_grade).to eq "5"
       end
 

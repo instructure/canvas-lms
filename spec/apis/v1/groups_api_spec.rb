@@ -91,13 +91,14 @@ describe "Groups API", type: :request do
   end
 
   def user_json(user, **)
-    {
+    hash = {
       'id' => user.id,
       'created_at' => user.created_at.iso8601,
       'name' => user.name,
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
     }
+    hash
   end
 
   def membership_json(membership, is_admin = false)
@@ -146,18 +147,18 @@ describe "Groups API", type: :request do
       @group.add_user(@member, 'accepted', true)
       @group.reload
       account = @course.account
-      @admin_user = User.create!
+      @admin_user = User.create!()
       account.account_users.create!(user: @admin_user, account: account)
     end
 
-    it "shows if the user has permission", priority: 3 do
+    it "shows if the user has permission", priority: 3, test_id: 3436528 do
       @user = @admin_user
       json = api_call(:get, "/api/v1/groups/#{@group.id}", @category_path_options.merge(action: "show", group_id: @group.id))
       expect(json).to have_key("sis_group_id")
       expect(json).to have_key("sis_import_id")
     end
 
-    it "does not show if the user doesn't have permission", priority: 3 do
+    it "does not show if the user doesn't have permission", priority: 3, test_id: 3436529 do
       @user = @member
       json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: 'index'))
       expect(json[0]).not_to have_key("sis_group_id")
@@ -299,44 +300,44 @@ describe "Groups API", type: :request do
     json = api_call(:get, "#{@community_path}.json?include[]=favorites",
                     @category_path_options.merge(:group_id => @community.to_param, :action => "show",
                                                  :include => ["favorites"]))
-    expect(json).to have_key("is_favorite")
+    expect(json.key?("is_favorite")).to be_truthy
   end
 
   it "includes the group category" do
     @user = @member
     json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => ["group_category"]))
-    expect(json).to have_key("group_category")
+    expect(json.has_key?("group_category")).to be_truthy
   end
 
   it 'includes permissions' do
     # Make sure it only returns permissions when asked
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json'))
-    expect(json).not_to have_key("permissions")
+    expect(json.has_key?("permissions")).to be_falsey
 
     # When its asked to return permissions make sure they are there
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
-    expect(json).to have_key("permissions")
+    expect(json.has_key?("permissions")).to be_truthy
   end
 
   it 'includes permission create_discussion_topic' do
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
 
-    expect(json).to have_key("permissions")
-    expect(json["permissions"]).to have_key("create_discussion_topic")
+    expect(json.has_key?("permissions")).to be_truthy
+    expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
   end
 
   it 'includes permission create_student_announcements' do
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
 
-    expect(json).to have_key("permissions")
-    expect(json["permissions"]).to have_key("create_announcement")
+    expect(json.has_key?("permissions")).to be_truthy
+    expect(json["permissions"].has_key?("create_announcement")).to be_truthy
     expect(json['permissions']['create_announcement']).to be_truthy
   end
 
   it 'includes tabs if requested' do
     json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["tabs"]))
     expect(json).to have_key 'tabs'
-    expect(json['tabs'].map { |tab| tab['id'] }).to eq(%w[home announcements pages people discussions files])
+    expect(json['tabs'].map { |tab| tab['id'] }).to eq(["home", "announcements", "pages", "people", "discussions", "files"])
   end
 
   it "allows searching by SIS ID" do
@@ -897,7 +898,7 @@ describe "Groups API", type: :request do
     end
 
     it "returns users in a group" do
-      expected_keys = %w[id name sortable_name short_name]
+      expected_keys = %w{id name sortable_name short_name}
       json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
                       { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
       expect(json.count).to eq 2
@@ -921,7 +922,7 @@ describe "Groups API", type: :request do
     end
 
     it "returns a list of users" do
-      expected_keys = %w[id name sortable_name short_name]
+      expected_keys = %w{id name sortable_name short_name}
 
       json = api_call(:get, api_url, api_route, { :search_term => 'value' })
 
@@ -1033,7 +1034,7 @@ describe "Groups API", type: :request do
     it "sanitizes html and process links" do
       @user = @teacher
       attachment_model(:context => @group)
-      html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
+      html = %{<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>}
       json = api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
                       { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
                       { :html => html })
@@ -1061,14 +1062,14 @@ describe "Groups API", type: :request do
       @group.add_user(@student)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages&permissions[]=manage_blarghs",
                       :controller => 'groups', :action => 'permissions', :group_id => @group.to_param,
-                      :format => 'json', :permissions => %w[send_messages manage_blarghs])
+                      :format => 'json', :permissions => %w(send_messages manage_blarghs))
       expect(json).to eq({ "send_messages" => true, "manage_blarghs" => false })
     end
 
     it "requires :read permission on the group" do
       api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages",
                { :controller => 'groups', :action => 'permissions', :group_id => @group.to_param, :format => 'json',
-                 :permissions => %w[send_messages] }, {}, {}, { :expected_status => 401 })
+                 :permissions => %w(send_messages) }, {}, {}, { :expected_status => 401 })
     end
   end
 end

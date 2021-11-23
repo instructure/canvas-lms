@@ -30,33 +30,33 @@ module Types
       value "deleted"
     end
 
-    field :current_score, Float, <<~MD, null: true
+    field :current_score, Float, <<~DESC, null: true
       The current score includes all graded assignments, excluding muted submissions.
-    MD
-    field :unposted_current_score, Float, <<~MD, null: true
+    DESC
+    field :unposted_current_score, Float, <<~DESC, null: true
       The current score includes all graded assignments, including muted submissions.
-    MD
+    DESC
     field :current_grade, String, null: true
     field :unposted_current_grade, String, null: true
 
-    field :final_score, Float, <<~MD, null: true
+    field :final_score, Float, <<~DESC, null: true
       The final score includes all assignments, excluding muted submissions
       (ungraded assignments are counted as 0 points).
-    MD
-    field :unposted_final_score, Float, <<~MD, null: true
+    DESC
+    field :unposted_final_score, Float, <<~DESC, null: true
       The final score includes all assignments, including muted submissions
       (ungraded assignments are counted as 0 points).
-    MD
+    DESC
     field :final_grade, String, null: true
     field :unposted_final_grade, String, null: true
 
-    field :override_score, Float, <<~MD, null: true
+    field :override_score, Float, <<~DESC, null: true
       The override score. Supersedes the computed final score if set.
-    MD
+    DESC
 
-    field :override_grade, String, <<~MD, null: true
+    field :override_grade, String, <<~DESC, null: true
       The override grade. Supersedes the computed final grade if set.
-    MD
+    DESC
     def override_grade
       return nil if object.override_score.blank?
 

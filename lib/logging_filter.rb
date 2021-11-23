@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module LoggingFilter
-  FILTERED_PARAMETERS = %i[password auth_password access_token api_key client_secret fb_sig_friends].freeze
+  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret, :fb_sig_friends]
   def self.filtered_parameters
     FILTERED_PARAMETERS
   end
 
-  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"].freeze
+  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"]
   def self.all_filtered_parameters
     FILTERED_PARAMETERS.map(&:to_s) + EXTENDED_FILTERED_PARAMETERS
   end
@@ -34,7 +34,7 @@ module LoggingFilter
 
   def self.filter_query_string(qs)
     regs = all_filtered_parameters.map { |p| p.gsub("[", "\\[").gsub("]", "\\]") }.join('|')
-    @@filtered_parameters_regex ||= /([?&](?:#{regs}))=[^&]+/
+    @@filtered_parameters_regex ||= %r{([?&](?:#{regs}))=[^&]+}
     qs.gsub(@@filtered_parameters_regex, '\1=[FILTERED]')
   end
 

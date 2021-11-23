@@ -22,19 +22,19 @@ require_relative '../../import_helper'
 
 describe "Importing wikis" do
   SYSTEMS.each do |system|
-    next unless import_data_exists? system, 'wiki'
+    if import_data_exists? system, 'wiki'
+      it "imports for #{system}" do
+        data = get_import_data(system, 'wiki')
+        context = get_import_context(system)
+        migration = context.content_migrations.create!
 
-    it "imports for #{system}" do
-      data = get_import_data(system, 'wiki')
-      context = get_import_context(system)
-      migration = context.content_migrations.create!
+        Importers::WikiPageImporter.import_from_migration(data, context, migration)
+        Importers::WikiPageImporter.import_from_migration(data, context, migration)
+        expect(context.wiki_pages.count).to eq 1
 
-      Importers::WikiPageImporter.import_from_migration(data, context, migration)
-      Importers::WikiPageImporter.import_from_migration(data, context, migration)
-      expect(context.wiki_pages.count).to eq 1
-
-      wiki = WikiPage.where(migration_id: data[:migration_id]).first
-      expect(wiki.title).to eq data[:title]
+        wiki = WikiPage.where(migration_id: data[:migration_id]).first
+        expect(wiki.title).to eq data[:title]
+      end
     end
   end
 
@@ -52,10 +52,10 @@ describe "Importing wikis" do
     # The wiki references should resolve to course urls
     expect(context.wiki_pages.count).to eq 18
     wiki = WikiPage.where(migration_id: 'res00146').first
-    expect(wiki.body =~ %r{/courses/\d+/pages/course-glossary-a-to-d}).not_to be_nil
-    expect(wiki.body =~ %r{/courses/\d+/pages/course-glossary-e-f-g-h}).not_to be_nil
-    expect(wiki.body =~ %r{/courses/\d+/pages/course-glossary-i-j-k-l-m}).not_to be_nil
-    expect(wiki.body =~ %r{/courses/\d+/pages/course-glossary-n-o-p-q-r}).not_to be_nil
+    expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-a-to-d/).not_to be_nil
+    expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-e-f-g-h/).not_to be_nil
+    expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-i-j-k-l-m/).not_to be_nil
+    expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-n-o-p-q-r/).not_to be_nil
   end
 
   it 'resurrects deleted pages' do

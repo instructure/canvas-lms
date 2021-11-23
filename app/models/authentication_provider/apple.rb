@@ -52,11 +52,11 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_federated_attributes
-    %w[
-      email
-      firstName
-      lastName
-      sub
+    [
+      'email',
+      'firstName',
+      'lastName',
+      'sub',
     ].freeze
   end
 

@@ -41,13 +41,13 @@ class Attachments::Storage
       data.original_filename
     elsif data.respond_to?(:filename)
       data.filename
-    elsif data.instance_of?(File)
+    elsif data.class == File
       File.basename(data)
     end
   end
 
   def self.detect_mimetype(data)
-    if data.respond_to?(:content_type) && (data.content_type.blank? || data.content_type.strip == "application/octet-stream")
+    if data && data.respond_to?(:content_type) && (data.content_type.blank? || data.content_type.strip == "application/octet-stream")
       res = nil
       res ||= File.mime_type?(data.original_filename) if data.respond_to?(:original_filename)
       res ||= File.mime_type?(data)

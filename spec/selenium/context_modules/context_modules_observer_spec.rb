@@ -56,7 +56,7 @@ describe "context modules" do
       override.set = section2
       override.override_due_at(due_at)
       override.save!
-      section2
+      return section2
     end
 
     it "when not associated, and in one section, it should show the section's due date" do

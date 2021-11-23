@@ -44,13 +44,13 @@ describe 'Account Reports API', type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports",
                       { :controller => 'account_reports', :action => 'available_reports', :format => 'json', :account_id => @admin.account.id.to_s })
       json.each do |report|
-        expect(report).to have_key('title')
-        expect(report).to have_key('parameters')
-        expect(report).to have_key('report')
+        expect(report.key?('title')).to be_truthy
+        expect(report.key?('parameters')).to be_truthy
+        expect(report.key?('report')).to be_truthy
 
         report[:parameters]&.each_value do |parameter|
-          expect(parameter).to have_key('required')
-          expect(parameter).to have_key('description')
+          expect(parameter.key?('required')).to be_truthy
+          expect(parameter.key?('description')).to be_truthy
         end
       end
     end
@@ -61,7 +61,7 @@ describe 'Account Reports API', type: :request do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { report: @report.report_type, controller: 'account_reports', action: 'create',
                           format: 'json', account_id: @admin.account.id.to_s })
-      keys = %w[id progress parameters current_line status report created_at started_at ended_at file_url]
+      keys = %w(id progress parameters current_line status report created_at started_at ended_at file_url)
       expect(report['status']).to eq 'created'
       expect(keys - report.keys).to be_empty
     end
@@ -70,7 +70,7 @@ describe 'Account Reports API', type: :request do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { :report => @report.report_type, :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s,
                           :parameters => { 'some_param' => 1 } })
-      expect(report).to have_key('id')
+      expect(report.key?('id')).to be_truthy
     end
 
     it '404s for non existing reports' do
@@ -88,10 +88,10 @@ describe 'Account Reports API', type: :request do
       expect(json.length).to be >= 0
       expect(json.length).to be <= 50
       json.each do |report|
-        expect(report).to have_key('id')
-        expect(report).to have_key('status')
-        expect(report).to have_key('progress')
-        expect(report).to have_key('file_url')
+        expect(report.key?('id')).to be_truthy
+        expect(report.key?('status')).to be_truthy
+        expect(report.key?('progress')).to be_truthy
+        expect(report.key?('file_url')).to be_truthy
       end
     end
 

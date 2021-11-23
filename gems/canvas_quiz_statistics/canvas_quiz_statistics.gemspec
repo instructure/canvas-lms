@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.version       = CanvasQuizStatistics::VERSION
   spec.authors       = ['Ahmad Amireh']
   spec.email         = ['ahmad@instructure.com']
-  spec.summary       = 'Bundle of statistics generators for quizzes and quiz questions.'
+  spec.summary       = %q{Bundle of statistics generators for quizzes and quiz questions.}
   spec.files         = Dir.glob("lib/**/*") + %w[LICENSE.txt README.md Rakefile]
-  spec.test_files    = spec.files.grep(/spec/)
+  spec.test_files    = spec.files.grep(%r{spec})
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activesupport'

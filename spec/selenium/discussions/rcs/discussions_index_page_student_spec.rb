@@ -23,7 +23,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap(&:offer!) }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:section_student) do
     student_in_course(course: course,
@@ -62,7 +62,7 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      it "allows a student to create a discussion", priority: "1" do
+      it "allows a student to create a discussion", priority: "1", test_id: 270941 do
         get url
         expect_new_page_load { f('#add_discussion').click }
         edit_topic("from a student", "tell me a story")

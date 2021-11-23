@@ -23,12 +23,12 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
   belongs_to :course
   belongs_to :user
 
-  validates :user, :course, :enrollment_type, presence: true
-  validates :user_id, uniqueness: { scope: %i[course_id enrollment_type] }
+  validates_presence_of :user, :course, :enrollment_type
+  validates_uniqueness_of :user_id, scope: %i[course_id enrollment_type]
 
   resolves_root_account through: :course
 
-  # NOTE: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
+  # Note: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
   # but rather "owner" or "member", also referred to as "MSFT role type"
   OWNER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::OWNER_MSFT_ROLE_TYPE
   MEMBER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::MEMBER_MSFT_ROLE_TYPE

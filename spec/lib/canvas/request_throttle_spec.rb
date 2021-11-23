@@ -33,9 +33,7 @@ describe 'RequestThrottle' do
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   # not a let so that actual and expected aren't the same object that get modified together
-  def response
-    [200, { 'Content-Type' => 'text/plain' }, ['Hello']]
-  end
+  def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
 
   after { RequestThrottle.reload! }
 
@@ -47,19 +45,19 @@ describe 'RequestThrottle' do
 
   describe "#client_identifier" do
     def req(hash)
-      ActionDispatch::Request.new(hash).tap(&:fullpath)
+      ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
     end
 
     it "uses access token" do
-      expect(throttler.client_identifier(req(request_header_token))).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
+      expect(throttler.client_identifier(req request_header_token)).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
     it "uses user id" do
-      expect(throttler.client_identifier(req(request_user_2))).to eq "user:2"
+      expect(throttler.client_identifier(req request_user_2)).to eq "user:2"
     end
 
     it "uses session id" do
-      expect(throttler.client_identifier(req(request_logged_out))).to eq 'session:sess1'
+      expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
     end
 
     it "falls back to ip" do
@@ -433,7 +431,7 @@ describe 'RequestThrottle' do
 
         it "uses regexes to predict up front costs by path if set" do
           hash = {
-            %r{\A/files/\d+/download} => 1,
+            /\A\/files\/\d+\/download/ => 1,
             "equation_images\/" => 2
           }
           expect(RequestThrottle).to receive(:dynamic_settings).and_return({ 'up_front_cost_by_path_regex' => hash })

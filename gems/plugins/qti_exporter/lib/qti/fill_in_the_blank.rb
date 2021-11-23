@@ -22,11 +22,11 @@ module Qti
     def initialize(opts)
       super(opts)
       @type = opts[:custom_type]
-      @question[:question_type] = if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
-                                    'multiple_dropdowns_question'
-                                  else
-                                    'fill_in_multiple_blanks_question'
-                                  end
+      if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
+        @question[:question_type] = 'multiple_dropdowns_question'
+      else
+        @question[:question_type] = 'fill_in_multiple_blanks_question'
+      end
     end
 
     def parse_question_data
@@ -54,11 +54,11 @@ module Qti
       create_xml_doc
       body = ""
       @doc.at_css('itemBody').children.each do |child|
-        body += if child.name == 'textEntryInteraction'
-                  " [#{child['responseIdentifier']}] "
-                else
-                  child.text.gsub(']]>', '').gsub('<div></div>', '').strip
-                end
+        if child.name == 'textEntryInteraction'
+          body += " [#{child['responseIdentifier']}] "
+        else
+          body += child.text.gsub(']]>', '').gsub('<div></div>', '').strip
+        end
       end
       @question[:question_text] = body
 
@@ -67,13 +67,13 @@ module Qti
           answer = {}
           node = match.at_css('baseValue[baseType=string],baseValue[baseType=integer],baseValue[baseType=float]')
           answer[:text] = node.text.strip if node
-          next if answer[:text].blank?
-
-          @question[:answers] << answer
-          answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
-          answer[:comments] = ""
-          answer[:id] = unique_local_id
-          answer[:blank_id] = get_node_att(match, 'variable', 'identifier')
+          unless answer[:text].blank?
+            @question[:answers] << answer
+            answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+            answer[:comments] = ""
+            answer[:id] = unique_local_id
+            answer[:blank_id] = get_node_att(match, 'variable', 'identifier')
+          end
         end
       end
     end
@@ -98,11 +98,11 @@ module Qti
 
       if @type == 'multiple_dropdowns_question'
         @doc.css('responseProcessing responseCondition responseIf,responseElseIf').each do |if_node|
-          next unless if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
-
-          id = if_node.at_css('match baseValue[baseType=identifier]').text
-          if (answer = answer_hash[id])
-            answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+          if if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
+            id = if_node.at_css('match baseValue[baseType=identifier]').text
+            if (answer = answer_hash[id])
+              answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+            end
           end
         end
       end
@@ -127,8 +127,7 @@ module Qti
 
     def recursively_clean_inline_body_and_get_answers(node, answer_hash)
       node.children.each do |child|
-        case child.name
-        when 'inlineChoiceInteraction'
+        if child.name == 'inlineChoiceInteraction'
           response_id = child['responseIdentifier']
           answer_hash[response_id] = {}
           child.search('inlineChoice').each do |choice|
@@ -142,7 +141,7 @@ module Qti
             answer_hash[response_id][choice_id] = answer
           end
           child.replace(Nokogiri::XML::Text.new("[#{response_id}]", @doc))
-        when 'text'
+        elsif child.name == 'text'
           child.content = child.text.gsub(']]>', '').gsub('<div></div>', '')
         else
           recursively_clean_inline_body_and_get_answers(child, answer_hash)
@@ -157,10 +156,9 @@ module Qti
           next if node.name == 'text'
 
           text = ''
-          case node.name
-          when 'div'
+          if node.name == 'div'
             text = sanitize_html_string(node.text, true)
-          when 'extendedTextInteraction'
+          elsif node.name == 'extendedTextInteraction'
             id = node['responseIdentifier']
             text = " [#{id}] "
           end
@@ -169,29 +167,29 @@ module Qti
       end
 
       @doc.css('responseCondition stringMatch').each do |match|
-        next unless (blank_id = get_node_att(match, 'variable', 'identifier'))
-
-        text = get_node_val(match, 'baseValue')
-        answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
-        answer[:migration_id] = blank_id
-        answer[:text] = sanitize_html_string(text, true)
-        answer[:blank_id] = blank_id
-        @question[:answers] << answer
+        if (blank_id = get_node_att(match, 'variable', 'identifier'))
+          text = get_node_val(match, 'baseValue')
+          answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
+          answer[:migration_id] = blank_id
+          answer[:text] = sanitize_html_string(text, true)
+          answer[:blank_id] = blank_id
+          @question[:answers] << answer
+        end
       end
     end
 
     def process_respondus
       @doc.css('responseCondition stringMatch baseValue[baseType=string]').each do |val_node|
-        next unless (blank_id = val_node['identifier'])
-
-        blank_id = blank_id.sub(/^RESPONSE_-([^-]*)-/, '\1')
-        @question[:answers] << {
-          :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
-          :id => unique_local_id,
-          :migration_id => blank_id,
-          :text => sanitize_html_string(val_node.text, true),
-          :blank_id => blank_id,
-        }
+        if (blank_id = val_node['identifier'])
+          blank_id = blank_id.sub(%r{^RESPONSE_-([^-]*)-}, '\1')
+          @question[:answers] << {
+            :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
+            :id => unique_local_id,
+            :migration_id => blank_id,
+            :text => sanitize_html_string(val_node.text, true),
+            :blank_id => blank_id,
+          }
+        end
       end
     end
 

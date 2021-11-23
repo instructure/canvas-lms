@@ -37,11 +37,9 @@ module Api::V1::TodoItem
       else
         assignment = assignment_or_quiz
         hash[:assignment] = assignment_json(assignment, user, session, :include_all_dates => true)
-        hash[:html_url] = if todo_type == 'grading'
-                            speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id)
-                          else
-                            "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
-                          end
+        hash[:html_url] = todo_type == 'grading' ?
+          speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id) :
+          "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
 
         if todo_type == 'grading'
           hash['needs_grading_count'] = Assignments::NeedsGradingCountQuery.new(assignment, user).count

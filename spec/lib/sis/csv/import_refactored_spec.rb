@@ -428,10 +428,8 @@ describe SIS::CSV::ImportRefactored do
           tf
         end
       end
-      csv_string = <<~CSV
-        term_id,name,status
-        "T001","Winter13",active
-      CSV
+      csv_string = "term_id,name,status\n" +
+                   "\"T001\",\"Winter13\",active"
       fake_attachment = flakey_attachment_cls.new(csv_string)
       root_account = account_model
       user = user_model

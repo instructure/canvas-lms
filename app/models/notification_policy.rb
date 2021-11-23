@@ -23,11 +23,11 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :communication_channel
   has_many :delayed_messages, inverse_of: :notification_policy, :dependent => :destroy
 
-  validates :communication_channel_id, :frequency, presence: true
-  validates :frequency, inclusion: { in: [Notification::FREQ_IMMEDIATELY,
+  validates_presence_of :communication_channel_id, :frequency
+  validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
                                           Notification::FREQ_DAILY,
                                           Notification::FREQ_WEEKLY,
-                                          Notification::FREQ_NEVER] }
+                                          Notification::FREQ_NEVER]
 
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or
@@ -72,7 +72,7 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.all_cached.select { |n| (n.category&.underscore&.gsub(/\s/, '_')) == params[:category] }.map(&:id)
+      notifications = Notification.all_cached.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
       frequency = params[:frequency]
       cc = user.communication_channels.find(params[:channel_id])
 
@@ -118,7 +118,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   # Updates notification policies for a given category in a given communication channel
   def self.find_or_update_for_category(communication_channel, category, frequency = nil)
-    notifs = Notification.where(category: category)
+    notifs = Notification.where("category = ?", category)
     raise ActiveRecord::RecordNotFound unless notifs.exists?
 
     notifs.map do |notif|
@@ -137,7 +137,7 @@ class NotificationPolicy < ActiveRecord::Base
     communication_channel.shard.activate do
       unique_constraint_retry do
         np = communication_channel.notification_policies.where(notification_id: notification).first
-        unless np
+        if !np
           np = communication_channel.notification_policies.build(notification: notification)
           frequency ||= if communication_channel == communication_channel.user.communication_channel
                           notification.default_frequency(communication_channel.user)
@@ -157,7 +157,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   # frequencies is an optional hash; key is notification_name (underscore)
   def self.find_all_for(communication_channel, frequencies = {}, context_type: nil)
-    frequencies = frequencies.transform_keys { |name| BroadcastPolicy.notification_finder.by_name(name.titleize) }
+    frequencies = Hash[frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }]
     communication_channel.shard.activate do
       policies = communication_channel.notification_policies.to_a
       Notification.all_cached.each do |notification|

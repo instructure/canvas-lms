@@ -79,7 +79,7 @@ module Turnitin
                             .new_submission
         end
       end
-    rescue
+    rescue StandardError
       if attempt_number == self.class.max_attempts
         create_error_attachment
       end

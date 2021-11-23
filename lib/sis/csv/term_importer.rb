@@ -33,7 +33,7 @@ module SIS
       # expected columns
       # account_id,parent_account_id,name,status
       def process(csv, index = nil, count = nil)
-        SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             start_date = nil
             end_date = nil
@@ -51,6 +51,7 @@ module SIS
             end
           end
         end
+        count
       end
     end
   end

@@ -23,14 +23,14 @@ class Profile < ActiveRecord::Base
 
   serialize :data
 
-  validates :root_account, presence: true
-  validates :context, presence: true
-  validates :title, length: { :within => 0..255 }
-  validates :path, length: { :within => 0..255 }
-  validates :path, format: { :with => /\A[a-z0-9-]+\z/ }
-  validates :path, uniqueness: { :scope => :root_account_id }
-  validates :context_id, uniqueness: { :scope => :context_type }
-  validates :visibility, inclusion: { :in => %w[public unlisted private] }
+  validates_presence_of :root_account
+  validates_presence_of :context
+  validates_length_of :title, :within => 0..255
+  validates_length_of :path, :within => 0..255
+  validates_format_of :path, :with => /\A[a-z0-9-]+\z/
+  validates_uniqueness_of :path, :scope => :root_account_id
+  validates_uniqueness_of :context_id, :scope => :context_type
+  validates_inclusion_of :visibility, :in => %w{public unlisted private}
 
   def title=(title)
     write_attribute(:title, title)
@@ -61,7 +61,7 @@ class Profile < ActiveRecord::Base
   def self.data(field, options = {})
     options[:type] ||= :string
     define_method(field) {
-      data.key?(field) ? data[field] : data[field] = options[:default]
+      data.has_key?(field) ? data[field] : data[field] = options[:default]
     }
     define_method("#{field}=") { |value|
       data_before_type_cast[field] = value
@@ -76,8 +76,9 @@ class Profile < ActiveRecord::Base
     return nil unless value.present?
 
     case options[:type]
-    when :decimal, :float then value.to_f
-    when :int then value.to_i
+    when :decimal,
+           :float; value.to_f
+    when :int; value.to_i
     else value
     end
   end
@@ -85,7 +86,7 @@ class Profile < ActiveRecord::Base
   # some tricks to make it behave like STI with a type column
   def self.inherited(klass)
     super
-    context_type = klass.name.delete_suffix('Profile')
+    context_type = klass.name.sub(/Profile\z/, '')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
   end
 

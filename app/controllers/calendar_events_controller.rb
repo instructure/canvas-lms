@@ -24,7 +24,7 @@ class CalendarEventsController < ApplicationController
   before_action :require_context
   before_action :rce_js_env, only: [:new, :edit]
 
-  add_crumb(proc { t(:"#crumbs.calendar_events", "Calendar Events") }, :only => %i[show new edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
+  add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events") }, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
 
   def show
     @event = @context.calendar_events.find(params[:id])
@@ -125,10 +125,9 @@ class CalendarEventsController < ApplicationController
   protected
 
   def feature_context
-    case @context
-    when User
+    if @context.is_a?(User)
       @domain_root_account
-    when Group
+    elsif @context.is_a?(Group)
       @context.context
     else
       @context

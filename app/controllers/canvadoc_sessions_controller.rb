@@ -51,20 +51,11 @@ class CanvadocSessionsController < ApplicationController
       return render json: { error: "No annotations associated with that submission_attempt" }, status: :bad_request
     end
 
-    # Check whether the user can view annotations
-    enable_annotations = annotation_context.grants_right?(@current_user, :read)
-    # Allow observers to continue with annotations disabled (viewing draft) while others are unauthorized
-    return render_unauthorized_action unless enable_annotations || submission.observer?(@current_user)
+    return render_unauthorized_action unless annotation_context.grants_right?(@current_user, :read)
 
     render json: {
       annotation_context_launch_id: annotation_context.launch_id,
-      canvadocs_session_url: canvadocs_session_url(
-        @current_user,
-        annotation_context,
-        submission,
-        true,
-        enable_annotations
-      )
+      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission, true)
     }
   end
 

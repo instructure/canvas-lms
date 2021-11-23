@@ -27,15 +27,13 @@ module FeatureFlags
       # This is a "one-way" flag:
       #  - Once Allowed, it can no longer be set to Off.
       #  - Once On, it can no longer be Off nor Allowed.
-      case context
-      when Course
+      if context.is_a?(Course)
         transitions['off']['locked'] = true if from_state == 'on' # lock off to enforce no take backs
-      when Account
+      elsif context.is_a?(Account)
         transitions['allowed'] ||= {}
-        case from_state
-        when 'allowed'
+        if from_state == 'allowed'
           transitions['off']['locked'] = true # lock off to enforce no take backs
-        when 'on'
+        elsif from_state == 'on'
           # lock both `off` and `allowed` to enforce no take backs
           transitions['off']['locked'] = true
           transitions['allowed']['locked'] = true

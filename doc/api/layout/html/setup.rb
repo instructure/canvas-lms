@@ -46,7 +46,7 @@ def init
   end
 end
 
-def contents # rubocop:disable Style/TrivialAccessors not a Class
+def contents
   @contents
 end
 
@@ -60,7 +60,7 @@ end
 
 def diskfile
   content = "<div id='filecontents'>" +
-            case (File.extname(@file)[1..] || '').downcase
+            case (File.extname(@file)[1..-1] || '').downcase
             when 'htm', 'html'
               @contents
             when 'txt'

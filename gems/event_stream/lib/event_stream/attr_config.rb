@@ -28,7 +28,7 @@ module EventStream::AttrConfig
 
                 raise(ArgumentError, "Expected attribute #{name} to be a Proc: #{value.class}")
               }
-    }.freeze
+    }
 
     def attr_config_defaults
       @attr_config_defaults ||= {}
@@ -40,11 +40,11 @@ module EventStream::AttrConfig
 
     def attr_config(name, options = {})
       attr_config_known << name
-      if options.key?(:type)
+      if options.has_key?(:type)
         type = options[:type]
         typecast = CASTS[type]
       end
-      required = !options.key?(:default)
+      required = !options.has_key?(:default)
       unless required
         default = options[:default]
         default = typecast.call(name, default) if default && typecast
@@ -84,7 +84,7 @@ module EventStream::AttrConfig
 
   def attr_config_validate
     self.class.attr_config_defaults.each do |key, value|
-      unless attr_config_values.key?(key)
+      unless attr_config_values.has_key?(key)
         attr_config_values[key] = value
       end
     end

@@ -59,8 +59,8 @@ describe AppointmentGroup do
       )
 
       expect(group).to be_valid
-      selected = [c1section1.asset_string, c1section2.asset_string, c2section1.asset_string].sort
-      expect(group.sub_context_codes.sort).to eql selected
+      selected = [c1section1.asset_string, c1section2.asset_string, c2section1.asset_string].sort()
+      expect(group.sub_context_codes.sort()).to eql selected
     end
 
     it "ignores invalid sub context types" do
@@ -440,20 +440,20 @@ describe AppointmentGroup do
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
     end
 
-    it "notifies all participants when publishing", priority: "1" do
+    it "notifies all participants when publishing", priority: "1", test_id: 186566 do
       @ag.publish!
       expect(@ag.messages_sent).to be_include("Appointment Group Published")
       expect(@ag.messages_sent["Appointment Group Published"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
 
-    it "notifies all participants when adding appointments", priority: "1" do
+    it "notifies all participants when adding appointments", priority: "1", test_id: 193138 do
       @ag.publish!
       @ag.update(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
       expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
 
-    it "notifies all participants when deleting", priority: "1" do
+    it "notifies all participants when deleting", priority: "1", test_id: 193137 do
       @ag.publish!
       @ag.cancel_reason = "just because"
       @ag.destroy(@teacher)
@@ -489,12 +489,12 @@ describe AppointmentGroup do
 
     ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 17:00:00', '2012-01-01 18:00:00']])
     appt = ag.appointments.first
-    participants = Array.new(3) do
+    participants = 3.times.map {
       student_in_course(:course => @course, :active_all => true)
       participant = appt.reserve_for(@user, @teacher)
       expect(participant).to be_locked
       participant
-    end
+    }
 
     ag.destroy(@teacher)
     expect(appt.reload).to be_deleted
@@ -573,7 +573,7 @@ describe AppointmentGroup do
     end
 
     it "respects the current_only option" do
-      @ag.update(:new_appointments => [[(Time.zone.now - 2.hours).to_s, (Time.zone.now - 1.hour).to_s]])
+      @ag.update(:new_appointments => [[(Time.zone.now - 2.hour).to_s, (Time.zone.now - 1.hour).to_s]])
       expect(@ag.available_slots(current_only: true)).to eql 4
     end
   end

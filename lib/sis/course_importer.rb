@@ -66,7 +66,7 @@ module SIS
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless /\A(active|deleted|completed|unpublished|published)/i.match?(status)
+        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished|published)/i
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
 
         valid_grade_passback_settings = (Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',') << 'not_set')
@@ -96,8 +96,8 @@ module SIS
           end
 
           course_account_stuck = course.stuck_sis_fields.include?(:account_id)
-          if !course_account_stuck && account
-            course.account = account
+          unless course_account_stuck
+            course.account = account if account
           end
           course.account ||= @root_account
 
@@ -105,9 +105,9 @@ module SIS
 
           course.integration_id = integration_id
           course.sis_source_id = course_id
-          active_state = status.casecmp?('published') ? 'available' : 'claimed'
+          active_state = (status.downcase == 'published') ? 'available' : 'claimed'
           unless course.stuck_sis_fields.include?(:workflow_state)
-            if %w[active unpublished published].include?(status.downcase)
+            if %w(active unpublished published).include?(status.downcase)
               case course.workflow_state
               when 'completed'
                 # not using active state here, because it has always been set to available
@@ -121,10 +121,10 @@ module SIS
                 course.workflow_state = active_state
                 state_changes << :published if active_state == 'available'
               end
-            elsif /deleted/i.match?(status)
+            elsif status =~ /deleted/i
               course.workflow_state = 'deleted'
               state_changes << :deleted
-            elsif /completed/i.match?(status)
+            elsif status =~ /completed/i
               course.workflow_state = 'completed'
               state_changes << :concluded
             end
@@ -181,7 +181,7 @@ module SIS
             end
           end
 
-          update_enrollments = !course.new_record? && !(course.changes.keys & %w[workflow_state name course_code]).empty?
+          update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
 
           if course_format
             course_format = nil if course_format == 'not_set'
@@ -210,7 +210,7 @@ module SIS
               templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course_name_stuck
               templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course_course_code_stuck
               templated_course.enrollment_term = course.enrollment_term if !templated_course.stuck_sis_fields.include?(:enrollment_term_id) && !course_enrollment_term_id_stuck
-              if (templated_course.stuck_sis_fields & %i[start_at conclude_at restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
+              if (templated_course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
                 templated_course.start_at = course.start_at
                 templated_course.conclude_at = course.conclude_at
                 templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates

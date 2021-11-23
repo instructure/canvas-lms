@@ -19,7 +19,6 @@
 
 describe RuboCop::Cop::Specs::NoSeleniumWebDriverWait do
   subject(:cop) { described_class.new }
-
   let(:msg_regex) { /Avoid using Selenium::WebDriver::Wait/ }
 
   it 'disallows Selenium::WebDriver::Wait' do

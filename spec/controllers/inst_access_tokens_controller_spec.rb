@@ -34,26 +34,19 @@ describe InstAccessTokensController do
     context "with valid user session" do
       before { user_session(user) }
 
-      let(:deserialized_token) do
-        token = JSON.parse(response.body)['token']
-        decrypt_and_deserialize_token(token)
-      end
-
-      it "generates an InstAccess token for the requesting user" do
+      it "generates an InstAccess token for the requeting user" do
         post 'create', format: 'json'
         expect(response.status).to eq(201)
-        expect(deserialized_token.user_uuid).to eq(user.uuid)
+        token = JSON.parse(response.body)['token']
+        access_token = decrypt_and_deserialize_token(token)
+        expect(access_token.user_uuid).to eq(user.uuid)
       end
 
       it "has the user's domain in the token" do
         post 'create', format: 'json'
-        expect(deserialized_token.canvas_domain).to eq("test.host")
-      end
-
-      it 'has the region in the token' do
-        expect(ApplicationController).to receive(:region).and_return 'us-west-2'
-        post 'create', format: 'json'
-        expect(deserialized_token.region).to eq('us-west-2')
+        token = JSON.parse(response.body)['token']
+        access_token = decrypt_and_deserialize_token(token)
+        expect(access_token.canvas_domain).to eq("test.host")
       end
     end
 

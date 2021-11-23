@@ -59,7 +59,9 @@ module Quizzes
                    :course_quiz_quiz_submissions_url,
                    :course_quiz_submission_versions_url
 
-    delegate context: :quiz
+    def context
+      quiz.context
+    end
 
     def_delegators :@quiz, :quiz_questions
 
@@ -268,22 +270,24 @@ module Quizzes
       quiz.require_lockdown_browser_monitor?
     end
 
-    delegate lockdown_browser_monitor_data: :quiz
+    def lockdown_browser_monitor_data
+      quiz.lockdown_browser_monitor_data
+    end
 
     def serializable_object(**)
       hash = super
       # legacy v1 api
-      if accepts_jsonapi?
+      unless accepts_jsonapi?
+        hash.delete('links')
+        # id = hash['assignment_group']
+        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
+      else
         # since we're not embedding QuizStatistics as an association because
         # the statistics objects are built on-demand when the endpoint is
         # requested, and we only need the link, we'll have to assign it manually
         hash['links'] ||= {}
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
-      else
-        hash.delete('links')
-        # id = hash['assignment_group']
-        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       end
       if (mc_status = serializer_option(:master_course_status))
         hash.merge!(quiz.master_course_api_restriction_data(mc_status))
@@ -347,12 +351,10 @@ module Quizzes
     #
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
-      if !serializer_option(:skip_date_overrides) &&
-         context.user_has_been_student?(current_user) && due_dates.any?
-        due_dates[0][domain]
-      else
+      !serializer_option(:skip_date_overrides) &&
+        context.user_has_been_student?(current_user) && due_dates.any? ?
+        due_dates[0][domain] :
         quiz.send(domain)
-      end
     end
 
     def due_at

@@ -40,7 +40,7 @@ describe "Api::V1::GroupCategory" do
     describe 'groups_count' do
       it 'is absent without the includes' do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.key?("groups_count")).to be(false)
+        expect(json.keys.include?("groups_count")).to be(false)
       end
 
       it 'is present with the includes' do
@@ -53,13 +53,13 @@ describe "Api::V1::GroupCategory" do
     describe 'progress_url' do
       it 'is absent without the includes' do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.key?("progress")).to be(false)
+        expect(json.keys.include?("progress")).to be(false)
       end
 
       it 'is present with the includes' do
         allow(category).to receive_messages(current_progress: double(:pending? => true))
         json = CategoryHarness.new.group_category_json(category, nil, nil, { :include => ['progress_url'] })
-        expect(json["progress"]['url']).to match(%r{example.com/api/api_v1})
+        expect(json["progress"]['url']).to match(/example.com\/api\/api_v1/)
       end
     end
 

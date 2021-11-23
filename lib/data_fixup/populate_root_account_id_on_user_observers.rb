@@ -32,12 +32,14 @@ module DataFixup::PopulateRootAccountIdOnUserObservers
         # for the unlikely scenario that somehow an equivalent link was made after the deploy but before the fixup finished
         new_id = -1 * retry_count # just in case
         updates = { :root_account_id => new_id, :workflow_state => 'deleted' }
+        shadow.update(updates) if shadow
+        link.update(updates)
       else
         updates = { :root_account_id => root_account_id }
-        updates[:workflow_state] = 'deleted' if destroy
+        updates.merge!(:workflow_state => 'deleted') if destroy
+        shadow.update(updates) if shadow
+        link.update(updates)
       end
-      shadow&.update(updates)
-      link.update(updates)
     end
   end
 end

@@ -27,7 +27,7 @@ module Tracers
       @domain = domain
     end
 
-    def trace(key, metadata, &block)
+    def trace(key, metadata)
       if key == "validate"
         tags = {}
 
@@ -43,7 +43,9 @@ module Tracers
           InstStatsd::Statsd.increment("graphql.#{op}.count", tags: tags.merge(field: field))
         end
         InstStatsd::Statsd.increment("graphql.operation.count", tags: tags.merge(domain: @domain))
-        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain), &block)
+        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain)) do
+          yield
+        end
       else
         yield
       end

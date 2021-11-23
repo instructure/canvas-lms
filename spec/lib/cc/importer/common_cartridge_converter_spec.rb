@@ -40,7 +40,7 @@ describe "Standard Common Cartridge importing" do
 
   it "imports webcontent" do
     expect(@course.attachments.count).to eq 10
-    atts = %w[I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3]
+    atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
     atts.each do |mig_id|
       expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
@@ -49,7 +49,7 @@ describe "Standard Common Cartridge importing" do
   it "imports files as assignments with intended_use set" do
     assignment = @course.assignments.where(:migration_id => "f5").first
     att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
-    expect(assignment.description).to match_ignoring_whitespace(%(<img src="/courses/#{@course.id}/files/#{att.id}/preview">))
+    expect(assignment.description).to match_ignoring_whitespace(%{<img src="/courses/#{@course.id}/files/#{att.id}/preview">})
     expect(assignment.title).to eq "Assignment 2"
   end
 
@@ -59,11 +59,11 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
 
     dt = @course.discussion_topics.where(migration_id: "I_00006_R").first
-    expect(dt.message).to match_ignoring_whitespace(%(Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">))
+    expect(dt.message).to match_ignoring_whitespace(%{Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">})
     dt.attachment_id = file2_id
 
     dt = @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to match_ignoring_whitespace(%(Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>))
+    expect(dt.message).to match_ignoring_whitespace(%{Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>})
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
@@ -232,7 +232,7 @@ describe "Standard Common Cartridge importing" do
 
     it "imports webcontent" do
       expect(@course.attachments.active.count).to eq 10
-      mig_ids = %w[I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3]
+      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
         expect(atts.length).to eq 1
@@ -377,7 +377,7 @@ describe "Standard Common Cartridge importing" do
 
       mods = @course.context_modules.to_a
       expect(mods.map(&:position)).to eql [1, 2, 3, 4]
-      expect(mods.map(&:name)).to eql %w[ponies monsters monkeys last]
+      expect(mods.map(&:name)).to eql %w(ponies monsters monkeys last)
     end
 
     it "fixes position conflicts for assignment groups" do
@@ -404,7 +404,7 @@ describe "Standard Common Cartridge importing" do
 
       ags = @course.assignment_groups.to_a
       expect(ags.map(&:position)).to eql [1, 2, 3, 4]
-      expect(ags.map(&:name)).to eql %w[monkeys ponies monsters last]
+      expect(ags.map(&:name)).to eql %w(monkeys ponies monsters last)
     end
   end
 
@@ -493,20 +493,16 @@ describe "More Standard Common Cartridge importing" do
     # make all the fake attachments for the module items to link to
     unfiled_folder = Folder.unfiled_folder(@copy_to)
     w1 = Attachment.create!(:filename => 'w1.html', :uploaded_data => StringIO.new('w1'), :folder => unfiled_folder, :context => @copy_to)
-    w1.migration_id = "w1"
-    w1.save
+    w1.migration_id = "w1"; w1.save
     f3 = Attachment.create!(:filename => 'f3.html', :uploaded_data => StringIO.new('f3'), :folder => unfiled_folder, :context => @copy_to)
-    f3.migration_id = "f3"
-    f3.save
+    f3.migration_id = "f3"; f3.save
     f4 = Attachment.create!(:filename => 'f4.html', :uploaded_data => StringIO.new('f4'), :folder => unfiled_folder, :context => @copy_to)
-    f4.migration_id = "f4"
-    f4.save
+    f4.migration_id = "f4"; f4.save
     f5 = Attachment.create!(:filename => 'f5.html', :uploaded_data => StringIO.new('f5'), :folder => unfiled_folder, :context => @copy_to)
-    f5.migration_id = "f5"
-    f5.save
+    f5.migration_id = "f5"; f5.save
 
     # import json into new course
-    hash = hash.map(&:with_indifferent_access)
+    hash = hash.map { |h| h.with_indifferent_access }
     Importers::ContextModuleImporter.process_migration({ 'modules' => hash }, @migration)
     @copy_to.save!
 
@@ -582,7 +578,7 @@ describe "non-ASCII attachment names" do
                 "abc.txt",
                 "molé.txt",
                 "xyz.txt"]
-    expect(@converter.course[:file_map].values.pluck(:path_name).sort).to eq contents.sort
+    expect(@converter.course[:file_map].values.map { |v| v[:path_name] }.sort).to eq contents.sort
 
     Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)

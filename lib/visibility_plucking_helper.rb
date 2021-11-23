@@ -50,7 +50,7 @@ module VisibilityPluckingHelper
 
     def empty_id_hash(ids)
       # [1,2,3] => {1:[],2:[],3:[]}
-      ids.zip(ids.map { [] }).to_h
+      Hash[ids.zip(ids.map { [] })]
     end
 
     def check_args(opts, key)
@@ -59,7 +59,7 @@ module VisibilityPluckingHelper
     end
 
     def pluck_own_and_user_ids(column_to_pluck, opts)
-      where(opts).pluck(:user_id, column_to_pluck)
+      self.where(opts).pluck(:user_id, column_to_pluck)
     end
   end
 end

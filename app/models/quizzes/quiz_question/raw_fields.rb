@@ -28,11 +28,11 @@ class Quizzes::QuizQuestion::RawFields
   end
 
   def fetch_any(key, default = "")
-    if key.is_a?(Array)
+    unless key.is_a?(Array)
+      @fields[key] || default
+    else
       found = key.find { |k| @fields.key?(k) }
       @fields[found] || default
-    else
-      @fields[key] || default
     end
   end
 
@@ -51,7 +51,7 @@ class Quizzes::QuizQuestion::RawFields
 
   def check_length(html, type, max)
     if html && html.length > max
-      raise FieldTooLongError, "#{type} is too long, max length is #{max} characters"
+      raise FieldTooLongError.new("#{type} is too long, max length is #{max} characters")
     end
 
     html

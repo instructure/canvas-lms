@@ -112,8 +112,8 @@ describe Api::V1::DiscussionTopics do
     @me.update! pronouns: "she/her"
 
     expect(
-      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
-    ).to have_key("user_pronouns")
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronouns")
+    ).to eq true
     expect(
       @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronouns"]
     ).to eq "she/her"
@@ -191,7 +191,7 @@ describe DiscussionTopicsController, type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{locked_item.id}",
-        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s }
+        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s },
       )
     end
   end
@@ -292,21 +292,6 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.podcast_has_student_posts?).to eq true
       expect(@topic.require_initial_post?).to eq true
       expect(@topic.todo_date).to eq todo_date
-    end
-
-    context "anonymous discussions" do
-      before do
-        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json",
-                   :course_id => @course.to_param },
-                 { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded",
-                   :anonymous_state => "full_anonymity" })
-        @topic = @course.discussion_topics.order(:id).last
-      end
-
-      it "creates a fully anonymous discussion" do
-        expect(@topic["anonymous_state"]).to eq "full_anonymity"
-      end
     end
 
     context "publishing" do
@@ -555,7 +540,9 @@ describe DiscussionTopicsController, type: :request do
       it "only includes topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @topic2, @topic3].each(&:save!)
+        [@topic, @topic2, @topic3].each do |topic|
+          topic.save!
+        end
         [@topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
 
@@ -618,7 +605,7 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                         { controller: 'discussion_topics', action: 'index', format: 'json', course_id: @course.id.to_s })
 
-        json_topic = json.find { |t| t['group_category_id'] }
+        json_topic = json.select { |t| t['group_category_id'] }.first
 
         expect(json_topic).not_to be nil
         expect(json_topic['group_category_id']).to eq group_topic.group_category_id
@@ -1450,17 +1437,17 @@ describe DiscussionTopicsController, type: :request do
       get_index(topic.context)
       expect(JSON.parse(response.body).to_s).to include(topic.assignment.title.to_s)
 
-      calls = %i[get_show get_entries get_replies add_entry add_reply]
+      calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
       calls.reject! { |call| opts[:except].include?(call) }
-      calls.each { |call| expect(send(call, topic).to_s).not_to eq "401" }
+      calls.each { |call| expect(self.send(call, topic).to_s).not_to eq "401" }
     end
 
     def calls_do_not_show_topic(topic)
       get_index(topic.context)
       expect(JSON.parse(response.body).to_s).not_to include(topic.assignment.title.to_s)
 
-      calls = %i[get_show get_entries get_replies add_entry add_reply]
-      calls.each { |call| expect(send(call, topic).to_s).to eq "401" }
+      calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
+      calls.each { |call| expect(self.send(call, topic).to_s).to eq "401" }
     end
 
     def get_index(course)
@@ -1590,7 +1577,7 @@ describe DiscussionTopicsController, type: :request do
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics} }).to be_truthy
+    expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
     expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -1600,7 +1587,7 @@ describe DiscussionTopicsController, type: :request do
                     { :controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :page => '3', :per_page => '3' })
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics} }).to be_truthy
+    expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
     expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -1693,7 +1680,7 @@ describe DiscussionTopicsController, type: :request do
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ %r{api/v1/groups/#{group.id}/discussion_topics} }).to be_truthy
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
     expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -1703,7 +1690,7 @@ describe DiscussionTopicsController, type: :request do
                     { :controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :page => '3', :per_page => '3' })
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ %r{api/v1/groups/#{group.id}/discussion_topics} }).to be_truthy
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
     expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -1997,7 +1984,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 3
       expect(json.map { |e| e['id'] }).to eq entries.last(3).reverse.map(&:id)
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries} }).to be_truthy
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -2011,7 +1998,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 2
       expect(json.map { |e| e['id'] }).to eq [entries.first, @entry].map(&:id)
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries} }).to be_truthy
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -2093,7 +2080,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 3
       expect(json.map { |e| e['id'] }).to eq replies.last(3).reverse.map(&:id)
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies} }).to be_truthy
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -2107,7 +2094,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 2
       expect(json.map { |e| e['id'] }).to eq [replies.first, @reply].map(&:id)
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies} }).to be_truthy
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -2461,7 +2448,7 @@ describe DiscussionTopicsController, type: :request do
       url = +"/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
       expected_params = { :controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
                           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }
-      if opts.key?(:forced)
+      if opts.has_key?(:forced)
         url << "?forced_read_state=#{opts[:forced]}"
         expected_params[:forced_read_state] = opts[:forced].to_s
       end
@@ -2681,7 +2668,7 @@ describe DiscussionTopicsController, type: :request do
 
       it "sets and return editor_id if editing another user's post" do
         pending "WIP: Not implemented"
-        raise
+        fail
       end
 
       it "fails if the max entry depth is reached" do
@@ -3020,7 +3007,7 @@ describe DiscussionTopicsController, type: :request do
     override = @assignment.assignment_overrides.build
     override.set = @section
     override.title = "extension"
-    override.due_at = 2.days.from_now
+    override.due_at = 2.day.from_now
     override.due_at_overridden = true
     override.save!
 
@@ -3035,7 +3022,7 @@ describe DiscussionTopicsController, type: :request do
       course_with_teacher(:active_all => true)
       @student = User.create!(:name => "foo", :short_name => "fo")
       student_in_course(:course => @course, :active_all => true)
-      group_discussion_topic_model
+      group_discussion_topic_model()
     end
 
     it "checks permissions" do
@@ -3053,7 +3040,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "cannot duplicate announcements" do
       @user = @teacher
-      announcement_model
+      announcement_model()
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@a.id}/duplicate",
                { :controller => "discussion_topics_api",
                  :action => "duplicate",
@@ -3095,7 +3082,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "404s if deleted" do
       @user = @teacher
-      discussion_topic_model
+      discussion_topic_model()
       @topic.destroy
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
                { :controller => "discussion_topics_api",
@@ -3343,7 +3330,7 @@ describe DiscussionTopicsController, type: :request do
     course_with_teacher(:active_all => true)
     account_admin_user(account: @course.account) # sets @admin
 
-    ann_ids_ordered_by_posted_at = Array.new(10) do |i|
+    ann_ids_ordered_by_posted_at = 10.times.map do |i|
       ann = Announcement.create!({
                                    context: @course,
                                    message: "Test Message",

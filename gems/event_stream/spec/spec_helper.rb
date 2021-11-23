@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 begin
-  require '../../spec/coverage_tool'
+  require '../../spec/coverage_tool.rb'
   CoverageTool.start('event_stream-gem')
 rescue LoadError => e
   puts "Error: #{e}"

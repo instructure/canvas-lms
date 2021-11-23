@@ -53,13 +53,6 @@ import {
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 
-import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls'
-import {RequestDispatch} from '@canvas/network'
-
-const performance_controls = {
-  students_chunk_size: 2 // students per page,
-}
-
 const $fixtures = document.getElementById('fixtures')
 
 /* eslint-disable qunit/no-identical-names */
@@ -2430,6 +2423,22 @@ test('sets teacherNotesUpdating to true before sending the api request', functio
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
+test('sets contextModulesLoaded to false if there are modules', function () {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: true
+  }).contentLoadStates
+  equal(contextModulesLoaded, false)
+})
+
+test('sets contextModulesLoaded to true if there are no modules', function () {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: false
+  }).contentLoadStates
+  equal(contextModulesLoaded, true)
+})
+
 test('re-renders the view options menu after setting teacherNotesUpdating', function () {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
@@ -3186,8 +3195,8 @@ QUnit.module('Menus', {
 
 test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
   this.gradebook.renderViewOptionsMenu()
-  const buttonText = this.gradebook.props.viewOptionsMenuNode
-    .querySelector('Button')
+  const buttonText = document
+    .querySelector('[data-component="ViewOptionsMenu"] Button')
     .innerText.trim()
   equal(buttonText, 'View')
 })
@@ -6004,47 +6013,45 @@ QUnit.module('Gradebook', () => {
   QUnit.module('#updateFilterSettings', hooks => {
     let gradebook
     let currentFilters
-    const options = {
-      enhanced_gradebook_filters: false,
-      grading_period_set: {
-        id: '1501',
-        grading_periods: [
-          {id: '1401', title: 'Grading Period #1'},
-          {id: '1402', title: 'Grading Period #2'}
-        ]
-      },
-      sections: [
-        {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
-      ],
-      sections_enabled: true,
-      settings: {
-        filter_columns_by: {
-          assignment_group_id: '2',
-          grading_period_id: '1402',
-          context_module_id: '2'
-        },
-        filter_rows_by: {
-          section_id: '2001'
-        },
-        selected_view_options_filters: currentFilters
-      },
-      isModulesLoading: false,
-      modules: [
-        {id: '1', name: 'Module 1', position: 1},
-        {id: '2', name: 'Another Module', position: 2},
-        {id: '3', name: 'Module 2', position: 3}
-      ]
-    }
 
     hooks.beforeEach(() => {
       setFixtureHtml($fixtures)
       currentFilters = ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
-      gradebook = createGradebook(options)
+      gradebook = createGradebook({
+        enhanced_gradebook_filters: false,
+        grading_period_set: {
+          id: '1501',
+          grading_periods: [
+            {id: '1401', title: 'Grading Period #1'},
+            {id: '1402', title: 'Grading Period #2'}
+          ]
+        },
+        sections: [
+          {id: '2001', name: 'Freshmen'},
+          {id: '2002', name: 'Sophomores'}
+        ],
+        sections_enabled: true,
+        settings: {
+          filter_columns_by: {
+            assignment_group_id: '2',
+            grading_period_id: '1402',
+            context_module_id: '2'
+          },
+          filter_rows_by: {
+            section_id: '2001'
+          },
+          selected_view_options_filters: currentFilters
+        }
+      })
       gradebook.setAssignmentGroups({
         1: {id: '1', name: 'Assignment Group #1'},
         2: {id: '2', name: 'Assignment Group #2'}
       })
+      gradebook.setContextModules([
+        {id: '1', name: 'Module 1', position: 1},
+        {id: '2', name: 'Another Module', position: 2},
+        {id: '3', name: 'Module 2', position: 3}
+      ])
 
       sinon.spy(gradebook, 'setFilterColumnsBySetting')
       sinon.stub(gradebook, 'saveSettings')
@@ -6098,15 +6105,12 @@ QUnit.module('Gradebook', () => {
     })
 
     test('deletes the modules filter setting when the filter is hidden and modules have loaded', () => {
+      gradebook.contentLoadStates.contextModulesLoaded = true
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null)
     })
 
     test('does not delete the modules filter setting when the filter is hidden and modules have not loaded', () => {
-      gradebook = createGradebook({
-        ...options,
-        isModulesLoading: true
-      })
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
     })
@@ -9770,65 +9774,6 @@ QUnit.module('Gradebook#setCurrentGradingPeriod', hooks => {
   })
 })
 
-QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
-  let gradebook
-
-  hooks.beforeEach(() => {
-    gradebook = createGradebook({
-      grid: {
-        getColumns: () => [],
-        updateCell: sinon.stub()
-      },
-      settings: {
-        allow_separate_first_last_names: 'true'
-      }
-    })
-
-    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
-      callback()
-    })
-  })
-
-  test('toggles showSeparateFirstLastNames to true when false', () => {
-    gradebook.gridDisplaySettings.showSeparateFirstLastNames = false
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    gradebook.toggleShowSeparateFirstLastNames()
-
-    strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, true)
-  })
-
-  test('toggles showSeparateFirstLastNames to false when true', () => {
-    gradebook.gridDisplaySettings.showSeparateFirstLastNames = true
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    gradebook.toggleShowSeparateFirstLastNames()
-
-    strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, false)
-  })
-
-  test('calls updateColumnsAndRenderViewOptionsMenu after toggling', () => {
-    gradebook.gridDisplaySettings.showSeparateFirstLastNames = true
-    const stubFn = sandbox
-      .stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-      .callsFake(() => {
-        strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, false)
-      })
-    gradebook.toggleShowSeparateFirstLastNames()
-
-    strictEqual(stubFn.callCount, 1)
-  })
-
-  test('calls saveSettings with the new value of the setting', () => {
-    gradebook.gridDisplaySettings.showSeparateFirstLastNames = false
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-
-    gradebook.toggleShowSeparateFirstLastNames()
-
-    deepEqual(gradebook.saveSettings.firstCall.args[0], {
-      showSeparateFirstLastNames: true
-    })
-  })
-})
-
 QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   let gradebook
 
@@ -9920,11 +9865,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   let container
 
   hooks.beforeEach(() => {
-    const performanceControls = new PerformanceControls(performance_controls)
-    const dispatch = new RequestDispatch({
-      activeRequestLimit: performanceControls.activeRequestLimit
-    })
-
     // We need to actually mount and render the Gradebook component here to
     // ensure that grid colors (which use setState) are properly updated
     container = document.body.appendChild(document.createElement('div'))
@@ -9939,9 +9879,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       settings: {
         show_unpublished_assignments: false
       },
-      view_ungraded_as_zero: false,
-      performanceControls,
-      dispatch
+      view_ungraded_as_zero: false
     })
     ReactDOM.render(component, container)
 
@@ -9980,7 +9918,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     sinon.stub(GradebookApi, 'updateTeacherNotesColumn').resolves()
 
     sinon.stub(FlashAlert, 'showFlashError')
-    setFixtureHtml(container)
   })
 
   hooks.afterEach(() => {
@@ -10055,7 +9992,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     })
   })
 
-  QUnit.module('when updating view settings', () => {
+  QUnit.module('when updating teacher notes settings', () => {
     QUnit.module('when the notes column does not exist', () => {
       test('calls the createTeacherNotesColumn API function if showNotes is true', async () => {
         await gradebook.handleViewOptionsUpdated({showNotes: true})
@@ -10138,7 +10075,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     QUnit.module('when updating items stored in user settings', () => {
       const updateParams = (overrides = {}) => ({
         showUnpublishedAssignments: false,
-        showSeparateFirstLastNames: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         ...overrides
@@ -10164,33 +10100,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       test('does not call saveUserSettings if no value has changed', async () => {
         await gradebook.handleViewOptionsUpdated(updateParams())
         strictEqual(GradebookApi.saveUserSettings.callCount, 0)
-      })
-
-      QUnit.module('updating showSeparateFirstLastNames assignments', () => {
-        test('shows separate last/first names when showSeparateFirstLastNames is set to true', async () => {
-          await gradebook.handleViewOptionsUpdated(updateParams({showSeparateFirstLastNames: true}))
-          deepEqual(gradebook.gridData.columns.frozen, ['student_lastname', 'student_firstname'])
-        })
-
-        test('shows student name when showSeparateFirstLastNames is set to false', async () => {
-          await gradebook.handleViewOptionsUpdated(
-            updateParams({showSeparateFirstLastNames: false})
-          )
-          deepEqual(gradebook.gridData.columns.frozen, ['student'])
-        })
-
-        test('does not update student columns if the request fails', async () => {
-          QUnit.expect(1)
-          GradebookApi.saveUserSettings.rejects(new Error('no way'))
-
-          try {
-            await gradebook.handleViewOptionsUpdated(
-              updateParams({showSeparateFirstLastNames: true})
-            )
-          } catch {
-            deepEqual(gradebook.gridData.columns.frozen, ['student'])
-          }
-        })
       })
 
       QUnit.module('updating showing unpublished assignments', () => {
@@ -10398,10 +10307,13 @@ QUnit.module('Gradebook#saveSettings', () => {
 QUnit.module('Gradebook', suiteHooks => {
   let $container
   let gradebook
+  let options
 
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
+
+    options = {}
   })
 
   suiteHooks.afterEach(() => {
@@ -10410,7 +10322,7 @@ QUnit.module('Gradebook', suiteHooks => {
   })
 
   QUnit.module('#_updateEssentialDataLoaded()', () => {
-    function createInitializedGradebook(options) {
+    function createInitializedGradebook() {
       gradebook = createGradebook(options)
       sinon.stub(gradebook.dataLoader, 'loadInitialData')
       sinon.stub(gradebook, 'finishRenderingUI')
@@ -10419,6 +10331,7 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)
       gradebook.setAssignmentsLoaded()
+      gradebook.setContextModulesLoaded(true)
       gradebook.setCustomColumnsLoaded(true)
     }
 
@@ -10442,7 +10355,8 @@ QUnit.module('Gradebook', suiteHooks => {
     })
 
     test('does not finish rendering the UI when context modules are not loaded', async () => {
-      createInitializedGradebook({isModulesLoading: true})
+      createInitializedGradebook()
+      gradebook.setContextModulesLoaded(false)
       gradebook._updateEssentialDataLoaded()
       await waitForTick()
       strictEqual(gradebook.finishRenderingUI.callCount, 0)
@@ -10466,7 +10380,7 @@ QUnit.module('Gradebook', suiteHooks => {
 
     QUnit.module('when the course uses grading periods', contextHooks => {
       contextHooks.beforeEach(() => {
-        createInitializedGradebook({
+        options = {
           grading_period_set: {
             grading_periods: [
               {id: '1501', weight: 50},
@@ -10475,7 +10389,8 @@ QUnit.module('Gradebook', suiteHooks => {
             id: '1401',
             weighted: true
           }
-        })
+        }
+        createInitializedGradebook()
       })
 
       test('finishes rendering the UI when all essential data is loaded', async () => {

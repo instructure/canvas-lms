@@ -21,7 +21,7 @@ module Mutable
   def mute!
     return if muted?
 
-    update_attribute(:muted, true)
+    self.update_attribute(:muted, true)
     clear_sent_messages
     hide_submissions if respond_to?(:hide_submissions)
     ensure_post_policy(post_manually: true) if respond_to?(:ensure_post_policy)
@@ -31,7 +31,7 @@ module Mutable
   def unmute!
     return unless muted?
 
-    update_attribute(:muted, false)
+    self.update_attribute(:muted, false)
     post_submissions if respond_to?(:post_submissions)
     ensure_post_policy(post_manually: false) if respond_to?(:ensure_post_policy)
     true
@@ -40,13 +40,13 @@ module Mutable
   protected
 
   def clear_sent_messages
-    clear_broadcast_messages if respond_to? :clear_broadcast_messages
+    self.clear_broadcast_messages if self.respond_to? :clear_broadcast_messages
   end
 
   def hide_stream_items(submissions:)
     if submissions.present?
       submission_ids = submissions.pluck(:id)
-      stream_items = StreamItem.select(%i[id context_type context_id])
+      stream_items = StreamItem.select([:id, :context_type, :context_id])
                                .where(asset_type: 'Submission', asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
@@ -60,7 +60,7 @@ module Mutable
 
       # Teachers want to hide their submission comments if they mute
       # the assignment after leaving them.
-      instructor_ids = context.instructors.pluck(:id)
+      instructor_ids = self.context.instructors.pluck(:id)
       visible_comment_sub_ids =
         SubmissionComment.where(hidden: false, submission_id: submission_ids, author_id: instructor_ids)
                          .pluck(:submission_id)
@@ -71,7 +71,7 @@ module Mutable
   def show_stream_items(submissions:)
     if submissions.present?
       submission_ids = submissions.pluck(:id)
-      stream_items = StreamItem.select(%i[id context_type context_id])
+      stream_items = StreamItem.select([:id, :context_type, :context_id])
                                .where(asset_type: 'Submission', asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }

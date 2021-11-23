@@ -39,7 +39,7 @@ module SeleniumExtensions
         # If there is an alert open, the calling code needs to accept it, so we won't be reloading
         # as part of this event. Once the alert is accepted or discarded, we will then wait for
         # page reloads or outstanding AJAX requests.
-        nil
+        return
       end
     end
   end
@@ -136,7 +136,7 @@ module SeleniumExtensions
       raise unless finder_proc
 
       location = CallStackUtils.best_line_for($ERROR_INFO.backtrace)
-      warn "WARNING: StaleElementReferenceError at #{location.first}, attempting to recover..."
+      $stderr.puts "WARNING: StaleElementReferenceError at #{location.first}, attempting to recover..."
       @id = finder_proc.call.ref
       retry
     end
@@ -192,18 +192,20 @@ module SeleniumExtensions
     class << self
       attr_accessor :timeout
 
-      def wait_for(method:, timeout: self.timeout, ignore: nil, &block)
+      def wait_for(method:, timeout: self.timeout, ignore: nil)
         return yield if timeout == 0
 
         prevent_nested_waiting(method) do
-          Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until(&block)
+          Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
+            yield
+          end
         end
       rescue Selenium::WebDriver::Error::TimeoutError
         false
       end
 
       def disable
-        original_wait = timeout
+        original_wait = self.timeout
         self.timeout = 0
         yield
       ensure

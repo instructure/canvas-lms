@@ -128,9 +128,9 @@ module MessageBus
     ns = MessageBus::Namespace.build(namespace)
     check_conn_pool(["producers", ns.to_s, topic_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
-      ::MessageBus::CaCert.ensure_presence!(config)
-      topic = topic_url(ns, topic_name)
-      client.create_producer(topic)
+      ::MessageBus::CaCert.ensure_presence!(self.config)
+      topic = self.topic_url(ns, topic_name)
+      self.client.create_producer(topic)
     end
   end
 
@@ -171,18 +171,18 @@ module MessageBus
     ns = MessageBus::Namespace.build(namespace)
     check_conn_pool(["consumers", ns.to_s, topic_name, subscription_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
-      ::MessageBus::CaCert.ensure_presence!(config)
+      ::MessageBus::CaCert.ensure_presence!(self.config)
       topic = topic_url(ns, topic_name)
       consumer_config = Pulsar::ConsumerConfiguration.new({})
       consumer_config.subscription_initial_position = :earliest
-      client.subscribe(topic, subscription_name, consumer_config)
+      self.client.subscribe(topic, subscription_name, consumer_config)
     end
   end
 
   def self.topic_url(namespace, topic_name, app_env = Canvas.environment)
     ns = MessageBus::Namespace.build(namespace)
     app_env = (app_env || "development").downcase
-    conf_hash = config
+    conf_hash = self.config
     # by using the application env in the topic name, we can
     # share a non-prod pulsar instance between environments
     # like test/beta/edge whatever and not have to provision
@@ -253,7 +253,7 @@ module MessageBus
         # if we're forcing fresh, we want to close our existing
         # connections as politely as possible
         begin
-          cached_object.close
+          cached_object.close()
         rescue ::Pulsar::Error::AlreadyClosed
           Rails.logger.warn("evicting an already-closed pulsar topic client for #{path}")
         end
@@ -278,7 +278,7 @@ module MessageBus
     return @client if @client
 
     Bundler.require(:pulsar)
-    conf_hash = config
+    conf_hash = self.config
     token_vault_path = conf_hash['PULSAR_TOKEN_VAULT_PATH']
     if token_vault_path.present?
       conf_hash = conf_hash.dup
@@ -294,7 +294,7 @@ module MessageBus
   end
 
   def self.enabled?
-    hash = config
+    hash = self.config
     hash['PULSAR_BROKER_URI'].present? && hash['PULSAR_TENANT'].present?
   end
 
@@ -387,7 +387,7 @@ module MessageBus
       if thread_conn_pool['producers'].present?
         thread_conn_pool['producers'].each do |_namespace, topic_map|
           topic_map.each do |topic, producer|
-            producer.close
+            producer.close()
           rescue Pulsar::Error::AlreadyClosed
             Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
           end
@@ -399,7 +399,7 @@ module MessageBus
       thread_conn_pool['consumers'].each do |_namespace, topic_map|
         topic_map.each do |topic, subscription_map|
           subscription_map.each do |sub_name, consumer|
-            consumer.close
+            consumer.close()
           rescue Pulsar::Error::AlreadyClosed
             Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
           end

@@ -19,13 +19,13 @@
 
 module Quizzes
   class QuizStatisticsSerializer < Canvas::APISerializer
-    SubmissionStatisticsExtractor = /^submission_(.+)/.freeze
+    SubmissionStatisticsExtractor = /^submission_(.+)/
 
     # Utilizes both Student and Item analysis to generate a compound document of
     # quiz statistics.
     #
     # This is what you should pass to this serializer!!!
-    Input = Struct.new(:quiz, :options, :student_analysis, :item_analysis) do
+    class Input < Struct.new(:quiz, :options, :student_analysis, :item_analysis)
       include ActiveModel::SerializerSupport
     end
 
@@ -143,7 +143,9 @@ module Quizzes
       object[:student_analysis].includes_sis_ids
     end
 
-    delegate points_possible: :quiz
+    def points_possible
+      quiz.points_possible
+    end
 
     def anonymous_survey
       quiz.anonymous_survey?

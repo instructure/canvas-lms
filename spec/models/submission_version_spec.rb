@@ -68,7 +68,7 @@ describe SubmissionVersion do
     it "creates a new record for each version" do
       n = 5
 
-      submissions = Array.new(n) { unversioned_submission }
+      submissions = n.times.map { unversioned_submission }
       versions = submissions.map { |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
 
       expect {

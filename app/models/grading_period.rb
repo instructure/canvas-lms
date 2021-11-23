@@ -68,7 +68,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def self.date_in_closed_grading_period?(course:, date:, periods: nil)
-    period = for_date_in_course(date: date, course: course, periods: periods)
+    period = self.for_date_in_course(date: date, course: course, periods: periods)
     period.present? && period.closed?
   end
 
@@ -76,7 +76,7 @@ class GradingPeriod < ActiveRecord::Base
     periods ||= self.for(course)
 
     if date.nil?
-      periods.max_by(&:end_date)
+      return periods.sort_by(&:end_date).last
     else
       periods.detect { |p| p.in_date_range?(date) }
     end
@@ -156,7 +156,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def self.json_for(context, user)
     periods = self.for(context).sort_by(&:start_date)
-    periods_json(periods, user)
+    self.periods_json(periods, user)
   end
 
   def self.periods_json(periods, user)
@@ -167,9 +167,9 @@ class GradingPeriod < ActiveRecord::Base
 
   def as_json_with_user_permissions(user)
     as_json(
-      only: %i[id title start_date end_date close_date weight],
+      only: [:id, :title, :start_date, :end_date, :close_date, :weight],
       permissions: { user: user },
-      methods: [:is_last, :is_closed]
+      methods: [:is_last, :is_closed],
     ).fetch(:grading_period)
   end
 
@@ -255,7 +255,7 @@ class GradingPeriod < ActiveRecord::Base
     if new_record?
       grading_periods
     else
-      grading_periods.where.not(id: id)
+      grading_periods.where("id <> ?", id)
     end
   end
 

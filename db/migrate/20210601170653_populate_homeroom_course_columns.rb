@@ -24,4 +24,7 @@ class PopulateHomeroomCourseColumns < ActiveRecord::Migration[6.0]
   def up
     DataFixup::MigrateHomeroomSettingsToColumns.run
   end
+
+  def down
+  end
 end

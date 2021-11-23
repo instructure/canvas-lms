@@ -187,7 +187,7 @@ describe "assignments" do
       it "allows submission when within override locks" do
         @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
-        @override.unlock_at = Time.now.utc - 1.day # available now
+        @override.unlock_at = Time.now.utc - 1.days # available now
         @override.save!
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -249,14 +249,14 @@ describe "assignments" do
     context "google drive" do
       before do
         PluginSetting.create!(:name => 'google_drive', :settings => {})
-        setup_google_drive
+        setup_google_drive()
       end
 
       after do
         click_away_accept_alert
       end
 
-      it "has a google doc tab if google docs is enabled", priority: "1" do
+      it "has a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
         @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
@@ -268,7 +268,7 @@ describe "assignments" do
       context "select file or folder" do
         before do
           # double out function calls
-          google_drive_connection = double
+          google_drive_connection = double()
           allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
           allow(google_drive_connection).to receive(:retrieve_access_token).and_return('access_token')
           allow(google_drive_connection).to receive(:authorized?).and_return(true)
@@ -287,13 +287,13 @@ describe "assignments" do
           wait_for_animations
         end
 
-        it "selects a file from google drive", priority: "1" do
+        it "selects a file from google drive", priority: "1", test_id: 161886 do
           # find file in list
           # the file we are looking for is created as the second file in the list
           expect(ff(".filename")[1]).to include_text("test.mydoc")
         end
 
-        it "selects a file in a folder from google drive", priority: "1" do
+        it "selects a file in a folder from google drive", priority: "1", test_id: 161885 do
           # open folder
           f(".folder").click
           wait_for_animations
@@ -303,9 +303,9 @@ describe "assignments" do
         end
       end
 
-      it "forces users to authenticate", priority: "1" do
+      it "forces users to authenticate", priority: "1", test_id: 161892 do
         # double out google drive
-        google_drive_connection = double
+        google_drive_connection = double()
         allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
         allow(google_drive_connection).to receive(:retrieve_access_token).and_return(nil)
         allow(google_drive_connection).to receive(:authorized?).and_return(nil)

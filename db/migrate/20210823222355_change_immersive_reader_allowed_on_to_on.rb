@@ -23,4 +23,7 @@ class ChangeImmersiveReaderAllowedOnToOn < ActiveRecord::Migration[6.0]
   def self.up
     DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
   end
+
+  def self.down
+  end
 end

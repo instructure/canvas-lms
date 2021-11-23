@@ -26,12 +26,12 @@ module Importers
     def self.process_migration(data, migration)
       groups = data['groups'] || []
       groups.each do |group|
-        next unless migration.import_object?("groups", group['migration_id'])
-
-        begin
-          import_from_migration(group, migration.context, migration)
-        rescue
-          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
+        if migration.import_object?("groups", group['migration_id'])
+          begin
+            self.import_from_migration(group, migration.context, migration)
+          rescue
+            migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
+          end
         end
       end
     end
@@ -46,11 +46,9 @@ module Importers
       migration.add_imported_item(item)
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
-      item.group_category = if hash[:group_category].present?
-                              context.group_categories.where(name: hash[:group_category]).first_or_initialize
-                            else
-                              GroupCategory.imported_for(context)
-                            end
+      item.group_category = hash[:group_category].present? ?
+          context.group_categories.where(name: hash[:group_category]).first_or_initialize :
+          GroupCategory.imported_for(context)
 
       item.save!
       migration.add_imported_item(item)

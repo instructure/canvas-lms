@@ -27,7 +27,7 @@ module Importers
       :discussion_topic => DiscussionTopic,
       :quiz => Quizzes::Quiz,
       :wiki_page => WikiPage
-    }.freeze
+    }
 
     include LinkParser::Helpers
 
@@ -53,14 +53,14 @@ module Importers
     def load_questions!(link_map)
       aq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :assessment_question }
       aq_item_keys.each_slice(100) do |item_keys|
-        context.assessment_questions.where(:migration_id => item_keys.pluck(:migration_id)).preload(:assessment_question_bank).each do |aq|
+        context.assessment_questions.where(:migration_id => item_keys.map { |ikey| ikey[:migration_id] }).preload(:assessment_question_bank).each do |aq|
           item_keys.detect { |ikey| ikey[:migration_id] == aq.migration_id }[:item] = aq
         end
       end
 
       qq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :quiz_question }
       qq_item_keys.each_slice(100) do |item_keys|
-        context.quiz_questions.where(:migration_id => item_keys.pluck(:migration_id)).each do |qq|
+        context.quiz_questions.where(:migration_id => item_keys.map { |ikey| ikey[:migration_id] }).each do |qq|
           item_keys.detect { |ikey| ikey[:migration_id] == qq.migration_id }[:item] = qq
         end
       end
@@ -80,11 +80,11 @@ module Importers
       fix_issue_url = nil
       field_links.each do |field, links|
         missing_links = links.select { |link| link[:replaced] && (link[:missing_url] || !link[:new_value]) }
-        next unless missing_links.any?
-
-        fix_issue_url ||= fix_issue_url(item_key)
-        type = item_key[:type].to_s.humanize.titleize
-        @migration.add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
+        if missing_links.any?
+          fix_issue_url ||= fix_issue_url(item_key)
+          type = item_key[:type].to_s.humanize.titleize
+          @migration.add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
+        end
       end
     end
 
@@ -166,7 +166,7 @@ module Importers
       subbed = false
       case object
       when Hash
-        object.each_value { |o| subbed = true if recursively_sub_placeholders!(o, links) }
+        object.values.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
       when Array
         object.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
       when String
@@ -202,7 +202,7 @@ module Importers
       end
 
       if quiz_ids.any?
-        Quizzes::Quiz.where(:id => quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
+        Quizzes::Quiz.where(:id => quiz_ids.uniq).where("quiz_data IS NOT NULL").find_each do |quiz|
           if recursively_sub_placeholders!(quiz['quiz_data'], links)
             Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
           end
@@ -228,9 +228,11 @@ module Importers
         Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'])
       end
 
-      quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where.not(quiz_data: nil).first
-      if quiz && recursively_sub_placeholders!(quiz['quiz_data'], links)
-        Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
+      quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where("quiz_data IS NOT NULL").first
+      if quiz
+        if recursively_sub_placeholders!(quiz['quiz_data'], links)
+          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
+        end
       end
     end
   end

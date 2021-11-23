@@ -51,7 +51,7 @@ class AnnouncementNewEdit
       wait_for_new_page_load { submit_form('.form-actions') }
     end
 
-    # NOTE: This *appends* to the existing content in the text area
+    # Note: This *appends* to the existing content in the text area
     def add_message(message)
       type_in_tiny('textarea[name=message]', message)
     end
@@ -66,11 +66,11 @@ class AnnouncementNewEdit
 
     def select_a_section(section_name)
       fj(section_autocomplete_css).click
-      if section_name.empty?
-        driver.action.send_keys(:backspace).perform
-      else
+      if !section_name.empty?
         set_value(fj(section_autocomplete_css), section_name)
         driver.action.send_keys(:enter).perform
+      else
+        driver.action.send_keys(:backspace).perform
       end
       wait_for_ajax_requests
     end

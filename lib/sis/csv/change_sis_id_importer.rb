@@ -32,13 +32,14 @@ module SIS
       # possible columns:
       # old_id, new_id, old_integration_id, new_integration_id, type
       def process(csv, index = nil, count = nil)
-        SIS::ChangeSisIdImporter.new(@root_account, importer_opts).process do |i|
+        count = SIS::ChangeSisIdImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
             i.process_change_sis_id(create_change_data(row))
           rescue ImportError => e
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
+        count
       end
 
       private

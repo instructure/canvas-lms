@@ -59,11 +59,11 @@ class JobsController < ApplicationController
   end
 
   def show
-    job = if params[:flavor] == 'failed'
-            Delayed::Job::Failed.find(params[:id])
-          else
-            Delayed::Job.find(params[:id])
-          end
+    if params[:flavor] == 'failed'
+      job = Delayed::Job::Failed.find(params[:id])
+    else
+      job = Delayed::Job.find(params[:id])
+    end
     render :json => job.as_json(:include_root => false)
   end
 
@@ -89,7 +89,7 @@ class JobsController < ApplicationController
     case flavor
     when 'id'
       jobs = []
-      jobs << Delayed::Job.find_by(id: params[:q]) if params[:q].present?
+      jobs << Delayed::Job.find_by_id(params[:q]) if params[:q].present?
       jobs = jobs.compact
       jobs_count = jobs.size
     when 'future', 'current', 'failed'
@@ -106,7 +106,7 @@ class JobsController < ApplicationController
       end
     end
 
-    { :jobs => jobs, :total => jobs_count }
+    return { :jobs => jobs, :total => jobs_count }
   end
 
   def set_navigation

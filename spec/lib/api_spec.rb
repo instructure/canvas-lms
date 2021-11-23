@@ -222,7 +222,7 @@ describe Api do
     end
 
     it "finds assignment by id" do
-      assignment = assignment_model
+      assignment = assignment_model()
       expect(@api.api_find(Assignment, assignment.id.to_s)).to eq assignment
     end
 
@@ -308,7 +308,7 @@ describe Api do
     end
 
     it "does not hit the database if no valid conditions were found" do
-      collection = double
+      collection = double()
       allow(collection).to receive(:table_name).and_return("courses")
       expect(collection).to receive(:none).once
       relation = @api.api_find_all(collection, ["sis_invalid:1"])
@@ -405,18 +405,18 @@ describe Api do
     end
 
     it 'tries and make params when non-ar_id columns have returned with ar_id columns' do
-      collection = double
+      collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
-      expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq %w[thing1 thing2 thing3]
+      expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
 
     it 'tries and make params when non-ar_id columns have returned without ar_id columns' do
-      collection = double
+      collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
@@ -427,7 +427,7 @@ describe Api do
     end
 
     it 'does not try and make params when no non-ar_id columns have returned with ar_id columns' do
-      collection = double
+      collection = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"] })
@@ -436,7 +436,7 @@ describe Api do
     end
 
     it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
-      collection = double
+      collection = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})
@@ -511,22 +511,22 @@ describe Api do
 
     it 'handles a list of ar_ids' do
       expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(%w[1 2 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids(["1", "2", "3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
 
     it 'handles a list of sis ids' do
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
     it 'removes duplicates' do
       expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => [1, 2, 3] })
       expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
     it 'works with mixed sis id types' do
-      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => %w[U1 U2 U3], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
+      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
     it 'skips invalid things' do
@@ -586,7 +586,7 @@ describe Api do
     end
 
     it 'works with a few different column types and account scopings' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => ["a", "b", "c"], "id3" => ["s1", "s2", "s3"] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "scopes to accounts by default if :is_not_scoped_to_account doesn't exist" do
@@ -700,11 +700,11 @@ describe Api do
     end
 
     it 'converts string ids to numeric' do
-      expect(Api.map_non_sis_ids(%w[5 4 3 2])).to eq [5, 4, 3, 2]
+      expect(Api.map_non_sis_ids(%w{5 4 3 2})).to eq [5, 4, 3, 2]
     end
 
     it "excludes things that don't look like ids" do
-      expect(Api.map_non_sis_ids(%w[1 2 lolrus 4chan 5 6!])).to eq [1, 2, 5]
+      expect(Api.map_non_sis_ids(%w{1 2 lolrus 4chan 5 6!})).to eq [1, 2, 5]
     end
 
     it "strips whitespace" do
@@ -743,11 +743,9 @@ describe Api do
 
     it "ignores non-kaltura instructure_inline_media_comment links" do
       student_in_course
-      html = <<~HTML
-        <div>This is an awesome youtube:
-          <a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
-        </div>
-      HTML
+      html = %{<div>This is an awesome youtube:
+<a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
+</div>}
       res = klass.new.api_user_content(html, @course, @student)
       expect(res).to eq html
     end
@@ -767,8 +765,8 @@ describe Api do
 
       it 'prepends mobile css when not coming from a web browser' do
         res = @k.api_user_content(@html, @course, @student)
-        expect(res).to eq <<~HTML.strip
-          <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+        expect(res).to eq <<-HTML.strip
+  <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
         HTML
       end
 
@@ -832,33 +830,29 @@ describe Api do
       course_factory
       attachment_model(:context => @course)
 
-      html = <<~HTML
-        <div>
-          Here are some bad links
-          <a href="/files/#{@attachment.id}/download">here</a>
-          <a href="/files/#{@attachment.id}/download?verifier=lollercopter&amp;anotherparam=something">here</a>
-          <a href="/files/#{@attachment.id}/preview?sneakyparam=haha&amp;verifier=lollercopter&amp;another=blah">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
-          <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
-        </div>
-      HTML
+      html = %{<div>
+        Here are some bad links
+        <a href="/files/#{@attachment.id}/download">here</a>
+        <a href="/files/#{@attachment.id}/download?verifier=lollercopter&amp;anotherparam=something">here</a>
+        <a href="/files/#{@attachment.id}/preview?sneakyparam=haha&amp;verifier=lollercopter&amp;another=blah">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+        <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
+      </div>}
       fixed_html = klass.process_incoming_html_content(html)
-      expect(fixed_html).to eq <<~HTML
-        <div>
-          Here are some bad links
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?anotherparam=something">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?sneakyparam=haha&amp;another=blah">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
-          <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
-          <a href="/courses/#{@course.id}/assignments">absolute!</a>
-        </div>
-      HTML
+      expect(fixed_html).to eq %{<div>
+        Here are some bad links
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?anotherparam=something">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?sneakyparam=haha&amp;another=blah">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+        <a href="/courses/#{@course.id}/assignments">absolute!</a>
+      </div>}
     end
 
     it 'passes host and port to Content.process_incoming' do
@@ -867,7 +861,7 @@ describe Api do
     end
 
     it "doesn't explode with invalid mailtos" do
-      html = %(<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks)
+      html = %{<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks}
       expect(klass.process_incoming_html_content(html)).to eq html
     end
   end
@@ -1002,7 +996,7 @@ describe Api do
                                 :first => 1,
                                 :last => 10,
                               })
-      expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
+      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to match(/page=8&per_page=10>/)
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=4&per_page=10>/)
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=10>/)
@@ -1048,7 +1042,7 @@ describe Api do
                                 :first => 1,
                                 :last => 10,
                               })
-      expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
+      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to be_nil
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=4&per_page=10>/)
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=10>/)
@@ -1079,11 +1073,11 @@ describe Api do
 
   describe ".value_to_array" do
     it "splits comma delimited strings" do
-      expect(Api.value_to_array('1,2,3')).to eq %w[1 2 3]
+      expect(Api.value_to_array('1,2,3')).to eq ['1', '2', '3']
     end
 
     it "does nothing to arrays" do
-      expect(Api.value_to_array(%w[1 2 3])).to eq %w[1 2 3]
+      expect(Api.value_to_array(['1', '2', '3'])).to eq ['1', '2', '3']
     end
 
     it "returns an empty array for nil" do

@@ -33,7 +33,7 @@ class Wiki < ActiveRecord::Base
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
   def set_has_no_front_page_default
-    if has_no_front_page.nil?
+    if self.has_no_front_page.nil?
       self.has_no_front_page = true
     end
   end
@@ -50,7 +50,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def set_downstream_change_for_master_courses
-    if saved_change_to_front_page_url? && !@child_tag_for_import
+    if self.saved_change_to_front_page_url? && !@child_tag_for_import
       child_tag = MasterCourses::ChildContentTag.where(content: self).first
       if child_tag
         child_tag.downstream_changes = ["front_page_url"]
@@ -60,23 +60,23 @@ class Wiki < ActiveRecord::Base
   end
 
   def update_contexts
-    context.try(:touch)
+    self.context.try(:touch)
   end
 
   def to_atom
     Atom::Entry.new do |entry|
-      entry.title     = title
-      entry.updated   = updated_at
-      entry.published = created_at
+      entry.title     = self.title
+      entry.updated   = self.updated_at
+      entry.published = self.created_at
       entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "/wikis/#{id}")
+                                    :href => "/wikis/#{self.id}")
     end
   end
 
   def update_default_wiki_page_roles(new_roles, old_roles)
     return if new_roles == old_roles
 
-    wiki_pages.each do |p|
+    self.wiki_pages.each do |p|
       if p.editing_roles == old_roles
         p.editing_roles = new_roles
         p.save
@@ -85,48 +85,50 @@ class Wiki < ActiveRecord::Base
   end
 
   def front_page
-    url = get_front_page_url
+    url = self.get_front_page_url
     return nil if url.nil?
 
-    # TODO: i18n
+    # TODO i18n
     t :front_page_name, "Front Page"
     # attempt to find the page and store it's url (if it is found)
-    page = wiki_pages.not_deleted.where(url: url).first
-    set_front_page_url!(url) if has_no_front_page && page
+    page = self.wiki_pages.not_deleted.where(url: url).first
+    self.set_front_page_url!(url) if self.has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
-    page ||= wiki_pages.temp_record(:title => url.titleize, :url => url, :context => context)
+    unless page
+      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
+    end
     page
   end
 
   def has_front_page?
-    !has_no_front_page
+    !self.has_no_front_page
   end
 
   def get_front_page_url
-    front_page_url || DEFAULT_FRONT_PAGE_URL if has_front_page?
+    self.front_page_url || DEFAULT_FRONT_PAGE_URL if self.has_front_page?
   end
 
   def unset_front_page!
-    if context.is_a?(Course) && context.default_view == 'wiki'
-      context.default_view = nil
-      context.save
+    if self.context.is_a?(Course) && self.context.default_view == 'wiki'
+      self.context.default_view = nil
+      self.context.save
     end
 
-    front_page.touch if front_page&.persisted?
+    self.front_page.touch if self.front_page&.persisted?
 
     self.front_page_url = nil
     self.has_no_front_page = true
-    save
+    self.save
   end
 
   def set_front_page_url!(url)
     return false if url.blank?
-    return true if has_front_page? && front_page_url == url
+    return true if self.has_front_page? && self.front_page_url == url
 
     self.has_no_front_page = false
     self.front_page_url = url
-    save
+    self.save
   end
 
   def context
@@ -141,36 +143,38 @@ class Wiki < ActiveRecord::Base
     context.class.to_s
   end
 
-  delegate :id, to: :context, prefix: true
+  def context_id
+    context.id
+  end
 
   set_policy do
-    given { |user, session| context.grants_right?(user, session, :read) }
+    given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 
-    given { |user, session| context.grants_right?(user, session, :view_unpublished_items) }
+    given { |user, session| self.context.grants_right?(user, session, :view_unpublished_items) }
     can :view_unpublished_items
 
-    given { |user, session| context.grants_right?(user, session, :participate_as_student) && context.respond_to?(:allow_student_wiki_edits) && context.allow_student_wiki_edits }
+    given { |user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits }
     can :read and can :create_page and can :update_page
 
     given do |user, session|
-      context.grants_right?(user, session, :manage_wiki_create)
+      self.context.grants_right?(user, session, :manage_wiki_create)
     end
     can :read and can :create_page and can :view_unpublished_items
 
     given do |user, session|
-      context.grants_right?(user, session, :manage_wiki_delete)
+      self.context.grants_right?(user, session, :manage_wiki_delete)
     end
     can :read and can :delete_page and can :view_unpublished_items
 
     given do |user, session|
-      context.grants_right?(user, session, :manage_wiki_update)
+      self.context.grants_right?(user, session, :manage_wiki_update)
     end
     can :read and can :update and can :update_page and can :view_unpublished_items
 
     # Pages created by a user without this permission will be automatically published
     given do |user, session|
-      context.grants_right?(user, session, :manage_wiki_update) && !context.is_a?(Group)
+      self.context.grants_right?(user, session, :manage_wiki_update) && !self.context.is_a?(Group)
     end
     can :publish_page
   end
@@ -183,11 +187,11 @@ class Wiki < ActiveRecord::Base
         context.lock!
         return context.wiki if context.wiki_id
 
-        # TODO: i18n
+        # TODO i18n
         t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
         t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
-        extend TextHelper
+        self.extend TextHelper
         name = CanvasTextHelper.truncate_text(context.name, { :max_length => 200, :ellipsis => '' })
 
         context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki", :root_account_id => context.root_account_id)
@@ -203,10 +207,10 @@ class Wiki < ActiveRecord::Base
       opts[:url] = opts[:title].to_s.to_url if opts.include?(:title)
     end
 
-    shard.activate do
+    self.shard.activate do
       page = WikiPage.new(opts)
       page.wiki = self
-      page.context = context
+      page.context = self.context
       page.initialize_wiki_page(user)
       page
     end
@@ -215,14 +219,12 @@ class Wiki < ActiveRecord::Base
   def find_page(param, include_deleted: false)
     # to allow linking to a WikiPage by id (to avoid needing to hit the database to pull its url)
     if (match = param.match(/\Apage_id:(\d+)\z/))
-      return wiki_pages.where(id: match[1].to_i).first
+      return self.wiki_pages.where(id: match[1].to_i).first
     end
 
-    scope = if include_deleted
-              wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END"))
-            else
-              wiki_pages.not_deleted
-            end
+    scope = include_deleted ?
+      self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
+      self.wiki_pages.not_deleted
     scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 

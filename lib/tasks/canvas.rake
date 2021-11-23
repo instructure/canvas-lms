@@ -51,25 +51,19 @@ unless $canvas_tasks_loaded
           ('js:yarn_install' if npm_install)
         ].compact
 
-        if build_i18n
-          task 'i18n:generate_js' => [
-            ('js:yarn_install' if npm_install)
-          ].compact
-        end
+        task 'i18n:generate_js' => [
+          ('js:yarn_install' if npm_install)
+        ].compact if build_i18n && build_js
 
-        if build_js && build_dev_js
-          task 'js:webpack_development' => [
-            'js:gulp_rev',
-            ('i18n:generate_js' if build_i18n),
-          ]
-        end
+        task 'js:webpack_development' => [
+          'js:gulp_rev',
+          ('i18n:generate_js' if build_i18n),
+        ] if build_js && build_dev_js
 
-        if build_js && build_prod_js
-          task 'js:webpack_production' => [
-            'js:gulp_rev',
-            ('i18n:generate_js' if build_i18n),
-          ]
-        end
+        task 'js:webpack_production' => [
+          'js:gulp_rev',
+          ('i18n:generate_js' if build_i18n),
+        ] if build_js && build_prod_js
       end
 
       batch_times = []
@@ -79,7 +73,7 @@ unless $canvas_tasks_loaded
             name, runner = if task.is_a?(Hash)
                              task.values_at(:name, :runner)
                            else
-                             [task, -> { Rake::Task[task].invoke }]
+                             [task, ->() { Rake::Task[task].invoke }]
                            end
 
             log_time(name, &runner)
@@ -87,11 +81,11 @@ unless $canvas_tasks_loaded
         end
       end
 
-      combined_time = batch_times.sum
+      combined_time = batch_times.reduce(:+)
 
       puts(
-        "Finished compiling assets in #{real_time.round(2)}s. " \
-        "Parallelism saved #{(combined_time - real_time).round(2)}s " \
+        "Finished compiling assets in #{real_time.round(2)}s. " +
+        "Parallelism saved #{(combined_time - real_time).round(2)}s " +
         "(#{(real_time.to_f / combined_time.to_f * 100.0).round(2)}%)"
       )
     end
@@ -109,7 +103,7 @@ unless $canvas_tasks_loaded
       def load_tree(root, tree)
         tree.each do |node, subtree|
           key = [root, node].compact.join('/')
-          if subtree.is_a?(Hash)
+          if Hash === subtree
             load_tree(key, subtree)
           else
             Diplomat::Kv.put(key, subtree.to_s, { cas: 0 })
@@ -138,10 +132,10 @@ unless $canvas_tasks_loaded
       output = `script/render_json_lint`
       exit_status = $?.exitstatus
       puts output
-      if exit_status == 0
-        puts "lint:render_json test succeeded"
-      else
+      if exit_status != 0
         raise "lint:render_json test failed"
+      else
+        puts "lint:render_json test succeeded"
       end
     end
   end
@@ -212,7 +206,7 @@ unless $canvas_tasks_loaded
       method = :select!
       if region[0] == '-'
         method = :reject!
-        region = region[1..]
+        region = region[1..-1]
       end
       if region == 'self'
         servers.send(method, &:in_current_region?)
@@ -223,7 +217,7 @@ unless $canvas_tasks_loaded
     block.call(servers)
   end
 
-  %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
+  %w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
     Switchman::Rake.shardify_task(task_name, categories: -> { Shard.categories })
   end
 

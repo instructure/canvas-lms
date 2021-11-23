@@ -24,16 +24,16 @@ module LiveAssessments
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
 
-    validates :assessor_id, :assessment_id, :assessed_at, presence: true
-    validates :passed, inclusion: { :in => [true, false] }
+    validates_presence_of :assessor_id, :assessment_id, :assessed_at
+    validates_inclusion_of :passed, :in => [true, false]
 
     scope :for_user, lambda { |user| where(:user_id => user) }
 
     set_policy do
-      given { |user, session| assessment.grants_right?(user, session, :update) }
+      given { |user, session| self.assessment.grants_right?(user, session, :update) }
       can :create
 
-      given { |user, session| assessment.grants_right?(user, session, :read) }
+      given { |user, session| self.assessment.grants_right?(user, session, :read) }
       can :read
     end
   end

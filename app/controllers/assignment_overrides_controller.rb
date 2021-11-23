@@ -89,10 +89,10 @@ class AssignmentOverridesController < ApplicationController
   before_action :require_group, :only => :group_alias
   before_action :require_section, :only => :section_alias
   before_action :require_course
-  before_action :require_assignment, :except => %i[batch_retrieve batch_update batch_create]
-  before_action :require_assignment_edit, :only => %i[create update destroy]
+  before_action :require_assignment, :except => [:batch_retrieve, :batch_update, :batch_create]
+  before_action :require_assignment_edit, :only => [:create, :update, :destroy]
   before_action :require_all_assignments_edit, :only => [:batch_update, :batch_create]
-  before_action :require_override, :only => %i[show update destroy]
+  before_action :require_override, :only => [:show, :update, :destroy]
 
   include Api::V1::AssignmentOverride
 
@@ -214,7 +214,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
-      render :json => assignment_override_json(@override), :status => :created
+      render :json => assignment_override_json(@override), :status => 201
     else
       bad_request(@override.errors)
     end
@@ -469,7 +469,7 @@ class AssignmentOverridesController < ApplicationController
       render json: assignment_overrides_json(overrides, @current_user)
     else
       errors = overrides.map do |override|
-        override.errors.presence
+        override.errors if override.errors.present?
       end
       errors = ['unknown error'] unless errors.compact.present?
       bad_request(errors: errors)

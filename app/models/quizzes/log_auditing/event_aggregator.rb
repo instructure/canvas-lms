@@ -49,7 +49,7 @@ module Quizzes::LogAuditing
     # @return [Hash] Submission data is returned
     #
     def run(quiz_submission_id, attempt, timestamp)
-      sql_string = <<~SQL.squish
+      sql_string = <<~SQL
         quiz_submission_id = :qs_id
         AND attempt = :attempt
         AND event_type IN(:filter)
@@ -74,11 +74,12 @@ module Quizzes::LogAuditing
     # constructs submission data from events, including the parsing of flagged
     # to indicate that they are 'marked' or 'flagged'
     def build_submission_data_from_events(events)
-      events.each_with_object({}) do |event, submission_data|
+      events.reduce({}) do |submission_data, event|
         case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
           submission_data["question_#{event.event_data['quiz_question_id']}_marked"] = event.event_data['flagged']
         end
+        submission_data
       end
     end
 
@@ -88,12 +89,12 @@ module Quizzes::LogAuditing
       submission_data = {}
       answers.each do |question_id, answer|
         question = quiz.quiz_questions.find { |qq| qq.id == question_id.to_i }
-        question ||= Quizzes::QuizQuestion.where(id: question_id).first
-        next unless question.question_data["question_type"] != "text_only_question"
-
-        serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
-        thing = serializer.serialize(answer).answer
-        submission_data.merge! thing
+        question = Quizzes::QuizQuestion.where(id: question_id).first unless question
+        if question.question_data["question_type"] != "text_only_question"
+          serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
+          thing = serializer.serialize(answer).answer
+          submission_data.merge! thing
+        end
       end
       submission_data
     end

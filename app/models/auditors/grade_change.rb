@@ -154,9 +154,17 @@ class Auditors::GradeChange
     end
     private :id_or_placeholder
 
-    delegate :root_account, to: :account
-    delegate :account, to: :context
-    delegate :assignment, to: :submission
+    def root_account
+      account.root_account
+    end
+
+    def account
+      context.account
+    end
+
+    def assignment
+      submission.assignment
+    end
 
     def course
       context if context_type == 'Course'
@@ -215,7 +223,7 @@ class Auditors::GradeChange
 
     # If we *are* specifically searching for override grades, swap out the
     # placeholder ID for a real NULL check.
-    scope.unscope(where: :assignment_id).where(assignment_id: nil)
+    scope.unscope(where: :assignment_id).where("assignment_id IS NULL")
   end
 
   Stream = Audits.stream do
@@ -439,7 +447,7 @@ class Auditors::GradeChange
 
   def self.for_scope_conditions(conditions, options)
     scope = Auditors::GradeChange.filter_by_assignment(Auditors::ActiveRecord::GradeChangeRecord.where(conditions))
-    EventStream::IndexStrategy::ActiveRecord.for_ar_scope(Auditors::ActiveRecord::GradeChangeRecord, scope, options)
+    EventStream::IndexStrategy::ActiveRecord::for_ar_scope(Auditors::ActiveRecord::GradeChangeRecord, scope, options)
   end
 
   def self.return_override_grades?

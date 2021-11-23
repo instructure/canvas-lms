@@ -36,7 +36,7 @@ def select_migration_file(opts = {})
 
   new_filename, fullpath, _data = get_file(filename, opts[:data])
   f('#migrationFileUpload').send_keys(fullpath)
-  new_filename
+  return new_filename
 end
 
 def fill_migration_form(opts = {})
@@ -168,7 +168,7 @@ describe "content migrations", :non_parallel do
       @filename = 'cc_full_test.zip'
     end
 
-    # TODO: reimplement per CNVS-29593, but make sure we're testing at the right level
+    # TODO reimplement per CNVS-29593, but make sure we're testing at the right level
     it "should import all content immediately by default"
 
     it "shows each form" do
@@ -226,10 +226,10 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    # TODO: reimplement per CNVS-29594, but make sure we're testing at the right level
+    # TODO reimplement per CNVS-29594, but make sure we're testing at the right level
     it "should import selective content"
 
-    # TODO: reimplement per CNVS-29595, but make sure we're testing at the right level
+    # TODO reimplement per CNVS-29595, but make sure we're testing at the right level
     it "should overwrite quizzes when option is checked and duplicate otherwise"
 
     it "shifts dates" do
@@ -256,17 +256,17 @@ describe "content migrations", :non_parallel do
       expect(Date.parse(opts["new_end_date"])).to eq Date.new(2014, 8, 15)
     end
 
-    # TODO: reimplement per CNVS-29596, but make sure we're testing at the right level
+    # TODO reimplement per CNVS-29596, but make sure we're testing at the right level
     it "should remove dates"
 
     context "default question bank" do
-      # TODO: reimplement per CNVS-29597, but make sure we're testing at the right level
+      # TODO reimplement per CNVS-29597, but make sure we're testing at the right level
       it "should import into selected question bank"
 
-      # TODO: reimplement per CNVS-29598, but make sure we're testing at the right level
+      # TODO reimplement per CNVS-29598, but make sure we're testing at the right level
       it "should import into new question bank"
 
-      # TODO: reimplement per CNVS-29599, but make sure we're testing at the right level
+      # TODO reimplement per CNVS-29599, but make sure we're testing at the right level
       it "should import into default question bank if not selected"
     end
   end
@@ -306,7 +306,7 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "shows warning before self-copy", priority: "1" do
+    it "shows warning before self-copy", priority: "1", test_id: 2889675 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -323,7 +323,7 @@ describe "content migrations", :non_parallel do
       expect(f('#courseSelectWarning')).to_not be_displayed
     end
 
-    it "selects by drop-down or by search box", priority: "2" do
+    it "selects by drop-down or by search box", priority: "2", test_id: 2889684 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -355,7 +355,7 @@ describe "content migrations", :non_parallel do
       expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
-    it "only shows courses the user is authorized to see", priority: "1" do
+    it "only shows courses the user is authorized to see", priority: "1", test_id: 2889686 do
       new_course = Course.create!(:name => "please don't see me")
       visit_page
       select_migration_type
@@ -375,7 +375,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
-    it "includes completed courses when checked", priority: "1" do
+    it "includes completed courses when checked", priority: "1", test_id: 2889687 do
       new_course = Course.create!(:name => "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -391,7 +391,7 @@ describe "content migrations", :non_parallel do
       expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
     end
 
-    it "finds courses in other accounts", priority: "1" do
+    it "finds courses in other accounts", priority: "1", test_id: 2890402 do
       new_account1 = account_model
       enrolled_course = Course.create!(:name => "faraway course", :account => new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -437,7 +437,7 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "copies all content from a course", priority: "1" do
+      it "copies all content from a course", priority: "1", test_id: 126677 do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -458,7 +458,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1" do
+      it "selectively copies content", priority: "1", test_id: 126682 do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -505,7 +505,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets day substitution and date adjustment settings", priority: "1" do
+    it "sets day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
       new_course = Course.create!(:name => "day sub")
       new_course.enroll_teacher(@user).accept
 
@@ -580,7 +580,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "removes dates", priority: "1" do
+    it "removes dates", priority: "1", test_id: 2891742 do
       new_course = Course.create!(:name => "date remove", :start_at => 'Jul 1, 2014', :conclude_at => 'Jul 11, 2014')
       new_course.enroll_teacher(@user).accept
 
@@ -599,7 +599,7 @@ describe "content migrations", :non_parallel do
       expect(opts["remove_dates"]).to eq '1'
     end
 
-    it "retains announcement content settings after course copy", priority: "2" do
+    it "retains announcement content settings after course copy", priority: "2", test_id: 403057 do
       @announcement = @copy_from.announcements.create!(:title => 'Migration', :message => 'Here is my message')
       @copy_from.lock_all_announcements = true
       @copy_from.save!
@@ -617,7 +617,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "persists topic 'allow liking' settings across course copy", priority: "2" do
+    it "persists topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
       @copy_from.discussion_topics.create!(
         title: 'Liking Allowed Here',
         message: 'Like I said, liking is allowed',
@@ -683,7 +683,7 @@ describe "content migrations", :non_parallel do
       visit_page
       migration_type_options = ff('#chooseMigrationConverter option')
       migration_type_values = migration_type_options.map { |op| op['value'] }
-      migration_type_texts = migration_type_options.map(&:text)
+      migration_type_texts = migration_type_options.map { |op| op.text }
       expect(migration_type_values).to include(import_tool.asset_string)
       expect(migration_type_texts).to include(import_tool.name)
       expect(migration_type_values).not_to include(other_tool.asset_string)

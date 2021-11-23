@@ -20,7 +20,7 @@
 ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
 ActiveSupport::SafeBuffer.class_eval do
   def encode_with(coder)
-    coder.scalar("!str", to_str)
+    coder.scalar("!str", self.to_str)
   end
 end
 
@@ -36,7 +36,7 @@ module ActiveSupport::Cache
 
     def normalize_key(key, options)
       result = super
-      if options&.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
         result = "rails61:#{result}"
       end
       result

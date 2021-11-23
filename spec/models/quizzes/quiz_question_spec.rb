@@ -130,7 +130,7 @@ describe Quizzes::QuizQuestion do
 
   describe ".update_all_positions" do
     def question_positions(object)
-      object.quiz_questions.active.sort_by(&:position).map(&:id)
+      object.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
     end
 
     before :once do
