@@ -23,6 +23,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
 
   validates :quiz_regrade_id, presence: true
+  delegate :root_account, to: :quiz_regrade
 
   def self.perform(regrade)
     run = create!(quiz_regrade_id: regrade.id, started_at: Time.now)
