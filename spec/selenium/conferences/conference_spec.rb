@@ -44,21 +44,21 @@ describe 'Web conferences' do
   after { close_extra_windows }
 
   context 'when creating a conference' do
-    it 'invites a subset of users', priority: "1", test_id: 273639 do
+    it 'invites a subset of users', priority: "1" do
       skip_if_safari(:alert)
       conference_title = 'Private Conference by Invitation Only'
       create_conference(title: conference_title, invite_all_users: false)
       verify_conference_list_includes(conference_title)
     end
 
-    it 'invites all the course users', priority: "1", test_id: 273640 do
+    it 'invites all the course users', priority: "1" do
       skip_if_safari(:alert)
       conference_title = 'Course Conference'
       create_conference(title: conference_title, invite_all_users: true)
       verify_conference_list_includes(conference_title)
     end
 
-    it 'includes observers in manual invite', priority: "1", test_id: 3255709 do
+    it 'includes observers in manual invite', priority: "1" do
       skip_if_safari(:alert)
       course_with_observer(name: 'Observer Kim', course: @course, active_all: true)
       get conferences_index_page
@@ -77,13 +77,13 @@ describe 'Web conferences' do
     end
 
     context 'as a teacher' do
-      it 'concludes the conference', priority: "1", test_id: 323320 do
+      it 'concludes the conference', priority: "1" do
         end_first_conference_in_list
         verify_conference_list_is_empty
         verify_concluded_conference_list_includes(conference_title)
       end
 
-      it 'does not treat the concluded conference as active', priority: "2", test_id: 1041396 do
+      it 'does not treat the concluded conference as active', priority: "2" do
         end_first_conference_in_list
         refresh_page
         expect(f('#new-conference-list .emptyMessage').text).to include('There are no new conferences')
@@ -96,7 +96,7 @@ describe 'Web conferences' do
         get conferences_index_page
       end
 
-      it 'concludes the conference', priority: "1", test_id: 323319 do
+      it 'concludes the conference', priority: "1" do
         end_first_conference_in_list
         verify_conference_list_is_empty
         verify_concluded_conference_list_includes(conference_title)
@@ -105,7 +105,7 @@ describe 'Web conferences' do
   end
 
   context 'when no conferences exist' do
-    it 'displays initial elements of the conference page', priority: "1", test_id: 118488 do
+    it 'displays initial elements of the conference page', priority: "1" do
       skip_if_safari(:alert)
       expect(new_conference_button).to be
 
@@ -117,14 +117,14 @@ describe 'Web conferences' do
       verify_concluded_conference_list_is_empty
     end
 
-    it 'creates a web conference', priority: "1", test_id: 118489 do
+    it 'creates a web conference', priority: "1" do
       skip_if_safari(:alert)
       conference_title = 'A New Web Conference'
       create_conference(title: conference_title, invite_all_users: true)
       verify_conference_list_includes(conference_title)
     end
 
-    it 'cancels creating a web conference', priority: "2", test_id: 581092 do
+    it 'cancels creating a web conference', priority: "2" do
       skip_if_safari(:alert)
       create_conference(cancel: true)
       expect(f('#add_conference_form')).not_to be_displayed
@@ -136,7 +136,7 @@ describe 'Web conferences' do
     before(:once) { @conference = create_wimba_conference('A Conference', 1234) }
 
     context 'when the conference is open' do
-      it 'deletes active conferences', priority: "1", test_id: 126912 do
+      it 'deletes active conferences', priority: "1" do
         delete_conference
         verify_conference_list_is_empty
       end
@@ -167,7 +167,7 @@ describe 'Web conferences' do
     context 'when the conference is concluded' do
       before(:once) { conclude_conference(@conference) }
 
-      it 'deletes concluded conferences', priority: "2", test_id: 163991 do
+      it 'deletes concluded conferences', priority: "2" do
         delete_conference
         verify_concluded_conference_list_is_empty
       end

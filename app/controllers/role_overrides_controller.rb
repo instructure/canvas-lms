@@ -112,7 +112,7 @@
 #
 class RoleOverridesController < ApplicationController
   before_action :require_context
-  before_action :require_role, :only => [:activate_role, :remove_role, :update, :show]
+  before_action :require_role, :only => %i[activate_role remove_role update show]
   before_action :set_js_env_for_current_account
 
   # @API List roles
@@ -555,14 +555,14 @@ class RoleOverridesController < ApplicationController
               end
       if params[:permissions]
         RoleOverride.permissions.each_key do |key|
-          if params[:permissions][key]
-            roles.each do |role|
-              if (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
-                override = settings[:override] == 'checked' if ['checked', 'unchecked'].include?(settings[:override])
-                locked = settings[:locked] == 'true' if settings[:locked]
-                RoleOverride.manage_role_override(@context, role, key.to_s, :override => override, :locked => locked)
-              end
-            end
+          next unless params[:permissions][key]
+
+          roles.each do |role|
+            next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
+
+            override = settings[:override] == 'checked' if ['checked', 'unchecked'].include?(settings[:override])
+            locked = settings[:locked] == 'true' if settings[:locked]
+            RoleOverride.manage_role_override(@context, role, key.to_s, :override => override, :locked => locked)
           end
         end
       end
@@ -726,11 +726,11 @@ class RoleOverridesController < ApplicationController
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin
           site_admin[:group_permissions] << hash if is_course_permission
-        else
-          account[:group_permissions] << hash if is_course_permission
+        elsif is_course_permission
+          account[:group_permissions] << hash
         end
-      else
-        course[:group_permissions] << hash if is_course_permission
+      elsif is_course_permission
+        course[:group_permissions] << hash
       end
     end
 

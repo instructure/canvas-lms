@@ -161,8 +161,8 @@ class LearningOutcome < ActiveRecord::Base
 
   def adjust_calculation_int
     # If we are changing calculation_method, set default calculation_int
-    if calculation_method_changed? && (!calculation_int_changed? || %w[highest latest].include?(calculation_method))
-      self.calculation_int = default_calculation_int unless new_record?
+    if calculation_method_changed? && (!calculation_int_changed? || %w[highest latest].include?(calculation_method)) && !new_record?
+      self.calculation_int = default_calculation_int
     end
   end
 
@@ -322,12 +322,10 @@ class LearningOutcome < ActiveRecord::Base
   def assessed?(course = nil)
     if course
       learning_outcome_results.active.where(context_id: course, context_type: "Course").exists?
+    elsif learning_outcome_results.active.loaded?
+      learning_outcome_results.active.any?
     else
-      if learning_outcome_results.active.loaded?
-        learning_outcome_results.active.any?
-      else
-        learning_outcome_results.active.exists?
-      end
+      learning_outcome_results.active.exists?
     end
   end
 

@@ -89,7 +89,7 @@ describe ConfigFile do
 
     describe "deep freezing" do
       it "can deep freeze arrays" do
-        array = ["asdf", "sdfg", "dfgh", "fghj"]
+        array = %w[asdf sdfg dfgh fghj]
         out = ConfigFile.deep_freeze_cached_value(array)
         expect(out).to be_frozen
         expect(out.class).to eq(Array)

@@ -32,7 +32,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:name, :description]
-  restrict_columns :settings, [:consumer_key, :shared_secret, :url, :domain, :settings]
+  restrict_columns :settings, %i[consumer_key shared_secret url domain settings]
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :name, :consumer_key, :shared_secret, presence: true
@@ -240,9 +240,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   def extension_setting(type, property = nil)
     val = calculate_extension_setting(type, property)
-    if val && property == :icon_url
-      val = nil if (URI.parse(val) rescue nil).nil? # make sure it's a valid url
-    end
+    # make sure it's a valid url
+    val = nil if val && property == :icon_url && (URI.parse(val) rescue nil).nil?
     val
   end
 
@@ -272,23 +271,23 @@ class ContextExternalTool < ActiveRecord::Base
     hash = hash.with_indifferent_access
     hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
 
-    extension_keys = [
-      :canvas_icon_class,
-      :custom_fields,
-      :default,
-      :display_type,
-      :enabled,
-      :icon_svg_path_64,
-      :icon_url,
-      :message_type,
-      :prefer_sis_email,
-      :required_permissions,
-      :selection_height,
-      :selection_width,
-      :text,
-      :windowTarget,
-      :url,
-      :target_link_uri
+    extension_keys = %i[
+      canvas_icon_class
+      custom_fields
+      default
+      display_type
+      enabled
+      icon_svg_path_64
+      icon_url
+      message_type
+      prefer_sis_email
+      required_permissions
+      selection_height
+      selection_width
+      text
+      windowTarget
+      url
+      target_link_uri
     ]
 
     if (custom_keys = CUSTOM_EXTENSION_KEYS[type])
@@ -450,7 +449,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def privacy_level=(val)
-    if ['anonymous', 'name_only', 'email_only', 'public'].include?(val)
+    if %w[anonymous name_only email_only public].include?(val)
       self.workflow_state = val
     end
   end

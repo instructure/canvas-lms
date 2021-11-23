@@ -1701,7 +1701,7 @@ describe 'Submissions API', type: :request do
       submit_homework(@a1, @student2)
     end
 
-    it "returns all submissions for a student", priority: "1", test_id: 2989898 do
+    it "returns all submissions for a student", priority: "1" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { :controller => 'submissions_api', :action => 'for_students',
@@ -1764,7 +1764,7 @@ describe 'Submissions API', type: :request do
       expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
     end
 
-    it "can return assignments based on graded_at time", priority: "1", test_id: 2989899 do
+    it "can return assignments based on graded_at time", priority: "1" do
       @a2.grade_student @student1, grade: 10, grader: @teacher
       @a1.grade_student @student1, grade: 5, grader: @teacher
       @a3 = @course.assignments.create! title: "a3"
@@ -5759,7 +5759,7 @@ describe 'Submissions API', type: :request do
     end
 
     it 'doesnt show submissions from various inactive types of enrollments' do
-      inactive = ['deleted', 'rejected', 'inactive', 'invited']
+      inactive = %w[deleted rejected inactive invited]
 
       @student4 = student_in_course(:active_all => true).user
       enrollment = @section.enroll_user(@student4, 'StudentEnrollment', 'active')

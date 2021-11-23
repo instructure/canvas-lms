@@ -30,7 +30,7 @@ describe Types::AssignmentType do
     course.assignments.create(title: "some assignment",
                               submission_types: ["online_text_entry"],
                               workflow_state: "published",
-                              allowed_extensions: ["doc", "xlt", "foo"])
+                              allowed_extensions: %w[doc xlt foo])
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }

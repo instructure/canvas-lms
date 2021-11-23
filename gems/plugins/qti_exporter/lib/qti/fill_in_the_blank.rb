@@ -67,13 +67,13 @@ module Qti
           answer = {}
           node = match.at_css('baseValue[baseType=string],baseValue[baseType=integer],baseValue[baseType=float]')
           answer[:text] = node.text.strip if node
-          unless answer[:text].blank?
-            @question[:answers] << answer
-            answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
-            answer[:comments] = ""
-            answer[:id] = unique_local_id
-            answer[:blank_id] = get_node_att(match, 'variable', 'identifier')
-          end
+          next if answer[:text].blank?
+
+          @question[:answers] << answer
+          answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+          answer[:comments] = ""
+          answer[:id] = unique_local_id
+          answer[:blank_id] = get_node_att(match, 'variable', 'identifier')
         end
       end
     end
@@ -98,11 +98,11 @@ module Qti
 
       if @type == 'multiple_dropdowns_question'
         @doc.css('responseProcessing responseCondition responseIf,responseElseIf').each do |if_node|
-          if if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
-            id = if_node.at_css('match baseValue[baseType=identifier]').text
-            if (answer = answer_hash[id])
-              answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
-            end
+          next unless if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
+
+          id = if_node.at_css('match baseValue[baseType=identifier]').text
+          if (answer = answer_hash[id])
+            answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
           end
         end
       end
@@ -169,29 +169,29 @@ module Qti
       end
 
       @doc.css('responseCondition stringMatch').each do |match|
-        if (blank_id = get_node_att(match, 'variable', 'identifier'))
-          text = get_node_val(match, 'baseValue')
-          answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
-          answer[:migration_id] = blank_id
-          answer[:text] = sanitize_html_string(text, true)
-          answer[:blank_id] = blank_id
-          @question[:answers] << answer
-        end
+        next unless (blank_id = get_node_att(match, 'variable', 'identifier'))
+
+        text = get_node_val(match, 'baseValue')
+        answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
+        answer[:migration_id] = blank_id
+        answer[:text] = sanitize_html_string(text, true)
+        answer[:blank_id] = blank_id
+        @question[:answers] << answer
       end
     end
 
     def process_respondus
       @doc.css('responseCondition stringMatch baseValue[baseType=string]').each do |val_node|
-        if (blank_id = val_node['identifier'])
-          blank_id = blank_id.sub(/^RESPONSE_-([^-]*)-/, '\1')
-          @question[:answers] << {
-            :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
-            :id => unique_local_id,
-            :migration_id => blank_id,
-            :text => sanitize_html_string(val_node.text, true),
-            :blank_id => blank_id,
-          }
-        end
+        next unless (blank_id = val_node['identifier'])
+
+        blank_id = blank_id.sub(/^RESPONSE_-([^-]*)-/, '\1')
+        @question[:answers] << {
+          :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
+          :id => unique_local_id,
+          :migration_id => blank_id,
+          :text => sanitize_html_string(val_node.text, true),
+          :blank_id => blank_id,
+        }
       end
     end
 

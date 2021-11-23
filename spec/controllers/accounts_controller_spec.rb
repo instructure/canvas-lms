@@ -1122,7 +1122,7 @@ describe AccountsController do
           subtext: 'Custom subtext',
           url: 'https://canvas.instructure.com/guides',
           type: 'custom',
-          available_to: ['user', 'student', 'teacher'],
+          available_to: %w[user student teacher],
         },
       ]
       @account.save

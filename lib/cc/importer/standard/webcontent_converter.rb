@@ -69,11 +69,11 @@ module CC::Importer::Standard
           add_course_file(sub_file)
         end
 
-        if main_file[:path_name].present?
-          main_file[:file_name] = File.basename main_file[:path_name]
-          main_file[:type] = 'FILE_TYPE'
-          add_course_file(main_file, true)
-        end
+        next unless main_file[:path_name].present?
+
+        main_file[:file_name] = File.basename main_file[:path_name]
+        main_file[:type] = 'FILE_TYPE'
+        add_course_file(main_file, true)
       end
 
       new_assignments.each do |a|

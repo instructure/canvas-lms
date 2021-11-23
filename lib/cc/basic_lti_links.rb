@@ -100,18 +100,18 @@ module CC
 
           if (cm_settings = tool.settings[:content_migration]&.with_indifferent_access)
             ext_node.lticm(:options, 'name' => 'content_migration') do |cm_node|
-              [:export_start_url, :import_start_url, :export_format, :import_format].each do |key|
+              %i[export_start_url import_start_url export_format import_format].each do |key|
                 cm_node.lticm(:property, cm_settings[key], 'name' => key.to_s) if cm_settings[key].present?
               end
             end
           end
 
-          extension_exclusions = [
-            :custom_fields,
-            :vendor_extensions,
-            :selection_width,
-            :selection_height,
-            :icon_url
+          extension_exclusions = %i[
+            custom_fields
+            vendor_extensions
+            selection_width
+            selection_height
+            icon_url
           ] + Lti::ResourcePlacement::PLACEMENTS
 
           tool.settings.keys.reject { |i| extension_exclusions.include?(i) }.each do |key|
@@ -119,23 +119,23 @@ module CC
           end
 
           Lti::ResourcePlacement::PLACEMENTS.each do |type|
-            if tool.settings[type]
-              ext_node.lticm(:options, :name => type.to_s) do |type_node|
-                tool.settings[type].except(:labels, :custom_fields).each do |key, value|
-                  type_node.lticm(:property, value, 'name' => key.to_s)
-                end
-                if tool.settings[type][:labels]
-                  type_node.lticm(:options, :name => 'labels') do |labels_node|
-                    tool.settings[type][:labels].each do |lang, text|
-                      labels_node.lticm(:property, text, 'name' => lang)
-                    end
+            next unless tool.settings[type]
+
+            ext_node.lticm(:options, :name => type.to_s) do |type_node|
+              tool.settings[type].except(:labels, :custom_fields).each do |key, value|
+                type_node.lticm(:property, value, 'name' => key.to_s)
+              end
+              if tool.settings[type][:labels]
+                type_node.lticm(:options, :name => 'labels') do |labels_node|
+                  tool.settings[type][:labels].each do |lang, text|
+                    labels_node.lticm(:property, text, 'name' => lang)
                   end
                 end
-                if tool.settings[type][:custom_fields]
-                  type_node.tag!("blti:custom") do |custom_node|
-                    tool.settings[type][:custom_fields].each_pair do |key, val|
-                      custom_node.lticm :property, val, 'name' => key
-                    end
+              end
+              if tool.settings[type][:custom_fields]
+                type_node.tag!("blti:custom") do |custom_node|
+                  tool.settings[type][:custom_fields].each_pair do |key, val|
+                    custom_node.lticm :property, val, 'name' => key
                   end
                 end
               end

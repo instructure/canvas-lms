@@ -103,7 +103,7 @@ describe GroupMembership do
         @group1 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
       end
 
-      it "sends message if the first membership in a student organized group", priority: "1", test_id: 193157 do
+      it "sends message if the first membership in a student organized group", priority: "1" do
         Notification.create(name: 'New Student Organized Group', category: 'TestImmediately')
         communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
@@ -111,7 +111,7 @@ describe GroupMembership do
         expect(group_membership.messages_sent['New Student Organized Group']).not_to be_empty
       end
 
-      it "sends message when a new student is invited to group and auto-joins", priority: "1", test_id: 193155 do
+      it "sends message when a new student is invited to group and auto-joins", priority: "1" do
         Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
         student2 = student_in_course(active_all: true).user
         communication_channel(student2, { username: "test_channel_email_#{student2.id}@test.com", active_cc: true })

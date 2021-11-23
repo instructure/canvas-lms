@@ -264,7 +264,7 @@ describe DeveloperKeysController, type: :request do
 
   def confirm_valid_key_in_json(json, key)
     json.map! do |hash|
-      hash.keep_if { |k, _| ['id', 'icon_url', 'name'].include?(k) }
+      hash.keep_if { |k, _| %w[id icon_url name].include?(k) }
     end
 
     expect(json.include?(key_to_hash(key))).to be true

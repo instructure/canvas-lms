@@ -81,11 +81,11 @@ module Alerts
               matches = last_sent + alert.repetition.days <= today
             end
           end
-          if matches
-            Rails.cache.write(cache_key, today)
+          next unless matches
 
-            send_alert(alert, alert.resolve_recipients(user_id, teacher_student_mapper.teachers_for_student(user_id)), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id })
-          end
+          Rails.cache.write(cache_key, today)
+
+          send_alert(alert, alert.resolve_recipients(user_id, teacher_student_mapper.teachers_for_student(user_id)), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id })
         end
       end
     end

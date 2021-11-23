@@ -103,12 +103,12 @@ module Quizzes::QuizQuestion::AnswerSerializers
         match_id = submission_data[answer_key] # this is always a string
         has_match = match_id.present?
 
-        if has_match || full
-          out << {
-            answer_id: answer_id.to_s,
-            match_id: has_match ? match_id : nil
-          }.with_indifferent_access
-        end
+        next unless has_match || full
+
+        out << {
+          answer_id: answer_id.to_s,
+          match_id: has_match ? match_id : nil
+        }.with_indifferent_access
       end
     end
 

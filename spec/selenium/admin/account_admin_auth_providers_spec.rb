@@ -33,14 +33,14 @@ describe 'account authentication' do
     let(:change_password_url) { f('#sso_settings_change_password_url') }
     let(:auth_discovery_url) { f('#sso_settings_auth_discovery_url') }
 
-    it 'saves', priority: "1", test_id: 249778 do
+    it 'saves', priority: "1" do
       add_sso_config
       expect(login_handle_name).to have_value 'login'
       expect(change_password_url).to have_value 'http://test.example.com'
       expect(auth_discovery_url).to have_value 'http://test.example.com'
     end
 
-    it 'updates', priority: "1", test_id: 249779 do
+    it 'updates', priority: "1" do
       add_sso_config
       login_handle_name.clear
       change_password_url.clear
@@ -56,7 +56,7 @@ describe 'account authentication' do
     context 'ldap' do
       let!(:ldap_aac) { AuthenticationProvider::LDAP }
 
-      it 'allows creation of config', priority: "1", test_id: 250262 do
+      it 'allows creation of config', priority: "1" do
         add_ldap_config
         keep_trying_until { expect(ldap_aac.active.count).to eq 1 }
         config = ldap_aac.active.last.reload
@@ -69,7 +69,7 @@ describe 'account authentication' do
         expect(config.auth_decrypted_password).to eq 'password'
       end
 
-      it 'allows update of config', priority: "1", test_id: 250263 do
+      it 'allows update of config', priority: "1" do
         add_ldap_config
         suffix = "ldap_#{ldap_aac.active.last.id}"
         ldap_form = f("#edit_#{suffix}")
@@ -94,7 +94,7 @@ describe 'account authentication' do
         expect(config.auth_decrypted_password).to eq 'newpassword'
       end
 
-      it 'allows deletion of config', priority: "1", test_id: 250264 do
+      it 'allows deletion of config', priority: "1" do
         skip_if_safari(:alert)
         add_ldap_config
         f("#delete-aac-#{ldap_aac.active.last.id}").click
@@ -104,14 +104,14 @@ describe 'account authentication' do
         expect(ldap_aac.active.count).to eq 0
       end
 
-      it 'allows creation of multiple configs', priority: "2", test_id: 268056 do
+      it 'allows creation of multiple configs', priority: "2" do
         add_ldap_config(1)
         expect(error_displayed?).to be_falsey
         add_ldap_config(2)
         expect(error_displayed?).to be_falsey
       end
 
-      it 'allows deletion of multiple configs', priority: "2", test_id: 250265 do
+      it 'allows deletion of multiple configs', priority: "2" do
         skip_if_safari(:alert)
         add_ldap_config(1)
         add_ldap_config(2)
@@ -129,7 +129,7 @@ describe 'account authentication' do
     context 'saml' do
       let!(:saml_aac) { AuthenticationProvider::SAML }
 
-      it 'allows creation of config', priority: "1", test_id: 250266 do
+      it 'allows creation of config', priority: "1" do
         add_saml_config
         expect { saml_aac.active.count }.to become 1
         config = saml_aac.active.last.reload
@@ -143,7 +143,7 @@ describe 'account authentication' do
         expect(config.parent_registration).to be_falsey
       end
 
-      it 'allows update of config', priority: "1", test_id: 250267 do
+      it 'allows update of config', priority: "1" do
         add_saml_config
         expect { saml_aac.active.count }.to become 1
         suffix = "saml_#{saml_aac.active.last.id}"
@@ -167,7 +167,7 @@ describe 'account authentication' do
         expect(config.parent_registration).to be_falsey
       end
 
-      it 'allows deletion of config', priority: "1", test_id: 250268 do
+      it 'allows deletion of config', priority: "1" do
         skip_if_safari(:alert)
         add_saml_config
         expect { saml_aac.active.count }.to become 1
@@ -180,7 +180,7 @@ describe 'account authentication' do
       end
 
       context 'debugging' do
-        it 'starts debug info', priority: "1", test_id: 250269 do
+        it 'starts debug info', priority: "1" do
           enable_cache do
             start_saml_debug
             wait_for_ajaximations
@@ -190,7 +190,7 @@ describe 'account authentication' do
           end
         end
 
-        it 'refreshes debug info', priority: "1", test_id: 250270 do
+        it 'refreshes debug info', priority: "1" do
           enable_cache do
             start_saml_debug
             wait_for_ajaximations
@@ -212,7 +212,7 @@ describe 'account authentication' do
           end
         end
 
-        it 'stops debug info', priority: "1", test_id: 250271 do
+        it 'stops debug info', priority: "1" do
           enable_cache do
             start_saml_debug
             wait_for_ajaximations
@@ -344,14 +344,14 @@ describe 'account authentication' do
     context 'cas' do
       let!(:cas_aac) { AuthenticationProvider::CAS }
 
-      it 'allows creation of config', priority: "1", test_id: 250272 do
+      it 'allows creation of config', priority: "1" do
         add_cas_config
         keep_trying_until { expect(cas_aac.active.count).to eq 1 }
         config = cas_aac.active.last.reload
         expect(config.auth_base).to eq 'http://auth.base.dev'
       end
 
-      it 'allows update of config', priority: "1", test_id: 250273 do
+      it 'allows update of config', priority: "1" do
         add_cas_config
         suffix = "cas_#{cas_aac.active.last.id}"
         cas_form = f("#edit_#{suffix}")
@@ -364,7 +364,7 @@ describe 'account authentication' do
         expect(config.auth_base).to eq ''
       end
 
-      it 'allows deletion of config', priority: "1", test_id: 250274 do
+      it 'allows deletion of config', priority: "1" do
         skip_if_safari(:alert)
         add_cas_config
         f("#delete-aac-#{cas_aac.active.last.id}").click
@@ -379,7 +379,7 @@ describe 'account authentication' do
     context 'facebook' do
       let!(:facebook_aac) { AuthenticationProvider::Facebook }
 
-      it 'allows creation of config', priority: "2", test_id: 250275 do
+      it 'allows creation of config', priority: "2" do
         add_facebook_config
         keep_trying_until { expect(facebook_aac.active.count).to eq 1 }
         config = facebook_aac.active.last.reload
@@ -387,7 +387,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'id'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250276 do
+      it 'allows update of config', priority: "2" do
         add_facebook_config
         suffix = "facebook_#{facebook_aac.active.last.id}"
         facebook_form = f("#edit_#{suffix}")
@@ -400,7 +400,7 @@ describe 'account authentication' do
         expect(config.entity_id).to eq ''
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250277 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_facebook_config
         f("#delete-aac-#{facebook_aac.active.last.id}").click
@@ -415,7 +415,7 @@ describe 'account authentication' do
     context 'github' do
       let!(:github_aac) { AuthenticationProvider::GitHub }
 
-      it 'allows creation of config', priority: "2", test_id: 250278 do
+      it 'allows creation of config', priority: "2" do
         add_github_config
         keep_trying_until { expect(github_aac.active.count).to eq 1 }
         config = github_aac.active.last.reload
@@ -424,7 +424,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'id'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250279 do
+      it 'allows update of config', priority: "2" do
         add_github_config
         suffix = "github_#{github_aac.active.last.id}"
         github_form = f("#edit_#{suffix}")
@@ -440,7 +440,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'id'
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250280 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_github_config
         f("#delete-aac-#{github_aac.active.last.id}").click
@@ -455,7 +455,7 @@ describe 'account authentication' do
     context 'google' do
       let!(:google_aac) { AuthenticationProvider::Google }
 
-      it 'allows creation of config', priority: "2", test_id: 250281 do
+      it 'allows creation of config', priority: "2" do
         add_google_config
         keep_trying_until { expect(google_aac.active.count).to eq 1 }
         config = google_aac.active.last.reload
@@ -463,7 +463,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'sub'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250282 do
+      it 'allows update of config', priority: "2" do
         add_google_config
         suffix = "google_#{google_aac.active.last.id}"
         google_form = f("#edit_#{suffix}")
@@ -477,7 +477,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'sub'
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250283 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_google_config
         f("#delete-aac-#{google_aac.active.last.id}").click
@@ -492,7 +492,7 @@ describe 'account authentication' do
     context 'linkedin' do
       let!(:linkedin_aac) { AuthenticationProvider::LinkedIn }
 
-      it 'allows creation of config', priority: "2", test_id: 250284 do
+      it 'allows creation of config', priority: "2" do
         add_linkedin_config
         keep_trying_until { expect(linkedin_aac.active.count).to eq 1 }
         config = linkedin_aac.active.last.reload
@@ -500,7 +500,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'id'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250285 do
+      it 'allows update of config', priority: "2" do
         add_linkedin_config
         suffix = "linkedin_#{linkedin_aac.active.last.id}"
         linkedin_form = f("#edit_#{suffix}")
@@ -514,7 +514,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'id'
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250286 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_linkedin_config
         f("#delete-aac-#{linkedin_aac.active.last.id}").click
@@ -529,7 +529,7 @@ describe 'account authentication' do
     context 'openid connect' do
       let!(:openid_aac) { AuthenticationProvider::OpenIDConnect }
 
-      it 'allows creation of config', priority: "2", test_id: 250287 do
+      it 'allows creation of config', priority: "2" do
         add_openid_connect_config
         keep_trying_until { expect(openid_aac.active.count).to eq 1 }
         config = openid_aac.active.last.reload
@@ -540,7 +540,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'sub'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250288 do
+      it 'allows update of config', priority: "2" do
         add_openid_connect_config
         suffix = "openid_connect_#{openid_aac.active.last.id}"
         openid_connect_form = f("#edit_#{suffix}")
@@ -560,7 +560,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'sub'
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250289 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_openid_connect_config
         f("#delete-aac-#{openid_aac.active.last.id}").click
@@ -575,7 +575,7 @@ describe 'account authentication' do
     context 'twitter' do
       let!(:twitter_aac) { AuthenticationProvider::Twitter }
 
-      it 'allows creation of config', priority: "2", test_id: 250290 do
+      it 'allows creation of config', priority: "2" do
         add_twitter_config
         keep_trying_until { expect(twitter_aac.active.count).to eq 1 }
         config = twitter_aac.active.last.reload
@@ -583,7 +583,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'user_id'
       end
 
-      it 'allows update of config', priority: "2", test_id: 250291 do
+      it 'allows update of config', priority: "2" do
         add_twitter_config
         suffix = "twitter_#{twitter_aac.active.last.id}"
         twitter_form = f("#edit_#{suffix}")
@@ -597,7 +597,7 @@ describe 'account authentication' do
         expect(config.login_attribute).to eq 'user_id'
       end
 
-      it 'allows deletion of config', priority: "2", test_id: 250292 do
+      it 'allows deletion of config', priority: "2" do
         skip_if_safari(:alert)
         add_twitter_config
         f("#delete-aac-#{twitter_aac.active.last.id}").click

@@ -124,7 +124,7 @@ module Lti::IMS
           return_url: nil,
           opts: {
             # See #variable_expander for additional constraints on custom param expansion
-            claim_group_whitelist: [:public, :i18n, :custom_params],
+            claim_group_whitelist: %i[public i18n custom_params],
             extension_whitelist: [:canvas_user_id, :canvas_user_login_id]
           }
         ).generate_post_payload_message(validate_launch: false)

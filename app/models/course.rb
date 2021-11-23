@@ -121,11 +121,11 @@ class Course < ActiveRecord::Base
                                                    .where(:enrollment_states => { :state => 'active' })
                                                }, through: :all_enrollments, source: :user
 
-  has_many :admins, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'] }) }, through: :enrollments, source: :user
-  has_many :admin_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']) }, class_name: 'Enrollment'
-  has_many :participating_admins, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
+  has_many :admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment] }) }, through: :enrollments, source: :user
+  has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: 'Enrollment'
+  has_many :participating_admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: 'active' }) }, through: :enrollments, source: :user
   has_many :participating_admins_by_date, -> {
-                                            where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'], workflow_state: 'active' })
+                                            where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: 'active' })
                                               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
                                               .where(:enrollment_states => { :state => 'active' })
                                           }, through: :all_enrollments, source: :user
@@ -367,17 +367,15 @@ class Course < ActiveRecord::Base
   def update_enrollment_states_if_necessary
     return if saved_change_to_id # new object, nothing to possibly invalidate
 
-    if (saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
+    # a lot of things can change the date logic here :/
+    if ((saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
        (restrict_enrollments_to_course_dates? && (saved_changes.keys & %w[start_at conclude_at]).any?) ||
-       (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == 'completed'))
-      # a lot of things can change the date logic here :/
-
-      if enrollments.exists?
-        EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
-                       .invalidate_states_for_course_or_section(self)
-      end
-      # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
+       (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == 'completed'))) &&
+       enrollments.exists?
+      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
+                     .invalidate_states_for_course_or_section(self)
     end
+    # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     if saved_change_to_account_id? || @changed_settings
       state_settings = [:restrict_student_future_view, :restrict_student_past_view]
       changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
@@ -408,12 +406,10 @@ class Course < ActiveRecord::Base
       else
         context_modules.not_deleted
       end
+    elsif array_is_okay && association(:context_modules).loaded?
+      context_modules.select(&:active?)
     else
-      if array_is_okay && association(:context_modules).loaded?
-        context_modules.select(&:active?)
-      else
-        context_modules.active
-      end
+      context_modules.active
     end
   end
 
@@ -749,9 +745,11 @@ class Course < ActiveRecord::Base
       end
       Course.clear_cache_keys(course_ids_to_update_user_account_associations, :account_associations)
 
-      user_ids_to_update_account_associations = Enrollment
-                                                .where("course_id IN (?) AND workflow_state<>'deleted'", course_ids_to_update_user_account_associations)
-                                                .group(:user_id).pluck(:user_id) unless course_ids_to_update_user_account_associations.empty?
+      unless course_ids_to_update_user_account_associations.empty?
+        user_ids_to_update_account_associations = Enrollment
+                                                  .where("course_id IN (?) AND workflow_state<>'deleted'", course_ids_to_update_user_account_associations)
+                                                  .group(:user_id).pluck(:user_id)
+      end
     end
     User.update_account_associations(user_ids_to_update_account_associations, :account_chain_cache => account_chain_cache) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
     user_ids_to_update_account_associations
@@ -1137,8 +1135,8 @@ class Course < ActiveRecord::Base
       if account
         if account.root_account?
           self.account = nil if root_account_id != account.id
-        else
-          self.account = nil if account&.root_account_id != root_account_id
+        elsif account&.root_account_id != root_account_id
+          self.account = nil
         end
       end
       self.account_id ||= self.root_account_id
@@ -1148,7 +1146,7 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= root_account.default_enrollment_term
     self.allow_student_wiki_edits = (default_wiki_editing_roles || "").split(',').include?('students')
-    if course_format && !['on_campus', 'online', 'blended'].include?(course_format)
+    if course_format && !%w[on_campus online blended].include?(course_format)
       self.course_format = nil
     end
     self.default_view ||= default_home_page
@@ -1156,7 +1154,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrollments_later
-    update_enrolled_users if !new_record? && !(changes.keys & ['workflow_state', 'name', 'course_code', 'start_at', 'conclude_at', 'enrollment_term_id']).empty?
+    update_enrolled_users if !new_record? && !(changes.keys & %w[workflow_state name course_code start_at conclude_at enrollment_term_id]).empty?
     true
   end
 
@@ -1273,8 +1271,8 @@ class Course < ActiveRecord::Base
 
   # set license to "private" if it's present but not recognized
   def validate_license
-    unless license.nil?
-      self.license = 'private' unless self.class.licenses.key?(license)
+    if !license.nil? && !self.class.licenses.key?(license)
+      self.license = 'private'
     end
   end
 
@@ -1706,7 +1704,7 @@ class Course < ActiveRecord::Base
       !deleted? && user &&
         fetch_on_enrollments("has_completed_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.completed_by_date.exists? }
     end
-    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items, :read_rubrics]
+    can %i[read read_as_admin use_student_view read_outcomes view_unpublished_items read_rubrics]
 
     # overrideable permissions for concluded users
     RoleOverride.concluded_permission_types.each do |permission, details|
@@ -1826,7 +1824,7 @@ class Course < ActiveRecord::Base
     is_unpublished = created? || claimed?
     active_enrollments = fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
       scope = enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      scope = scope.where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment']) if is_unpublished
+      scope = scope.where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
       scope.to_a.each(&:clear_association_cache)
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
@@ -2103,18 +2101,18 @@ class Course < ActiveRecord::Base
     enrollment_ids = []
 
     res = CSV.generate do |csv|
-      column_names = [
-        "publisher_id",
-        "publisher_sis_id",
-        "course_id",
-        "course_sis_id",
-        "section_id",
-        "section_sis_id",
-        "student_id",
-        "student_sis_id",
-        "enrollment_id",
-        "enrollment_status",
-        "score"
+      column_names = %w[
+        publisher_id
+        publisher_sis_id
+        course_id
+        course_sis_id
+        section_id
+        section_sis_id
+        student_id
+        student_sis_id
+        enrollment_id
+        enrollment_status
+        score
       ]
       column_names << "grade" if grading_standard_enabled?
       csv << column_names
@@ -2287,8 +2285,8 @@ class Course < ActiveRecord::Base
     enrollment_state ||= available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
       enrollment_state = 'invited' if enrollment_state == 'creation_pending'
-    else
-      enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !available?
+    elsif enrollment_state == 'invited' && !available?
+      enrollment_state = 'creation_pending'
     end
     Course.unique_constraint_retry do
       e = if opts[:allow_multiple_enrollments]
@@ -2305,10 +2303,12 @@ class Course < ActiveRecord::Base
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil
         end
-        e.attributes = {
-          :course_section => section,
-          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state
-        } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
+        if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
+          e.attributes = {
+            :course_section => section,
+            :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state
+          }
+        end
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
       e.limit_privileges_to_course_section = limit_privileges_to_course_section if e
@@ -2530,81 +2530,81 @@ class Course < ActiveRecord::Base
       attachments.each_with_index do |file, i|
         cm.update_import_progress((i.to_f / total) * 18.0) if cm && (i % 10 == 0)
 
-        if !ce || ce.export_object?(file)
-          begin
-            migration_id = ce&.create_key(file)
-            new_file = file.clone_for(self, nil, :overwrite => true, :migration_id => migration_id, :migration => cm, :match_on_migration_id => cm.for_master_course_import?)
-            cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
-            new_folder_id = merge_mapped_id(file.folder)
+        next unless !ce || ce.export_object?(file)
 
-            if file.folder && file.folder.parent_folder_id.nil?
-              new_folder_id = root_folder.id
-            end
-            # make sure the file has somewhere to go
-            unless new_folder_id
-              # gather mapping of needed folders from old course to new course
-              old_folders = []
-              old_folders << file.folder
-              new_folders = []
-              new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
-              while old_folders.last.parent_folder&.parent_folder_id
-                old_folders << old_folders.last.parent_folder
-                new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
-              end
-              old_folders.reverse!
-              new_folders.reverse!
-              # try to use folders that already match if possible
-              final_new_folders = []
-              parent_folder = Folder.root_folders(self).first
-              old_folders.each_with_index do |folder, idx|
-                final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
-                                       f
-                                     else
-                                       new_folders[idx]
-                                     end
-                parent_folder = final_new_folders.last
-              end
-              # add or update the folder structure needed for the file
-              final_new_folders.first.parent_folder_id ||=
-                merge_mapped_id(old_folders.first.parent_folder) ||
-                Folder.root_folders(self).first.id
-              old_folders.each_with_index do |folder, idx|
-                final_new_folders[idx].save!
-                map_merge(folder, final_new_folders[idx])
-                final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-              end
-              new_folder_id = merge_mapped_id(file.folder)
-            end
-            new_file.folder_id = new_folder_id
-            new_file.need_notify = false
-            new_file.save_without_broadcasting!
-            new_file.handle_duplicates(:rename)
-            cm.add_imported_item(new_file)
-            cm.add_imported_item(new_file.folder, key: new_file.folder.id)
-            map_merge(file, new_file)
-          rescue
-            cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
+        begin
+          migration_id = ce&.create_key(file)
+          new_file = file.clone_for(self, nil, :overwrite => true, :migration_id => migration_id, :migration => cm, :match_on_migration_id => cm.for_master_course_import?)
+          cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
+          new_folder_id = merge_mapped_id(file.folder)
+
+          if file.folder && file.folder.parent_folder_id.nil?
+            new_folder_id = root_folder.id
           end
+          # make sure the file has somewhere to go
+          unless new_folder_id
+            # gather mapping of needed folders from old course to new course
+            old_folders = []
+            old_folders << file.folder
+            new_folders = []
+            new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
+            while old_folders.last.parent_folder&.parent_folder_id
+              old_folders << old_folders.last.parent_folder
+              new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
+            end
+            old_folders.reverse!
+            new_folders.reverse!
+            # try to use folders that already match if possible
+            final_new_folders = []
+            parent_folder = Folder.root_folders(self).first
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
+                                     f
+                                   else
+                                     new_folders[idx]
+                                   end
+              parent_folder = final_new_folders.last
+            end
+            # add or update the folder structure needed for the file
+            final_new_folders.first.parent_folder_id ||=
+              merge_mapped_id(old_folders.first.parent_folder) ||
+              Folder.root_folders(self).first.id
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders[idx].save!
+              map_merge(folder, final_new_folders[idx])
+              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+            end
+            new_folder_id = merge_mapped_id(file.folder)
+          end
+          new_file.folder_id = new_folder_id
+          new_file.need_notify = false
+          new_file.save_without_broadcasting!
+          new_file.handle_duplicates(:rename)
+          cm.add_imported_item(new_file)
+          cm.add_imported_item(new_file.folder, key: new_file.folder.id)
+          map_merge(file, new_file)
+        rescue
+          cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
         end
       end
     end
   end
 
   def self.clonable_attributes
-    [:group_weighting_scheme, :grading_standard_id, :is_public, :is_public_to_auth_users, :public_syllabus,
-     :public_syllabus_to_auth, :allow_student_wiki_edits, :show_public_context_messages,
-     :syllabus_body, :syllabus_course_summary, :allow_student_forum_attachments,
-     :lock_all_announcements, :default_wiki_editing_roles, :allow_student_organized_groups,
-     :default_view, :show_total_grade_as_points, :allow_final_grade_override,
-     :open_enrollment, :filter_speed_grader_by_student_group,
-     :storage_quota, :tab_configuration, :allow_wiki_comments,
-     :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
-     :hide_final_grade, :hide_distribution_graphs, :allow_student_anonymous_discussion_topics,
-     :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-     :allow_student_discussion_reporting, :organize_epub_by_content_type, :show_announcements_on_home_page,
-     :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
-     :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-     :homeroom_course, :course_color, :alt_name]
+    %i[group_weighting_scheme grading_standard_id is_public is_public_to_auth_users public_syllabus
+       public_syllabus_to_auth allow_student_wiki_edits show_public_context_messages
+       syllabus_body syllabus_course_summary allow_student_forum_attachments
+       lock_all_announcements default_wiki_editing_roles allow_student_organized_groups
+       default_view show_total_grade_as_points allow_final_grade_override
+       open_enrollment filter_speed_grader_by_student_group
+       storage_quota tab_configuration allow_wiki_comments
+       turnitin_comments self_enrollment license indexed locale
+       hide_final_grade hide_distribution_graphs allow_student_anonymous_discussion_topics
+       allow_student_discussion_topics allow_student_discussion_editing lock_all_announcements
+       allow_student_discussion_reporting organize_epub_by_content_type show_announcements_on_home_page
+       home_page_announcement_limit enable_offline_web_export usage_rights_required
+       restrict_student_future_view restrict_student_past_view restrict_enrollments_to_course_dates
+       homeroom_course course_color alt_name]
   end
 
   def student_reporting?
@@ -2781,9 +2781,9 @@ class Course < ActiveRecord::Base
     when :full then scope
     when :sections then scope.where(enrollments: { course_section_id: visibilities.pluck(:course_section_id) })
     when :restricted then scope.where(enrollments: { user_id: (visibilities.filter_map { |s| s[:associated_user_id] } + [user]) })
-    when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
+    when :limited then scope.where(enrollments: { type: %w[StudentEnrollment TeacherEnrollment TaEnrollment StudentViewEnrollment] })
     when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.pluck(:course_section_id) })
-                                     .where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
+                                     .where(enrollments: { type: %w[StudentEnrollment TeacherEnrollment TaEnrollment StudentViewEnrollment] })
     else scope.none
     end
   end
@@ -2792,7 +2792,7 @@ class Course < ActiveRecord::Base
   def course_section_visibility(user, opts = {})
     visibilities = section_visibilities_for(user, opts)
     visibility = enrollment_visibility_level_for(user, visibilities, check_full: false)
-    enrollment_types = ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
+    enrollment_types = %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment]
     if [:restricted, :sections].include?(visibility) || (
         visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
       )
@@ -3099,19 +3099,19 @@ class Course < ActiveRecord::Base
 
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find { |t| t[:id] == tab[:id] } || external_tabs.find { |t| t[:id] == tab[:id] }
-        if default_tab
-          tab[:label] = default_tab[:label]
-          tab[:href] = default_tab[:href]
-          tab[:css_class] = default_tab[:css_class]
-          tab[:args] = default_tab[:args]
-          tab[:visibility] = default_tab[:visibility]
-          tab[:external] = default_tab[:external]
-          tab[:icon] = default_tab[:icon]
-          tab[:target] = default_tab[:target] if default_tab[:target]
-          default_tabs.delete_if { |t| t[:id] == tab[:id] }
-          external_tabs.delete_if { |t| t[:id] == tab[:id] }
-          tab
-        end
+        next unless default_tab
+
+        tab[:label] = default_tab[:label]
+        tab[:href] = default_tab[:href]
+        tab[:css_class] = default_tab[:css_class]
+        tab[:args] = default_tab[:args]
+        tab[:visibility] = default_tab[:visibility]
+        tab[:external] = default_tab[:external]
+        tab[:icon] = default_tab[:icon]
+        tab[:target] = default_tab[:target] if default_tab[:target]
+        default_tabs.delete_if { |t| t[:id] == tab[:id] }
+        external_tabs.delete_if { |t| t[:id] == tab[:id] }
+        tab
       end
       tabs.compact!
 
@@ -3289,7 +3289,7 @@ class Course < ActiveRecord::Base
   def self.add_setting(setting, opts = {})
     setting = setting.to_sym
     settings_options[setting] = opts
-    valid_keys = [:boolean, :default, :inherited, :alias, :arbitrary]
+    valid_keys = %i[boolean default inherited alias arbitrary]
     invalid_keys = opts.except(*valid_keys).keys
     raise "invalid options - #{invalid_keys.inspect} (must be in #{valid_keys.inspect})" if invalid_keys.any?
 
@@ -3486,10 +3486,10 @@ class Course < ActiveRecord::Base
     shard.activate do
       Course.transaction do
         new_course = Course.new
-        keys_to_copy = Course.column_names - [
-          :id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view,
-          :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id,
-          :grading_standard_id
+        keys_to_copy = Course.column_names - %i[
+          id created_at updated_at syllabus_body wiki_id default_view
+          tab_configuration lti_context_id workflow_state latest_outcome_import_id
+          grading_standard_id
         ].map(&:to_s)
         attributes.each do |key, val|
           new_course.write_attribute(key, val) if keys_to_copy.include?(key)
@@ -3870,7 +3870,7 @@ class Course < ActiveRecord::Base
     # Who..." for unsubmitted.
     expire_time = Setting.get('late_policy_tainted_submissions', 1.hour).to_i
     Rails.cache.fetch(['late_policy_tainted_submissions', self].cache_key, expires_in: expire_time) do
-      submissions.except(:order).where(late_policy_status: ['missing', 'late', 'none']).exists?
+      submissions.except(:order).where(late_policy_status: %w[missing late none]).exists?
     end
   end
 
@@ -3930,7 +3930,7 @@ class Course < ActiveRecord::Base
   end
 
   def apply_overridden_course_visibility(visibility)
-    self.overridden_course_visibility = if !['institution', 'public', 'course'].include?(visibility) &&
+    self.overridden_course_visibility = if !%w[institution public course].include?(visibility) &&
                                            root_account.available_course_visibility_override_options.key?(visibility)
                                           visibility
                                         else

@@ -38,8 +38,8 @@ class AccountNotification < ActiveRecord::Base
   validates :months_in_display_cycle, inclusion: { in: 1..48, allow_nil: true }
 
   def validate_dates
-    if start_at && end_at
-      errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time")) if end_at < start_at
+    if start_at && end_at && end_at < start_at
+      errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time"))
     end
   end
 

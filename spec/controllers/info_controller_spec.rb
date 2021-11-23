@@ -264,14 +264,14 @@ describe InfoController do
                                                                                   :is_default => 'true'
                                                                                 },
                                                                                 {
-                                                                                  :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+                                                                                  :available_to => %w[user student teacher admin observer unenrolled],
                                                                                   :text => 'Search the Canvas Guides',
                                                                                   :subtext => 'Find answers to common questions',
                                                                                   :url => 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
                                                                                   :is_default => 'true'
                                                                                 },
                                                                                 {
-                                                                                  :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+                                                                                  :available_to => %w[user student teacher admin observer unenrolled],
                                                                                   :text => 'Report a Problem',
                                                                                   :subtext => 'If Canvas misbehaves, tell us about it',
                                                                                   :url => '#create_ticket',

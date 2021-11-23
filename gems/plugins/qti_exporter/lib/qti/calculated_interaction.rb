@@ -132,7 +132,7 @@ module Qti
         # is this secretly a simple numeric question in disguise
         var = @question[:variables].first
         if (var[:min] == var[:max]) && (@question[:imported_formula] == var[:name]) # yup the formula for the answer is "x" and there's only one possible value
-          [:variables, :formulas, :imported_formula, :formula_decimal_places, :answer_tolerance].each { |k| @question.delete(k) }
+          %i[variables formulas imported_formula formula_decimal_places answer_tolerance].each { |k| @question.delete(k) }
           @question[:question_type] = 'numerical_question'
           @question[:answers] = [
             { :weight => 100, :id => unique_local_id, :text => 'answer_text',

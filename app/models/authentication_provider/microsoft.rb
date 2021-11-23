@@ -51,21 +51,21 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def self.recognized_params
     # need to filter out OpenIDConnect params, but still call super to get mfa_required
-    super - open_id_connect_params + [:tenant, :login_attribute, :jit_provisioning].freeze
+    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning].freeze
   end
 
   def self.login_attributes
-    ['sub', 'email', 'oid', 'preferred_username'].freeze
+    %w[sub email oid preferred_username].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'email',
-      'name',
-      'preferred_username',
-      'oid',
-      'sub',
+    %w[
+      email
+      name
+      preferred_username
+      oid
+      sub
     ].freeze
   end
 
@@ -86,7 +86,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v['attribute'] }
-    result << 'profile' unless (requested_attributes & ['name', 'oid', 'preferred_username']).empty?
+    result << 'profile' unless (requested_attributes & %w[name oid preferred_username]).empty?
     result << 'email' if requested_attributes.include?('email')
     result.join(' ')
   end

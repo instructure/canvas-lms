@@ -370,10 +370,10 @@ describe ContentMigration do
       rub = @copy_to.rubrics.where(migration_id: mig_id(@rubric)).first
       expect(rub).not_to be_nil
 
-      [:description, :id, :points].each do |k|
+      %i[description id points].each do |k|
         expect(rub.data.first[k]).to eq @rubric.data.first[k]
       end
-      [:criterion_id, :description, :id, :points].each do |k|
+      %i[criterion_id description id points].each do |k|
         rub.data.first[:ratings].each_with_index do |criterion, i|
           expect(criterion[k]).to eq @rubric.data.first[:ratings][i][k]
         end

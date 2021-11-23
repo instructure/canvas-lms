@@ -31,14 +31,14 @@ module DataFixup
       WHERE token(id) > token(?)
       LIMIT ?
     }
-    INDEX_METHODS = [
-      :add_course_assignment_index,
-      :add_course_assignment_grader_index,
-      :add_course_assignment_grader_student_index,
-      :add_course_assignment_student_index,
-      :add_course_grader_index,
-      :add_course_grader_student_index,
-      :add_course_student_index
+    INDEX_METHODS = %i[
+      add_course_assignment_index
+      add_course_assignment_grader_index
+      add_course_assignment_grader_student_index
+      add_course_assignment_student_index
+      add_course_grader_index
+      add_course_grader_student_index
+      add_course_student_index
     ].freeze
 
     def read_batch_size

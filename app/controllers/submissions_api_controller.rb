@@ -207,11 +207,11 @@
 class SubmissionsApiController < ApplicationController
   before_action :get_course_from_section, :require_context, :require_user
   batch_jobs_in_actions :only => [:update, :update_anonymous], :batch => { :priority => Delayed::LOW_PRIORITY }
-  before_action :ensure_submission, :only => [:show,
-                                              :document_annotations_read_state,
-                                              :mark_document_annotations_read,
-                                              :rubric_comments_read_state,
-                                              :mark_rubric_comments_read]
+  before_action :ensure_submission, :only => %i[show
+                                                document_annotations_read_state
+                                                mark_document_annotations_read
+                                                rubric_comments_read_state
+                                                mark_rubric_comments_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper

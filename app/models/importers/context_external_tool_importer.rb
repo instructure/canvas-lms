@@ -26,12 +26,12 @@ module Importers
     def self.process_migration(data, migration)
       tools = data['external_tools'] || []
       tools.each do |tool|
-        if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-          begin
-            import_from_migration(tool, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
-          end
+        next unless migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
+
+        begin
+          import_from_migration(tool, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
         end
       end
       migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|
@@ -215,9 +215,9 @@ module Importers
       return if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
       return if migration.migration_type == "canvas_cartridge_importer" && hash[:title] && tool.name != hash[:title]
 
-      if preexisting_tool
+      if preexisting_tool && (((hash[:consumer_key] || 'fake') == 'fake') && ((hash[:shared_secret] || 'fake') == 'fake'))
         # we're matching to existing tools; go with their config if we don't have a real one
-        ignore_key_check = true if ((hash[:consumer_key] || 'fake') == 'fake') && ((hash[:shared_secret] || 'fake') == 'fake')
+        ignore_key_check = true
       end
       return unless ignore_key_check || (tool.consumer_key == (hash[:consumer_key] || 'fake') && tool.shared_secret == (hash[:shared_secret] || 'fake'))
 

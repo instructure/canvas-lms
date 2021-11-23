@@ -236,7 +236,7 @@ module AssignmentOverrideApplicator
           user,
           excluded_workflows: ['deleted', 'completed']
         ).select { |v|
-          ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
+          %w[StudentEnrollment ObserverEnrollment StudentViewEnrollment].include? v[:type]
         }.pluck(:course_section_id).uniq
     end
 
@@ -284,7 +284,7 @@ module AssignmentOverrideApplicator
     end
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
-    [:id, :updated_at, :created_at].each { |attr|
+    %i[id updated_at created_at].each { |attr|
       clone[attr] = assignment.send(attr)
     }
     copy_preloaded_associations_to_clone(assignment, clone)
@@ -342,15 +342,15 @@ module AssignmentOverrideApplicator
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
         # clone the assignment_or_quiz, apply overrides, and freeze
-        [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
-          if assignment_or_quiz.respond_to?(field)
-            value = send("overridden_#{field}", assignment_or_quiz, overrides)
-            # force times to un-zoned UTC -- this will be a cached value and should
-            # not care about the TZ of the user that cached it. the user's TZ will
-            # be applied before it's returned.
-            value = value.utc if value.respond_to?(:utc) && !value.is_a?(Date)
-            overridden_data[field] = value
-          end
+        %i[due_at all_day all_day_date unlock_at lock_at].each do |field|
+          next unless assignment_or_quiz.respond_to?(field)
+
+          value = send("overridden_#{field}", assignment_or_quiz, overrides)
+          # force times to un-zoned UTC -- this will be a cached value and should
+          # not care about the TZ of the user that cached it. the user's TZ will
+          # be applied before it's returned.
+          value = value.utc if value.respond_to?(:utc) && !value.is_a?(Date)
+          overridden_data[field] = value
         end
         overridden_data
       end

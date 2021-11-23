@@ -52,7 +52,7 @@ module PacePlansDateHelpers
     private
 
     def business_time_config(exclude_weekends, blackout_dates)
-      work_week = exclude_weekends ? [:mon, :tue, :wed, :thu, :fri] : [:sun, :mon, :tue, :wed, :thu, :fri, :sat]
+      work_week = exclude_weekends ? %i[mon tue wed thu fri] : %i[sun mon tue wed thu fri sat]
 
       holidays = blackout_dates.map do |blackout_date|
         (blackout_date.start_date..blackout_date.end_date).to_a

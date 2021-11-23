@@ -156,11 +156,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           obj[:name] = aq_name if aq_name
         end
       end
-      if obj[:answers] && obj[:question_type] != 'text_only_question'
-        stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
-        stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
-        stats[:questions] << ['question', stat]
-      end
+      next unless obj[:answers] && obj[:question_type] != 'text_only_question'
+
+      stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
+      stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
+      stats[:questions] << ['question', stat]
     end
 
     stats
@@ -210,11 +210,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         quiz_data.each do |question|
           next if question['entry_type'] == 'quiz_group'
 
-          unless found_question_ids[question[:id]]
-            columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
-            columns << question[:points_possible]
-            found_question_ids[question[:id]] = true
-          end
+          next if found_question_ids[question[:id]]
+
+          columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
+          columns << question[:points_possible]
+          found_question_ids[question[:id]] = true
         end
       end
       last_question_index = columns.length - 1

@@ -38,7 +38,7 @@ module Api
 
       private
 
-      APPLICABLE_CONTEXT_TYPES = ["Course", "Group", "Account"].freeze
+      APPLICABLE_CONTEXT_TYPES = %w[Course Group Account].freeze
       SKIP_CONTEXT_TYPES = ["User"].freeze
       FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}.freeze
       VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/.freeze
@@ -68,10 +68,8 @@ module Api
       end
 
       def scope_link_to_context(local_link)
-        if local_link.start_with?('/files')
-          if attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type)
-            return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
-          end
+        if local_link.start_with?('/files') && (attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type))
+          return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
         end
 
         local_link

@@ -41,17 +41,17 @@ module CC::Importer::Standard
           File.open(full_path, 'w') { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
         end
 
-        if File.exist?(full_path)
-          qti_converted_dir = File.join(conversion_dir, id)
-          if run_qti_converter(full_path, qti_converted_dir, id)
-            # get quizzes/questions
-            if (q_list = convert_questions(qti_converted_dir, id))
-              questions += q_list
-            end
-            if (quiz = convert_assessment(qti_converted_dir, id))
-              quizzes << quiz
-            end
-          end
+        next unless File.exist?(full_path)
+
+        qti_converted_dir = File.join(conversion_dir, id)
+        next unless run_qti_converter(full_path, qti_converted_dir, id)
+
+        # get quizzes/questions
+        if (q_list = convert_questions(qti_converted_dir, id))
+          questions += q_list
+        end
+        if (quiz = convert_assessment(qti_converted_dir, id))
+          quizzes << quiz
         end
       end
 
@@ -84,8 +84,8 @@ module CC::Importer::Standard
           question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
           question[:answers].each do |ans|
             ans.each_pair do |key, val|
-              if key.to_s.end_with? "html"
-                ans[key] = replace_urls(val, resource_id) if ans[key]
+              if key.to_s.end_with?("html") && ans[key]
+                ans[key] = replace_urls(val, resource_id)
               end
             end
           end

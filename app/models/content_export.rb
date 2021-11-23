@@ -564,9 +564,8 @@ class ContentExport < ActiveRecord::Base
   def expired?
     return false unless ContentExport.expire?
 
-    if user
-      return false if user.content_shares.where(content_export: self).exists?
-    end
+    return false if user && user.content_shares.where(content_export: self).exists?
+
     created_at < ContentExport.expire_days.days.ago
   end
 

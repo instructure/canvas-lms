@@ -535,14 +535,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.has_seen_results = false
     end
 
-    if quiz && quiz.scoring_policy == "keep_highest"
-      # exclude the score of the version we're curretly overwriting
-      if to_be_kept_score < highest_score_so_far(version.id)
-        self.manually_scored = true
-      end
+    # exclude the score of the version we're curretly overwriting
+    if quiz && quiz.scoring_policy == "keep_highest" && to_be_kept_score < highest_score_so_far(version.id)
+      self.manually_scored = true
     end
 
-    update_submission_version(version, [:score, :fudge_points, :manually_scored])
+    update_submission_version(version, %i[score fudge_points manually_scored])
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
@@ -571,8 +569,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     now = (Time.zone.now - ((strict ? 1 : 5) * 60))
     return false unless end_at && end_at.localtime < now
 
-    if quiz&.timer_autosubmit_disabled?
-      return false unless end_at_without_time_limit && end_at_without_time_limit.localtime < now
+    if quiz&.timer_autosubmit_disabled? && !(end_at_without_time_limit && end_at_without_time_limit.localtime < now)
+      return false
     end
 
     true
@@ -748,7 +746,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # the interaction in here is messy
 
     # first we update the version we've been modifying, so that all versions are current.
-    update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
+    update_submission_version(version, %i[submission_data score fudge_points workflow_state])
 
     if version.model.attempt != attempt || !completed_before_changes
       reload

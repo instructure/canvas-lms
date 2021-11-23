@@ -56,7 +56,7 @@ describe "account" do
       expect(term.end_at).to eq Date.parse("2011-07-31")
     end
 
-    it 'general term dates', priority: 1, test_id: 1621631 do
+    it 'general term dates', priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
       f('.edit_term_link').click
@@ -72,7 +72,7 @@ describe "account" do
                                   })
     end
 
-    it 'student enrollment dates', priority: 1, test_id: 1621632 do
+    it 'student enrollment dates', priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
       f('.edit_term_link').click
@@ -88,7 +88,7 @@ describe "account" do
                                   })
     end
 
-    it 'teacher enrollment dates', priority: 1, test_id: 1621633 do
+    it 'teacher enrollment dates', priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
       f('.edit_term_link').click
@@ -104,7 +104,7 @@ describe "account" do
                                   })
     end
 
-    it 'ta enrollment dates', priority: 1, test_id: 1621934 do
+    it 'ta enrollment dates', priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
       f('.edit_term_link').click

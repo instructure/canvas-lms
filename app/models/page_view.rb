@@ -29,7 +29,7 @@ class PageView < ActiveRecord::Base
 
   before_save :ensure_account
   before_save :cap_interaction_seconds
-  belongs_to :context, polymorphic: [:course, :account, :group, :user, :user_profile], polymorphic_prefix: true
+  belongs_to :context, polymorphic: %i[course account group user user_profile], polymorphic_prefix: true
 
   CONTEXT_TYPES = %w[Course Account Group User UserProfile].freeze
 

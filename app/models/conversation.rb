@@ -30,7 +30,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_messages, -> { order("created_at DESC, id DESC") }, dependent: :delete_all
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
-  belongs_to :context, polymorphic: [:account, :course, :group]
+  belongs_to :context, polymorphic: %i[account course group]
 
   before_save :update_root_account_ids
 
@@ -366,8 +366,8 @@ class Conversation < ActiveRecord::Base
 
       cps = cps.visible if options[:only_existing]
 
-      unless options[:new_message]
-        cps = cps.where.not(user_id: skip_participants.map(&:user_id)) if skip_participants.present?
+      if !options[:new_message] && skip_participants.present?
+        cps = cps.where.not(user_id: skip_participants.map(&:user_id))
       end
 
       cps = cps.where(:user_id => (options[:only_users] + [message.author]).map(&:id)) if options[:only_users]
@@ -474,8 +474,10 @@ class Conversation < ActiveRecord::Base
   def update_participants(message, options = {})
     updated = false
     conversation_participants.shard(self).activate do |conversation_participants|
-      conversation_participants = conversation_participants.where(:user_id =>
-        (options[:only_users]).map(&:id)) if options[:only_users]
+      if options[:only_users]
+        conversation_participants = conversation_participants.where(:user_id =>
+          (options[:only_users]).map(&:id))
+      end
 
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       update_for_skips = options[:update_for_skips] != false

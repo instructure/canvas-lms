@@ -148,7 +148,7 @@ if ENV['ENABLE_AXE_SELENIUM'] == '1'
   Stormbreaker.configure do |config|
     config.driver = lambda { SeleniumDriverSetup.driver }
     config.skip = [:"color-contrast", :"duplicate-id"]
-    config.rules = [:wcag2a, :wcag2aa, :section508]
+    config.rules = %i[wcag2a wcag2aa section508]
     if ENV['RSPEC_PROCESSES']
       config.serialize_output = true
       config.serialize_prefix = 'log/results/stormbreaker_results'
@@ -747,10 +747,8 @@ RSpec.configure do |config|
     if opts[:stubs]
       ConfigFile.singleton_class.prepend(StubS3)
       allow(StubS3).to receive(:stubbed?).and_return(true)
-    else
-      if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
-        skip "Please put valid S3 credentials in config/amazon_s3.yml"
-      end
+    elsif Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
+      skip "Please put valid S3 credentials in config/amazon_s3.yml"
     end
   end
 

@@ -20,7 +20,7 @@
 
 class GradingStandardsController < ApplicationController
   JSON_METHODS =
-    [:display_name, :context_code, :assessed_assignment?, :context_name].freeze
+    %i[display_name context_code assessed_assignment? context_name].freeze
 
   before_action :require_context
   add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }

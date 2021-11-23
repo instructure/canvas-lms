@@ -114,10 +114,10 @@ module Importers
         end
 
         begin
-          if migration.for_master_course_import?
-            # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
-            next if question['assessment_question_id'] && question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
-          end
+          # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
+          next if migration.for_master_course_import? &&
+                  question['assessment_question_id'] &&
+                  question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
           question = import_from_migration(question, migration.context, migration, question_bank)
           question_data[:aq_data][question['migration_id']] = question
@@ -186,12 +186,12 @@ module Importers
                                      t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
       end
 
-      [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
-        if hash[field].present?
-          hash[field] = migration.convert_html(
-            hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
-          )
-        end
+      %i[question_text correct_comments_html incorrect_comments_html neutral_comments_html more_comments_html].each do |field|
+        next unless hash[field].present?
+
+        hash[field] = migration.convert_html(
+          hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
+        )
       end
 
       if hash[:question_text]&.length&.> 16.kilobytes
@@ -200,7 +200,7 @@ module Importers
                                 :question_name => hash[:question_name]))
       end
 
-      [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
+      %i[correct_comments incorrect_comments neutral_comments more_comments].each do |field|
         html_field = "#{field}_html".to_sym
         if hash[field].present? && hash[field] == hash[html_field]
           hash.delete(html_field)
@@ -208,14 +208,14 @@ module Importers
       end
 
       hash[:answers]&.each_with_index do |answer, i|
-        [:html, :comments_html, :left_html].each do |field|
+        %i[html comments_html left_html].each do |field|
           key = "answer #{i} #{field}"
 
-          if answer[field].present?
-            answer[field] = migration.convert_html(
-              answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
-            )
-          end
+          next unless answer[field].present?
+
+          answer[field] = migration.convert_html(
+            answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
+          )
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)

@@ -22,24 +22,24 @@ require_relative '../../import_helper'
 
 describe "Importing Groups" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'group'
-      it "imports from #{system}" do
-        data = get_import_data(system, 'group')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, 'group'
 
-        data[:groups_to_import] = {}
-        expect(Importers::GroupImporter.import_from_migration(data, context, migration)).to be_nil
-        expect(context.groups.count).to eq 0
+    it "imports from #{system}" do
+      data = get_import_data(system, 'group')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        data[:groups_to_import][data[:migration_id]] = true
-        Importers::GroupImporter.import_from_migration(data, context, migration)
-        Importers::GroupImporter.import_from_migration(data, context, migration)
-        expect(context.groups.count).to eq 1
-        g = Group.where(migration_id: data[:migration_id]).first
+      data[:groups_to_import] = {}
+      expect(Importers::GroupImporter.import_from_migration(data, context, migration)).to be_nil
+      expect(context.groups.count).to eq 0
 
-        expect(g.name).to eq data[:title]
-      end
+      data[:groups_to_import][data[:migration_id]] = true
+      Importers::GroupImporter.import_from_migration(data, context, migration)
+      Importers::GroupImporter.import_from_migration(data, context, migration)
+      expect(context.groups.count).to eq 1
+      g = Group.where(migration_id: data[:migration_id]).first
+
+      expect(g.name).to eq data[:title]
     end
   end
 

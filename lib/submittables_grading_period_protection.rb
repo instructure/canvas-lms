@@ -38,8 +38,10 @@ module SubmittablesGradingPeriodProtection
   def grading_periods_allow_submittable_update?(submittable, submittable_params, flash_message: false)
     return true unless submittable.graded?
 
-    submittable.only_visible_to_overrides =
-      submittable_params[:only_visible_to_overrides] if submittable_params.key?(:only_visible_to_overrides)
+    if submittable_params.key?(:only_visible_to_overrides)
+      submittable.only_visible_to_overrides =
+        submittable_params[:only_visible_to_overrides]
+    end
     submittable.due_at = submittable_params[:due_at] if submittable_params.key?(:due_at)
     return true unless submittable.only_visible_to_overrides_changed? || due_at_changed?(submittable)
     return true unless constrained_by_grading_periods?

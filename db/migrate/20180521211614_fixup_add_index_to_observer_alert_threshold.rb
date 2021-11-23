@@ -32,6 +32,6 @@ class FixupAddIndexToObserverAlertThreshold < ActiveRecord::Migration[5.1]
       t.references :observer, null: false, foreign_key: { to_table: 'users' }
     end
 
-    add_index :observer_alert_thresholds, [:alert_type, :user_id, :observer_id], unique: true, name: 'observer_alert_thresholds_on_alert_type_and_observer_and_user'
+    add_index :observer_alert_thresholds, %i[alert_type user_id observer_id], unique: true, name: 'observer_alert_thresholds_on_alert_type_and_observer_and_user'
   end
 end

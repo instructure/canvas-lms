@@ -36,12 +36,12 @@ describe "Gradebook" do
       Gradebook.visit(@course)
     end
 
-    it 'is maintained in editable mode', priority: "1", test_id: 3438379 do
+    it 'is maintained in editable mode', priority: "1" do
       Gradebook::Cells.select_scheme_grade(@students[0], @assignment, 'C')
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq('C')
     end
 
-    it 'is maintained on page refresh post grade update', priority: "1", test_id: 3438380 do
+    it 'is maintained on page refresh post grade update', priority: "1" do
       Gradebook::Cells.select_scheme_grade(@students[0], @assignment, 'A-')
       refresh_page
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq('A-')

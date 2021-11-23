@@ -43,7 +43,7 @@ describe 'quizzes students' do
       @quiz.save
     end
 
-    it "does not show 'take quiz' button after the allowed attempts are over", priority: "1", test_id: 333736 do
+    it "does not show 'take quiz' button after the allowed attempts are over", priority: "1" do
       student = student_in_course(course: @course, name: 'student', active_all: true).user
       @quiz.allowed_attempts = 2
       @quiz.save
@@ -63,7 +63,7 @@ describe 'quizzes students' do
     end
 
     context 'when using the course student view' do
-      it 'can take a quiz', priority: "1", test_id: 210050 do
+      it 'can take a quiz', priority: "1" do
         # NOTE: this is different from masquerading!
         @fake_student = @course.student_view_student
         enter_student_view

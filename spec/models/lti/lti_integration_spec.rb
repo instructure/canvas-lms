@@ -281,7 +281,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
+      expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq %w[custom___taa____ custom_bob custom_canvas_enrollment_state custom_fred custom_john]
       expect(hash['custom_bob']).to eql('bob')
       expect(hash['custom_fred']).to eql('fred')
       expect(hash['custom_john']).to eql('john')

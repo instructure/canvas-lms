@@ -71,7 +71,7 @@ class User < ActiveRecord::Base
   has_many :enrollments, :dependent => :destroy
 
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
-  has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
+  has_many :not_removed_enrollments, -> { where.not(workflow_state: %w[rejected deleted inactive]) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
 
@@ -604,7 +604,7 @@ class User < ActiveRecord::Base
       users = if users_or_user_ids.first.is_a?(User)
                 users_or_user_ids
               else
-                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
+                users_or_user_ids = User.select(%i[id preferences workflow_state updated_at]).where(id: user_ids).to_a
               end
 
       if opts[:all_shards]
@@ -621,14 +621,16 @@ class User < ActiveRecord::Base
         data[:enrollments] += shard_enrollments =
           Enrollment.where("workflow_state NOT IN ('deleted','rejected') AND type<>'StudentViewEnrollment'")
                     .where(:user_id => shard_user_ids)
-                    .select([:user_id, :course_id, :course_section_id])
+                    .select(%i[user_id course_id course_section_id])
                     .distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
         shard_enrollments.each { |e| course_section_ids << e.course_section_id }
-        data[:sections] += shard_sections = CourseSection.select([:id, :course_id, :nonxlist_course_id])
-                                                         .where(:id => course_section_ids.to_a).to_a unless course_section_ids.empty?
+        unless course_section_ids.empty?
+          data[:sections] += shard_sections = CourseSection.select(%i[id course_id nonxlist_course_id])
+                                                           .where(:id => course_section_ids.to_a).to_a
+        end
         shard_sections ||= []
         course_ids = Set.new
         shard_sections.each do |s|
@@ -870,7 +872,7 @@ class User < ActiveRecord::Base
     end
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
-    self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
+    self.initial_enrollment_type = nil unless %w[student teacher ta observer].include?(initial_enrollment_type)
     self.lti_id ||= SecureRandom.uuid
     true
   end
@@ -1251,7 +1253,7 @@ class User < ActiveRecord::Base
     given { |user| check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    [:read_email_addresses, :read_sis, :manage_sis].each do |permission|
+    %i[read_email_addresses read_sis manage_sis].each do |permission|
       given { |user| check_courses_right?(user, permission) }
       can permission
     end
@@ -1366,16 +1368,14 @@ class User < ActiveRecord::Base
   end
 
   def update_avatar_image(force_reload = false)
-    if !avatar_image_url || force_reload
-      if avatar_image_source == 'twitter'
-        twitter = user_services.for_service('twitter').first rescue nil
-        if twitter
-          url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-          data = JSON.parse(Net::HTTP.get(url)) rescue nil
-          if data
-            self.avatar_image_url = data['profile_image_url_https'] || avatar_image_url
-            self.avatar_image_updated_at = Time.now
-          end
+    if (!avatar_image_url || force_reload) && avatar_image_source == 'twitter'
+      twitter = user_services.for_service('twitter').first rescue nil
+      if twitter
+        url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
+        data = JSON.parse(Net::HTTP.get(url)) rescue nil
+        if data
+          self.avatar_image_url = data['profile_image_url_https'] || avatar_image_url
+          self.avatar_image_updated_at = Time.now
         end
       end
     end
@@ -1454,7 +1454,7 @@ class User < ActiveRecord::Base
   end
 
   def avatar_state
-    if ['none', 'submitted', 'approved', 'locked', 'reported', 're_reported'].include?(read_attribute(:avatar_state))
+    if %w[none submitted approved locked reported re_reported].include?(read_attribute(:avatar_state))
       read_attribute(:avatar_state).to_sym
     else
       :none
@@ -1462,7 +1462,7 @@ class User < ActiveRecord::Base
   end
 
   def avatar_state=(val)
-    if ['none', 'submitted', 'approved', 'locked', 'reported', 're_reported'].include?(val.to_s)
+    if %w[none submitted approved locked reported re_reported].include?(val.to_s)
       if val == 'none'
         self.avatar_image_url = nil
         self.avatar_image_source = 'no_pic'
@@ -1473,15 +1473,15 @@ class User < ActiveRecord::Base
   end
 
   def avatar_reportable?
-    [:submitted, :approved, :reported, :re_reported].include?(avatar_state)
+    %i[submitted approved reported re_reported].include?(avatar_state)
   end
 
   def avatar_approvable?
-    [:submitted, :reported, :re_reported].include?(avatar_state)
+    %i[submitted reported re_reported].include?(avatar_state)
   end
 
   def avatar_approved?
-    [:approved, :locked, :re_reported].include?(avatar_state)
+    %i[approved locked re_reported].include?(avatar_state)
   end
 
   def avatar_locked?
@@ -1502,7 +1502,7 @@ class User < ActiveRecord::Base
     Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 
-  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled'].freeze
+  AVATAR_SETTINGS = %w[enabled enabled_pending sis_only disabled].freeze
   def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback = true)
     return fallback if avatar_setting == 'disabled'
 
@@ -1785,14 +1785,14 @@ class User < ActiveRecord::Base
   end
 
   def self.serialization_excludes
-    [
-      :uuid,
-      :phone,
-      :features_used,
-      :otp_communication_channel_id,
-      :otp_secret_key_enc,
-      :otp_secret_key_salt,
-      :collkey
+    %i[
+      uuid
+      phone
+      features_used
+      otp_communication_channel_id
+      otp_secret_key_enc
+      otp_secret_key_salt
+      collkey
     ]
   end
 
@@ -2107,7 +2107,7 @@ class User < ActiveRecord::Base
 
   def all_course_ids
     cached_course_ids('all') do |enrollments|
-      enrollments.where.not(:workflow_state => ['rejected', 'deleted', 'inactive'])
+      enrollments.where.not(:workflow_state => %w[rejected deleted inactive])
     end
   end
 

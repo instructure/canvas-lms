@@ -23,10 +23,10 @@ require_relative '../../import_helper'
 describe "Assessment Question import from hash" do
   SYSTEMS.each do |system|
     QUESTIONS.each do |q|
-      if import_data_exists? [system, 'quiz'], q[0]
-        it "imports #{q[0]} questions for #{system}" do
-          test_question_import(q[0], system)
-        end
+      next unless import_data_exists? [system, 'quiz'], q[0]
+
+      it "imports #{q[0]} questions for #{system}" do
+        test_question_import(q[0], system)
       end
     end
   end

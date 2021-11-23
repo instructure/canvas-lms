@@ -34,12 +34,12 @@ module Importers
     def self.process_migration(data, migration)
       standards = data['grading_standards'] || []
       standards.each do |standard|
-        if migration.import_object?('grading_standards', standard['migration_id'])
-          begin
-            import_from_migration(standard, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
-          end
+        next unless migration.import_object?('grading_standards', standard['migration_id'])
+
+        begin
+          import_from_migration(standard, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
         end
       end
     end

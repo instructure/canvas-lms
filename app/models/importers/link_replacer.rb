@@ -80,11 +80,11 @@ module Importers
       fix_issue_url = nil
       field_links.each do |field, links|
         missing_links = links.select { |link| link[:replaced] && (link[:missing_url] || !link[:new_value]) }
-        if missing_links.any?
-          fix_issue_url ||= fix_issue_url(item_key)
-          type = item_key[:type].to_s.humanize.titleize
-          @migration.add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
-        end
+        next unless missing_links.any?
+
+        fix_issue_url ||= fix_issue_url(item_key)
+        type = item_key[:type].to_s.humanize.titleize
+        @migration.add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
       end
     end
 
@@ -229,10 +229,8 @@ module Importers
       end
 
       quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where.not(quiz_data: nil).first
-      if quiz
-        if recursively_sub_placeholders!(quiz['quiz_data'], links)
-          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
-        end
+      if quiz && recursively_sub_placeholders!(quiz['quiz_data'], links)
+        Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
       end
     end
   end

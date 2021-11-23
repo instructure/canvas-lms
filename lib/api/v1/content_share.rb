@@ -51,10 +51,10 @@ module Api::V1::ContentShare
 
   def preload_content_exports(content_shares, additional_associations)
     ActiveRecord::Associations::Preloader.new.preload(content_shares, [
-                                                        { :content_export => [
-                                                          :context,
-                                                          :job_progress,
-                                                          :attachment,
+                                                        { :content_export => %i[
+                                                          context
+                                                          job_progress
+                                                          attachment
                                                         ] },
                                                         *additional_associations
                                                       ])

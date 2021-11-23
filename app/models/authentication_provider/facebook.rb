@@ -47,13 +47,13 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'email',
-      'first_name',
-      'id',
-      'last_name',
-      'locale',
-      'name',
+    %w[
+      email
+      first_name
+      id
+      last_name
+      locale
+      name
     ].freeze
   end
 

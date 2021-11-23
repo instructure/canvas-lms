@@ -131,11 +131,12 @@ module SIS
         end
 
         if section.changed?
-          if section.workflow_state_changed? && section.workflow_state_was == "deleted"
-            if section.default_section? && CourseSection.active.where(:course_id => section.course_id, :default_section => true).exists?
-              # trying to restore a previously default section but there's one already so undefault the restored one
-              section.default_section = false
-            end
+          if section.workflow_state_changed? &&
+             section.workflow_state_was == "deleted" &&
+             section.default_section? &&
+             CourseSection.active.where(:course_id => section.course_id, :default_section => true).exists?
+            # trying to restore a previously default section but there's one already so undefault the restored one
+            section.default_section = false
           end
           section.sis_batch_id = @batch.id
           if section.valid?

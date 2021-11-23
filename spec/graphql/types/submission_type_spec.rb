@@ -359,7 +359,7 @@ describe Types::SubmissionType do
     it 'properly handles cursors for submission histories' do
       expect(
         submission_history_type.resolve('submissionHistoriesConnection { edges { cursor }}')
-      ).to eq ["MQ", "Mg", "Mw"]
+      ).to eq %w[MQ Mg Mw]
     end
 
     context 'filter' do

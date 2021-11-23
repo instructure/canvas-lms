@@ -185,8 +185,8 @@ namespace :db do
   end
 
   desc "generate data"
-  task :generate_data => [:configure_default_settings, :load_notifications,
-                          :evaluate_notification_templates]
+  task :generate_data => %i[configure_default_settings load_notifications
+                            evaluate_notification_templates]
 
   desc "Configure Default Account Name"
   task :configure_account_name => :load_environment do
@@ -214,7 +214,7 @@ namespace :db do
   end
 
   desc "Create all the initial data, including notifications and admin account"
-  task :load_initial_data => [:create_default_accounts, :configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
+  task :load_initial_data => %i[create_default_accounts configure_admin configure_account_name configure_statistics_collection generate_data] do
     puts "\nInitial data loaded"
   end # Task: load_initial_data
 

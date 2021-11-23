@@ -105,7 +105,7 @@ module CC::Exporter::Epub
     end
 
     def item_details_present?(item)
-      details = [:due_at, :unlock_at, :lock_at, :grading_type, :points_possible, :submission_types]
+      details = %i[due_at unlock_at lock_at grading_type points_possible submission_types]
       details.any? { |detail| item[detail].present? }
     end
   end

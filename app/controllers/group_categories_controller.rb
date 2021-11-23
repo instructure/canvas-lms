@@ -96,7 +96,7 @@ require 'csv'
 #
 class GroupCategoriesController < ApplicationController
   before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import, :export]
+  before_action :get_category_context, :only => %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -376,12 +376,10 @@ class GroupCategoriesController < ApplicationController
           flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
           render :json => { :deleted => true }
         end
+      elsif api_request?
+        render :json => @group_category.errors, :status => :bad_request
       else
-        if api_request?
-          render :json => @group_category.errors, :status => :bad_request
-        else
-          render :json => { :deleted => false }
-        end
+        render :json => { :deleted => false }
       end
     end
   end

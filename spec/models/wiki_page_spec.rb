@@ -223,7 +223,7 @@ describe WikiPage do
     end
 
     context 'allows account admins to read' do
-      [:manage_wiki_create, :manage_wiki_update, :manage_wiki_delete].each do |perm|
+      %i[manage_wiki_create manage_wiki_update manage_wiki_delete].each do |perm|
         it "with #{perm} rights" do
           account = @course.root_account
           role = custom_account_role('CustomAccountUser', :account => account)

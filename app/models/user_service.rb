@@ -239,7 +239,7 @@ class UserService < ActiveRecord::Base
   end
 
   def self.serialization_excludes
-    [:crypted_password, :password_salt, :token, :secret]
+    %i[crypted_password password_salt token secret]
   end
 
   def self.associated_shards(_service, _service_user_id)

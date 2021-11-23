@@ -30,25 +30,25 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    super + [
-      :log_in_url,
-      :log_out_url,
-      :requested_authn_context,
-      :certificate_fingerprint,
-      :identifier_format,
-      :login_attribute,
-      :idp_entity_id,
-      :parent_registration,
-      :jit_provisioning,
-      :metadata,
-      :metadata_uri,
-      :sig_alg,
-      :strip_domain_from_login_attribute
+    super + %i[
+      log_in_url
+      log_out_url
+      requested_authn_context
+      certificate_fingerprint
+      identifier_format
+      login_attribute
+      idp_entity_id
+      parent_registration
+      jit_provisioning
+      metadata
+      metadata_uri
+      sig_alg
+      strip_domain_from_login_attribute
     ].freeze
   end
 
   def self.deprecated_params
-    [:change_password_url, :login_handle_name, :unknown_user_url].freeze
+    %i[change_password_url login_handle_name unknown_user_url].freeze
   end
 
   def self.recognized_federated_attributes

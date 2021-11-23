@@ -28,7 +28,7 @@ module Canvas::Migration
     OVERVIEW_JSON = "overview.json"
     ALL_FILES_ZIP = "all_files.zip"
 
-    COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :tab_configuration, :syllabus_body, :storage_quota].freeze
+    COURSE_NO_COPY_ATTS = %i[name course_code start_at conclude_at grading_standard_id tab_configuration syllabus_body storage_quota].freeze
 
     QUIZ_FILE_DIRECTORY = "Quiz Files"
 
@@ -214,12 +214,11 @@ module Canvas::Migration
         next unless m[:items]
 
         m[:items].each do |i|
-          if /assessment|quiz/i.match?(i[:linked_resource_type])
-            if should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
-              i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
-              i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
-            end
-          end
+          next unless /assessment|quiz/i.match?(i[:linked_resource_type]) &&
+                      should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
+
+          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
         end
       end
     end

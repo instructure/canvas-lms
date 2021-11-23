@@ -32,16 +32,16 @@ data = JSON.parse($stdin.read)
 data.each do |event|
   id = event['ID']
   # only invalidate events we haven't seen yet
-  if cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
-    key = Base64.decode64(event['Payload'])
-    # Special-case flushall
-    if key == 'FLUSHDB'
-      cache.flushdb
-      # Readd this event so that it doesn't get forgotten about in the future
-      cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
-    else
-      cache.del(key)
-    end
+  next unless cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+
+  key = Base64.decode64(event['Payload'])
+  # Special-case flushall
+  if key == 'FLUSHDB'
+    cache.flushdb
+    # Readd this event so that it doesn't get forgotten about in the future
+    cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+  else
+    cache.del(key)
   end
 end
 # limit the set to the 256 newest elements

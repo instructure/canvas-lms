@@ -199,19 +199,19 @@ class GradebookImporter
         submission['original_grade'] = assignment.fetch(:score, nil)
         submission['gradeable'] = assignment.fetch(:gradable, nil)
 
-        if submission.fetch('gradeable').nil?
-          assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
-          new_submission = Submission.new
-          new_submission.user = student
-          new_submission.assignment = assignment
-          edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
-          new_submission.cached_due_date = edd.fetch(:due_at, nil)
-          new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
-          submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
-            submission: new_submission,
-            is_admin: is_admin
-          )
-        end
+        next unless submission.fetch('gradeable').nil?
+
+        assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
+        new_submission = Submission.new
+        new_submission.user = student
+        new_submission.assignment = assignment
+        edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
+        new_submission.cached_due_date = edd.fetch(:due_at, nil)
+        new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
+        submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
+          submission: new_submission,
+          is_admin: is_admin
+        )
       end
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
         custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }
@@ -711,7 +711,7 @@ class GradebookImporter
     pseudonyms = root_account.shard.activate do
       root_account.pseudonyms
                   .active
-                  .select([:id, :unique_id, :sis_user_id, :user_id])
+                  .select(%i[id unique_id sis_user_id user_id])
                   .where(:user_id => @all_students.values).to_a
     end
     pseudonyms.each do |pseudonym|
@@ -752,13 +752,13 @@ class GradebookImporter
   end
 
   def valid_context?(context = nil)
-    context && [
-      :students,
-      :assignments,
-      :submissions,
-      :students=,
-      :assignments=,
-      :submissions=
+    context && %i[
+      students
+      assignments
+      submissions
+      students=
+      assignments=
+      submissions=
     ].all? { |m| context.respond_to?(m) }
   end
 
@@ -798,9 +798,7 @@ class GradebookImporter
 
     return false unless current_value.present? && new_value.present?
 
-    if consider_excused
-      return false if new_value.to_s.casecmp('EX') == 0 || current_value.casecmp('EX') == 0
-    end
+    return false if consider_excused && (new_value.to_s.casecmp?('EX') || current_value.casecmp?('EX'))
 
     # The exporter exports scores rounded to two decimal places (which is also
     # the maximum level of precision shown in the gradebook), so 123.456 will

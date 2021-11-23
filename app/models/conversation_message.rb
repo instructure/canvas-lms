@@ -315,7 +315,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def as_json(**)
-    super(:only => [:id, :created_at, :body, :generated, :author_id])['conversation_message']
+    super(:only => %i[id created_at body generated author_id])['conversation_message']
       .merge('forwarded_messages' => forwarded_messages,
              'attachments' => attachments,
              'media_comment' => media_comment)

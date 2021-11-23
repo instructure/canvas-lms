@@ -89,10 +89,10 @@ class AssignmentOverridesController < ApplicationController
   before_action :require_group, :only => :group_alias
   before_action :require_section, :only => :section_alias
   before_action :require_course
-  before_action :require_assignment, :except => [:batch_retrieve, :batch_update, :batch_create]
-  before_action :require_assignment_edit, :only => [:create, :update, :destroy]
+  before_action :require_assignment, :except => %i[batch_retrieve batch_update batch_create]
+  before_action :require_assignment_edit, :only => %i[create update destroy]
   before_action :require_all_assignments_edit, :only => [:batch_update, :batch_create]
-  before_action :require_override, :only => [:show, :update, :destroy]
+  before_action :require_override, :only => %i[show update destroy]
 
   include Api::V1::AssignmentOverride
 

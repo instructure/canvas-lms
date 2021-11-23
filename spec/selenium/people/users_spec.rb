@@ -358,7 +358,7 @@ describe "users" do
   end
 
   context "masquerading" do
-    it "masquerades as a user", priority: "1", test_id: 134743 do
+    it "masquerades as a user", priority: "1" do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
 

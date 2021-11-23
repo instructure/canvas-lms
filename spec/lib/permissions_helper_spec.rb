@@ -471,11 +471,11 @@ describe PermissionsHelper do
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
 
       courses = [concluded_student_enrollment.course, concluded_teacher_enrollment.course, active_student_enrollment.course]
-      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:moderate_forum, :read_forum, :post_to_forum]))).to eq({
-                                                                                                                                         concluded_student_enrollment.global_course_id => { :moderate_forum => false, :read_forum => true, :post_to_forum => false }, # concluded students can't post
-                                                                                                                                         concluded_teacher_enrollment.global_course_id => { :moderate_forum => false, :read_forum => true, :post_to_forum => true }, # concluded teachers can
-                                                                                                                                         active_student_enrollment.global_course_id => { :moderate_forum => true, :read_forum => true, :post_to_forum => true } # active student can do all of it
-                                                                                                                                       })
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, %i[moderate_forum read_forum post_to_forum]))).to eq({
+                                                                                                                                      concluded_student_enrollment.global_course_id => { :moderate_forum => false, :read_forum => true, :post_to_forum => false }, # concluded students can't post
+                                                                                                                                      concluded_teacher_enrollment.global_course_id => { :moderate_forum => false, :read_forum => true, :post_to_forum => true }, # concluded teachers can
+                                                                                                                                      active_student_enrollment.global_course_id => { :moderate_forum => true, :read_forum => true, :post_to_forum => true } # active student can do all of it
+                                                                                                                                    })
     end
 
     context "sharding" do
@@ -498,7 +498,7 @@ describe PermissionsHelper do
         RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: teacher_role, account: Account.default)
 
         courses = @user.enrollments.shard(@user).to_a.map(&:course)
-        permissions = [:manage_calendar, :moderate_forum, :manage_grades]
+        permissions = %i[manage_calendar moderate_forum manage_grades]
         all_data = @user.precalculate_permissions_for_courses(courses, permissions)
         courses.each do |course|
           permissions.each do |permission|

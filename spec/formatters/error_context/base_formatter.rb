@@ -154,7 +154,7 @@ module ErrorContext
         # TODO: does not work with new docker builds
         # discard_video! if capturing_video?
       else
-        save_screenshot! if capture_screenshot?
+        save_screenshot! if capture_screenshot? # rubocop:disable Style/IfInsideElse
         # TODO: does not work with new docker builds
         # save_video! if capturing_video?
       end

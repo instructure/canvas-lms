@@ -27,10 +27,10 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
 
-  PRELOADS = [:external_tool_tag,
-              :duplicate_of,
-              :rubric,
-              :rubric_association].freeze
+  PRELOADS = %i[external_tool_tag
+                duplicate_of
+                rubric
+                rubric_association].freeze
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w[
@@ -432,7 +432,7 @@ module Api::V1::Assignment
 
   def turnitin_settings_json(assignment)
     settings = assignment.turnitin_settings.with_indifferent_access
-    [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
+    %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
 
@@ -451,7 +451,7 @@ module Api::V1::Assignment
 
   def vericite_settings_json(assignment)
     settings = assignment.vericite_settings.with_indifferent_access
-    [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+    %i[exclude_quoted exclude_self_plag store_in_index].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
 
@@ -616,13 +616,13 @@ module Api::V1::Assignment
 
   # validate that date and times are iso8601
   def assignment_dates_valid?(assignment, assignment_params)
-    errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
-      if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
-        assignment.errors.add("assignment[#{v}]",
-                              I18n.t("assignments_api.invalid_date_time",
-                                     'Invalid datetime for %{attribute}',
-                                     attribute: v))
-      end
+    errors = %w[due_at lock_at unlock_at peer_reviews_assign_at].map do |v|
+      next unless assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
+
+      assignment.errors.add("assignment[#{v}]",
+                            I18n.t("assignments_api.invalid_date_time",
+                                   'Invalid datetime for %{attribute}',
+                                   attribute: v))
     end
 
     errors.compact.empty?
@@ -680,10 +680,9 @@ module Api::V1::Assignment
       update_params.delete('peer_reviews_assign_at')
     end
 
-    if update_params.key?("anonymous_peer_reviews")
-      if Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
-        ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
-      end
+    if update_params.key?("anonymous_peer_reviews") &&
+       Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
+      ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
     end
 
     if update_params["submission_types"].is_a? Array
@@ -925,10 +924,9 @@ module Api::V1::Assignment
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
-    if assignment_params[:points_possible].blank?
-      if assignment.new_record? || assignment_params.key?(:points_possible) # only change if they're deliberately updating to blank
-        assignment_params[:points_possible] = 0
-      end
+    if assignment_params[:points_possible].blank? &&
+       (assignment.new_record? || assignment_params.key?(:points_possible)) # only change if they're deliberately updating to blank
+      assignment_params[:points_possible] = 0
     end
 
     unless assignment.new_record?

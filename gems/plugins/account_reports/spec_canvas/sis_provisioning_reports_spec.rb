@@ -484,7 +484,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [["sub1", nil, "English", "active"],
                                        ["sub3", nil, "math", "active"],
-                                       ["subsub1", "sub1", "sESL", "active"]]
+                                       %w[subsub1 sub1 sESL active]]
       end
 
       it "runs the SIS report on a sub account" do
@@ -493,7 +493,7 @@ describe "Default Account Reports" do
         parsed = read_report("sis_export_csv", { params: parameters, account: @sub_account })
 
         expect(parsed.length).to eq 1
-        expect(parsed).to match_array [["subsub1", "sub1", "sESL", "active"]]
+        expect(parsed).to match_array [%w[subsub1 sub1 sESL active]]
       end
 
       it "runs the SIS report including deleted accounts" do
@@ -506,7 +506,7 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [["sub1", nil, "English", "active"],
                                        ["sub3", nil, "math", "active"],
                                        ["sub4", nil, "deleted sis account", "deleted"],
-                                       ["subsub1", "sub1", "sESL", "active"]]
+                                       %w[subsub1 sub1 sESL active]]
       end
 
       it "runs the provisioning report including deleted accounts" do
@@ -1201,7 +1201,7 @@ describe "Default Account Reports" do
         parameters["group_categories"] = true
         parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 4 })
         expect(parsed.length).to eq 4
-        expect(parsed).to match_array [["group_category_id", "account_id", "course_id", "category_name", "status"],
+        expect(parsed).to match_array [%w[group_category_id account_id course_id category_name status],
                                        ['gc101', @account.sis_source_id, nil, "Test Group Category", 'active'],
                                        ['gc102', @account.sis_source_id, nil, "Test Group Category2", 'active'],
                                        ['gc104', nil, "SIS_COURSE_ID_3", "Test Group Category Course", 'active']]
@@ -1240,7 +1240,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters['group_categories'] = true
         parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 0 })
-        expect(parsed).to match_array [['group_category_id', 'account_id', 'course_id', 'category_name', 'status'],
+        expect(parsed).to match_array [%w[group_category_id account_id course_id category_name status],
                                        ['GC1', nil, 'C1', 'Some Group Category', 'active']]
       end
     end
@@ -1317,9 +1317,9 @@ describe "Default Account Reports" do
         expect(report.parameters['extra_text']).to eq "Term: Default Term; Reports: xlist "
         parsed = parse_report(report, { header: true })
         headers = parsed.shift
-        expect(headers).to eq ['xlist_course_id', 'section_id', 'status']
-        expect(parsed).to match_array [["SIS_COURSE_ID_2", "english_section_1",
-                                        "active"]]
+        expect(headers).to eq %w[xlist_course_id section_id status]
+        expect(parsed).to match_array [%w[SIS_COURSE_ID_2 english_section_1
+                                          active]]
         expect(parsed.length).to eq 1
       end
 
@@ -1329,10 +1329,10 @@ describe "Default Account Reports" do
         parameters["xlist"] = true
         parameters["include_deleted"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
-        expect(parsed).to match_array [["SIS_COURSE_ID_1", "english_section_3",
-                                        "deleted"],
-                                       ["SIS_COURSE_ID_2", "english_section_1",
-                                        "active"]]
+        expect(parsed).to match_array [%w[SIS_COURSE_ID_1 english_section_3
+                                          deleted],
+                                       %w[SIS_COURSE_ID_2 english_section_1
+                                          active]]
         expect(parsed.length).to eq 2
       end
 
@@ -1344,8 +1344,8 @@ describe "Default Account Reports" do
         report = run_report("sis_export_csv", { params: parameters, account: @sub_account })
         expect(report.parameters['extra_text']).to eq "Term: All Terms; Include Deleted Objects; Reports: xlist "
         parsed = parse_report(report)
-        expect(parsed).to match_array [["SIS_COURSE_ID_1", "english_section_3",
-                                        "deleted"]]
+        expect(parsed).to match_array [%w[SIS_COURSE_ID_1 english_section_3
+                                          deleted]]
         expect(parsed.length).to eq 1
       end
 
@@ -1391,8 +1391,8 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
-        expect(parsed).to match_array [['canvas_observer_id', 'observer_id', 'canvas_student_id',
-                                        'student_id', 'status', 'created_by_sis'],
+        expect(parsed).to match_array [%w[canvas_observer_id observer_id canvas_student_id
+                                          student_id status created_by_sis],
                                        [@user2.id.to_s, "user_sis_id_02",
                                         @user1.id.to_s, "user_sis_id_01", "active", 'true'],
                                        [@user4.id.to_s, "user_sis_id_04",
@@ -1406,9 +1406,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
-        expect(parsed).to match_array [['observer_id', 'student_id', 'status'],
-                                       ["user_sis_id_02", "user_sis_id_01", "active"],
-                                       ["user_sis_id_04", "user_sis_id_03", "active"]]
+        expect(parsed).to match_array [%w[observer_id student_id status],
+                                       %w[user_sis_id_02 user_sis_id_01 active],
+                                       %w[user_sis_id_04 user_sis_id_03 active]]
         expect(parsed.length).to eq 3
       end
 
@@ -1417,7 +1417,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
-        expect(parsed).to match_array [["user_sis_id_04", "user_sis_id_03", "active"]]
+        expect(parsed).to match_array [%w[user_sis_id_04 user_sis_id_03 active]]
         expect(parsed.length).to eq 1
       end
 
@@ -1427,8 +1427,8 @@ describe "Default Account Reports" do
         parameters["user_observers"] = true
         parameters["include_deleted"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
-        expect(parsed).to match_array [["user_sis_id_02", "user_sis_id_01", "deleted"],
-                                       ["user_sis_id_04", "user_sis_id_03", "active"]]
+        expect(parsed).to match_array [%w[user_sis_id_02 user_sis_id_01 deleted],
+                                       %w[user_sis_id_04 user_sis_id_03 active]]
         expect(parsed.length).to eq 2
       end
 
@@ -1436,7 +1436,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { account: @sub_account, params: parameters, order: 0, header: true })
-        expect(parsed).to match_array [['observer_id', 'student_id', 'status']]
+        expect(parsed).to match_array [%w[observer_id student_id status]]
       end
 
       it "includes associated observers when running from a sub-account" do
@@ -1444,8 +1444,8 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { account: @sub_account, params: parameters, order: 0, header: true })
-        expect(parsed).to match_array [['observer_id', 'student_id', 'status'],
-                                       ["user_sis_id_02", "user_sis_id_01", "active"]]
+        expect(parsed).to match_array [%w[observer_id student_id status],
+                                       %w[user_sis_id_02 user_sis_id_01 active]]
       end
     end
 
@@ -1468,7 +1468,7 @@ describe "Default Account Reports" do
         parameters['admins'] = true
         parameters['include_deleted'] = true
         parsed = read_report('sis_export_csv', { params: parameters, order: 3, header: true })
-        expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status'],
+        expect(parsed).to match_array [%w[user_id account_id role_id role status],
                                        ['U001', 'sub1', admin_role(root_account_id: @account.id).id.to_s, 'AccountAdmin', 'active'],
                                        ['U002', nil, @role1.id.to_s, 'role1', 'active']]
       end
@@ -1479,8 +1479,8 @@ describe "Default Account Reports" do
         parameters['include_deleted'] = true
         @admin.pseudonyms.create!(account: @account, unique_id: 'deleted').destroy
         parsed = read_report('provisioning_csv', { params: parameters, order: [1, 5], header: true })
-        expect(parsed).to match_array [['admin_user_name', 'canvas_user_id', 'user_id', 'canvas_account_id',
-                                        'account_id', 'role_id', 'role', 'status', 'created_by_sis'],
+        expect(parsed).to match_array [%w[admin_user_name canvas_user_id user_id canvas_account_id
+                                          account_id role_id role status created_by_sis],
                                        ['user 1', @u1.id.to_s, 'U001', @sub_account.id.to_s, 'sub1',
                                         admin_role(root_account_id: @account.id).id.to_s, 'AccountAdmin', 'active', 'true'],
                                        ['user 2', @u2.id.to_s, 'U002', @account.id.to_s, nil,
@@ -1508,7 +1508,7 @@ describe "Default Account Reports" do
           parameters['admins'] = true
           parsed = read_report('sis_export_csv', { params: parameters, order: [3, 0], header: true })
 
-          expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status', 'root_account'],
+          expect(parsed).to match_array [%w[user_id account_id role_id role status root_account],
                                          ['U001', 'sub1', admin_role(root_account_id: @account.id).id.to_s, 'AccountAdmin',
                                           'active', HostUrl.context_host(@account)],
                                          ['U002', nil, @role1.id.to_s, 'role1',
@@ -1533,7 +1533,7 @@ describe "Default Account Reports" do
       accounts_report = parsed["accounts.csv"][1..].sort_by { |r| r[0] }
       expect(accounts_report[0]).to eq ["sub1", nil, "English", "active"]
       expect(accounts_report[1]).to eq ["sub3", nil, "math", "active"]
-      expect(accounts_report[2]).to eq ["subsub1", "sub1", "sESL", "active"]
+      expect(accounts_report[2]).to eq %w[subsub1 sub1 sESL active]
 
       users_report = parsed["users.csv"][1..].sort_by { |r| r[0] }
       expect(users_report.length).to eq 4
@@ -1555,20 +1555,20 @@ describe "Default Account Reports" do
       expect(AccountReports).to receive(:message_recipient).once
       parsed = read_report("sis_export_csv", { params: parameters, header: true })
 
-      expect(parsed["accounts.csv"]).to eq [["account_id", "parent_account_id", "name", "status"]]
-      expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
+      expect(parsed["accounts.csv"]).to eq [%w[account_id parent_account_id name status]]
+      expect(parsed["terms.csv"]).to eq [%w[term_id name status start_date end_date]]
       expect(parsed["users.csv"]).to eq [user_headers]
-      expect(parsed["courses.csv"]).to eq [["course_id", "integration_id", "short_name", "long_name",
-                                            "account_id", "term_id", "status", "start_date", "end_date", "course_format", "blueprint_course_id"]]
-      expect(parsed["sections.csv"]).to eq [["section_id", "course_id", "integration_id", "name", "status",
-                                             "start_date", "end_date"]]
-      expect(parsed["enrollments.csv"]).to eq [["course_id", "user_id", "role", "role_id", "section_id",
-                                                "status", "associated_user_id",
-                                                "limit_section_privileges"]]
-      expect(parsed["groups.csv"]).to eq [["group_id", "group_category_id", "account_id", "course_id", "name", "status"]]
-      expect(parsed["group_categories.csv"]).to eq [["group_category_id", "account_id", "course_id", "category_name", "status"]]
-      expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
-      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
+      expect(parsed["courses.csv"]).to eq [%w[course_id integration_id short_name long_name
+                                              account_id term_id status start_date end_date course_format blueprint_course_id]]
+      expect(parsed["sections.csv"]).to eq [%w[section_id course_id integration_id name status
+                                               start_date end_date]]
+      expect(parsed["enrollments.csv"]).to eq [%w[course_id user_id role role_id section_id
+                                                  status associated_user_id
+                                                  limit_section_privileges]]
+      expect(parsed["groups.csv"]).to eq [%w[group_id group_category_id account_id course_id name status]]
+      expect(parsed["group_categories.csv"]).to eq [%w[group_category_id account_id course_id category_name status]]
+      expect(parsed["group_membership.csv"]).to eq [%w[group_id user_id status]]
+      expect(parsed["xlist.csv"]).to eq [%w[xlist_course_id section_id status]]
     end
 
     it "does not return reports passed as false" do
@@ -1585,14 +1585,14 @@ describe "Default Account Reports" do
       parsed = read_report("sis_export_csv", { params: parameters, header: true })
 
       expect(parsed["accounts.csv"]).to eq nil
-      expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
+      expect(parsed["terms.csv"]).to eq [%w[term_id name status start_date end_date]]
       expect(parsed["users.csv"]).to eq [user_headers]
       expect(parsed["courses.csv"]).to eq nil
       expect(parsed["sections.csv"]).to eq nil
       expect(parsed["enrollments.csv"]).to eq nil
-      expect(parsed["groups.csv"]).to eq [["group_id", "group_category_id", "account_id", "course_id", "name", "status"]]
-      expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
-      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
+      expect(parsed["groups.csv"]).to eq [%w[group_id group_category_id account_id course_id name status]]
+      expect(parsed["group_membership.csv"]).to eq [%w[group_id user_id status]]
+      expect(parsed["xlist.csv"]).to eq [%w[xlist_course_id section_id status]]
     end
   end
 end

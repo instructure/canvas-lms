@@ -36,7 +36,7 @@ class Folder < ActiveRecord::Base
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
   STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE = "student annotation documents"
 
-  belongs_to :context, polymorphic: [:user, :group, :account, :course], optional: false
+  belongs_to :context, polymorphic: %i[user group account course], optional: false
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment"
@@ -58,7 +58,7 @@ class Folder < ActiveRecord::Base
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
-  after_commit :clear_permissions_cache, if: -> { [:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? { |k| saved_changes.key?(k) } }
+  after_commit :clear_permissions_cache, if: -> { %i[workflow_state parent_folder_id locked lock_at unlock_at].any? { |k| saved_changes.key?(k) } }
 
   def file_attachments_visible_to(user)
     if context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
@@ -289,17 +289,17 @@ class Folder < ActiveRecord::Base
     if options[:include_subcontent] != false
       dup.save!
       subcontent.each do |item|
-        if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
-          case item
-          when Attachment
-            file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
-            file.folder_id = dup.id
-            file.save_without_broadcasting!
-          when Folder
-            sub = item.clone_for(context, nil, options)
-            sub.parent_folder_id = dup.id
-            sub.save!
-          end
+        next unless options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
+
+        case item
+        when Attachment
+          file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
+          file.folder_id = dup.id
+          file.save_without_broadcasting!
+        when Folder
+          sub = item.clone_for(context, nil, options)
+          sub.parent_folder_id = dup.id
+          sub.save!
         end
       end
     end

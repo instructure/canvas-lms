@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::LiveEventsCallbacks
-  ELIGIBLE_ATTACHMENT_CONTEXTS = ['Course', 'Group', 'User'].freeze
+  ELIGIBLE_ATTACHMENT_CONTEXTS = %w[Course Group User].freeze
 
   def self.after_create(obj)
     case obj
@@ -95,10 +95,8 @@ module Canvas::LiveEventsCallbacks
   def self.after_update(obj, changes)
     case obj
     when ContentExport
-      if obj.quizzes2_export? && changes["workflow_state"]
-        if obj.workflow_state == "exported"
-          Canvas::LiveEvents.quiz_export_complete(obj)
-        end
+      if obj.quizzes2_export? && changes["workflow_state"] && obj.workflow_state == "exported"
+        Canvas::LiveEvents.quiz_export_complete(obj)
       end
     when ContentMigration
       if changes["workflow_state"] && obj.workflow_state == "imported"
@@ -114,7 +112,7 @@ module Canvas::LiveEventsCallbacks
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
-      if (changes.keys - ["state_is_current", "lock_version", "access_is_current"]).any?
+      if (changes.keys - %w[state_is_current lock_version access_is_current]).any?
         Canvas::LiveEvents.enrollment_state_updated(obj)
       end
     when GroupCategory

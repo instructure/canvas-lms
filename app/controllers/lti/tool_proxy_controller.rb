@@ -23,7 +23,7 @@ module Lti
 
     before_action :require_context
     before_action :require_user
-    before_action :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update, :recreate_subscriptions]
+    before_action :set_tool_proxy, only: %i[destroy update accept_update dismiss_update recreate_subscriptions]
     before_action :require_site_admin, only: [:recreate_subscriptions]
 
     def destroy

@@ -36,12 +36,12 @@ class AssessmentQuestion < ActiveRecord::Base
   validates :workflow_state, :assessment_question_bank_id, presence: true
   resolves_root_account through: :context
 
-  ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",
-                        "matching_question", "missing_word_question",
-                        "multiple_choice_question", "numerical_question",
-                        "text_only_question", "short_answer_question",
-                        "multiple_dropdowns_question", "calculated_question",
-                        "essay_question", "true_false_question", "file_upload_question"].freeze
+  ALL_QUESTION_TYPES = %w[multiple_answers_question fill_in_multiple_blanks_question
+                          matching_question missing_word_question
+                          multiple_choice_question numerical_question
+                          text_only_question short_answer_question
+                          multiple_dropdowns_question calculated_question
+                          essay_question true_false_question file_upload_question].freeze
 
   serialize :question_data
 
@@ -221,11 +221,9 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def question_data
-    if (data = read_attribute(:question_data))
-      if data.instance_of?(Hash)
-        write_attribute(:question_data, data.with_indifferent_access)
-        data = read_attribute(:question_data)
-      end
+    if (data = read_attribute(:question_data)) && data.instance_of?(Hash)
+      write_attribute(:question_data, data.with_indifferent_access)
+      data = read_attribute(:question_data)
     end
 
     data

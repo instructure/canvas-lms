@@ -125,7 +125,7 @@ module SIS
           old_item = details[:scope].where(column => data_change.old_id).take
         end
         if data_change.old_integration_id.present?
-          old_int_item = details[:scope].where(integration_id: data_change.old_integration_id).take if data_change.old_integration_id.present?
+          old_int_item = details[:scope].where(integration_id: data_change.old_integration_id).take
         end
         if data_change.old_id.present? && data_change.old_integration_id.present?
           raise ImportError, "An old_id, '#{data_change.old_id}', referenced a different #{type} than the old_integration_id, '#{data_change.old_integration_id}'" unless old_item == old_int_item

@@ -244,7 +244,7 @@ describe Api::V1::PlannerItem do
       it 'returns the submission statuses for the learning object' do
         json = api.planner_item_json(@assignment, @student, session)
         expect(json).to have_key(:submissions)
-        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback, :redo_request].all? do |k|
+        expect(%i[submitted excused graded late missing needs_grading has_feedback redo_request].all? do |k|
           json[:submissions].key?(k)
         end).to be true
       end

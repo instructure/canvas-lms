@@ -108,7 +108,7 @@ class SectionsController < ApplicationController
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
+    if authorized_action(@context, @current_user, %i[read read_roster view_all_grades manage_grades])
       if params[:include].present? && !@context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
         params[:include] = nil
       end
@@ -277,8 +277,8 @@ class SectionsController < ApplicationController
         if @section.root_account.grants_right?(@current_user, :manage_sis)
           @section.sis_source_id = (sis_id == '') ?  nil : sis_id if sis_id
           @section.integration_id = (integration_id == '') ? nil : integration_id if integration_id
-        else
-          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized if api_request?
+        elsif api_request?
+          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized
         end
       end
 

@@ -59,24 +59,24 @@ module Canvas
         }
       end
 
-      USEFUL_ENV = [
-        "HTTP_ACCEPT",
-        "HTTP_ACCEPT_ENCODING",
-        "HTTP_HOST",
-        "HTTP_REFERER",
-        "HTTP_USER_AGENT",
-        "PATH_INFO",
-        "QUERY_STRING",
-        "REMOTE_HOST",
-        "REQUEST_METHOD",
-        "REQUEST_PATH",
-        "REQUEST_URI",
-        "SERVER_NAME",
-        "SERVER_PORT",
-        "SERVER_PROTOCOL",
-        "HTTP_X_FORWARDED_HOST",
-        "HTTP_X_FORWARDED_PROTO",
-        "HTTP_X_FORWARDED_FOR",
+      USEFUL_ENV = %w[
+        HTTP_ACCEPT
+        HTTP_ACCEPT_ENCODING
+        HTTP_HOST
+        HTTP_REFERER
+        HTTP_USER_AGENT
+        PATH_INFO
+        QUERY_STRING
+        REMOTE_HOST
+        REQUEST_METHOD
+        REQUEST_PATH
+        REQUEST_URI
+        SERVER_NAME
+        SERVER_PORT
+        SERVER_PROTOCOL
+        HTTP_X_FORWARDED_HOST
+        HTTP_X_FORWARDED_PROTO
+        HTTP_X_FORWARDED_FOR
       ].freeze
 
       def self.useful_http_env_stuff_from_request(req)

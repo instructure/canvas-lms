@@ -22,34 +22,34 @@ require_relative '../../import_helper'
 
 describe "Importing Rubrics" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'rubric'
-      it "imports from #{system}" do
-        data = get_import_data(system, 'rubric')
-        context = get_import_context(system)
-        migration = double
-        allow(migration).to receive(:context).and_return(context)
-        allow(migration).to receive(:add_imported_item)
+    next unless import_data_exists? system, 'rubric'
 
-        data[:rubrics_to_import] = {}
-        expect(Importers::RubricImporter.import_from_migration(data, migration)).to be_nil
-        expect(context.rubrics.count).to eq 0
+    it "imports from #{system}" do
+      data = get_import_data(system, 'rubric')
+      context = get_import_context(system)
+      migration = double
+      allow(migration).to receive(:context).and_return(context)
+      allow(migration).to receive(:add_imported_item)
 
-        data[:rubrics_to_import][data[:migration_id]] = true
-        Importers::RubricImporter.import_from_migration(data, migration)
-        Importers::RubricImporter.import_from_migration(data, migration)
-        expect(context.rubrics.count).to eq 1
-        r = Rubric.where(migration_id: data[:migration_id]).first
+      data[:rubrics_to_import] = {}
+      expect(Importers::RubricImporter.import_from_migration(data, migration)).to be_nil
+      expect(context.rubrics.count).to eq 0
 
-        expect(r.title).to eq data[:title]
-        expect(r.description).to include(data[:description]) if data[:description]
-        expect(r.points_possible).to eq data[:points_possible].to_f
+      data[:rubrics_to_import][data[:migration_id]] = true
+      Importers::RubricImporter.import_from_migration(data, migration)
+      Importers::RubricImporter.import_from_migration(data, migration)
+      expect(context.rubrics.count).to eq 1
+      r = Rubric.where(migration_id: data[:migration_id]).first
 
-        crit_ids = r.data.map { |rub| rub[:ratings].first[:criterion_id] }
+      expect(r.title).to eq data[:title]
+      expect(r.description).to include(data[:description]) if data[:description]
+      expect(r.points_possible).to eq data[:points_possible].to_f
 
-        data[:data].each do |crit|
-          id = crit[:migration_id] || crit[:id]
-          expect(crit_ids.member?(id)).to be_truthy
-        end
+      crit_ids = r.data.map { |rub| rub[:ratings].first[:criterion_id] }
+
+      data[:data].each do |crit|
+        id = crit[:migration_id] || crit[:id]
+        expect(crit_ids.member?(id)).to be_truthy
       end
     end
   end

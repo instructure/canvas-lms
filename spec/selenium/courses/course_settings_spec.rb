@@ -348,7 +348,7 @@ describe "course settings" do
       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
     end
 
-    it "disables from Course Navigation tab", priority: "1", test_id: 112172 do
+    it "disables from Course Navigation tab", priority: "1" do
       get "/courses/#{@course.id}/settings#tab-navigation"
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click

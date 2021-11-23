@@ -451,7 +451,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'includes its linked user, quiz, and submission' do
         json = qs_api_show(false, {
-                             :include => ['user', 'quiz', 'submission']
+                             :include => %w[user quiz submission]
                            })
 
         expect(json).to have_key('users')
@@ -467,7 +467,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it 'conforms to the JSON-API spec when returning linked objects' do
-        includes = ['user', 'quiz', 'submission']
+        includes = %w[user quiz submission]
 
         json = qs_api_show(false, {
                              :include => includes

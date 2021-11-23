@@ -21,7 +21,7 @@
 class ContentParticipation < ActiveRecord::Base
   include Workflow
 
-  ACCESSIBLE_ATTRIBUTES = [:content, :user, :workflow_state].freeze
+  ACCESSIBLE_ATTRIBUTES = %i[content user workflow_state].freeze
 
   belongs_to :content, polymorphic: [:submission]
   belongs_to :user

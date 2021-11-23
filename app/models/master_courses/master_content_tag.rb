@@ -60,10 +60,10 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
 
   def require_valid_restrictions
     # this may be changed in the future
-    if restrictions_changed? && (restrictions.keys != [:all])
-      if (restrictions.keys - MasterCourses::LOCK_TYPES).any?
-        errors.add(:restrictions, "Invalid settings")
-      end
+    if restrictions_changed? &&
+       restrictions.keys != [:all] &&
+       (restrictions.keys - MasterCourses::LOCK_TYPES).any?
+      errors.add(:restrictions, "Invalid settings")
     end
   end
 

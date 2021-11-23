@@ -44,7 +44,7 @@ describe "student planner" do
                                                       assignment: @assignment_d)
     end
 
-    it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
+    it "shows and navigates to graded discussions page from student planner", priority: "1" do
       go_to_list_view
       validate_object_displayed(@course.name, 'Discussion')
       validate_link_to_url(@discussion, 'discussion_topics')
@@ -58,13 +58,13 @@ describe "student planner" do
       validate_link_to_submissions(@assignment_d, @student1, 'assignments')
     end
 
-    it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
+    it "shows new replies tag for discussion with new replies", priority: "1" do
       @discussion.reply_from(user: @teacher, text: 'teacher reply')
       go_to_list_view
       validate_pill('Replies')
     end
 
-    it "shows the new activity button", priority: "1", test_id: 3263164 do
+    it "shows the new activity button", priority: "1" do
       skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       # create discussions in the future and in the past to be able to see the new activity button
       past_discussion = graded_discussion_in_the_past
@@ -85,7 +85,7 @@ describe "student planner" do
                                                                todo_date: Time.zone.now + 2.days)
     end
 
-    it "shows and navigates to ungraded discussions with todo dates from student planner", priority: "1", test_id: 3259305 do
+    it "shows and navigates to ungraded discussions with todo dates from student planner", priority: "1" do
       go_to_list_view
       validate_object_displayed(@course.name, 'Discussion')
       validate_link_to_url(@ungraded_discussion, 'discussion_topics')

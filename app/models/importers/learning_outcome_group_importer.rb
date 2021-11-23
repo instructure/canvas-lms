@@ -44,10 +44,14 @@ module Importers
         root_outcome_group = context.root_outcome_group
         parent_group = hash[:parent_group] || root_outcome_group
 
-        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s)
-                                     .where(migration_id: hash[:migration_id]).first if hash[:migration_id]
-        item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
-                                              context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
+        if hash[:migration_id]
+          item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s)
+                                       .where(migration_id: hash[:migration_id]).first
+        end
+        if hash[:vendor_guid].present?
+          item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
+                                                context: context, learning_outcome_group: parent_group)
+        end
         # Don't migrate if we already have a folder with the same name inside the parent_group
         item ||= LearningOutcomeGroup.active.where(
           context: context,
@@ -82,11 +86,9 @@ module Importers
       # model validation fails that requires a title.  Since "ENG" is
       # always from the UK, we can safely set the title here to avoid
       # the breakage and make imports of UK standards work again
-      unless item.title
-        if item.vendor_guid == "ENG"
-          item.title = "United Kingdom"
-          item.description = "United Kingdom Authority"
-        end
+      if !item.title && item.vendor_guid == "ENG"
+        item.title = "United Kingdom"
+        item.description = "United Kingdom Authority"
       end
 
       item.save!

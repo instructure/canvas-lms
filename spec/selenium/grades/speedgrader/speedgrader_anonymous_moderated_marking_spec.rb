@@ -68,7 +68,7 @@ describe "SpeedGrader" do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    it "student names are anonymous", priority: "1", test_id: 3481048 do
+    it "student names are anonymous", priority: "1" do
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
       expect(student_names).to eql ["Student 1", "Student 2"]
@@ -81,13 +81,13 @@ describe "SpeedGrader" do
         @current_student = Speedgrader.selected_student
       end
 
-      it "when their submission is selected and page reloaded", priority: "1", test_id: 3481049 do
+      it "when their submission is selected and page reloaded", priority: "1" do
         expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from('Student 2')
       end
     end
 
     context "given student comment and file submission" do
-      it 'author of comment is anonymous', priority: 2, test_id: 3496274 do
+      it 'author of comment is anonymous', priority: 2 do
         expect(Speedgrader.comment_citation.first.text).not_to match(/(First|Second) Student/)
         expect(Speedgrader.comment_citation.first.text).to match(/Student (1|2)/)
       end
@@ -107,7 +107,7 @@ describe "SpeedGrader" do
       )
     end
 
-    it 'prevents posting grades before they are released', priority: '2', test_id: 3493531 do
+    it 'prevents posting grades before they are released', priority: '2' do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 
@@ -121,7 +121,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.no_grades_to_post_button).to be_displayed
     end
 
-    it 'allows posting grades after they are released', priority: '2', test_id: 3493531 do
+    it 'allows posting grades after they are released', priority: '2' do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 
@@ -139,7 +139,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.post_grades_link).to be_displayed
     end
 
-    it 'allows adding provisional grades', priority: '2', test_id: 3505172 do
+    it 'allows adding provisional grades', priority: '2' do
       user_session(@teacher2)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
       Speedgrader.enter_grade(10)
@@ -147,7 +147,7 @@ describe "SpeedGrader" do
       expect(@moderated_assignment.provisional_grades.first.scorer_id).to eq @teacher2.id
     end
 
-    it 'shows multiple provisional grades', priority: '2', test_id: 3505172 do
+    it 'shows multiple provisional grades', priority: '2' do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 
@@ -160,7 +160,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.grading_details_container.text).to include 'Teacher3'
     end
 
-    it 'allows selecting a custom grade', priority: '1', test_id: 3505172 do
+    it 'allows selecting a custom grade', priority: '1' do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 
@@ -219,7 +219,7 @@ describe "SpeedGrader" do
     end
 
     it "graders cannot view other grader's comments when `grader_comments_visible_to_graders = false`",
-       priority: 1, test_id: 3512445 do
+       priority: 1 do
       @moderated_assignment.update!(grader_comments_visible_to_graders: false)
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
@@ -242,7 +242,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.comment_citation.first.text).to eq 'Teacher2'
     end
 
-    it "final-grader can view other grader's comments by default", priority: 1, test_id: 3512445 do
+    it "final-grader can view other grader's comments by default", priority: 1 do
       user_session(@teacher1)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
@@ -264,7 +264,7 @@ describe "SpeedGrader" do
     end
 
     it "anonymizes grader comments for other non-final graders when `graders_anonymous_to_graders = true`",
-       priority: 1, test_id: 3505165 do
+       priority: 1 do
       @moderated_assignment.update!(
         grader_comments_visible_to_graders: true,
         anonymous_grading: true,
@@ -295,7 +295,7 @@ describe "SpeedGrader" do
       )
     end
 
-    it 'anonymizes grader names in provisional grade details', priority: '2', test_id: 3505172 do
+    it 'anonymizes grader names in provisional grade details', priority: '2' do
       @moderated_anonymous_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
       @moderated_anonymous_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 

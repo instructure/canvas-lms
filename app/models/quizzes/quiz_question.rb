@@ -58,7 +58,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   include MasterCourses::CollectionRestrictor
   self.collection_owner_association = :quiz
-  restrict_columns :content, [:question_data, :position, :quiz_group_id, :workflow_state]
+  restrict_columns :content, %i[question_data position quiz_group_id workflow_state]
 
   workflow do
     state :active

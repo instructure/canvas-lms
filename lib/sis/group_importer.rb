@@ -93,10 +93,10 @@ module SIS
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
 
-        if group&.group_memberships&.exists?
-          unless context.id == group.context_id && context.class.base_class.name == group.context_type
-            raise ImportError, "Cannot move group #{group_id} because it has group_memberships." if group.context.is_a?(Course) || context.is_a?(Course)
-          end
+        if group&.group_memberships&.exists? &&
+           !(context.id == group.context_id && context.class.base_class.name == group.context_type) &&
+           (group.context.is_a?(Course) || context.is_a?(Course))
+          raise ImportError, "Cannot move group #{group_id} because it has group_memberships."
         end
 
         group ||= context.groups.new(name: name, sis_source_id: group_id)

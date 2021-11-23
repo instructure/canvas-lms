@@ -22,7 +22,7 @@ require_relative '../common'
 describe "Authenticity Tokens" do
   include_context "in-process server selenium tests"
 
-  it "changes the masked authenticity token on each request but not the unmasked token", priority: "1", test_id: 296921 do
+  it "changes the masked authenticity token on each request but not the unmasked token", priority: "1" do
     user_logged_in
     get('/')
     token = driver.execute_script "return $.cookie('_csrf_token')"
@@ -34,7 +34,7 @@ describe "Authenticity Tokens" do
     )
   end
 
-  it "changes the unmasked token on logout", priority: "1", test_id: 296922 do
+  it "changes the unmasked token on logout", priority: "1" do
     user_logged_in
     get('/')
     token = driver.execute_script "return $.cookie('_csrf_token')"

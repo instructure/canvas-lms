@@ -237,7 +237,7 @@ describe "Wiki Pages" do
         end
       end
 
-      it "validates that revision restored is displayed", priority: "1", test_id: 126832 do
+      it "validates that revision restored is displayed", priority: "1" do
         get "/courses/#{@course.id}/pages/#{@vpage.url}"
         f('.al-trigger').click
         expect(f('.icon-clock')).to be_present
@@ -269,14 +269,14 @@ describe "Wiki Pages" do
         wait_for_ajaximations
       end
 
-      it "alerts user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
+      it "alerts user if navigating away from page with unsaved RCE changes", priority: "1" do
         add_text_to_tiny("derp")
         course_home_nav_menu.click
         expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
 
-      it "alerts user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+      it "alerts user if navigating away from page with unsaved html changes", priority: "1" do
         skip_if_safari(:alert)
         switch_editor_views
         wiki_page_body.send_keys("derp")
@@ -285,7 +285,7 @@ describe "Wiki Pages" do
         driver.switch_to.alert.accept
       end
 
-      it "does not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+      it "does not save changes when navigating away and not saving", priority: "1" do
         skip_if_safari(:alert)
         switch_editor_views
         wiki_page_body.send_keys('derp')
@@ -296,7 +296,7 @@ describe "Wiki Pages" do
         expect(f('textarea')).not_to include_text('derp')
       end
 
-      it "alerts user if navigating away from page after title change", priority: "1", test_id: 267832 do
+      it "alerts user if navigating away from page after title change", priority: "1" do
         skip_if_safari(:alert)
         switch_editor_views
         f('.title').clear

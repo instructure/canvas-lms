@@ -88,7 +88,7 @@ describe "assignments" do
       expect(f('.submit_online_upload_option')).to be_displayed
     end
 
-    it "validates an assignment created with the type of external tool", priority: "1", test_id: 2624905 do
+    it "validates an assignment created with the type of external tool", priority: "1" do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')

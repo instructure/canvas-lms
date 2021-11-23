@@ -1390,7 +1390,7 @@ test_1,u1,student,active)
         b.batch_mode_term = term
         b.save!
       end
-      ['failed', 'failed_with_messages', 'aborted'].each do |status|
+      %w[failed failed_with_messages aborted].each do |status|
         batch.workflow_state = status
         batch.save!
         expect(batch.remove_previous_imports).to be_falsey

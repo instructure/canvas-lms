@@ -292,7 +292,7 @@ class GroupsController < ApplicationController
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
         if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-          categories_json = @categories.map { |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
+          categories_json = @categories.map { |cat| group_category_json(cat, @current_user, session, include: %w[progress_url unassigned_users_count groups_count]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
             json = group_category_json(GroupCategory.uncategorized(context: @context), @current_user, session)
@@ -518,7 +518,7 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session, { include: ['users', 'group_category', 'permissions'] }) }
+          format.json { render :json => group_json(@group, @current_user, session, { include: %w[users group_category permissions] }) }
         else
           format.html { render :new }
           format.json { render :json => @group.errors, :status => :bad_request }
@@ -623,7 +623,7 @@ class GroupsController < ApplicationController
           @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session, { include: ['users', 'group_category', 'permissions'] }) }
+          format.json { render :json => group_json(@group, @current_user, session, { include: %w[users group_category permissions] }) }
         else
           format.html { render :edit }
           format.json { render :json => @group.errors, :status => :bad_request }

@@ -534,10 +534,8 @@ class CommunicationChannel < ActiveRecord::Base
   def check_if_bouncing_changed
     if retired?
       user.update_bouncing_channel_message!(self) if !was_retired? && was_bouncing?
-    else
-      if (was_retired? && bouncing?) || (was_bouncing? != bouncing?)
-        user.update_bouncing_channel_message!(self)
-      end
+    elsif (was_retired? && bouncing?) || (was_bouncing? != bouncing?)
+      user.update_bouncing_channel_message!(self)
     end
   end
   private :check_if_bouncing_changed

@@ -98,12 +98,12 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, [
-    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit, :disable_timer_autosubmission,
-    :anonymous_submissions, :scoring_policy, :allowed_attempts, :hide_results,
-    :one_time_results, :show_correct_answers, :show_correct_answers_last_attempt,
-    :show_correct_answers_at, :hide_correct_answers_at, :one_question_at_a_time,
-    :cant_go_back, :access_code, :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results
+  restrict_columns :settings, %i[
+    quiz_type assignment_group_id shuffle_answers time_limit disable_timer_autosubmission
+    anonymous_submissions scoring_policy allowed_attempts hide_results
+    one_time_results show_correct_answers show_correct_answers_last_attempt
+    show_correct_answers_at hide_correct_answers_at one_question_at_a_time
+    cant_go_back access_code ip_filter require_lockdown_browser require_lockdown_browser_for_results
   ]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
@@ -153,11 +153,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     @update_existing_submissions = true if for_assignment? && quiz_type_changed?
     @stored_questions = nil
 
-    [
-      :shuffle_answers, :disable_timer_autosubmission, :could_be_locked, :anonymous_submissions,
-      :require_lockdown_browser, :require_lockdown_browser_for_results,
-      :one_question_at_a_time, :cant_go_back, :require_lockdown_browser_monitor,
-      :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
+    %i[
+      shuffle_answers disable_timer_autosubmission could_be_locked anonymous_submissions
+      require_lockdown_browser require_lockdown_browser_for_results
+      one_question_at_a_time cant_go_back require_lockdown_browser_monitor
+      only_visible_to_overrides one_time_results show_correct_answers_last_attempt
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self[:show_correct_answers] = true if self[:show_correct_answers].nil?
   end
@@ -191,7 +191,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       overrides_params[:assignment_id] = assignment_id
     end
 
-    fields = [:assignment_version, :assignment_id, :quiz_version, :quiz_id]
+    fields = %i[assignment_version assignment_id quiz_version quiz_id]
     overrides.flatten.each do |override|
       fields.each do |field|
         override.send(:"#{field}=", overrides_params[field])
@@ -208,7 +208,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # There is no need to create a new assignment if the quiz being deleted
     return if workflow_state == 'deleted'
 
-    if !assignment_id && graded? && (force || ![:assignment, :clone, :migration].include?(@saved_by))
+    if !assignment_id && graded? && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= context.assignments.build(:title => title, :due_at => due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -287,8 +287,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     res = save!
-    if for_assignment?
-      assignment.destroy unless assignment.deleted?
+    if for_assignment? && !assignment.deleted?
+      assignment.destroy
     end
     res
   end
@@ -454,37 +454,38 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     delay_if_production.update_existing_submissions if @update_existing_submissions
-    if (assignment || @assignment_to_set) && (@assignment_id_set || for_assignment?) && @saved_by != :assignment
-      unless !graded? && @old_assignment_id
-        Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if assignment_id
-        self.assignment = @assignment_to_set if @assignment_to_set && !assignment
-        a = assignment
-        a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
-        a.points_possible = points_possible
-        a.description = description
-        a.title = title
-        a.due_at = due_at
-        a.lock_at = lock_at
-        a.unlock_at = unlock_at
-        a.only_visible_to_overrides = only_visible_to_overrides
-        a.submission_types = "online_quiz"
-        a.assignment_group_id = self.assignment_group_id
-        a.saved_by = :quiz
-        if saved_by == :migration
-          a.needs_update_cached_due_dates = true if a.update_cached_due_dates?
-        end
-        unless deleted?
-          a.workflow_state = published? ? 'published' : 'unpublished'
-        end
-        @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
-        a.notify_of_update = @notify_of_update
-        a.mark_as_importing!(@importing_migration) if @importing_migration
-        a.with_versioning(false) do
-          @notify_of_update ? a.save : a.save_without_broadcasting!
-        end
-        self.assignment_id = a.id
-        Quizzes::Quiz.where(id: self).update_all(assignment_id: a.id)
+    if (assignment || @assignment_to_set) &&
+       (@assignment_id_set || for_assignment?) &&
+       @saved_by != :assignment &&
+       (graded? || !@old_assignment_id)
+      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if assignment_id
+      self.assignment = @assignment_to_set if @assignment_to_set && !assignment
+      a = assignment
+      a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
+      a.points_possible = points_possible
+      a.description = description
+      a.title = title
+      a.due_at = due_at
+      a.lock_at = lock_at
+      a.unlock_at = unlock_at
+      a.only_visible_to_overrides = only_visible_to_overrides
+      a.submission_types = "online_quiz"
+      a.assignment_group_id = self.assignment_group_id
+      a.saved_by = :quiz
+      if saved_by == :migration && a.update_cached_due_dates?
+        a.needs_update_cached_due_dates = true
       end
+      unless deleted?
+        a.workflow_state = published? ? 'published' : 'unpublished'
+      end
+      @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
+      a.notify_of_update = @notify_of_update
+      a.mark_as_importing!(@importing_migration) if @importing_migration
+      a.with_versioning(false) do
+        @notify_of_update ? a.save : a.save_without_broadcasting!
+      end
+      self.assignment_id = a.id
+      Quizzes::Quiz.where(id: self).update_all(assignment_id: a.id)
     end
   end
 
@@ -1275,7 +1276,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.non_shuffled_questions
-    ["true_false_question", "matching_question", "fill_in_multiple_blanks_question"]
+    %w[true_false_question matching_question fill_in_multiple_blanks_question]
   end
 
   def self.shuffleable_question_type?(question_type)

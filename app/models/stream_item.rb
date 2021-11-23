@@ -26,10 +26,10 @@ class StreamItem < ActiveRecord::Base
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
-  belongs_to :context, polymorphic: [:course, :account, :group, :assignment_override, :assignment]
-  belongs_to :asset, polymorphic: [
-    :collaboration, :conversation, :discussion_entry,
-    :discussion_topic, :message, :submission, :web_conference, :assessment_request
+  belongs_to :context, polymorphic: %i[course account group assignment_override assignment]
+  belongs_to :asset, polymorphic: %i[
+    collaboration conversation discussion_entry
+    discussion_topic message submission web_conference assessment_request
   ]
   validates :asset_type, :data, presence: true
 
@@ -291,11 +291,9 @@ class StreamItem < ActiveRecord::Base
             :context_id => l_context_id,
           }
         end
-        if object.is_a?(Submission) && !object.posted?
-          # set the hidden flag if this submission is not posted
-          if (owner_insert = inserts.detect { |i| i[:user_id] == object.user_id })
-            owner_insert[:hidden] = true
-          end
+        # set the hidden flag if this submission is not posted
+        if object.is_a?(Submission) && !object.posted? && (owner_insert = inserts.detect { |i| i[:user_id] == object.user_id })
+          owner_insert[:hidden] = true
         end
 
         StreamItemInstance.unique_constraint_retry do

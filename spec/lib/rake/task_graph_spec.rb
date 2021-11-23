@@ -44,7 +44,7 @@ describe Rake::TaskGraph do
     subject.task 'a'
     subject.task 'b' => ['a']
     subject.task 'c' => []
-    subject.task 'd' => ['a', 'b', 'c']
+    subject.task 'd' => %w[a b c]
 
     expect(subject.batches).to eq(subject.batches)
   end

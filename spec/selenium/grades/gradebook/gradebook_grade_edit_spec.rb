@@ -42,7 +42,7 @@ describe "Gradebook editing grades" do
     clear_local_storage
   end
 
-  it "updates a graded quiz and have the points carry over to the quiz attempts page", priority: "1", test_id: 220310 do
+  it "updates a graded quiz and have the points carry over to the quiz attempts page", priority: "1" do
     points = 50
     q = factory_with_protected_attributes(@course.quizzes, title: "new quiz", points_possible: points, quiz_type: 'assignment', workflow_state: 'available')
     q.save!
@@ -58,14 +58,14 @@ describe "Gradebook editing grades" do
     expect(f('#after_fudge_points_total')).to include_text points.to_s
   end
 
-  it "validates initial grade totals are correct", priority: "1", test_id: 220311 do
+  it "validates initial grade totals are correct", priority: "1" do
     Gradebook.visit(@course)
 
     expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
     expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
   end
 
-  it "changes grades and validate course total is correct", :xbrowser, priority: "1", test_id: 220312 do
+  it "changes grades and validate course total is correct", :xbrowser, priority: "1" do
     expected_edited_total = "33.33%"
     Gradebook.visit(@course)
 
@@ -81,7 +81,7 @@ describe "Gradebook editing grades" do
     expect(final_score_for_row(1)).to eq expected_edited_total
   end
 
-  it "allows setting a letter grade on a no-points assignment", priority: "1", test_id: 220313 do
+  it "allows setting a letter grade on a no-points assignment", priority: "1" do
     assignment_model(course: @course, grading_type: 'letter_grade', points_possible: nil, title: 'no-points')
     Gradebook.visit(@course)
 
@@ -96,7 +96,7 @@ describe "Gradebook editing grades" do
     expect(sub.score).to eq 0.0
   end
 
-  it "does not update default grades for users not in this section", priority: "1", test_id: 220314 do
+  it "does not update default grades for users not in this section", priority: "1" do
     # create new user and section
 
     Gradebook.visit(@course)
@@ -119,7 +119,7 @@ describe "Gradebook editing grades" do
     expect(first_cell).to have_class('editable')
   end
 
-  it "'tabs' forward out of the grid when focused on the options menu", priority: "1", test_id: 3455461 do
+  it "'tabs' forward out of the grid when focused on the options menu", priority: "1" do
     Gradebook.visit(@course)
 
     first_cell = Gradebook::Cells.grading_cell(@student_1, @second_assignment)
@@ -133,7 +133,7 @@ describe "Gradebook editing grades" do
     expect(next_cell).not_to have_class('editable')
   end
 
-  it "'shift-tab' within the grid navigates backward out of the grid", priority: "1", test_id: 3455462 do
+  it "'shift-tab' within the grid navigates backward out of the grid", priority: "1" do
     Gradebook.visit(@course)
 
     second_cell = Gradebook::Cells.grading_cell(@student_1, @second_assignment)
@@ -145,7 +145,7 @@ describe "Gradebook editing grades" do
     expect(first_cell).not_to have_class('editable')
   end
 
-  it "'tab' into the grid activates the first header cell by default", priority: "1", test_id: 3455459 do
+  it "'tab' into the grid activates the first header cell by default", priority: "1" do
     Gradebook.visit(@course)
 
     # Select the search field (the closest element we can "click" that won't
@@ -158,7 +158,7 @@ describe "Gradebook editing grades" do
     expect(first_header_cell).to contain_css(':focus')
   end
 
-  it "'tab' into the grid re-activates the previously-active cell if set", priority: "1", test_id: 3455460 do
+  it "'tab' into the grid re-activates the previously-active cell if set", priority: "1" do
     Gradebook.visit(@course)
 
     selected_cell = Gradebook::Cells.grading_cell(@student_1, @second_assignment)
@@ -171,7 +171,7 @@ describe "Gradebook editing grades" do
     expect(selected_cell).to have_class('editable')
   end
 
-  it "displays dropped grades correctly after editing a grade", priority: "1", test_id: 220316 do
+  it "displays dropped grades correctly after editing a grade", priority: "1" do
     @course.assignment_groups.first.update!(rules: 'drop_lowest:1')
     Gradebook.visit(@course)
 
@@ -188,7 +188,7 @@ describe "Gradebook editing grades" do
     expect(Gradebook::Cells.grading_cell(@student_1, @third_assignment)).to contain_css('.dropped')
   end
 
-  it "updates a grade when clicking outside of slickgrid", priority: "1", test_id: 220319 do
+  it "updates a grade when clicking outside of slickgrid", priority: "1" do
     Gradebook.visit(@course)
 
     first_cell = Gradebook::Cells.grading_cell(@student_1, @second_assignment)
@@ -199,7 +199,7 @@ describe "Gradebook editing grades" do
     expect(f("body")).not_to contain_css('.gradebook_cell_editable')
   end
 
-  it "validates curving grades option", priority: "1", test_id: 220320 do
+  it "validates curving grades option", priority: "1" do
     skip_if_chrome('issue with set_value')
     skip_if_safari(:alert)
     curved_grade_text = "8"
@@ -214,7 +214,7 @@ describe "Gradebook editing grades" do
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text curved_grade_text
   end
 
-  it "assigns zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
+  it "assigns zeroes to unsubmitted assignments during curving", priority: "1" do
     skip_if_safari(:alert)
     @first_assignment.grade_student(@student_2, grade: '', grader: @teacher)
     Gradebook.visit(@course)
@@ -227,7 +227,7 @@ describe "Gradebook editing grades" do
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text '0'
   end
 
-  it "does not factor non graded assignments into group total", priority: "1", test_id: 220323 do
+  it "does not factor non graded assignments into group total", priority: "1" do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, body: 'student 1 submission ungraded assignment')
     @ungraded_assignment.grade_student(@student_1, grade: 20, grader: @teacher)
@@ -239,7 +239,7 @@ describe "Gradebook editing grades" do
     end
   end
 
-  it "validates setting default grade for an assignment", priority: "1", test_id: 220383 do
+  it "validates setting default grade for an assignment", priority: "1" do
     expected_grade = "45"
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu(@third_assignment.id)
@@ -262,7 +262,7 @@ describe "Gradebook editing grades" do
       Gradebook.visit(@course)
     end
 
-    it 'indicates an error without posting the grade', priority: "1", test_id: 3455458 do
+    it 'indicates an error without posting the grade', priority: "1" do
       Gradebook::Cells.edit_grade(@students[0], @assignment, 'invalid')
       current_cell = Gradebook::Cells.grading_cell(@students[0], @assignment)
       expect(current_cell).to contain_css(".Grid__GradeCell__InvalidGrade")
@@ -293,7 +293,7 @@ describe "Gradebook editing grades" do
       Gradebook.visit(@course)
     end
 
-    it "is not allowed until grades are posted", priority: "1", test_id: 3503489 do
+    it "is not allowed until grades are posted", priority: "1" do
       Gradebook::Cells.grading_cell(@student_1, @moderated_assignment).click
       grid_cell = Gradebook::Cells.grid_assignment_row_cell(@student_1, @moderated_assignment)
       class_attribute_fetched = grid_cell.attribute("class")

@@ -44,7 +44,7 @@ describe "conversations index page" do
         @conv2 = conversation(@teacher, @s2, body: "roberto")
       end
 
-      it "allows finding messages by recipient", priority: "1", test_id: 197540 do
+      it "allows finding messages by recipient", priority: "1" do
         conversations
         name = @s2.name
         f('[role=main] header [role=search] input').send_keys(name)
@@ -60,13 +60,13 @@ describe "conversations index page" do
                           conversation(@teacher, @s1, @s2, workflow_state: 'read')]
       end
 
-      it "selects multiple conversations", priority: "1", test_id: 201429 do
+      it "selects multiple conversations", priority: "1" do
         conversations
         select_conversations(2)
         expect(ff('.messages li.active').count).to eq 2
       end
 
-      it "selects all conversations", priority: "1", test_id: 201462 do
+      it "selects all conversations", priority: "1" do
         conversations
         f('#content').click # Ensures focus is in the window and not on the address bar
         driver.action.key_down(modifier)
@@ -76,7 +76,7 @@ describe "conversations index page" do
         expect(ff('.messages li.active').count).to eq 3
       end
 
-      it "archives multiple conversations", priority: "1", test_id: 201490 do
+      it "archives multiple conversations", priority: "1" do
         conversations
         select_conversations
         click_archive_button
@@ -85,7 +85,7 @@ describe "conversations index page" do
         @conversations.each { |c| expect(c.reload).to be_archived }
       end
 
-      it "deletes multiple conversations", priority: "1", test_id: 201491 do
+      it "deletes multiple conversations", priority: "1" do
         conversations
         select_conversations
         f('#delete-btn').click

@@ -377,13 +377,13 @@ class Account < ActiveRecord::Base
             if val.is_a?(Hash) || val.is_a?(ActionController::Parameters)
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
-                if opts[:values].include?(inner_key)
-                  new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
-                                          Canvas::Plugin.value_to_boolean(inner_val)
-                                        else
-                                          inner_val.to_s
-                                        end
-                end
+                next unless opts[:values].include?(inner_key)
+
+                new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                                        Canvas::Plugin.value_to_boolean(inner_val)
+                                      else
+                                        inner_val.to_s
+                                      end
               end
             end
             settings[key] = new_hash.empty? ? nil : new_hash
@@ -1873,9 +1873,9 @@ class Account < ActiveRecord::Base
       if enable
         # only enable if it is not enabled by default
         allowed_service_names << "+#{service}" unless AccountServices.default_allowable_services[service]
-      else
+      elsif AccountServices.default_allowable_services[service]
         # only disable if it is not enabled by default
-        allowed_service_names << "-#{service}" if AccountServices.default_allowable_services[service]
+        allowed_service_names << "-#{service}"
       end
     end
     # rubocop:enable Style/IdenticalConditionalBranches
@@ -1906,15 +1906,15 @@ class Account < ActiveRecord::Base
         end
 
         allowed_service_names.each do |service_switch|
-          if service_switch =~ /\A([+-]?)(.*)\z/
-            flag = $1
-            service_name = $2.to_sym
+          next unless service_switch =~ /\A([+-]?)(.*)\z/
 
-            if flag == '-'
-              account_allowed_services.delete(service_name)
-            else
-              account_allowed_services[service_name] = AccountServices.allowable_services[service_name]
-            end
+          flag = $1
+          service_name = $2.to_sym
+
+          if flag == '-'
+            account_allowed_services.delete(service_name)
+          else
+            account_allowed_services[service_name] = AccountServices.allowable_services[service_name]
           end
         end
       end
@@ -2109,16 +2109,14 @@ class Account < ActiveRecord::Base
       terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
     end
 
-    if terms.changed?
-      unless terms.save
-        errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
-      end
+    if terms.changed? && !terms.save
+      errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
     end
   end
 
   # Different views are available depending on feature flags
   def dashboard_views
-    ['activity', 'cards', 'planner']
+    %w[activity cards planner]
   end
 
   # Getter/Setter for default_dashboard_view account setting

@@ -23,7 +23,7 @@ class BrandConfig < ActiveRecord::Base
   self.primary_key = 'md5'
   serialize :variables, Hash
 
-  OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
+  OVERRIDE_TYPES = %i[js_overrides css_overrides mobile_js_overrides mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
 
   validates :variables, presence: true, unless: :overrides?
@@ -142,7 +142,7 @@ class BrandConfig < ActiveRecord::Base
     "dist/brandable_css/#{md5}"
   end
 
-  [:json, :js, :css].each do |type|
+  %i[json js css].each do |type|
     define_method :"public_#{type}_path" do
       "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.#{type}"
     end

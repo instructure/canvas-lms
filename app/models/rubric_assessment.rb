@@ -66,11 +66,11 @@ class RubricAssessment < ActiveRecord::Base
                  end
 
     (data || []).each do |rating|
-      if rating[:learning_outcome_id]
-        alignments.each do |alignment|
-          if alignment.learning_outcome_id == rating[:learning_outcome_id]
-            create_outcome_result(alignment)
-          end
+      next unless rating[:learning_outcome_id]
+
+      alignments.each do |alignment|
+        if alignment.learning_outcome_id == rating[:learning_outcome_id]
+          create_outcome_result(alignment)
         end
       end
     end

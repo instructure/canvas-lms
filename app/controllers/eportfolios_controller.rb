@@ -25,8 +25,8 @@ class EportfoliosController < ApplicationController
   include EportfolioPage
   before_action :require_user, :only => [:index, :user_index]
   before_action :reject_student_view_student
-  before_action :verified_user_check, :only => [:index, :user_index, :create]
-  before_action :get_eportfolio, :except => [:index, :user_index, :create]
+  before_action :verified_user_check, :only => %i[index user_index create]
+  before_action :get_eportfolio, :except => %i[index user_index create]
 
   def index
     user_index
@@ -176,7 +176,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @attachments = @portfolio.attachments.not_deleted
                                .where(display_name: zip_filename,
-                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'],
+                                      workflow_state: %w[to_be_zipped zipping zipped unattached],
                                       user_id: @current_user)
       @attachment = @attachments.order(:created_at).last
       @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)

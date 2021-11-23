@@ -31,8 +31,8 @@ module AccountReports
     end
 
     def lti_report
-      headers = ['context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
-                 'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
+      headers = %w[context_type context_id account_name course_name tool_type_name
+                   tool_type_id tool_created_at privacy_level launch_url custom_fields]
 
       write_report headers do |csv|
         courses = add_course_sub_account_scope(root_account.all_courses).joins(:account).select(:id)

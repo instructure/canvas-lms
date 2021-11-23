@@ -59,8 +59,8 @@ module CC
 
           migration_id = create_key(rubric)
           rubrics_node.rubric(:identifier => migration_id) do |r_node|
-            atts = [:read_only, :title, :reusable, :public, :points_possible,
-                    :hide_score_total, :free_form_criterion_comments]
+            atts = %i[read_only title reusable public points_possible
+                      hide_score_total free_form_criterion_comments]
             if rubric.context != @course
               r_node.external_identifier rubric.id
             end
@@ -93,13 +93,11 @@ module CC
         c_node.description criterion[:description]
         c_node.long_description criterion[:long_description] if criterion[:long_description].present?
         c_node.criterion_use_range criterion[:criterion_use_range] if criterion[:criterion_use_range].present?
-        if criterion[:learning_outcome_id].present?
-          if (lo = @course.available_outcome(criterion[:learning_outcome_id]))
-            if lo.context_type == "Course" && lo.context_id == @course.id
-              c_node.learning_outcome_identifierref create_key(lo)
-            else
-              c_node.learning_outcome_external_identifier lo.id
-            end
+        if criterion[:learning_outcome_id].present? && (lo = @course.available_outcome(criterion[:learning_outcome_id]))
+          if lo.context_type == "Course" && lo.context_id == @course.id
+            c_node.learning_outcome_identifierref create_key(lo)
+          else
+            c_node.learning_outcome_external_identifier lo.id
           end
         end
 

@@ -114,7 +114,7 @@ class FoldersController < ApplicationController
   include Api::V1::Attachment
   include AttachmentHelper
 
-  before_action :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file, :copy_folder, :copy_file]
+  before_action :require_context, :except => %i[api_index show api_destroy update create create_file copy_folder copy_file]
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -262,8 +262,8 @@ class FoldersController < ApplicationController
                   else
                     @folder.visible_file_attachments.not_hidden.not_locked.by_position_then_display_name
                   end
-          files_options = { :permissions => { :user => @current_user }, :methods => [:currently_locked, :mime_class, :readable_size], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :filename, :workflow_state] }
-          folders_options = { :permissions => { :user => @current_user }, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :name, :parent_folder_id, :position, :unlock_at] }
+          files_options = { :permissions => { :user => @current_user }, :methods => %i[currently_locked mime_class readable_size], :only => %i[id comments content_type context_id context_type display_name folder_id position media_entry_id filename workflow_state] }
+          folders_options = { :permissions => { :user => @current_user }, :methods => [:currently_locked, :mime_class], :only => %i[id context_id context_type lock_at name parent_folder_id position unlock_at] }
           sub_folders_scope = @folder.active_sub_folders
           unless can_view_hidden_files
             sub_folders_scope = sub_folders_scope.not_hidden.not_locked

@@ -32,7 +32,7 @@ describe "speed grader - rubrics" do
     @association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
   end
 
-  it "grades assignment using rubric", priority: "2", test_id: 283749 do
+  it "grades assignment using rubric", priority: "2" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -73,7 +73,7 @@ describe "speed grader - rubrics" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
-  it "updates grading status icon when rubric assignment is graded", priority: "1", test_id: 3368679 do
+  it "updates grading status icon when rubric assignment is graded", priority: "1" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -91,7 +91,7 @@ describe "speed grader - rubrics" do
     expect(Speedgrader.student_grading_status_icon(@student.name)).to have_class('graded')
   end
 
-  it "allows commenting using rubric", priority: "1", test_id: 283750 do
+  it "allows commenting using rubric", priority: "1" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -119,7 +119,7 @@ describe "speed grader - rubrics" do
     expect(Speedgrader.rubric_comment_for_row("no outcome row")).to include_text to_comment
   end
 
-  it "does not convert invalid text to 0", priority: "2", test_id: 283751 do
+  it "does not convert invalid text to 0", priority: "2" do
     student_submission
     @association.save!
 
@@ -141,7 +141,7 @@ describe "speed grader - rubrics" do
     expect(f('.rubric_container td[data-testid="criterion-points"] input')).to have_value('--')
   end
 
-  it "ignores rubric lines for grading", priority: "1", test_id: 283989 do
+  it "ignores rubric lines for grading", priority: "1" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -198,7 +198,7 @@ describe "speed grader - rubrics" do
   end
 
   context "when rounding .rubric_total" do
-    it "rounds to 2 decimal places", priority: "1", test_id: 283752 do
+    it "rounds to 2 decimal places", priority: "1" do
       setup_and_grade_rubric('1.001', '1.01')
 
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2.01') # while entering scores
@@ -214,7 +214,7 @@ describe "speed grader - rubrics" do
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2.01') # after opening the rubric up again to re-score
     end
 
-    it "does not display trailing zeros", priority: "1", test_id: 283753 do
+    it "does not display trailing zeros", priority: "1" do
       setup_and_grade_rubric('1', '1')
 
       expect(f("span[data-selenium='rubric_total']")).to include_text('2') # while entering scores

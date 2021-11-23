@@ -32,7 +32,7 @@ class CalendarEvent < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, [:location_name, :location_address, :start_at, :end_at, :all_day, :all_day_date]
+  restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date]
 
   attr_accessor :cancel_reason, :imported
 
@@ -41,14 +41,14 @@ class CalendarEvent < ActiveRecord::Base
 
   include Workflow
 
-  PERMITTED_ATTRIBUTES = [:title, :description, :start_at, :end_at, :location_name,
-                          :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment,
-                          :remove_child_events, :all_day, :comments, :important_dates].freeze
+  PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name
+                            location_address time_zone_edited cancel_reason participants_per_appointment
+                            remove_child_events all_day comments important_dates].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
 
-  belongs_to :context, polymorphic: [:course, :user, :group, :appointment_group, :course_section],
+  belongs_to :context, polymorphic: %i[course user group appointment_group course_section],
                        polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
@@ -329,12 +329,12 @@ class CalendarEvent < ActiveRecord::Base
                                                    ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
   end
 
-  CASCADED_ATTRIBUTES = [
-    :title,
-    :description,
-    :location_name,
-    :location_address,
-    :web_conference
+  CASCADED_ATTRIBUTES = %i[
+    title
+    description
+    location_name
+    location_address
+    web_conference
   ].freeze
   LOCKED_ATTRIBUTES = CASCADED_ATTRIBUTES + [
     :start_at,

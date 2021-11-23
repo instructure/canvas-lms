@@ -342,16 +342,15 @@ module CanvasSecurity
         end
       end
 
-      if body[:exp].present? && !ignore_expiration
-        if timestamp_as_integer(body[:exp]) < verification_time.to_i
-          raise CanvasSecurity::TokenExpired
-        end
+      if body[:exp].present? &&
+         !ignore_expiration &&
+         timestamp_as_integer(body[:exp]) < verification_time.to_i
+        raise CanvasSecurity::TokenExpired
       end
 
-      if body[:nbf].present?
-        if timestamp_as_integer(body[:nbf]) > verification_time.to_i
-          raise CanvasSecurity::InvalidToken
-        end
+      if body[:nbf].present? &&
+         timestamp_as_integer(body[:nbf]) > verification_time.to_i
+        raise CanvasSecurity::InvalidToken
       end
     end
 

@@ -79,10 +79,8 @@ class AssignmentGroup < ActiveRecord::Base
   protected :generate_default_values
 
   def update_student_grades
-    if saved_change_to_rules? || saved_change_to_group_weight?
-      unless saved_by == :migration
-        self.class.connection.after_transaction_commit { context.recompute_student_scores }
-      end
+    if (saved_change_to_rules? || saved_change_to_group_weight?) && saved_by != :migration
+      self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
   end
 

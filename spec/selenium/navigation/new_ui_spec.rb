@@ -31,91 +31,91 @@ describe 'new ui' do
       course_with_teacher_logged_in
     end
 
-    it 'breadcrumbs show for course navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course navigation menu item', priority: "2" do
       get "/courses/#{@course.id}"
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course announcements navigation menu item', priority: "2", test_id: 856927 do
+    it 'breadcrumbs show for course announcements navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/announcements"
       expect(f('.home + li + li .ellipsible')).to include_text('Announcements')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course assignments navigation menu item', priority: "2", test_id: 856928 do
+    it 'breadcrumbs show for course assignments navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/assignments"
       expect(f('.home + li + li .ellipsible')).to include_text('Assignments')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course discussions navigation menu item', priority: "2", test_id: 856929 do
+    it 'breadcrumbs show for course discussions navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/discussion_topics"
       expect(f('.home + li + li .ellipsible')).to include_text('Discussions')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course grades navigation menu item', priority: "2", test_id: 856930 do
+    it 'breadcrumbs show for course grades navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/gradebook"
       expect(f('.home + li + li .ellipsible')).to include_text('Grades')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course people navigation menu item', priority: "2", test_id: 856931 do
+    it 'breadcrumbs show for course people navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/users"
       expect(f('.home + li + li .ellipsible')).to include_text('People')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course pages navigation menu item', priority: "2", test_id: 856932 do
+    it 'breadcrumbs show for course pages navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/wiki"
       expect(f('.home + li + li .ellipsible')).to include_text('Pages')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course files navigation menu item', priority: "2", test_id: 856933 do
+    it 'breadcrumbs show for course files navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/files"
       expect(f('#breadcrumbs .ellipsis')).to include_text('Files')
       expect(f('.ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course syllabus navigation menu item', priority: "2", test_id: 856934 do
+    it 'breadcrumbs show for course syllabus navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/assignments/syllabus"
       expect(f('.home + li + li .ellipsible')).to include_text('Syllabus')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course outcomes navigation menu item', priority: "2", test_id: 856935 do
+    it 'breadcrumbs show for course outcomes navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/outcomes"
       expect(f('.home + li + li .ellipsible')).to include_text('Outcomes')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course quizzes navigation menu item', priority: "2", test_id: 856936 do
+    it 'breadcrumbs show for course quizzes navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/quizzes"
       expect(f('.home + li + li .ellipsible')).to include_text('Quizzes')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course modules navigation menu item', priority: "2", test_id: 856937 do
+    it 'breadcrumbs show for course modules navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/modules"
       expect(f('.home + li + li .ellipsible')).to include_text('Modules')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'breadcrumbs show for course settings navigation menu item', priority: "2", test_id: 856938 do
+    it 'breadcrumbs show for course settings navigation menu item', priority: "2" do
       get "/courses/#{@course.id}/settings"
       expect(f('.home + li + li .ellipsible')).to include_text('Settings')
       expect(f('.home + li .ellipsible')).to include_text(@course.course_code)
     end
 
-    it 'shows new files folder icon in course files', priority: "2", test_id: 248683 do
+    it 'shows new files folder icon in course files', priority: "2" do
       get "/courses/#{@course.id}/files"
       add_folder
       # verifying new files folder icon css property still displays with new ui
       expect(f('.media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder')).to be_displayed
     end
 
-    it 'does not override high contrast theme', priority: "2", test_id: 244898 do
+    it 'does not override high contrast theme', priority: "2" do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       @user.enable_feature!('high_contrast')
       get '/profile/settings'
@@ -124,7 +124,7 @@ describe 'new ui' do
       expect(menu_link.css_value('color')).to eq('rgba(45, 59, 69, 1)')
     end
 
-    it 'does not break tiny mce css', priority: "2", test_id: 244891 do
+    it 'does not break tiny mce css', priority: "2" do
       skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       mce_icons = f('.mce-ico')
@@ -139,7 +139,7 @@ describe 'new ui' do
       expect(mce_icons.css_value('height')).to eq('16px')
     end
 
-    it 'does not break equation editor css', priority: "2", test_id: 273600 do
+    it 'does not break equation editor css', priority: "2" do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
       select_math_equation_from_toolbar
@@ -149,7 +149,7 @@ describe 'new ui' do
   end
 
   context 'as student' do
-    it 'still has courses icon when only course is unpublished', priority: "1", test_id: 288860 do
+    it 'still has courses icon when only course is unpublished', priority: "1" do
       course_with_student_logged_in(active_course: false)
       get "/"
       # make sure that "courses" shows up in the global nav even though we only have an unpublisned course

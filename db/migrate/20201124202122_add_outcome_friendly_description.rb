@@ -32,6 +32,6 @@ class AddOutcomeFriendlyDescription < ActiveRecord::Migration[5.2]
       t.references :learning_outcome, foreign_key: true, index: true, limit: 8, null: false
     end
 
-    add_index :outcome_friendly_descriptions, [:context_type, :context_id, :learning_outcome_id], unique: true, name: 'index_outcome_friendly_description_on_context_and_outcome'
+    add_index :outcome_friendly_descriptions, %i[context_type context_id learning_outcome_id], unique: true, name: 'index_outcome_friendly_description_on_context_and_outcome'
   end
 end

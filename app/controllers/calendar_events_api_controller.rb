@@ -419,7 +419,7 @@ class CalendarEventsApiController < ApplicationController
         calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
         ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
         ActiveRecord::Associations::Preloader.new.preload(assignments, Api::V1::Assignment::PRELOADS)
-        ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), [:account, :grading_period_groups, :enrollment_term])
+        ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
 
         json = events.map do |event|
           subs = submissions[event.id] if submissions
@@ -1114,11 +1114,11 @@ class CalendarEventsApiController < ApplicationController
       pertinent_context_codes = Set.new(@contexts.map(&:asset_string))
 
       codes.each do |c|
-        unless pertinent_context_codes.include?(c)
-          context = Context.find_by_asset_string(c)
-          @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
-          @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
-        end
+        next if pertinent_context_codes.include?(c)
+
+        context = Context.find_by_asset_string(c)
+        @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
+        @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
       end
 
       # filter the contexts to only the requested contexts
@@ -1464,11 +1464,10 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def check_for_past_signup(event)
-    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup)
-      unless event.context.grants_right?(@current_user, :manage)
-        render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
-        return false
-      end
+    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
+       !event.context.grants_right?(@current_user, :manage)
+      render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
+      return false
     end
     true
   end

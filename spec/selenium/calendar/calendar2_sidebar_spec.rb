@@ -51,7 +51,7 @@ describe "calendar2" do
           expect(Time.zone.parse(events.first['data-date']).day).to eq(c.start_at.day)
         end
 
-        it "changes the main calendars month on click", priority: "1", test_id: 140224 do
+        it "changes the main calendars month on click", priority: "1" do
           title_selector = ".navigation_title"
           get "/calendar2"
 
@@ -70,7 +70,7 @@ describe "calendar2" do
         end
       end
 
-      it "shows the event in the mini calendar", priority: "1", test_id: 138849 do
+      it "shows the event in the mini calendar", priority: "1" do
         # lock to a particular day (the 13th because why not)
         # otherwise it turns out this spec will break on almost every 31st
         date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
@@ -134,7 +134,7 @@ describe "calendar2" do
           expect(f('#calendar_feed_box')).to be_displayed
         end
 
-        it "removes calendar item if calendar is unselected", priority: "1", test_id: 138861 do
+        it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
           make_event :context => @course, :start => Time.now, :title => title
           load_month_view
@@ -153,7 +153,7 @@ describe "calendar2" do
       end
 
       describe "undated calendar items" do
-        it "shows undated events after clicking link", priority: "1", test_id: 138847 do
+        it "shows undated events after clicking link", priority: "1" do
           e = make_event :start => nil, :title => "pizza party"
           get "/calendar2"
 

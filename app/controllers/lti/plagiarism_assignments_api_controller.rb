@@ -126,9 +126,7 @@ module Lti
     end
 
     def user_related_to_assignment?
-      if user
-        render_unauthorized_action if assignment.context.students.find_by(id: user).blank?
-      end
+      render_unauthorized_action if user && assignment.context.students.find_by(id: user).blank?
     end
 
     def tool_proxy_related_to_assignment?

@@ -156,7 +156,7 @@ describe "Outcome Groups API", type: :request do
                      :action => 'redirect',
                      :format => 'json')
         assert_status(302)
-        expect(response.location).to eq polymorphic_url([:api_v1, :global, :outcome_group], :id => root.id)
+        expect(response.location).to eq polymorphic_url(%i[api_v1 global outcome_group], :id => root.id)
       end
 
       it "creates the root global group if necessary" do
@@ -550,11 +550,11 @@ describe "Outcome Groups API", type: :request do
                              "id" => group.id,
                              "title" => group.title,
                              "vendor_guid" => group.vendor_guid,
-                             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
+                             "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => group.id),
                              "can_edit" => true,
-                             "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
-                             "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
-                             "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
+                             "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => group.id),
+                             "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => group.id),
+                             "import_url" => polymorphic_path(%i[api_v1 global outcome_group_import], :id => group.id),
                              "context_id" => nil,
                              "context_type" => nil,
                              "description" => group.description
@@ -579,18 +579,18 @@ describe "Outcome Groups API", type: :request do
                              "id" => group.id,
                              "title" => group.title,
                              "vendor_guid" => group.vendor_guid,
-                             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
+                             "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => group.id),
                              "can_edit" => true,
-                             "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
-                             "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
-                             "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
+                             "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => group.id),
+                             "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => group.id),
+                             "import_url" => polymorphic_path(%i[api_v1 global outcome_group_import], :id => group.id),
                              "parent_outcome_group" => {
                                "id" => parent_group.id,
                                "title" => parent_group.title,
                                "vendor_guid" => parent_group.vendor_guid,
-                               "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => parent_group.id),
-                               "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => parent_group.id),
-                               "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => parent_group.id),
+                               "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => parent_group.id),
+                               "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => parent_group.id),
+                               "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => parent_group.id),
                                "can_edit" => true
                              },
                              "context_id" => nil,
@@ -977,7 +977,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders links by outcome title" do
-      @links = ["B", "A", "C"].map { |title| create_outcome(:title => title) }
+      @links = %w[B A C].map { |title| create_outcome(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       :controller => 'outcome_groups_api',
                       :action => 'outcomes',
@@ -1557,11 +1557,11 @@ describe "Outcome Groups API", type: :request do
       end
 
       context "should fail (400) to create a new outcome with an illegal calculation_int" do
-        methods = [
-          'decaying_average',
-          'n_mastery',
-          'highest',
-          'latest'
+        methods = %w[
+          decaying_average
+          n_mastery
+          highest
+          latest
         ]
 
         methods.each do |method|
@@ -1771,7 +1771,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders subgroups by title" do
-      @subgroups = ["B", "A", "C"].map { |title| create_subgroup(:title => title) }
+      @subgroups = %w[B A C].map { |title| create_subgroup(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       :controller => 'outcome_groups_api',
                       :action => 'subgroups',

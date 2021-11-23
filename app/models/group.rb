@@ -442,8 +442,8 @@ class Group < ActiveRecord::Base
     (params || {}).each do |key, val|
       if context
         invitees << context.users.where(id: key.to_i).first if val != '0'
-      else
-        invitees << User.where(id: key.to_i).first if val != '0'
+      elsif val != '0'
+        invitees << User.where(id: key.to_i).first
       end
     end
     invitees.compact.filter_map { |i| invite_user(i) }

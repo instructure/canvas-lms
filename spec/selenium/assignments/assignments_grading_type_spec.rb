@@ -42,28 +42,28 @@ describe "assignments" do
       )
     end
 
-    it "validates points for percentage grading (!= '')", priority: '2', test_id: 209980 do
+    it "validates points for percentage grading (!= '')", priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Percentage'
         AssignmentCreateEditPage.enter_points_possible ''
       end
     end
 
-    it 'validates points for percentage grading (digits only)', priority: '2', test_id: 209984 do
+    it 'validates points for percentage grading (digits only)', priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Percentage'
         AssignmentCreateEditPage.enter_points_possible 'taco'
       end
     end
 
-    it "validates points for letter grading (!= '')", priority: '2', test_id: 209985 do
+    it "validates points for letter grading (!= '')", priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Letter Grade'
         AssignmentCreateEditPage.enter_points_possible ''
       end
     end
 
-    it 'validates points for letter grading (digits only)', priority: '2', test_id: 209986 do
+    it 'validates points for letter grading (digits only)', priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Letter Grade'
         AssignmentCreateEditPage.enter_points_possible 'taco'
@@ -79,7 +79,7 @@ describe "assignments" do
     end
 
     %w[points percent pass_fail letter_grade gpa_scale].each do |grading_option|
-      it "can create an assignment with #{grading_option} grading option", priority: '2', test_id: 209976 do
+      it "can create an assignment with #{grading_option} grading option", priority: '2' do
         AssignmentCreateEditPage.select_grading_type grading_option, :value
         AssignmentCreateEditPage.enter_points_possible '5'
         AssignmentCreateEditPage.select_submission_type 'No Submission'
@@ -102,27 +102,27 @@ describe "assignments" do
       )
     end
 
-    it "validates points for GPA scale grading (!= '')", priority: '2', test_id: 209988 do
+    it "validates points for GPA scale grading (!= '')", priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'GPA Scale'
         AssignmentCreateEditPage.enter_points_possible ''
       end
     end
 
-    it 'validates points for GPA scale grading (digits only)', priority: '2', test_id: 209980 do
+    it 'validates points for GPA scale grading (digits only)', priority: '2' do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'GPA Scale'
         AssignmentCreateEditPage.enter_points_possible 'taco'
       end
     end
 
-    it "shows 'GPA Scale' option if the assignment's type is GPA Scale", priority: '1', test_id: 3431684 do
+    it "shows 'GPA Scale' option if the assignment's type is GPA Scale", priority: '1' do
       AssignmentCreateEditPage.visit_assignment_edit_page @course.id, @assignment.id
 
       expect(f('#assignment_grading_type')).to contain_css('option[value="gpa_scale"]')
     end
 
-    it "shows 'GPA Scale' option if the assignment's type is not GPA Scale", priority: '2', test_id: 3431685 do
+    it "shows 'GPA Scale' option if the assignment's type is not GPA Scale", priority: '2' do
       @assignment.update!(grading_type: 'points')
       AssignmentCreateEditPage.visit_assignment_edit_page @course.id, @assignment.id
 

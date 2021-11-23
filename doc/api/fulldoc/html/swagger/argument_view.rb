@@ -136,7 +136,7 @@ class ArgumentView < HashView
   end
 
   def builtin?(type)
-    ["string", "integer", "boolean", "number"].include?(type.downcase)
+    %w[string integer boolean number].include?(type.downcase)
   end
 
   def to_swagger

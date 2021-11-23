@@ -220,7 +220,7 @@ class PlannerController < ApplicationController
       collections << item_collection("pages_#{i}", scope, WikiPage, [:todo_date, :created_at], :id)
     end
     discussion_topic_todo_scopes.each_with_index do |scope, i|
-      collections << item_collection("discussions_#{i}", scope, DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+      collections << item_collection("discussions_#{i}", scope, DiscussionTopic, %i[todo_date posted_at created_at], :id)
     end
     BookmarkedCollection.merge(*collections)
   end
@@ -244,7 +244,7 @@ class PlannerController < ApplicationController
 
       collections << item_collection(scope_name.to_s,
                                      scope,
-                                     Assignment, [:user_due_date, :due_at, :created_at], :id)
+                                     Assignment, %i[user_due_date due_at created_at], :id)
     end
     collections
   end
@@ -252,14 +252,14 @@ class PlannerController < ApplicationController
   def ungraded_quiz_collection
     item_collection('ungraded_quizzes',
                     @user.ungraded_quizzes(**default_opts),
-                    Quizzes::Quiz, [:user_due_date, :due_at, :created_at], :id)
+                    Quizzes::Quiz, %i[user_due_date due_at created_at], :id)
   end
 
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
                     @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
                     .unread_for(@user),
-                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
+                    DiscussionTopic, %i[todo_date posted_at delayed_post_at created_at], :id)
   end
 
   def unread_assignment_collection
@@ -275,7 +275,7 @@ class PlannerController < ApplicationController
                         ).due_between_for_user(start_date, end_date, @user)
     item_collection('unread_assignment_submissions',
                     scope,
-                    Assignment, [:user_due_date, :due_at, :created_at], :id)
+                    Assignment, %i[user_due_date due_at created_at], :id)
   end
 
   def planner_note_collection
@@ -295,7 +295,7 @@ class PlannerController < ApplicationController
 
   def ungraded_discussion_collection
     item_collection('ungraded_discussions', @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
-                    DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+                    DiscussionTopic, %i[todo_date posted_at created_at], :id)
   end
 
   def calendar_events_collection

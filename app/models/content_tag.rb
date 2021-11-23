@@ -284,17 +284,15 @@ class ContentTag < ActiveRecord::Base
       else
         'unpublished'
       end
-    else
-      if asset.respond_to?(:workflow_state)
-        workflow_state = asset.workflow_state.to_s
-        if ['active', 'available', 'published'].include?(workflow_state)
-          'active'
-        elsif ['unpublished', 'deleted'].include?(workflow_state)
-          workflow_state
-        end
-      else
-        nil
+    elsif asset.respond_to?(:workflow_state)
+      workflow_state = asset.workflow_state.to_s
+      if %w[active available published].include?(workflow_state)
+        'active'
+      elsif ['unpublished', 'deleted'].include?(workflow_state)
+        workflow_state
       end
+    else
+      nil
     end
   end
 
@@ -419,12 +417,10 @@ class ContentTag < ActiveRecord::Base
   end
 
   def clear_discussion_stream_items
-    if content_type == "DiscussionTopic"
-      if saved_change_to_workflow_state? &&
+    if content_type == "DiscussionTopic" && (saved_change_to_workflow_state? &&
          ['active', nil].include?(workflow_state_before_last_save) &&
-         workflow_state == 'unpublished'
-        content.clear_stream_items
-      end
+         workflow_state == 'unpublished')
+      content.clear_stream_items
     end
   end
 
@@ -437,7 +433,7 @@ class ContentTag < ActiveRecord::Base
   def self.update_for(asset, exclude_tag: nil)
     tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted
     tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
-    tags = tags.select([:id, :tag_type, :content_type, :context_module_id]).to_a
+    tags = tags.select(%i[id tag_type content_type context_module_id]).to_a
     return if tags.empty?
 
     module_ids = tags.filter_map(&:context_module_id)
@@ -467,7 +463,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    content_type_quiz? || ['Attachment', 'Assignment', 'WikiPage', 'DiscussionTopic'].include?(content_type)
+    content_type_quiz? || %w[Attachment Assignment WikiPage DiscussionTopic].include?(content_type)
   end
 
   def content_type_quiz?

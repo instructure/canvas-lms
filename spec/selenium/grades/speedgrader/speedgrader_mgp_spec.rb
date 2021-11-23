@@ -38,7 +38,7 @@ describe "speedgrader with grading periods" do
       user_session(@teacher)
     end
 
-    it 'assignment in ended gp should be gradable', test_id: 2947134, priority: "1" do
+    it 'assignment in ended gp should be gradable', priority: "1" do
       assignment = @course.assignments.create!(due_at: 13.days.ago, title: "assign in ended")
       Speedgrader.visit(@course.id, assignment.id)
       Speedgrader.enter_grade(8)
@@ -47,7 +47,7 @@ describe "speedgrader with grading periods" do
       expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first.grade).to eq "8"
     end
 
-    it 'assignment in closed gp should not be gradable', test_id: 2947133, priority: "1" do
+    it 'assignment in closed gp should not be gradable', priority: "1" do
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       Speedgrader.visit(@course.id, assignment.id)
       expect(Speedgrader.grading_enabled?).to be false

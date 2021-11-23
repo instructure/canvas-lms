@@ -98,7 +98,7 @@ module CanvasKaltura
         all_assets_are_done_converting = true
         assets&.each do |asset|
           if ASSET_STATUSES[asset[:status]] == :READY
-            keys = [:containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal]
+            keys = %i[containerFormat width fileExt size bitrate height isOriginal]
             hash = asset.select { |k| keys.member?(k) }
 
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])

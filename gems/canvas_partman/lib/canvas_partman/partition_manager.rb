@@ -82,9 +82,7 @@ module CanvasPartman
     def create_partition(value, graceful: false)
       partition_table = generate_name_for_partition(value)
 
-      if graceful == true
-        return if partition_exists?(partition_table)
-      end
+      return if graceful && partition_exists?(partition_table)
 
       constraint_check = generate_check_constraint(value)
 

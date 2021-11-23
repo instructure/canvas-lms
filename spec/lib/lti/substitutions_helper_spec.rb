@@ -107,7 +107,7 @@ module Lti
     describe '#all_roles' do
       it 'converts multiple roles' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles
         expect(roles).to include LtiOutbound::LTIRoles::System::USER
         expect(roles).to include LtiOutbound::LTIRoles::Institution::STUDENT
@@ -127,7 +127,7 @@ module Lti
 
       it 'converts multiple roles for lis 2' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles('lis2')
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
@@ -156,7 +156,7 @@ module Lti
 
       it 'converts multiple roles for lti 1.3' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles('lti1_3')
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'

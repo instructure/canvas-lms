@@ -117,14 +117,12 @@ module Lti
             graph.reverse_each { |ts| custom.merge!(ts.custom) }
             custom
           end
+        elsif request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings+json')
+          @content_type = 'application/vnd.ims.lti.v2.toolsettings+json'
+          ::IMS::LTI::Models::ToolSettingContainer.new(graph: [collect_tool_settings(tool_setting)])
         else
-          if request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings+json')
-            @content_type = 'application/vnd.ims.lti.v2.toolsettings+json'
-            ::IMS::LTI::Models::ToolSettingContainer.new(graph: [collect_tool_settings(tool_setting)])
-          else
-            @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
-            tool_setting.custom || {}
-          end
+          @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
+          tool_setting.custom || {}
         end
       end
 

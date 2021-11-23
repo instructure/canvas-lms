@@ -37,14 +37,14 @@ module Canvas::Migration::ExternalContent
         pending_exports = {}
         pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
         registered_services.each do |key, service|
-          if service.applies_to_course?(course)
-            begin
-              if (export = service.begin_export(course, opts))
-                pending_exports[key] = export
-              end
-            rescue => e
-              Canvas::Errors.capture_exception(:external_content_migration, e)
+          next unless service.applies_to_course?(course)
+
+          begin
+            if (export = service.begin_export(course, opts))
+              pending_exports[key] = export
             end
+          rescue => e
+            Canvas::Errors.capture_exception(:external_content_migration, e)
           end
         end
         pending_exports
@@ -121,14 +121,14 @@ module Canvas::Migration::ExternalContent
         pending_imports = {}
         imported_content.each do |key, content|
           service = import_service_for(key)
-          if service
-            begin
-              if (import = service.send_imported_content(migration.context, migration, content))
-                pending_imports[key] = import
-              end
-            rescue => e
-              Canvas::Errors.capture_exception(:external_content_migration, e)
+          next unless service
+
+          begin
+            if (import = service.send_imported_content(migration.context, migration, content))
+              pending_imports[key] = import
             end
+          rescue => e
+            Canvas::Errors.capture_exception(:external_content_migration, e)
           end
         end
         ensure_imports_completed(pending_imports)

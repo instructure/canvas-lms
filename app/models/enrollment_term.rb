@@ -197,10 +197,8 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def consistent_account_associations
-    if read_attribute(:grading_period_group_id).present?
-      if root_account_id != grading_period_group.account_id
-        errors.add(:grading_period_group, t("cannot be associated with a different account"))
-      end
+    if read_attribute(:grading_period_group_id).present? && (root_account_id != grading_period_group.account_id)
+      errors.add(:grading_period_group, t("cannot be associated with a different account"))
     end
   end
 

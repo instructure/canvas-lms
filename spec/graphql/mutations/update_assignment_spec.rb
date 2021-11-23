@@ -559,7 +559,7 @@ describe Mutations::UpdateAssignment do
     expect(
       result["errors"].map { |e| e["path"] }
     ).to eq [
-      ["mutation", "updateAssignment", "input", "state"]
+      %w[mutation updateAssignment input state]
     ]
   end
 

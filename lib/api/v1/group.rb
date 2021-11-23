@@ -33,7 +33,7 @@ module Api::V1::Group
   }.freeze
 
   # permission keys need to be symbols
-  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join, :create_announcement].freeze
+  API_PERMISSIONS_TO_INCLUDE = %i[create_discussion_topic join create_announcement].freeze
 
   def group_json(group, user, session, options = {})
     options.reverse_merge!(include_inactive_users: false)

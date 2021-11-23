@@ -20,7 +20,7 @@
 
 module Courses
   module ItemVisibilityHelper
-    ITEM_TYPES = [:assignment, :discussion, :page, :quiz].freeze
+    ITEM_TYPES = %i[assignment discussion page quiz].freeze
 
     def visible_item_ids_for_users(item_type, user_ids)
       # return all the item ids that are visible to _any_ of the users

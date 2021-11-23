@@ -23,7 +23,7 @@ class UsageRights < ActiveRecord::Base
 
   USE_JUSTIFICATIONS = %w[own_copyright public_domain used_by_permission fair_use creative_commons].freeze
 
-  belongs_to :context, polymorphic: [:course, :group, :user]
+  belongs_to :context, polymorphic: %i[course group user]
 
   before_validation :infer_license
   validates :use_justification, inclusion: { in: USE_JUSTIFICATIONS }

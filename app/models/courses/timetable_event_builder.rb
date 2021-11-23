@@ -93,7 +93,7 @@ module Courses
       end
     end
 
-    ALLOWED_TIMETABLE_KEYS = [:weekdays, :course_start_at, :course_end_at, :start_time, :end_time, :location_name].freeze
+    ALLOWED_TIMETABLE_KEYS = %i[weekdays course_start_at course_end_at start_time end_time location_name].freeze
     def process_and_validate_timetables(timetable_hashes)
       timetable_hashes.each do |hash|
         hash.slice!(*ALLOWED_TIMETABLE_KEYS)

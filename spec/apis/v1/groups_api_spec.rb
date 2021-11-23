@@ -150,14 +150,14 @@ describe "Groups API", type: :request do
       account.account_users.create!(user: @admin_user, account: account)
     end
 
-    it "shows if the user has permission", priority: 3, test_id: 3436528 do
+    it "shows if the user has permission", priority: 3 do
       @user = @admin_user
       json = api_call(:get, "/api/v1/groups/#{@group.id}", @category_path_options.merge(action: "show", group_id: @group.id))
       expect(json).to have_key("sis_group_id")
       expect(json).to have_key("sis_import_id")
     end
 
-    it "does not show if the user doesn't have permission", priority: 3, test_id: 3436529 do
+    it "does not show if the user doesn't have permission", priority: 3 do
       @user = @member
       json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: 'index'))
       expect(json[0]).not_to have_key("sis_group_id")
@@ -336,7 +336,7 @@ describe "Groups API", type: :request do
   it 'includes tabs if requested' do
     json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["tabs"]))
     expect(json).to have_key 'tabs'
-    expect(json['tabs'].map { |tab| tab['id'] }).to eq(["home", "announcements", "pages", "people", "discussions", "files"])
+    expect(json['tabs'].map { |tab| tab['id'] }).to eq(%w[home announcements pages people discussions files])
   end
 
   it "allows searching by SIS ID" do

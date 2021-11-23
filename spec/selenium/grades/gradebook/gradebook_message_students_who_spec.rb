@@ -89,7 +89,7 @@ describe "Gradebook - message students who" do
     end.to change(ConversationMessage, :count).by_at_least(2)
   end
 
-  it "shows not-submitted students", priority: "2", test_id: 3265183 do
+  it "shows not-submitted students", priority: "2" do
     # student 2 has submitted assignment 3, but it hasn't been graded
     submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
     submission.save!
@@ -103,7 +103,7 @@ describe "Gradebook - message students who" do
     expect(visible_students[0]).to include_text @student_name_1
   end
 
-  it "shows ungraded students", priority: "2", test_id: 3440541 do
+  it "shows ungraded students", priority: "2" do
     # student 2 has submitted assignment 3, but it hasn't been graded
     submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
     submission.save!

@@ -306,7 +306,7 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "shows warning before self-copy", priority: "1", test_id: 2889675 do
+    it "shows warning before self-copy", priority: "1" do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -323,7 +323,7 @@ describe "content migrations", :non_parallel do
       expect(f('#courseSelectWarning')).to_not be_displayed
     end
 
-    it "selects by drop-down or by search box", priority: "2", test_id: 2889684 do
+    it "selects by drop-down or by search box", priority: "2" do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -355,7 +355,7 @@ describe "content migrations", :non_parallel do
       expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
-    it "only shows courses the user is authorized to see", priority: "1", test_id: 2889686 do
+    it "only shows courses the user is authorized to see", priority: "1" do
       new_course = Course.create!(:name => "please don't see me")
       visit_page
       select_migration_type
@@ -375,7 +375,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
-    it "includes completed courses when checked", priority: "1", test_id: 2889687 do
+    it "includes completed courses when checked", priority: "1" do
       new_course = Course.create!(:name => "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -391,7 +391,7 @@ describe "content migrations", :non_parallel do
       expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
     end
 
-    it "finds courses in other accounts", priority: "1", test_id: 2890402 do
+    it "finds courses in other accounts", priority: "1" do
       new_account1 = account_model
       enrolled_course = Course.create!(:name => "faraway course", :account => new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -437,7 +437,7 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "copies all content from a course", priority: "1", test_id: 126677 do
+      it "copies all content from a course", priority: "1" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -458,7 +458,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1", test_id: 126682 do
+      it "selectively copies content", priority: "1" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -505,7 +505,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
+    it "sets day substitution and date adjustment settings", priority: "1" do
       new_course = Course.create!(:name => "day sub")
       new_course.enroll_teacher(@user).accept
 
@@ -580,7 +580,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "removes dates", priority: "1", test_id: 2891742 do
+    it "removes dates", priority: "1" do
       new_course = Course.create!(:name => "date remove", :start_at => 'Jul 1, 2014', :conclude_at => 'Jul 11, 2014')
       new_course.enroll_teacher(@user).accept
 
@@ -599,7 +599,7 @@ describe "content migrations", :non_parallel do
       expect(opts["remove_dates"]).to eq '1'
     end
 
-    it "retains announcement content settings after course copy", priority: "2", test_id: 403057 do
+    it "retains announcement content settings after course copy", priority: "2" do
       @announcement = @copy_from.announcements.create!(:title => 'Migration', :message => 'Here is my message')
       @copy_from.lock_all_announcements = true
       @copy_from.save!
@@ -617,7 +617,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "persists topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
+    it "persists topic 'allow liking' settings across course copy", priority: "2" do
       @copy_from.discussion_topics.create!(
         title: 'Liking Allowed Here',
         message: 'Like I said, liking is allowed',

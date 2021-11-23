@@ -38,8 +38,8 @@ class DiscussionTopic < ActiveRecord::Base
   include LockedFor
 
   restrict_columns :content, [:title, :message]
-  restrict_columns :settings, [:require_initial_post, :discussion_type, :assignment_id,
-                               :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating, :group_category_id]
+  restrict_columns :settings, %i[require_initial_post discussion_type assignment_id
+                                 pinned locked allow_rating only_graders_can_rate sort_by_rating group_category_id]
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
   restrict_assignment_columns
@@ -206,10 +206,10 @@ class DiscussionTopic < ActiveRecord::Base
     end
     self.lock_at = CanvasTime.fancy_midnight(lock_at&.in_time_zone(context.time_zone))
 
-    [
-      :could_be_locked, :podcast_enabled, :podcast_has_student_posts,
-      :require_initial_post, :pinned, :locked, :allow_rating,
-      :only_graders_can_rate, :sort_by_rating
+    %i[
+      could_be_locked podcast_enabled podcast_has_student_posts
+      require_initial_post pinned locked allow_rating
+      only_graders_can_rate sort_by_rating
     ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
@@ -268,11 +268,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def sync_attachment_with_publish_state
-    if (saved_change_to_workflow_state? || saved_change_to_locked? || saved_change_to_attachment_id?) && attachment
-      unless attachment.hidden? # if it's already hidden leave alone
-        locked = !!(unpublished? || not_available_yet? || not_available_anymore?)
-        attachment.update_attribute(:locked, locked)
-      end
+    if (saved_change_to_workflow_state? || saved_change_to_locked? || saved_change_to_attachment_id?) &&
+       attachment && !attachment.hidden? # if it's already hidden leave alone
+      locked = !!(unpublished? || not_available_yet? || not_available_anymore?)
+      attachment.update_attribute(:locked, locked)
     end
   end
 
@@ -1079,8 +1078,8 @@ class DiscussionTopic < ActiveRecord::Base
     discussion_topic_section_visibilities&.update_all(:workflow_state => "deleted")
     save
 
-    if for_assignment? && root_topic_id.blank?
-      assignment.destroy unless assignment.deleted?
+    if for_assignment? && root_topic_id.blank? && !assignment.deleted?
+      assignment.destroy
     end
 
     child_topics.each(&:destroy)

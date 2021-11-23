@@ -51,11 +51,11 @@ module Importers
 
       hash[:module_items].each do |pp_module_item|
         module_item_id = module_items_by_migration_id[pp_module_item[:module_item_migration_id]]&.id
-        if module_item_id
-          pace_plan_module_item = pace_plan.pace_plan_module_items.find_or_create_by(module_item_id: module_item_id)
-          pace_plan_module_item.duration = pp_module_item[:duration]
-          pace_plan_module_item.save!
-        end
+        next unless module_item_id
+
+        pace_plan_module_item = pace_plan.pace_plan_module_items.find_or_create_by(module_item_id: module_item_id)
+        pace_plan_module_item.duration = pp_module_item[:duration]
+        pace_plan_module_item.save!
       end
     end
   end

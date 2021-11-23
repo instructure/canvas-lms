@@ -90,7 +90,7 @@ class DelayedNotification < ActiveRecord::Base
       # rails de-dups them and only does one query, but if not included twice,
       # they will not show as loaded against both objects.
       includes = if klass == CommunicationChannel
-                   [:notification_policies, :notification_policy_overrides, { user: [:pseudonyms, :notification_policies, :notification_policy_overrides] }]
+                   [:notification_policies, :notification_policy_overrides, { user: %i[pseudonyms notification_policies notification_policy_overrides] }]
                  elsif klass == User
                    [:pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] }, :notification_policies, :notification_policy_overrides]
                  else

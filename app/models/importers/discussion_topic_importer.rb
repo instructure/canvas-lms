@@ -47,9 +47,11 @@ module Importers
     def self.process_discussion_topics_migration(discussion_topics, migration)
       topic_entries_to_import = migration.to_import('topic_entries')
       discussion_topics.each do |topic|
-        context = Group.where(context_id: migration.context.id,
-                              context_type: migration.context.class.to_s,
-                              migration_id: topic['group_id']).first if topic['group_id']
+        if topic['group_id']
+          context = Group.where(context_id: migration.context.id,
+                                context_type: migration.context.class.to_s,
+                                migration_id: topic['group_id']).first
+        end
         context ||= migration.context
         next unless context && can_import_topic?(topic, migration)
 
@@ -97,9 +99,9 @@ module Importers
     def run
       return unless options.importable?
 
-      [:migration_id, :title, :discussion_type, :position, :pinned,
-       :require_initial_post, :allow_rating, :only_graders_can_rate,
-       :sort_by_rating].each do |attr|
+      %i[migration_id title discussion_type position pinned
+         require_initial_post allow_rating only_graders_can_rate
+         sort_by_rating].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
 
         item.send("#{attr}=", options[attr])
@@ -195,7 +197,7 @@ module Importers
     class DiscussionTopicOptions
       attr_reader :options
 
-      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked].freeze
+      BOOLEAN_KEYS = %i[pinned require_initial_post locked].freeze
 
       def initialize(options = {})
         @options = options.with_indifferent_access

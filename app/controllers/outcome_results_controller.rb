@@ -541,32 +541,30 @@ class OutcomeResultsController < ApplicationController
       reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
       @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: group_id).preload(:learning_outcome_content)
       @outcomes = @outcome_links.map(&:learning_outcome_content)
-    else
-      if params[:outcome_ids]
-        outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-        # outcomes themselves are not duped when moved into a new group, so we
-        # need to instead look at the uniqueness of the associating content tag's
-        # outcome id in order to ensure we get the correct result
-        # from the query without rendering the reject! check moot
+    elsif params[:outcome_ids]
+      outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
+      # outcomes themselves are not duped when moved into a new group, so we
+      # need to instead look at the uniqueness of the associating content tag's
+      # outcome id in order to ensure we get the correct result
+      # from the query without rendering the reject! check moot
 
-        @outcome_links = ContentTag.learning_outcome_links.active.preload(:learning_outcome_content)
-                                   .where(content_id: outcome_ids, context: @context)
-                                   .select('DISTINCT ON (content_tags.content_id) content_tags.*')
-        @outcomes = @outcome_links.map(&:learning_outcome_content)
-        reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
-      else
-        outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
-          @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
-        end
-        associations = [:learning_outcome_content]
-        if Api.value_to_array(params[:include]).include? 'outcome_paths'
-          associations << { associated_asset: :learning_outcome_group }
-        end
-        @outcome_links.each_slice(100) do |outcome_links_slice|
-          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, associations)
-        end
-        @outcomes = @outcome_links.map(&:learning_outcome_content)
+      @outcome_links = ContentTag.learning_outcome_links.active.preload(:learning_outcome_content)
+                                 .where(content_id: outcome_ids, context: @context)
+                                 .select('DISTINCT ON (content_tags.content_id) content_tags.*')
+      @outcomes = @outcome_links.map(&:learning_outcome_content)
+      reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
+    else
+      outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
+        @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
       end
+      associations = [:learning_outcome_content]
+      if Api.value_to_array(params[:include]).include? 'outcome_paths'
+        associations << { associated_asset: :learning_outcome_group }
+      end
+      @outcome_links.each_slice(100) do |outcome_links_slice|
+        ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, associations)
+      end
+      @outcomes = @outcome_links.map(&:learning_outcome_content)
     end
   end
 

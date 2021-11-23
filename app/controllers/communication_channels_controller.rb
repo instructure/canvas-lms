@@ -79,7 +79,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, :only => [:create, :destroy, :re_send_confirmation, :delete_push_token]
+  before_action :require_user, :only => %i[create destroy re_send_confirmation delete_push_token]
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel

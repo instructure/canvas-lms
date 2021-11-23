@@ -27,12 +27,12 @@ module Importers
     def self.process_migration(data, migration)
       events = data['calendar_events'] || []
       events.each do |event|
-        if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
-          begin
-            import_from_migration(event, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
-          end
+        next unless migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
+
+        begin
+          import_from_migration(event, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
         end
       end
     end

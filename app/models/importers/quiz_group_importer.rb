@@ -61,10 +61,8 @@ module Importers
           else
             migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
           end
-        else
-          if (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
-            item.assessment_question_bank_id = bank.id
-          end
+        elsif (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
+          item.assessment_question_bank_id = bank.id
         end
       end
       item.save!

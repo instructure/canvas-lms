@@ -35,7 +35,7 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
-    it 'adds an unpublished page to a module', priority: "1", test_id: 126709 do
+    it 'adds an unpublished page to a module', priority: "1" do
       @unpub_page = @course.wiki_pages.create!(title: 'Unpublished Page')
       @unpub_page.workflow_state = 'unpublished'
       @unpub_page.save!
@@ -45,7 +45,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'adds a published page to a module', priority: "1", test_id: 126710 do
+    it 'adds a published page to a module', priority: "1" do
       @pub_page = @course.wiki_pages.create!(title: 'Published Page')
       @mod.add_item(type: 'wiki_page', id: @pub_page.id)
       go_to_modules
@@ -53,7 +53,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'adds an unpublished quiz to a module', priority: "1", test_id: 126720 do
+    it 'adds an unpublished quiz to a module', priority: "1" do
       @unpub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Unpublished Quiz')
       @unpub_quiz.workflow_state = 'unpublished'
       @unpub_quiz.save!
@@ -63,7 +63,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'adds a published quiz to a module', priority: "1", test_id: 126721 do
+    it 'adds a published quiz to a module', priority: "1" do
       @pub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Published Quiz')
       @mod.add_item(type: 'quiz', id: @pub_quiz.id)
       go_to_modules
@@ -78,7 +78,7 @@ describe "context modules" do
       expect(f('.due_date_display').text).to eq date_string(@pub_quiz.due_at, :no_words)
     end
 
-    it 'adds an unpublished assignment to a module', priority: "1", test_id: 126724 do
+    it 'adds an unpublished assignment to a module', priority: "1" do
       @unpub_assignment = Assignment.create!(context: @course, title: 'Unpublished Assignment')
       @unpub_assignment.workflow_state = 'unpublished'
       @unpub_assignment.save!
@@ -88,7 +88,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'adds a published assignment to a module', priority: "1", test_id: 126725 do
+    it 'adds a published assignment to a module', priority: "1" do
       @pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
       @mod.add_item(type: 'assignment', id: @pub_assignment.id)
       go_to_modules
@@ -96,7 +96,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'adds an non-graded unpublished discussion to a module', priority: "1", test_id: 126712 do
+    it 'adds an non-graded unpublished discussion to a module', priority: "1" do
       @unpub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Unpublished Discussion')
       @unpub_ungraded_discussion.workflow_state = 'unpublished'
       @unpub_ungraded_discussion.save!
@@ -106,7 +106,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'adds a non-graded published discussion to a module', priority: "1", test_id: 126713 do
+    it 'adds a non-graded published discussion to a module', priority: "1" do
       @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
       @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
       go_to_modules
@@ -114,7 +114,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'adds an graded unpublished discussion to a module', priority: "1", test_id: 126714 do
+    it 'adds an graded unpublished discussion to a module', priority: "1" do
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
       @unpub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Unpublished Discussion')
       @unpub_graded_discussion.workflow_state = 'unpublished'
@@ -126,7 +126,7 @@ describe "context modules" do
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'adds a graded published discussion to a module', priority: "1", test_id: 126715 do
+    it 'adds a graded published discussion to a module', priority: "1" do
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
       @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion')
       @pub_graded_discussion.save!
@@ -137,7 +137,7 @@ describe "context modules" do
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'adds a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
+    it 'adds a graded published discussion with a due date to a module', priority: "1" do
       @due_at = 3.days.from_now
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10, due_at: @due_at)
       @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion with Due Date')
@@ -151,7 +151,7 @@ describe "context modules" do
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'shows the due date on an graded discussion in a module', priority: "2", test_id: 126717 do
+    it 'shows the due date on an graded discussion in a module', priority: "2" do
       due_at = 3.days.from_now
       @assignment = @course.assignments.create!(name: "assignemnt", due_at: due_at)
       @discussion = @course.discussion_topics.create!(title: 'Graded Discussion', assignment: @assignment)
@@ -169,7 +169,7 @@ describe "context modules" do
       expect(f('.due_date_display').text).to eq date_string(todo_date, :no_words)
     end
 
-    it 'edits available/until dates on a ungraded discussion in a module', priority: "2", test_id: 126718 do
+    it 'edits available/until dates on a ungraded discussion in a module', priority: "2" do
       available_from = 2.days.from_now
       available_until = 4.days.from_now
       @discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
@@ -184,7 +184,7 @@ describe "context modules" do
       expect(f('.context_module_item')).not_to include_text(available_from.to_s)
     end
 
-    it 'publishes assignment on publish module', priority: "2", test_id: 126719 do
+    it 'publishes assignment on publish module', priority: "2" do
       @unpub_assignment = Assignment.create!(context: @course, title: 'some assignment in a module')
       @unpub_assignment.workflow_state = 'unpublished'
       @unpub_assignment.save!
@@ -211,48 +211,48 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
-    it 'edit text header module item inline', priority: "2", test_id: 132487 do
+    it 'edit text header module item inline', priority: "2" do
       @mod.add_item(title: 'EditMe text header', type: 'sub_header')
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit assignment module item inline', priority: "2", test_id: 132485 do
+    it 'edit assignment module item inline', priority: "2" do
       @edit_assignment = Assignment.create!(context: @course, title: 'EditMe Assignment')
       @mod.add_item(type: 'assignment', id: @edit_assignment.id)
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit quiz module item inline', priority: "2", test_id: 132486 do
+    it 'edit quiz module item inline', priority: "2" do
       @edit_quiz = Quizzes::Quiz.create!(context: @course, title: 'EditMe Quiz')
       @mod.add_item(type: 'quiz', id: @edit_quiz.id)
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit content page module item inline', priority: "2", test_id: 132491 do
+    it 'edit content page module item inline', priority: "2" do
       @edit_page = @course.wiki_pages.create!(title: 'EditMe Page')
       @mod.add_item(type: 'wiki_page', id: @edit_page.id)
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit discussion module item inline', priority: "2", test_id: 132490 do
+    it 'edit discussion module item inline', priority: "2" do
       @edit_discussion = @course.discussion_topics.create!(title: 'EditMe Discussion')
       @mod.add_item(type: 'discussion_topic', id: @edit_discussion.id)
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit external tool module item inline', priority: "2", test_id: 132488 do
+    it 'edit external tool module item inline', priority: "2" do
       @edit_tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
       @mod.add_item(title: 'EditMe Tool', type: 'external_tool', id: @edit_tool.id, url: 'http://what.example.org/')
       go_to_modules
       verify_edit_item_form
     end
 
-    it 'edit external URL module item inline', priority: "2", test_id: 132489 do
+    it 'edit external URL module item inline', priority: "2" do
       go_to_modules
       add_new_external_item('External URL', 'www.google.com', 'Google')
       verify_edit_item_form
@@ -502,7 +502,7 @@ describe "context modules" do
       end
     end
 
-    it "adds a file item to a module", priority: "1", test_id: 126728 do
+    it "adds a file item to a module", priority: "1" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', file_name)
     end
@@ -521,7 +521,7 @@ describe "context modules" do
       expect(f('.context_module_item')).to include_text(file_name)
     end
 
-    it "sets usage rights on a file in a module", priority: "1", test_id: 369251 do
+    it "sets usage rights on a file in a module", priority: "1" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', file_name)
       ff('.icon-publish')[0].click
@@ -535,7 +535,7 @@ describe "context modules" do
       expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
     end
 
-    it 'edit file module item inline', priority: "2", test_id: 132492 do
+    it 'edit file module item inline', priority: "2" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', file_name)
       verify_edit_item_form
@@ -563,7 +563,7 @@ describe "context modules" do
   context "when a public course is accessed" do
     include_context "public course as a logged out user"
 
-    it "displays modules list", priority: "1", test_id: 269812 do
+    it "displays modules list", priority: "1" do
       @module = public_course.context_modules.create!(:name => "module 1")
       @assignment = public_course.assignments.create!(:name => 'assignment 1', :assignment_group => @assignment_group)
       @module.add_item :type => 'assignment', :id => @assignment.id

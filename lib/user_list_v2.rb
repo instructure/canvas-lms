@@ -136,12 +136,12 @@ class UserListV2
 
     @addresses.each do |a|
       address = @lowercase ? a[:address].downcase : a[:address]
-      unless grouped_results.key?(address)
-        if (name = a.delete(:name))
-          a[:user_name] = name
-        end
-        @missing_results << a
+      next if grouped_results.key?(address)
+
+      if (name = a.delete(:name))
+        a[:user_name] = name
       end
+      @missing_results << a
     end
   end
 
@@ -157,8 +157,8 @@ class UserListV2
 
         dup_hash[:email] = user.email
         pseudonym = SisPseudonym.for(user, @root_account, type: :trusted, require_sis: false)
-        if @can_read_sis
-          dup_hash[:sis_user_id] = pseudonym.sis_user_id if pseudonym
+        if @can_read_sis && pseudonym
+          dup_hash[:sis_user_id] = pseudonym.sis_user_id
         end
         dup_hash[:login_id] = pseudonym.unique_id if pseudonym
       end

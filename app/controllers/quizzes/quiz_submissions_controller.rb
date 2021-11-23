@@ -23,9 +23,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
+  protect_from_forgery :except => %i[create backup record_answer], with: :exception
   before_action :require_context
-  before_action :require_quiz, :only => [:index, :create, :extensions, :show, :update, :log]
+  before_action :require_quiz, :only => %i[index create extensions show update log]
   before_action :require_quiz_submission, :only => [:show, :log]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 

@@ -357,9 +357,9 @@ class CoursesController < ApplicationController
   include NewQuizzesFeaturesHelper
   include ObserverEnrollmentsHelper
 
-  before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  before_action :require_user, :only => %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
   before_action :require_user_or_observer, :only => [:user_index]
-  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :confirm_action, :copy, :effective_due_dates, :offline_web_exports, :link_validator, :settings, :start_offline_web_export, :statistics, :user_progress]
+  before_action :require_context, :only => %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -1046,7 +1046,7 @@ class CoursesController < ApplicationController
   def users
     GuardRail.activate(:secondary) do
       get_context
-      if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+      if authorized_action(@context, @current_user, %i[read_roster view_all_grades manage_grades])
         log_api_asset_access(["roster", @context], 'roster', 'other')
         # backcompat limit param
         params[:per_page] ||= params[:limit]
@@ -1487,7 +1487,7 @@ class CoursesController < ApplicationController
                COURSE_ROOT_URL: "/courses/#{@context.id}",
                SEARCH_URL: search_recipients_url,
                CONTEXTS: @contexts,
-               USER_PARAMS: { :include => ['email', 'enrollments', 'locked', 'observed_users'] },
+               USER_PARAMS: { :include => %w[email enrollments locked observed_users] },
                PERMISSIONS: js_permissions,
                APP_CENTER: {
                  enabled: Canvas::Plugin.find(:app_center).enabled?
@@ -2577,8 +2577,10 @@ class CoursesController < ApplicationController
         enrollment_term_id =
           params[:course].delete(:term_id).presence ||
           params[:course].delete(:enrollment_term_id).presence
-        args[:enrollment_term] =
-          root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
+        if enrollment_term_id
+          args[:enrollment_term] =
+            root_account.enrollment_terms.where(id: enrollment_term_id).first
+        end
       end
       # :manage will be false for teachers in concluded courses
       args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage)
@@ -2868,9 +2870,9 @@ class CoursesController < ApplicationController
       event = params[:course][:event].to_s
       # check permissions on processable events
       # allow invalid and non_events to pass through
-      if %w[offer claim conclude delete undelete].include?(event)
-        return unless authorized_action(@course, @current_user, permission_for_event(event))
-      end
+      return if %w[offer claim conclude delete undelete].include?(event) &&
+                !authorized_action(@course, @current_user, permission_for_event(event))
+
       # authorized, invalid, and non_events are processed
       if process_course_event
         render_update_success
@@ -2960,21 +2962,16 @@ class CoursesController < ApplicationController
         params_for_update.delete :storage_quota
         params_for_update.delete :storage_quota_mb
       end
-      unless @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
-        if @course.root_account.settings[:prevent_course_renaming_by_teachers]
-          params_for_update.delete :name
-          params_for_update.delete :course_code
-        end
+      if !@course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
+         @course.root_account.settings[:prevent_course_renaming_by_teachers]
+        params_for_update.delete :name
+        params_for_update.delete :course_code
       end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
-      if (sis_id = params[:course].delete(:sis_source_id))
-        if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
-          @course.sis_source_id = if sis_id == ''
-                                    nil
-                                  else
-                                    sis_id
-                                  end
-        end
+      if (sis_id = params[:course].delete(:sis_source_id)) &&
+         sis_id != @course.sis_source_id &&
+         @course.root_account.grants_right?(@current_user, session, :manage_sis)
+        @course.sis_source_id = sis_id.presence
       end
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
@@ -3001,9 +2998,9 @@ class CoursesController < ApplicationController
         event = params[:course][:event].to_s
         # check permissions on processable events
         # allow invalid and non_events to pass through
-        if %w[offer claim conclude delete undelete].include?(event)
-          return unless authorized_action(@course, @current_user, permission_for_event(event))
-        end
+        return if %w[offer claim conclude delete undelete].include?(event) &&
+                  !authorized_action(@course, @current_user, permission_for_event(event))
+
         # authorized, invalid, and non_events are processed
         unless process_course_event
           render_update_failure
@@ -3030,11 +3027,14 @@ class CoursesController < ApplicationController
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
 
       # Remove enrollment dates if "Term" enrollment is specified
-      if @course.enrollment_term
-        unless params_for_update.key?(:restrict_enrollments_to_course_dates) ? value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates]) : @course.restrict_enrollments_to_course_dates
-          params_for_update[:start_at] = nil if @course.unpublished?
-          params_for_update[:conclude_at] = nil
-        end
+      restrict_enrollments_to_course_dates = if params_for_update.key?(:restrict_enrollments_to_course_dates)
+                                               value_to_boolean(params_for_update[:restrict_enrollments_to_course_dates])
+                                             else
+                                               @course.restrict_enrollments_to_course_dates
+                                             end
+      if @course.enrollment_term && !restrict_enrollments_to_course_dates
+        params_for_update[:start_at] = nil if @course.unpublished?
+        params_for_update[:conclude_at] = nil
       end
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
@@ -3053,7 +3053,7 @@ class CoursesController < ApplicationController
           end
         end
       end
-      blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
+      blueprint_keys = %i[blueprint_restrictions use_blueprint_restrictions_by_object_type blueprint_restrictions_by_object_type]
       if blueprint_keys.any? { |k| params[:course].key?(k) } && MasterCourses::MasterTemplate.is_master_course?(@course)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
 
@@ -3224,7 +3224,7 @@ class CoursesController < ApplicationController
         if api_request?
           render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)
         else
-          render :json => @course.as_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok
+          render :json => @course.as_json(:methods => %i[readable_license quota account_name term_name grading_standard_title storage_quota_mb]), :status => :ok
         end
       end
     end
@@ -3391,8 +3391,8 @@ class CoursesController < ApplicationController
                   EffectiveDueDates.for_course(@context)
                 end
 
-    render json: due_dates.to_hash([
-                                     :due_at, :grading_period_id, :in_closed_grading_period
+    render json: due_dates.to_hash(%i[
+                                     due_at grading_period_id in_closed_grading_period
                                    ])
   end
 

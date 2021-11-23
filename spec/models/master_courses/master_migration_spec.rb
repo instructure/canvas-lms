@@ -2930,7 +2930,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "sends notifications", priority: "2", test_id: 3211103 do
+    it "sends notifications", priority: "2" do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
       @admin = @user

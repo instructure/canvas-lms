@@ -208,11 +208,11 @@ class CrocodocDocument < ActiveRecord::Base
           statuses.each do |status|
             bulk_updates[status['status']] ||= []
             bulk_updates[status['status']] << status['uuid']
-            if status['status'] == 'ERROR'
-              error = status['error'] || 'No explanation given'
-              error_uuids << status['uuid']
-              Canvas::Errors.capture 'crocodoc', message: error
-            end
+            next unless status['status'] == 'ERROR'
+
+            error = status['error'] || 'No explanation given'
+            error_uuids << status['uuid']
+            Canvas::Errors.capture 'crocodoc', message: error
           end
 
           bulk_updates.each do |status, uuids|

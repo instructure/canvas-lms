@@ -25,7 +25,7 @@ class FeatureFlag < ActiveRecord::Base
   # the change.
   attr_writer :current_user
 
-  belongs_to :context, polymorphic: [:account, :course, :user]
+  belongs_to :context, polymorphic: %i[account course user]
 
   self.ignored_columns = %i[visibility manipulate]
 

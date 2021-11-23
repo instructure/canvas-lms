@@ -23,24 +23,24 @@ module CC::Importer::Standard
 
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
-        if (doc = get_node_or_open_file(res, 'assignment'))
-          path = res[:href] || (res[:files]&.first && res[:files].first[:href])
-          resource_dir = File.dirname(path) if path
+        next unless (doc = get_node_or_open_file(res, 'assignment'))
 
-          asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
-          if res[:intended_user_role] == 'Instructor'
-            asmnt[:workflow_state] = 'unpublished'
-          end
-          parse_cc_assignment_data(asmnt, doc, resource_dir)
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
+        resource_dir = File.dirname(path) if path
 
-          # FIXME: check the XML namespace to make sure it's actually a canvas assignment
-          # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
-          if (assgn_node = doc.at_css('extensions > assignment'))
-            parse_canvas_assignment_data(assgn_node, nil, asmnt)
-          end
-
-          asmnts << asmnt
+        asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
+        if res[:intended_user_role] == 'Instructor'
+          asmnt[:workflow_state] = 'unpublished'
         end
+        parse_cc_assignment_data(asmnt, doc, resource_dir)
+
+        # FIXME: check the XML namespace to make sure it's actually a canvas assignment
+        # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
+        if (assgn_node = doc.at_css('extensions > assignment'))
+          parse_canvas_assignment_data(assgn_node, nil, asmnt)
+        end
+
+        asmnts << asmnt
       end
 
       asmnts
@@ -114,23 +114,23 @@ module CC::Importer::Standard
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
-      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "external_tool_data_json", "turnitin_settings"].each do |string_type|
+      %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json turnitin_settings].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      ["turnitin_enabled", "vericite_enabled", "peer_reviews",
-       "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
-       "grade_group_students_individually", "external_tool_new_tab",
-       "rubric_hide_points", "rubric_hide_outcome_results", "rubric_use_for_grading",
-       "rubric_hide_score_total", "has_group_category", "omit_from_final_grade",
-       "intra_group_peer_reviews", "only_visible_to_overrides", "post_to_sis",
-       "moderated_grading", "grader_comments_visible_to_graders",
-       "anonymous_grading", "graders_anonymous_to_graders",
-       "grader_names_visible_to_final_grader", "anonymous_instructor_annotations"].each do |bool_val|
+      %w[turnitin_enabled vericite_enabled peer_reviews
+         automatic_peer_reviews anonymous_peer_reviews freeze_on_copy
+         grade_group_students_individually external_tool_new_tab
+         rubric_hide_points rubric_hide_outcome_results rubric_use_for_grading
+         rubric_hide_score_total has_group_category omit_from_final_grade
+         intra_group_peer_reviews only_visible_to_overrides post_to_sis
+         moderated_grading grader_comments_visible_to_graders
+         anonymous_grading graders_anonymous_to_graders
+         grader_names_visible_to_final_grader anonymous_instructor_annotations].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end
-      ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_due_at'].each do |date_type|
+      %w[due_at lock_at unlock_at peer_reviews_due_at].each do |date_type|
         val = get_time_val(meta_doc, date_type)
         assignment[date_type] = val
       end

@@ -50,14 +50,14 @@ module CC::Importer
         path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
-        if File.exist?(path)
-          doc = open_file_xml(path)
-          tool = convert_blti_link(doc)
-          tool[:migration_id] = res[:migration_id]
-          res[:url] = tool[:url] # for the organization item to reference
+        next unless File.exist?(path)
 
-          tools << tool
-        end
+        doc = open_file_xml(path)
+        tool = convert_blti_link(doc)
+        tool[:migration_id] = res[:migration_id]
+        res[:url] = tool[:url] # for the organization item to reference
+
+        tools << tool
       end
 
       tools
@@ -177,16 +177,16 @@ module CC::Importer
       asmnts = []
 
       lti_tools.each do |tool|
-        if tool[:assignment_points_possible]
-          asmnt = { :migration_id => tool[:migration_id] }
-          asmnt[:title] = tool[:title]
-          asmnt[:description] = tool[:description]
-          asmnt[:submission_format] = "external_tool"
-          asmnt[:external_tool_url] = tool[:url]
-          asmnt[:grading_type] = 'points'
-          asmnt[:points_possible] = tool[:assignment_points_possible]
-          asmnts << asmnt
-        end
+        next unless tool[:assignment_points_possible]
+
+        asmnt = { :migration_id => tool[:migration_id] }
+        asmnt[:title] = tool[:title]
+        asmnt[:description] = tool[:description]
+        asmnt[:submission_format] = "external_tool"
+        asmnt[:external_tool_url] = tool[:url]
+        asmnt[:grading_type] = 'points'
+        asmnt[:points_possible] = tool[:assignment_points_possible]
+        asmnts << asmnt
       end
 
       asmnts

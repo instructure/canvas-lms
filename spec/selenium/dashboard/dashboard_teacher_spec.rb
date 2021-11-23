@@ -29,7 +29,7 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
-    it "validates the functionality of soft concluded courses on courses page", priority: "1", test_id: 216396 do
+    it "validates the functionality of soft concluded courses on courses page", priority: "1" do
       term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
       term.root_account_id = @course.root_account_id
       term.save!
@@ -42,7 +42,7 @@ describe "dashboard" do
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
-    it "displays assignment to grade in to do list for a teacher", priority: "1", test_id: 216397 do
+    it "displays assignment to grade in to do list for a teacher", priority: "1" do
       assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
@@ -57,7 +57,7 @@ describe "dashboard" do
       end
     end
 
-    it "is able to ignore an assignment until the next submission", priority: "1", test_id: 216399 do
+    it "is able to ignore an assignment until the next submission", priority: "1" do
       assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwertyuiop')
@@ -95,7 +95,7 @@ describe "dashboard" do
         setup_notification(@teacher, name: 'Assignment Created')
       end
 
-      it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
+      it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1" do
         assignment_model({ :submission_types => ['online_text_entry'], :course => @course })
         get "/"
         f('#DashboardOptionsMenu_Container button').click
@@ -104,7 +104,7 @@ describe "dashboard" do
         expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end
 
-      it 'does not show an unpublished assignment under recent activity under dashboard', priority: "2", test_id: 108722 do
+      it 'does not show an unpublished assignment under recent activity under dashboard', priority: "2" do
         # manually creating assignment as assignment created through backend are published by default
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
@@ -204,7 +204,7 @@ describe "dashboard" do
         assignment.submit_homework(@student, { :submission_type => 'online_text_entry', :body => 'ABC' })
       end
 
-      it "focuses on the previous ignore link after ignoring a todo item", priority: "1", test_id: 216400 do
+      it "focuses on the previous ignore link after ignoring a todo item", priority: "1" do
         assignment2 = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
         assignment2.submit_homework(@student, { :submission_type => 'online_text_entry', :body => 'Number2' })
         enable_cache do
@@ -218,7 +218,7 @@ describe "dashboard" do
         end
       end
 
-      it "focuses on the 'To Do' header if there are no other todo items", priority: "1", test_id: 216401 do
+      it "focuses on the 'To Do' header if there are no other todo items", priority: "1" do
         enable_cache do
           get "/"
 
@@ -230,7 +230,7 @@ describe "dashboard" do
       end
     end
 
-    it "does not display assignment to grade in to do list for a designer", priority: "1", test_id: 216402 do
+    it "does not display assignment to grade in to do list for a designer", priority: "1" do
       course_with_designer_logged_in(:active_all => true)
       assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
@@ -245,7 +245,7 @@ describe "dashboard" do
       end
     end
 
-    it "shows submitted essay quizzes in the todo list", priority: "1", test_id: 216403 do
+    it "shows submitted essay quizzes in the todo list", priority: "1" do
       quiz_title = 'new quiz'
       student_in_course(:active_all => true)
       q = @course.quizzes.create!(:title => quiz_title)
@@ -266,7 +266,7 @@ describe "dashboard" do
     end
 
     context "course menu customization" do
-      it "always has a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
+      it "always has a link to the courses page (with customizations)", priority: "1" do
         course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
 
         get "/"
@@ -282,7 +282,7 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_course => false)
     end
 
-    it 'does not show an unpublished assignment for an unpublished course', priority: "2", test_id: 56003 do
+    it 'does not show an unpublished assignment for an unpublished course', priority: "2" do
       name = 'venkman'
       due_date = Time.zone.now.utc + 2.days
       assignment = @course.assignments.create(name: name,

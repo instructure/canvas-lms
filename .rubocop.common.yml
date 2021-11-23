@@ -305,6 +305,8 @@ Style/HashTransformValues:
   Severity: error
 Style/IdenticalConditionalBranches:
   Severity: error
+Style/IfInsideElse:
+  Severity: error
 Style/InverseMethods:
   Severity: error
 Style/IfUnlessModifier:
@@ -321,6 +323,8 @@ Style/LineEndConcatenation:
 Style/MethodCallWithoutArgsParentheses:
   Severity: error
 Style/MethodDefParentheses:
+  Severity: error
+Style/MultilineIfModifier:
   Severity: error
 Style/MultilineIfThen:
   Severity: error
@@ -345,6 +349,8 @@ Style/NestedModifier:
 Style/NestedParenthesizedCalls:
   Severity: error
 Style/NestedTernaryOperator:
+  Severity: error
+Style/Next:
   Severity: error
 Style/NilComparison:
   Severity: error
@@ -441,6 +447,8 @@ Style/SingleLineMethods:
   Severity: error
 Style/SlicingWithRange:
   Severity: error
+Style/SoleNestedConditional:
+  Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/StderrPuts:
@@ -448,6 +456,9 @@ Style/StderrPuts:
 Style/StringChars:
   Severity: error
 Style/StructInheritance:
+  Severity: error
+Style/SymbolArray:
+  MinSize: 3
   Severity: error
 Style/SymbolProc:
   Severity: error
@@ -466,6 +477,9 @@ Style/WhenThen:
   Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
+Style/WordArray:
+  MinSize: 3
+  Severity: error
 Style/ZeroLengthPredicate:
   Severity: error
 
@@ -531,11 +545,7 @@ Style/StringConcatenation: # TODO: autocorrect (maybe)
 Style/StringLiterals:
   EnforcedStyle: double_quotes
   Enabled: false # TODO: autocorrect
-Style/SymbolArray: # TODO: autocorrect
-  Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
-  Enabled: false
-Style/WordArray: # TODO: autocorrect
   Enabled: false

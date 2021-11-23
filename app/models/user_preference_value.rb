@@ -97,12 +97,10 @@ class UserPreferenceValue < ActiveRecord::Base
         id, value = user_preference_values.where(:key => key, :sub_key => sub_key).pluck(:id, :value).first
         mark_preference_row(key, sub_key) if id # if we know there's a row
         value
+      elsif sub_key
+        value && value[sub_key]
       else
-        if sub_key
-          value && value[sub_key]
-        else
-          value
-        end
+        value
       end
     end
 

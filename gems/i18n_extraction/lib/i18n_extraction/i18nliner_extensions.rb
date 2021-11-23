@@ -37,11 +37,10 @@ module I18nExtraction; end
 module I18nExtraction::Extensions
   module TranslateCall
     def validate_default
-      if @default.is_a?(String)
-        if %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
-          raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
-        end
+      if @default.is_a?(String) && %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
+        raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
       end
+
       super
     end
 
@@ -58,7 +57,7 @@ module I18nExtraction::Extensions
   end
 
   module RubyExtractor
-    LABEL_CALLS = [:label, :blabel, :label_tag, :_label_symbol_translation, :before_label].freeze
+    LABEL_CALLS = %i[label blabel label_tag _label_symbol_translation before_label].freeze
     CANVAS_TRANSLATE_CALLS = [:mt, :ot].freeze
     ALL_CALLS = (I18nliner::Extractors::RubyExtractor::TRANSLATE_CALLS +
       LABEL_CALLS + CANVAS_TRANSLATE_CALLS +
@@ -145,7 +144,7 @@ module I18nExtraction::Extensions
       default = nil
       key = args.shift
       # these can have an optional explicit key arg
-      if [:label, :blabel, :label_tag].include?(method) && (args[0].is_a?(Symbol) || args[0].is_a?(String))
+      if %i[label blabel label_tag].include?(method) && (args[0].is_a?(Symbol) || args[0].is_a?(String))
         key = args.shift
       end
 

@@ -58,7 +58,7 @@ describe "admin settings tab" do
   context "SIS Agent Token Authentication" do
     let(:sis_token) { 'too much tuna' }
 
-    it "tests SIS Agent Token Authentication with post_grades feature enabled", priority: "2", test_id: 132577 do
+    it "tests SIS Agent Token Authentication with post_grades feature enabled", priority: "2" do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
       course_with_admin_logged_in(account: Account.default, user: user)
       account.enable_feature!(:post_grades)
@@ -72,7 +72,7 @@ describe "admin settings tab" do
       expect(token).to have_value(sis_token)
     end
 
-    it "tests SIS Agent Token Authentication with post_grades feature disabled", priority: "2", test_id: 132578 do
+    it "tests SIS Agent Token Authentication with post_grades feature disabled", priority: "2" do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
       course_with_admin_logged_in(account: Account.default, user: user)
       get_settings_page(account)

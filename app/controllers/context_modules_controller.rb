@@ -78,7 +78,7 @@ class ContextModulesController < ApplicationController
       end
 
       @menu_tools = {}
-      placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
+      placements = %i[assignment_menu discussion_topic_menu file_menu module_menu quiz_menu wiki_page_menu]
       tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
                                                     :root_account => @domain_root_account, :current_user => @current_user).to_a
@@ -368,8 +368,10 @@ class ContextModulesController < ApplicationController
                                                   .having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
                                    end
                                  end
-      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard)
-                                        .completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
+      if @current_user && quiz_ids.any?
+        submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard)
+                                          .completed.where(:quiz_id => quiz_ids).pluck(:quiz_id)
+      end
       submitted_assignment_ids ||= []
       submitted_quiz_ids ||= []
       all_tags.each do |tag|
@@ -422,23 +424,22 @@ class ContextModulesController < ApplicationController
     tags = mod.content_tags_visible_to(@current_user)
     pres = []
     tags.each do |tag|
-      if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
-        progression.requirements_met ||= []
-        unless progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
-          if !before_tag || tag.position <= before_tag.position
-            pre = {
-              :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
-              :id => tag.id,
-              :context_module_id => mod.id,
-              :title => tag.title
-            }
-            pre[:requirement] = req
-            pre[:requirement_description] = ContextModule.requirement_description(req)
-            pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
-            pres << pre
-          end
-        end
-      end
+      next unless (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
+
+      progression.requirements_met ||= []
+      next unless progression.requirements_met.none? { |r| r[:id] == req[:id] && r[:type] == req[:type] } &&
+                  (!before_tag || tag.position <= before_tag.position)
+
+      pre = {
+        :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
+        :id => tag.id,
+        :context_module_id => mod.id,
+        :title => tag.title
+      }
+      pre[:requirement] = req
+      pre[:requirement_description] = ContextModule.requirement_description(req)
+      pre[:available] = !progression.locked? && (!mod.require_sequential_progress || tag.position <= progression.current_position)
+      pres << pre
     end
     pres
   end
@@ -475,12 +476,14 @@ class ContextModulesController < ApplicationController
       valid_previous_modules.reverse!
       valid_previous_modules.each do |mod|
         prog = mod.evaluate_for(@current_user)
+        next if prog.completed?
+
         res[:modules] << {
           :id => mod.id,
           :name => mod.name,
           :prerequisites => prerequisites_needing_finishing_for(mod, prog),
           :locked => prog.locked?
-        } unless prog.completed?
+        }
       end
     elsif @module.require_sequential_progress && @progression.current_position && @tag && @tag.position && @progression.current_position < @tag.position
       res[:locked] = true
@@ -553,11 +556,11 @@ class ContextModulesController < ApplicationController
       items.each_with_index do |item, idx|
         item.position = idx + 1
         item.context_module_id = @module.id
-        if item.changed?
-          item.skip_touch = true
-          item.save
-          affected_items << item
-        end
+        next unless item.changed?
+
+        item.skip_touch = true
+        item.save
+        affected_items << item
       end
       ContentTag.touch_context_modules(affected_module_ids)
       ContentTag.update_could_be_locked(affected_items)
@@ -587,7 +590,7 @@ class ContextModulesController < ApplicationController
       else
         result[:current_item] = possible_tags.first
         unless result[:current_item]
-          obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
+          obj = @context.find_asset(params[:id], %i[attachment discussion_topic assignment quiz wiki_page content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }
           elsif (obj.is_a?(DiscussionTopic) && obj.assignment_id) ||
@@ -668,13 +671,11 @@ class ContextModulesController < ApplicationController
         if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && (@user = @context.students.find(params[:user_id]))
             @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
+          elsif @context.large_roster
+            @progressions = []
           else
-            if @context.large_roster
-              @progressions = []
-            else
-              context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
-            end
+            context_module_ids = @context.context_modules.active.pluck(:id)
+            @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
           @progressions = @context.context_modules.active.order(:id).map { |m| m.evaluate_for(@current_user) }

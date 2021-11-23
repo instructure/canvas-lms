@@ -69,7 +69,7 @@ describe GradeSummaryPresenter do
       expect(f('#course_select_menu')).to be_displayed
     end
 
-    it 'maintains focus on show what-if/revert to original buttons', priority: 2, test_id: 229660 do
+    it 'maintains focus on show what-if/revert to original buttons', priority: 2 do
       student_submission.student_entered_score = 8
       student_submission.save!
 

@@ -276,8 +276,8 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    [:migration_id, :lti_context_id, :turnitin_id,
-     :discussion_topic, :integration_id, :integration_data].each do |attr|
+    %i[migration_id lti_context_id turnitin_id
+       discussion_topic integration_id integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -777,11 +777,9 @@ class Assignment < ActiveRecord::Base
   private :needs_to_recompute_grade?
 
   def update_grades_if_details_changed
-    if needs_to_recompute_grade?
-      unless saved_by == :migration
-        Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
-        self.class.connection.after_transaction_commit { context.recompute_student_scores }
-      end
+    if needs_to_recompute_grade? && saved_by != :migration
+      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
+      self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
     true
   end
@@ -950,13 +948,13 @@ class Assignment < ActiveRecord::Base
     end
     self.submission_types ||= "none"
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    [
-      :all_day, :could_be_locked, :grade_group_students_individually,
-      :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
-      :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
-      :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
-      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews,
-      :anonymous_grading
+    %i[
+      all_day could_be_locked grade_group_students_individually
+      anonymous_peer_reviews turnitin_enabled vericite_enabled
+      moderated_grading omit_from_final_grade freeze_on_copy
+      copied only_visible_to_overrides post_to_sis peer_reviews_assigned
+      peer_reviews automatic_peer_reviews muted intra_group_peer_reviews
+      anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -2064,8 +2062,8 @@ class Assignment < ActiveRecord::Base
     submission.audit_grade_changes = false
 
     if opts[:provisional]
-      unless score.present? || submission.excused
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE unless opts[:grade] == ""
+      if !(score.present? || submission.excused) && opts[:grade] != ""
+        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
       end
 
       submission.find_or_create_provisional_grade!(
@@ -2155,9 +2153,9 @@ class Assignment < ActiveRecord::Base
       submissions: []
     }
 
-    if opts[:comment] && opts[:assessment_request]
+    if opts[:comment] && opts[:assessment_request] && !opts[:assessment_request].active_rubric_association?
       # if there is no rubric the peer review is complete with just a comment
-      opts[:assessment_request].complete unless opts[:assessment_request].active_rubric_association?
+      opts[:assessment_request].complete
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2293,11 +2291,11 @@ class Assignment < ActiveRecord::Base
     end
     homeworks.each do |homework|
       context_module_action(homework.student, homework.workflow_state.to_sym)
-      if comment && (group_comment || homework == primary_homework)
-        hash = { :comment => comment, :author => original_student }
-        hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
-        homework.add_comment(hash)
-      end
+      next unless comment && (group_comment || homework == primary_homework)
+
+      hash = { :comment => comment, :author => original_student }
+      hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
+      homework.add_comment(hash)
     end
     touch_context
     primary_homework
@@ -2734,15 +2732,13 @@ class Assignment < ActiveRecord::Base
         group_ids = peer_review_params[:submissions].select { |s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id }.map(&:id)
         candidate_set -= group_ids
       end
-    else
-      if discussion_topic? && discussion_topic.group_category_id
-        # only assign to other members in the group discussion
-        child_topic = discussion_topic.child_topic_for(current_submission.user)
-        if child_topic
-          other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
-          candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
-        end
+    elsif discussion_topic? && discussion_topic.group_category_id
+      child_topic = discussion_topic.child_topic_for(current_submission.user)
+      if child_topic
+        other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
+        candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
       end
+      # only assign to other members in the group discussion
     end
     candidate_set
   end
@@ -3166,13 +3162,11 @@ class Assignment < ActiveRecord::Base
   def att_frozen?(att, user = nil)
     return false unless frozen?
 
-    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer))
-      if Canvas::Plugin.value_to_boolean(settings[att.to_s])
-        if user
-          return !context.grants_right?(user, :manage_frozen_assignments)
-        else
-          return true
-        end
+    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer)) && Canvas::Plugin.value_to_boolean(settings[att.to_s])
+      if user
+        return !context.grants_right?(user, :manage_frozen_assignments)
+      else
+        return true
       end
     end
 
@@ -3187,12 +3181,12 @@ class Assignment < ActiveRecord::Base
     return if copying
 
     FREEZABLE_ATTRIBUTES.each do |att|
-      if changes[att] && att_frozen?(att, @updating_user)
-        errors.add(att,
-                   t('errors.cannot_save_att',
-                     "You don't have permission to edit the locked attribute %{att_name}",
-                     :att_name => att))
-      end
+      next unless changes[att] && att_frozen?(att, @updating_user)
+
+      errors.add(att,
+                 t('errors.cannot_save_att',
+                   "You don't have permission to edit the locked attribute %{att_name}",
+                   :att_name => att))
     end
   end
 
@@ -3862,11 +3856,9 @@ class Assignment < ActiveRecord::Base
 
   def due_date_ok?
     # lock_at OR unlock_at can be empty
-    if (unlock_at || lock_at) && due_at
-      unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
-        errors.add(:due_at, I18n.t("must be between availability dates"))
-        return false
-      end
+    if (unlock_at || lock_at) && due_at && !AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
+      errors.add(:due_at, I18n.t("must be between availability dates"))
+      return false
     end
     unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
@@ -3969,7 +3961,7 @@ class Assignment < ActiveRecord::Base
   def instructor_selectable_states
     return {} unless moderated_grading?
 
-    states = ['inactive', 'completed', 'deleted', 'invited']
+    states = %w[inactive completed deleted invited]
     active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)

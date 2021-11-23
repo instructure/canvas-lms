@@ -232,7 +232,7 @@ module Api::V1::Attachment
   end
 
   def filenames(params)
-    [:name, :filename, :url].filter_map { |param| params[param] }
+    %i[name filename url].filter_map { |param| params[param] }
   end
 
   def valid_mime_type?(mime_type)

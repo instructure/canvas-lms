@@ -38,7 +38,7 @@ class Account::HelpLinks
         :feature_headline => -> { '' }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+        :available_to => %w[user student teacher admin observer unenrolled],
         :text => -> { I18n.t('#help_dialog.search_the_canvas_guides', 'Search the Canvas Guides') },
         :subtext => -> { I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions') },
         :url => Setting.get('help_dialog_canvas_guide_url', I18n.t(:"community.guides_home")),
@@ -49,7 +49,7 @@ class Account::HelpLinks
         :feature_headline => -> { I18n.t('Little lost? Try here first!') }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+        :available_to => %w[user student teacher admin observer unenrolled],
         :text => -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
         :subtext => -> { I18n.t('#help_dialog.report_problem_sub', 'If Canvas misbehaves, tell us about it') },
         :url => '#create_ticket',
@@ -60,7 +60,7 @@ class Account::HelpLinks
         :feature_headline => -> { '' }
       }.freeze,
       {
-        :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+        :available_to => %w[user student teacher admin observer unenrolled],
         :text => -> { I18n.t('#help_dialog.covid', 'COVID-19 Canvas Resources') },
         :subtext => -> { I18n.t('#help_dialog.covid_sub', 'Tips for teaching and learning online') },
         :url => Setting.get('help_dialog_covid_url', I18n.t(:"community.contingency_covid")),

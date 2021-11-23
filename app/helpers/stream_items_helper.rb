@@ -68,9 +68,7 @@ module StreamItemsHelper
         next unless item.data.asset.grants_right?(user, :read)
       end
 
-      if topic_types.include? category
-        next if item.data.try(:visible_for?, user) == false
-      end
+      next if topic_types.include?(category) && item.data.try(:visible_for?, user) == false
 
       categorized_items[category] << generate_presenter(category, item, user)
     end

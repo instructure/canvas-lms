@@ -38,7 +38,7 @@ describe "discussion assignments" do
   end
 
   context "created with 'more options'" do
-    it "redirects to the discussion new page and maintain parameters", priority: "1", test_id: 209966 do
+    it "redirects to the discussion new page and maintain parameters", priority: "1" do
       ag = @course.assignment_groups.create!(:name => "Stuff")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "More options created discussion", :points => '30', :more_options => true) }
@@ -50,7 +50,7 @@ describe "discussion assignments" do
   end
 
   context "edited from the index page" do
-    it "updates discussion when updated", priority: "2", test_id: 209967 do
+    it "updates discussion when updated", priority: "2" do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       edit_assignment(assign.id, :name => 'Rediscuss!', :submit => true)
@@ -59,7 +59,7 @@ describe "discussion assignments" do
   end
 
   context "edited with 'more options'" do
-    it "redirects to the discussion edit page and maintain parameters", priority: "2", test_id: 209968 do
+    it "redirects to the discussion edit page and maintain parameters", priority: "2" do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
@@ -69,7 +69,7 @@ describe "discussion assignments" do
   end
 
   context "created with html in title" do
-    it "does not render html in flash notice", priority: "2", test_id: 132616 do
+    it "does not render html in flash notice", priority: "2" do
       discussion_title = '<s>broken</s>'
       topic = create_discussion(discussion_title, 'threaded')
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
@@ -83,7 +83,7 @@ describe "discussion assignments" do
   end
 
   context "insert content using RCE" do
-    it "inserts file using rce in a discussion", priority: "1", test_id: 126674 do
+    it "inserts file using rce in a discussion", priority: "1" do
       discussion_title = 'New Discussion'
       topic = create_discussion(discussion_title, 'threaded')
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
@@ -95,7 +95,7 @@ describe "discussion assignments" do
   end
 
   context "created by different users" do
-    it "lists identical authors after a user merge", priority: "2", test_id: 85899 do
+    it "lists identical authors after a user merge", priority: "2" do
       @student_a = User.create!(:name => 'Student A')
       @student_b = User.create!(:name => 'Student B')
       discussion_a = @course.discussion_topics.create!(user: @student_a, title: 'title a', message: 'from student a')

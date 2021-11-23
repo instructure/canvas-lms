@@ -1068,7 +1068,7 @@ describe Quizzes::Quiz do
 
     # nothing should be restricted
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+    [q, q1, q2].product(%i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?])
                .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # register a plugin
@@ -1078,7 +1078,7 @@ describe Quizzes::Quiz do
 
     # nothing should change yet
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+    [q, q1, q2].product(%i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?])
                .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # now actually enable the plugin
@@ -1088,13 +1088,13 @@ describe Quizzes::Quiz do
 
     # now the restrictions should take effect
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_truthy
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q.send(s)).to be_falsey }
     [:require_lockdown_browser, :require_lockdown_browser?]
       .each { |s| expect(q1.send(s)).to be_truthy }
-    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q1.send(s)).to be_falsey }
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q2.send(s)).to be_truthy }
   end
 
@@ -1422,7 +1422,7 @@ describe Quizzes::Quiz do
                                                        { "question_type" => "foo" },
                                                        { "entry_type" => "quiz_group", "questions" => [{ "question_type" => "bar" }, { "question_type" => "baz" }] }
                                                      ])
-      expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
+      expect(@quiz.question_types).to eq(%w[foo bar baz])
     end
   end
 

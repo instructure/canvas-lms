@@ -19,12 +19,12 @@
 #
 
 class Quizzes::QuizRegrader::Answer
-  REGRADE_OPTIONS = [
-    'full_credit',
-    'current_and_previous_correct',
-    'current_correct_only',
-    'no_regrade',
-    'disabled'
+  REGRADE_OPTIONS = %w[
+    full_credit
+    current_and_previous_correct
+    current_correct_only
+    no_regrade
+    disabled
   ].freeze
 
   attr_accessor :answer, :question, :regrade_option

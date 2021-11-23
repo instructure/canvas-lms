@@ -26,16 +26,16 @@ RSpec.shared_context 'name_bookmarker_base_shared_examples' do
     let(:model_name_proc) { lambda { |model| model.name } }
 
     {
-      simple_lowercase: ['aaa', 'bbb', 'ccc'],
-      simple_alphanumeric: ['Model0', 'Model1', 'Model2'],
-      all_equal: ['Abc', 'Abc', 'Abc'],
+      simple_lowercase: %w[aaa bbb ccc],
+      simple_alphanumeric: %w[Model0 Model1 Model2],
+      all_equal: %w[Abc Abc Abc],
       spaces: [' Abc', 'A bc', 'Abc '],
-      casing: ['abc', 'Abc', 'ABC'],
-      diacritics: ['a', 'á', 'ä'],
-      diacritic_casing: ['Á', 'Á', 'á', 'á'],
-      natural_numbers: ['100', '101', '11', '12'],
+      casing: %w[abc Abc ABC],
+      diacritics: %w[a á ä],
+      diacritic_casing: %w[Á Á á á],
+      natural_numbers: %w[100 101 11 12],
       letter_plus_natural_numbers: ['a 100', 'a 101', 'a 11', 'a 12'],
-      hanzi: ['我', '很', '好']
+      hanzi: %w[我 很 好]
     }.each do |test_name, model_names|
       context "test set #{test_name}" do
         let!(:models) do

@@ -25,7 +25,7 @@ module Lti
 
       def scope
         options = {
-          enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student'],
+          enrollment_type: %w[teacher ta designer observer student],
           include_inactive_enrollments: false
         }
 

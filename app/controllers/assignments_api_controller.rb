@@ -1396,7 +1396,7 @@ class AssignmentsApiController < ApplicationController
   def bulk_update
     return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
 
-    data = params.permit(:_json => [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]).to_h[:_json]
+    data = params.permit(:_json => [:id, :all_dates => %i[id base due_at unlock_at lock_at]]).to_h[:_json]
     return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
 
@@ -1446,10 +1446,9 @@ class AssignmentsApiController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
 
     @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
-    if @context.grants_right?(@current_user, :view_all_grades)
-      # teacher, ta
-      return if @context.students_visible_to(@current_user).include?(@user)
-    end
+    # teacher, ta
+    return if @context.grants_right?(@current_user, :view_all_grades) && @context.students_visible_to(@current_user).include?(@user)
+
     # self, observer
     authorized_action(@user, @current_user, %i[read_as_parent read])
   end

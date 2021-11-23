@@ -46,7 +46,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   before_action :require_manage_developer_keys, except: :show
   before_action :require_key_in_context, only: :show
   before_action :require_lti_add_edit, only: :show
-  before_action :require_tool_configuration, only: [:show, :update, :destroy]
+  before_action :require_tool_configuration, only: %i[show update destroy]
 
   # @API Create Tool configuration
   # Creates tool configuration with the provided parameters.

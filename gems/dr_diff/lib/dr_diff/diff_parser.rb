@@ -56,12 +56,12 @@ module DrDiff
           parsed[key][:context] << range
           cur_line_number = range.first
         end
-        if code_line?(line)
-          if touched?(line)
-            parsed[key][:change] << cur_line_number
-          end
-          cur_line_number += 1 unless line_gone?(line)
+        next unless code_line?(line)
+
+        if touched?(line)
+          parsed[key][:change] << cur_line_number
         end
+        cur_line_number += 1 unless line_gone?(line)
       end
       parsed
     end

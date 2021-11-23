@@ -32,7 +32,7 @@ module CanvasBreachMitigation
         encoded_masked_token = masked_token(unmasked_token(cookies['_csrf_token']))
 
         cookie = { value: encoded_masked_token }
-        [:domain, :httponly, :secure].each do |key|
+        %i[domain httponly secure].each do |key|
           next unless options.key?(key)
 
           cookie[key] = options[key]

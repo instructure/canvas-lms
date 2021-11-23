@@ -63,7 +63,7 @@ describe "speed grader - discussion submissions" do
     entry_2.context_module_action
   end
 
-  it "displays discussion entries for only one student", priority: "1", test_id: 283745 do
+  it "displays discussion entries for only one student", priority: "1" do
     Speedgrader.visit(@course.id, @assignment.id)
 
     # check for correct submissions in speed grader iframe
@@ -83,7 +83,7 @@ describe "speed grader - discussion submissions" do
   end
 
   context "when student names hidden" do
-    it "hides the name of student on discussion iframe", priority: "2", test_id: 283746 do
+    it "hides the name of student on discussion iframe", priority: "2" do
       Speedgrader.visit(@course.id, @assignment.id)
 
       Speedgrader.click_settings_link
@@ -98,7 +98,7 @@ describe "speed grader - discussion submissions" do
     end
 
     it "hides student names and shows name of grading teacher" \
-       "entries on both discussion links", priority: "2", test_id: 283747 do
+       "entries on both discussion links", priority: "2" do
       teacher = @course.teachers.first
       teacher_message = "why did the taco cross the road?"
 
@@ -127,7 +127,7 @@ describe "speed grader - discussion submissions" do
       end
     end
 
-    it "hides avatars on entries on both discussion links", priority: "2", test_id: 283748 do
+    it "hides avatars on entries on both discussion links", priority: "2" do
       Speedgrader.visit(@course.id, @assignment.id)
 
       Speedgrader.click_settings_link

@@ -36,14 +36,14 @@ describe "Gradebook" do
     user_session(@teacher)
   end
 
-  it "shows unpublished assignments", priority: "1", test_id: 3253281 do
+  it "shows unpublished assignments", priority: "1" do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
     Gradebook.visit(@course)
     expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(assignment.title)
   end
 
-  it "hides 'not-graded' assignments", priority: "1", test_id: 210017 do
+  it "hides 'not-graded' assignments", priority: "1" do
     Gradebook.visit(@course)
 
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
@@ -103,12 +103,12 @@ describe "Gradebook" do
     end
   end
 
-  it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
+  it "validates correct number of students showing up in gradebook", priority: "1" do
     Gradebook.visit(@course)
     expect(Gradebook.fetch_student_names.size).to eq(@course.students.count)
   end
 
-  it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
+  it "shows students sorted by their sortable_name", priority: "1" do
     Gradebook.visit(@course)
     expect(Gradebook.fetch_student_names).to eq @all_students.map(&:name)
   end
@@ -119,7 +119,7 @@ describe "Gradebook" do
       Gradebook.visit(@course)
     end
 
-    it "allows editing grades", priority: "1", test_id: 210026 do
+    it "allows editing grades", priority: "1" do
       cell = Gradebook::Cells.grading_cell(@student_1, @first_assignment)
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
@@ -184,7 +184,7 @@ describe "Gradebook" do
   end
 
   it 'gradebook settings modal is displayed when gradebook settings button is clicked',
-     priority: '1', test_id: 164219 do
+     priority: '1' do
     Gradebook.visit(@course)
 
     Gradebook.gradebook_settings_btn_select
@@ -192,7 +192,7 @@ describe "Gradebook" do
   end
 
   it 'late policies tab is selected by default',
-     priority: '1', test_id: 164220 do
+     priority: '1' do
     Gradebook.visit(@course)
 
     Gradebook.gradebook_settings_btn_select
@@ -201,7 +201,7 @@ describe "Gradebook" do
     expect(late_policies_tab.attribute('aria-selected')).to eq('true')
   end
 
-  it 'focus is returned to gradebook settings button when modal is closed', priority: '1', test_id: 164221 do
+  it 'focus is returned to gradebook settings button when modal is closed', priority: '1' do
     Gradebook.visit(@course)
 
     Gradebook.gradebook_settings_btn_select
@@ -325,7 +325,7 @@ describe "Gradebook" do
     expect(ff('.late')).to have_size(1)
   end
 
-  it "hides the speedgrader link for large courses", priority: "2", test_id: 210099 do
+  it "hides the speedgrader link for large courses", priority: "2" do
     pending('TODO: Refactor this and add it back as part of CNVS-32440')
     allow(@course).to receive(:large_roster?).and_return(true)
 
@@ -381,7 +381,7 @@ describe "Gradebook" do
     let(:essay_text) { { "question_#{essay_question.id}": "Essay Response!" } }
     let(:file_submission) { file_question.generate_submission(student) }
 
-    it 'displays the "needs grading" icon for essay questions', priority: "1", test_id: 229430 do
+    it 'displays the "needs grading" icon for essay questions', priority: "1" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
@@ -389,7 +389,7 @@ describe "Gradebook" do
       expect(f('#gradebook_grid .icon-not-graded')).to be_truthy
     end
 
-    it 'displays the "needs grading" icon for file_upload questions', priority: "1", test_id: 498844 do
+    it 'displays the "needs grading" icon for file_upload questions', priority: "1" do
       file_submission.attachments.create!({
                                             filename: "doc.doc",
                                             display_name: "doc.doc", user: @user,
@@ -402,7 +402,7 @@ describe "Gradebook" do
       expect(f('#gradebook_grid .icon-not-graded')).to be_truthy
     end
 
-    it 'removes the "needs grading" icon when graded manually', priority: "1", test_id: 491040 do
+    it 'removes the "needs grading" icon when graded manually', priority: "1" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 

@@ -51,7 +51,7 @@ CanvasRails::Application.routes.draw do
   get 'search/recipients' => 'search#recipients'
   post 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read'
   get 'conversations/batches' => 'conversations#batches', as: :conversation_batches
-  resources :conversations, only: [:index, :show, :update, :create, :destroy] do
+  resources :conversations, only: %i[index show update create destroy] do
     post :add_recipients
     post :add_message
     post :remove_messages
@@ -93,7 +93,7 @@ CanvasRails::Application.routes.draw do
 
   concern :groups do
     resources :groups, except: :edit
-    resources :group_categories, only: [:create, :update, :destroy]
+    resources :group_categories, only: %i[create update destroy]
     get 'group_unassigned_members' => 'groups#unassigned_members'
   end
 
@@ -152,13 +152,13 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :discussions do
-    resources :discussion_topics, only: [:index, :new, :show, :edit, :destroy]
+    resources :discussion_topics, only: %i[index new show edit destroy]
     get 'discussion_topics/:id/:extras' => 'discussion_topics#show', as: :map, extras: /.+/
     resources :discussion_entries
   end
 
   concern :pages do
-    resources :wiki_pages, path: :pages, except: [:update, :destroy, :new], constraints: { id: %r{[^/]+} } do
+    resources :wiki_pages, path: :pages, except: %i[update destroy new], constraints: { id: %r{[^/]+} } do
       get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
@@ -205,7 +205,7 @@ CanvasRails::Application.routes.draw do
     post 'limit_user_grading/:id' => 'courses#limit_user', as: :limit_user_grading
     delete 'conclude_user/:id' => 'courses#conclude_user', as: :conclude_user_enrollment
     post 'unconclude_user/:id' => 'courses#unconclude_user', as: :unconclude_user_enrollment
-    resources :sections, except: [:index, :edit, :new] do
+    resources :sections, except: %i[index edit new] do
       get 'crosslist/confirm/:new_course_id' => 'sections#crosslist_check', as: :confirm_crosslist
       post :crosslist
       delete 'crosslist' => 'sections#uncrosslist', as: :uncrosslist
@@ -335,7 +335,7 @@ CanvasRails::Application.routes.draw do
                                             action: 'resource', as: :resource_link_id
     end
 
-    resources :grading_standards, only: [:index, :create, :update, :destroy]
+    resources :grading_standards, only: %i[index create update destroy]
     resources :assignment_groups do
       post 'reorder' => 'assignment_groups#reorder_assignments', as: :reorder_assignments
       collection do
@@ -401,8 +401,8 @@ CanvasRails::Application.routes.draw do
       end
 
       post 'extensions/:user_id' => 'quizzes/quiz_submissions#extensions', as: :extensions
-      resources :quiz_questions, controller: 'quizzes/quiz_questions', path: :questions, only: [:create, :update, :destroy, :show]
-      resources :quiz_groups, controller: 'quizzes/quiz_groups', path: :groups, only: [:create, :update, :destroy] do
+      resources :quiz_questions, controller: 'quizzes/quiz_questions', path: :questions, only: %i[create update destroy show]
+      resources :quiz_groups, controller: 'quizzes/quiz_groups', path: :groups, only: %i[create update destroy] do
         member do
           post :reorder
         end
@@ -438,7 +438,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :outcome_groups, only: [:create, :update, :destroy] do
+    resources :outcome_groups, only: %i[create update destroy] do
       post :reorder
     end
 
@@ -458,7 +458,7 @@ CanvasRails::Application.routes.draw do
     get 'pace_plans' => 'pace_plans#index'
 
     post 'collapse_all_modules' => 'context_modules#toggle_collapse_all'
-    resources :content_exports, only: [:create, :index, :destroy, :show]
+    resources :content_exports, only: %i[create index destroy show]
     get 'offline_web_exports' => 'courses#offline_web_exports'
     post 'start_offline_web_export' => 'courses#start_offline_web_export'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
@@ -614,7 +614,7 @@ CanvasRails::Application.routes.draw do
     get 'search' => 'accounts#course_user_search', :as => :course_user_search
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
     delete 'account_users/:id' => 'accounts#remove_account_user', as: :remove_account_user
-    resources :grading_standards, only: [:index, :create, :update, :destroy]
+    resources :grading_standards, only: %i[index create update destroy]
     get :statistics
     get 'statistics/over_time/:attribute' => 'accounts#statistics_graph', as: :statistics_graph
     get 'statistics/over_time/:attribute.:format' => 'accounts#statistics_graph', as: :formatted_statistics_graph
@@ -643,27 +643,27 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :terms, except: [:show, :new, :edit]
+    resources :terms, except: %i[show new edit]
     resources :sub_accounts
 
     get :avatars
     get :sis_import
-    resources :sis_imports, only: [:create, :show, :index], controller: :sis_imports_api
+    resources :sis_imports, only: %i[create show index], controller: :sis_imports_api
     get 'users' => 'accounts#users', as: 'users'
     post 'users' => 'users#create', as: :add_user
     get 'users/:user_id/delete' => 'accounts#confirm_delete_user', as: :confirm_delete_user
     delete 'users/:user_id' => 'accounts#remove_user', as: :delete_user
 
     # create/delete are handled by specific routes just above
-    resources :users, only: [:new, :edit, :show, :update]
-    resources :account_notifications, only: [:create, :update, :destroy]
+    resources :users, only: %i[new edit show update]
+    resources :account_notifications, only: %i[create update destroy]
     concerns :announcements
     resources :submissions
     delete 'authentication_providers' => 'authentication_providers#destroy_all', as: :remove_all_authentication_providers
     put 'sso_settings' => 'authentication_providers#update_sso_settings',
         as: :update_sso_settings
 
-    resources :authentication_providers, only: [:index, :create, :update, :destroy] do
+    resources :authentication_providers, only: %i[index create update destroy] do
       get :debugging, action: :debug_data
       put :debugging, action: :start_debugging
       delete :debugging, action: :stop_debugging
@@ -704,7 +704,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :outcome_groups, only: [:create, :update, :destroy] do
+    resources :outcome_groups, only: %i[create update destroy] do
       post :reorder
     end
 
@@ -852,7 +852,7 @@ CanvasRails::Application.routes.draw do
     get 'teacher_activity/course/:course_id' => 'users#teacher_activity', as: :course_teacher_activity
     get 'teacher_activity/student/:student_id' => 'users#teacher_activity', as: :student_teacher_activity
     get :media_download
-    resources :messages, only: [:index, :create, :show] do
+    resources :messages, only: %i[index create show] do
       get :html_message
     end
   end
@@ -910,7 +910,7 @@ CanvasRails::Application.routes.draw do
     delete 'ignore_stream_item/:id' => 'users#ignore_stream_item', as: :dashboard_ignore_stream_item
   end
 
-  resources :plugins, only: [:index, :show, :update]
+  resources :plugins, only: %i[index show update]
 
   get 'calendar' => 'calendars#show'
   get 'calendar2' => 'calendars#show'
@@ -926,9 +926,9 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  resources :appointment_groups, only: [:index, :show, :edit]
+  resources :appointment_groups, only: %i[index show edit]
 
-  resources :errors, only: [:show, :index, :create], path: :error_reports
+  resources :errors, only: %i[show index create], path: :error_reports
 
   get 'health_check' => 'info#health_check'
   get 'health_prognosis' => 'info#health_prognosis'

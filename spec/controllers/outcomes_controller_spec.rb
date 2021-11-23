@@ -78,9 +78,9 @@ describe OutcomesController do
       user_session(@admin)
       get 'index', params: { :account_id => @account.id }
       permissions = assigns[:js_env][:PERMISSIONS]
-      [
-        :manage_outcomes, :manage_rubrics, :can_manage_courses, :import_outcomes, :manage_proficiency_scales,
-        :manage_proficiency_calculations
+      %i[
+        manage_outcomes manage_rubrics can_manage_courses import_outcomes manage_proficiency_scales
+        manage_proficiency_calculations
       ].each do |permission|
         expect(permissions).to have_key(permission)
       end

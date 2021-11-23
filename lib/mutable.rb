@@ -46,7 +46,7 @@ module Mutable
   def hide_stream_items(submissions:)
     if submissions.present?
       submission_ids = submissions.pluck(:id)
-      stream_items = StreamItem.select([:id, :context_type, :context_id])
+      stream_items = StreamItem.select(%i[id context_type context_id])
                                .where(asset_type: 'Submission', asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
@@ -71,7 +71,7 @@ module Mutable
   def show_stream_items(submissions:)
     if submissions.present?
       submission_ids = submissions.pluck(:id)
-      stream_items = StreamItem.select([:id, :context_type, :context_id])
+      stream_items = StreamItem.select(%i[id context_type context_id])
                                .where(asset_type: 'Submission', asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }

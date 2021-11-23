@@ -209,7 +209,7 @@ describe "BookmarkedCollection::MergeProxy" do
       it "keeps the first of each pair of duplicates" do
         results = @proxy.paginate(:per_page => 6)
         expect(results).to eq(@courses)
-        expect(results.map(&:scope)).to eq(['1', '1', '1', '1', '2', '2'])
+        expect(results.map(&:scope)).to eq(%w[1 1 1 1 2 2])
       end
 
       it "indicates the first collection to provide the last value in the bookmark" do

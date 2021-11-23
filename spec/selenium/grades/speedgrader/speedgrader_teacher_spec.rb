@@ -59,7 +59,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "there")
     end
 
-    it "lists the correct number of students", priority: "2", test_id: 283737 do
+    it "lists the correct number of students", priority: "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students_frd")).to include_text("1/1")
@@ -68,7 +68,7 @@ describe "speed grader" do
   end
 
   context "alerts" do
-    it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+    it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
       student_in_course(active_user: true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       comment_textarea = f("#speed_grader_comment_textarea")
@@ -89,7 +89,7 @@ describe "speed grader" do
       @assignment.submit_homework(@student, submission_type: "online_url", workflow_state: "submitted", url: "http://www.instructure.com")
     end
 
-    it "properly shows and hides student name when name hidden toggled", priority: "2", test_id: 283741 do
+    it "properly shows and hides student name when name hidden toggled", priority: "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
@@ -99,7 +99,7 @@ describe "speed grader" do
     end
   end
 
-  it "does not show students in other sections if visibility is limited", priority: "1", test_id: 283758 do
+  it "does not show students in other sections if visibility is limited", priority: "1" do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(username: 'otherstudent@example.com', section: @course.course_sections.create(name: "another section"))
@@ -247,13 +247,13 @@ describe "speed grader" do
                                            allow_multiple_enrollments: true)
     end
 
-    it "does not duplicate students", priority: "1", test_id: 283985 do
+    it "does not duplicate students", priority: "1" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(ff("#students_selectmenu > option")).to have_size 1
     end
 
-    it "filters by section properly", priority: "1", test_id: 283986 do
+    it "filters by section properly", priority: "1" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       sections = @course.course_sections
@@ -266,7 +266,7 @@ describe "speed grader" do
     end
   end
 
-  it "shows the first ungraded student with a submission", priority: "1", test_id: 283987 do
+  it "shows the first ungraded student with a submission", priority: "1" do
     s1, s2, s3 = n_students_in_course(3, course: @course)
     s1.update_attribute :name, "A"
     s2.update_attribute :name, "B"
@@ -284,7 +284,7 @@ describe "speed grader" do
     expect(fj("#students_selectmenu option[value=#{s3.id}]")[:selected]).to be_truthy
   end
 
-  it "allows the user to change sorting and hide student names", priority: "1", test_id: 283988 do
+  it "allows the user to change sorting and hide student names", priority: "1" do
     student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -345,14 +345,14 @@ describe "speed grader" do
     end
   end
 
-  it "includes the student view student for grading", priority: "1", test_id: 283990 do
+  it "includes the student view student for grading", priority: "1" do
     @course.student_view_student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     expect(ff("#students_selectmenu option")).to have_size 1
   end
 
-  it "marks the checkbox of students for graded assignments", priority: "1", test_id: 283992 do
+  it "marks the checkbox of students for graded assignments", priority: "1" do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -366,7 +366,7 @@ describe "speed grader" do
   end
 
   context "Pass / Fail assignments" do
-    it "displays correct options in the speedgrader dropdown", priority: "1", test_id: 283996 do
+    it "displays correct options in the speedgrader dropdown", priority: "1" do
       course_with_teacher_logged_in
       course_with_student(course: @course, active_all: true)
 
@@ -387,7 +387,7 @@ describe "speed grader" do
 
     let_once(:quiz) { seed_quiz_with_submission }
 
-    it 'lets you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
+    it 'lets you enter in a float for a quiz question point value', priority: "1" do
       user_session(@teacher)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
       # In the left panel modify the grade to 0.5
@@ -432,7 +432,7 @@ describe "speed grader" do
       )
     end
 
-    it 'displays a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+    it 'displays a flash warning banner when viewed in Firefox', priority: "2" do
       skip_if_chrome('This test applies to Firefox')
       skip_if_ie('This test applies to Firefox')
       # sometimes google docs is slow to load, which causes the flash

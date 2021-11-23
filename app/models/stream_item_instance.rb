@@ -23,7 +23,7 @@ class StreamItemInstance < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :stream_item
-  belongs_to :context, polymorphic: [:course, :account, :group, :assignment_override]
+  belongs_to :context, polymorphic: %i[course account group assignment_override]
 
   validates :stream_item_id, :user_id, :context_id, :context_type, presence: true
 

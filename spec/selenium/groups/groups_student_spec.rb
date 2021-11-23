@@ -32,7 +32,7 @@ describe "student groups" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "allows student group leaders to edit the group name", priority: "1", test_id: 180670 do
+    it "allows student group leaders to edit the group name", priority: "1" do
       category1 = @course.group_categories.create!(:name => "category 1")
       category1.configure_self_signup(true, false)
       category1.save!
@@ -50,14 +50,14 @@ describe "student groups" do
       expect(g1.reload.name).to include("new group name")
     end
 
-    it "shows locked student organized, invite only groups", priority: "1", test_id: 180671 do
+    it "shows locked student organized, invite only groups", priority: "1" do
       @course.groups.create!(:name => "my group")
       get "/courses/#{@course.id}/groups"
 
       expect(f(".icon-lock")).to be_displayed
     end
 
-    it "restricts students from accessing groups in unpublished course", priority: "1", test_id: 246620 do
+    it "restricts students from accessing groups in unpublished course", priority: "1" do
       group_test_setup(1, 1, 1)
       add_user_to_group(@students.first, @testgroup[0])
       @course.workflow_state = 'unpublished'
@@ -75,13 +75,13 @@ describe "student groups" do
         wait_for_ajaximations
       end
 
-      it "has dropdown with two options", priority: "2", test_id: 180681 do
+      it "has dropdown with two options", priority: "2" do
         expect(ff("#joinLevelSelect option").length).to eq 2
         expect(ff("#joinLevelSelect option")[0]).to include_text("Course members are free to join")
         expect(ff("#joinLevelSelect option")[1]).to include_text("Membership by invitation only")
       end
 
-      it "shows students in the course", priority: "1", test_id: 180675 do
+      it "shows students in the course", priority: "1" do
         expected_student_list = ["Test Student 1", "Test Student 2"]
         student_list = ff(".checkbox")
         expect(student_list).to have_size(expected_student_list.size) # there should be no teachers in the list
@@ -91,13 +91,13 @@ describe "student groups" do
         expect(student_list[1].text).to eq "Test Student 2"
       end
 
-      it "is titled what the user types in", priority: "1", test_id: 180676 do
+      it "is titled what the user types in", priority: "1" do
         create_default_student_group(group_name)
 
         expect(fj(".student-group-title")).to include_text(group_name.to_s)
       end
 
-      it "by default, created student group only contains the student creator", priority: "2", test_id: 180682 do
+      it "by default, created student group only contains the student creator", priority: "2" do
         create_default_student_group
 
         # expand the group
@@ -110,7 +110,7 @@ describe "student groups" do
         expect(students[1]).to include_text("nobody@example.com")
       end
 
-      it "adds students to the group", priority: "1", test_id: 180677 do
+      it "adds students to the group", priority: "1" do
         create_group_and_add_all_students
 
         # expand the group
@@ -132,7 +132,7 @@ describe "student groups" do
     end
 
     describe "new self sign-up groups" do
-      it "allows a student to leave a group and not change the group leader", priority: "1", test_id: 96027 do
+      it "allows a student to leave a group and not change the group leader", priority: "1" do
         # Creating two groups, using one, and ensuring the second group remains empty
         group_test_setup(4, 1, 2)
         @group_category.first.configure_self_signup(true, false)
@@ -177,7 +177,7 @@ describe "student groups" do
         get "/courses/#{@course.id}/groups"
       end
 
-      it "leaving a group should decrement student count", priority: "1", test_id: 180678 do
+      it "leaving a group should decrement student count", priority: "1" do
         expect(f(".student-group-students")).to include_text("1 student")
 
         find_button("Leave").click
@@ -186,7 +186,7 @@ describe "student groups" do
         expect(find_button("Join")).to be_displayed
       end
 
-      it "student should be able to leave a group and rejoin", priority: "1", test_id: 180679 do
+      it "student should be able to leave a group and rejoin", priority: "1" do
         # verify that you are in the group
         leave_button = find_button("Leave")
         expect(leave_button).to be_displayed
@@ -201,14 +201,14 @@ describe "student groups" do
         expect(find_button("Leave")).to be_displayed
       end
 
-      it "visits the group", priority: "1", test_id: 180680 do
+      it "visits the group", priority: "1" do
         fln('Visit').click
         wait_for_ajaximations
 
         expect(f("#breadcrumbs")).to include_text(group_name.to_s)
       end
 
-      it "student group leader can manage group", priority: "2", test_id: 180702 do
+      it "student group leader can manage group", priority: "2" do
         fln('Manage').click
         wait_for_ajaximations
 
@@ -216,7 +216,7 @@ describe "student groups" do
       end
     end
 
-    describe "student who is not in the group", priority: "2", test_id: 184465 do
+    describe "student who is not in the group", priority: "2" do
       it "allows the student to join a student group they did not create" do
         create_group(group_name: group_name, enroll_student_count: 0, add_self_to_group: false)
         get "/courses/#{@course.id}/groups"
@@ -233,14 +233,14 @@ describe "student groups" do
         get "/courses/#{@course.id}/groups"
       end
 
-      it "populates dialog with current group name", priority: "2", test_id: 180711 do
+      it "populates dialog with current group name", priority: "2" do
         fln('Manage').click
         wait_for_ajaximations
 
         expect(f("#group_name")).to have_attribute(:value, group_name.to_s)
       end
 
-      it "changes group name", priority: "2", test_id: 180714 do
+      it "changes group name", priority: "2" do
         fln('Manage').click
         wait_for_ajaximations
 
@@ -253,7 +253,7 @@ describe "student groups" do
         expect(f(".student-group-title")).to include_text(new_group_name.to_s)
       end
 
-      it "adds users to group", priority: "1", test_id: 180718 do
+      it "adds users to group", priority: "1" do
         # expand the group
         fj(".student-group-title").click
         wait_for_ajaximations
@@ -285,7 +285,7 @@ describe "student groups" do
         end
       end
 
-      it "add/remove plurality to the word 'student' if one student", priority: "2", test_id: 180723 do
+      it "add/remove plurality to the word 'student' if one student", priority: "2" do
         skip('KNO-183')
         fln('Manage').click
         wait_for_ajaximations

@@ -54,7 +54,7 @@ describe "Gradebook - Assignment Column" do
   before { user_session(@teacher) }
 
   context "with Sorting" do
-    it "sorts by Missing", test_id: 3253336, priority: "1" do
+    it "sorts by Missing", priority: "1" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).update!(late_policy_status: "missing")
       Gradebook.visit(@course)
@@ -81,7 +81,7 @@ describe "Gradebook - Assignment Column" do
       Gradebook.visit(@course)
     end
 
-    it "can switch from letter grade to points", priority: "1", test_id: 3415925 do
+    it "can switch from letter grade to points", priority: "1" do
       # Initial grade is letter grade
       expect(Gradebook::Cells.get_grade(@course.students[2], @assignment)).to eq 'A'
 
@@ -92,7 +92,7 @@ describe "Gradebook - Assignment Column" do
       expect(Gradebook::Cells.get_grade(@course.students[2], @assignment)).to eq '10'
     end
 
-    it "can switch from letter grade to percentage and edit grade", priority: "1", test_id: 3434871 do
+    it "can switch from letter grade to percentage and edit grade", priority: "1" do
       # Change grade type to percentage and re-grade
       Gradebook.click_assignment_popover_enter_grade_as(@assignment.id, 'Percentage')
       Gradebook::Cells.edit_grade(@course.students[1], @assignment, 8)
@@ -100,14 +100,14 @@ describe "Gradebook - Assignment Column" do
       expect { Gradebook::Cells.get_grade(@course.students[1], @assignment) }.to become '8%'
     end
 
-    it "active grading scheme displays a check", priority: "2", test_id: 3415924 do
+    it "active grading scheme displays a check", priority: "2" do
       # Initial grade is letter grade
       Gradebook.click_assignment_header_menu(@assignment.id)
 
       expect(Gradebook.enter_grade_as_popover_menu_item_checked?('Grading Scheme')).to eq 'true'
     end
 
-    it "grade detail tray has the new grading scheme", priority: "1", test_id: 3416270 do
+    it "grade detail tray has the new grading scheme", priority: "1" do
       # Initial grade is letter grade
       Gradebook.click_assignment_popover_enter_grade_as(@assignment.id, 'Percentage')
 
@@ -115,7 +115,7 @@ describe "Gradebook - Assignment Column" do
       expect(Gradebook::GradeDetailTray.grade_input.attribute('value')).to eq '100%'
     end
 
-    it "tray accepts input per new grading scheme", priority: "2", test_id: 3433716 do
+    it "tray accepts input per new grading scheme", priority: "2" do
       # Initial grade is letter grade and total of 10 points
       Gradebook.click_assignment_popover_enter_grade_as(@assignment.id, 'Points')
 
@@ -125,7 +125,7 @@ describe "Gradebook - Assignment Column" do
       expect { Gradebook::Cells.get_grade(@course.students[2], @assignment) }.to become '8.5'
     end
 
-    it "replace EX with Excused in Gradebook Cells", priority: "2", test_id: 3424906 do
+    it "replace EX with Excused in Gradebook Cells", priority: "2" do
       # excuse the student by entering 'EX' in the cell
       Gradebook::Cells.edit_grade(@course.students[2], @assignment, 'EX')
 
@@ -151,7 +151,7 @@ describe "Gradebook - Assignment Column" do
       expect(Gradebook.select_assignment_header_secondary_label('Anon Assignment').text).to eq 'ANONYMOUS'
     end
 
-    it "speedgrader link on tray displays warning", priority: "1", test_id: 3481216 do
+    it "speedgrader link on tray displays warning", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @assignment)
       Gradebook::GradeDetailTray.speedgrader_link.click
 

@@ -88,7 +88,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   TITLE_LENGTH = 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = %i[workflow_state editing_roles notify_of_update].freeze
 
   self.ignored_columns = %i[view_count]
 
@@ -97,13 +97,12 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context
-    unless association(:context).loaded?
-      if association(:wiki).loaded? &&
-         wiki.context_loaded? &&
-         context_type == wiki.context_type &&
-         context_id == wiki.context_id
-        self.context = wiki.context
-      end
+    if !association(:context).loaded? &&
+       association(:wiki).loaded? &&
+       wiki.context_loaded? &&
+       context_type == wiki.context_type &&
+       context_id == wiki.context_id
+      self.context = wiki.context
     end
     super
   end

@@ -148,13 +148,13 @@ describe ExternalToolsController do
         end
 
         it 'creates a login message' do
-          expect(assigns[:lti_launch].params.keys).to match_array [
-            "iss",
-            "login_hint",
-            "target_link_uri",
-            "lti_message_hint",
-            "canvas_region",
-            "client_id"
+          expect(assigns[:lti_launch].params.keys).to match_array %w[
+            iss
+            login_hint
+            target_link_uri
+            lti_message_hint
+            canvas_region
+            client_id
           ]
         end
 
