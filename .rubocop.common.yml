@@ -329,6 +329,8 @@ Style/MethodCallWithoutArgsParentheses:
   Severity: error
 Style/MethodDefParentheses:
   Severity: error
+Style/MultilineBlockChain:
+  Enabled: false # this is common when building up a large API result
 Style/MultilineIfModifier:
   Severity: error
 Style/MultilineIfThen:
@@ -436,6 +438,8 @@ Style/RegexpLiteral:
 Style/RescueStandardError:
   EnforcedStyle: implicit
   Severity: error
+Style/ReturnNil:
+  Enabled: false # explicit nil is okay when a method is expected to have a return value
 Style/SafeNavigation:
   Severity: error
 Style/SelectByRegexp:
@@ -535,8 +539,6 @@ Style/NumericLiterals: # TODO: autocorrect
 Style/RescueModifier: # TODO
   Severity: warning
   AutoCorrect: false
-Style/ReturnNil: # TODO: autocorrect (investigate violations)
-  Enabled: false
 Style/StringConcatenation: # TODO: autocorrect (maybe)
   Enabled: false
 Style/StringLiterals:
