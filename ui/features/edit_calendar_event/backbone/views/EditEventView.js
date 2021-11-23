@@ -304,7 +304,8 @@ export default class EditCalendarEventView extends Backbone.View {
   toJSON() {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
-    result.k5_subject = ENV.K5_SUBJECT_COURSE && ENV.FEATURES?.important_dates
+    result.k5_course =
+      (ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE) && ENV.FEATURES?.important_dates
     return result
   }
 
