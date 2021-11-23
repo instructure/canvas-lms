@@ -484,7 +484,7 @@ module InstFS
         claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s
         claims[:legacy_api_root_account_id] = root_account.global_id.to_s
       else
-        # TODO: long term solution for updated API consumers goes here
+        nil # TODO: long term solution for updated API consumers goes here
       end
     end
 

@@ -90,7 +90,6 @@ class EportfolioCategoriesController < ApplicationController
         if @category.destroy
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @category }
-        else
         end
       end
     end

@@ -1159,7 +1159,6 @@ class ContextExternalTool < ActiveRecord::Base
         if !permission_given &&
            context.present? &&
            launch_type.to_s == Lti::ResourcePlacement::GLOBAL_NAVIGATION.to_s
-        then
           permission_given = manageable_enrollments_by_permission(
             p,
             user.enrollments_for_account_and_sub_accounts(context.root_account)

@@ -178,7 +178,7 @@ module CC
               attachment_key = attachment_key.split('?').second
               attachment_key = "/" + attachment_key.split('/').second
             else
-              # formatted appropriately, no need to massage the pathname
+              nil # formatted appropriately, no need to massage the pathname
             end
           else
             # e.g. "/amazing_file.txt?canvas_=1&canvas_qs_wrap=1"

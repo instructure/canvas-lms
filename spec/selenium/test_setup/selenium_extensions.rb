@@ -136,7 +136,7 @@ module SeleniumExtensions
       raise unless finder_proc
 
       location = CallStackUtils.best_line_for($ERROR_INFO.backtrace)
-      $stderr.puts "WARNING: StaleElementReferenceError at #{location.first}, attempting to recover..."
+      warn "WARNING: StaleElementReferenceError at #{location.first}, attempting to recover..."
       @id = finder_proc.call.ref
       retry
     end
