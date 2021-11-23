@@ -32,7 +32,7 @@ def appendix
   return unless controllers.is_a?(Array)
 
   @appendixes = controllers.collect do |c|
-    c.children.select { |o| :appendix == o.type }
+    c.children.select { |o| o.type == :appendix }
   end.flatten
 
   super
