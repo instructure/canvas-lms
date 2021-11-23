@@ -1002,6 +1002,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/collaborations", controller: :collaborations, action: :api_index, as: "course_collaborations_index"
       delete "courses/:course_id/collaborations/:id", controller: :collaborations, action: :destroy
       put "courses/:id/quizzes", action: "new_quizzes_selection_update", as: "course_new_quizzes_selection_update"
+      post "courses/:id/dismiss_migration_limitation_message", action: "dismiss_migration_limitation_msg", as: "course_dismiss_migration_limitation_msg"
 
       # this api endpoint has been removed, it was redundant with just courses#users
       # we keep it around for backward compatibility though

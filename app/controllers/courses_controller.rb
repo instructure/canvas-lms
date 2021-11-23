@@ -3617,6 +3617,26 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Remove quiz migration alert
+  #
+  # Remove alert about the limitations of quiz migrations that is displayed
+  # to a user in a course
+  #
+  # you must be logged in to use this endpoint
+  #
+  # @example_response
+  #   { "success": "true" }
+  def dismiss_migration_limitation_msg
+    @course = api_find(Course, params[:id])
+    quiz_migration_alert = @course.quiz_migration_alert_for_user(@current_user&.id)
+    if quiz_migration_alert
+      quiz_migration_alert.destroy
+      render json: { success: true }, status: :ok
+    else
+      render json: { message: "Quiz migration alert not found" }, status: :not_found
+    end
+  end
+
   def start_link_validation
     get_context
     return unless authorized_action(@context, @current_user, :manage_content)

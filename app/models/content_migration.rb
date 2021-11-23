@@ -31,9 +31,11 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   has_one :content_export
   has_many :migration_issues
+  has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
   serialize :migration_settings
   cattr_accessor :export_file_path
+  before_save :assign_quiz_migration_limitation_alert
   before_save :set_started_at_and_finished_at
   after_save :handle_import_in_progress_notice
   after_save :check_for_blocked_migration
@@ -99,6 +101,13 @@ class ContentMigration < ActiveRecord::Base
       if failed? || imported? || exported?
         self.finished_at ||= Time.now.utc
       end
+    end
+  end
+
+  def assign_quiz_migration_limitation_alert
+    if workflow_state_changed? && imported? && quizzes_next_migration? &&
+       NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+      context.create_or_update_quiz_migration_alert(user_id, self)
     end
   end
 

@@ -2385,6 +2385,61 @@ RSpec.describe ApplicationController do
       end
     end
   end
+
+  describe "should_show_migration_limitation_message helper" do
+    context "for teachers" do
+      before :once do
+        course_with_teacher active_all: true
+      end
+
+      before do
+        user_session @teacher
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+      end
+
+      context "when the teacher has a quiz migration alert" do
+        before do
+          @quiz_migration_alert =
+            QuizMigrationAlert.create!(user_id: @teacher.id, course_id: @course.id, migration_id: "10000000000040")
+        end
+
+        it "returns true" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:should_show_migration_limitation_message)).to eq(true)
+        end
+      end
+
+      context "when the teacher doesn't have a quiz migration alert" do
+        it "returns false" do
+          controller.params[:controller] = "courses"
+          controller.params[:action] = "show"
+          expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+        end
+      end
+    end
+
+    context "for students" do
+      before :once do
+        course_with_student active_all: true
+      end
+
+      before do
+        user_session @student
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+        @quiz_migration_alert =
+          QuizMigrationAlert.create!(user_id: @student.id, course_id: @course.id, migration_id: "10000000000040")
+      end
+
+      it "returns false" do
+        controller.params[:controller] = "courses"
+        controller.params[:action] = "show"
+        expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+      end
+    end
+  end
 end
 
 describe WikiPagesController do

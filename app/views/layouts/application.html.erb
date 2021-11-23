@@ -194,6 +194,38 @@
       <% end %>
       <div id="not_right_side" class="ic-app-main-content">
         <div id="content-wrapper" class="ic-Layout-contentWrapper">
+          <% if should_show_migration_limitation_message %>
+            <% js_bundle :quiz_migration_alerts %>
+            <div class="ic-notification ic-notification--info quiz_migration_notification">
+              <div class="ic-notification__icon" role="presentation">
+                <i class="icon-info"></i>
+                <span class="screenreader-only">
+                  <%= accessible_message_icon_text('information') %>
+                </span>
+              </div>
+              <div class="ic-notification__content">
+                <div class="ic-notification__message notification_message" style="margin-bottom:1rem;">
+                  <%= t 'Your Classic Quizzes have been migrated to New Quizzes! ' %><br />
+                  <%= t 'Please note:' %>
+                  <ul>
+                    <li><%= t 'Text No Question has moved to a Stimulus; please add a question so it can display within the quiz.' %></li>
+                    <li><%= t 'Classic Quizzes with New RCE audio/video may not have moved completely; these will need to be rebuilt.' %></li>
+                    <li><%= t 'LaTex equations are currently migrated as images, and the questions should not be edited.' %></li>
+                  </ul>
+                  <%= t 'We apologize for the inconvenience and thank you for your patience as we continue to improve the migration experience!' %>
+                </div>
+                <div class="ic-notification__actions">
+                  <a href="#"
+                    rel="<%= api_v1_course_dismiss_migration_limitation_msg_url(@context.id) %>"
+                    class="close_migration_notification_link Button Button--info"
+                    role="button"
+                  >
+                    <%= t('Close') %>
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% end %>
           <%= render :partial => 'shared/content_notices' if @has_content_notices && @show_left_side %>
           <div id="content" class="ic-Layout-contentMain" role="main">
             <%= yield %>

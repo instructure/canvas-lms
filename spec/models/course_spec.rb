@@ -6849,4 +6849,36 @@ describe Course do
       expect(@course).to be_has_modules
     end
   end
+
+  describe "#create_or_update_quiz_migration_alert" do
+    before do
+      @course = Course.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @content_migration = ContentMigration.create(context: @course)
+      @content_migration2 = ContentMigration.create(context: @course)
+    end
+
+    context "when there are not quiz migration alerts that belong to the provided user" do
+      it "creates a quiz migration alert" do
+        expect do
+          @course.create_or_update_quiz_migration_alert(@teacher.id, @content_migration)
+        end.to change { QuizMigrationAlert.count }.from(0).to(1)
+      end
+    end
+
+    context "when there are quiz migration alerts that belong to the provided user with a different migration_id" do
+      before do
+        @quiz_migration_alert =
+          QuizMigrationAlert.create(user_id: @teacher.id, course_id: @course.id, migration: @content_migration)
+      end
+
+      it "updates the migration_id on the quiz migration alert" do
+        expect do
+          @course.create_or_update_quiz_migration_alert(@teacher.id, @content_migration2)
+          @quiz_migration_alert.reload
+        end.to change { @quiz_migration_alert.migration }.from(@content_migration).to(@content_migration2)
+      end
+    end
+  end
 end

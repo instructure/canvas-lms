@@ -222,6 +222,7 @@ class Course < ActiveRecord::Base
 
   has_many :master_course_subscriptions, class_name: "MasterCourses::ChildSubscription", foreign_key: "child_course_id"
   has_one :late_policy, dependent: :destroy, inverse_of: :course
+  has_many :quiz_migration_alerts, dependent: :destroy
   has_many :notification_policy_overrides, as: :context, inverse_of: :context
 
   has_many :post_policies, dependent: :destroy, inverse_of: :course
@@ -2205,6 +2206,21 @@ class Course < ActiveRecord::Base
     Attachments::Storage.store_for_attachment(attachment, StringIO.new(csv))
     attachment.content_type = "text/csv"
     attachment.save!
+  end
+
+  def create_or_update_quiz_migration_alert(user_id, migration)
+    quiz_migration_alert = quiz_migration_alerts.find_by(user_id: user_id)
+
+    if quiz_migration_alert.nil?
+      new_quiz_migration_alert = quiz_migration_alerts.build(user_id: user_id, migration: migration)
+      new_quiz_migration_alert.save
+    elsif quiz_migration_alert && quiz_migration_alert.migration != migration
+      quiz_migration_alert.update(migration: migration)
+    end
+  end
+
+  def quiz_migration_alert_for_user(user_id)
+    quiz_migration_alerts.find_by(user_id: user_id)
   end
 
   # included to make it easier to work with api, which returns

@@ -2896,6 +2896,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :show_immersive_reader?
 
+  def should_show_migration_limitation_message
+    @context.is_a?(Course) && @context.user_is_instructor?(@current_user) &&
+      @context.quiz_migration_alert_for_user(@current_user.id).present?
+  end
+  helper_method :should_show_migration_limitation_message
+
   def uncached_k5_user?
     if @current_user
       # Collect global ids of all accounts in current region with k5 enabled
