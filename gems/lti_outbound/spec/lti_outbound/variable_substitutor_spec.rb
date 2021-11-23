@@ -57,11 +57,11 @@ describe LtiOutbound::VariableSubstitutor do
       end
     end
 
-    it '#key?' do
+    it '#has_key?' do
       subject.add_substitution '$My.custom.variable', 'value'
 
-      expect(subject).to have_key('$My.custom.variable')
-      expect(subject).not_to have_key('$My.fake.variable')
+      expect(subject.has_key?('$My.custom.variable')).to eq true
+      expect(subject.has_key?('$My.fake.variable')).to eq false
     end
   end
 end

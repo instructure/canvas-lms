@@ -24,4 +24,7 @@ class FixAssignmentPeerReviewJobs < ActiveRecord::Migration[5.0]
   def up
     DataFixup::FixAssignmentPeerReviewJobs.delay_if_production(priority: Delayed::LOW_PRIORITY).run
   end
+
+  def down
+  end
 end

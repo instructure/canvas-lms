@@ -359,7 +359,7 @@ describe Types::SubmissionType do
     it 'properly handles cursors for submission histories' do
       expect(
         submission_history_type.resolve('submissionHistoriesConnection { edges { cursor }}')
-      ).to eq %w[MQ Mg Mw]
+      ).to eq ["MQ", "Mg", "Mw"]
     end
 
     context 'filter' do
@@ -469,7 +469,7 @@ describe Types::SubmissionType do
         purpose: 'grading'
       )
 
-      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hours.ago)
+      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hour.ago)
 
       rubric_assessment_model(
         user: @student,

@@ -51,13 +51,13 @@ class SubAccountsController < ApplicationController
   def index
     # accept :manage_courses or :manage_account_settings so the course settings page can query subaccounts
     return unless require_account_management(
-      permissions: %i[manage_account_settings manage_courses manage_courses_admin]
+      permissions: [:manage_account_settings, :manage_courses, :manage_courses_admin]
     )
 
     @query = (params[:account] && params[:account][:name]) || params[:term]
     if @query
       @accounts = []
-      if @context.is_a?(Account)
+      if @context && @context.is_a?(Account)
         @accounts = @context.all_accounts.active.name_like(@query).limit(100).to_a
         @accounts << @context if value_to_boolean(params[:include_self]) && @context.name.downcase.include?(@query.downcase)
         @accounts.sort_by! { |a| Canvas::ICU.collation_key(a.name) }
@@ -128,11 +128,11 @@ class SubAccountsController < ApplicationController
   #
   # @returns Account
   def create
-    parent_id = if params[:account][:parent_account_id]
-                  params[:account].delete(:parent_account_id)
-                else
-                  params[:account_id]
-                end
+    if params[:account][:parent_account_id]
+      parent_id = params[:account].delete(:parent_account_id)
+    else
+      parent_id = params[:account_id]
+    end
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
 
@@ -143,13 +143,13 @@ class SubAccountsController < ApplicationController
       if can_manage_sis
         @sub_account.sis_source_id = params[:account][:sis_account_id]
       else
-        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: :unauthorized
+        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: 401
       end
     end
     if @sub_account.save
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: :bad_request
+      render :json => @sub_account.errors, status: 400
     end
   end
 
@@ -159,7 +159,7 @@ class SubAccountsController < ApplicationController
     if @sub_account.update(account_params)
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: :bad_request
+      render :json => @sub_account.errors, status: 400
     end
   end
 
@@ -171,13 +171,13 @@ class SubAccountsController < ApplicationController
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: :conflict
+      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: 409
     end
     if @sub_account.sub_accounts.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: :conflict
+      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: 409
     end
     if @sub_account.root_account?
-      return render json: { message: I18n.t("You can't delete a root_account.") }, status: :unauthorized
+      return render json: { message: I18n.t("You can't delete a root_account.") }, status: 401
     end
 
     @sub_account.destroy

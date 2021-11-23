@@ -21,7 +21,7 @@
 # These methods are mixed into the classes that can be considered a "context".
 # See Context::CONTEXT_TYPES below.
 module Context
-  CONTEXT_TYPES = %i[Account Course CourseSection User Group].freeze
+  CONTEXT_TYPES = [:Account, :Course, :CourseSection, :User, :Group].freeze
 
   ASSET_TYPES = {
     Announcement: :Announcement,
@@ -57,7 +57,7 @@ module Context
 
   def clear_cached_short_name
     self.class.connection.after_transaction_commit do
-      Rails.cache.delete(['short_name_lookup', asset_string].cache_key)
+      Rails.cache.delete(['short_name_lookup', self.asset_string].cache_key)
     end
   end
 
@@ -71,7 +71,7 @@ module Context
           :message => entry.message
         )
       elsif !entry.asset
-        announcement = announcements.build(
+        announcement = self.announcements.build(
           :title => entry.title,
           :message => entry.message
         )
@@ -85,18 +85,18 @@ module Context
 
   def self.sorted_rubrics(context)
     associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
-    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select { |r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
     associations = []
-    course_ids = [id]
+    course_ids = [self.id]
     course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map { |id| Shard.relative_id_for(id, user.shard, Shard.current) }).uniq if user
     Shard.partition_by_shard(course_ids) do |sharded_course_ids|
       context_codes = sharded_course_ids.map { |id| "course_#{id}" }
-      if Shard.current == shard
+      if Shard.current == self.shard
         context = self
-        while context.respond_to?(:account) || context.respond_to?(:parent_account)
+        while (context && context.respond_to?(:account)) || context.respond_to?(:parent_account)
           context = context.respond_to?(:account) ? context.account : context.parent_account
           context_codes << context.asset_string if context
         end
@@ -121,18 +121,18 @@ module Context
     return @active_record_types[only_check] if @active_record_types[only_check]
 
     possible_types = {
-      files: -> { respond_to?(:attachments) && attachments.active.exists? },
-      modules: -> { respond_to?(:context_modules) && context_modules.active.exists? },
+      files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
+      modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
       quizzes: -> {
-                 (respond_to?(:quizzes) && quizzes.active.exists?) ||
-                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?)
+                 (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
+                   (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?)
                },
-      assignments: -> { respond_to?(:assignments) && assignments.active.exists? },
-      pages: -> { respond_to?(:wiki_pages) && wiki_pages.active.exists? },
-      conferences: -> { respond_to?(:web_conferences) && web_conferences.active.exists? },
-      announcements: -> { respond_to?(:announcements) && announcements.active.exists? },
-      outcomes: -> { respond_to?(:has_outcomes?) && has_outcomes? },
-      discussions: -> { respond_to?(:discussion_topics) && discussion_topics.only_discussion_topics.except(:preload).exists? }
+      assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
+      pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
+      conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },
+      announcements: -> { self.respond_to?(:announcements) && self.announcements.active.exists? },
+      outcomes: -> { self.respond_to?(:has_outcomes?) && self.has_outcomes? },
+      discussions: -> { self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:preload).exists? }
     }
 
     types_to_check = if only_check
@@ -144,7 +144,7 @@ module Context
     raise ArgumentError, "only_check is either an empty array or you are aking for invalid types" if types_to_check.empty?
 
     base_cache_key = 'active_record_types3'
-    cache_key = [base_cache_key, (only_check.presence || 'everything'), self].cache_key
+    cache_key = [base_cache_key, (only_check.present? ? only_check : 'everything'), self].cache_key
 
     # if it exists in redis, return that
     if (cached = Rails.cache.read(cache_key))
@@ -159,7 +159,9 @@ module Context
     # otherwise compute it and store it in the cache
     value_to_cache = nil
     ActiveRecord::Base.uncached do
-      value_to_cache = types_to_check.transform_values(&:call)
+      value_to_cache = types_to_check.each_with_object({}) do |(key, type_to_check), memo|
+        memo[key] = type_to_check.call
+      end
     end
     Rails.cache.write(cache_key, value_to_cache)
     @active_record_types[only_check] = value_to_cache
@@ -264,7 +266,7 @@ module Context
       object = rel_path && Folder.find_attachment_in_context_with_path(course, CGI.unescape(rel_path))
       file_id = params[:file_id] || params[:id]
       file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
-      object ||= context.attachments.find_by(id: file_id) # attachments.find_by(id:) uses the replacement hackery
+      object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
       if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
@@ -278,17 +280,17 @@ module Context
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end
     when 'context_modules'
-      object = if %w[item_redirect item_redirect_mastery_paths choose_mastery_path].include?(params[:action])
-                 context.context_module_tags.find_by(id: params[:id])
-               else
-                 context.context_modules.find_by(id: params[:id])
-               end
+      if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
+        object = context.context_module_tags.find_by(id: params[:id])
+      else
+        object = context.context_modules.find_by(id: params[:id])
+      end
     when 'media_objects'
       object = media_obj
     when 'context'
       object = context.users.find(params[:id]) if params[:action] == 'roster_user' && params[:id]
     else
-      object = context.try(params[:controller].sub(%r{^.+/}, ''))&.find_by(id: params[:id])
+      object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end
     object
   rescue
@@ -351,7 +353,7 @@ module Context
   end
 
   def nickname_for(_user, fallback = :name, prefer_friendly_name: true)
-    send fallback if fallback
+    self.send fallback if fallback
   end
 
   def self.last_updated_at(klasses_to_ids)
@@ -376,6 +378,6 @@ module Context
   end
 
   def resolved_root_account_id
-    root_account_id if respond_to? :root_account_id
+    self.root_account_id if self.respond_to? :root_account_id
   end
 end

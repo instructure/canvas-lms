@@ -24,7 +24,7 @@
 class AssetUserAccess < ActiveRecord::Base
   extend RootAccountResolver
 
-  belongs_to :context, polymorphic: %i[account course group user], polymorphic_prefix: true
+  belongs_to :context, polymorphic: [:account, :course, :group, :user], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
 
@@ -53,7 +53,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def category
-    asset_category
+    self.asset_category
   end
 
   def infer_defaults
@@ -78,26 +78,26 @@ class AssetUserAccess < ActiveRecord::Base
   def asset_display_name
     return nil unless asset
 
-    if asset.respond_to?(:title) && !asset.title.nil?
+    if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
-    elsif asset.is_a? Enrollment
+    elsif self.asset.is_a? Enrollment
       asset.user.name
-    elsif asset.respond_to?(:name) && !asset.name.nil?
+    elsif self.asset.respond_to?(:name) && !self.asset.name.nil?
       asset.name
     else
-      asset_code
+      self.asset_code
     end
   end
 
   def context_code
-    "#{context_type.underscore}_#{context_id}" rescue nil
+    "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
   def readable_name(include_group_name: true)
-    if asset_code&.include?(':')
-      split = asset_code.split(":")
+    if self.asset_code&.include?(':')
+      split = self.asset_code.split(/:/)
 
-      if split[1].match?(/course_\d+/)
+      if split[1].match(/course_\d+/)
         case split[0]
         when "announcements"
           t("Course Announcements")
@@ -157,19 +157,19 @@ class AssetUserAccess < ActiveRecord::Base
         else
           "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
         end
-      elsif split[1].match?(/user_\d+/)
+      elsif split[1].match(/user_\d+/)
         case split[0]
         when "files"
           t('User Files')
         else
-          display_name
+          self.display_name
         end
       else
-        display_name
+        self.display_name
       end
     else
-      re = Regexp.new("#{asset_code} - ")
-      display_name.nil? ? "" : display_name.gsub(re, "")
+      re = Regexp.new("#{self.asset_code} - ")
+      self.display_name.nil? ? "" : self.display_name.gsub(re, "")
     end
   end
 
@@ -185,7 +185,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset_class_name
-    name = asset.class.name.underscore if asset
+    name = self.asset.class.name.underscore if self.asset
     name = "Quiz" if name == "Quizzes::Quiz"
     name
   end
@@ -209,7 +209,7 @@ class AssetUserAccess < ActiveRecord::Base
   def self.log(user, context, accessed_asset)
     return unless user && accessed_asset[:code]
 
-    correct_context = get_correct_context(context, accessed_asset)
+    correct_context = self.get_correct_context(context, accessed_asset)
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
 
     GuardRail.activate(:secondary) do
@@ -232,7 +232,7 @@ class AssetUserAccess < ActiveRecord::Base
     infer_defaults
     infer_root_account_id(accessed[:asset_for_root_account_id])
 
-    if self.class.use_log_compaction_for_views? && eligible_for_log_path?
+    if self.class.use_log_compaction_for_views? && self.eligible_for_log_path?
       # Since this is JUST a view bump, we'll write it to the
       # view log and let periodic jobs compact them later
       # (this is intentionally trading off more latency for less I/O pressure)
@@ -248,33 +248,33 @@ class AssetUserAccess < ActiveRecord::Base
     # view count updates happen a LOT though, so if the setting is
     # configured such that we're allowed to use the log path, check
     # if this set of changes is "just" a view update.
-    change_hash = changes_to_save
-    updated_key_set = changes_to_save.keys.to_set
+    change_hash = self.changes_to_save
+    updated_key_set = self.changes_to_save.keys.to_set
     return false unless updated_key_set.include?('view_score')
-    return false unless (updated_key_set - Set.new(%w[updated_at last_access view_score])).empty?
+    return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
 
     # ASSUMPTION: All view_score updates are a single increment.
     # If this is violated, rather than failing to capture, we should accept the
     # write through the row update for now (by returning false from here).
     view_delta = change_hash['view_score'].compact
     # ^array with old and new value, which CAN be null, hence compact
-    return false if view_delta.empty?
+    return false if view_delta.size < 1
     return (view_delta[0] - 1.0).abs < Float::EPSILON if view_delta.size == 1
 
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end
 
   def log_action(level)
-    increment(:view_score) if %w[view participate].include?(level)
-    increment(:participate_score) if %w[participate submit].include?(level)
+    increment(:view_score) if %w{view participate}.include?(level)
+    increment(:participate_score) if %w{participate submit}.include?(level)
 
-    if action_level != 'participate'
+    if self.action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level
     end
   end
 
   def self.use_log_compaction_for_views?
-    view_counting_method.to_s == "log"
+    self.view_counting_method.to_s == "log"
   end
 
   def self.view_counting_method
@@ -292,7 +292,7 @@ class AssetUserAccess < ActiveRecord::Base
     deductible_points = 0
 
     if 'quizzes' == self.asset_group_code
-      deductible_points = participate_score || 0
+      deductible_points = self.participate_score || 0
     end
 
     self.view_score ||= 0
@@ -332,7 +332,7 @@ class AssetUserAccess < ActiveRecord::Base
   private
 
   def increment(attribute)
-    incremented_value = (send(attribute) || 0) + 1
-    send("#{attribute}=", incremented_value)
+    incremented_value = (self.send(attribute) || 0) + 1
+    self.send("#{attribute}=", incremented_value)
   end
 end

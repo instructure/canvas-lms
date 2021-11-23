@@ -121,7 +121,7 @@ describe Loaders::DiscussionEntryLoader do
 
     GraphQL::Batch.batch do
       Loaders::DiscussionEntryLoader.for(
-        current_user: @teacher
+        current_user: @teacher,
       ).load(@de2).then { |discussion_entries|
         expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id]
       }
@@ -194,7 +194,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           filter: 'drafts'
         ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w[hey howdy])
+          expect(discussion_entries.map(&:message)).to match_array(%w(hey howdy))
         end
       end
     end
@@ -207,7 +207,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           filter: 'drafts'
         ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w[howdy])
+          expect(discussion_entries.map(&:message)).to match_array(%w(howdy))
         end
       end
     end

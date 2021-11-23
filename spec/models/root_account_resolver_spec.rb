@@ -39,7 +39,8 @@ describe RootAccountResolver do
         attributes.key?(key)
       end
 
-      def self.belongs_to(relation, **opts); end
+      def self.belongs_to(relation, **opts)
+      end
     end
   end
   let(:test_class) do

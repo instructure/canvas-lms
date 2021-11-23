@@ -147,8 +147,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   before_action :require_user, :require_context, :require_quiz
   before_action :require_overridden_quiz, :except => [:index]
-  before_action :require_quiz_submission, :except => %i[index submission create]
-  before_action :prepare_service, :only => %i[create update complete]
+  before_action :require_quiz_submission, :except => [:index, :submission, :create]
+  before_action :prepare_service, :only => [:create, :update, :complete]
   before_action :validate_ldb_status!, :only => [:create, :complete]
 
   # @API Get all quiz submissions.
@@ -237,7 +237,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      if params.key?(:attempt)
+      if params.has_key?(:attempt)
         retrieve_quiz_submission_attempt!(params[:attempt])
       end
 
@@ -445,8 +445,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   def validate_ldb_status!(quiz = @quiz)
-    if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
-      reject! 'this quiz requires the lockdown browser', :forbidden
+    if quiz.require_lockdown_browser?
+      unless ldb_plugin.authorized?(self)
+        reject! 'this quiz requires the lockdown browser', :forbidden
+      end
     end
   end
 

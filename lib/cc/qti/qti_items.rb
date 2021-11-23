@@ -19,17 +19,14 @@
 #
 require 'bigdecimal'
 
-# rubocop:disable comments of Style/SymbolProc in this file are because the
-# builder DSL uses method_missing and blocks to define nested XML elements, and
-# a symbol proc confuses that use of the block
 module CC
   module Qti
     module QtiItems
-      CC_SUPPORTED_TYPES = %w[multiple_choice_question
-                              multiple_answers_question
-                              true_false_question
-                              short_answer_question
-                              essay_question].freeze
+      CC_SUPPORTED_TYPES = ['multiple_choice_question',
+                            'multiple_answers_question',
+                            'true_false_question',
+                            'short_answer_question',
+                            'essay_question']
 
       CC_TYPE_PROFILES = {
         'multiple_choice_question' => 'cc.multiple_choice.v0p1',
@@ -37,24 +34,26 @@ module CC
         'true_false_question' => 'cc.true_false.v0p1',
         'short_answer_question' => 'cc.fib.v0p1',
         'essay_question' => 'cc.essay.v0p1'
-      }.freeze
+      }
 
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
-      MULTI_ANSWER_TYPES = %w[matching_question
-                              multiple_dropdowns_question
-                              fill_in_multiple_blanks_question].freeze
+      MULTI_ANSWER_TYPES = ['matching_question',
+                            'multiple_dropdowns_question',
+                            'fill_in_multiple_blanks_question']
 
       def add_ref_or_question(node, question)
         aq = nil
-        if question[:assessment_question_id].present? &&
-           (aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first) &&
-           (aq.deleted? ||
-              !aq.assessment_question_bank ||
-              aq.assessment_question_bank.deleted? ||
-              aq.assessment_question_bank.context_id != @course.id ||
-              aq.assessment_question_bank.context_type != @course.class.to_s)
-          aq = nil
+        unless question[:assessment_question_id].blank?
+          if (aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first)
+            if aq.deleted? ||
+               !aq.assessment_question_bank ||
+               aq.assessment_question_bank.deleted? ||
+               aq.assessment_question_bank.context_id != @course.id ||
+               aq.assessment_question_bank.context_type != @course.class.to_s
+              aq = nil
+            end
+          end
         end
 
         if aq
@@ -82,7 +81,7 @@ module CC
 
       def qq_mig_id(question)
         qq_id = question['id']
-        if @manifest&.exporter&.for_master_migration
+        if @manifest && @manifest.exporter.for_master_migration
           create_key("quizzes/quiz_question_#{Shard.global_id_for(qq_id)}") # curse you namespacing
         else
           create_key("quiz_question_#{qq_id}")
@@ -91,7 +90,7 @@ module CC
 
       def aq_mig_id(question)
         aq_id = question['assessment_question_id']
-        if @manifest&.exporter&.for_master_migration
+        if @manifest && @manifest.exporter.for_master_migration
           aq_id = Shard.global_id_for(aq_id)
         end
         create_key("assessment_question_#{aq_id}")
@@ -161,7 +160,7 @@ module CC
       ## question response_str methods
 
       def presentation_options(node, question)
-        if %w[multiple_choice_question true_false_question multiple_answers_question].member? question['question_type']
+        if ['multiple_choice_question', 'true_false_question', 'multiple_answers_question'].member? question['question_type']
           multiple_choice_response_str(node, question)
         elsif ['short_answer_question', 'essay_question'].member? question['question_type']
           short_answer_response_str(node, question)
@@ -267,7 +266,7 @@ module CC
       ## question resprocessing methods
 
       def resprocessing(node, question)
-        if question['neutral_comments'].present? || question['neutral_comments_html'].present?
+        if !question['neutral_comments'].blank? || !question['neutral_comments_html'].blank?
           other_respcondition(node, 'Yes', 'general_fb')
         end
 
@@ -294,7 +293,7 @@ module CC
           numerical_resprocessing(node, question)
         end
 
-        if (question['incorrect_comments'].present? || question['incorrect_comments_html'].present?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
+        if (!question['incorrect_comments'].blank? || !question['incorrect_comments_html'].blank?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
@@ -416,15 +415,15 @@ module CC
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
 
-          next if answer['comments'].blank? && answer['comments_html'].blank?
-
-          node.respcondition do |r_node|
-            r_node.conditionvar do |c_node|
-              c_node.not do
-                c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
+          unless answer['comments'].blank? && answer['comments_html'].blank?
+            node.respcondition do |r_node|
+              r_node.conditionvar do |c_node|
+                c_node.not do
+                  c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
+                end
               end
+              r_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
             end
-            r_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
           end
         end
       end
@@ -435,29 +434,27 @@ module CC
         correct_points = "%.2f" % correct_points
 
         groups.each_pair do |id, answers|
-          next unless (answer = answers.find { |a| a['weight'].to_i > 0 })
-
-          node.respcondition do |r_node|
-            r_node.conditionvar do |c_node|
-              c_node.varequal(answer['id'], :respident => "response_#{id}")
+          if (answer = answers.find { |a| a['weight'].to_i > 0 })
+            node.respcondition do |r_node|
+              r_node.conditionvar do |c_node|
+                c_node.varequal(answer['id'], :respident => "response_#{id}")
+              end
+              r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
             end
-            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
         end
       end
 
       def calculated_resprocessing(node, _question)
         node.respcondition(:title => 'correct') do |r_node|
-          r_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
+          r_node.conditionvar do |c_node|
             c_node.other
           end
           r_node.setvar(100, :varname => 'SCORE', :action => 'Set')
         end
         node.respcondition(:title => 'incorrect') do |r_node|
           r_node.conditionvar do |c_node|
-            c_node.not do |n_node| # rubocop:disable Style/SymbolProc
-              n_node.other
-            end
+            c_node.not { |n_node| n_node.other }
           end
           r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
         end
@@ -467,28 +464,28 @@ module CC
 
       def answer_feedback_respconditions(node, question)
         question['answers'].each do |answer|
-          next if answer['comments'].blank? && answer['comments_html'].blank?
-
-          respident = 'response1'
-          if MULTI_ANSWER_TYPES.member? question['question_type']
-            respident = "response_#{answer['blank_id']}"
-          end
-          node.respcondition(:continue => 'Yes') do |res_node|
-            res_node.conditionvar do |c_node|
-              if question[:question_type] == 'short_answer_question'
-                c_node.varequal answer['text'], :respident => respident
-              else
-                c_node.varequal answer['id'], :respident => respident
-              end
-            end # c_node
-            node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
+          unless answer['comments'].blank? && answer['comments_html'].blank?
+            respident = 'response1'
+            if MULTI_ANSWER_TYPES.member? question['question_type']
+              respident = "response_#{answer['blank_id']}"
+            end
+            node.respcondition(:continue => 'Yes') do |res_node|
+              res_node.conditionvar do |c_node|
+                if question[:question_type] == 'short_answer_question'
+                  c_node.varequal answer['text'], :respident => respident
+                else
+                  c_node.varequal answer['id'], :respident => respident
+                end
+              end # c_node
+              node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
+            end
           end
         end
       end
 
       def other_respcondition(node, continue = 'No', feedback_ref = nil)
         node.respcondition(:continue => continue) do |res_node|
-          res_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
+          res_node.conditionvar do |c_node|
             c_node.other
           end # c_node
           res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => feedback_ref) if feedback_ref

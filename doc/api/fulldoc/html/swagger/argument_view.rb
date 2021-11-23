@@ -61,7 +61,7 @@ class ArgumentView < HashView
     # This regex is impossible to read, basically we're splitting the string up
     # into the first [bracketed] section, which might contain internal brackets,
     # and then the rest of the string.
-    md = str.strip.match(/\A(\[[\w ,\[\]|"]+\])?\s*(.+)?/m)
+    md = str.strip.match(%r{\A(\[[\w ,\[\]|"]+\])?\s*(.+)?}m)
     [md[1] || DEFAULT_TYPE, md[2] || DEFAULT_DESC]
   end
 
@@ -88,12 +88,12 @@ class ArgumentView < HashView
   end
 
   def enums
-    enum_and_types.first.map { |e| e.delete('"') }
+    enum_and_types.first.map { |e| e.gsub('"', '') }
   end
 
   def types
     enum_and_types.last.reject do |t|
-      %w[optional required].include?(t.downcase)
+      %w(optional required).include?(t.downcase)
     end
   end
 
@@ -112,22 +112,22 @@ class ArgumentView < HashView
 
   def swagger_type
     type = (types.first || 'string')
-    type = "number" if type.casecmp?("float")
+    type = "number" if type.downcase == "float"
     builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
     type = (types.first || 'string')
     return "int64" if swagger_type == "integer"
-    return "float" if type.casecmp?("float")
+    return "float" if type.downcase == "float"
   end
 
   def optional?
-    !required?
+    not required?
   end
 
   def required?
-    types = enum_and_types.last.map(&:downcase)
+    types = enum_and_types.last.map { |t| t.downcase }
     swagger_param_type == 'path' || types.include?('required')
   end
 
@@ -136,7 +136,7 @@ class ArgumentView < HashView
   end
 
   def builtin?(type)
-    %w[string integer boolean number].include?(type.downcase)
+    ["string", "integer", "boolean", "number"].include?(type.downcase)
   end
 
   def to_swagger

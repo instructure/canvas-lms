@@ -32,7 +32,7 @@ module DataFixup::ReclaimInstfsAttachments
   end
 
   def self.reclaim_attachment(attachment)
-    # NOTE: this downloads the whole attachment at once into a temp file.
+    # note: this downloads the whole attachment at once into a temp file.
     # unfortunately, this is unavoidable with how attachment_fu works
     attachment.uploaded_data = attachment.open
     attachment.instfs_uuid = nil
@@ -99,7 +99,7 @@ module DataFixup::ReclaimInstfsAttachments
     ].map { |scope| scope.where("#{Account.resolved_root_account_id_sql} IN (?)", root_account_ids) }
 
     (course_queries + group_queries + account_queries)
-      .map { |q| q.where.not(instfs_uuid: nil) }
+      .map { |q| q.where("instfs_uuid IS NOT NULL") }
       .reduce { |q1, q2| q1.union(q2) }
   end
 end

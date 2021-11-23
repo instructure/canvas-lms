@@ -419,7 +419,8 @@ describe RubricAssessment do
         expect(assessment.artifact.score).to be 3.0
       end
 
-      it "allows points to exceed max points possible if Allow Outcome Extra Credit feature is enabled" do
+      it "should allow points to exceed max points possible " +
+         "if Allow Outcome Extra Credit feature is enabled" do
         @course.enable_feature!(:outcome_extra_credit)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({

@@ -82,32 +82,28 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     user_id: nil
   )
     <<~GQL
-      #{if context_type && (course_id || account_id)
-          "notificationPreferencesEnabled(
-          contextType: #{context_type},
-          #{"courseId: #{course_id}" if course_id}
-          #{"accountId: #{account_id}" if account_id}
-      )"
-        end}
+      #{"notificationPreferencesEnabled(
+        contextType: #{context_type},
+        #{"courseId: #{course_id}" if course_id}
+        #{"accountId: #{account_id}" if account_id}
+      )" if context_type && (course_id || account_id)}
       notificationPreferences {
         sendScoresInEmails#{"(courseId: #{course_id})" if course_id}
         sendObservedNamesInNotifications
         readPrivacyNoticeDate
         channels {
-          #{if context_type && (course_id || account_id)
-              "notificationPolicyOverrides(
-              contextType: #{context_type},
-              #{"courseId: #{course_id}" if course_id}
-              #{"accountId: #{account_id}" if account_id}
+          #{"notificationPolicyOverrides(
+            contextType: #{context_type},
+            #{"courseId: #{course_id}" if course_id}
+            #{"accountId: #{account_id}" if account_id}
           ) {
-              frequency
-              notification {
-                category
-                categoryDisplayName
-                name
-              }
-          }"
-            end}
+            frequency
+            notification {
+              category
+              categoryDisplayName
+              name
+            }
+          }" if context_type && (course_id || account_id)}
           notificationPolicies#{"(contextType: #{context_type})" if context_type} {
             frequency
             notification {

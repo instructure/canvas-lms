@@ -520,7 +520,10 @@ describe('DiscussionFullPage', () => {
 
   describe('reply with ascending sort order', () => {
     beforeEach(() => {
-      window.ENV.per_page = 1
+      jest.mock('../utils/constants', () => ({
+        ...jest.requireActual('../utils/constants'),
+        PER_PAGE: 1
+      }))
     })
 
     afterEach(() => {
@@ -532,8 +535,8 @@ describe('DiscussionFullPage', () => {
 
     it('should change to last page when sort order is asc', async () => {
       const mocks = [
-        ...getDiscussionQueryMock({perPage: 1}),
-        ...getDiscussionQueryMock({perPage: 1, sort: 'asc'}),
+        ...getDiscussionQueryMock(),
+        ...getDiscussionQueryMock({sort: 'asc'}),
         ...createDiscussionEntryMock()
       ]
       const container = setup(mocks)

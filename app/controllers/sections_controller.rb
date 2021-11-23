@@ -108,7 +108,7 @@ class SectionsController < ApplicationController
   #
   # @returns [Section]
   def index
-    if authorized_action(@context, @current_user, %i[read read_roster view_all_grades manage_grades])
+    if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
       if params[:include].present? && !@context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
         params[:include] = nil
       end
@@ -197,7 +197,7 @@ class SectionsController < ApplicationController
   def crosslist_check
     course_id = params[:new_course_id]
     # cross-listing should only be allowed within the same root account
-    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if Api::ID_REGEX.match?(course_id)
+    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
     res = { :allowed => !!allowed }
@@ -277,8 +277,8 @@ class SectionsController < ApplicationController
         if @section.root_account.grants_right?(@current_user, :manage_sis)
           @section.sis_source_id = (sis_id == '') ?  nil : sis_id if sis_id
           @section.integration_id = (integration_id == '') ? nil : integration_id if integration_id
-        elsif api_request?
-          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized
+        else
+          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized if api_request?
         end
       end
 
@@ -318,7 +318,7 @@ class SectionsController < ApplicationController
           add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
           @enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'active').count
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
-          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w[invited pending]).count
+          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
           js_env
           if @context.grants_right?(@current_user, session, :manage)

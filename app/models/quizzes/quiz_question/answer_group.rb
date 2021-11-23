@@ -56,8 +56,9 @@ class Quizzes::QuizQuestion::AnswerGroup
 
   def self.generate(question)
     answers = if question[:answers].is_a? Hash
-                question[:answers].each_with_object([]) do |(key, value), arr|
+                question[:answers].reduce([]) do |arr, (key, value)|
                   arr[key.to_i] = value
+                  arr
                 end
               else
                 question[:answers] || []
@@ -91,7 +92,7 @@ class Quizzes::QuizQuestion::AnswerGroup
 
     def set_id(taken_ids, key = :id)
       @data[key] = @data[key.to_s] if @data[key.to_s]
-      @data[key] = nil if @data[key]&.to_i&.zero? || taken_ids.include?(@data[key])
+      @data[key] = nil if (@data[key] && @data[key].to_i.zero?) || taken_ids.include?(@data[key])
       @data[key] ||= unique_local_id(taken_ids)
       @data[key]
     end

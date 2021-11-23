@@ -49,11 +49,9 @@ module Api::V1::UserProfile
     end
 
     if includes.include? 'user_services'
-      services = if user == current_user
-                   user.user_services
-                 else
-                   user.user_services.visible
-                 end
+      services = user == current_user ?
+        user.user_services :
+        user.user_services.visible
 
       services = services.select { |s| feature_and_service_enabled?(s.service) }
       json[:user_services] = services.map { |s| user_service_json(s, current_user, session) }
@@ -74,11 +72,11 @@ module Api::V1::UserProfile
 
   def user_service_json(user_service, current_user, session)
     api_json(user_service, current_user, session,
-             :only => %w[service visible],
+             :only => %w(service visible),
              :methods => %(service_user_link))
   end
 
   def user_profile_link_json(link, current_user, session)
-    api_json(link, current_user, session, :only => %w[url title])
+    api_json(link, current_user, session, :only => %w(url title))
   end
 end

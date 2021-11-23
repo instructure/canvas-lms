@@ -91,7 +91,9 @@ class DiscussionTopicPresenter
   # Public: Determine if comment feature is disabled for the context/announcement.
   #
   # Returns a boolean.
-  delegate :comments_disabled?, to: :topic
+  def comments_disabled?
+    topic.comments_disabled?
+  end
 
   # Public: Determine if the discussion's context has a large roster flag set.
   #
@@ -120,7 +122,7 @@ class DiscussionTopicPresenter
     if topic.context.is_a?(Course)
       student_enrollment = topic.user.enrollments.active.where(
         course_id: topic.context.id,
-        type: "StudentEnrollment"
+        type: "StudentEnrollment",
       ).first
 
       if student_enrollment

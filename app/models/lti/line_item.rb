@@ -36,7 +36,8 @@ class Lti::LineItem < ApplicationRecord
   belongs_to :assignment,
              inverse_of: :line_items
   belongs_to :root_account,
-             class_name: 'Account'
+             class_name: 'Account',
+             foreign_key: :root_account_id
   has_many :results,
            inverse_of: :line_item,
            class_name: 'Lti::Result',
@@ -50,11 +51,11 @@ class Lti::LineItem < ApplicationRecord
   AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'
 
   def assignment_line_item?
-    assignment.line_items.order(:created_at).first.id == id
+    assignment.line_items.order(:created_at).first.id == self.id
   end
 
   def self.create_line_item!(assignment, context, tool, params)
-    transaction do
+    self.transaction do
       assignment_attr = {
         context: context,
         name: params[:label],
@@ -84,7 +85,7 @@ class Lti::LineItem < ApplicationRecord
         line_item = assignment.line_items.first
       end
 
-      line_item ||= new(assignment: assignment, root_account_id: assignment.root_account_id)
+      line_item ||= self.new(assignment: assignment, root_account_id: assignment.root_account_id)
       attrs = params.to_h.merge(coupled: false).compact
       attrs[:client_id] = tool.global_developer_key_id if tool
       line_item.update!(attrs)
@@ -124,7 +125,7 @@ class Lti::LineItem < ApplicationRecord
 
   # this is to prevent orphaned (ie undeleted state) line_items when an assignment is destroyed
   def destroy_resource_link
-    resource_link&.destroy
+    self.resource_link&.destroy
   end
 
   # This is to delete assignments that were created with the line items API
@@ -132,7 +133,7 @@ class Lti::LineItem < ApplicationRecord
   def destroy_assignment
     return unless assignment_line_item? && !coupled
 
-    assignment.destroy
+    self.assignment.destroy
   end
 
   def set_root_account_id

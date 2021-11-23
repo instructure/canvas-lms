@@ -26,7 +26,7 @@ class FileInContext
     end
 
     def destroy_queued_files
-      if @queued_files.present?
+      if @queued_files && !@queued_files.empty?
         Attachment.delay_if_production.destroy_files(@queued_files.map(&:id))
         @queued_files.clear
       end
@@ -37,7 +37,7 @@ class FileInContext
         @queued_files ||= []
         @queued_files += files
       else
-        files.each(&:destroy)
+        files.each { |f| f.destroy }
       end
     end
 
@@ -73,7 +73,7 @@ class FileInContext
 
       @attachment
     ensure
-      uploaded_data&.close
+      uploaded_data.close if uploaded_data
     end
   end
 end

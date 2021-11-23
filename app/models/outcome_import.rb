@@ -42,7 +42,7 @@ class OutcomeImport < ApplicationRecord
     state :failed
   end
 
-  IMPORT_TYPES = %w[instructure_csv].freeze
+  IMPORT_TYPES = %w(instructure_csv).freeze
 
   def self.valid_import_type?(type)
     IMPORT_TYPES.include? type
@@ -73,19 +73,21 @@ class OutcomeImport < ApplicationRecord
 
   def as_json(_options = {})
     data = {
-      "id" => id,
-      "created_at" => created_at,
-      "ended_at" => ended_at,
-      "updated_at" => updated_at,
-      "progress" => progress,
-      "workflow_state" => workflow_state,
+      "id" => self.id,
+      "created_at" => self.created_at,
+      "ended_at" => self.ended_at,
+      "updated_at" => self.updated_at,
+      "progress" => self.progress,
+      "workflow_state" => self.workflow_state,
       "data" => self.data
     }
-    data["processing_errors"] = outcome_import_errors.order(:row).limit(25).pluck(:row, :message)
+    data["processing_errors"] = self.outcome_import_errors.order(:row).limit(25).pluck(:row, :message)
     data
   end
 
-  delegate :root_account, to: :context
+  def root_account
+    context.root_account
+  end
 
   def schedule
     delay(strand: "OutcomeImport::run::#{root_account.global_id}").run
@@ -103,13 +105,13 @@ class OutcomeImport < ApplicationRecord
     root_account.shard.activate do
       job_started!
       I18n.locale = locale if locale.present?
-      file = attachment.open(need_local_file: true)
+      file = self.attachment.open(need_local_file: true)
 
       Outcomes::CSVImporter.new(self, file).run do |status|
         status[:errors].each do |row, error|
           add_error row, error
         end
-        update!(progress: status[:progress])
+        self.update!(progress: status[:progress])
       end
 
       job_completed!
@@ -177,47 +179,47 @@ class OutcomeImport < ApplicationRecord
       subject = I18n.t 'Outcomes Import Completed'
       user_name = user.name.split('@').first
       if error_count == 0
-        body = I18n.t(<<~TEXT, name: user_name, url: url).gsub(/^ +/, '')
-          Hello %{name},
+        body = I18n.t(<<-BODY, name: user_name, url: url).gsub(/^ +/, '')
+        Hello %{name},
 
-          Your outcomes were successfully imported. You can now manage them at %{url}
+        Your outcomes were successfully imported. You can now manage them at %{url}
 
-          Thank you,
-          Instructure
-        TEXT
+        Thank you,
+        Instructure
+        BODY
       else
         rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
-        body = I18n.t(<<~TEXT, name: user_name, rows: rows, url: url).gsub(/^ +/, '')
-          Hello %{name},
+        body = I18n.t(<<-BODY, name: user_name, rows: rows, url: url).gsub(/^ +/, '')
+        Hello %{name},
 
-          Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
+        Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
 
-          %{rows}
+        %{rows}
 
-          You can now manage them at %{url}
+        You can now manage them at %{url}
 
-          Thank you,
-          Instructure
-        TEXT
+        Thank you,
+        Instructure
+        BODY
       end
     else
       subject = I18n.t 'Outcomes Import Failed'
       user_name = user.name.split('@').first
       doc_url = "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/doc/api/file.outcomes_csv.html"
       row = n_errors(1).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.first
-      body = I18n.t(<<~TEXT, name: user_name, row: row, doc_url: doc_url, url: url).gsub(/^ +/, '')
-        Hello %{name},
+      body = I18n.t(<<-BODY, name: user_name, row: row, doc_url: doc_url, url: url).gsub(/^ +/, '')
+      Hello %{name},
 
-        Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}
+      Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}
 
-        The following error occurred:
-        %{row}
+      The following error occurred:
+      %{row}
 
-        To view the proper import format, please review the Canvas API Docs at %{doc_url}
+      To view the proper import format, please review the Canvas API Docs at %{doc_url}
 
-        Thank you,
-        Instructure
-      TEXT
+      Thank you,
+      Instructure
+      BODY
     end
 
     [subject, body]

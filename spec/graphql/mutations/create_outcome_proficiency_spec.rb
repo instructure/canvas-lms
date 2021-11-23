@@ -61,7 +61,7 @@ describe Mutations::CreateOutcomeProficiency do
   end
 
   let(:good_query) do
-    <<~GQL
+    <<~QUERY
       contextType: "Account"
       contextId: #{@account.id}
       proficiencyRatings: [
@@ -72,18 +72,18 @@ describe Mutations::CreateOutcomeProficiency do
           points: 1.0
         }
       ]
-    GQL
+    QUERY
   end
 
   it "creates an outcome proficiency" do
     result = execute_with_input(good_query)
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createOutcomeProficiency', 'errors')).to be_nil
     result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result['_id'])
+    record = OutcomeProficiency.find(result.dig('_id'))
     expect(record.context).to eq @account
-    expect(result['contextType']).to eq 'Account'
-    expect(result['contextId']).to eq @account.id.to_s
+    expect(result.dig('contextType')).to eq 'Account'
+    expect(result.dig('contextId')).to eq @account.id.to_s
     ratings = result.dig('proficiencyRatingsConnection', 'nodes')
     expect(ratings.length).to eq 1
     expect(ratings[0]['color']).to eq 'FFFFFF'
@@ -97,13 +97,13 @@ describe Mutations::CreateOutcomeProficiency do
     original_record.destroy
     result = execute_with_input(good_query)
     result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result['_id'])
+    record = OutcomeProficiency.find(result.dig('_id'))
     expect(record.id).to eq original_record.id
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'createOutcomeProficiency', 'errors')
+      errors = result.dig('errors') || result.dig('data', 'createOutcomeProficiency', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
@@ -114,21 +114,21 @@ describe Mutations::CreateOutcomeProficiency do
     end
 
     it "invalid context type" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Foobar"
         contextId: 1
         proficiencyRatings: []
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid context type')
     end
 
     it "invalid context id" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Account"
         contextId: -1
         proficiencyRatings: []
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'context not found')
     end
@@ -149,10 +149,10 @@ describe Mutations::CreateOutcomeProficiency do
         end
       end
       result = execute_with_input(good_query)
-      expect(result['errors']).to be_nil
+      expect(result.dig('errors')).to be_nil
       expect(result.dig('data', 'createOutcomeProficiency', 'errors')).to be_nil
       result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-      record = OutcomeProficiency.find(result['_id'])
+      record = OutcomeProficiency.find(result.dig('_id'))
       expect(record.id).to eq original_record.id
     end
   end

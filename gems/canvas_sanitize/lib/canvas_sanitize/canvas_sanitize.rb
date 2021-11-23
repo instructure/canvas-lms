@@ -36,7 +36,7 @@ class Sanitize
       #
       # http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#embedding-custom-non-visible-data-with-the-data-*-attributes
       remove_const(:REGEX_DATA_ATTR)
-      REGEX_DATA_ATTR = /\Adata-(?!xml|kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title)[a-z_][\w.\u00E0-\u00F6\u00F8-\u017F\u01DD-\u02AF-]*\z/u.freeze
+      REGEX_DATA_ATTR = /\Adata-(?!xml|kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title)[a-z_][\w.\u00E0-\u00F6\u00F8-\u017F\u01DD-\u02AF-]*\z/u
     end
   end
 end
@@ -76,7 +76,7 @@ module CanvasSanitize # :nodoc:
                'role',
                'lang',
                'dir',
-               :data, # NOTE: the symbol :data allows for arbitrary HTML5 data-* attributes
+               :data, # Note: the symbol :data allows for arbitrary HTML5 data-* attributes
                'aria-labelledby',
                'aria-atomic',
                'aria-busy',
@@ -115,128 +115,128 @@ module CanvasSanitize # :nodoc:
                'aria-valuemin',
                'aria-valuenow',
                'aria-valuetext'].freeze,
-      'a' => %w[href target name].freeze,
-      'area' => %w[alt coords href shape target].freeze,
+      'a' => ['href', 'target', 'name'].freeze,
+      'area' => ['alt', 'coords', 'href', 'shape', 'target'].freeze,
       'blockquote' => ['cite'].freeze,
       'col' => ['span', 'width'].freeze,
       'colgroup' => ['span', 'width'].freeze,
-      'img' => %w[align alt height src usemap width longdesc].freeze,
+      'img' => ['align', 'alt', 'height', 'src', 'usemap', 'width', 'longdesc'].freeze,
       'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling',
                    'allow', # TODO: remove explicit allow with domain whitelist account setting
                    'sandbox', 'allowfullscreen', 'webkitallowfullscreen', 'mozallowfullscreen'].freeze,
       'ol' => ['start', 'type'].freeze,
       'q' => ['cite'].freeze,
-      'table' => %w[summary width border cellpadding cellspacing center frame rules].freeze,
-      'tr' => %w[align valign dir].freeze,
-      'td' => %w[abbr axis colspan rowspan width align valign dir].freeze,
-      'th' => %w[abbr axis colspan rowspan width align valign dir scope].freeze,
+      'table' => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules'].freeze,
+      'tr' => ['align', 'valign', 'dir'].freeze,
+      'td' => ['abbr', 'axis', 'colspan', 'rowspan', 'width', 'align', 'valign', 'dir'].freeze,
+      'th' => ['abbr', 'axis', 'colspan', 'rowspan', 'width', 'align', 'valign', 'dir', 'scope'].freeze,
       'ul' => ['type'].freeze,
       'param' => ['name', 'value'].freeze,
-      'object' => %w[width height style data type classid codebase].freeze,
-      'source' => %w[media sizes src srcset type].freeze,
-      'embed' => %w[name src type allowfullscreen pluginspage wmode
-                    allowscriptaccess width height].freeze,
-      'video' => %w[name src allowfullscreen muted poster width height controls playsinline].freeze,
-      'track' => %w[default kind label src srclang].freeze,
-      'audio' => %w[name src muted controls].freeze,
-      'font' => %w[face color size].freeze,
+      'object' => ['width', 'height', 'style', 'data', 'type', 'classid', 'codebase'].freeze,
+      'source' => ['media', 'sizes', 'src', 'srcset', 'type'].freeze,
+      'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode',
+                  'allowscriptaccess', 'width', 'height'].freeze,
+      'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls', 'playsinline'].freeze,
+      'track' => ['default', 'kind', 'label', 'src', 'srclang'].freeze,
+      'audio' => ['name', 'src', 'muted', 'controls'].freeze,
+      'font' => ['face', 'color', 'size'].freeze,
       # MathML
-      'annotation' => %w[href xref definitionURL encoding cd name src].freeze,
-      'annotation-xml' => %w[href xref definitionURL encoding cd name src].freeze,
-      'maction' => %w[href xref mathcolor mathbackground actiontype selection].freeze,
-      'maligngroup' => %w[href xref mathcolor mathbackground groupalign].freeze,
-      'malignmark' => %w[href xref mathcolor mathbackground edge].freeze,
+      'annotation' => ['href', 'xref', 'definitionURL', 'encoding', 'cd', 'name', 'src'].freeze,
+      'annotation-xml' => ['href', 'xref', 'definitionURL', 'encoding', 'cd', 'name', 'src'].freeze,
+      'maction' => ['href', 'xref', 'mathcolor', 'mathbackground', 'actiontype', 'selection'].freeze,
+      'maligngroup' => ['href', 'xref', 'mathcolor', 'mathbackground', 'groupalign'].freeze,
+      'malignmark' => ['href', 'xref', 'mathcolor', 'mathbackground', 'edge'].freeze,
       'map' => ['name'].freeze,
-      'math' => %w[href xref display maxwidth overflow altimg altimg-width
-                   altimg-height altimg-valign alttext cdgroup mathcolor
-                   mathbackground scriptlevel displaystyle scriptsizemultiplier
-                   scriptminsize infixlinebreakstyle decimalpoint mathvariant
-                   mathsize width height valign form fence separator
-                   lspace rspace stretchy symmetric maxsize minsize largeop
-                   movablelimits accent linebreak lineleading linebreakstyle
-                   linebreakmultchar indentalign indentshift indenttarget
-                   indentalignfirst indentshiftfirst indentalignlast indentshiftlast
-                   depth lquote rquote linethickness munalign denomalign
-                   bevelled voffset open close separators notation
-                   subscriptshift superscriptshift accentunder align rowalign
-                   columnalign groupalign alignmentscope columnwidth rowspacing
-                   columnspacing rowlines columnlines frame framespacing
-                   equalrows equalcolumns side minlabelspacing rowspan
-                   columnspan edge stackalign charalign charspacing longdivstyle
-                   position shift location crossout length leftoverhang
-                   rightoverhang mslinethickness selection xmlns].freeze,
-      'menclose' => %w[href xref mathcolor mathbackground notation].freeze,
-      'merror' => %w[href xref mathcolor mathbackground].freeze,
-      'mfenced' => %w[href xref mathcolor mathbackground open close separators].freeze,
-      'mfrac' => %w[href xref mathcolor mathbackground linethickness munalign
-                    denomalign bevelled].freeze,
-      'mglyph' => %w[href xref mathcolor mathbackground src alt width height valign].freeze,
-      'mi' => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
-      'mlabeledtr' => %w[href xref mathcolor mathbackground].freeze,
-      'mlongdiv' => %w[href xref mathcolor mathbackground longdivstyle align
-                       stackalign charalign charspacing].freeze,
-      'mmultiscripts' => %w[href xref mathcolor mathbackground subscriptshift
-                            superscriptshift].freeze,
-      'mn' => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
-      'mo' => %w[href xref mathcolor mathbackground mathvariant mathsize form
-                 fence separator lspace rspace stretchy symmetric maxsize
-                 minsize largeop movablelimits accent linebreak lineleading
-                 linebreakstyle linebreakmultchar indentalign indentshift
-                 indenttarget indentalignfirst indentshiftfirst indentalignlast
-                 indentshiftlast].freeze,
-      'mover' => %w[href xref mathcolor mathbackground accent align].freeze,
-      'mpadded' => %w[href xref mathcolor mathbackground height depth width
-                      lspace voffset].freeze,
-      'mphantom' => %w[href xref mathcolor mathbackground].freeze,
-      'mprescripts' => %w[href xref mathcolor mathbackground].freeze,
-      'mroot' => %w[href xref mathcolor mathbackground].freeze,
-      'mrow' => %w[href xref mathcolor mathbackground].freeze,
-      'ms' => %w[href xref mathcolor mathbackground mathvariant mathsize lquote rquote].freeze,
-      'mscarries' => %w[href xref mathcolor mathbackground position location
-                        crossout scriptsizemultiplier].freeze,
-      'mscarry' => %w[href xref mathcolor mathbackground location crossout].freeze,
-      'msgroup' => %w[href xref mathcolor mathbackground position shift].freeze,
-      'msline' => %w[href xref mathcolor mathbackground position length
-                     leftoverhang rightoverhang mslinethickness].freeze,
-      'mspace' => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
-      'msqrt' => %w[href xref mathcolor mathbackground].freeze,
-      'msrow' => %w[href xref mathcolor mathbackground position].freeze,
-      'mstack' => %w[href xref mathcolor mathbackground align stackalign
-                     charalign charspacing].freeze,
-      'mstyle' => %w[href xref mathcolor mathbackground scriptlevel displaystyle
-                     scriptsizemultiplier scriptminsize infixlinebreakstyle
-                     decimalpoint mathvariant mathsize width height valign
-                     form fence separator lspace rspace stretchy symmetric
-                     maxsize minsize largeop movablelimits accent linebreak
-                     lineleading linebreakstyle linebreakmultchar indentalign
-                     indentshift indenttarget indentalignfirst indentshiftfirst
-                     indentalignlast indentshiftlast depth lquote rquote
-                     linethickness munalign denomalign bevelled voffset open
-                     close separators notation subscriptshift superscriptshift
-                     accentunder align rowalign columnalign groupalign
-                     alignmentscope columnwidth rowspacing columnspacing rowlines
-                     columnlines frame framespacing equalrows equalcolumns side
-                     minlabelspacing rowspan columnspan edge stackalign
-                     charalign charspacing longdivstyle position shift location
-                     crossout length leftoverhang rightoverhang mslinethickness
-                     selection].freeze,
-      'msub' => %w[href xref mathcolor mathbackground subscriptshift].freeze,
-      'msubsup' => %w[href xref mathcolor mathbackground subscriptshift superscriptshift].freeze,
-      'msup' => %w[href xref mathcolor mathbackground superscriptshift].freeze,
-      'mtable' => %w[href xref mathcolor mathbackground align rowalign
-                     columnalign groupalign alignmentscope columnwidth width
-                     rowspacing columnspacing rowlines columnlines frame
-                     framespacing equalrows equalcolumns displaystyle side
-                     minlabelspacing].freeze,
-      'mtd' => %w[href xref mathcolor mathbackground rowspan columnspan
-                  rowalign columnalign groupalign].freeze,
-      'mtext' => %w[href xref mathcolor mathbackground mathvariant mathsize
-                    width height depth linebreak].freeze,
-      'mtr' => %w[href xref mathcolor mathbackground rowalign columnalign groupalign].freeze,
-      'munder' => %w[href xref mathcolor mathbackground accentunder align].freeze,
-      'munderover' => %w[href xref mathcolor mathbackground accent accentunder align].freeze,
-      'none' => %w[href xref mathcolor mathbackground].freeze,
-      'semantics' => %w[href xref definitionURL encoding].freeze,
+      'math' => ['href', 'xref', 'display', 'maxwidth', 'overflow', 'altimg', 'altimg-width',
+                 'altimg-height', 'altimg-valign', 'alttext', 'cdgroup', 'mathcolor',
+                 'mathbackground', 'scriptlevel', 'displaystyle', 'scriptsizemultiplier',
+                 'scriptminsize', 'infixlinebreakstyle', 'decimalpoint', 'mathvariant',
+                 'mathsize', 'width', 'height', 'valign', 'form', 'fence', 'separator',
+                 'lspace', 'rspace', 'stretchy', 'symmetric', 'maxsize', 'minsize', 'largeop',
+                 'movablelimits', 'accent', 'linebreak', 'lineleading', 'linebreakstyle',
+                 'linebreakmultchar', 'indentalign', 'indentshift', 'indenttarget',
+                 'indentalignfirst', 'indentshiftfirst', 'indentalignlast', 'indentshiftlast',
+                 'depth', 'lquote', 'rquote', 'linethickness', 'munalign', 'denomalign',
+                 'bevelled', 'voffset', 'open', 'close', 'separators', 'notation',
+                 'subscriptshift', 'superscriptshift', 'accentunder', 'align', 'rowalign',
+                 'columnalign', 'groupalign', 'alignmentscope', 'columnwidth', 'rowspacing',
+                 'columnspacing', 'rowlines', 'columnlines', 'frame', 'framespacing',
+                 'equalrows', 'equalcolumns', 'side', 'minlabelspacing', 'rowspan',
+                 'columnspan', 'edge', 'stackalign', 'charalign', 'charspacing', 'longdivstyle',
+                 'position', 'shift', 'location', 'crossout', 'length', 'leftoverhang',
+                 'rightoverhang', 'mslinethickness', 'selection', 'xmlns'].freeze,
+      'menclose' => ['href', 'xref', 'mathcolor', 'mathbackground', 'notation'].freeze,
+      'merror' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'mfenced' => ['href', 'xref', 'mathcolor', 'mathbackground', 'open', 'close', 'separators'].freeze,
+      'mfrac' => ['href', 'xref', 'mathcolor', 'mathbackground', 'linethickness', 'munalign',
+                  'denomalign', 'bevelled'].freeze,
+      'mglyph' => ['href', 'xref', 'mathcolor', 'mathbackground', 'src', 'alt', 'width', 'height', 'valign'].freeze,
+      'mi' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize'].freeze,
+      'mlabeledtr' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'mlongdiv' => ['href', 'xref', 'mathcolor', 'mathbackground', 'longdivstyle', 'align',
+                     'stackalign', 'charalign', 'charspacing'].freeze,
+      'mmultiscripts' => ['href', 'xref', 'mathcolor', 'mathbackground', 'subscriptshift',
+                          'superscriptshift'].freeze,
+      'mn' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize'].freeze,
+      'mo' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize', 'form',
+               'fence', 'separator', 'lspace', 'rspace', 'stretchy', 'symmetric', 'maxsize',
+               'minsize', 'largeop', 'movablelimits', 'accent', 'linebreak', 'lineleading',
+               'linebreakstyle', 'linebreakmultchar', 'indentalign', 'indentshift',
+               'indenttarget', 'indentalignfirst', 'indentshiftfirst', 'indentalignlast',
+               'indentshiftlast'].freeze,
+      'mover' => ['href', 'xref', 'mathcolor', 'mathbackground', 'accent', 'align'].freeze,
+      'mpadded' => ['href', 'xref', 'mathcolor', 'mathbackground', 'height', 'depth', 'width',
+                    'lspace', 'voffset'].freeze,
+      'mphantom' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'mprescripts' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'mroot' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'mrow' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'ms' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize', 'lquote', 'rquote'].freeze,
+      'mscarries' => ['href', 'xref', 'mathcolor', 'mathbackground', 'position', 'location',
+                      'crossout', 'scriptsizemultiplier'].freeze,
+      'mscarry' => ['href', 'xref', 'mathcolor', 'mathbackground', 'location', 'crossout'].freeze,
+      'msgroup' => ['href', 'xref', 'mathcolor', 'mathbackground', 'position', 'shift'].freeze,
+      'msline' => ['href', 'xref', 'mathcolor', 'mathbackground', 'position', 'length',
+                   'leftoverhang', 'rightoverhang', 'mslinethickness'].freeze,
+      'mspace' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize'].freeze,
+      'msqrt' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'msrow' => ['href', 'xref', 'mathcolor', 'mathbackground', 'position'].freeze,
+      'mstack' => ['href', 'xref', 'mathcolor', 'mathbackground', 'align', 'stackalign',
+                   'charalign', 'charspacing'].freeze,
+      'mstyle' => ['href', 'xref', 'mathcolor', 'mathbackground', 'scriptlevel', 'displaystyle',
+                   'scriptsizemultiplier', 'scriptminsize', 'infixlinebreakstyle',
+                   'decimalpoint', 'mathvariant', 'mathsize', 'width', 'height', 'valign',
+                   'form', 'fence', 'separator', 'lspace', 'rspace', 'stretchy', 'symmetric',
+                   'maxsize', 'minsize', 'largeop', 'movablelimits', 'accent', 'linebreak',
+                   'lineleading', 'linebreakstyle', 'linebreakmultchar', 'indentalign',
+                   'indentshift', 'indenttarget', 'indentalignfirst', 'indentshiftfirst',
+                   'indentalignlast', 'indentshiftlast', 'depth', 'lquote', 'rquote',
+                   'linethickness', 'munalign', 'denomalign', 'bevelled', 'voffset', 'open',
+                   'close', 'separators', 'notation', 'subscriptshift', 'superscriptshift',
+                   'accentunder', 'align', 'rowalign', 'columnalign', 'groupalign',
+                   'alignmentscope', 'columnwidth', 'rowspacing', 'columnspacing', 'rowlines',
+                   'columnlines', 'frame', 'framespacing', 'equalrows', 'equalcolumns', 'side',
+                   'minlabelspacing', 'rowspan', 'columnspan', 'edge', 'stackalign',
+                   'charalign', 'charspacing', 'longdivstyle', 'position', 'shift', 'location',
+                   'crossout', 'length', 'leftoverhang', 'rightoverhang', 'mslinethickness',
+                   'selection'].freeze,
+      'msub' => ['href', 'xref', 'mathcolor', 'mathbackground', 'subscriptshift'].freeze,
+      'msubsup' => ['href', 'xref', 'mathcolor', 'mathbackground', 'subscriptshift', 'superscriptshift'].freeze,
+      'msup' => ['href', 'xref', 'mathcolor', 'mathbackground', 'superscriptshift'].freeze,
+      'mtable' => ['href', 'xref', 'mathcolor', 'mathbackground', 'align', 'rowalign',
+                   'columnalign', 'groupalign', 'alignmentscope', 'columnwidth', 'width',
+                   'rowspacing', 'columnspacing', 'rowlines', 'columnlines', 'frame',
+                   'framespacing', 'equalrows', 'equalcolumns', 'displaystyle', 'side',
+                   'minlabelspacing'].freeze,
+      'mtd' => ['href', 'xref', 'mathcolor', 'mathbackground', 'rowspan', 'columnspan',
+                'rowalign', 'columnalign', 'groupalign'].freeze,
+      'mtext' => ['href', 'xref', 'mathcolor', 'mathbackground', 'mathvariant', 'mathsize',
+                  'width', 'height', 'depth', 'linebreak'].freeze,
+      'mtr' => ['href', 'xref', 'mathcolor', 'mathbackground', 'rowalign', 'columnalign', 'groupalign'].freeze,
+      'munder' => ['href', 'xref', 'mathcolor', 'mathbackground', 'accentunder', 'align'].freeze,
+      'munderover' => ['href', 'xref', 'mathcolor', 'mathbackground', 'accent', 'accentunder', 'align'].freeze,
+      'none' => ['href', 'xref', 'mathcolor', 'mathbackground'].freeze,
+      'semantics' => ['href', 'xref', 'definitionURL', 'encoding'].freeze,
     }.freeze,
 
     :protocols => {
@@ -298,37 +298,37 @@ module CanvasSanitize # :nodoc:
       'semantics' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
     }.freeze,
     css: {
-      properties: (%w[
-        align-content align-items align-self
-        background border border-radius clear clip color
-        column-gap cursor direction display flex
-        flex-basis flex-direction flex-flow
-        flex-grow flex-shrink flex-wrap float
-        font gap grid height
-        justify-content justify-items justify-self left
-        line-height list-style margin max-height
-        max-width min-height min-width
-        order overflow overflow-x overflow-y
-        padding position place-content
-        place-items place-self right row-gap
-        text-align table-layout
-        text-decoration text-indent
-        top vertical-align
-        visibility white-space width
-        z-index zoom
+      properties: ([
+        'align-content', 'align-items', 'align-self',
+        'background', 'border', 'border-radius', 'clear', 'clip', 'color',
+        'column-gap', 'cursor', 'direction', 'display', 'flex',
+        'flex-basis', 'flex-direction', 'flex-flow',
+        'flex-grow', 'flex-shrink', 'flex-wrap', 'float',
+        'font', 'gap', 'grid', 'height',
+        'justify-content', 'justify-items', 'justify-self', 'left',
+        'line-height', 'list-style', 'margin', 'max-height',
+        'max-width', 'min-height', 'min-width',
+        'order', 'overflow', 'overflow-x', 'overflow-y',
+        'padding', 'position', 'place-content',
+        'place-items', 'place-self', 'right', 'row-gap',
+        'text-align', 'table-layout',
+        'text-decoration', 'text-indent',
+        'top', 'vertical-align',
+        'visibility', 'white-space', 'width',
+        'z-index', 'zoom'
       ] +
-      %w[area auto-columns auto-flow auto-rows column gap row template].map { |i| "grid-#{i}" } +
-      %w[areas columns rows].map { |i| "grid-template-#{i}" } +
-      %w[end gap start].map { |i| "grid-column-#{i}" } +
-      %w[end gap start].map { |i| "grid-row-#{i}" } +
-      %w[attachment color image position repeat].map { |i| "background-#{i}" } +
-      %w[x y].map { |i| "background-position-#{i}" } +
-      %w[bottom collapse color left right spacing style top width].map { |i| "border-#{i}" } +
-      %w[bottom left right top].map { |i| %w[color style width].map { |j| "border-#{i}-#{j}" } }.flatten +
-      %w[family size stretch style variant width].map { |i| "font-#{i}" } +
-      %w[image position type].map { |i| "list-style-#{i}" } +
-      %w[bottom left right top offset].map { |i| "margin-#{i}" } +
-      %w[bottom left right top].map { |i| "padding-#{i}" }
+      %w{area auto-columns auto-flow auto-rows column gap row template}.map { |i| "grid-#{i}" } +
+      %w{areas columns rows}.map { |i| "grid-template-#{i}" } +
+      %w{end gap start}.map { |i| "grid-column-#{i}" } +
+      %w{end gap start}.map { |i| "grid-row-#{i}" } +
+      %w{attachment color image position repeat}.map { |i| "background-#{i}" } +
+      %w{x y}.map { |i| "background-position-#{i}" } +
+      %w{bottom collapse color left right spacing style top width}.map { |i| "border-#{i}" } +
+      %w{bottom left right top}.map { |i| %w{color style width}.map { |j| "border-#{i}-#{j}" } }.flatten +
+      %w{family size stretch style variant width}.map { |i| "font-#{i}" } +
+      %w{image position type}.map { |i| "list-style-#{i}" } +
+      %w{bottom left right top offset}.map { |i| "margin-#{i}" } +
+      %w{bottom left right top}.map { |i| "padding-#{i}" }
                   ).to_set.freeze,
       protocols: DEFAULT_PROTOCOLS
     }
@@ -384,17 +384,17 @@ module CanvasSanitize # :nodoc:
     def fully_sanitize_fields
       fields_hash = self.class.fully_sanitize_fields_config || {}
       fields_hash.each do |field, config|
-        next unless attribute_changed?(field)
+        next unless self.attribute_changed?(field)
 
         config ||= Sanitize::Config::RESTRICTED
         config = Sanitize::Config::RESTRICTED if config.empty?
         # Doesn't try to sanitize nil
-        f = send(field)
+        f = self.send(field)
         next unless f
-        next unless f.is_a?(String) || f.is_a?(IO)
+        next unless f.is_a?(String) or f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
-        send((field.to_s + "="), val)
+        self.send((field.to_s + "="), val)
       end
     end
   end # InstanceMethods

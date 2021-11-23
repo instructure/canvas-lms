@@ -194,8 +194,7 @@ describe OverrideListPresenter do
   end
 
   describe "#visible_due_dates" do
-    attr_reader :visible_due_dates
-
+    def visible_due_dates; @visible_due_dates; end
     let(:sections) do
       # the count is the important part, the actual course sections are
       # not used
@@ -250,7 +249,7 @@ describe OverrideListPresenter do
     end
 
     context "only some sections have overrides" do
-      let(:dates_visible) { dates_visible_to_user[1..] }
+      let(:dates_visible) { dates_visible_to_user[1..-1] }
 
       before do
         allow(assignment.context).to receive(:active_section_count)

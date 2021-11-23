@@ -21,7 +21,7 @@
 module PermissionsHelper
   def manageable_enrollments_by_permission(permission, enrollments = nil)
     permission = permission.to_sym
-    raise "invalid permission" unless RoleOverride.permissions.key?(permission)
+    raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission)
 
     enrollments ||= participating_enrollments
     ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
@@ -51,10 +51,8 @@ module PermissionsHelper
       unpublished, published = sharded_courses.partition(&:unpublished?)
       all_applicable_enrollments = []
       enrollment_scope = Enrollment.not_inactive_by_date.for_user(self).select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      if unpublished.any?
-        all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished)
-                                                      .where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]).to_a
-      end
+      all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished)
+                                                    .where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment']).to_a if unpublished.any?
       all_applicable_enrollments += enrollment_scope.where(:course_id => published).to_a if published.any?
 
       grouped_enrollments = all_applicable_enrollments.group_by(&:course_id)
@@ -149,7 +147,7 @@ module PermissionsHelper
     account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = courses.map(&:root_account_id).uniq
-    query = <<~SQL.squish
+    query = <<~SQL
       WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
           ro.applies_to_self, ro.applies_to_descendants, ro.permission

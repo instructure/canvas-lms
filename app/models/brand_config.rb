@@ -23,7 +23,7 @@ class BrandConfig < ActiveRecord::Base
   self.primary_key = 'md5'
   serialize :variables, Hash
 
-  OVERRIDE_TYPES = %i[js_overrides css_overrides mobile_js_overrides mobile_css_overrides].freeze
+  OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
 
   validates :variables, presence: true, unless: :overrides?
@@ -72,7 +72,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def clear_cache
-    shard.activate do
+    self.shard.activate do
       self.class.connection.after_transaction_commit do
         MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
       end
@@ -109,17 +109,17 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def clone_with_new_parent(new_parent_md5)
-    attrs = attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
+    attrs = self.attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
     attrs[:parent_md5] = new_parent_md5
     BrandConfig.for(attrs)
   end
 
   def dup?
-    BrandConfig.where(md5: md5).exists?
+    BrandConfig.where(md5: self.md5).exists?
   end
 
   def save_unless_dup!
-    save! unless dup?
+    self.save! unless dup?
   end
 
   def to_json(*args)
@@ -142,7 +142,7 @@ class BrandConfig < ActiveRecord::Base
     "dist/brandable_css/#{md5}"
   end
 
-  %i[json js css].each do |type|
+  [:json, :js, :css].each do |type|
     define_method :"public_#{type}_path" do
       "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.#{type}"
     end
@@ -233,7 +233,9 @@ class BrandConfig < ActiveRecord::Base
                           .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
                           .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5"))
                           .first
-    unused_brand_config&.destroy
+    if unused_brand_config
+      unused_brand_config.destroy
+    end
   end
 
   def self.clean_unused_from_db!

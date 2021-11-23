@@ -62,9 +62,13 @@ module Api::V1::QuizSubmission
                       methods: QUIZ_SUBMISSION_JSON_FIELD_METHODS.dup
                     })
 
-    hash[:html_url] = course_quiz_quiz_submission_url(context, quiz, qs)
+    hash.merge!({
+                  html_url: course_quiz_quiz_submission_url(context, quiz, qs)
+                })
 
-    hash[:result_url] = course_quiz_history_url(context, quiz, quiz_submission_id: qs.id, version: qs.version_number) if qs.completed? || qs.needs_grading?
+    hash.merge!({
+                  result_url: course_quiz_history_url(context, quiz, quiz_submission_id: qs.id, version: qs.version_number)
+                }) if qs.completed? || qs.needs_grading?
 
     hash
   end
@@ -93,7 +97,7 @@ module Api::V1::QuizSubmission
     end
 
     if includes.include?('submission')
-      with_submissions = quiz_submissions.select(&:submission)
+      with_submissions = quiz_submissions.select { |qs| !!qs.submission }
 
       hash[:submissions] = with_submissions.map do |qs|
         submission_json(qs.submission, quiz.assignment, user, session, context, includes, params)
@@ -122,7 +126,7 @@ module Api::V1::QuizSubmission
   end
 
   def quiz_submission_zip(quiz)
-    latest_submission = quiz.quiz_submissions.filter_map(&:finished_at).max
+    latest_submission = quiz.quiz_submissions.map { |s| s.finished_at }.compact.max
     submission_zip(quiz, latest_submission)
   end
 end

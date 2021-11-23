@@ -46,12 +46,14 @@ class ConversationMessageParticipant < ActiveRecord::Base
     state :deleted
   end
 
-  delegate :conversation, to: :conversation_message
+  def conversation
+    conversation_message.conversation
+  end
 
   def self.query_deleted(user_id, options = {})
-    query = deleted.eager_load(:conversation_message).where(user_id: user_id).order(deleted_at: :desc)
+    query = self.deleted.eager_load(:conversation_message).where(user_id: user_id).order(deleted_at: :desc)
 
-    query = query.where(conversation_messages: { conversation_id: options['conversation_id'] }) if options['conversation_id']
+    query = query.where('conversation_messages.conversation_id = ?', options['conversation_id']) if options['conversation_id']
     query = query.where('conversation_message_participants.deleted_at < ?', options['deleted_before']) if options['deleted_before']
     query = query.where('conversation_message_participants.deleted_at > ?', options['deleted_after']) if options['deleted_after']
 

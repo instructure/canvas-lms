@@ -57,7 +57,7 @@ describe 'MessageDispatcher' do
       job = created_jobs.first
       @messages[0].cancel
 
-      am_message = double
+      am_message = double()
       expect(am_message).to receive(:deliver_now).and_return(true)
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error).ordered
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error).and_return(am_message).ordered
@@ -66,7 +66,7 @@ describe 'MessageDispatcher' do
       expect(created_jobs.size).to eq 1
       job2 = created_jobs.first
       @messages.each(&:reload)
-      expect(@messages.map(&:state)).to eq %i[cancelled staged sent]
+      expect(@messages.map(&:state)).to eq [:cancelled, :staged, :sent]
       expect(@messages[1].dispatch_at).to be > Time.now.utc + 4.minutes
       # the original job is complete, but the individual message gets re-scheduled in its own job
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)

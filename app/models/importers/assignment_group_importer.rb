@@ -25,15 +25,15 @@ module Importers
 
     def self.process_migration(data, migration)
       AssignmentGroup.suspend_callbacks(:update_student_grades) do
-        add_groups_for_imported_assignments(data, migration)
-        groups = data['assignment_groups'] || []
+        self.add_groups_for_imported_assignments(data, migration)
+        groups = data['assignment_groups'] ? data['assignment_groups'] : []
         groups.each do |group|
-          next unless migration.import_object?("assignment_groups", group['migration_id'])
-
-          begin
-            import_from_migration(group, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
+          if migration.import_object?("assignment_groups", group['migration_id'])
+            begin
+              import_from_migration(group, migration.context, migration)
+            rescue
+              migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
+            end
           end
         end
         migration.context.assignment_groups.first.try(:fix_position_conflicts)
@@ -43,7 +43,7 @@ module Importers
     def self.add_groups_for_imported_assignments(data, migration)
       return unless migration.migration_settings[:migration_ids_to_import] &&
                     migration.migration_settings[:migration_ids_to_import][:copy] &&
-                    !migration.migration_settings[:migration_ids_to_import][:copy].empty?
+                    migration.migration_settings[:migration_ids_to_import][:copy].length > 0
 
       migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'] ||= {}
       data['assignments']&.each do |assignment_hash|
@@ -89,12 +89,11 @@ module Importers
       item.group_weight = hash[:group_weight] if hash[:group_weight]
 
       rules = ""
-      if hash[:rules].present?
+      if hash[:rules] && hash[:rules].length > 0
         hash[:rules].each do |rule|
-          case rule[:drop_type]
-          when "drop_lowest", "drop_highest"
+          if rule[:drop_type] == "drop_lowest" || rule[:drop_type] == "drop_highest"
             rules += "#{rule[:drop_type]}:#{rule[:drop_count]}\n"
-          when "never_drop"
+          elsif rule[:drop_type] == "never_drop"
             if context.respond_to?(:assignment_group_no_drop_assignments)
               context.assignment_group_no_drop_assignments[rule[:assignment_migration_id]] = item
             end

@@ -35,7 +35,7 @@ module Lti
         before_action :authorized_lti2_tool
 
         def index
-          head :ok
+          head 200
         end
 
         def lti2_service_name

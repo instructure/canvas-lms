@@ -43,7 +43,7 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   attr_accessor :uncrypted_token
 
-  validates :pseudonym_id, :crypted_token, :token_salt, presence: true
+  validates_presence_of :pseudonym_id, :crypted_token, :token_salt
 
   def self.generate(pseudonym)
     salt = SecureRandom.hex(8)
@@ -51,12 +51,12 @@ class SessionPersistenceToken < ActiveRecord::Base
     pseudonym.session_persistence_tokens.create!(
       :token_salt => salt,
       :uncrypted_token => token,
-      :crypted_token => hashed_token(salt, token)
+      :crypted_token => self.hashed_token(salt, token)
     )
   end
 
   def self.hashed_token(salt, token)
-    crypto.encrypt(salt, token)
+    self.crypto.encrypt(salt, token)
   end
 
   def self.crypto
@@ -67,11 +67,11 @@ class SessionPersistenceToken < ActiveRecord::Base
     token_id, persistence_token, uuid = creds.split("::")
     return unless token_id.present? && persistence_token.present? && uuid.present?
 
-    token = where(id: token_id).first
+    token = self.where(id: token_id).first
     return unless token
     return unless token.valid_token?(persistence_token, uuid)
 
-    token
+    return token
   end
 
   def self.delete_expired(since)
@@ -81,9 +81,9 @@ class SessionPersistenceToken < ActiveRecord::Base
   def valid_token?(persistence_token, uncrypted_token)
     # if the pseudonym is marked deleted, the token can still be marked as
     # valid, but the actual login step will fail as expected.
-    pseudonym &&
-      pseudonym.persistence_token == persistence_token &&
-      self.class.crypto.matches?(crypted_token, token_salt, uncrypted_token)
+    self.pseudonym &&
+      self.pseudonym.persistence_token == persistence_token &&
+      self.class.crypto.matches?(self.crypted_token, self.token_salt, uncrypted_token)
   end
 
   def pseudonym_credentials
@@ -94,6 +94,6 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   def use!
     destroy
-    pseudonym
+    return pseudonym
   end
 end

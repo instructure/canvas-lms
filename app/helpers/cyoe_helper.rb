@@ -20,10 +20,9 @@
 
 module CyoeHelper
   def cyoe_able?(item)
-    case item.content_type
-    when 'Assignment'
+    if item.content_type == 'Assignment'
       item.graded? && item.content.graded?
-    when 'Quizzes::Quiz'
+    elsif item.content_type == 'Quizzes::Quiz'
       item.graded? && item.content.assignment?
     else
       item.graded?

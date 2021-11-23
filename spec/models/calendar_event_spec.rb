@@ -227,12 +227,12 @@ describe CalendarEvent do
       end
 
       it "returns a plain-text description" do
-        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<~HTML)
-          <p>
-            This assignment is due December 16th. <b>Please</b> do the reading.
-            <br/>
-            <a href="www.example.com">link!</a>
-          </p>
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
+      <p>
+        This assignment is due December 16th. <b>Please</b> do the reading.
+        <br/>
+        <a href="www.example.com">link!</a>
+      </p>
         HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
@@ -241,7 +241,7 @@ describe CalendarEvent do
 
       it "does not add verifiers to files unless course or attachment is public" do
         attachment_model(:context => course_factory)
-        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
+        html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to_not include("verifier")
@@ -271,7 +271,7 @@ describe CalendarEvent do
 
         @course.media_objects.create!(:media_id => '0_12345678')
         event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
-                                                                :description => %(<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>))
+                                                                :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
         event.effective_context_code = @course.asset_string
         event.save!
 
@@ -440,7 +440,7 @@ describe CalendarEvent do
           @users = @event1.messages_sent["New Event Created"].map(&:user_id)
         end
 
-        it "sends to participants", priority: "1" do
+        it "sends to participants", priority: "1", test_id: 186751 do
           expect(@event1.messages_sent).to be_include("New Event Created")
           expect(@users).to include(@student.id)
         end
@@ -470,7 +470,7 @@ describe CalendarEvent do
             @users = @event1.messages_sent["Event Date Changed"].map(&:user_id)
           end
 
-          it "sends to participants", priority: "1" do
+          it "sends to participants", priority: "1", test_id: 193162 do
             expect(@event1.messages_sent).to be_include("Event Date Changed")
             expect(@users).to include(@student.id)
           end
@@ -563,7 +563,7 @@ describe CalendarEvent do
         expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
       end
 
-      it "notifies all participants except the person reserving", priority: "1" do
+      it "notifies all participants except the person reserving", priority: "1", test_id: 193149 do
         @appointment2.reserve_for(@group, @student1)
         expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
@@ -575,14 +575,14 @@ describe CalendarEvent do
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
-      it "notifies participants if teacher deletes the appointment time slot", priority: "1" do
+      it "notifies participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
         @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "notifies all participants when the the time slot is canceled", priority: "1" do
+      it "notifies all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
         @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         user_evt = CalendarEvent.where(context_type: 'Group').first
@@ -591,7 +591,7 @@ describe CalendarEvent do
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "notifies admins and observers when a user reserves", priority: "1" do
+      it "notifies admins and observers when a user reserves", priority: "1", test_id: 193144 do
         reservation = @appointment.reserve_for(@student1, @student1)
         messages = reservation.messages_sent["Appointment Reserved By User"]
         expect(messages).to be_present
@@ -605,7 +605,7 @@ describe CalendarEvent do
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "notifies admins and observers when a user cancels", priority: "1" do
+      it "notifies admins and observers when a user cancels", priority: "1", test_id: 193147 do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy
@@ -658,10 +658,10 @@ describe CalendarEvent do
       appointment.participants_per_appointment = 3
       appointment.save!
 
-      s1, s2, s3 = Array.new(3) do
+      s1, s2, s3 = 3.times.map {
         student_in_course(:course => @course, :active_all => true)
         @user
-      end
+      }
 
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(s1, s1)).not_to be_nil
@@ -1168,7 +1168,7 @@ describe CalendarEvent do
         expect(event.web_conference.reload.title).to eq 'updated title'
       end
 
-      it "keeps date of conference in sync with event" do
+      it "keeps date  of conference in sync with event" do
         event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
         start_at = Time.zone.now + 3.days
         event.reload.update! start_at: start_at

@@ -139,7 +139,7 @@ class TermsApiController < ApplicationController
   def index
     terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 
-    state = Array(params[:workflow_state]) & %w[all active deleted]
+    state = Array(params[:workflow_state]) & ['all', 'active', 'deleted']
     state = 'active' if state == []
     state = nil if Array(state).include?('all')
     terms = terms.where(workflow_state: state) if state.present?
@@ -159,7 +159,7 @@ class TermsApiController < ApplicationController
   # @returns EnrollmentTerm
   def show
     term = api_find(@context.enrollment_terms, params[:id])
-    render json: enrollment_term_json(term, @current_user, session, nil, %w[overrides])
+    render json: enrollment_term_json(term, @current_user, session, nil, %w{overrides})
   end
 
   protected
@@ -167,7 +167,7 @@ class TermsApiController < ApplicationController
   def require_root_account
     unless @context.root_account?
       render json: { message: 'Terms only belong to root_accounts.' }, status: :bad_request
-      false
+      return false
     end
   end
 

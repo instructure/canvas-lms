@@ -28,7 +28,7 @@ class Lti::ResourceLink < ApplicationRecord
   validates :lookup_uuid, uniqueness: { scope: [:context_id, :context_type] }
 
   belongs_to :context_external_tool
-  belongs_to :context, polymorphic: %i[account assignment course]
+  belongs_to :context, polymorphic: [:account, :assignment, :course]
   belongs_to :root_account, class_name: 'Account'
 
   alias_method :original_context_external_tool, :context_external_tool
@@ -93,6 +93,6 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   def set_root_account
-    self.root_account_id ||= original_context_external_tool&.root_account_id
+    self.root_account_id ||= self.original_context_external_tool&.root_account_id
   end
 end

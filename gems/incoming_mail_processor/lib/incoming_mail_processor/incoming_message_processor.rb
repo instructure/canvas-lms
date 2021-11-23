@@ -31,7 +31,7 @@ module IncomingMailProcessor
       :sqs => IncomingMailProcessor::SqsMailbox,
     }.freeze
 
-    ImportantHeaders = %w[To From Subject Content-Type].freeze
+    ImportantHeaders = %w(To From Subject Content-Type)
 
     BULK_PRECEDENCE_VALUES = %w[bulk list junk].freeze
     private_constant :BULK_PRECEDENCE_VALUES
@@ -43,7 +43,7 @@ module IncomingMailProcessor
         mailbox_class = get_mailbox_class(account)
         mailbox = mailbox_class.new(account.config)
         mailbox.set_timeout_method(&method(:timeout_method))
-        mailbox
+        return mailbox
       end
 
       def error_report_category
@@ -104,8 +104,10 @@ module IncomingMailProcessor
         MailboxClasses.fetch(account.protocol)
       end
 
-      def timeout_method(&block)
-        Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true, &block)
+      def timeout_method
+        Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true) do
+          yield
+        end
       end
 
       def configure_settings(config)
@@ -114,10 +116,10 @@ module IncomingMailProcessor
 
         config.symbolize_keys.each do |key, value|
           if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
-            settings.send("#{key}=", value)
+            self.settings.send("#{key}=", value)
           elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
-            logger&.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
-            deprecated_settings.send("#{key}=", value)
+            logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}") if logger
+            self.deprecated_settings.send("#{key}=", value)
           else
             raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
           end
@@ -139,11 +141,13 @@ module IncomingMailProcessor
       end
 
       def flatten_account_configs(account_configs)
-        account_configs.each_with_object([]) do |(mailbox_protocol, mailbox_config), flat_account_configs|
+        account_configs.reduce([]) do |flat_account_configs, (mailbox_protocol, mailbox_config)|
           flat_mailbox_configs = flatten_mailbox_overrides(mailbox_config)
           flat_mailbox_configs.each do |single_mailbox_config|
             flat_account_configs << [mailbox_protocol, single_mailbox_config]
           end
+
+          flat_account_configs
         end
       end
 
@@ -162,12 +166,12 @@ module IncomingMailProcessor
     end
 
     def self.queue_processors
-      if run_periodically?
-        imp = new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
-        workers.times do |worker_id|
-          if dedicated_workers_per_mailbox
+      if self.run_periodically?
+        imp = self.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
+        self.workers.times do |worker_id|
+          if self.dedicated_workers_per_mailbox
             # Launch one per mailbox
-            mailbox_accounts.each do |account|
+            self.mailbox_accounts.each do |account|
               imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}")
                  .process({ worker_id: worker_id, mailbox_account_address: account.address })
             end
@@ -214,12 +218,12 @@ module IncomingMailProcessor
     end
 
     def process(opts = {})
-      accounts_to_process = if opts[:mailbox_account_address]
-                              # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
-                              self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
-                            else
-                              self.class.mailbox_accounts
-                            end
+      if opts[:mailbox_account_address]
+        # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
+        accounts_to_process = self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
+      else
+        accounts_to_process = self.class.mailbox_accounts
+      end
 
       accounts_to_process.each do |account|
         mailbox = self.class.create_mailbox(account)
@@ -269,7 +273,7 @@ module IncomingMailProcessor
         html_body = self.class.format_message(text_body).first
       end
 
-      [text_body, html_body]
+      return text_body, html_body
     end
 
     def report_stats(incoming_message, mailbox_account)
@@ -295,7 +299,7 @@ module IncomingMailProcessor
       mailbox.connect
       mailbox.each_message(opts) do |message_id, raw_contents|
         message, errors = parse_message(raw_contents)
-        if message && errors.blank?
+        if message && !errors.present?
           process_message(message, account)
           mailbox.delete_message(message_id)
         else
@@ -324,7 +328,7 @@ module IncomingMailProcessor
       # access some of the fields to make sure they don't raise errors when accessed
       message.subject
 
-      [message, errors]
+      return message, errors
     rescue => e
       @error_reporter.log_exception(self.class.error_report_category, e, {})
       nil

@@ -229,14 +229,14 @@ describe EpubExport do
     end
 
     context "running" do
-      %w[created exporting exported generating].each do |state|
+      ['created', 'exporting', 'exported', 'generating'].each do |state|
         it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 1
         end
       end
 
-      %w[generated failed deleted].each do |state|
+      ['generated', 'failed', 'deleted'].each do |state|
         it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 0

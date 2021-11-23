@@ -238,13 +238,13 @@ class SubmissionsController < SubmissionsBaseController
 
     return unless valid_text_entry?
 
-    return if api_request? && !process_api_submission_params
+    return unless process_api_submission_params if api_request?
 
     lookup_existing_attachments
 
-    return if api_request? && !verify_api_call_has_attachment
+    return unless verify_api_call_has_attachment if api_request?
 
-    unless api_request?
+    if !api_request?
       if online_upload?
         return unless extensions_allowed?
         return unless has_file_attached?
@@ -305,9 +305,10 @@ class SubmissionsController < SubmissionsBaseController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          tardiness = if @submission.late?
+          tardiness = case
+                      when @submission.late?
                         2 # late
-                      elsif @submission.cached_due_date.nil?
+                      when @submission.cached_due_date.nil?
                         0 # don't know
                       else
                         1 # on time
@@ -321,7 +322,7 @@ class SubmissionsController < SubmissionsBaseController
         end
         format.json do
           if api_request?
-            includes = %(submission_comments attachments)
+            includes = %|submission_comments attachments|
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
             render json: json,
                    status: :created,
@@ -410,11 +411,11 @@ class SubmissionsController < SubmissionsBaseController
   private :auditing_user_role
 
   def lookup_existing_attachments
-    attachment_ids = if params[:submission][:file_ids].is_a?(Array)
-                       params[:submission][:file_ids]
-                     else
-                       (params[:submission][:attachment_ids] || "").split(",")
-                     end
+    if params[:submission][:file_ids].is_a?(Array)
+      attachment_ids = params[:submission][:file_ids]
+    else
+      attachment_ids = (params[:submission][:attachment_ids] || "").split(",")
+    end
 
     attachment_ids = attachment_ids.select(&:present?)
     params[:submission][:attachments] = []
@@ -428,12 +429,12 @@ class SubmissionsController < SubmissionsBaseController
   private :lookup_existing_attachments
 
   def is_media_recording?
-    params[:submission][:submission_type] == 'media_recording'
+    return params[:submission][:submission_type] == 'media_recording'
   end
   private :is_media_recording?
 
   def has_media_recording?
-    params[:submission][:media_comment_id].present?
+    return params[:submission][:media_comment_id].present?
   end
   private :has_media_recording?
 
@@ -442,7 +443,7 @@ class SubmissionsController < SubmissionsBaseController
       render(:json => { :message => "No valid file ids given" }, :status => :bad_request)
       return false
     end
-    true
+    return true
   end
   private :verify_api_call_has_attachment
 
@@ -457,7 +458,7 @@ class SubmissionsController < SubmissionsBaseController
     # that'll take some further investigation/testing.
     submission_type = params[:submission][:submission_type]
     unless allowed_api_submission_type?(submission_type)
-      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => :bad_request)
+      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => 400)
       return false
     end
 
@@ -468,24 +469,24 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission].slice!(*submission_params)
     if params[:submission].keys.sort != submission_params
       render(:json => {
-               :message => "Invalid parameters for submission_type #{submission_type}. " \
-                           "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
-             }, :status => :bad_request)
+               :message => "Invalid parameters for submission_type #{submission_type}. " +
+                 "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
+             }, :status => 400)
       return false
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
 
-    if params[:submission].key?(:body)
+    if params[:submission].has_key?(:body)
       params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
     end
 
     params[:submission].merge!(always_permitted)
-    true
+    return true
   end
   private :process_api_submission_params
 
   def online_upload?
-    params[:attachments] && params[:submission][:submission_type] == 'online_upload'
+    return params[:attachments] && params[:submission][:submission_type] == 'online_upload'
   end
   private :online_upload?
 
@@ -496,7 +497,7 @@ class SubmissionsController < SubmissionsBaseController
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
-    true
+    return true
   end
   private :has_file_attached?
 
@@ -504,17 +505,18 @@ class SubmissionsController < SubmissionsBaseController
     # if extensions are being restricted, check that the extension is allowed
     # The first check here is for web interface submissions that contain only one file
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
-    if @assignment.allowed_extensions.present? &&
-       (params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
-          params[:attachments].values.any? do |a|
-            !a[:uploaded_data].empty? &&
-            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
-          end)
-      flash[:error] = t('errors.invalid_file_type', "Invalid file type")
-      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-      return false
+    if @assignment.allowed_extensions.present?
+      if params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
+         params[:attachments].values.any? do |a|
+           !a[:uploaded_data].empty? &&
+           !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+         end
+        flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+        redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+        return false
+      end
     end
-    true
+    return true
   end
   private :extensions_allowed?
 
@@ -525,12 +527,12 @@ class SubmissionsController < SubmissionsBaseController
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
-    true
+    return true
   end
   private :valid_text_entry?
 
   def is_google_doc?
-    params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
+    return params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
   end
   private :is_google_doc?
 
@@ -550,7 +552,7 @@ class SubmissionsController < SubmissionsBaseController
 
     restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
-    if restriction_enabled && restricted_google_docs_domain.present? && !@current_user.gmail.match(/@#{restricted_google_docs_domain}$/)
+    if restriction_enabled && !restricted_google_docs_domain.blank? && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
       return nil, t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
     end
 
@@ -569,13 +571,13 @@ class SubmissionsController < SubmissionsBaseController
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
       attachment.save!
     end
-    [attachment, nil] # error message doesn't exist if we got this far
+    return attachment, nil # error message doesn't exist if we got this far
   rescue GoogleDrive::WorkflowError => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    [nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')]
+    return nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')
   rescue GoogleDrive::ConnectionException => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    [nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')]
+    return nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')
   end
   protected :submit_google_doc
 
@@ -587,7 +589,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = %i[eula_agreement_timestamp submitted_at resource_link_lookup_uuid].freeze
+    always_permitted_params = [:eula_agreement_timestamp, :submitted_at, :resource_link_lookup_uuid].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
@@ -607,7 +609,7 @@ class SubmissionsController < SubmissionsBaseController
     # Homework submission is done by API request, but I saw other parts of code
     # that are handling HTML and JSON format. So, I kept the same logic here...
     if api_request?
-      render(json: { message: message }, status: :bad_request)
+      render(json: { message: message }, status: 400)
     else
       flash[:error] = message
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)

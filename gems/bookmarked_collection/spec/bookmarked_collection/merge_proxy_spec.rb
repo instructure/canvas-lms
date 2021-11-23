@@ -55,7 +55,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     it "requires per_page parameter" do
-      expect { @proxy.paginate }.to raise_error(ArgumentError)
+      expect { @proxy.paginate() }.to raise_error(ArgumentError)
     end
 
     it "ignores total_entries parameter" do
@@ -181,7 +181,7 @@ describe "BookmarkedCollection::MergeProxy" do
     describe "with a merge proc" do
       before do
         @example_class.delete_all
-        @courses = Array.new(6) { @example_class.create! }
+        @courses = 6.times.map { @example_class.create! }
         @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
         @scope2 = @example_class.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 
@@ -209,7 +209,7 @@ describe "BookmarkedCollection::MergeProxy" do
       it "keeps the first of each pair of duplicates" do
         results = @proxy.paginate(:per_page => 6)
         expect(results).to eq(@courses)
-        expect(results.map(&:scope)).to eq(%w[1 1 1 1 2 2])
+        expect(results.map(&:scope)).to eq(['1', '1', '1', '1', '2', '2'])
       end
 
       it "indicates the first collection to provide the last value in the bookmark" do

@@ -71,7 +71,7 @@ module Canvas::OAuth
         # account id
         claims[CUSTOM_CLAIM_KEY] = { "account_uuid" => key.account.uuid }
       end
-      [claims, scopes, ttl]
+      return claims, scopes, ttl
     end
   end
 

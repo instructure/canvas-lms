@@ -79,7 +79,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, :only => %i[create destroy re_send_confirmation delete_push_token]
+  before_action :require_user, :only => [:create, :destroy, :re_send_confirmation, :delete_push_token]
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -159,10 +159,10 @@ class CommunicationChannelsController < ApplicationController
                         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
-      unless @access_token
+      if !@access_token
         return render :json => { errors: { type: 'Push is only supported when using an access token' } }, status: :bad_request
       end
-      unless @access_token.developer_key.try(:sns_arn)
+      if !@access_token.developer_key.try(:sns_arn)
         return render :json => { errors: { type: 'SNS is not configured for this developer key' } }, status: :bad_request
       end
 
@@ -220,10 +220,10 @@ class CommunicationChannelsController < ApplicationController
 
   def confirm
     @nonce = params[:nonce]
-    cc = CommunicationChannel.unretired.where.not(path_type: CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
+    cc = CommunicationChannel.unretired.where('path_type != ?', CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
 
     # See if we can find it cross shard if it wasn't found on this shard
-    cc ||= @current_user && @current_user.communication_channels.unretired.where.not(path_type: CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
+    cc ||= @current_user && @current_user.communication_channels.unretired.where('path_type != ?', CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
 
     @headers = false
     if !cc || (cc.path_type == 'email' && !EmailAddressValidator.valid?(cc.path))
@@ -232,7 +232,7 @@ class CommunicationChannelsController < ApplicationController
       @communication_channel = cc
       @user = cc.user
       @enrollment = @user.enrollments.where(uuid: params[:enrollment], workflow_state: 'invited').first if params[:enrollment].present?
-      @course = @enrollment&.course
+      @course = @enrollment && @enrollment.course
       @root_account = @course.root_account if @course
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
@@ -291,7 +291,7 @@ class CommunicationChannelsController < ApplicationController
               (account_to_pseudonyms_hash[p.account] ||= []) << p
             end
             @merge_opportunities << [user, account_to_pseudonyms_hash.each_value.map do |pseudonyms|
-              pseudonyms.detect(&:sis_user_id) || pseudonyms.min_by(&:position)
+              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
             end]
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
@@ -307,11 +307,11 @@ class CommunicationChannelsController < ApplicationController
         @user.transaction do
           @current_user.transaction do
             cc.confirm
-            @enrollment&.accept
+            @enrollment.accept if @enrollment
             UserMerge.from(@user).into(@current_user, merger: @current_user, source: 'cc_confirmation') if @user != @current_user
             # create a new pseudonym if necessary and possible
             pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
-            pseudonym.save! if pseudonym&.changed?
+            pseudonym.save! if pseudonym && pseudonym.changed?
           end
         end
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
@@ -406,7 +406,7 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.save!
 
           if cc.confirm
-            @enrollment&.accept
+            @enrollment.accept if @enrollment
             reset_session_saving_keys(:return_to)
             @user.register
 
@@ -554,9 +554,9 @@ class CommunicationChannelsController < ApplicationController
     endpoints = @current_user.notification_endpoints.shard(@current_user).where("lower(token) = ?", params[:push_token].downcase)
     if endpoints&.destroy_all
       @current_user.touch
-      render json: { success: true }
+      return render json: { success: true }
     else
-      render json: endpoints.errors, status: :bad_request
+      return render json: endpoints.errors, status: :bad_request
     end
   end
 

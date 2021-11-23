@@ -31,14 +31,14 @@ module DataFixup
       WHERE token(id) > token(?)
       LIMIT ?
     }
-    INDEX_METHODS = %i[
-      add_course_assignment_index
-      add_course_assignment_grader_index
-      add_course_assignment_grader_student_index
-      add_course_assignment_student_index
-      add_course_grader_index
-      add_course_grader_student_index
-      add_course_student_index
+    INDEX_METHODS = [
+      :add_course_assignment_index,
+      :add_course_assignment_grader_index,
+      :add_course_assignment_grader_student_index,
+      :add_course_assignment_student_index,
+      :add_course_grader_index,
+      :add_course_grader_student_index,
+      :add_course_student_index
     ].freeze
 
     def read_batch_size
@@ -70,17 +70,17 @@ module DataFixup
       result.fetch do |row|
         last_id = row['id']
         INDEX_METHODS.each do |method|
-          result = send(method, row)
+          result = self.send(method, row)
           index_entries << result if result
         end
       end
       write_in_batches(index_entries)
       save_last_id(last_id)
-      [false, last_id]
+      return false, last_id
     end
 
     def write_in_batches(batch)
-      until batch.empty?
+      while batch.size > 0
         write_batch(batch.shift(write_batch_size))
       end
     end

@@ -34,13 +34,13 @@ module Outcomes
     #
     # Returns a relation of the results, suitably ordered.
     def find_outcome_results(user, opts)
-      required_opts = %i[users context outcomes]
+      required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
       results = LearningOutcomeResult.active.with_active_link.where(
         context_code: context.asset_string,
         user_id: users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id)
+        learning_outcome_id: outcomes.map(&:id),
       )
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
         results = results.exclude_muted_associations
@@ -118,7 +118,7 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results, context = nil)
-      filtered_results = user_results.reject { |r| r.score.nil? }
+      filtered_results = user_results.select { |r| !r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
         RollupScore.new(outcome_results: outcome_results, opts: opts)

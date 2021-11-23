@@ -79,7 +79,7 @@ describe "Group Categories API", type: :request do
             status = raw_api_call(:get, api_url, api_route)
             expect(status).to eq 200
             csv = CSV.parse(response.body)
-            expect(csv.shift).to eq(%w[name canvas_user_id user_id login_id sections group_name])
+            expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
             expect(csv.count).to eq(5)
             5.times do
               p = Pseudonym.by_unique_id(csv.first[3]).take
@@ -132,7 +132,7 @@ describe "Group Categories API", type: :request do
         status = raw_api_call(:get, api_url, api_route)
         expect(status).to eq 200
         csv = CSV.parse(response.body)
-        expect(csv.shift).to eq(%w[name canvas_user_id user_id login_id sections group_name canvas_group_id group_id])
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
         expect(csv.count).to eq(5)
         5.times do
           p = Pseudonym.by_unique_id(csv.first[3]).take
@@ -150,7 +150,7 @@ describe "Group Categories API", type: :request do
         status = raw_api_call(:get, api_url, api_route)
         expect(status).to eq 200
         csv = CSV.parse(response.body)
-        expect(csv.shift).to eq(%w[name canvas_user_id user_id login_id sections group_name])
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
         expect(csv.count).to eq(5)
         5.times do
           p = Pseudonym.by_unique_id(csv.first[3]).take
@@ -199,7 +199,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns users in a group_category" do
-        expected_keys = %w[id name sortable_name short_name]
+        expected_keys = %w{id name sortable_name short_name}
         json = api_call(:get, api_url, api_route)
         expect(json.count).to eq 8
         json.each do |user|
@@ -221,7 +221,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns a list of users" do
-        expected_keys = %w[id name sortable_name short_name]
+        expected_keys = %w{id name sortable_name short_name}
 
         json = api_call(:get, api_url, api_route, { :search_term => 'waldo' })
 
@@ -233,7 +233,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns a list of unassigned users" do
-        expected_keys = %w[id name sortable_name short_name]
+        expected_keys = %w{id name sortable_name short_name}
 
         json = api_call(:get, api_url, api_route, { :search_term => 'antisocial', :unassigned => 'true' })
 
@@ -736,18 +736,18 @@ describe "Group Categories API", type: :request do
           @account.account_users.create(user: @user)
         end
 
-        it "shows SIS fields if the user has permission", priority: 3 do
+        it "shows SIS fields if the user has permission", priority: 3, test_id: 3436530 do
           expect(json[0]).to have_key("sis_group_category_id")
           expect(json[0]).to have_key("sis_import_id")
         end
 
-        it "shows only sis_group_category_id without manage_sis permission", priority: 3 do
+        it "shows only sis_group_category_id without manage_sis permission", priority: 3, test_id: 3436880 do
           @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
           expect(json[0]).to have_key("sis_group_category_id")
           expect(json[0]).not_to have_key("sis_import_id")
         end
 
-        it "does not show SIS fields if the user doesn't have permission", priority: 3 do
+        it "does not show SIS fields if the user doesn't have permission", priority: 3, test_id: 3436531 do
           @account.role_overrides.create(role: admin, enabled: false, permission: :read_sis)
           @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
           expect(json[0]).not_to have_key("sis_group_category_id")

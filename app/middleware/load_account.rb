@@ -51,9 +51,7 @@ class LoadAccount
     clear_caches
   end
 
-  def self.default_domain_root_account
-    Account.default
-  end
+  def self.default_domain_root_account; Account.default; end
 
   def clear_caches
     Canvas::Reloader.reload! if Canvas::Reloader.pending_reload

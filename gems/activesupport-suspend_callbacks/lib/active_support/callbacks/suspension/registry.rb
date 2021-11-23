@@ -29,7 +29,9 @@ module ActiveSupport::Callbacks
       end
 
       def any_registered?(kind)
-        return true if !kind.nil? && any_registered?(nil)
+        unless kind.nil?
+          return true if any_registered?(nil)
+        end
 
         types = @callbacks[kind]
         return false if types.nil?
@@ -43,11 +45,9 @@ module ActiveSupport::Callbacks
       end
 
       def [](kind, type)
-        if @callbacks.key?(kind) && @callbacks[kind].key?(type)
-          @callbacks[kind][type]
-        else
+        @callbacks.has_key?(kind) && @callbacks[kind].has_key?(type) ?
+          @callbacks[kind][type] :
           []
-        end
       end
 
       def []=(kind, type, value)

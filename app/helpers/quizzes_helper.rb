@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 module QuizzesHelper
-  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/.freeze
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
   def needs_unpublished_warning?(quiz = @quiz)
     return false unless can_publish(quiz)
@@ -39,7 +39,7 @@ module QuizzesHelper
 
   def unpublished_quiz_warning
     I18n.t(
-      '*This quiz is unpublished* Only teachers can see the quiz until ' \
+      '*This quiz is unpublished* Only teachers can see the quiz until ' +
       'it is published.',
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>'
     )
@@ -47,18 +47,18 @@ module QuizzesHelper
 
   def unsaved_changes_warning
     I18n.t(
-      '*You have made changes to the questions in this quiz.* ' \
-      'These changes will not appear for students until you ' \
+      '*You have made changes to the questions in this quiz.* ' +
+      'These changes will not appear for students until you ' +
       'save the quiz.',
       :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>'
     )
   end
 
   def quiz_published_state_warning(quiz = @quiz)
-    if quiz.available?
-      unsaved_changes_warning
-    else
+    if !quiz.available?
       unpublished_quiz_warning
+    else
+      unsaved_changes_warning
     end
   end
 
@@ -110,7 +110,7 @@ module QuizzesHelper
   end
 
   def render_show_correct_answers(quiz)
-    unless quiz.show_correct_answers
+    if !quiz.show_correct_answers
       return I18n.t('No')
     end
 
@@ -415,7 +415,7 @@ module QuizzesHelper
     if text.empty?
       ''
     else
-      content_tag(:div, text.join.html_safe, { :class => 'quiz_comment' })
+      content_tag(:div, text.join('').html_safe, { :class => 'quiz_comment' })
     end
   end
 
@@ -444,9 +444,9 @@ module QuizzesHelper
       entry[:blank_id] = AssessmentQuestion.variable_id(entry[:blank_id])
     end
     # Requires mutliline option to be robust
-    res.gsub!(/<input.*?name=\\?['"](question_.*?)\\?['"].*?>/m) do |match|
+    res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
-      blank.delete!('\\')
+      blank.gsub!(/\\/, '')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
       answer = h(answer[:answer] || '')
 
@@ -455,10 +455,10 @@ module QuizzesHelper
         #  Replace the {{question_IDNUM_VARIABLEID}} template text with the user's answer text.
         match = match.sub(/\{\{question_.*?\}\}/, answer.to_s).
                 # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
-                sub(%r{/*>\Z}, readonly_markup)
+                sub(/\/*>\Z/, readonly_markup)
       end
       # add labelling to input element regardless
-      match.sub(%r{/*>\Z}, "#{label_attr} />")
+      match.sub(/\/*>\Z/, "#{label_attr} />")
     end
 
     if answer_list.empty?
@@ -481,7 +481,7 @@ module QuizzesHelper
     doc = Nokogiri::HTML5.fragment(res)
     selects = doc.css(".question_input")
     selects.each do |s|
-      if answer_list.present?
+      if answer_list && !answer_list.empty?
         a = answer_list[index]
         index += 1
       else
@@ -494,11 +494,13 @@ module QuizzesHelper
         if (opt_tag = s.children.css("option[value='#{a}']").first)
           opt_tag["selected"] = "selected"
         end
-      elsif (opt_tag = s.children.css("option[value='#{a}']").first)
+      else
         # If existing answer is one of the options, replace it with a span
-        span = doc.fragment("<span />").children.first
-        span.children = opt_tag.children
-        s.swap(span)
+        if (opt_tag = s.children.css("option[value='#{a}']").first)
+          span = doc.fragment("<span />").children.first
+          span.children = opt_tag.children
+          s.swap(span)
+        end
       end
 
       s['aria-label'] = I18n.t("Multiple dropdowns, read surrounding text")
@@ -507,11 +509,11 @@ module QuizzesHelper
   end
 
   def duration_in_minutes(duration_seconds)
-    duration_minutes = if duration_seconds < 60
-                         0
-                       else
-                         (duration_seconds / 60).round
-                       end
+    if duration_seconds < 60
+      duration_minutes = 0
+    else
+      duration_minutes = (duration_seconds / 60).round
+    end
     I18n.t(
       { :zero => "less than 1 minute",
         :one => "1 minute",
@@ -523,7 +525,7 @@ module QuizzesHelper
   def score_out_of_points_possible(score, points_possible, options = {})
     options.reverse_merge!({ :precision => 2 })
     score_html = \
-      if options[:id] || options[:class] || options[:style]
+      if options[:id] or options[:class] or options[:style] then
         content_tag('span',
                     render_score(score, options[:precision]),
                     options.slice(:class, :id, :style))
@@ -537,7 +539,7 @@ module QuizzesHelper
 
   def link_to_take_quiz(link_body, opts = {})
     opts = opts.with_indifferent_access
-    class_array = (opts['class'] || "").split
+    class_array = (opts['class'] || "").split(" ")
     class_array << 'element_toggler' if @quiz.cant_go_back?
     opts['class'] = class_array.compact.join(" ")
     opts['aria-controls'] = 'js-sequential-warning-dialogue' if @quiz.cant_go_back?
@@ -550,7 +552,7 @@ module QuizzesHelper
   end
 
   def take_quiz_url
-    user_id = @current_user&.id
+    user_id = @current_user && @current_user.id
     course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
@@ -583,27 +585,21 @@ module QuizzesHelper
   end
 
   def take_poll_message(quiz = @quiz)
-    if quiz.survey?
-      I18n.t('Take the Survey')
-    else
+    quiz.survey? ?
+      I18n.t('Take the Survey') :
       I18n.t('Take the Quiz')
-    end
   end
 
   def retake_poll_message(quiz = @quiz)
-    if quiz.survey?
-      I18n.t('Take the Survey Again')
-    else
+    quiz.survey? ?
+      I18n.t('Take the Survey Again') :
       I18n.t('Take the Quiz Again')
-    end
   end
 
   def resume_poll_message(quiz = @quiz)
-    if quiz.survey?
-      I18n.t('Resume Survey')
-    else
+    quiz.survey? ?
+      I18n.t('Resume Survey') :
       I18n.t('Resume Quiz')
-    end
   end
 
   def attachment_id_for(question)
@@ -667,7 +663,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
   end
 
   def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
@@ -692,7 +688,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
   end
 
   def show_correct_answers?

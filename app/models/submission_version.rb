@@ -30,7 +30,7 @@ class SubmissionVersion < ActiveRecord::Base
   # specify the name, we might as well use the whole module/class name
   belongs_to :version, class_name: "SimplyVersioned::Version"
 
-  validates :context_id, :version_id, :user_id, :assignment_id, presence: true
+  validates_presence_of :context_id, :version_id, :user_id, :assignment_id
 
   class << self
     def index_version(version)
@@ -39,7 +39,7 @@ class SubmissionVersion < ActiveRecord::Base
     end
 
     def index_versions(versions, options = {})
-      records = versions.filter_map { |version| extract_version_attributes(version, options) }
+      records = versions.map { |version| extract_version_attributes(version, options) }.compact
       bulk_insert(records) if records.present?
     end
 

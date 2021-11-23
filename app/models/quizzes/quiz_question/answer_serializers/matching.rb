@@ -54,7 +54,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         entry = entry.with_indifferent_access
 
         %w[answer_id match_id].each do |required_param|
-          unless entry.key?(required_param)
+          unless entry.has_key?(required_param)
             return rc.reject 'Matching pair is missing parameter "%s"' % [
               required_param
             ]
@@ -103,12 +103,12 @@ module Quizzes::QuizQuestion::AnswerSerializers
         match_id = submission_data[answer_key] # this is always a string
         has_match = match_id.present?
 
-        next unless has_match || full
-
-        out << {
-          answer_id: answer_id.to_s,
-          match_id: has_match ? match_id : nil
-        }.with_indifferent_access
+        if has_match || full
+          out << {
+            answer_id: answer_id.to_s,
+            match_id: has_match ? match_id : nil
+          }.with_indifferent_access
+        end
       end
     end
 

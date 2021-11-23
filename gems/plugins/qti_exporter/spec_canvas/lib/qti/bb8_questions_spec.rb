@@ -68,10 +68,7 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
       end
       # compare everything else without the ids
-      hash[:answers].each { |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      }
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB8Expected::MATCHING
     end
@@ -106,10 +103,7 @@ if Qti.migration_executable
 
     it "converts ordering questions into matching questions" do
       hash = get_question_hash(bb8_question_dir, 'ordering')
-      hash[:answers].each { |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      }
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB8Expected::ORDER
     end
@@ -160,7 +154,7 @@ if Qti.migration_executable
                         :question_type => "multiple_choice_question",
                         :question_name => "",
                         :question_text => "The answer is nose.<br>",
-                        :migration_id => "_154767_1" }.freeze
+                        :migration_id => "_154767_1" }
 
     MULTIPLE_CHOICE_BLANK_ANSWERS = { :question_name => "",
                                       :question_text => "This is a great question.<br>",
@@ -181,7 +175,7 @@ if Qti.migration_executable
                                                 :migration_id => "RESPONSE_686165cd422f45669b6be25b4f90f5de" }],
                                       :migration_id => "_154777_1",
                                       :correct_comments => "",
-                                      :points_possible => 17.0 }.freeze
+                                      :points_possible => 17.0 }
 
     # removed ids on the answers
     TRUE_FALSE = { :answers =>
@@ -193,7 +187,7 @@ if Qti.migration_executable
                    :question_type => "true_false_question",
                    :question_name => "",
                    :question_text => "I am wearing a black hat.<br>",
-                   :migration_id => "_154772_1" }.freeze
+                   :migration_id => "_154772_1" }
 
     # removed ids on the answers
     MULTIPLE_ANSWER = { :answers =>
@@ -215,7 +209,7 @@ if Qti.migration_executable
                         :question_type => "multiple_answers_question",
                         :question_name => "",
                         :question_text => "The answers are house and garage.<br>",
-                        :migration_id => "_154766_1" }.freeze
+                        :migration_id => "_154766_1" }
 
     ESSAY = { :example_solution => "Nobody.",
               :migration_id => "_154759_1",
@@ -225,7 +219,7 @@ if Qti.migration_executable
               :question_name => "",
               :question_text => "Who likes to use Blackboard?<br>",
               :incorrect_comments => "",
-              :question_type => "essay_question" }.freeze
+              :question_type => "essay_question" }
 
     SHORT_RESPONSE = { :migration_id => "_154771_1",
                        :answers => [],
@@ -235,7 +229,7 @@ if Qti.migration_executable
                        :points_possible => 10.0,
                        :question_type => "essay_question",
                        :question_name => "",
-                       :question_text => "We all live in what?<br>" }.freeze
+                       :question_text => "We all live in what?<br>" }
 
     # removed ids on the answers
     MATCHING = { :answers =>
@@ -254,7 +248,7 @@ if Qti.migration_executable
                         [{ :text => "right 1" },
                          { :text => "right 2" },
                          { :text => "right 4" },
-                         { :text => "right 3" }] }.freeze
+                         { :text => "right 3" }] }
 
     LIKERT = { :answers =>
             [{ :text => "Strongly Agree",
@@ -281,7 +275,7 @@ if Qti.migration_executable
                :question_name => "",
                :migration_id => "_154768_1",
                :question_text => "You love Blackboard<br>",
-               :correct_comments => "right?" }.freeze
+               :correct_comments => "right?" }
 
     FILL_IN_THE_BLANK = { :question_text => "The answer is 'purple'.<br>",
                           :answers =>
@@ -292,7 +286,7 @@ if Qti.migration_executable
                           :points_possible => 10.0,
                           :question_type => "short_answer_question",
                           :question_name => "",
-                          :migration_id => "_154762_1" }.freeze
+                          :migration_id => "_154762_1" }
 
     EITHER_OR_YES_NO = { :question_name => "",
                          :answers =>
@@ -305,7 +299,7 @@ if Qti.migration_executable
                          :correct_comments => "right answer",
                          :incorrect_comments => "Wrong answer",
                          :points_possible => 10.0,
-                         :question_type => "multiple_choice_question" }.freeze
+                         :question_type => "multiple_choice_question" }
 
     EITHER_OR_AGREE_DISAGREE = { :question_type => "multiple_choice_question",
                                  :answers =>
@@ -318,7 +312,7 @@ if Qti.migration_executable
                                  :question_text => "Either or question with agree/disagree.",
                                  :correct_comments => "correct answer",
                                  :incorrect_comments => "wrong answer",
-                                 :points_possible => 10.0 }.freeze
+                                 :points_possible => 10.0 }
 
     EITHER_OR_TRUE_FALSE = { :question_type => "multiple_choice_question",
                              :answers =>
@@ -331,7 +325,7 @@ if Qti.migration_executable
                              :question_text => "Either/or question with true/false options",
                              :correct_comments => "r",
                              :incorrect_comments => "w",
-                             :points_possible => 10.0 }.freeze
+                             :points_possible => 10.0 }
 
     EITHER_OR_RIGHT_WRONG = { :question_type => "multiple_choice_question",
                               :answers =>
@@ -344,7 +338,7 @@ if Qti.migration_executable
                               :question_text => "A duck is either a bird or a plane.<br>",
                               :correct_comments => "right",
                               :incorrect_comments => "wrong",
-                              :points_possible => 7.0 }.freeze
+                              :points_possible => 7.0 }
 
     FILE_RESPONSE = { :correct_comments => "",
                       :answers => [],
@@ -354,7 +348,7 @@ if Qti.migration_executable
                       :question_type => "File Upload",
                       :question_name => "",
                       :migration_id => "_154760_1",
-                      :question_text => "File response question. I don't know what this is.<br>" }.freeze
+                      :question_text => "File response question. I don't know what this is.<br>" }
 
     HOT_SPOT = { :answers => [],
                  :question_name => "",
@@ -364,7 +358,7 @@ if Qti.migration_executable
                  :incorrect_comments => "",
                  :unsupported => true,
                  :points_possible => 10.0,
-                 :question_type => "Hot Spot" }.freeze
+                 :question_type => "Hot Spot" }
 
     QUIZ_BOWL = { :answers => [],
                   :question_type => "Quiz Bowl",
@@ -374,7 +368,7 @@ if Qti.migration_executable
                   :correct_comments => "",
                   :incorrect_comments => "",
                   :unsupported => true,
-                  :points_possible => 10.0 }.freeze
+                  :points_possible => 10.0 }
 
     FILL_IN_MULTIPLE_BLANKS = { :answers =>
             [{ :text => "poor", :comments => "", :blank_id => "1", :weight => 100 },
@@ -389,7 +383,7 @@ if Qti.migration_executable
                                 :question_name => "",
                                 :migration_id => "_154761_1",
                                 :question_text => "I'm just a [1] [kind-of-being] from a [2-a] [family]<br>",
-                                :correct_comments => "right" }.freeze
+                                :correct_comments => "right" }
 
     JUMBLED_SENTENCE = {
       :answers =>
@@ -414,7 +408,7 @@ if Qti.migration_executable
       :migration_id => "_154764_1",
       :question_text => "The quick [brown] fox [jumped] over the [fence].<br>",
       :correct_comments => "right"
-    }.freeze
+    }
 
     ORDER = { :answers =>
             [{ :text => "1", :comments => "" },
@@ -432,7 +426,7 @@ if Qti.migration_executable
                      [{ :text => "b" },
                       { :text => "a" },
                       { :text => "c" },
-                      { :text => "d" }] }.freeze
+                      { :text => "d" }] }
 
     CALCULATED_SIMPLE = { :question_type => "calculated_question",
                           :variables => [{ :min => -10, :max => 10, :name => "x", :scale => 0 }],
@@ -461,7 +455,7 @@ if Qti.migration_executable
                           :incorrect_comments => "You got it wrong...",
                           :formulas => [{ :formula => "<math><apply><minus/><cn>10</cn><ci>x</ci></apply></math>" }],
                           :unit_case_sensitive => false,
-                          :points_possible => 10 }.freeze
+                          :points_possible => 10 }
 
     CALCULATED_COMPLEX = { :question_type => "calculated_question",
                            :variables =>
@@ -487,7 +481,7 @@ if Qti.migration_executable
                            :incorrect_comments => "Wrong.",
                            :formulas => [{ :formula => "<math><apply><times/><apply><power/><apply><times/><cn>10</cn><ci>F</ci></apply><apply><minus/><cn>1</cn></apply></apply><apply><plus/><apply><times/><cn>1000</cn><ci>F</ci><ci>r</ci><apply><power/><ci>i</ci><apply><minus/><cn>1</cn></apply></apply><apply><minus/><cn>1</cn><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><times/><cn>1000</cn><ci>F</ci><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><plus/><cn>1</cn><apply><times/><apply><divide/><ci>i</ci><cn>100</cn></apply><apply><divide/><ci>n</ci><cn>360</cn></apply></apply></apply></apply></math>" }],
                            :unit_case_sensitive => false,
-                           :points_possible => 10 }.freeze
+                           :points_possible => 10 }
 
     CALCULATED_NUMERIC = { :migration_id => "_154758_1",
                            :answers =>
@@ -501,7 +495,7 @@ if Qti.migration_executable
                            :incorrect_comments => "Left",
                            :points_possible => 10.0,
                            :question_type => "numerical_question",
-                           :question_name => "" }.freeze
+                           :question_name => "" }
 
     ASSESSMENT = { :points_possible => "237.0",
                    :questions =>
@@ -540,6 +534,6 @@ if Qti.migration_executable
                             :grade_type => "numeric",
                             :due_date => nil,
                             :weight => nil
-                          } }.freeze
+                          } }
   end
 end

@@ -46,7 +46,7 @@ module NotificationsCommon
   end
 
   def load_all_notifications
-    load File.expand_path('../../../lib/tasks/db_load_data.rake', __dir__)
+    load File.expand_path("../../../../lib/tasks/db_load_data.rake", __FILE__)
     Rake::Task.define_task(:environment)
     Rake::Task["db:load_notifications"].invoke
   end

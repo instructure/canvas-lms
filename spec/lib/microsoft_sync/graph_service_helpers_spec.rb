@@ -22,14 +22,7 @@ require_relative '../../spec_helper'
 describe MicrosoftSync::GraphServiceHelpers do
   subject { described_class.new('mytenant123', extra_tag: 'abc') }
 
-  let(:graph_service) do
-    instance_double(
-      MicrosoftSync::GraphService,
-      education_classes: instance_double(MicrosoftSync::GraphService::EducationClassesEndpoints),
-      users: instance_double(MicrosoftSync::GraphService::UsersEndpoints),
-      groups: instance_double(MicrosoftSync::GraphService::GroupsEndpoints)
-    )
-  end
+  let(:graph_service) { double('GraphService') }
 
   before do
     allow(MicrosoftSync::GraphService).to \
@@ -39,7 +32,7 @@ describe MicrosoftSync::GraphServiceHelpers do
   describe '#list_education_classes_for_course' do
     it 'filters by externalId=course.uuid' do
       course_model
-      expect(graph_service.education_classes).to receive(:list)
+      expect(graph_service).to receive(:list_education_classes)
         .with(filter: { externalId: @course.uuid })
         .and_return([{ abc: 123 }])
       expect(subject.list_education_classes_for_course(@course)).to eq([{ abc: 123 }])
@@ -51,13 +44,13 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     it 'maps course fields to Microsoft education class fields' do
       course_model(public_description: 'great class', name: 'math 101')
-      expect(graph_service.education_classes).to receive(:create).with(
+      expect(graph_service).to receive(:create_education_class).with(
         description: 'great class',
         displayName: 'math 101',
         externalId: @course.uuid,
         externalName: 'math 101',
         externalSource: 'manual',
-        mailNickname: "Course_math_101-#{@course.uuid.first(13)}"
+        mailNickname: "Course_math_101-#{@course.uuid.first(13)}",
       ).and_return('foo')
 
       expect(subject.create_education_class(@course)).to eq('foo')
@@ -68,7 +61,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       # string
       it 'sends nil instead of the empty string' do
         course_model(public_description: '', name: 'math 101')
-        expect(graph_service.education_classes).to receive(:create).with(
+        expect(graph_service).to receive(:create_education_class).with(
           hash_including(description: nil)
         ).and_return('foo')
         subject.create_education_class(@course)
@@ -83,13 +76,13 @@ describe MicrosoftSync::GraphServiceHelpers do
       end
 
       it 'removes the special characters' do
-        expect(graph_service.education_classes).to receive(:create).with(
+        expect(graph_service).to receive(:create_education_class).with(
           description: 'great class',
           displayName: course.name,
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math_241-#{course.uuid.first(13)}"
+          mailNickname: "Course_math_241-#{course.uuid.first(13)}",
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -104,13 +97,13 @@ describe MicrosoftSync::GraphServiceHelpers do
       end
 
       it 'removes the invalid characters' do
-        expect(graph_service.education_classes).to receive(:create).with(
+        expect(graph_service).to receive(:create_education_class).with(
           description: 'great class',
           displayName: course.name,
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math-#{course.uuid.first(13)}"
+          mailNickname: "Course_math-#{course.uuid.first(13)}",
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -125,13 +118,13 @@ describe MicrosoftSync::GraphServiceHelpers do
       end
 
       it 'removes the whitespace' do
-        expect(graph_service.education_classes).to receive(:create).with(
+        expect(graph_service).to receive(:create_education_class).with(
           description: 'great class',
           displayName: course.name,
           externalId: course.uuid,
           externalName: course.name,
           externalSource: 'manual',
-          mailNickname: "Course_math_101-#{course.uuid.first(13)}"
+          mailNickname: "Course_math_101-#{course.uuid.first(13)}",
         ).and_return('foo')
 
         subject.create_education_class(course)
@@ -144,7 +137,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       before { course_model(public_description: 'great class', name: name) }
 
       it 'shortens the mailNickname' do
-        expect(graph_service.education_classes).to receive(:create).with(
+        expect(graph_service).to receive(:create_education_class).with(
           description: 'great class',
           displayName: name,
           externalId: @course.uuid,
@@ -161,8 +154,8 @@ describe MicrosoftSync::GraphServiceHelpers do
       before { course_model(public_description: 'a' * 1025) }
 
       it 'truncates the description' do
-        expect(graph_service.education_classes).to \
-          receive(:create).with(hash_including(description: ('a' * 1021) + '...'))
+        expect(graph_service).to \
+          receive(:create_education_class).with(hash_including(description: ('a' * 1021) + '...'))
         subject.create_education_class(@course)
       end
     end
@@ -171,8 +164,8 @@ describe MicrosoftSync::GraphServiceHelpers do
       before { course_model(public_description: 'a' * 1024) }
 
       it 'does not truncate the description' do
-        expect(graph_service.education_classes).to \
-          receive(:create).with(hash_including(description: 'a' * 1024))
+        expect(graph_service).to \
+          receive(:create_education_class).with(hash_including(description: 'a' * 1024))
         subject.create_education_class(@course)
       end
     end
@@ -186,7 +179,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       # force generation of lti context id (normally done lazily)
       lti_context_id = Lti::Asset.opaque_identifier_for(@course)
       expect(lti_context_id).to_not eq(nil)
-      expect(graph_service.groups).to receive(:update).with(
+      expect(graph_service).to receive(:update_group).with(
         'msgroupid',
         microsoft_EducationClassLmsExt: {
           ltiContextId: lti_context_id,
@@ -203,10 +196,10 @@ describe MicrosoftSync::GraphServiceHelpers do
     end
 
     def expect_lms_ext_properties(props)
-      expect(graph_service.groups).to receive(:update).with(
+      expect(graph_service).to receive(:update_group).with(
         'msgroupid',
         hash_including(
-          microsoft_EducationClassLmsExt: hash_including(props)
+          microsoft_EducationClassLmsExt: hash_including(props),
         )
       )
     end
@@ -236,8 +229,8 @@ describe MicrosoftSync::GraphServiceHelpers do
     let(:expected_remote_attr) { 'mailNickname' }
 
     before do
-      allow(subject.graph_service.users).to \
-        receive(:list)
+      allow(subject.graph_service).to \
+        receive(:list_users)
         .with(select: ['id', expected_remote_attr], filter: { expected_remote_attr => requested })
         .and_return([
                       { 'id' => '789', expected_remote_attr => 'D' },
@@ -303,21 +296,19 @@ describe MicrosoftSync::GraphServiceHelpers do
 
   describe '#get_group_users_aad_ids' do
     it 'returns ids of all pages of members' do
-      expect(subject.graph_service.groups).to receive(:list_members)
-        .once
-        .with('mygroupid', select: ['id'], top: 999)
-        .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
-        .and_yield([{ 'id' => 'c' }])
+      expect(subject.graph_service).to receive(:list_group_members).once
+                                                                   .with('mygroupid', select: ['id'], top: 999)
+                                                                   .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+                                                                   .and_yield([{ 'id' => 'c' }])
       expect(subject.get_group_users_aad_ids('mygroupid')).to eq(%w[a b c])
     end
 
     context 'when owners: true is passed in' do
       it 'returns owners' do
-        expect(subject.graph_service.groups).to receive(:list_owners)
-          .once
-          .with('mygroupid', select: ['id'], top: 999)
-          .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
-          .and_yield([{ 'id' => 'c' }])
+        expect(subject.graph_service).to receive(:list_group_owners).once
+                                                                    .with('mygroupid', select: ['id'], top: 999)
+                                                                    .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+                                                                    .and_yield([{ 'id' => 'c' }])
         expect(subject.get_group_users_aad_ids('mygroupid', owners: true)).to eq(%w[a b c])
       end
     end

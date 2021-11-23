@@ -26,7 +26,7 @@
 
 require_relative '../common'
 
-RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/.freeze # 10 chars of an MD5
+RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
 
 describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   include_context "in-process server selenium tests"
@@ -54,7 +54,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           next unless includes_no_variables
 
           msg = "all variants should output the same css if a bundle doesn't pull in the variables file"
-          unique_fingerprints = fingerprints.pluck(:combinedChecksum).uniq
+          unique_fingerprints = fingerprints.map { |f| f[:combinedChecksum] }.uniq
           expect(unique_fingerprints.length).to eq(1), msg
         end
       end

@@ -23,15 +23,15 @@ require 'set'
 
 class ContentZipper
   def initialize(options = {})
-    @check_user = options.key?(:check_user) ? options[:check_user] : true
+    @check_user = options.has_key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
   attr_writer :user
 
   # we evaluate some ERB templates from under app/views/ while generating assignment zips
   include I18nUtilities
-  def t(...)
-    I18n.t(...)
+  def t(*a, &b)
+    I18n.t(*a, &b)
   end
 
   def self.process_attachment(*args)
@@ -76,7 +76,7 @@ class ContentZipper
     # downloadable submissions below as well as those that can't be
     # downloaded. In that case, only retrieve the ones that can be
     # downloaded.
-    downloadable_submissions = %w[online_upload online_url online_text_entry]
+    downloadable_submissions = ["online_upload", "online_url", "online_text_entry"]
     if @context.completed?
       submissions = assignment.submissions.where(submission_type: downloadable_submissions)
       # This neglects the complexity of group assignments
@@ -147,6 +147,7 @@ class ContentZipper
       submissions_hash[s.id] = s
       if s.submission_type == 'online_upload'
         static_attachments += s.attachments
+      else
       end
     end
     static_attachments = static_attachments.uniq.map do |a|
@@ -173,7 +174,7 @@ class ContentZipper
           add_attachment_to_zip(a.attachment, zipfile, a.unencoded_filename)
           update_progress(zip_attachment, index, count)
         end
-        content = Rails.root.join('public/images/logo.png').read rescue nil
+        content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
         zipfile.get_output_stream("logo.png") { |f| f.write content } if content
       end
       mark_successful!
@@ -187,7 +188,8 @@ class ContentZipper
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
-    av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
+    res = av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
+    res
   end
 
   def self.zip_base_folder(*args)
@@ -226,7 +228,7 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
-    filename = File.basename(filename.tr(' ', "_").gsub(/[^\w-]/, ""))
+    filename = File.basename(filename.gsub(/ /, "_").gsub(/[^\w-]/, ""))
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name
@@ -234,9 +236,9 @@ class ContentZipper
   end
 
   # The callback should accept two arguments, the attachment/folder and the folder names
-  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
-    if block && (folder.hidden? || folder.locked)
-      yield(folder, folder_names)
+  def zip_folder(folder, zipfile, folder_names, opts = {}, &callback)
+    if callback && (folder.hidden? || folder.locked)
+      callback.call(folder, folder_names)
     end
     # @user = nil either means that
     # 1. this is part of a public course, and is being downloaded by somebody
@@ -254,26 +256,30 @@ class ContentZipper
     attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
       attachment.display_name = Attachment.shorten_filename(attachment.display_name)
       # Preventing further unwanted filename alterations during the rest of the process,
-      # namely, in the block further below. Also, we want to avoid accidental saving of the file
+      # namely, in the callback further below. Also, we want to avoid accidental saving of the file
       # with the shortened name
       attachment.readonly!
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
-      yield(attachment, folder_names) if block
+      callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       if add_attachment_to_zip(attachment, zipfile, path)
         @files_added ||= 0
         @files_added += 1
         update_progress(@zip_attachment, @files_added, @file_count) if @zip_attachment
-      elsif @files_added.nil?
-        @files_added = false
+      else
+        @files_added = false if @files_added.nil?
       end
     end
     folder.active_sub_folders.select do |f|
       !@check_user || f.grants_right?(@user, :read_contents_for_export)
     end.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
-      zip_folder(sub_folder, zipfile, new_names, opts, &block)
+      if callback
+        zip_folder(sub_folder, zipfile, new_names, opts, &callback)
+      else
+        zip_folder(sub_folder, zipfile, new_names, opts)
+      end
     end
   end
 
@@ -319,7 +325,7 @@ class ContentZipper
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false
     ensure
-      handle&.close
+      handle.close if handle
     end
 
     true
@@ -412,11 +418,10 @@ class ContentZipper
   end
 
   def add_text_or_url(type, to_zip, called)
-    case type
-    when :text
+    if type == :text
       filename = "#{called}_text.html"
       display_page = "text_entry_page.html.erb"
-    when :url
+    elsif type == :url
       filename = "#{called}_link.html"
       display_page = "redirect_page.html.erb"
     end
@@ -461,7 +466,7 @@ class ContentZipper
   end
 
   def sanitize_attachment_filename(filename)
-    filename.gsub(%r{[\x00/\\:*?"<>|]+}, '_')
+    filename.gsub(/[\x00\/\\:*?"<>|]+/, '_')
   end
 
   def sanitize_user_name(user_name)

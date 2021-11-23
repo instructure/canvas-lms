@@ -66,9 +66,9 @@ describe Importers::CalendarEventImporter do
   end
 
   def check_paragraph_link(s, type = nil)
-    md = s.match(/^<p><a href=['"]([^'"]*)['"]/)
+    md = s.match %r(^<p><a href=['"]([^'"]*)['"])
     expect(md).not_to be_nil
-    expect(md[1]).to match %r{courses/\d+/#{type}/\d+} if type
+    expect(md[1]).to match %r(courses/\d+/#{type}/\d+) if type
   end
 
   describe '.import_from_migration' do
@@ -141,25 +141,25 @@ describe Importers::CalendarEventImporter do
   end
 
   SYSTEMS.each do |system|
-    next unless import_data_exists? system, 'calendar_event'
+    if import_data_exists? system, 'calendar_event'
+      it "imports calendar events for #{system}" do
+        data = get_import_data(system, 'calendar_event')
+        context = get_import_context(system)
+        migration = context.content_migrations.create!
 
-    it "imports calendar events for #{system}" do
-      data = get_import_data(system, 'calendar_event')
-      context = get_import_context(system)
-      migration = context.content_migrations.create!
+        data[:events_to_import] = {}
+        expect(Importers::CalendarEventImporter.import_from_migration(data, context, migration)).to be_nil
+        expect(context.calendar_events.count).to eq 0
 
-      data[:events_to_import] = {}
-      expect(Importers::CalendarEventImporter.import_from_migration(data, context, migration)).to be_nil
-      expect(context.calendar_events.count).to eq 0
+        data[:events_to_import][data[:migration_id]] = true
+        Importers::CalendarEventImporter.import_from_migration(data, context, migration)
+        Importers::CalendarEventImporter.import_from_migration(data, context, migration)
+        expect(context.calendar_events.count).to eq 1
 
-      data[:events_to_import][data[:migration_id]] = true
-      Importers::CalendarEventImporter.import_from_migration(data, context, migration)
-      Importers::CalendarEventImporter.import_from_migration(data, context, migration)
-      expect(context.calendar_events.count).to eq 1
-
-      event = CalendarEvent.where(migration_id: data[:migration_id]).first
-      expect(event.title).to eq data[:title]
-      expect(event.description.gsub("&#x27;", "'").index(data[:description])).not_to be_nil
+        event = CalendarEvent.where(migration_id: data[:migration_id]).first
+        expect(event.title).to eq data[:title]
+        expect(event.description.gsub("&#x27;", "'").index(data[:description])).not_to be_nil
+      end
     end
   end
 end

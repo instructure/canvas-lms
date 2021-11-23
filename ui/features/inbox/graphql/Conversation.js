@@ -31,12 +31,18 @@ export const Conversation = {
       contextType
       contextName
       subject
+      conversationMessagesConnection {
+        nodes {
+          ...ConversationMessage
+        }
+      }
       conversationParticipantsConnection {
         nodes {
           ...ConversationParticipant
         }
       }
     }
+    ${ConversationMessage.fragment}
     ${ConversationParticipant.fragment}
   `,
 

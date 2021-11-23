@@ -37,7 +37,8 @@ class GradeSummaryAssignmentPresenter
     # first one.
     submission.attachments
               .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .min
+              .sort
+              .first
   end
 
   def originality_report?
@@ -96,7 +97,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_comments?
-    submission&.visible_submission_comments && !submission.visible_submission_comments.empty?
+    submission && submission.visible_submission_comments && !submission.visible_submission_comments.empty?
   end
 
   def has_scoring_details?
@@ -200,11 +201,11 @@ class GradeSummaryAssignmentPresenter
   end
 
   def plagiarism(type)
-    plag_data = if type == 'vericite'
-                  submission.vericite_data(true)
-                else
-                  submission.originality_data
-                end
+    if type == 'vericite'
+      plag_data = submission.vericite_data(true)
+    else
+      plag_data = submission.originality_data
+    end
     t = if is_text_entry?
           plag_data[OriginalityReport.submission_asset_key(submission)] ||
             plag_data[submission.asset_string]
@@ -223,7 +224,7 @@ class GradeSummaryAssignmentPresenter
   def graph
     @graph ||= begin
       high, low, mean = grade_distribution
-      score = submission&.score
+      score = submission && submission.score
       GradeSummaryGraph.new(high, low, mean, assignment.points_possible, score)
     end
   end
@@ -249,7 +250,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def group
-    @group ||= assignment&.assignment_group
+    @group ||= assignment && assignment.assignment_group
   end
 
   def viewing_fake_student?
