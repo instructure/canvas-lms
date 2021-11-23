@@ -2702,16 +2702,16 @@ describe User do
 
     it "returns default gradebook when preferred" do
       user.set_preference(:gradebook_version, "default")
-      is_expected.to eq 'default'
+      expect(subject).to eq 'default'
     end
 
     it "returns individual gradebook when preferred" do
       user.set_preference(:gradebook_version, "individual")
-      is_expected.to eq 'individual'
+      expect(subject).to eq 'individual'
     end
 
     it "returns default gradebook when not set" do
-      is_expected.to eq 'default'
+      expect(subject).to eq 'default'
     end
   end
 

@@ -56,7 +56,7 @@ describe GradingPeriod do
 
   it "requires start_date to be before end_date" do
     subject.assign_attributes(start_date: now.change(sec: 59), end_date: now.change(sec: 0))
-    is_expected.not_to be_valid
+    expect(subject).not_to be_valid
   end
 
   it "requires a title" do
@@ -142,7 +142,7 @@ describe GradingPeriod do
 
     context "no periods" do
       it "finds no current periods" do
-        is_expected.to be_empty
+        expect(subject).to be_empty
       end
     end
 
@@ -157,48 +157,48 @@ describe GradingPeriod do
       end
 
       it "finds one current period" do
-        is_expected.to eq [period]
+        expect(subject).to eq [period]
       end
 
       it "includes the period if the current time is the same as the grading period end date" do
         Timecop.freeze(now) do
           period.update!(end_date: now)
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
 
       it "includes the period if the current time is past the end date but the minute has not passed" do
         Timecop.freeze(now.change(sec: 59)) do
           period.update!(end_date: now.change(sec: 0))
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
 
       it "does not include the period if the current time is past the end date and the minute has passed" do
         Timecop.freeze(1.minute.from_now(now)) do
           period.update!(end_date: now)
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "does not include the period if start_date equals Time.now" do
         Timecop.freeze(now) do
           period.update!(start_date: now)
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "does not include period if the current time is past the start date and the minute has not passed" do
         Timecop.freeze(now.change(sec: 59)) do
           period.update!(start_date: now.change(sec: 0))
-          is_expected.to be_empty
+          expect(subject).to be_empty
         end
       end
 
       it "includes the period if the current time is past the start date and the minute has passed" do
         Timecop.freeze(1.minute.from_now(now)) do
           period.update!(start_date: now)
-          is_expected.to be_present
+          expect(subject).to be_present
         end
       end
     end
@@ -818,35 +818,35 @@ describe GradingPeriod do
     end
 
     it "is in date range for a date that equals end_date" do
-      is_expected.to be_in_date_range(period.end_date)
+      expect(subject).to be_in_date_range(period.end_date)
     end
 
     it "is in date range for a date that is past the end date but the minute has not yet passed" do
-      is_expected.to be_in_date_range(period.end_date.change(sec: 59))
+      expect(subject).to be_in_date_range(period.end_date.change(sec: 59))
     end
 
     it "is not in date range for a date that is past the end date and the minute has passed" do
-      is_expected.not_to be_in_date_range(1.minute.from_now(period.end_date))
+      expect(subject).not_to be_in_date_range(1.minute.from_now(period.end_date))
     end
 
     it "is not in date range for a date before the period" do
-      is_expected.not_to be_in_date_range(2.weeks.ago(now))
+      expect(subject).not_to be_in_date_range(2.weeks.ago(now))
     end
 
     it "is not in date range for or a date after the period" do
-      is_expected.not_to be_in_date_range(3.weeks.from_now(now))
+      expect(subject).not_to be_in_date_range(3.weeks.from_now(now))
     end
 
     it "is not in date range for a date that equals start_date" do
-      is_expected.not_to be_in_date_range(period.start_date)
+      expect(subject).not_to be_in_date_range(period.start_date)
     end
 
     it "is not in date range for a date that is past the start_date but the minute has not yet passed" do
-      is_expected.not_to be_in_date_range(period.start_date.change(sec: 59))
+      expect(subject).not_to be_in_date_range(period.start_date.change(sec: 59))
     end
 
     it "is in date range for a date that is past the start_date and the minute has passed" do
-      is_expected.to be_in_date_range(1.minute.from_now(period.start_date))
+      expect(subject).to be_in_date_range(1.minute.from_now(period.start_date))
     end
   end
 

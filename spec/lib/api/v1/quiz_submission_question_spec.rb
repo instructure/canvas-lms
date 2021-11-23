@@ -71,7 +71,7 @@ describe Api::V1::QuizSubmissionQuestion do
       end
 
       it "returns json" do
-        is_expected.to be_a Hash
+        expect(subject).to be_a Hash
       end
     end
 
@@ -81,7 +81,7 @@ describe Api::V1::QuizSubmissionQuestion do
       end
 
       it "handles submitted submission_data" do
-        is_expected.to be_a Hash
+        expect(subject).to be_a Hash
       end
     end
   end

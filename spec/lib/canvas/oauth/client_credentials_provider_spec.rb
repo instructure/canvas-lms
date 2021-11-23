@@ -111,7 +111,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq true
+          expect(subject).to eq true
         end
       end
 
@@ -122,7 +122,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq true
+          expect(subject).to eq true
         end
       end
 
@@ -135,7 +135,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq false
+          expect(subject).to eq false
         end
       end
 
@@ -154,7 +154,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          is_expected.to eq false
+          expect(subject).to eq false
         end
       end
 

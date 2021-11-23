@@ -5626,12 +5626,12 @@ describe Course do
 
         it "without granular permissions" do
           @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-          is_expected.to include :delete
+          expect(subject).to include :delete
         end
 
         it "with granular permissions" do
           @course.root_account.enable_feature!(:granular_permissions_manage_courses)
-          is_expected.not_to include :delete
+          expect(subject).not_to include :delete
         end
       end
     end

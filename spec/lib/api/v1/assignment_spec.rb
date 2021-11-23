@@ -358,7 +358,7 @@ describe "Api::V1::Assignment" do
       end
 
       it "is valid when user is an account admin" do
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
     end
 
@@ -369,7 +369,7 @@ describe "Api::V1::Assignment" do
 
       it "is valid when not in a closed grading period" do
         expect(assignment).to receive(:in_closed_grading_period?).and_return(false)
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
 
       context "in a closed grading period" do

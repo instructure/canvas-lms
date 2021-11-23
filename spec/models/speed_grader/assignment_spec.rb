@@ -121,49 +121,49 @@ describe SpeedGrader::Assignment do
         end
 
         it do
-          is_expected.to include({ "author_id" => first_student.id.to_s, "comment" => homework_params.fetch(:comment) })
+          expect(subject).to include({ "author_id" => first_student.id.to_s, "comment" => homework_params.fetch(:comment) })
         end
 
         it do
-          is_expected.to include({
-                                   "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_two_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.to include({
-                                   "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_three_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.to include({
-                                   "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_six_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.not_to include({
-                                       "author_id" => comment_four_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_four_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_two_to_group_params.fetch(:comment)
                                      })
         end
 
         it do
-          is_expected.not_to include({
-                                       "author_id" => comment_five_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_five_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_three_to_group_params.fetch(:comment)
                                      })
         end
 
         it do
-          is_expected.not_to include({
-                                       "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_seven_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_six_to_group_params.fetch(:comment)
                                      })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_four_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_four_private_params.fetch(:comment)
+                                         })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_five_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_five_private_params.fetch(:comment)
+                                         })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_seven_private_params.fetch(:comment)
+                                         })
         end
       end
     end

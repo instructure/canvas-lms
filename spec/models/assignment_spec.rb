@@ -2645,7 +2645,7 @@ describe Assignment do
 
       it "returns false if an assignment does not have a submission" \
          "or matching submission_types" do
-        is_expected.not_to send(be_type)
+        expect(subject).not_to send(be_type)
       end
 
       it "returns true if the assignment has an associated submission, " \
