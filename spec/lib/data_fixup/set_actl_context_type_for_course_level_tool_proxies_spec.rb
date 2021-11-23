@@ -20,8 +20,6 @@
 require_relative '../../lti2_spec_helper'
 
 describe DataFixup::SetActlContextTypeForCourseLevelToolProxies do
-  include_context 'lti2_spec_helper'
-
   subject do
     lookup = AssignmentConfigurationToolLookup.create!(
       assignment: assignment,
@@ -36,6 +34,8 @@ describe DataFixup::SetActlContextTypeForCourseLevelToolProxies do
 
     lookup.context_type
   end
+
+  include_context 'lti2_spec_helper'
 
   let(:assignment) { assignment_model(course: course) }
 

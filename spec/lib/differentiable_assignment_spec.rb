@@ -181,15 +181,15 @@ shared_examples_for "a differentiable_object" do
 end
 
 describe Assignment do
-  include_examples "a differentiable_object"
-
-  let(:differentiable) { assignment_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
   let(:differentiable_view) { AssignmentStudentVisibility }
+  let(:differentiable) { assignment_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+
+  include_examples "a differentiable_object"
 end
 
 describe Quizzes::Quiz do
-  include_examples "a differentiable_object"
-
-  let(:differentiable) { quiz_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
   let(:differentiable_view) { Quizzes::QuizStudentVisibility }
+  let(:differentiable) { quiz_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+
+  include_examples "a differentiable_object"
 end

@@ -21,8 +21,20 @@
 require 'spec_helper'
 
 describe IncomingMailProcessor::SqsMailbox do
-  include_examples 'Mailbox'
+  subject { IncomingMailProcessor::SqsMailbox.new(default_config) }
 
+  let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
+  let(:sqs_message) { double(body: sqs_message_body) }
+  let(:sqs_message_body) do
+    {
+      Message: {
+        mail: {
+          messageId: 's3_key'
+        }
+      }.to_json
+    }.to_json
+  end
+  let(:queue) { double }
   let(:default_config) do
     {
       access_key_id: 'access-key',
@@ -35,20 +47,7 @@ describe IncomingMailProcessor::SqsMailbox do
     }
   end
 
-  let(:queue) { double }
-  let(:sqs_message_body) do
-    {
-      Message: {
-        mail: {
-          messageId: 's3_key'
-        }
-      }.to_json
-    }.to_json
-  end
-  let(:sqs_message) { double(body: sqs_message_body) }
-  let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
-
-  subject { IncomingMailProcessor::SqsMailbox.new(default_config) }
+  include_examples 'Mailbox'
 
   describe '#connect' do
     it 'returns the incoming mail queue' do

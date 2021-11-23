@@ -276,6 +276,8 @@ module Lti
     end
 
     describe '#index on root account' do
+      subject { api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps", params) }
+
       let(:tool) { new_valid_external_tool(account, true) }
       let(:params) do
         {
@@ -285,8 +287,6 @@ module Lti
           account_id: account.id
         }
       end
-
-      subject { api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps", params) }
 
       it "includes is_rce_favorite when applicable" do
         account_admin_user(account: account)

@@ -301,6 +301,8 @@ describe PageView do
   end
 
   describe '.generate' do
+    subject { PageView.generate(request, attributes) }
+
     let(:params) { { :action => 'path', :controller => 'some' } }
     let(:session) { { :id => '42' } }
     let(:request) { double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
@@ -308,8 +310,6 @@ describe PageView do
     let(:attributes) { { :real_user => user, :user => user } }
 
     before { allow(RequestContextGenerator).to receive_messages(:request_id => 'xyz') }
-
-    subject { PageView.generate(request, attributes) }
 
     describe '#url' do
       subject { super().url }

@@ -21,8 +21,13 @@ require_relative 'support/answer_serializers_specs'
 require_relative 'support/textual_answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
-  include_examples 'Answer Serializers'
-
+  let :output do
+    {
+      "question_5_#{AssessmentQuestion.variable_id 'answer1'}" => 'red',
+      "question_5_#{AssessmentQuestion.variable_id 'answer3'}" => 'green',
+      "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue'
+    }.with_indifferent_access
+  end
   let :input do
     {
       answer1: 'Red',
@@ -31,13 +36,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
     }.with_indifferent_access
   end
 
-  let :output do
-    {
-      "question_5_#{AssessmentQuestion.variable_id 'answer1'}" => 'red',
-      "question_5_#{AssessmentQuestion.variable_id 'answer3'}" => 'green',
-      "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue'
-    }.with_indifferent_access
-  end
+  include_examples 'Answer Serializers'
 
   # needed for auto specs
   def sanitize(answer_hash)

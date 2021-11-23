@@ -20,6 +20,8 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::Matching do
+  subject { described_class.new(question_data) }
+
   let(:question_data) { QuestionHelpers.fixture('matching_question') }
   let :correct_answer do
     {
@@ -36,8 +38,6 @@ describe CanvasQuizStatistics::Analyzers::Matching do
       answer_6430: "4573"
     }
   end
-
-  subject { described_class.new(question_data) }
 
   it 'does not blow up when no responses are provided' do
     expect { subject.run([]) }.to_not raise_error

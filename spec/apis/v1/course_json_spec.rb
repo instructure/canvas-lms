@@ -595,6 +595,8 @@ module Api
       end
 
       describe '#initialization' do
+        subject { @json }
+
         let(:enrollments) { double(:enrollments) }
         let(:hash) { { :a => '1', :b => '2' } }
         let(:includes) { %w[these three keys] }
@@ -602,8 +604,6 @@ module Api
         before do
           @json = CourseJson.new(course, user, includes, enrollments) { hash }
         end
-
-        subject { @json }
 
         describe '#course' do
           subject { super().course }

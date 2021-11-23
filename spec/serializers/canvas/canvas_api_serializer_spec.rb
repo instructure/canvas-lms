@@ -118,6 +118,13 @@ describe Canvas::APISerializer do
     end
 
     context 'embedding objects in root' do
+      subject do
+        FooSerializer.new(object, {
+                            controller: controller,
+                            root: nil
+                          })
+      end
+
       before do
         Bar = Struct.new(:id, :name) do
           def read_attribute_for_serialization(attr)
@@ -146,13 +153,6 @@ describe Canvas::APISerializer do
                                           accepts_jsonapi: true,
                                           stringify_json_ids: true
                                         })
-      end
-
-      subject do
-        FooSerializer.new(object, {
-                            controller: controller,
-                            root: nil
-                          })
       end
 
       it "uses objects for embed: :object, embed_in_root: true" do

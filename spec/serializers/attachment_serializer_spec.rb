@@ -18,6 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe AttachmentSerializer do
+  subject do
+    AttachmentSerializer.new(attachment, {
+                               controller: controller,
+                               scope: User.new
+                             })
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -51,13 +58,6 @@ describe AttachmentSerializer do
       allow(controller).to receive(:session).and_return Object.new
       allow(controller).to receive(:context).and_return context
     end
-  end
-
-  subject do
-    AttachmentSerializer.new(attachment, {
-                               controller: controller,
-                               scope: User.new
-                             })
   end
 
   let :json do

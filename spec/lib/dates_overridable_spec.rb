@@ -501,15 +501,15 @@ shared_examples_for "an object whose dates are overridable" do
 end
 
 describe Assignment do
-  include_examples "an object whose dates are overridable"
-
-  let(:overridable) { assignment_model(:due_at => 5.days.ago) }
   let(:overridable_type) { :assignment }
+  let(:overridable) { assignment_model(:due_at => 5.days.ago) }
+
+  include_examples "an object whose dates are overridable"
 end
 
 describe Quizzes::Quiz do
-  include_examples "an object whose dates are overridable"
-
-  let(:overridable) { quiz_model(:due_at => 5.days.ago) }
   let(:overridable_type) { :quiz }
+  let(:overridable) { quiz_model(:due_at => 5.days.ago) }
+
+  include_examples "an object whose dates are overridable"
 end

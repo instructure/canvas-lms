@@ -664,12 +664,6 @@ module Lti
       end
 
       describe "#email" do
-        it "returns the users email" do
-          expect(substitution_helper.email).to eq user.email
-        end
-
-        let(:sis_email) { 'sis@example.com' }
-
         let(:sis_pseudonym) do
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
@@ -680,6 +674,11 @@ module Lti
           pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           pseudonym
+        end
+        let(:sis_email) { 'sis@example.com' }
+
+        it "returns the users email" do
+          expect(substitution_helper.email).to eq user.email
         end
 
         it "returns the sis email if it's an LTI2 tool" do

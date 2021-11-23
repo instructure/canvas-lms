@@ -30,9 +30,9 @@ describe AssignmentsApiController, type: :request do
   include LtiSpecHelper
 
   context 'locked api item' do
-    include_examples 'a locked api item'
-
     let(:item_type) { 'assignment' }
+
+    include_examples 'a locked api item'
 
     let_once(:locked_item) do
       @course.assignments.create!(:title => 'Locked Assignment')

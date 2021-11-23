@@ -1680,12 +1680,12 @@ RSpec.describe ApplicationController do
   end
 
   describe '#discard_flash_if_xhr' do
-    before do
-      flash[:notice] = 'A flash notice'
-    end
-
     subject(:discard) do
       flash.instance_variable_get('@discard')
+    end
+
+    before do
+      flash[:notice] = 'A flash notice'
     end
 
     it 'sets flash discard if request is xhr' do

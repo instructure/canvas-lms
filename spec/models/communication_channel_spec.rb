@@ -775,12 +775,12 @@ describe CommunicationChannel do
   end
 
   describe '#user_can_have_more_channels?' do
+    subject { CommunicationChannel.user_can_have_more_channels?(@user, @domain_root_account) }
+
     before do
       @domain_root_account = Account.default
       @user = User.create!
     end
-
-    subject { CommunicationChannel.user_can_have_more_channels?(@user, @domain_root_account) }
 
     it 'returns true if :max_communication_channels settings is not set' do
       expect(subject).to be_truthy

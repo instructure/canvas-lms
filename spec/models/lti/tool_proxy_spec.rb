@@ -23,13 +23,13 @@ require_dependency "lti/tool_proxy"
 
 module Lti
   describe ToolProxy do
+    subject(:tool_proxy) { ToolProxy.new }
+
     let(:account) { Account.create }
     let(:product_family) do
       ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
     end
     let(:resource_handler) { ResourceHandler.new }
-
-    subject(:tool_proxy) { ToolProxy.new }
 
     describe 'validations' do
       before do

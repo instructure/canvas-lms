@@ -19,6 +19,8 @@
 #
 
 describe BasicLTI::QuizzesNextSubmissionReverter do
+  subject { described_class.new(submission, launch_url, -1) }
+
   before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
@@ -27,8 +29,6 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
     @course.enroll_student(@user)
   end
-
-  subject { described_class.new(submission, launch_url, -1) }
 
   let(:assignment) do
     @course.assignments.create!(

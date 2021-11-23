@@ -21,10 +21,10 @@
 require_relative '../../common'
 
 describe 'Course Grading Periods' do
-  include_examples 'in-process server selenium tests'
-
-  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:period_helper) { Factories::GradingPeriodHelper.new }
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+
+  include_examples 'in-process server selenium tests'
 
   context 'with grading periods' do
     before do
@@ -63,11 +63,11 @@ end
 # the way this works will change soon (MGP version 3), so it makes more sense to wait for these
 # changes before refactoring these tests
 describe 'Course Grading Periods Inheritance' do
-  include_examples 'in-process server selenium tests'
-
-  let(:title) { 'hi' }
-  let(:start_date) { format_date_for_view(3.months.from_now) }
   let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
+  let(:start_date) { format_date_for_view(3.months.from_now) }
+  let(:title) { 'hi' }
+
+  include_examples 'in-process server selenium tests'
 
   before do
     course_with_admin_logged_in

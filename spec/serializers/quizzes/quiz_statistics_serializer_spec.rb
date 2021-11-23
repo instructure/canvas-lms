@@ -18,6 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::QuizStatisticsSerializer do
+  subject do
+    Quizzes::QuizStatisticsSerializer.new(statistics, {
+                                            controller: controller,
+                                            scope: user,
+                                            session: session
+                                          })
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -65,14 +73,6 @@ describe Quizzes::QuizStatisticsSerializer do
       allow(controller).to receive(:session).and_return session
       allow(controller).to receive(:context).and_return context
     end
-  end
-
-  subject do
-    Quizzes::QuizStatisticsSerializer.new(statistics, {
-                                            controller: controller,
-                                            scope: user,
-                                            session: session
-                                          })
   end
 
   before do

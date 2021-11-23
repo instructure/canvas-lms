@@ -19,11 +19,11 @@
 #
 
 describe CanvasOutcomesHelper do
+  subject { Object.new.extend CanvasOutcomesHelper }
+
   before do
     course_with_teacher_logged_in(:active_all => true)
   end
-
-  subject { Object.new.extend CanvasOutcomesHelper }
 
   let(:account) { @course.account }
 

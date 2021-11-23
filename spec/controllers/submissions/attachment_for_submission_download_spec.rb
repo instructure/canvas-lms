@@ -19,6 +19,10 @@
 #
 
 describe Submissions::AttachmentForSubmissionDownload do
+  subject do
+    Submissions::AttachmentForSubmissionDownload.new(@submission, @options)
+  end
+
   before :once do
     course_with_student(active_all: true)
     assignment_model(course: @course)
@@ -31,10 +35,6 @@ describe Submissions::AttachmentForSubmissionDownload do
     @submission.submitted_at = 3.hours.ago
     @submission.save
     @options = {}
-  end
-
-  subject do
-    Submissions::AttachmentForSubmissionDownload.new(@submission, @options)
   end
 
   describe '#attachment' do

@@ -20,9 +20,9 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::Numerical do
-  let(:question_data) { QuestionHelpers.fixture('numerical_question') }
-
   subject { described_class.new(question_data) }
+
+  let(:question_data) { QuestionHelpers.fixture('numerical_question') }
 
   it 'does not blow up when no responses are provided' do
     expect do

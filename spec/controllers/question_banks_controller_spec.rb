@@ -110,6 +110,10 @@ describe QuestionBanksController do
   end
 
   describe "#show" do
+    subject do
+      get :show, params: { course_id: @course.id, id: @bank.id }
+    end
+
     before :once do
       course_with_teacher
       @bank = @course.assessment_question_banks.create!
@@ -117,10 +121,6 @@ describe QuestionBanksController do
 
     before do
       user_session(@teacher)
-    end
-
-    subject do
-      get :show, params: { course_id: @course.id, id: @bank.id }
     end
 
     it 'renders show template' do

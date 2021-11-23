@@ -552,14 +552,14 @@ describe DeveloperKey do
       end
 
       describe 'destroy_external_tools!' do
-        include_context 'lti_1_3_spec_helper'
-        specs_require_sharding
-
         subject do
           @shard1.activate { ContextExternalTool.active }.merge(
             @shard2.activate { ContextExternalTool.active }
           )
         end
+
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
 
         context 'when developer key is an LTI key' do
           let(:shard_1_account) { @shard1.activate { account_model } }
@@ -617,10 +617,10 @@ describe DeveloperKey do
       end
 
       describe 'destroy_external_tools!' do
+        subject { ContextExternalTool.active }
+
         include_context 'lti_1_3_spec_helper'
         specs_require_sharding
-
-        subject { ContextExternalTool.active }
 
         let(:account) { account_model }
         let(:tool) do

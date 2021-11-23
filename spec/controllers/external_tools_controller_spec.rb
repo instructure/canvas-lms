@@ -1389,11 +1389,12 @@ describe ExternalToolsController do
     let(:xml_response) { OpenStruct.new({ body: xml }) }
 
     context 'with client id' do
-      include_context 'lti_1_3_spec_helper'
       subject do
         post 'create', params: params, format: 'json'
         ContextExternalTool.find_by(id: tool_id)
       end
+
+      include_context 'lti_1_3_spec_helper'
 
       let(:tool_id) { response.status == 200 ? JSON.parse(response.body)['id'] : -1 }
       let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
@@ -2419,6 +2420,11 @@ describe ExternalToolsController do
       end
 
       context 'with a module item launch' do
+        subject do
+          get :generate_sessionless_launch, params: params
+          json_parse['url']
+        end
+
         before do
           controller.instance_variable_set(
             :@access_token,
@@ -2426,11 +2432,6 @@ describe ExternalToolsController do
           )
 
           external_tool
-        end
-
-        subject do
-          get :generate_sessionless_launch, params: params
-          json_parse['url']
         end
 
         let(:course) { @course }

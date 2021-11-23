@@ -209,13 +209,13 @@ describe GradebookExporter do
     end
 
     describe "default output with blank course" do
+      subject(:csv) { exporter.to_csv }
+
       before(:once) do
         @course.custom_gradebook_columns.create! title: "Custom Column 1"
         @course.custom_gradebook_columns.create! title: "Custom Column 2"
         @course.custom_gradebook_columns.create!({ title: "Custom Column 3", workflow_state: "hidden" })
       end
-
-      subject(:csv) { exporter.to_csv }
 
       let(:expected_headers) do
         [

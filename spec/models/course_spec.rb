@@ -5614,12 +5614,12 @@ describe Course do
       end
 
       describe 'an instructor policy' do
+        subject { @course.check_policy(instructor) }
+
         let(:instructor) do
           user.teacher_enrollments.create!(:workflow_state => 'completed', :course => @course)
           user
         end
-
-        subject { @course.check_policy(instructor) }
 
         it { is_expected.to include :read_prior_roster }
         it { is_expected.to include :view_all_grades }
