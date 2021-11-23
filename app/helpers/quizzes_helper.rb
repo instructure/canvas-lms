@@ -39,7 +39,7 @@ module QuizzesHelper
 
   def unpublished_quiz_warning
     I18n.t(
-      '*This quiz is unpublished* Only teachers can see the quiz until ' +
+      '*This quiz is unpublished* Only teachers can see the quiz until ' \
       'it is published.',
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>'
     )
@@ -47,8 +47,8 @@ module QuizzesHelper
 
   def unsaved_changes_warning
     I18n.t(
-      '*You have made changes to the questions in this quiz.* ' +
-      'These changes will not appear for students until you ' +
+      '*You have made changes to the questions in this quiz.* ' \
+      'These changes will not appear for students until you ' \
       'save the quiz.',
       :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>'
     )

@@ -116,8 +116,7 @@ describe Quizzes::TakeQuizPresenter do
       expect(presenter.previous_question_viewable?).to eq false
     end
 
-    it "returns true if there is a previous question and quiz allows " +
-       "user to go back" do
+    it "returns true if there is a previous question and quiz allows user to go back" do
       expect(presenter).to receive(:previous_question).and_return true
       expect(presenter).to receive(:cant_go_back?).and_return false
       expect(presenter.previous_question_viewable?).to eq true

@@ -67,8 +67,7 @@ describe SortsAssignments do
   end
 
   describe "upcoming" do
-    it "and_return an array of assignments due between right now and 1 week " +
-       "from now" do
+    it "and_return an array of assignments due between right now and 1 week from now" do
       expect(SortsAssignments.upcoming(assignments)).to match_array(
         [
           due_today,
@@ -246,15 +245,13 @@ describe SortsAssignments do
     let(:submissions) { [submission1, submission2] }
     let(:assignments) { [due_yesterday, due_today] }
 
-    it "and_return assignments that don't have a matching submission in the " +
-       "passed submissions collection" do
+    it "and_return assignments that don't have a matching submission in the passed submissions collection" do
       allow(submission1).to receive_messages(:assignment_id => nil)
       expect(SortsAssignments.without_graded_submission(assignments, submissions))
         .to match_array [due_yesterday]
     end
 
-    it "and_return assignments that have a matching submission in the collection " +
-       "but the submission is without a graded submission." do
+    it "and_return assignments that have a matching submission in the collection but the submission is without a graded submission." do
       expect(submission1).to receive(:without_graded_submission?).and_return true
       expect(SortsAssignments.without_graded_submission(assignments, submissions))
         .to match_array [due_yesterday]
@@ -272,8 +269,7 @@ describe SortsAssignments do
       }
     end
 
-    it "includes assignments where assignment not expecting a submission and " +
-       "don't grant rights to user" do
+    it "includes assignments where assignment not expecting a submission and don't grant rights to user" do
       expect(due_yesterday).to receive(:expects_submission?).and_return true
       expect(due_yesterday).to receive(:grants_right?).with(user, session, :submit).and_return true
       expect(SortsAssignments.user_allowed_to_submit(assignments, user, session))
@@ -286,8 +282,7 @@ describe SortsAssignments do
     let(:user) { double }
     let(:submissions) { double }
 
-    it "and_return the set of assignments that user is allowed to submit and " +
-       "without graded submissions" do
+    it "and_return the set of assignments that user is allowed to submit and without graded submissions" do
       allow(SortsAssignments).to receive(:past).and_return([due_yesterday])
       allow(SortsAssignments).to receive(:user_allowed_to_submit).and_return [due_yesterday]
       allow(SortsAssignments).to receive(:without_graded_submission).and_return [due_yesterday]
