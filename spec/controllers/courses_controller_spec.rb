@@ -4030,4 +4030,47 @@ describe CoursesController do
       expect(controller.visible_self_enrollment_option).to be_nil
     end
   end
+
+  describe "POST 'dismiss_migration_limitation_msg'" do
+    before do
+      course_with_teacher(name: "search teacher", active_all: true)
+      @quiz_migration_alert =
+        QuizMigrationAlert.create!(user_id: @teacher.id, course_id: @course.id, migration_id: "10000000000040")
+    end
+
+    context "when the current user has a quiz migration alert for the course" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "returns a successful response" do
+        post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        expect(response).to be_successful
+      end
+
+      it "destroys the quiz migration alert" do
+        expect do
+          post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        end.to change { @teacher.quiz_migration_alerts.count }.from(1).to(0)
+      end
+    end
+
+    context "when the current user does not have a quiz migration alert for the course" do
+      before do
+        other_user = user_model
+        user_session(other_user)
+      end
+
+      it "returns a not_found response" do
+        post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        expect(response).to be_not_found
+      end
+
+      it "does not destroy quiz migration alerts" do
+        expect do
+          post "dismiss_migration_limitation_msg", params: { id: @course.id }
+        end.to not_change { QuizMigrationAlert.count }
+      end
+    end
+  end
 end

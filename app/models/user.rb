@@ -210,6 +210,7 @@ class User < ActiveRecord::Base
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
 
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
+  has_many :quiz_migration_alerts, dependent: :destroy
 
   belongs_to :otp_communication_channel, class_name: "CommunicationChannel"
 

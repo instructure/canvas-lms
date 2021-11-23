@@ -28,6 +28,7 @@ class ContentExport < ActiveRecord::Base
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_one :sent_content_share
   has_many :received_content_shares
+  has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
@@ -38,6 +39,7 @@ class ContentExport < ActiveRecord::Base
 
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
 
+  before_save :assign_quiz_migration_limitation_alert
   before_create :set_global_identifiers
 
   # export types
@@ -578,6 +580,13 @@ class ContentExport < ActiveRecord::Base
     return false if user && user.content_shares.where(content_export: self).exists?
 
     created_at < ContentExport.expire_days.days.ago
+  end
+
+  def assign_quiz_migration_limitation_alert
+    if workflow_state_changed? && exported? && quizzes_next? && context.is_a?(Course) &&
+       NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+      context.create_or_update_quiz_migration_alert(user_id, self)
+    end
   end
 
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
