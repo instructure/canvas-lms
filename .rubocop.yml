@@ -14,8 +14,6 @@ AllCops:
 
 Bundler:
   Severity: error
-Bundler/OrderedGems:
-  Enabled: false # this isn't good for us because of how we pin dependencies
 
 Gemspec:
   Severity: error
@@ -28,8 +26,6 @@ Gemspec/RequiredRubyVersion:
 
 Layout:
   Severity: error
-Layout/LineLength:
-  Enabled: false # TODO. Maybe.
 
 Lint:
   Severity: error
@@ -55,28 +51,23 @@ Lint/UnusedMethodArgument:
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
 
-Migration/Tagged:
+Migration:
   Severity: error
+Migration/Tagged:
   AllowedTags:
     - predeploy
     - postdeploy
     - cassandra
     - dynamodb
 
-Naming/HeredocDelimiterCase:
+Naming:
   Severity: error
 Naming/HeredocDelimiterNaming:
-  Severity: error
   ForbiddenDelimiters:
     # negative regex - these are the _allowed_ delimiters
     # any you add should describe the format of the data, not describe
     # what the data is for. this allows editors to syntax highlight
     - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML).+$
-Naming/FileName:
-  Exclude:
-    - "**/Gemfile.d/~after.rb"
-Naming/RescuedExceptionsVariableName:
-  Severity: error
 
 Performance:
   Severity: error
@@ -87,20 +78,16 @@ Performance/CollectionLiteralInLoop:
 Performance/MethodObjectAsBlock:
   Enabled: false # decreases expressiveness
 
-Rails/ActiveRecordAliases:
+Rails:
   Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
   UnlessPresent: false # allow `unless foo.present?`
-  Severity: error
 Rails/ContentTag:
-  Severity: error
   Exclude:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
-Rails/Delegate:
-  Severity: error
 Rails/DynamicFindBy:
   AllowedMethods:
     - find_by_confirmation_code # CommunicationChannel
@@ -110,86 +97,29 @@ Rails/DynamicFindBy:
     - find_by_asset_string # ApplicationRecord
     - find_by_pseudonym_credentials # SessionPersistenceToken
     - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
-  Severity: error
-Rails/ExpandedDateRange:
-  Severity: error
-Rails/FilePath:
-  Severity: error
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
-Rails/HttpPositionalArguments:
-  Severity: error
-Rails/HttpStatus:
-  Severity: error
-Rails/IndexBy:
-  Severity: error
-Rails/IndexWith:
-  Severity: error
-Rails/MatchRoute:
-  Severity: error
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
-Rails/Pluck:
-  Severity: error
-Rails/PluralizationGrammar:
-  Severity: error
-Rails/Presence:
-  Severity: error
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
-  Severity: error
-Rails/RedundantAllowNil:
-  Severity: error
-Rails/RedundantForeignKey:
-  Severity: error
-Rails/ReflectionClassName:
-  Severity: error
-Rails/RequestReferer:
-  Severity: error
-Rails/ShortI18n:
-  Severity: error
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
-Rails/SquishedSQLHeredocs:
-  Severity: error
-Rails/Validation:
-  Severity: error
-Rails/WhereEquals:
-  Severity: error
 Rails/WhereExists:
   EnforcedStyle: where
-  Severity: error
-Rails/WhereNot:
-  Severity: error
 
+RSpec:
+  Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
 RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
-RSpec/EmptyExampleGroup:
-  Severity: error
-RSpec/EmptyLineAfterExample:
-  Severity: error
-RSpec/EmptyLineAfterExampleGroup:
-  Severity: error
-RSpec/EmptyLineAfterFinalLet:
-  Severity: error
-RSpec/EmptyLineAfterHook:
-  Severity: error
-RSpec/EmptyLineAfterSubject:
-  Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
-RSpec/ExampleWording:
-  Severity: error
-RSpec/ExcessiveDocstringSpacing:
-  Severity: error
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
-RSpec/HookArgument:
-  Severity: error
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -200,10 +130,6 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
 RSpec/NestedGroups:
   Enabled: false # legacy code
-RSpec/ReceiveNever:
-  Severity: error
-RSpec/RepeatedDescription:
-  Severity: error
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 RSpec/StubbedMock:
@@ -221,418 +147,355 @@ Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
 
+Style:
+  Severity: error
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
-  Severity: error
-Style/AndOr:
-  Severity: error
-Style/ArgumentsForwarding:
-  Severity: error
-Style/ArrayJoin:
-  Severity: error
-Style/BarePercentLiterals:
-  Severity: error
-Style/BlockComments:
-  Severity: error
 Style/BlockDelimiters:
   IgnoredMethods: []
-  Severity: error
-Style/CaseEquality:
-  Severity: error
-Style/CaseLikeIf:
-  Severity: error
-Style/CharacterLiteral:
-  Severity: error
-Style/ClassCheck:
-  Severity: error
-Style/ClassEqualityComparison:
-  Severity: error
-Style/ColonMethodCall:
-  Severity: error
-Style/CommentAnnotation:
-  Severity: error
-Style/ConditionalAssignment:
-  Severity: error
-Style/DefWithParentheses:
-  Severity: error
-Style/Dir:
-  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/DoubleNegation:
   Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
-Style/EmptyLambdaParameter:
-  Severity: error
-Style/EachForSimpleLoop:
-  Severity: error
-Style/EachWithObject:
-  Severity: error
-Style/EmptyCaseCondition:
-  Severity: error
 Style/EmptyElse:
   EnforcedStyle: empty # explicit nil indicates programmer intent
-  Severity: error
-Style/EmptyLiteral:
-  Severity: error
-Style/EmptyMethod:
-  Severity: error
-Style/Encoding:
-  Severity: error
-Style/ExpandPathArguments:
-  Severity: error
-Style/ExplicitBlockArgument:
-  Severity: error
-Style/EvalWithLocation:
-  Severity: error
-Style/EvenOdd:
-  Severity: error
 Style/FloatDivision:
   Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
-Style/For:
-  Severity: error
 Style/FormatStringToken:
   Enabled: false # I18n requires template style, but ohter code uses annotated style, and there are some trivial unannotted that don't really need to be annotated
-Style/FrozenStringLiteralComment:
-  Severity: error
-Style/GlobalStdStream:
-  Severity: error
-Style/HashConversion:
-  Severity: error
-Style/HashEachMethods:
-  Severity: error
-Style/HashLikeCase:
-  Severity: error
-Style/HashTransformKeys:
-  Severity: error
-Style/HashTransformValues:
-  Severity: error
-Style/IdenticalConditionalBranches:
-  Severity: error
-Style/IfInsideElse:
-  Severity: error
-Style/InverseMethods:
-  Severity: error
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
-Style/IfWithBooleanLiteralBranches:
-  Severity: error
-Style/IfUnlessModifierOfIfUnless:
-  Severity: error
-Style/Lambda:
-  Severity: error
-Style/LambdaCall:
-  Severity: error
-Style/LineEndConcatenation:
-  Severity: error
-Style/MethodCallWithoutArgsParentheses:
-  Severity: error
-Style/MethodDefParentheses:
-  Severity: error
 Style/MultilineBlockChain:
   Enabled: false # this is common when building up a large API result
-Style/MultilineIfModifier:
-  Severity: error
-Style/MultilineIfThen:
-  Severity: error
-Style/MultilineMemoization:
-  Severity: error
-Style/MultilineTernaryOperator:
-  Severity: error
-Style/MultilineWhenThen:
-  Severity: error
-Style/MutableConstant:
-  Severity: error
-Style/NegatedIf:
-  Severity: error
-Style/NegatedIfElseCondition:
-  Severity: error
-Style/NegatedUnless:
-  Severity: error
-Style/NegatedWhile:
-  Severity: error
-Style/NestedModifier:
-  Severity: error
-Style/NestedParenthesizedCalls:
-  Severity: error
-Style/NestedTernaryOperator:
-  Severity: error
-Style/Next:
-  Severity: error
-Style/NilComparison:
-  Severity: error
-Style/NilLambda:
-  Severity: error
-Style/NonNilCheck:
-  Severity: error
-Style/Not:
-  Severity: error
-Style/NumericLiteralPrefix:
-  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
-Style/OneLineConditional:
-  Severity: error
-Style/OrAssignment:
-  Severity: error
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
-Style/ParenthesesAroundCondition:
-  Severity: error
-Style/PercentLiteralDelimiters:
-  Severity: error
 Style/PercentQLiterals:
   EnforcedStyle: upper_case_q
-  Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
-Style/PreferredHashMethods:
-  Severity: error
-Style/Proc:
-  Severity: error
 Style/QuotedSymbols:
   EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
-  Severity: error
-Style/RaiseArgs:
-  Severity: error
-Style/RandomWithOffset:
-  Severity: error
-Style/RedundantArgument:
-  Severity: error
-Style/RedundantAssignment:
-  Severity: error
-Style/RedundantBegin:
-  Severity: error
-Style/RedundantCondition:
-  Severity: error
-Style/RedundantException:
-  Severity: error
-Style/RedundantFetchBlock:
-  Severity: error
-Style/RedundantFileExtensionInRequire:
-  Severity: error
-Style/RedundantFreeze:
-  Severity: error
-Style/RedundantInterpolation:
-  Severity: error
-Style/RedundantParentheses:
-  Severity: error
-Style/RedundantPercentQ:
-  Severity: error
-Style/RedundantRegexpCharacterClass:
-  Severity: error
-Style/RedundantRegexpEscape:
-  Severity: error
-Style/RedundantReturn:
-  Severity: error
-Style/RedundantSelf:
-  Severity: error
-Style/RedundantSelfAssignment:
-  Severity: error
-Style/RedundantSelfAssignmentBranch:
-  Severity: error
-Style/RedundantSort:
-  Severity: error
-Style/RegexpLiteral:
-  Severity: error
 Style/RescueStandardError:
   EnforcedStyle: implicit
-  Severity: error
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
-Style/SafeNavigation:
-  Severity: error
-Style/SelectByRegexp:
-  Severity: error
-Style/SelfAssignment:
-  Severity: error
-Style/Semicolon:
-  Severity: error
-Style/SignalException:
-  Severity: error
-Style/SingleArgumentDig:
-  Severity: error
-Style/SingleLineMethods:
-  Severity: error
-Style/SlicingWithRange:
-  Severity: error
-Style/SoleNestedConditional:
-  Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
-Style/StderrPuts:
-  Severity: error
-Style/StringChars:
-  Severity: error
-Style/StructInheritance:
-  Severity: error
 Style/SymbolArray:
   MinSize: 3
-  Severity: error
-Style/SymbolProc:
-  Severity: error
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
-  Severity: error
-Style/TrailingCommaInArguments:
-  Severity: error
-Style/TrivialAccessors:
-  Severity: error
-Style/UnlessElse:
-  Severity: error
-Style/UnpackFirst:
-  Severity: error
-Style/WhenThen:
-  Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
 Style/WordArray:
   MinSize: 3
-  Severity: error
-Style/ZeroLengthPredicate:
-  Severity: error
 
-# the following cops are currently silenced, but we may want to enable them IF
-# we correct all instances in the codebase first
 
-Lint/UriEscapeUnescape: # TODO
-  Severity: warning
 
-Naming/VariableNumber: # TODO
-  Enabled: false
+# the following cops have offenses in the code base that have not been fixed.
+# we should eventually either fix them, or turn them off completely (and move
+# them to the section above)
+# auto-correct needs to be disabled for any that support it in the meantime
 
-Rails/Date: # TODO: autocorrect (unsafe)
+Layout/LineLength:
   Enabled: false
-Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
-  Enabled: false # accessors are often defined in terms of read_attribute
-Rails/TimeZone: # TODO: autocorrect (unsafe)
-  Enabled: false
-
-RSpec/BeEql: # TODO: autocorrect
-  Enabled: false
-RSpec/ContextWording: # TODO
-  Enabled: false
-RSpec/DescribeClass: # TODO
-  Enabled: false
-RSpec/ExpectChange: # TODO: autocorrect (unsafe)
-  Enabled: false
-RSpec/NamedSubject: # TODO
-  Enabled: false
-RSpec/NotToNot: # TODO: autocorrect
-  Enabled: false
-RSpec/PredicateMatcher: # TODO: autocorrect (unsafe)
-  Enabled: false
-RSpec/ScatteredSetup: # TODO: investigate if these are required
-  Enabled: false
-RSpec/VerifiedDoubles: # TODO
-  Enabled: false
-
-Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/GuardClause: # TODO
-  Enabled: false
-Style/HashSyntax:
-  EnforcedStyle: ruby19_no_mixed_keys
-  Enabled: false # TODO: autocorrect
-Style/NumericLiterals: # TODO: autocorrect
-  Enabled: false
-Style/RescueModifier: # TODO
-  Severity: warning
   AutoCorrect: false
-Style/StringConcatenation: # TODO: autocorrect (maybe)
-  Enabled: false
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-  Enabled: false # TODO: autocorrect
-Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInHashLiteral: # TODO: autocorrect
-  Enabled: false
 
-# the following cops have violations that have not been fixed, so
-# auto-correct needs to be disabled for them
+Lint/UriEscapeUnescape:
+  Severity: warning
 
+Migration/NonTransactional:
+  Severity: warning
+Migration/PrimaryKey:
+  Severity: warning
+
+Naming/AccessorMethodName:
+  Severity: convention
 Naming/BinaryOperatorParameterName:
+  Severity: convention
   AutoCorrect: false
+Naming/BlockParameterName:
+  Severity: convention
+Naming/ClassAndModuleCamelCase:
+  Severity: convention
+Naming/ConstantName:
+  Severity: convention
+Naming/FileName:
+  Severity: convention
+  Exclude:
+    - "**/Gemfile.d/~after.rb"
+Naming/MemoizedInstanceVariableName:
+  Severity: convention
+Naming/MethodName:
+  Severity: convention
+Naming/MethodParameterName:
+  Severity: convention
+Naming/PredicateName:
+  Severity: convention
+Naming/VariableName:
+  Severity: convention
+Naming/VariableNumber:
+  Enabled: false
 
 Rails/ActiveRecordCallbacksOrder:
+  Severity: convention
   AutoCorrect: false
+Rails/ActiveRecordOverride:
+  Severity: convention
 Rails/ApplicationMailer:
+  Severity: convention
   AutoCorrect: false
 Rails/BelongsTo:
+  Severity: convention
+  AutoCorrect: false
+Rails/BulkChangeTable:
+  Severity: convention
+Rails/CreateTableWithTimestamps:
+  Severity: convention
+Rails/Date:
+  Enabled: false
   AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
+  Severity: convention
   AutoCorrect: false
 Rails/EnumHash:
+  Severity: convention
   AutoCorrect: false
 Rails/FindBy:
+  Severity: convention
   AutoCorrect: false
 Rails/FindById:
+  Severity: convention
   AutoCorrect: false
 Rails/FindEach:
+  Severity: convention
   AutoCorrect: false
+Rails/InverseOf:
+  Severity: convention
+Rails/LexicallyScopedActionFilter:
+  Severity: convention
+Rails/NotNullColumn:
+  Severity: convention
 Rails/Output:
+  Severity: convention
   AutoCorrect: false
+Rails/OutputSafety:
+  Severity: convention
 Rails/Pick:
+  Severity: convention
   AutoCorrect: false
 Rails/PluckInWhere:
+  Severity: convention
   AutoCorrect: false
 Rails/RakeEnvironment:
+  Severity: convention
+  AutoCorrect: false
+Rails/ReadWriteAttribute:
+  Enabled: false # accessors are often defined in terms of read_attribute
+  AutoCorrect: false
+Rails/ReversibleMigration:
+  Severity: convention
+Rails/TimeZone:
+  Enabled: false
   AutoCorrect: false
 
 Rake/Desc:
+  Severity: convention
   AutoCorrect: false
+Rake/MethodDefinitionInTask:
+  Severity: convention
 
 RSpec/Capybara/FeatureMethods:
+  Severity: convention
   AutoCorrect: false
 RSpec/Rails/HttpStatus:
+  Severity: convention
   AutoCorrect: false
+RSpec/AroundBlock:
+  Severity: convention
+RSpec/Be:
+  Severity: convention
+RSpec/BeEql:
+  Enabled: false
+  AutoCorrect: false
+RSpec/BeforeAfterAll:
+  Severity: convention
 RSpec/ContextMethod:
+  Severity: convention
   AutoCorrect: false
+RSpec/ContextWording:
+  Enabled: false
+RSpec/DescribeClass:
+  Enabled: false
+RSpec/DescribeMethod:
+  Severity: convention
 RSpec/ExpectActual:
+  Severity: convention
   AutoCorrect: false
+RSpec/ExpectChange:
+  Enabled: false
+  AutoCorrect: false
+RSpec/FilePath:
+  Severity: convention
 RSpec/HooksBeforeExamples:
+  Severity: convention
   AutoCorrect: false
+RSpec/IdenticalEqualityAssertion:
+  Severity: convention
+RSpec/ImplicitBlockExpectation:
+  Severity: convention
 RSpec/ImplicitExpect:
+  Severity: convention
   AutoCorrect: false
 RSpec/ImplicitSubject:
+  Severity: convention
   AutoCorrect: false
 RSpec/ItBehavesLike:
+  Severity: convention
   AutoCorrect: false
+RSpec/IteratedExpectation:
+  Severity: convention
 RSpec/LeadingSubject:
+  Severity: convention
   AutoCorrect: false
+RSpec/LeakyConstantDeclaration:
+  Severity: convention
 RSpec/LetBeforeExamples:
+  Severity: convention
+  AutoCorrect: false
+RSpec/LetSetup:
+  Severity: convention
+RSpec/MessageChain:
+  Severity: convention
+RSpec/MissingExampleGroupArgument:
+  Severity: convention
+RSpec/MultipleDescribes:
+  Severity: convention
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/NotToNot:
+  Enabled: false
+  AutoCorrect: false
+RSpec/OverwritingSetup:
+  Severity: convention
+RSpec/PredicateMatcher:
+  Enabled: false
   AutoCorrect: false
 RSpec/ReceiveCounts:
+  Severity: convention
   AutoCorrect: false
+RSpec/RepeatedExample:
+  Severity: convention
+RSpec/RepeatedExampleGroupBody:
+  Severity: convention
+RSpec/RepeatedExampleGroupDescription:
+  Severity: convention
+RSpec/RepeatedIncludeExample:
+  Severity: convention
 RSpec/ReturnFromStub:
+  Severity: convention
   AutoCorrect: false
 RSpec/ScatteredLet:
+  Severity: convention
   AutoCorrect: false
+RSpec/ScatteredSetup:
+  Enabled: false
 RSpec/SharedContext:
+  Severity: convention
   AutoCorrect: false
+RSpec/SubjectDeclaration:
+  Severity: convention
+RSpec/VariableName:
+  Severity: convention
+RSpec/VerifiedDoubles:
+  Enabled: false
+RSpec/VoidExpect:
+  Severity: convention
 
+Style/AccessModifierDeclarations:
+  Severity: convention
 Style/AccessorGrouping:
+  Severity: convention
   AutoCorrect: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+  AutoCorrect: false
+Style/ClassVars:
+  Severity: convention
+Style/CombinableLoops:
+  Severity: convention
 Style/CommentedKeyword:
+  Severity: convention
   AutoCorrect: false
+Style/DocumentDynamicEvalDefinition:
+  Severity: convention
+Style/ExponentialNotation:
+  Severity: convention
 Style/FormatString:
+  Severity: convention
   AutoCorrect: false
+Style/GlobalVars:
+  Severity: convention
+Style/GuardClause:
+  Enabled: false
 Style/HashAsLastArrayItem:
+  Severity: convention
+  AutoCorrect: false
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+  Enabled: false
   AutoCorrect: false
 Style/InfiniteLoop:
+  Severity: convention
   AutoCorrect: false
 Style/KeywordParametersOrder:
+  Severity: convention
   AutoCorrect: false
+Style/MissingRespondToMissing:
+  Severity: convention
+Style/MixinUsage:
+  Severity: convention
 Style/ModuleFunction:
+  Severity: convention
   AutoCorrect: false
 Style/MultipleComparison:
+  Severity: convention
+  AutoCorrect: false
+Style/NumericLiterals:
+  Enabled: false
+  AutoCorrect: false
+Style/OptionalArguments:
+  Severity: convention
+Style/OptionalBooleanParameter:
+  Severity: convention
+Style/RescueModifier:
+  Severity: warning
+  AutoCorrect: false
+Style/StringConcatenation:
+  Enabled: false
+  AutoCorrect: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+  Enabled: false
   AutoCorrect: false
 Style/StringLiteralsInInterpolation:
+  Severity: convention
+  AutoCorrect: false
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+  AutoCorrect: false
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
   AutoCorrect: false
 Style/TrailingUnderscoreVariable:
+  Severity: convention
   AutoCorrect: false
 Style/WhileUntilDo:
+  Severity: convention
   AutoCorrect: false
 Style/YodaCondition:
+  Severity: convention
   AutoCorrect: false
