@@ -1464,7 +1464,7 @@ describe DiscussionTopicsController do
         post 'create',
              params: topic_params(@course, { is_announcement: true, specific_sections: @section3.id.to_s }),
              :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq old_count
       end
 
@@ -1503,7 +1503,7 @@ describe DiscussionTopicsController do
         @group = @course.groups.create!(:group_category => @group_category)
         post 'create',
              params: group_topic_params(@group, { specific_sections: @section1.id.to_s }), :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1519,7 +1519,7 @@ describe DiscussionTopicsController do
           group_category_id: @group_category.id,
         }
         post('create', params: topic_params(@course, param_overrides), format: :json)
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1529,7 +1529,7 @@ describe DiscussionTopicsController do
                      .merge(assignment_params(@course))
         expect(DiscussionTopic.count).to eq 0
         post('create', params: obj_params, format: :json)
-        expect(response).to have_http_status 422
+        expect(response).to have_http_status :unprocessable_entity
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1538,7 +1538,7 @@ describe DiscussionTopicsController do
         # This teacher does not have permissino for section 3 and 4
         sections = [@section1.id, @section2.id, @section3.id, @section4.id].join(",")
         post 'create', params: topic_params(@course, { specific_sections: sections }), :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1782,7 +1782,7 @@ describe DiscussionTopicsController do
             specific_sections: section2.id,
             title: 'Updated Topic',
           })
-      expect(response).to have_http_status 422
+      expect(response).to have_http_status :unprocessable_entity
       expect(DiscussionTopic.count).to eq 2
       expect(DiscussionTopicSectionVisibility.count).to eq 0
     end
@@ -1802,7 +1802,7 @@ describe DiscussionTopicsController do
             specific_sections: section1.id,
             title: 'Updated Topic',
           })
-      expect(response).to have_http_status 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "Allows an admin to update a section-specific discussion" do
@@ -1817,7 +1817,7 @@ describe DiscussionTopicsController do
             specific_sections: section.id,
             title: "foobers"
           })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
     end
 
     it "triggers module progression recalculation if needed after changing sections" do
@@ -1865,7 +1865,7 @@ describe DiscussionTopicsController do
             assignment: { set_assignment: "0" },
             specific_sections: section1.id
           })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       topic.reload
       expect(topic.assignment).to be_nil
     end
@@ -1875,7 +1875,7 @@ describe DiscussionTopicsController do
                               title: 'Updated Topic',
                               lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
                               locked: false })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(@topic.reload).not_to be_locked
       expect(@topic.lock_at).not_to be_nil
     end
@@ -1888,7 +1888,7 @@ describe DiscussionTopicsController do
                               title: 'Updated Topic',
                               locked: false,
                               delayed_post_at: nil })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq 'Updated Topic'
       expect(assigns[:topic].locked).to eq false
       expect(assigns[:topic].delayed_post_at).to be_nil
@@ -1905,7 +1905,7 @@ describe DiscussionTopicsController do
                               title: 'Updated Topic',
                               locked: true,
                               delayed_post_at: delayed_post_time.to_s })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq 'Updated Topic'
       expect(assigns[:topic].locked).to eq true
       expect(assigns[:topic].delayed_post_at.year).to eq 2018

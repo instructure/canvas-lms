@@ -135,6 +135,9 @@ RSpec/SubjectStub:
 RSpec/StubbedMock:
   Enabled: false # this style goes along with spies
 
+RSpec/Rails:
+  Severity: error
+
 Security:
   Severity: error
 Security/YAMLLoad:
@@ -313,9 +316,6 @@ Rake/MethodDefinitionInTask:
   Severity: convention
 
 RSpec/Capybara/FeatureMethods:
-  Severity: convention
-  AutoCorrect: false
-RSpec/Rails/HttpStatus:
   Severity: convention
   AutoCorrect: false
 RSpec/AroundBlock:

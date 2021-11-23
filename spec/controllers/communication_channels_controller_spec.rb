@@ -818,7 +818,7 @@ describe CommunicationChannelsController do
       user_session(@user)
       session[:become_user_id] = u.id
       post 'reset_bounce_count', params: { :user_id => u.id, :id => cc1.id }
-      expect(response).to have_http_status(401)
+      expect(response).to have_http_status(:unauthorized)
       cc1.reload
       expect(cc1.bounce_count).to eq(3)
     end
@@ -1025,7 +1025,7 @@ describe CommunicationChannelsController do
           user_with_pseudonym
           user_session(@user)
           get 'bouncing_channel_report', params: { account_id: Account.default.id }
-          expect(response).to have_http_status(401)
+          expect(response).to have_http_status(:unauthorized)
         end
       end
     end
@@ -1151,7 +1151,7 @@ describe CommunicationChannelsController do
 
           post 'bulk_reset_bounce_counts', params: { account_id: Account.default.id }
 
-          expect(response).to have_http_status(401)
+          expect(response).to have_http_status(:unauthorized)
           expect(c.reload.bounce_count).to eq(1)
         end
       end
@@ -1235,14 +1235,14 @@ describe CommunicationChannelsController do
         context "GET 'unconfirmed_channel_report'" do
           it "doesn't work" do
             get 'unconfirmed_channel_report', params: { account_id: Account.default.id }
-            expect(response).to have_http_status(401)
+            expect(response).to have_http_status(:unauthorized)
           end
         end
 
         context "POST 'bulk_confirm'" do
           it "doesn't work" do
             post 'bulk_confirm', params: { account_id: Account.default.id }
-            expect(response).to have_http_status(401)
+            expect(response).to have_http_status(:unauthorized)
           end
         end
       end

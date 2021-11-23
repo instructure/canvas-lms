@@ -2675,7 +2675,7 @@ RSpec.describe ApplicationController, '#compute_http_cost' do
     stub_request(:get, "http://www.example.com/test")
       .to_return(status: 200, body: "", headers: {})
     get :index, params: { do_http: 1, do_error: 1 }
-    expect(response).to have_http_status 500
+    expect(response).to have_http_status :internal_server_error
     expect(CanvasHttp.cost > 0).to be_truthy
     expect(controller.request.env['extra-request-cost']).to eq(CanvasHttp.cost)
   end
