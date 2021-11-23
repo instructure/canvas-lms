@@ -471,7 +471,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_discussion?
-    'DiscussionTopic' == content_type
+    content_type == 'DiscussionTopic'
   end
 
   def context_module_action(user, action, points = nil)
