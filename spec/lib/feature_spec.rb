@@ -224,6 +224,10 @@ describe "Feature.register" do
     t_feature_hash.merge(environments: { production: { state: 'disabled' } })
   end
 
+  let(:t_hidden_in_prod_feature_hash) do
+    t_feature_hash.merge(environments: { production: { state: 'hidden' } })
+  end
+
   it "registers a feature" do
     Feature.register({ some_feature: t_feature_hash })
     expect(Feature.definitions).to be_frozen
@@ -257,10 +261,6 @@ describe "Feature.register" do
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions['dev_feature']).to eq Feature::DISABLED_FEATURE
     end
-  end
-
-  let(:t_hidden_in_prod_feature_hash) do
-    t_feature_hash.merge(environments: { production: { state: 'hidden' } })
   end
 
   describe 'hidden_in_prod' do

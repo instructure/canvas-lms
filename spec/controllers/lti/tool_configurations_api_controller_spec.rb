@@ -21,9 +21,9 @@
 require_relative '../../lti_1_3_spec_helper'
 
 RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
-  include_context 'lti_1_3_spec_helper'
-
   subject { response }
+
+  include_context 'lti_1_3_spec_helper'
 
   let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account: account) }
@@ -284,6 +284,13 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   end
 
   shared_examples_for 'an endpoint that validates public_jwk and public_jwk_url' do
+    subject do
+      make_request
+      return nil if json_parse['errors'].blank?
+
+      json_parse['errors'].first['message']
+    end
+
     let(:make_request) { raise 'set in examples' }
     let(:tool_config_public_jwk) do
       {
@@ -299,13 +306,6 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       s = super()
       s['public_jwk_url'] = "https://test.com"
       s
-    end
-
-    subject do
-      make_request
-      return nil if json_parse['errors'].blank?
-
-      json_parse['errors'].first['message']
     end
 
     context 'when the public jwk is missing' do

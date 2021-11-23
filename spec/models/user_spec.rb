@@ -2716,9 +2716,9 @@ describe User do
   end
 
   describe "manual_mark_as_read" do
-    let(:user) { User.new }
-
     subject { user.manual_mark_as_read? }
+
+    let(:user) { User.new }
 
     context 'default' do
       it { is_expected.to be_falsey }

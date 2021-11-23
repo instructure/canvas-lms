@@ -19,6 +19,8 @@
 #
 
 describe BasicLTI::QuizzesNextVersionedSubmission do
+  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
   before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
@@ -27,8 +29,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
     @course.enroll_student(@user)
   end
-
-  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
   let(:tool) do
     @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret', tool_id: "Quizzes 2")
@@ -265,11 +265,11 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   end
 
   describe "#commit_history" do
+    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
     before do
       allow(Submission).to receive(:find_or_initialize_by).and_return(submission)
     end
-
-    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
     let(:submission) do
       assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)

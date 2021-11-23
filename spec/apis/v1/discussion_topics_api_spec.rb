@@ -178,9 +178,9 @@ describe DiscussionTopicsController, type: :request do
   include AvatarHelper
 
   context 'locked api item' do
-    include_examples 'a locked api item'
-
     let(:item_type) { 'discussion_topic' }
+
+    include_examples 'a locked api item'
 
     let_once(:locked_item) do
       @course.discussion_topics.create!(:user => @user, :message => 'Locked Discussion')

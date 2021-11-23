@@ -33,6 +33,9 @@ describe "speed grader submissions" do
   end
 
   context "as a teacher" do
+    let(:student_3) { @course.enroll_student(unenrolled_user, enrollment_state: :active) }
+    let(:unenrolled_user) { create_users(1, return_type: :record)[0] }
+
     it "displays submission of first student and then second student", priority: "1" do
       student_submission
 
@@ -131,10 +134,6 @@ describe "speed grader submissions" do
 
       expect(f('#this_student_does_not_have_a_submission')).to be_displayed
     end
-
-    let(:unenrolled_user) { create_users(1, return_type: :record)[0] }
-
-    let(:student_3) { @course.enroll_student(unenrolled_user, enrollment_state: :active) }
 
     it "handles versions correctly", priority: "2" do
       submission1 = student_submission(username: "student1@example.com", body: 'first student, first version')

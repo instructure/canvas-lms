@@ -18,6 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe ProgressSerializer do
+  subject do
+    ProgressSerializer.new(progress, {
+                             controller: controller,
+                             scope: User.new
+                           })
+  end
+
   let(:context) { Account.default }
 
   let :progress do
@@ -41,13 +48,6 @@ describe ProgressSerializer do
       allow(controller).to receive(:session).and_return Object.new
       allow(controller).to receive(:context).and_return Object.new
     end
-  end
-
-  subject do
-    ProgressSerializer.new(progress, {
-                             controller: controller,
-                             scope: User.new
-                           })
   end
 
   let :json do

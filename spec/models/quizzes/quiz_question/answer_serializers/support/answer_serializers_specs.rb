@@ -30,6 +30,9 @@ shared_examples_for 'Answer Serializers' do
   #     answer_parser_compatibility: true
   #   }
   # end
+  # An AnswerSerializer for the QuizQuestion being tested.
+  subject { described_class.new qq }
+
   let(:qq) do
     question_type = self.class.described_class.question_type
 
@@ -59,9 +62,6 @@ shared_examples_for 'Answer Serializers' do
 
     qq
   end
-
-  # An AnswerSerializer for the QuizQuestion being tested.
-  subject { described_class.new qq }
 
   context 'serialization' do
     before do

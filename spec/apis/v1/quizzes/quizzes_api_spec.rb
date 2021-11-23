@@ -164,12 +164,6 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       context 'a published quiz' do
-        let(:published_quiz) { quizzes.first }
-
-        before do
-          published_quiz.publish!
-        end
-
         subject do
           api_call(:get,
                    "/api/v1/courses/#{@course.id}/quizzes",
@@ -177,6 +171,12 @@ describe Quizzes::QuizzesApiController, type: :request do
                    action: 'index',
                    format: 'json',
                    course_id: @course.id.to_s)
+        end
+
+        let(:published_quiz) { quizzes.first }
+
+        before do
+          published_quiz.publish!
         end
 
         it "only returns published quizzes" do

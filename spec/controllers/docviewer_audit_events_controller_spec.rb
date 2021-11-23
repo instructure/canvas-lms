@@ -247,6 +247,10 @@ describe DocviewerAuditEventsController do
   end
 
   context "as an admin" do
+    subject(:annotate_as_admin) do
+      -> { post :create, format: :json, params: default_params.merge(canvas_user_id: account_admin_user.id) }
+    end
+
     before(:once) do
       @assignment = Assignment.create!(
         course: @course,
@@ -257,10 +261,6 @@ describe DocviewerAuditEventsController do
       )
       @submission = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
       @assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
-    end
-
-    subject(:annotate_as_admin) do
-      -> { post :create, format: :json, params: default_params.merge(canvas_user_id: account_admin_user.id) }
     end
 
     it "can annotate even if there are no slots available" do

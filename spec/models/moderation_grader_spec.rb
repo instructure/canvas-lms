@@ -21,12 +21,12 @@
 require_relative '../spec_helper'
 
 describe ModerationGrader do
+  subject { ModerationGrader.create!(user: @user, assignment: @assignment, anonymous_id: 'aaaaa') }
+
   before(:once) do
     course_with_teacher
     @assignment = @course.assignments.create!(title: 'test assignment')
   end
-
-  subject { ModerationGrader.create!(user: @user, assignment: @assignment, anonymous_id: 'aaaaa') }
 
   describe 'relationships' do
     it { is_expected.to belong_to(:user) }

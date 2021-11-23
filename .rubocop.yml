@@ -359,14 +359,8 @@ RSpec/ItBehavesLike:
   AutoCorrect: false
 RSpec/IteratedExpectation:
   Severity: convention
-RSpec/LeadingSubject:
-  Severity: convention
-  AutoCorrect: false
 RSpec/LeakyConstantDeclaration:
   Severity: convention
-RSpec/LetBeforeExamples:
-  Severity: convention
-  AutoCorrect: false
 RSpec/LetSetup:
   Severity: convention
 RSpec/MessageChain:

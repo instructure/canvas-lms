@@ -19,12 +19,12 @@
 #
 
 describe SIS::CSV::DiffGenerator do
+  subject { described_class.new(@account, @batch) }
+
   before :once do
     account_model
     @batch = @account.sis_batches.create
   end
-
-  subject { described_class.new(@account, @batch) }
 
   def csv(name, data)
     @files ||= []

@@ -1675,11 +1675,11 @@ describe Quizzes::Quiz do
   end
 
   describe "#restrict_answers_for_concluded_course?" do
+    subject { quiz.restrict_answers_for_concluded_course? }
+
     let(:account) { Account.default }
     let(:course) { Course.create!(root_account: account) }
     let(:quiz) { course.quizzes.create! }
-
-    subject { quiz.restrict_answers_for_concluded_course? }
 
     before do
       account.settings[:restrict_quiz_questions] = restrict_quiz_settings
@@ -1721,6 +1721,8 @@ describe Quizzes::Quiz do
           it { is_expected.to be(true) }
 
           context 'student in a section with extended time' do
+            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
+
             let(:section_end_at) { 10.minutes.from_now }
             let(:section_start_at) { 10.minutes.ago }
             let(:section) do
@@ -1731,8 +1733,6 @@ describe Quizzes::Quiz do
               )
             end
             let(:student) { student_in_section(section) }
-
-            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
 
             it { is_expected.to be(false) }
           end
@@ -2193,12 +2193,12 @@ describe Quizzes::Quiz do
   end
 
   describe '#locked_for?' do
+    subject { quiz.locked_for?(subject_user, opts) }
+
     let(:quiz) { @course.quizzes.create! }
     let(:student) { student_in_course(course: @course, active_enrollment: true).user }
     let(:subject_user) { student }
     let(:opts) { {} }
-
-    subject { quiz.locked_for?(subject_user, opts) }
 
     before do
       @course.offer!

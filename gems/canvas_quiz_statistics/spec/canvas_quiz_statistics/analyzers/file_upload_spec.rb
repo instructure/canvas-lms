@@ -20,9 +20,9 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::FileUpload do
-  let(:question_data) { QuestionHelpers.fixture('file_upload_question') }
-
   subject { described_class.new(question_data) }
+
+  let(:question_data) { QuestionHelpers.fixture('file_upload_question') }
 
   it 'does not blow up when no responses are provided' do
     expect { expect(subject.run([])).to be_present }.to_not raise_error

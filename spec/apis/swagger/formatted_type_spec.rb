@@ -22,9 +22,9 @@ require_relative 'swagger_helper'
 require 'formatted_type'
 
 describe FormattedType do
-  let(:ft) { FormattedType.new(example) }
-
   subject { ft }
+
+  let(:ft) { FormattedType.new(example) }
 
   context "integer" do
     let(:example) { 1 }

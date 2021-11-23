@@ -21,8 +21,12 @@ require_relative 'support/answer_serializers_specs'
 require_relative 'support/id_answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
-  include_examples 'Answer Serializers'
-
+  let :output do
+    {
+      "question_5_#{AssessmentQuestion.variable_id 'structure1'}" => "4390",
+      "question_5_#{AssessmentQuestion.variable_id 'event2'}" => "599"
+    }.with_indifferent_access
+  end
   let :input do
     {
       structure1: '4390',
@@ -30,12 +34,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
     }.with_indifferent_access
   end
 
-  let :output do
-    {
-      "question_5_#{AssessmentQuestion.variable_id 'structure1'}" => "4390",
-      "question_5_#{AssessmentQuestion.variable_id 'event2'}" => "599"
-    }.with_indifferent_access
-  end
+  include_examples 'Answer Serializers'
 
   # for auto specs
   def format(value)

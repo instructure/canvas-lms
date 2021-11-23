@@ -58,9 +58,10 @@ describe LearningOutcomeResult do
   end
 
   it_behaves_like 'soft deletion' do
+    subject { LearningOutcomeResult.all }
+
     let(:first) { learning_outcome_result }
     let(:second) { create_and_associate_lor(course.assignments.create!) }
-    subject { LearningOutcomeResult.all }
   end
 
   describe '#submitted_or_assessed_at' do

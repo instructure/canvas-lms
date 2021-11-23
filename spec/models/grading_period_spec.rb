@@ -368,8 +368,9 @@ describe GradingPeriod do
 
   describe '#destroy' do
     it_behaves_like 'soft deletion' do
-      let(:creation_arguments) { params }
       subject { grading_period_group.grading_periods }
+
+      let(:creation_arguments) { params }
     end
 
     it 'destroys associated scores' do

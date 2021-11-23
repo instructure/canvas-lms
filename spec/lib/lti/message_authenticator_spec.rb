@@ -21,6 +21,8 @@ require_dependency "lti/message_authenticator"
 
 module Lti
   describe MessageAuthenticator do
+    subject { described_class.new(launch_url, message.signed_post_params(tool.shared_secret)) }
+
     let(:launch_url) { 'http://test.com/test' }
     let(:course) { Course.create! }
     let!(:tool) do
@@ -51,8 +53,6 @@ module Lti
       m.oauth_consumer_key = tool.consumer_key
       m
     end
-
-    subject { described_class.new(launch_url, message.signed_post_params(tool.shared_secret)) }
 
     it 'creates a message from the signed_params' do
       expect(subject.message.oauth_consumer_key).to eq tool.consumer_key

@@ -246,9 +246,10 @@ describe GradingPeriodGroup do
   end
 
   it_behaves_like "soft deletion" do
+    subject { course.grading_period_groups }
+
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { { title: "A title" } }
-    subject { course.grading_period_groups }
   end
 
   describe "deletion" do

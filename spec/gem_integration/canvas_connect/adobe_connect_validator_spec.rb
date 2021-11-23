@@ -19,9 +19,9 @@
 #
 
 describe Canvas::Plugins::Validators::AdobeConnectValidator do
-  let(:plugin_setting) { double }
-
   subject { Canvas::Plugins::Validators::AdobeConnectValidator }
+
+  let(:plugin_setting) { double }
 
   it 'allows an empty hash' do
     expect(subject.validate({}, plugin_setting)).to eql({})

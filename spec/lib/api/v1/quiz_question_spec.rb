@@ -91,12 +91,12 @@ describe Api::V1::QuizQuestion do
   end
 
   describe 'as a student' do
+    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
+
     let(:answers) { [] }
     let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
     let(:user) { User.new }
     let(:session) { nil }
-
-    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
 
     describe 'text_only_questions' do
       let(:question_data) { { "answers" => answers, "question_type" => "text_only_questions" } }

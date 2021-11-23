@@ -149,10 +149,10 @@ describe AssetUserAccess do
   end
 
   describe '#log_action' do
+    subject { asset }
+
     let(:scores) { {} }
     let(:asset) { AssetUserAccess.new(scores) }
-
-    subject { asset }
 
     describe 'when action level is nil' do
       describe 'with nil scores' do
@@ -316,10 +316,10 @@ describe AssetUserAccess do
   end
 
   describe '#log' do
+    subject { access }
+
     let(:access) { AssetUserAccess.new }
     let(:context) { User.new }
-
-    subject { access }
 
     before { allow(access).to receive :save }
 

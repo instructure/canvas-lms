@@ -21,17 +21,16 @@ require_relative 'support/answer_serializers_specs'
 require_relative 'support/textual_answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
-  include_examples 'Answer Serializers'
-
-  let :input do
-    'hello world!'
-  end
-
   let :output do
     {
       question_5: 'hello world!'
     }.with_indifferent_access
   end
+  let :input do
+    'hello world!'
+  end
+
+  include_examples 'Answer Serializers'
 
   it 'returns nil when un-answered' do
     expect(subject.deserialize({})).to eq nil

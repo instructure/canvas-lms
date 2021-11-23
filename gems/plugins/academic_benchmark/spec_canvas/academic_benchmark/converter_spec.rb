@@ -91,6 +91,10 @@ describe AcademicBenchmark::Converter do
              "type" => "standards" } } } }
   end
 
+  subject(:converter) do
+    AcademicBenchmark::Converter.new(converter_settings)
+  end
+
   let(:raw_authority) do
     raw_standard.dig('attributes', 'document', 'publication', 'authorities', 0)
   end
@@ -145,10 +149,6 @@ describe AcademicBenchmark::Converter do
     )
     allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     @user = admin_user
-  end
-
-  subject(:converter) do
-    AcademicBenchmark::Converter.new(converter_settings)
   end
 
   describe '#export' do

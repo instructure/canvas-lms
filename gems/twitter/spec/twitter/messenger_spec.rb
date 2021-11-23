@@ -59,9 +59,9 @@ describe Twitter::Messenger do
   end
 
   describe '#url' do
-    let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
-
     subject { messenger.url }
+
+    let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
 
     it { is_expected.to match(/host/) }
     it { is_expected.to match(/#{id}$/) }

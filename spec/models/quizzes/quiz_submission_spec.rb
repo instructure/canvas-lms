@@ -1049,9 +1049,9 @@ describe Quizzes::QuizSubmission do
     end
 
     describe "#results_visible?" do
-      let(:quiz_submission) { @quiz.generate_submission(@student) }
-
       subject { quiz_submission.results_visible? }
+
+      let(:quiz_submission) { @quiz.generate_submission(@student) }
 
       it { is_expected.to be(true) }
 
@@ -1164,13 +1164,13 @@ describe Quizzes::QuizSubmission do
           end
 
           context 'an extra attempt' do
+            subject { extra_attempt.results_visible? }
+
             let(:extra_attempt) do
               quiz_submission
               second_quiz_submission
               @quiz.generate_submission(@student)
             end
-
-            subject { extra_attempt.results_visible? }
 
             it { is_expected.to be(true) }
           end

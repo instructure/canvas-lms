@@ -23,13 +23,14 @@ require_relative 'turnitin_spec_helper'
 require 'turnitin_api'
 module Turnitin
   describe OutcomeResponseProcessor do
+    subject { described_class.new(tool, lti_assignment, lti_student, outcome_response_json) }
+
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     end
 
     include_context "shared_tii_lti"
-    subject { described_class.new(tool, lti_assignment, lti_student, outcome_response_json) }
 
     describe '#process' do
       let(:filename) { 'my_sample_file' }

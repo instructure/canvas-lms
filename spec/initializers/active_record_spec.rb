@@ -398,13 +398,15 @@ module ActiveRecord
       end
 
       context "directly on the table" do
-        include_examples "query creation"
         let(:base) { User.active }
+
+        include_examples "query creation"
       end
 
       context "through a relation" do
-        include_examples "query creation"
         let(:base) { Account.create.users }
+
+        include_examples "query creation"
       end
     end
   end

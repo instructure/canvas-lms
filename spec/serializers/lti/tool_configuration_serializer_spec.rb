@@ -20,11 +20,11 @@
 require_relative '../../lti_1_3_spec_helper'
 
 RSpec.describe Lti::ToolConfigurationSerializer do
+  subject { Lti::ToolConfigurationSerializer.new(tool_configuration).as_json }
+
   include_context 'lti_1_3_spec_helper'
 
   let_once(:account) { Account.default }
-
-  subject { Lti::ToolConfigurationSerializer.new(tool_configuration).as_json }
 
   it { is_expected.to have_key 'tool_configuration' }
 

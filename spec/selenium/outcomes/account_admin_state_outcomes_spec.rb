@@ -20,12 +20,12 @@ require_relative '../common'
 require_relative '../helpers/outcome_common'
 
 describe "account admin outcomes" do
+  let(:account) { Account.default }
+  let(:who_to_login) { 'admin' }
+  let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
+
   include_examples "in-process server selenium tests"
   include OutcomeCommon
-
-  let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
-  let(:who_to_login) { 'admin' }
-  let(:account) { Account.default }
 
   describe "state level outcomes" do
     before do

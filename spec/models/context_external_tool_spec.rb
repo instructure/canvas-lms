@@ -49,6 +49,8 @@ describe ContextExternalTool do
   end
 
   describe '#permission_given?' do
+    subject { tool.permission_given?(launch_type, user, context) }
+
     let(:required_permission) { 'some-permission' }
     let(:launch_type) { 'some-launch-type' }
     let(:tool) do
@@ -79,8 +81,6 @@ describe ContextExternalTool do
     let(:course) { course_with_teacher(account: @root_account).context }
     let(:user) { course.teachers.first }
     let(:context) { course }
-
-    subject { tool.permission_given?(launch_type, user, context) }
 
     context 'when the placement does not require a specific permission' do
       let(:launch_type) { 'course_navigation' }
@@ -1641,15 +1641,15 @@ describe ContextExternalTool do
   end
 
   describe '#setting_with_default_enabled' do
+    subject do
+      tool.setting_with_default_enabled(type)
+    end
+
     let(:tool) do
       t = external_tool_model(context: @root_account)
       t.settings = settings
       t.save
       t
-    end
-
-    subject do
-      tool.setting_with_default_enabled(type)
     end
 
     context 'when settings does not contain type' do

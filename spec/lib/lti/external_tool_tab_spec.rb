@@ -19,6 +19,8 @@
 #
 
 describe Lti::ExternalToolTab do
+  subject { described_class.new(context, nil, [tool]) }
+
   let(:context) do
     account = Account.new
     allow(account).to receive(:id).and_return(1)
@@ -63,8 +65,6 @@ describe Lti::ExternalToolTab do
     allow(tool).to receive(:id).and_return(2)
     tool
   end
-
-  subject { described_class.new(context, nil, [tool]) }
 
   it 'sets the tab id to the tools asset_string' do
     expect(subject.tabs.first[:id]).to eq tool.asset_string
@@ -119,13 +119,13 @@ describe Lti::ExternalToolTab do
   end
 
   describe "course_navigation" do
+    subject { described_class.new(context, :course_navigation, [tool]) }
+
     let(:context) do
       course = Course.new
       allow(course).to receive(:id).and_return(3)
       course
     end
-
-    subject { described_class.new(context, :course_navigation, [tool]) }
 
     it 'sets the label based on placement' do
       expect(subject.tabs.first[:label]).to eq course_navigation[:text]
@@ -177,13 +177,13 @@ describe Lti::ExternalToolTab do
   end
 
   describe "user_navigation" do
+    subject { described_class.new(context, :user_navigation, [tool]) }
+
     let(:context) do
       user = User.new
       allow(user).to receive(:id).and_return(4)
       user
     end
-
-    subject { described_class.new(context, :user_navigation, [tool]) }
 
     it 'sets the label based on placement' do
       expect(subject.tabs.first[:label]).to eq user_navigation[:text]

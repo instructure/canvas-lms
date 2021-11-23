@@ -141,12 +141,12 @@ describe GradingStandardsController do
 
   describe "GET 'index'" do
     context "context is an account" do
+      subject { get :index, params: { account_id: @account.id } }
+
       before(:once) do
         @account = Account.default
         @admin = account_admin_user(account: @account)
       end
-
-      subject { get :index, params: { account_id: @account.id } }
 
       it "returns a 200 for a valid request" do
         user_session(@admin)
@@ -160,11 +160,11 @@ describe GradingStandardsController do
     end
 
     context "context is a course" do
+      subject { get :index, params: { course_id: @course.id } }
+
       before(:once) do
         course_with_teacher(active_all: true)
       end
-
-      subject { get :index, params: { course_id: @course.id } }
 
       it "returns a 200 for a valid request" do
         user_session(@teacher)

@@ -22,10 +22,10 @@ require_dependency "canvas/errors/worker_info"
 module Canvas
   class Errors
     describe WorkerInfo do
+      subject(:hash) { info.to_h }
+
       let(:worker) { double(name: 'workername') }
       let(:info) { described_class.new(worker) }
-
-      subject(:hash) { info.to_h }
 
       it "tags all exceptions as 'BackgroundJob'" do
         expect(hash[:tags][:process_type]).to eq("BackgroundJob")

@@ -20,11 +20,11 @@
 require_relative '../lti2_spec_helper'
 
 describe OriginalityReport do
+  subject { OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission, workflow_state: 'pending') }
+
   let(:attachment) { attachment_model }
   let(:course) { course_model }
   let(:submission) { submission_model }
-
-  subject { OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission, workflow_state: 'pending') }
 
   it 'can have attachments associated with it' do
     expect(subject.attachment).to eq attachment
