@@ -2066,11 +2066,11 @@ describe ExternalToolsController do
 
     it "generates a sessionless launch for an external tool assignment" do
       tool = new_valid_tool(@course)
-      assignment_model(:course => @course,
-                       :name => 'tool assignment',
-                       :submission_types => 'external_tool',
-                       :points_possible => 20,
-                       :grading_type => 'points')
+      assignment_model(course: @course,
+                       name: 'tool assignment',
+                       submission_types: 'external_tool',
+                       points_possible: 20,
+                       grading_type: 'points')
       tag = @assignment.build_external_tool_tag(:url => tool.url)
       tag.content_type = 'ContextExternalTool'
       tag.save!
@@ -2090,6 +2090,7 @@ describe ExternalToolsController do
       expect(tool_settings['custom_canvas_course_id']).to eq @course.id.to_s
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
+      expect(tool_settings['resource_link_title']).to eq 'tool assignment'
     end
 
     it 'passes whitelisted `platform` query param to lti launch body' do
@@ -2144,7 +2145,8 @@ describe ExternalToolsController do
                               context_module: @cm,
                               content_type: 'ContextExternalTool',
                               content: @tool,
-                              url: @tool.url)
+                              url: @tool.url,
+                              title: 'my module item title')
       @cm.content_tags << @tg
       @cm.save!
       @course.save!
@@ -2163,6 +2165,7 @@ describe ExternalToolsController do
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
 
       expect(launch_settings['tool_settings']['resource_link_id']).to eq opaque_id(@tg)
+      expect(launch_settings['tool_settings']['resource_link_title']).to eq 'my module item title'
     end
 
     it 'makes the module item available for variable expansions' do
