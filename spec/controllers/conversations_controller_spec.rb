@@ -640,6 +640,21 @@ describe ConversationsController do
       expect(response).to be_successful
       expect(@student.media_objects.by_media_id("m-whatever").count).to eq 1
     end
+
+    it "includes unknown recipients that are already part of the conversation" do
+      course_with_student_logged_in(active_all: true)
+      account_admin_user
+
+      convo = @admin.initiate_conversation([@student])
+      convo.add_message("wut up BOI!")
+      convo.conversation.update_attribute(:context, @course)
+
+      post "add_message", params: { conversation_id: convo.conversation_id, body: "just chillin" }
+      expect(response).to be_successful
+      messages = convo.messages.to_a
+      expect(messages.count).to eq 2
+      expect(messages.pluck(:body)).to match_array(["wut up BOI!", "just chillin"])
+    end
   end
 
   describe "POST 'add_recipients'" do
