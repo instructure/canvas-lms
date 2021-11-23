@@ -611,7 +611,7 @@ describe "Group Categories API", type: :request do
         course_with_teacher_logged_in(:active_all => true)
         category = @course.group_categories.create(:name => "Group Category")
 
-        expect {
+        expect do
           raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                        @category_path_options.merge(:action => 'assign_unassigned_members',
                                                     :group_category_id => category.to_param)
@@ -620,7 +620,7 @@ describe "Group Categories API", type: :request do
           json = JSON.parse(response.body)
           expect(json['url']).to match Regexp.new("http://www.example.com/api/v1/progress/\\d+")
           expect(json['completion']).to eq 0
-        }.to change(Delayed::Job, :count).by(1)
+        end.to change(Delayed::Job, :count).by(1)
       end
     end
   end
@@ -724,11 +724,11 @@ describe "Group Categories API", type: :request do
       end
 
       describe "sis permissions" do
-        let(:json) {
+        let(:json) do
           api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                    @category_path_options.merge(action: 'index',
                                                 account_id: @account.to_param))
-        }
+        end
         let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
         before do

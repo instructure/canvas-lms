@@ -33,16 +33,16 @@ describe GradeSummaryAssignmentPresenter do
     @submission = @assignment.submit_homework(@student, attachments: [@attachment])
   end
 
-  let(:summary) {
+  let(:summary) do
     GradeSummaryPresenter.new :first, :second, :third
-  }
+  end
 
-  let(:presenter) {
+  let(:presenter) do
     GradeSummaryAssignmentPresenter.new(summary,
                                         @student,
                                         @assignment,
                                         @submission)
-  }
+  end
 
   describe '#plagiarism_attachment?' do
     it 'returns true if the submission has an OriginalityReport' do

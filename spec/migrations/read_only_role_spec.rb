@@ -26,45 +26,45 @@ describe 'read-only database role' do
 
   it 'allows select' do
     user_factory(name: 'blah')
-    with_read_only_role {
+    with_read_only_role do
       expect(User.where(id: @user).pluck(:name)).to eq(['blah'])
-    }
+    end
   end
 
   it 'allows switching from read-only to read-write' do
     user_factory(name: 'blah')
     name = nil
-    with_read_only_role {
+    with_read_only_role do
       name = User.take.name
-    }
-    expect {
+    end
+    expect do
       @user.update name: name.succ
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it 'disallows insert' do
-    expect {
-      with_read_only_role {
+    expect do
+      with_read_only_role do
         user_factory
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 
   it 'disallows update' do
     user_factory(name: 'blah')
-    expect {
-      with_read_only_role {
+    expect do
+      with_read_only_role do
         @user.update_attribute(:name, 'bleh')
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 
   it 'disallows delete' do
     user_factory(name: 'blah')
-    expect {
-      with_read_only_role {
+    expect do
+      with_read_only_role do
         @user.destroy_permanently!
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 end

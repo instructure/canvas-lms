@@ -49,11 +49,11 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
 
     expect(RoleOverride.where(permission: 'manage_courses_delete').count).to eq 1
 
-    expect {
+    expect do
       DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
         base_role_type: 'AccountAdmin'
       )
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   context 'AccountAdmin' do

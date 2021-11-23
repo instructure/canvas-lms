@@ -148,11 +148,11 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
-        expect {
+        expect do
           endpoints.add_users_ignore_duplicates(
             'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
           )
-        }.to raise_error(
+        end.to raise_error(
           ArgumentError, "Only 20 users can be batched at once. Got 21."
         )
       end
@@ -470,11 +470,11 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
-        expect {
+        expect do
           endpoints.remove_users_ignore_missing(
             'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
           )
-        }.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
+        end.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
       end
     end
   end

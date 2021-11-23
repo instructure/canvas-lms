@@ -70,7 +70,7 @@ class UserList
 
   def users
     existing = @addresses.select { |a| a[:user_id] }
-    existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] }) do |shard_existing|
+    existing_users = Shard.partition_by_shard(existing, ->(a) { a[:shard] }) do |shard_existing|
       User.where(id: shard_existing.pluck(:user_id))
     end
 
@@ -185,10 +185,10 @@ class UserList
                  .select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id")
                  .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.pluck(:address), account_ids)
                  .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-          addresses = @addresses.select { |a|
+          addresses = @addresses.select do |a|
             a[:address].casecmp?(login[:address]) ||
               (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))
-          }
+          end
           addresses.each do |address|
             # already found a matching pseudonym
             if address[:user_id]

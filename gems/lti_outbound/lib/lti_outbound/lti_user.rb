@@ -53,10 +53,10 @@ module LtiOutbound
     def observer?
       return false unless current_roles
 
-      current_roles.any? { |e|
+      current_roles.any? do |e|
         LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').include?(e) ||
           LtiOutbound::LTIRoles::Context::OBSERVER.split(',').include?(e)
-      }
+      end
     end
   end
 end

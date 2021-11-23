@@ -866,9 +866,9 @@ module Api::V1::Assignment
 
     subs_list = if submissions_for_user
                   assignment_ids = assignments.map(&:id).to_set
-                  submissions_for_user.select { |s|
+                  submissions_for_user.select do |s|
                     assignment_ids.include?(s.assignment_id)
-                  }
+                  end
                 else
                   users = current_user_and_observed(include_observed: has_observed_users)
                   @context.submissions

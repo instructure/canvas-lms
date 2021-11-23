@@ -663,7 +663,7 @@ describe ContentMigration do
     end
 
     it "re-uses kaltura media objects" do
-      expect {
+      expect do
         media_id = '0_deadbeef'
         @copy_from.media_objects.create!(:media_id => media_id)
         att = Attachment.create!(:filename => 'video.mp4', :uploaded_data => StringIO.new('pixels and frames and stuff'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -674,7 +674,7 @@ describe ContentMigration do
         run_course_copy
 
         expect(@copy_to.attachments.where(migration_id: mig_id(att)).first.media_entry_id).to eq media_id
-      }.to change { Delayed::Job.jobs_count(:tag, 'MediaObject.add_media_files') }.by(0)
+      end.to change { Delayed::Job.jobs_count(:tag, 'MediaObject.add_media_files') }.by(0)
     end
 
     it "imports calendar events" do
@@ -720,9 +720,9 @@ describe ContentMigration do
 
       allow(Importers::WikiPageImporter).to receive(:process_migration).and_raise(ArgumentError)
 
-      expect {
+      expect do
         run_course_copy
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
 
       new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(new_att).not_to be_nil

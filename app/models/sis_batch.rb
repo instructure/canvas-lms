@@ -51,8 +51,8 @@ class SisBatch < ActiveRecord::Base
   def self.valid_import_types
     @valid_import_types ||= {
       "instructure_csv" => {
-        :name => lambda { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
-        :callback => lambda { |batch| batch.process_instructure_csv_zip },
+        :name => -> { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
+        :callback => ->(batch) { batch.process_instructure_csv_zip },
         :default => true
       }
     }

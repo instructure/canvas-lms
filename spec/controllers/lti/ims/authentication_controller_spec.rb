@@ -22,14 +22,14 @@ require_relative '../../../lti_1_3_spec_helper'
 describe Lti::IMS::AuthenticationController do
   include Lti::RedisMessageClient
 
-  let(:developer_key) {
+  let(:developer_key) do
     key = DeveloperKey.create!(
       redirect_uris: redirect_uris,
       account: context.root_account
     )
     enable_developer_key_account_binding!(key)
     key
-  }
+  end
   let(:redirect_uris) { ['https://redirect.tool.com'] }
   let(:user) { user_model }
   let(:redirect_domain) { 'redirect.instructure.com' }

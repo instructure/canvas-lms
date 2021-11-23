@@ -238,10 +238,10 @@ module Api::V1::Submission
       # individual group one. so we search far and wide for all student entries.
 
       entries = if assignment.discussion_topic.has_group_category?
-                  assignment.shard.activate {
+                  assignment.shard.activate do
                     DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id))
                                    .for_user(attempt.user_id).to_a.sort_by(&:created_at)
-                  }
+                  end
                 else
                   assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
                 end

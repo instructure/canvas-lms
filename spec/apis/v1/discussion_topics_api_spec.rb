@@ -122,9 +122,9 @@ describe Api::V1::DiscussionTopics do
   it "renders a podcast_url using the discussion topic's context if there is no @context_enrollment/@context" do
     @topic.update_attribute :podcast_enabled, true
     data = nil
-    expect {
+    expect do
       data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, {})
-    }.not_to raise_error
+    end.not_to raise_error
     expect(data[:podcast_url]).to match(/feeds_topic_format_path/)
   end
 
@@ -547,9 +547,9 @@ describe DiscussionTopicsController, type: :request do
         @topic2.assignment = @assignment
         @topic2.save!
 
-        expect {
+        expect do
           @topic2.lock
-        }.to raise_error DiscussionTopic::Errors::LockBeforeDueDate
+        end.to raise_error DiscussionTopic::Errors::LockBeforeDueDate
       end
 
       it "only includes topics with a given scope when specified" do
@@ -3248,8 +3248,8 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "public courses" do
-    let(:announcements_view_api) {
-      ->(user, course_id, announcement_id, status = 200) do
+    let(:announcements_view_api) do
+      lambda do |user, course_id, announcement_id, status = 200|
         old_at_user = @user
         @user = user # this is required because of api_call :-(
         json = api_call(
@@ -3272,7 +3272,7 @@ describe DiscussionTopicsController, type: :request do
         @user = old_at_user
         json
       end
-    }
+    end
 
     before do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
@@ -3288,14 +3288,14 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "should be shown" do
-      let(:check_access) {
-        ->(json) do
+      let(:check_access) do
+        lambda do |json|
           expect(json["new_entries"]).not_to be_nil
           expect(json["new_entries"].count).to eq(2)
           expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
           expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
         end
-      }
+      end
 
       it "shows student comments to students" do
         check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
@@ -3311,12 +3311,12 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "should not be shown" do
-      let(:check_access) {
-        ->(json) do
+      let(:check_access) do
+        lambda do |json|
           expect(json["new_entries"]).to be_nil
           expect(%w[unauthorized unauthenticated]).to include(json["status"])
         end
-      }
+      end
 
       before do
         prev_course = @course

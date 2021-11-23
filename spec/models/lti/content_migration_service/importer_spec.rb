@@ -25,23 +25,23 @@ RSpec.describe Lti::ContentMigrationService::Importer do
 
   let(:course) { course_model }
   let(:content_migration) { ContentMigration.new }
-  let(:tool) {
+  let(:tool) do
     course.context_external_tools.create!({
                                             name: 'a',
                                             domain: 'lti.example.com',
                                             consumer_key: '12345',
                                             shared_secret: 'sekret',
                                           })
-  }
+  end
   let(:importer) { Lti::ContentMigrationService::Importer.new(tool.id) }
-  let(:replacement_tool) {
+  let(:replacement_tool) do
     course.context_external_tools.create!({
                                             name: 'b',
                                             domain: 'lti.example.com',
                                             consumer_key: '12345',
                                             shared_secret: 'sekret',
                                           })
-  }
+  end
   let(:content) { { foo: 'bar', baz: 'qux' } }
   let(:root_account) { course.root_account }
   let(:import_url) { 'https://lti.example.com/begin_import' }

@@ -202,7 +202,7 @@ describe Api::V1::AssignmentOverride do
 
     context 'with no restrictions' do
       before do
-        2.times do @course.course_sections.create! end
+        2.times { @course.course_sections.create! }
         @section_invisible = @course.active_course_sections[2]
         @section_visible = @course.active_course_sections.second
 

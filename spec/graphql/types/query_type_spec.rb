@@ -85,10 +85,10 @@ describe Types::QueryType do
       assignment.assignment_group.update!(sis_source_id: generic_sis_id)
       assignment.assignment_group
     end
-    let_once(:term) {
+    let_once(:term) do
       course.enrollment_term.update!(sis_source_id: generic_sis_id)
       course.enrollment_term
-    }
+    end
     let_once(:admin) { account_admin_user(account: Account.default) }
 
     %w[account course assignment assignmentGroup term].each do |type|

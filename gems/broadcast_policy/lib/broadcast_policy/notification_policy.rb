@@ -23,7 +23,7 @@ module BroadcastPolicy
 
     def initialize(dispatch)
       self.dispatch = dispatch
-      self.recipient_filter = lambda { |record, _user| record }
+      self.recipient_filter = ->(record, _user) { record }
     end
 
     # This should be called for an instance.  It can only be sent out if the

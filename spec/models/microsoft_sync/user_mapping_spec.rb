@@ -211,9 +211,9 @@ describe MicrosoftSync::UserMapping do
     end
 
     it 'deletes all UserMappings associated with the current account' do
-      expect {
+      expect do
         MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
-      }.to change { MicrosoftSync::UserMapping.where(root_account: account).count }.from(2).to(0)
+      end.to change { MicrosoftSync::UserMapping.where(root_account: account).count }.from(2).to(0)
     end
 
     context 'multiple root accounts' do
@@ -227,9 +227,9 @@ describe MicrosoftSync::UserMapping do
       end
 
       it "doesn't delete the other root account's UserMappings" do
-        expect {
+        expect do
           MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
-        }.to not_change { MicrosoftSync::UserMapping.where(root_account: account2).count }.from(2)
+        end.to not_change { MicrosoftSync::UserMapping.where(root_account: account2).count }.from(2)
       end
     end
   end

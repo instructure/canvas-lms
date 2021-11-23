@@ -207,15 +207,15 @@ class GradeSummaryPresenter
       assignments_index = assignments.index_by(&:id)
 
       # preload submission comment stuff
-      comments = ss.map { |s|
+      comments = ss.map do |s|
         assign = assignments_index[s.assignment_id]
         s.assignment = assign if assign.present?
 
-        s.visible_submission_comments.map { |c|
+        s.visible_submission_comments.map do |c|
           c.submission = s
           c
-        }
-      }.flatten
+        end
+      end.flatten
       SubmissionComment.preload_attachments comments
 
       ss

@@ -42,12 +42,12 @@ class LearningOutcome < ActiveRecord::Base
   validates :display_name, length: { maximum: maximum_string_length, allow_blank: true }
   validates :calculation_method, inclusion: {
     in: OutcomeCalculationMethod::CALCULATION_METHODS,
-    message: -> {
+    message: lambda do
       t(
         "calculation_method must be one of the following: %{calc_methods}",
         :calc_methods => OutcomeCalculationMethod::CALCULATION_METHODS.to_s
       )
-    }
+    end
   }
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE

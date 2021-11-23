@@ -51,10 +51,10 @@ describe PageView do
   describe "cassandra page views" do
     include_examples "cassandra page views"
     it "stores and load from cassandra" do
-      expect {
+      expect do
         @page_view.request_id = "abcde1"
         @page_view.save!
-      }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+      end.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       expect(PageView.find(@page_view.id)).to eq @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -98,10 +98,10 @@ describe PageView do
       it "stores and load from cassandra when the birth shard is not the default shard" do
         allow(Shard).to receive(:birth).and_return(@shard1)
         @shard2.activate do
-          expect {
+          expect do
             @page_view.request_id = "abcde2"
             @page_view.save!
-          }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+          end.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
           expect(PageView.find(@page_view.id)).to eq @page_view
           expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
         end

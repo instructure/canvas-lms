@@ -102,16 +102,16 @@ class DiscussionEntry < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
     p.to { discussion_topic.subscribers - [user] - mentioned_users }
-    p.whenever { |record|
+    p.whenever do |record|
       record.just_created && record.active?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :announcement_reply
     p.to { discussion_topic.user }
-    p.whenever { |record|
+    p.whenever do |record|
       record.discussion_topic.is_announcement && record.just_created && record.active?
-    }
+    end
     p.data { course_broadcast_data }
   end
 

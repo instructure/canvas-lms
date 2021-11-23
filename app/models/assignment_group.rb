@@ -42,11 +42,11 @@ class AssignmentGroup < ActiveRecord::Base
   has_many :scores, -> { active }
   has_many :assignments, -> { order('position, due_at, title') }
 
-  has_many :active_assignments, -> {
+  has_many :active_assignments, lambda {
     where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title')
   }, class_name: 'Assignment', dependent: :destroy
 
-  has_many :published_assignments, -> {
+  has_many :published_assignments, lambda {
     where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title')
   }, class_name: 'Assignment'
 
@@ -183,9 +183,9 @@ class AssignmentGroup < ActiveRecord::Base
 
   scope :include_active_assignments, -> { preload(:active_assignments) }
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
-  scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
-  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).ordered }
-  scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
+  scope :before, ->(date) { where("assignment_groups.created_at<?", date) }
+  scope :for_context_codes, ->(codes) { active.where(:context_code => codes).ordered }
+  scope :for_course, ->(course) { where(:context_id => course, :context_type => 'Course') }
 
   def course_grading_change
     context.grade_weight_changed! if saved_change_to_group_weight? && context && context.group_weighting_scheme == 'percent'
@@ -204,10 +204,10 @@ class AssignmentGroup < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { context.participating_students_by_date }
-    p.whenever { |record|
+    p.whenever do |record|
       false &&
         record.changed_in_state(:available, :fields => :group_weight)
-    }
+    end
     p.data { course_broadcast_data }
   end
 

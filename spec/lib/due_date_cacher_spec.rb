@@ -308,35 +308,35 @@ describe DueDateCacher do
     let(:instance) { instance_double("DueDateCacher", recompute: nil) }
 
     it "accepts a User" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user(student) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts a user ID" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user(student) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts a nil value" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user(nil) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "raises an error if no argument is given" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
   end
 
@@ -1060,9 +1060,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1089,9 +1089,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1118,9 +1118,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1145,9 +1145,9 @@ describe DueDateCacher do
           )
         end
 
-        expect {
+        expect do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-        }.not_to change {
+        end.not_to change {
           AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
         }
       end
@@ -1159,9 +1159,9 @@ describe DueDateCacher do
         assignment = course.assignments.create!(title: 'zzz', anonymous_grading: true)
       end
 
-      expect {
+      expect do
         DueDateCacher.recompute(assignment)
-      }.not_to change {
+      end.not_to change {
         AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
       }
     end

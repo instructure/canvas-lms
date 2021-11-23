@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 last_cache_config = {}
-load_cache_config = -> do
+load_cache_config = lambda do
   cache_map = {}
 
   searched = Set.new

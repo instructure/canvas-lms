@@ -54,10 +54,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
-          format.html {
+          format.html do
             rce_js_env
             render :new
-          }
+          end
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -125,10 +125,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
-          format.html {
+          format.html do
             rce_js_env
             render :edit
-          }
+          end
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end

@@ -77,23 +77,23 @@ describe Rake::TaskGraph do
   end
 
   it 'whines on self-deps' do
-    expect {
+    expect do
       described_class.draw { task 'a' => ['a'] }
-    }.to raise_error(/has a self or circular dependency/)
+    end.to raise_error(/has a self or circular dependency/)
   end
 
   it 'whines on circular deps' do
-    expect {
+    expect do
       described_class.draw do
         task 'a' => ['b']
         task 'b' => ['a']
       end
-    }.to raise_error(/has a self or circular dependency/)
+    end.to raise_error(/has a self or circular dependency/)
   end
 
   it 'whines if a dependency is undefined' do
-    expect {
+    expect do
       described_class.draw { task 'a' => ['b'] }
-    }.to raise_error(/but were not defined/)
+    end.to raise_error(/but were not defined/)
   end
 end

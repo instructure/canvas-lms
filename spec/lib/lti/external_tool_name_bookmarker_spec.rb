@@ -26,7 +26,7 @@ describe Lti::ExternalToolNameBookmarker do
 
   it_behaves_like 'a bookmarker for models with names' do
     let(:model_factory_proc) do
-      lambda { |account, model_name| external_tool_model(context: account, opts: { name: model_name }) }
+      ->(account, model_name) { external_tool_model(context: account, opts: { name: model_name }) }
     end
 
     let(:model_base_scope) do

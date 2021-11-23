@@ -53,12 +53,12 @@ module Lti
       allow(m).to receive(:use_1_3?).and_return(false)
       m
     end
-    let(:available_canvas_resources) {
+    let(:available_canvas_resources) do
       [
         { id: '1', name: 'item 1' },
         { id: '2', name: 'item 2' }
       ]
-    }
+    end
 
     let(:controller) do
       request_mock = double('request')
@@ -244,7 +244,7 @@ module Lti
     end
 
     describe '#enabled_capability_params' do
-      let(:enabled_capability) {
+      let(:enabled_capability) do
         %w[TestCapability.Foo
            ToolConsumerInstance.guid
            CourseSection.sourcedId
@@ -260,7 +260,7 @@ module Lti
            Message.documentTarget
            Message.locale
            Context.id]
-      }
+      end
 
       it 'does not use expansions that do not have default names' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> { 'test' })

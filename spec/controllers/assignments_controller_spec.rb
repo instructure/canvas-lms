@@ -679,9 +679,9 @@ describe AssignmentsController do
         it { is_expected.to be_successful }
 
         it 'creates the default line item' do
-          expect {
+          expect do
             subject
-          }.to change {
+          end.to change {
             Lti::LineItem.where(assignment: assignment).count
           }.from(0).to(1)
         end

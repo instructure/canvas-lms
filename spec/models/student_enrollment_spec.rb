@@ -105,9 +105,9 @@ describe StudentEnrollment do
         end_date: 2.months.from_now(now)
       )
 
-      expect {
+      expect do
         enrollment.update_override_score(override_score: 80.0, grading_period_id: other_period.id, updating_user: teacher)
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "records a grade change event if record_grade_change is true and updating_user is supplied" do
@@ -141,9 +141,9 @@ describe StudentEnrollment do
     it "does not record a grade change if the override score did not actually change" do
       enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
 
-      expect {
+      expect do
         enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
-      }.not_to change {
+      end.not_to change {
         Auditors::ActiveRecord::GradeChangeRecord.where(
           context_id: course.id,
           student_id: student.id,

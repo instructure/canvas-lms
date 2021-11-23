@@ -68,10 +68,10 @@ module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
     return _extract_callstack(callstack) if callstack.first.is_a?(String)
 
-    offending_line = callstack.find { |frame|
+    offending_line = callstack.find do |frame|
       # pass the whole frame to the filter function, so we can ignore specific methods
       !ignored_callstack(frame)
-    } || callstack.first
+    end || callstack.first
 
     [offending_line.path, offending_line.lineno, offending_line.label]
   end

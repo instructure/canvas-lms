@@ -37,8 +37,8 @@ class ContextExternalTool < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :name, :consumer_key, :shared_secret, presence: true
   validates :name, length: { :maximum => maximum_string_length }
-  validates :config_url, presence: { :if => lambda { |t| t.config_type == "by_url" } }
-  validates :config_xml, presence: { :if => lambda { |t| t.config_type == "by_xml" } }
+  validates :config_url, presence: { :if => ->(t) { t.config_type == "by_url" } }
+  validates :config_xml, presence: { :if => ->(t) { t.config_type == "by_xml" } }
   validates :domain, length: { :maximum => 253, :allow_blank => true }
   validate :url_or_domain_is_set
   validate :validate_urls
@@ -294,7 +294,7 @@ class ContextExternalTool < ActiveRecord::Base
       extension_keys += custom_keys
     end
     extension_keys += {
-      :visibility => lambda { |v| %w[members admins public].include?(v) || v.nil? }
+      :visibility => ->(v) { %w[members admins public].include?(v) || v.nil? }
     }.to_a
 
     # merge with existing settings so that no caller can complain
@@ -438,9 +438,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def check_for_xml_error
-    (@config_errors || []).each { |attr, msg|
+    (@config_errors || []).each do |attr, msg|
       errors.add attr, msg
-    }
+    end
   end
   protected :check_for_xml_error
 
@@ -459,9 +459,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def custom_fields_string
-    (settings[:custom_fields] || {}).map { |key, val|
+    (settings[:custom_fields] || {}).map do |key, val|
       "#{key}=#{val}"
-    }.sort.join("\n")
+    end.sort.join("\n")
   end
 
   def vendor_help_link
@@ -1038,7 +1038,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
   }
 
-  scope :selectable, lambda { where("context_external_tools.not_selectable IS NOT TRUE") }
+  scope :selectable, -> { where("context_external_tools.not_selectable IS NOT TRUE") }
 
   scope :visible, lambda { |user, context, session, placements, current_scope = ContextExternalTool.all|
     if context.grants_right?(user, session, :read_as_admin)
@@ -1050,7 +1050,7 @@ class ContextExternalTool < ActiveRecord::Base
       allowed_visibility.push('members') if context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
       allowed_visibility.push('admins') if context.grants_right?(user, session, :read_as_admin)
       # To get at the visibility setting for each tool we need to use active record.  We will limit this to just the candidate tools using the current scope.
-      valid_tools = current_scope.select { |cet|
+      valid_tools = current_scope.select do |cet|
         include_tool = false
         placements.each do |placement|
           tool_settings = cet.settings.with_indifferent_access
@@ -1061,7 +1061,7 @@ class ContextExternalTool < ActiveRecord::Base
           break if include_tool
         end
         include_tool
-      }.pluck(:id)
+      end.pluck(:id)
       where(id: valid_tools)
     end
   }
@@ -1084,9 +1084,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     tool
   end
-  scope :active, -> do
+  scope :active, lambda {
     where.not(workflow_state: ['deleted', 'disabled'])
-  end
+  }
 
   def self.find_all_for(context, type)
     tools = []

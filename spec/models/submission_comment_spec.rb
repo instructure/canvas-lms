@@ -253,9 +253,9 @@ RSpec.describe SubmissionComment do
 
   it "does not create a stream item for a provisional comment" do
     prepare_test_submission
-    expect {
+    expect do
       @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional => true)
-    }.to change(StreamItem, :count).by(0)
+    end.to change(StreamItem, :count).by(0)
   end
 
   it "ensures the media object exists" do
@@ -329,9 +329,9 @@ RSpec.describe SubmissionComment do
       comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
       Account.default.destroy
       comment.reload
-      expect {
+      expect do
         comment.reply_from(:user => @student, :text => "some reply")
-      }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "creates reply" do
@@ -342,9 +342,9 @@ RSpec.describe SubmissionComment do
 
     it "does not create reply for observers" do
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
-      expect {
+      expect do
         comment.reply_from(:user => @observer, :text => "some reply")
-      }.to raise_error(IncomingMail::Errors::InvalidParticipant)
+      end.to raise_error(IncomingMail::Errors::InvalidParticipant)
     end
 
     it "creates reply in the same provisional grade" do
@@ -358,9 +358,9 @@ RSpec.describe SubmissionComment do
       assignment = @course.assignments.create!
       submission = assignment.submission_for_student(@student)
       comment = submission.add_comment(user: @student, comment: "student")
-      expect {
+      expect do
         comment.reply_from(user: @teacher, text: "teacher")
-      }.to change {
+      end.to change {
         submission.reload.posted?
       }.from(false).to(true)
     end
@@ -368,24 +368,24 @@ RSpec.describe SubmissionComment do
 
   describe "read/unread state" do
     it "is unread after submission is commented on by teacher" do
-      expect {
+      expect do
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
-      }.to change(ContentParticipation, :count).by(1)
+      end.to change(ContentParticipation, :count).by(1)
       expect(ContentParticipation.where(user_id: @student).first).to be_unread
       expect(@submission.unread?(@student)).to be_truthy
     end
 
     it "is read after submission is commented on by self" do
-      expect {
+      expect do
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
-      }.to change(ContentParticipation, :count).by(0)
+      end.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to be_truthy
     end
 
     it "does not set unread state when a provisional comment is made" do
-      expect {
+      expect do
         @submission.add_comment(:author => @teacher, :comment => 'wat', :provisional => true)
-      }.to change(ContentParticipation, :count).by(0)
+      end.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to eq true
     end
   end
@@ -426,9 +426,9 @@ RSpec.describe SubmissionComment do
       end
 
       it 'deletes other group comments on destroy' do
-        expect {
+        expect do
           first_comment.destroy
-        }.to change { submission.submission_comments.count }.from(3).to(1)
+        end.to change { submission.submission_comments.count }.from(3).to(1)
         expect(submission.submission_comments.reload).not_to include first_comment, second_comment
         expect(submission.submission_comments.reload).to include ungrouped_comment
       end
@@ -476,9 +476,9 @@ RSpec.describe SubmissionComment do
       end
 
       it 'updates other group comments when published' do
-        expect {
+        expect do
           first_comment.update_attribute(:draft, false)
-        }.to change { SubmissionComment.published.count }.from(0).to(2)
+        end.to change { SubmissionComment.published.count }.from(0).to(2)
         expect(submission.submission_comments.published.pluck(:id)).to include first_comment.id, second_comment.id
         expect(submission.submission_comments.published.pluck(:id)).not_to include ungrouped_comment.id
       end
@@ -712,9 +712,9 @@ RSpec.describe SubmissionComment do
     end
 
     it "does not create an event on creation when no author present" do
-      expect {
+      expect do
         @submission.submission_comments.create!(comment: "a comment")
-      }.not_to change { AnonymousOrModerationEvent.count }
+      end.not_to change { AnonymousOrModerationEvent.count }
     end
 
     it "does not create an event when no updating_user present" do
@@ -859,9 +859,9 @@ RSpec.describe SubmissionComment do
       submission.update!(posted_at: 1.hour.ago(Time.zone.now))
       comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
 
-      expect {
+      expect do
         comment.update!(draft: false)
-      }.not_to change {
+      end.not_to change {
         submission.reload.posted_at
       }
     end

@@ -72,7 +72,7 @@ class Course < ActiveRecord::Base
   has_many :participating_enrollments, -> { where(enrollments: { workflow_state: 'active' }).preload(:user) }, class_name: 'Enrollment', inverse_of: :course
 
   has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
-  has_many :participating_students_by_date, -> {
+  has_many :participating_students_by_date, lambda {
                                               where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' })
                                                 .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
                                                 .where(:enrollment_states => { :state => 'active' })
@@ -101,12 +101,12 @@ class Course < ActiveRecord::Base
   has_many :tas, :through => :ta_enrollments, :source => :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'ObserverEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
-  has_many :non_observer_enrollments, -> {
+  has_many :non_observer_enrollments, lambda {
     where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
       .preload(:user)
   }, class_name: 'Enrollment'
   has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
-  has_many :participating_observers_by_date, -> {
+  has_many :participating_observers_by_date, lambda {
                                                where(enrollments: { type: 'ObserverEnrollment', workflow_state: 'active' })
                                                  .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
                                                  .where(:enrollment_states => { :state => 'active' })
@@ -115,7 +115,7 @@ class Course < ActiveRecord::Base
   has_many :instructors, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment'] }) }, through: :enrollments, source: :user
   has_many :instructor_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment']) }, class_name: 'Enrollment'
   has_many :participating_instructors, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
-  has_many :participating_instructors_by_date, -> {
+  has_many :participating_instructors_by_date, lambda {
                                                  where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment'], workflow_state: 'active' })
                                                    .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
                                                    .where(:enrollment_states => { :state => 'active' })
@@ -124,7 +124,7 @@ class Course < ActiveRecord::Base
   has_many :admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment] }) }, through: :enrollments, source: :user
   has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: 'Enrollment'
   has_many :participating_admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: 'active' }) }, through: :enrollments, source: :user
-  has_many :participating_admins_by_date, -> {
+  has_many :participating_admins_by_date, lambda {
                                             where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: 'active' })
                                               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
                                               .where(:enrollment_states => { :state => 'active' })
@@ -307,9 +307,9 @@ class Course < ActiveRecord::Base
                         text: -> { t('One or more items are currently being imported. They will be shown in the course below once they are available.') },
                         link_text: -> { t('Import Status') },
                         link_target: ->(course) { "/courses/#{course.to_param}/content_migrations" },
-                        should_show: ->(course, user) do
+                        should_show: lambda { |course, user|
                           course.grants_right?(user, :manage_content)
-                        end
+                        }
 
   has_a_broadcast_policy
 
@@ -791,15 +791,15 @@ class Course < ActiveRecord::Base
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
-  scope :for_term, lambda { |term| term ? where(:enrollment_term_id => term) : all }
+  scope :for_term, ->(term) { term ? where(:enrollment_term_id => term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}")) }
   scope :name_like, lambda { |query|
     where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', query))
       .or(where(:id => query))
   }
-  scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
+  scope :needs_account, ->(account, limit) { where(:account_id => nil, :root_account_id => account).limit(limit) }
   scope :active, -> { where("courses.workflow_state<>'deleted'") }
-  scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
+  scope :least_recently_updated, ->(limit) { order(:updated_at).limit(limit) }
 
   scope :manageable_by_user, lambda { |*args|
     # args[0] should be user_id, args[1], if true, will include completed
@@ -836,21 +836,21 @@ class Course < ActiveRecord::Base
 
   scope :not_deleted, -> { where("workflow_state<>'deleted'") }
 
-  scope :with_enrollments, -> {
+  scope :with_enrollments, lambda {
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :with_enrollment_types, ->(types) {
+  scope :with_enrollment_types, lambda { |types|
     types = types.map { |type| "#{type.capitalize}Enrollment" }
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id").where(type: types))
   }
-  scope :without_enrollments, -> {
+  scope :without_enrollments, lambda {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :completed, -> {
+  scope :completed, lambda {
     joins(:enrollment_term)
       .where("courses.workflow_state='completed' OR courses.conclude_at<? OR enrollment_terms.end_at<?", Time.now.utc, Time.now.utc)
   }
-  scope :not_completed, -> {
+  scope :not_completed, lambda {
     joins(:enrollment_term)
       .where("courses.workflow_state<>'completed' AND
           (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
@@ -901,24 +901,24 @@ class Course < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }
-    p.whenever { |record|
+    p.whenever do |record|
       (record.available? && @grade_weight_changed) ||
         (
           record.changed_in_state(:available, :fields => :group_weighting_scheme) &&
           record.saved_changes[:group_weighting_scheme] != [nil, "equal"] # not a functional change
         )
-    }
+    end
     p.data { broadcast_data }
 
     p.dispatch :new_course
     p.to { root_account.account_users.active }
-    p.whenever { |record|
+    p.whenever do |record|
       record.root_account &&
         ((record.just_created && record.name != Course.default_name) ||
          (record.name_before_last_save == Course.default_name &&
            record.name != Course.default_name)
         )
-    }
+    end
     p.data { broadcast_data }
   end
 
@@ -957,9 +957,9 @@ class Course < ActiveRecord::Base
         role_ids = role_user_ids.map(&:first).uniq
 
         roles = Role.where(:id => role_ids).to_a
-        allowed_role_ids = roles.select { |role|
+        allowed_role_ids = roles.select do |role|
           [:view_all_grades, :manage_grades].any? { |permission| RoleOverride.enabled_for?(self, permission, role, self).include?(:self) }
-        }.map(&:id)
+        end.map(&:id)
         return [] unless allowed_role_ids.any?
 
         allowed_user_ids = Set.new
@@ -1627,15 +1627,15 @@ class Course < ActiveRecord::Base
     can :read and can :read_outcomes
 
     # Active students
-    given { |user|
+    given do |user|
       available? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? }
-    }
+    end
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
-    given { |user|
+    given do |user|
       (available? || completed?) && user &&
         fetch_on_enrollments("has_active_observer_enrollment", user) { enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? }
-    }
+    end
     can :read_grades
 
     # Active admins (Teacher/TA/Designer)
@@ -1643,9 +1643,9 @@ class Course < ActiveRecord::Base
     given do |user|
       !root_account.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
         !sis_source_id && user && !template? &&
-        fetch_on_enrollments('active_content_admin_enrollments', user) {
+        fetch_on_enrollments('active_content_admin_enrollments', user) do
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        }.any? { |e| e.has_permission_to?(:change_course_state) }
+        end.any? { |e| e.has_permission_to?(:change_course_state) }
     end
     can :delete
 
@@ -1672,9 +1672,9 @@ class Course < ActiveRecord::Base
     given do |user|
       root_account.feature_enabled?(:granular_permissions_manage_courses) &&
         user && !deleted? && !template? &&
-        fetch_on_enrollments('active_content_admin_enrollments', user) {
+        fetch_on_enrollments('active_content_admin_enrollments', user) do
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        }.any? { |e| e.has_permission_to?(:manage_courses_reset) }
+        end.any? { |e| e.has_permission_to?(:manage_courses_reset) }
     end
     can :reset_content
 
@@ -1682,9 +1682,9 @@ class Course < ActiveRecord::Base
     given do |user|
       root_account.feature_enabled?(:granular_permissions_manage_courses) && user &&
         !template? && !deleted? && !sis_source_id &&
-        fetch_on_enrollments('active_content_admin_enrollments', user) {
+        fetch_on_enrollments('active_content_admin_enrollments', user) do
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        }.any? { |e| e.has_permission_to?(:manage_courses_delete) }
+        end.any? { |e| e.has_permission_to?(:manage_courses_delete) }
     end
     can :delete
 
@@ -1989,7 +1989,7 @@ class Course < ActiveRecord::Base
     @valid_grade_export_types ||= {
       "instructure_csv" => {
         :name => t('grade_export_types.instructure_csv', "Instructure formatted CSV"),
-        :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+        :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                        grade_export_settings = Canvas::Plugin.find!('grade_export').settings || {}
                        include_final_grade_overrides = Canvas::Plugin.value_to_boolean(
                          grade_export_settings[:include_final_grade_overrides]
@@ -2002,7 +2002,7 @@ class Course < ActiveRecord::Base
                          publishing_pseudonym,
                          include_final_grade_overrides: include_final_grade_overrides
                        )
-                     },
+                     end,
         :requires_grading_standard => false,
         :requires_publishing_pseudonym => false
       }
@@ -2504,16 +2504,16 @@ class Course < ActiveRecord::Base
   end
 
   def same_dates?(old, new, columns)
-    old && new && columns.all? { |column|
+    old && new && columns.all? do |column|
       old.respond_to?(column) && new.respond_to?(column) && old.send(column) == new.send(column)
-    }
+    end
   end
 
   def student_annotation_documents_folder
     Folder.unique_folder(
       self,
       Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE,
-      lambda { t "Student Annotation Documents" }
+      -> { t "Student Annotation Documents" }
     )
   end
 
@@ -2625,10 +2625,10 @@ class Course < ActiveRecord::Base
   end
 
   def all_dates
-    (calendar_events.active + assignments.active).each_with_object([]) { |e, list|
+    (calendar_events.active + assignments.active).each_with_object([]) do |e, list|
       list << e.end_at if e.end_at
       list << e.start_at if e.start_at
-    }.compact.flatten.map(&:to_date).uniq rescue []
+    end.compact.flatten.map(&:to_date).uniq rescue []
   end
 
   def real_end_date
@@ -3351,7 +3351,7 @@ class Course < ActiveRecord::Base
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
-  add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
+  add_setting :large_roster, :boolean => true, :default => ->(c) { c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :public_syllabus_to_auth, :boolean => true, :default => false
   add_setting :course_format
@@ -3361,7 +3361,7 @@ class Course < ActiveRecord::Base
   add_setting :banner_image_id
   add_setting :banner_image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
-  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
+  add_setting :enable_offline_web_export, :boolean => true, :default => ->(c) { c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
   add_setting :overridden_course_visibility
 

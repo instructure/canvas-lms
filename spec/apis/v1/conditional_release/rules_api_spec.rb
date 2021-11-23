@@ -212,26 +212,26 @@ module ConditionalRelease
       end
 
       it 'does not create with invalid scoring range' do
-        expect {
+        expect do
           api_call(:post, @url, @base_params.merge('scoring_ranges' => [{ foo: 3 }]), {}, {}, { :expected_status => 400 })
-        }.not_to change { Rule.count }
+        end.not_to change { Rule.count }
       end
 
       it 'does not create with invalid assignment' do
         sr = { 'lower_bound' => 65, 'upper_bound' => 95 }
         sr['assignment_sets'] = [{ assignment_set_associations: [{ foo: 3 }] }]
-        expect {
+        expect do
           api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { :expected_status => 400 })
-        }.not_to change { Rule.count }
+        end.not_to change { Rule.count }
       end
 
       it 'does not create with trigger assignment in other course' do
         other_course = Course.create!
         other_assignment = other_course.assignments.create!
 
-        expect {
+        expect do
           api_call(:post, @url, @base_params.merge(:trigger_assignment_id => other_assignment.id), {}, {}, { :expected_status => 400 })
-        }.not_to change { Rule.count }
+        end.not_to change { Rule.count }
       end
 
       it 'does not create with assignment in other course' do
@@ -240,9 +240,9 @@ module ConditionalRelease
 
         sr = { 'lower_bound' => 65, 'upper_bound' => 95 }
         sr['assignment_sets'] = [{ assignment_set_associations: [{ assignment_id: other_assignment.id }] }]
-        expect {
+        expect do
           api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { :expected_status => 400 })
-        }.not_to change { Rule.count }
+        end.not_to change { Rule.count }
       end
     end
 

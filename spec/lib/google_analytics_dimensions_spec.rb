@@ -21,7 +21,7 @@ require_relative '../spec_helper'
 
 describe GoogleAnalyticsDimensions do
   subject do
-    ->(account: Account.default, real_user: nil, user: nil) do
+    lambda do |account: Account.default, real_user: nil, user: nil|
       described_class.calculate(
         domain_root_account: account,
         real_user: real_user,

@@ -99,10 +99,10 @@ describe CanvasCassandra do
       db.batch { db.update("1") }
 
       expect(db).to receive(:execute).with("BEGIN BATCH UPDATE ? ? UPDATE ? ? APPLY BATCH", 1, 2, 3, 4, {})
-      db.batch {
+      db.batch do
         db.update("UPDATE ? ?", 1, 2)
         db.update("UPDATE ? ?", 3, 4)
-      }
+      end
     end
 
     it "does not batch up execute statements" do
@@ -227,9 +227,9 @@ describe CanvasCassandra do
     end
 
     it "does not allow changing a primary key component" do
-      expect {
+      expect do
         db.update_record("test_table", { :id => 5, :sub_id => "sub!" }, { :name => "test", :id => 5, :sub_id => ["old", "sub!"] }, {})
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
   end
 

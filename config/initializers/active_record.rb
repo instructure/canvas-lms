@@ -442,16 +442,16 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    sql = ary.each_with_index.inject(+'CASE ') { |string, (values, i)|
+    sql = ary.each_with_index.inject(+'CASE ') do |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map { |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
-    } << "ELSE #{ary.size} END"
+    end << "ELSE #{ary.size} END"
     Arel.sql(sql)
   end
 
   def self.rank_hash(ary)
-    ary.each_with_index.each_with_object(Hash.new(ary.size + 1)) { |(values, i), hash|
+    ary.each_with_index.each_with_object(Hash.new(ary.size + 1)) do |(values, i), hash|
       Array(values).each { |value| hash[value] = i + 1 }
-    }
+    end
   end
 
   def self.distinct_values(column, include_nil: false)
@@ -761,10 +761,10 @@ module UsefulFindInBatches
     end
 
     kwargs.delete(:error_on_ignore)
-    activate { |r|
+    activate do |r|
       r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block)
       nil
-    }
+    end
   end
 
   def in_batches_needs_temp_table?
@@ -853,7 +853,7 @@ module UsefulFindInBatches
     # while we're running this will get a new connection
     pool.remove(conn)
 
-    checkin = -> do
+    checkin = lambda do
       pool&.restore_connection(conn)
       pool = nil
     end
@@ -888,7 +888,7 @@ module UsefulFindInBatches
 
       rows = []
 
-      build_relation = -> do
+      build_relation = lambda do
         if load
           records = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
           ids = records.map(&:id)
@@ -1459,15 +1459,15 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def infer_group_by_columns(columns)
-    columns.map { |col|
+    columns.map do |col|
       if col.respond_to?(:columns)
-        col.columns.map { |c|
+        col.columns.map do |c|
           "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
-        }
+        end
       else
         col
       end
-    }
+    end
   end
 end
 

@@ -723,12 +723,12 @@ describe "assignment rubrics" do
       rubric_name = 'this is a new rubric'
       get "/courses/#{@course.id}/rubrics"
 
-      expect {
+      expect do
         f('.add_rubric_link').click
         replace_content(f('.rubric_title input'), rubric_name)
         submit_form('#edit_rubric_form')
         wait_for_ajaximations
-      }.to change(Rubric, :count).by(1)
+      end.to change(Rubric, :count).by(1)
       refresh_page
       expect(f('#rubrics .title').text).to eq rubric_name
     end

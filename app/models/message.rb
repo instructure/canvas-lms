@@ -203,12 +203,12 @@ class Message < ActiveRecord::Base
   end
 
   # Named scopes
-  scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
+  scope :for, ->(context) { where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
-  scope :after, lambda { |date| where("messages.created_at>?", date) }
-  scope :more_recent_than, lambda { |date| where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
+  scope :after, ->(date) { where("messages.created_at>?", date) }
+  scope :more_recent_than, ->(date) { where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
 
-  scope :to_dispatch, -> {
+  scope :to_dispatch, lambda {
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
@@ -216,11 +216,11 @@ class Message < ActiveRecord::Base
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
-  scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
+  scope :by_name, ->(notification_name) { where(:notification_name => notification_name) }
 
-  scope :before, lambda { |date| where("messages.created_at<?", date) }
+  scope :before, ->(date) { where("messages.created_at<?", date) }
 
-  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_user, ->(user) { where(:user_id => user) }
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
@@ -232,9 +232,9 @@ class Message < ActiveRecord::Base
   # Where user can be a User or id, name needs to be the Notification name.
   scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
-  scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
+  scope :in_state, ->(state) { where(:workflow_state => Array(state).map(&:to_s)) }
 
-  scope :at_timestamp, lambda { |timestamp| where("created_at >= ? AND created_at < ?", Time.at(timestamp.to_i), Time.at(timestamp.to_i + 1)) }
+  scope :at_timestamp, ->(timestamp) { where("created_at >= ? AND created_at < ?", Time.at(timestamp.to_i), Time.at(timestamp.to_i + 1)) }
 
   # an optimization for queries that would otherwise target the main table to
   # make them target the specific partition table. Naturally this only works if

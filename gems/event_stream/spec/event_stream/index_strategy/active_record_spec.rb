@@ -68,8 +68,8 @@ describe EventStream::IndexStrategy::ActiveRecord do
       ar_cls = fake_record_type
       base_index = EventStream::Index.new(stream) do
         table "table"
-        entry_proc lambda { |_a1, _a2| }
-        ar_scope_proc lambda { |a1, a2| ar_cls.where({ one: a1.id, two: a2.id }) }
+        entry_proc ->(_a1, _a2) { }
+        ar_scope_proc ->(a1, a2) { ar_cls.where({ one: a1.id, two: a2.id }) }
       end
       @index = base_index.strategy_for(:active_record)
     end

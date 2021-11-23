@@ -43,7 +43,7 @@ describe "Feature Flags API", type: :request do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
                                                          'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'allowed'),
-                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true, autoexpand: true),
+                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),
                                                          'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
                                                          'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
                                                          'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true, pending_enforcement: true),
@@ -555,7 +555,7 @@ describe "Feature Flags API", type: :request do
     before do
       allow(Feature).to receive(:definitions).and_return({
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                                                                                           custom_transition_proc: ->(_user, _context, from_state, transitions) do
+                                                                                           custom_transition_proc: lambda do |_user, _context, from_state, transitions|
                                                                                                                      transitions['off'] = { 'locked' => true, 'message' => "don't ever turn this off" } if from_state == 'on'
                                                                                                                      transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.key?('on')
                                                                                                                    end),
@@ -606,7 +606,7 @@ describe "Feature Flags API", type: :request do
     before do
       allow(Feature).to receive(:definitions).and_return({
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                                                                                           after_state_change_proc: ->(user, context, from_state, to_state) do
+                                                                                           after_state_change_proc: lambda do |user, context, from_state, to_state|
                                                                                                                       t_state_changes << [user.id, context.id, from_state, to_state]
                                                                                                                     end),
                                                            'compact_live_event_payloads' => live_event_feature,
@@ -615,28 +615,28 @@ describe "Feature Flags API", type: :request do
     end
 
     it "fires when creating a feature flag to enable an allowed feature" do
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
                          { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'allowed', 'on']
     end
 
     it "fires when changing a feature flag's state" do
       t_course.disable_feature! 'custom_feature'
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
                          { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'off', 'on']
     end
 
     it 'fires when deleting a feature flag override (because of a hidden feature or otherwise)' do
       t_course.enable_feature! 'custom_feature'
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :delete, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
                          { controller: 'feature_flags', action: 'delete', format: 'json', course_id: t_course.to_param, feature: 'custom_feature' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'on', 'allowed']
     end
   end

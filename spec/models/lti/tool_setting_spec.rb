@@ -27,7 +27,7 @@ module Lti
     let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
     let(:resource_handler) { ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy) }
     let(:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
-    let(:tool_proxy) {
+    let(:tool_proxy) do
       ToolProxy.create(
         shared_secret: 'shared_secret',
         guid: 'guid',
@@ -38,7 +38,7 @@ module Lti
         workflow_state: 'active',
         raw_data: 'some raw data'
       )
-    }
+    end
 
     it 'can be associated with a resource link' do
       subject.tool_proxy = tool_proxy

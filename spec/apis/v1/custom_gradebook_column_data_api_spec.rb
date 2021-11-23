@@ -46,12 +46,12 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
   describe 'index' do
     before :once do
-      [@student1, @student2].each_with_index { |s, i|
-        @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap { |d|
+      [@student1, @student2].each_with_index do |s, i|
+        @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap do |d|
           d.user_id = s.id
           d.save!
-        }
-      }
+        end
+      end
     end
 
     it 'checks permissions' do
@@ -191,12 +191,12 @@ describe CustomGradebookColumnDataApiController, type: :request do
     it 'works' do
       json = nil
 
-      check = lambda { |content|
+      check = lambda do |content|
         expect(response).to be_successful
         expect(json["content"]).to eq content
         expect(@col.custom_gradebook_column_data.where(user_id: @student1.id)
         .first.reload.content).to eq content
-      }
+      end
 
       # create
       json = update(@student1, "blarg")

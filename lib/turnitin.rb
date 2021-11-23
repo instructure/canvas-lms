@@ -350,7 +350,7 @@ module Turnitin
         query, headers = mp.prepare_query(params)
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
-        http_response = http.start { |con|
+        http_response = http.start do |con|
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
@@ -359,7 +359,7 @@ module Turnitin
             Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
             Rails.logger.error(params.to_json)
           end
-        }
+        end
       else
         requestParams = ""
         params.each do |key, value|
@@ -372,9 +372,9 @@ module Turnitin
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          http_response = http.start { |conn|
+          http_response = http.start do |conn|
             conn.get("#{@endpoint}?#{requestParams}")
-          }
+          end
         end
       end
 

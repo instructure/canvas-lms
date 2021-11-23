@@ -37,9 +37,9 @@ module SimpleTags
       options = tags.last.is_a?(Hash) ? tags.pop : {}
       options[:mode] ||= :or
       conditions = handle_tags(tags, options) +
-                   tags.map { |tag|
+                   tags.map do |tag|
                      wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
-                   }
+                   end
       if conditions.empty?
         none
       else
@@ -93,7 +93,7 @@ module SimpleTags
   end
 
   def self.normalize_tags(tags)
-    tags.each_with_object([]) { |tag, ary|
+    tags.each_with_object([]) do |tag, ary|
       case tag
       when /\A((course|group)_\d+).*/
         ary << $1
@@ -102,7 +102,7 @@ module SimpleTags
         ary << section.course.asset_string if section
         # TODO: allow user-defined tags, e.g. #foo
       end
-    }.uniq
+    end.uniq
   end
 
   def self.included(klass)

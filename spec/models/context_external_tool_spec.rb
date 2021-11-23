@@ -130,10 +130,10 @@ describe ContextExternalTool do
       )
     end
 
-    let(:granted_permissions) {
+    let(:granted_permissions) do
       ContextExternalTool.global_navigation_granted_permissions(root_account: @root_account,
                                                                 user: global_nav_user, context: global_nav_context, session: nil)
-    }
+    end
     let(:global_nav_user) { nil }
     let(:global_nav_context) { nil }
     let(:required_permission) { 'some-permission' }
@@ -1260,12 +1260,12 @@ describe ContextExternalTool do
     end
 
     describe 'enabling/disabling placements' do
-      let!(:tool) {
+      let!(:tool) do
         tool = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
         tool.homework_submission = { enabled: true, selection_height: 300 }
         tool.save
         tool
-      }
+      end
 
       it 'moves inactive placement data back to active when re-enabled' do
         tool.homework_submission = { enabled: false }

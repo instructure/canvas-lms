@@ -94,22 +94,22 @@ module ConditionalRelease
 
       it "checks that a rule exists for the assignment" do
         @rule.destroy!
-        expect {
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "checks that the submission is actually graded" do
         Submission.where(:id => @sub).update_all(:posted_at => nil)
-        expect {
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "checks that the assignment set is valid for the submissions core" do
-        expect {
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @invalid_set.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "creates the assignment override" do

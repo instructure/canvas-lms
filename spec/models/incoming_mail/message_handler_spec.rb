@@ -40,7 +40,7 @@ describe IncomingMail::MessageHandler do
   end
   let(:context) { double("context", reply_from: nil) }
 
-  let(:original_message_attributes) {
+  let(:original_message_attributes) do
     {
       :notification_id => 1,
       :shard => shard,
@@ -49,9 +49,9 @@ describe IncomingMail::MessageHandler do
       :global_id => 1,
       :to => "lucy@example.com"
     }
-  }
+  end
 
-  let(:incoming_message_attributes) {
+  let(:incoming_message_attributes) do
     {
       subject: "some subject",
       header: {
@@ -61,7 +61,7 @@ describe IncomingMail::MessageHandler do
       reply_to: ["lucy@example.com"],
       message_id: 1,
     }
-  }
+  end
 
   let(:incoming_message) { double("incoming message", incoming_message_attributes) }
   let(:original_message) { double("original message", original_message_attributes) }

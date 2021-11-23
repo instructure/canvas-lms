@@ -366,7 +366,7 @@ describe 'Submissions API', type: :request do
                           { :submission => { :posted_grade => '75%' } })
       assert_status(404)
 
-      expect {
+      expect do
         json = api_call(:put,
                         "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
                         { :controller => 'submissions_api', :action => 'update',
@@ -374,7 +374,7 @@ describe 'Submissions API', type: :request do
                           :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
                         { :submission => { :posted_grade => '75%' } })
         # never more than 1 job added, because it's in a Delayed::Batch
-      }.to change { Delayed::Job.jobs_count(:current) }.by(1)
+      end.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
       expect(Submission.count).to eq 2
       @submission = Submission.order(:id).last
@@ -1146,9 +1146,9 @@ describe 'Submissions API', type: :request do
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
 
     sub2a1 = attachment_model(:context => student2, :filename => 'snapshot.png', :content_type => 'image/png')
-    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") { |s|
+    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") do |s|
       s.attachment = sub2a1
-    }
+    end
 
     media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
     a1.grade_student(student1, { :grade => '90%', :grader => @teacher })
@@ -2052,11 +2052,11 @@ describe 'Submissions API', type: :request do
     end
 
     context "as an observer" do
-      before {
+      before do
         @observer = User.create
         observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
         observer_enrollment.update_attribute(:associated_user_id, @student.id)
-      }
+      end
 
       context "differentiated_assignments on" do
         it "returns the submissons if the observed student is in the overriden section" do
@@ -2964,7 +2964,7 @@ describe 'Submissions API', type: :request do
     it "fetches the submission using the provided anonymous_id" do
       submission = @assignment.submission_for_student(@student)
 
-      expect {
+      expect do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
@@ -2979,7 +2979,7 @@ describe 'Submissions API', type: :request do
             submission: { posted_grade: 'B' }
           }
         )
-      }.to change {
+      end.to change {
         submission.reload.grade
       }.from(nil).to('B')
     end
@@ -3149,7 +3149,7 @@ describe 'Submissions API', type: :request do
       # The first grade given to a submission doesn't result in a new version.
       @assignment.grade_student(@student, score: 1, grader: @teacher)
 
-      expect {
+      expect do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -3164,7 +3164,7 @@ describe 'Submissions API', type: :request do
             submission: { late_policy_status: "missing" }
           }
         )
-      }.to change {
+      end.to change {
         submission.reload.versions.count
       }.by(1)
     end
@@ -3174,7 +3174,7 @@ describe 'Submissions API', type: :request do
       # The first grade given to a submission doesn't result in a new version.
       @assignment.grade_student(@student, score: 1, grader: @teacher)
 
-      expect {
+      expect do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
@@ -3189,7 +3189,7 @@ describe 'Submissions API', type: :request do
             submission: { late_policy_status: "missing", posted_grade: "1" }
           }
         )
-      }.to change {
+      end.to change {
         submission.reload.versions.count
       }.by(1)
     end

@@ -71,7 +71,7 @@ class DelayedMessage < ActiveRecord::Base
     end
   }
 
-  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
 
   include Workflow
 
@@ -101,10 +101,10 @@ class DelayedMessage < ActiveRecord::Base
     end
     delayed_messages = uniqs.values
     delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
-    first = delayed_messages.detect { |m|
+    first = delayed_messages.detect do |m|
       m.communication_channel&.active? &&
         !m.communication_channel.bouncing?
-    }
+    end
     to = first.communication_channel rescue nil
     return nil unless to
     return nil if delayed_messages.empty?

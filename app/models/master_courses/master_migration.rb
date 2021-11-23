@@ -340,9 +340,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :blueprint_sync_complete
     p.to { [user] }
-    p.whenever { |record|
+    p.whenever do |record|
       record.changed_state_to(:completed) && record.send_notification?
-    }
+    end
   end
 
   def notification_link_anchor

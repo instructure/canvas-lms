@@ -48,10 +48,10 @@ module CanvasSecurity
       include_context "JWT setup"
 
       let(:translate_token) do
-        ->(jwt) {
+        lambda do |jwt|
           decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
           return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
-        }
+        end
       end
 
       it "has secrets accessors" do

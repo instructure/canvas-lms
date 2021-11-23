@@ -157,8 +157,8 @@ class PageView < ActiveRecord::Base
 
       # index by the page view's user, but use the user's global_asset_string
       # when writing the index
-      entry_proc lambda { |page_view| page_view.user }
-      key_proc lambda { |user| user.global_asset_string }
+      entry_proc ->(page_view) { page_view.user }
+      key_proc ->(user) { user.global_asset_string }
     end
 
     self.raise_on_error = Rails.env.test?
@@ -203,9 +203,9 @@ class PageView < ActiveRecord::Base
   end
 
   def self.from_attributes(attrs, new_record = false)
-    @blank_template ||= columns.each_with_object({}) { |c, h|
+    @blank_template ||= columns.each_with_object({}) do |c, h|
       h[c.name] = nil
-    }
+    end
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     shard.activate do
@@ -288,7 +288,7 @@ class PageView < ActiveRecord::Base
   end
 
   scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
-  scope :for_users, lambda { |users| where(:user_id => users) }
+  scope :for_users, ->(users) { where(:user_id => users) }
 
   def self.pv4_client
     ConfigFile.cache_object('pv4') do |config|

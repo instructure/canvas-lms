@@ -785,14 +785,14 @@ describe TabsController, type: :request do
     describe "user profile" do
       before { user_model }
 
-      let(:tool) {
+      let(:tool) do
         Account.default.context_external_tools.new({
                                                      :name => 'Example',
                                                      :url => 'http://www.example.com',
                                                      :consumer_key => 'key',
                                                      :shared_secret => 'secret',
                                                    })
-      }
+      end
 
       it 'includes external tools' do
         tool.settings[:user_navigation] = {

@@ -70,9 +70,9 @@ describe 'Canvadoc' do
 
     it "doesn't upload when canvadocs isn't configured" do
       disable_canvadocs
-      expect {
+      expect do
         @doc.upload
-      }.to raise_error("Canvadocs isn't enabled")
+      end.to raise_error("Canvadocs isn't enabled")
     end
 
     it "ignores annotatable if unavailable" do

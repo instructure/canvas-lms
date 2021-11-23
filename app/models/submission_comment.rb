@@ -83,11 +83,11 @@ class SubmissionComment < ActiveRecord::Base
   scope :visible, -> { where(:hidden => false) }
   scope :draft, -> { where(draft: true) }
   scope :published, -> { where(draft: false) }
-  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
+  scope :after, ->(date) { where("submission_comments.created_at>?", date) }
   scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
   scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
-  scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
+  scope :for_assignment_id, ->(assignment_id) { where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
 
@@ -183,9 +183,9 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
 
-    given { |user, session|
+    given do |user, session|
       can_read_author?(user, session)
-    }
+    end
     can :read_author
   end
 
@@ -202,7 +202,7 @@ class SubmissionComment < ActiveRecord::Base
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
     end
-    p.whenever { |record|
+    p.whenever do |record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
@@ -212,16 +212,16 @@ class SubmissionComment < ActiveRecord::Base
         record.submission.posted? &&
         record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
         (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
-    p.whenever { |record|
+    p.whenever do |record|
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
         record.provisional_grade_id.nil? &&
         record.submission.user_id == record.author_id
-    }
+    end
     p.data { course_broadcast_data }
   end
 
@@ -328,11 +328,11 @@ class SubmissionComment < ActiveRecord::Base
     # on the assignment for now.
     attachments ||= []
     old_ids = parse_attachment_ids
-    write_attribute(:attachment_ids, attachments.select { |a|
+    write_attribute(:attachment_ids, attachments.select do |a|
       old_ids.include?(a.id) ||
       a.recently_created ||
       a.ok_for_submission_comment
-    }.map(&:id).join(","))
+    end.map(&:id).join(","))
   end
 
   def infer_details

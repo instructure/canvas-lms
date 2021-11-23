@@ -385,7 +385,7 @@ class OutcomeGroupsApiController < ApplicationController
       else
         @context.account.account_chain.dup
       end
-    account_chain.map! { |a|
+    account_chain.map! do |a|
       {
         :id => a.root_outcome_group.id,
         :title => a.name,
@@ -395,7 +395,7 @@ class OutcomeGroupsApiController < ApplicationController
         :subgroups_url => polymorphic_path([:api_v1, a, :outcome_group_subgroups], :id => a.root_outcome_group.id),
         :outcomes_url => polymorphic_path([:api_v1, a, :outcome_group_outcomes], :id => a.root_outcome_group.id)
       }
-    }
+    end
     path = polymorphic_path [:api_v1, @context, :account_chain]
     account_chain = Api.paginate(account_chain, self, path)
 

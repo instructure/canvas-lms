@@ -27,11 +27,11 @@ class GradesPresenter
   end
 
   def observed_enrollments
-    @observed_enrollments ||= observer_enrollments.map { |e|
+    @observed_enrollments ||= observer_enrollments.map do |e|
       e.shard.activate do
         StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
       end
-    }.uniq.compact
+    end.uniq.compact
   end
 
   def course_grade_summaries

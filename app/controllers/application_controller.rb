@@ -111,7 +111,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  add_crumb(proc {
+  add_crumb(proc do
     title = I18n.t('links.dashboard', 'My Dashboard')
     crumb = <<~HTML
       <i class="icon-home"
@@ -121,7 +121,7 @@ class ApplicationController < ActionController::Base
     HTML
 
     crumb.html_safe
-  }, :root_path, class: 'home')
+  end, :root_path, class: 'home')
 
   def clear_js_env
     @js_env = nil
@@ -610,7 +610,7 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_localizer
-    I18n.localizer = lambda {
+    I18n.localizer = lambda do
       context_hash = {
         context: @context,
         user: not_fake_student_user,
@@ -626,7 +626,7 @@ class ApplicationController < ActionController::Base
         logger.warn("[I18N] localizer executed from context-less controller")
       end
       infer_locale context_hash
-    }
+    end
   end
 
   def set_locale
@@ -769,13 +769,13 @@ class ApplicationController < ActionController::Base
   def render_tab_disabled
     msg = tab_disabled_message(@context)
     respond_to do |format|
-      format.html {
+      format.html do
         flash[:notice] = msg
         redirect_to named_context_url(@context, :context_url)
-      }
-      format.json {
+      end
+      format.json do
         render :json => { :message => msg }, :status => :not_found
-      }
+      end
     end
   end
 
@@ -1338,12 +1338,12 @@ class ApplicationController < ActionController::Base
           unless pseudonym.works_for_account?(@domain_root_account, true)
             # if the logged in pseudonym doesn't work, we can only switch to another pseudonym
             # that does work if it's the same password, and it's not a managed pseudonym
-            alternates = pseudonym.user.all_active_pseudonyms.select { |p|
+            alternates = pseudonym.user.all_active_pseudonyms.select do |p|
               !p.managed_password? &&
                 p.works_for_account?(@domain_root_account, true) &&
                 p.password_salt == pseudonym.password_salt &&
                 p.crypted_password == pseudonym.crypted_password
-            }
+            end
             # prefer a site admin pseudonym, then a pseudonym in this account, and then any old
             # pseudonym
             pseudonym = alternates.find { |p| p.account_id == Account.site_admin.id }
@@ -2757,7 +2757,7 @@ class ApplicationController < ActionController::Base
   end
 
   def setup_live_events_context
-    proc = -> do
+    proc = lambda do
       ctx = {}
 
       benchmark("setup_live_events_context") do

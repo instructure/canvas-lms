@@ -127,11 +127,11 @@ module SchedulerCommon
       :new_appointment_text => 'new appointment group'
     }.with_indifferent_access.merge(opts)
 
-    expect {
+    expect do
       fill_out_appointment_group_form(opts[:new_appointment_text], opts)
       submit_appointment_group_form(opts[:publish])
       expect(f('.view_calendar_link').text).to eq opts[:new_appointment_text]
-    }.to change(AppointmentGroup, :count).by(1)
+    end.to change(AppointmentGroup, :count).by(1)
   end
 
   def open_select_courses_modal(course_name)

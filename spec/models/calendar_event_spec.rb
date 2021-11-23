@@ -908,23 +908,23 @@ describe CalendarEvent do
       end
 
       it "validates child events" do
-        expect {
+        expect do
           @course.calendar_events.create! :title => "ohai",
                                           :child_event_data => [
                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string }
                                           ]
-        }.to raise_error(/Can't update child events unless an updating_user is set/)
+        end.to raise_error(/Can't update child events unless an updating_user is set/)
 
-        expect {
+        expect do
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
                                                   { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => "invalid_1" }
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Invalid child event context/)
+        end.to raise_error(/Invalid child event context/)
 
-        expect {
+        expect do
           other_section = Course.create!.default_section
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
@@ -932,9 +932,9 @@ describe CalendarEvent do
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Invalid child event context/)
+        end.to raise_error(/Invalid child event context/)
 
-        expect {
+        expect do
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
                                                   { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
@@ -942,7 +942,7 @@ describe CalendarEvent do
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Duplicate child event contexts/)
+        end.to raise_error(/Duplicate child event contexts/)
       end
 
       it "creates child events" do

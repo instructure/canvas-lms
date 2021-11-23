@@ -692,7 +692,7 @@ describe RubricAssessment do
     end
 
     describe "#considered_anonymous?" do
-      let_once(:assessment) {
+      let_once(:assessment) do
         RubricAssessment.create!({
                                    artifact: @assignment.find_or_create_submission(@student),
                                    assessment_type: 'peer_review',
@@ -700,7 +700,7 @@ describe RubricAssessment do
                                    rubric: @rubric,
                                    user: @student
                                  })
-      }
+      end
 
       it "does not blow up without a rubric_association" do
         expect { assessment.considered_anonymous? }.not_to raise_error

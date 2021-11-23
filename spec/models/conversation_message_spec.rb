@@ -303,7 +303,7 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      expect {
+      expect do
         cm.reply_from({
                         :purpose => 'general',
                         :user => @teacher,
@@ -311,7 +311,7 @@ describe ConversationMessage do
                         :html => "body",
                         :text => "body"
                       })
-      }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "replies only to the message author on conversations2 conversations" do

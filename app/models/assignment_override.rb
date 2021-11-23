@@ -39,13 +39,13 @@ class AssignmentOverride < ActiveRecord::Base
   validates :title, :workflow_state, presence: true
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
   validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
-  concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
+  concrete_set = ->(override) { ['CourseSection', 'Group'].include?(override.set_type) }
 
   validates :set, :set_id, presence: { :if => concrete_set }
   validates :set_id, uniqueness: { :scope => %i[assignment_id set_type workflow_state],
-                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) } }
+                                   :if => ->(override) { override.assignment? && override.active? && concrete_set.call(override) } }
   validates :set_id, uniqueness: { :scope => %i[quiz_id set_type workflow_state],
-                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) } }
+                                   :if => ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
@@ -199,23 +199,23 @@ class AssignmentOverride < ActiveRecord::Base
 
   scope :active, -> { where(:workflow_state => 'active') }
 
-  scope :visible_students_only, ->(visible_ids) do
+  scope :visible_students_only, lambda { |visible_ids|
     scope = select("assignment_overrides.*")
             .joins(:assignment_override_students)
             .distinct
 
     if visible_ids.is_a?(ActiveRecord::Relation)
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
-      scope = scope.primary_shard.activate {
+      scope = scope.primary_shard.activate do
         scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
-      }
+      end
       next scope.merge(visible_ids.except(:select))
     end
 
     scope.where(
       assignment_override_students: { user_id: visible_ids }
     )
-  end
+  }
 
   before_validation :default_values
   def default_values
@@ -415,10 +415,10 @@ class AssignmentOverride < ActiveRecord::Base
     p.dispatch :assignment_due_date_changed
     p.to { applies_to_students }
     p.whenever(&:notify_change?)
-    p.filter_asset_by_recipient { |record, user|
+    p.filter_asset_by_recipient do |record, user|
       # NOTE: our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_due_date_override_changed

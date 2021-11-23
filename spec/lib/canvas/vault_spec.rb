@@ -28,20 +28,20 @@ module Canvas
     let(:token_path) { '/path/to/token' }
     let(:addr) { 'http://vault:8200' }
     let(:addr_path) { '/path/to/addr' }
-    let(:static_config) {
+    let(:static_config) do
       {
         token: token,
         addr: addr,
         kv_mount: 'app-canvas'
       }
-    }
-    let(:path_config) {
+    end
+    let(:path_config) do
       {
         token_path: token_path,
         addr_path: addr_path,
         kv_mount: 'app-canvas'
       }
-    }
+    end
     let(:local_config) { { token: 'file', addr: 'file' } }
 
     before do

@@ -128,11 +128,11 @@ describe BroadcastPolicy::InstanceMethods do
     end
 
     it "restores the original changed_attributes no matter what" do
-      expect {
+      expect do
         harness.with_changed_attributes_from(prior_version) do
           raise "yolo"
         end
-      }.to raise_error(/yolo/)
+      end.to raise_error(/yolo/)
       expect(harness.changed_attributes).to equal og_changed_attributes
     end
   end

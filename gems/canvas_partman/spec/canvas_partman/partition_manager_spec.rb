@@ -20,9 +20,9 @@
 describe CanvasPartman::PartitionManager do
   describe '.create' do
     it 'whines if the target class is not Partitioned' do
-      expect {
+      expect do
         CanvasPartman::PartitionManager.create(Object)
-      }.to raise_error(ArgumentError, /can only work on models that are partitioned/i)
+      end.to raise_error(ArgumentError, /can only work on models that are partitioned/i)
     end
   end
 
@@ -32,9 +32,9 @@ describe CanvasPartman::PartitionManager do
     describe '#create_partition' do
       context 'precision = :months' do
         it 'creates a partition suffixed by YYYY_MM' do
-          expect {
+          expect do
             subject.create_partition(Time.new(2014, 11))
-          }.not_to raise_error
+          end.not_to raise_error
 
           expect(SchemaHelper.table_exists?('partman_animals_2014_11')).to be true
         end
@@ -113,11 +113,11 @@ describe CanvasPartman::PartitionManager do
 
     describe '#create_partition' do
       it 'creates partitions suffixed by year and week number' do
-        expect {
+        expect do
           subject.create_partition(Time.new(2018, 12, 24))
           subject.create_partition(Time.new(2018, 12, 31)) # beginning of next year's first week
           subject.create_partition(Time.new(2021, 1, 1)) # part of last year's 53rd week
-        }.not_to raise_error
+        end.not_to raise_error
 
         expect(SchemaHelper.table_exists?('partman_week_events_2018_52')).to be true
         expect(SchemaHelper.table_exists?('partman_week_events_2019_01')).to be true

@@ -23,17 +23,17 @@ require 'uri'
 
 class WimbaConference < WebConference
   external_url :archive,
-               :name => lambda { t('external_urls.archive', "Archive") },
-               :link_text => lambda { t('external_urls.archive_link', "View archive(s)") },
-               :restricted_to => lambda { |conf| conf.active? || conf.finished? }
+               :name => -> { t('external_urls.archive', "Archive") },
+               :link_text => -> { t('external_urls.archive_link', "View archive(s)") },
+               :restricted_to => ->(conf) { conf.active? || conf.finished? }
 
   def archive_external_url(user, url_id)
     urls = []
     if (res = send_request('listClass', { 'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname' }))
       res.delete_prefix("100 OK\n").split(/\n=END RECORD\n?/).each do |match|
-        data = match.split("\n").each_with_object({}) { |line, hash|
+        data = match.split("\n").each_with_object({}) do |line, hash|
           key, hash[key.to_sym] = line.split(/=/, 2)
-        }
+        end
         unless data[:longname] && data[:class_id]
           logger.error "wimba error reading archive list"
           break

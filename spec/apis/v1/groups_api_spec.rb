@@ -812,9 +812,9 @@ describe "Groups API", type: :request do
     it "allows a moderator to invite people to a group" do
       @user = @moderator
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
-      expect {
+      expect do
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
-      }.to change(User, :count).by(2)
+      end.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
       expect(@json.sort_by { |a| a['id'] }).to eq(@memberships.map { |gm| membership_json(gm) })

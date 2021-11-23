@@ -58,10 +58,10 @@ module Lti::IMS::AccessTokenHelper
     ims_tp = ::IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
     service_names = [*lti2_service_name]
     service = ims_tp.security_contract.tool_services.find(
-      -> {
+      lambda do
         raise Lti::OAuth2::InvalidTokenError,
               "The ToolProxy security contract doesn't include #{service_names.join(', or ')}"
-      }
+      end
     ) do |s|
       service_names.include? s.service.split(':').last.split('#').last
     end

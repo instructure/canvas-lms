@@ -1166,9 +1166,9 @@ describe DiscussionTopic do
       expect(student1.stream_item_instances.count).to eq 1
       expect(student2.stream_item_instances.count).to eq 1
 
-      expect {
+      expect do
         topic.update!(course_sections: [section1])
-      }.to change { student1.stream_item_instances.count }.by(0).and change {
+      end.to change { student1.stream_item_instances.count }.by(0).and change {
         student2.stream_item_instances.count
       }.from(1).to(0)
     end
@@ -2213,10 +2213,10 @@ describe DiscussionTopic do
     it "reflects account setting for when lock_all_announcements is enabled" do
       announcement = @course.announcements.create!(message: "Lock this")
       expect(announcement.comments_disabled?).to be_falsey
-      @course.account.tap { |a|
+      @course.account.tap do |a|
         a.settings[:lock_all_announcements] = { :value => true, :locked => true }
         a.save!
-      }
+      end
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
@@ -2234,10 +2234,10 @@ describe DiscussionTopic do
   describe "update_order" do
     it "handles existing null positions" do
       topics = (1..4).map { discussion_topic_model(pinned: true) }
-      topics.each { |x|
+      topics.each do |x|
         x.position = nil
         x.save
-      }
+      end
 
       new_order = [2, 3, 4, 1]
       ids = new_order.map { |x| topics[x - 1].id }
@@ -2486,9 +2486,9 @@ describe DiscussionTopic do
     end
 
     it 'clears stream items when added to unpublished module items' do
-      expect {
+      expect do
         @module.content_tags.create!(workflow_state: 'unpublished', content: @topic, context: @course)
-      }.to change { @student.stream_item_instances.count }.by(-1)
+      end.to change { @student.stream_item_instances.count }.by(-1)
     end
 
     describe 'unpublished context module' do

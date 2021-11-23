@@ -120,18 +120,18 @@ describe InstFS do
         url = InstFS.authenticated_url(@attachment, {})
         expect(url).to match(/token=/)
         token = url.split("token=").last
-        expect(-> {
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       it "includes an expiration on the token" do
         url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
         token = url.split("token=").last
         Timecop.freeze(2.hours.from_now) do
-          expect(-> {
+          expect(lambda do
             Canvas::Security.decode_jwt(token, [secret])
-          }).to raise_error(Canvas::Security::TokenExpired)
+          end).to raise_error(Canvas::Security::TokenExpired)
         end
       end
 
@@ -254,18 +254,18 @@ describe InstFS do
         url = InstFS.authenticated_thumbnail_url(@attachment)
         expect(url).to match(/token=/)
         token = url.split("token=").last
-        expect(-> {
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       it "includes an expiration on the token" do
         url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
         token = url.split("token=").last
         Timecop.freeze(2.hours.from_now) do
-          expect(-> {
+          expect(lambda do
             Canvas::Security.decode_jwt(token, [secret])
-          }).to raise_error(Canvas::Security::TokenExpired)
+          end).to raise_error(Canvas::Security::TokenExpired)
         end
       end
 
@@ -328,9 +328,9 @@ describe InstFS do
         upload_url = URI.parse(preflight_json[:upload_url])
         expect(upload_url.query).to match(/token=[^&]+/)
         token = upload_url.query.split('=').last
-        expect(-> {
+        expect(lambda do
           Canvas::Security.decode_jwt(token, [secret])
-        }).not_to raise_error
+        end).not_to raise_error
       end
 
       describe "the upload JWT" do

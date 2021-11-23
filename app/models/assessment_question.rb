@@ -163,9 +163,9 @@ class AssessmentQuestion < ActiveRecord::Base
     deep_translate = lambda do |obj|
       case obj
       when Hash
-        obj.each_with_object(HashWithIndifferentAccess.new) { |(k, v), h|
+        obj.each_with_object(HashWithIndifferentAccess.new) do |(k, v), h|
           h[k] = deep_translate.call(v)
-        }
+        end
       when Array
         obj.map { |v| deep_translate.call(v) }
       when String

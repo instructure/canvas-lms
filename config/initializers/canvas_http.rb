@@ -27,12 +27,12 @@ module CanvasHttpInitializer
     # need some place to store circuit breaker information so we don't
     # have to have each process store it's own circuit breaker
     # state
-    CanvasHttp::CircuitBreaker.redis = lambda {
+    CanvasHttp::CircuitBreaker.redis = lambda do
       return MultiCache.cache.redis if MultiCache.cache.respond_to?(:redis)
       return Canvas.redis if Canvas.redis_enabled?
 
       nil
-    }
+    end
 
     # how many failures for a domain trips the circuit breaker
     CanvasHttp::CircuitBreaker.threshold = lambda do |domain|

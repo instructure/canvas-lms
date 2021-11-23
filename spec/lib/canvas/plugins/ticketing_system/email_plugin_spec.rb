@@ -26,14 +26,14 @@ module Canvas::Plugins::TicketingSystem
       let(:plugin) { EmailPlugin.new(ticketing) }
       let(:email_address) { "to-address@example.com" }
       let(:config) { { email_address: email_address } }
-      let(:report) {
+      let(:report) do
         double(
           email: "from-address@example.com",
           to_document: {},
           raw_report: double,
           account_id: nil
         )
-      }
+      end
 
       it "sends an email to the address in the configuration" do
         expect(Message).to receive(:create!).with(include(to: email_address))

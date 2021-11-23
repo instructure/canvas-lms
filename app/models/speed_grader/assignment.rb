@@ -158,9 +158,9 @@ module SpeedGrader
       res[:too_many_quiz_submissions] = too_many = assignment.too_many_qs_versions?(submissions)
       qs_versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      enrollment_types_by_id = enrollments.each_with_object({}) { |e, h|
+      enrollment_types_by_id = enrollments.each_with_object({}) do |e, h|
         h[e.user_id] ||= e.type
-      }
+      end
 
       if assignment.quiz
         if assignment.quiz.assignment_overrides.to_a.count(&:active?) == 0

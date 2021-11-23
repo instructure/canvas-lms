@@ -70,15 +70,15 @@ class ContentExport < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
-    p.whenever { |record|
+    p.whenever do |record|
       record.changed_state(:exported) && record.send_notification?
-    }
+    end
 
     p.dispatch :content_export_failed
     p.to { [user] }
-    p.whenever { |record|
+    p.whenever do |record|
       record.changed_state(:failed) && record.send_notification?
-    }
+    end
   end
 
   set_policy do
@@ -576,18 +576,18 @@ class ContentExport < ActiveRecord::Base
   scope :quizzes2, -> { where(export_type: QUIZZES2) }
   scope :course_copy, -> { where(export_type: COURSE_COPY) }
   scope :running, -> { where(workflow_state: ['created', 'exporting']) }
-  scope :admin, ->(user) {
+  scope :admin, lambda { |user|
     where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
             ZIP, USER_DATA
           ], user)
   }
-  scope :non_admin, ->(user) {
+  scope :non_admin, lambda { |user|
     where("content_exports.export_type IN (?) AND content_exports.user_id=?", [
             ZIP, USER_DATA
           ], user)
   }
   scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
-  scope :expired, -> {
+  scope :expired, lambda {
     if ContentExport.expire?
       where('created_at < ?', ContentExport.expire_days.days.ago)
     else

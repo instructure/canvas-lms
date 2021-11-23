@@ -93,7 +93,7 @@ module ReportSpecHelper
 end
 
 RSpec::Matchers.define :eq_stringified_array do |expected|
-  stringify_csv_record = ->(item) {
+  stringify_csv_record = lambda do |item|
     if item.nil?
       nil
     elsif item.is_a? Array
@@ -101,7 +101,7 @@ RSpec::Matchers.define :eq_stringified_array do |expected|
     else
       item.to_s
     end
-  }
+  end
 
   match do |actual|
     actual == expected.map { |item| stringify_csv_record.call(item) }

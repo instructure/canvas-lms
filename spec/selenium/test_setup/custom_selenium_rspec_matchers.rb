@@ -174,7 +174,7 @@ module CustomSeleniumRSpecMatchers
     expected_specified = args.size > 1
     expected = args[1]
 
-    attribute_matcher = ->(actual) do
+    attribute_matcher = lambda do |actual|
       if expected_specified
         actual.respond_to?(:match) ? actual.match(expected) : actual == expected
       else
@@ -454,10 +454,10 @@ module CustomSeleniumRSpecMatchers
       raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
 
       wait_for(method: :become) do
-        disable_implicit_wait {
+        disable_implicit_wait do
           a = actual.call
           min < a && a < max
-        }
+        end
       end
     end
   end

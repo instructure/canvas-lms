@@ -578,9 +578,9 @@ describe LearningOutcome do
                                      })
       @outcome.alignments << @alignment
 
-      expect {
+      expect do
         @outcome.remove_alignment(@alignment.id, @outcome.context)
-      }.to change {
+      end.to change {
         @outcome.alignments.count
       }.from(1).to(0)
     end
@@ -609,9 +609,9 @@ describe LearningOutcome do
       expect(@outcome).to respond_to(:rubric_criterion)
       expect(@outcome.data).not_to be_nil
       expect(@outcome.rubric_criterion).to eq(@outcome.data[:rubric_criterion])
-      expect {
+      expect do
         @outcome.rubric_criterion = @outcome.rubric_criterion.merge(mpoints)
-      }.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
+      end.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
     end
 
     it "updates aligned rubrics after save" do
@@ -1026,14 +1026,14 @@ describe LearningOutcome do
       )
     end
 
-    let(:c1) {
+    let(:c1) do
       course_with_teacher
       @course
-    }
-    let(:c2) {
+    end
+    let(:c2) do
       course_with_teacher
       @course
-    }
+    end
 
     let(:add_student) do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }
@@ -1042,7 +1042,7 @@ describe LearningOutcome do
     let(:account) { -> { Account.all.find { |a| !a.site_admin? && a.root_account? } } }
 
     let(:create_rubric) do
-      ->(outcome) do
+      lambda do |outcome|
         rubric = Rubric.create!(:context => outcome.context)
         rubric.data = [{
           :points => 3,
@@ -1070,7 +1070,7 @@ describe LearningOutcome do
     end
 
     let(:find_rubric) do
-      ->(outcome) do
+      lambda do |outcome|
         # This is horribly inefficient, but there's not a good
         # way to query by learning outcome id because it's stored
         # in a serialized field :facepalm:.  When we do our outcomes
@@ -1088,7 +1088,7 @@ describe LearningOutcome do
     end
 
     let(:assess_with) do
-      ->(outcome, context) do
+      lambda do |outcome, context|
         assignment = assignment_model(context: context)
         rubric = add_or_get_rubric(outcome)
         user = user_factory(active_all: true)

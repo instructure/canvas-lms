@@ -28,9 +28,9 @@ describe "communication channel selenium tests" do
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       set_value f('#pseudonym_password'), "asdfasdf"
-      expect_new_page_load {
+      expect_new_page_load do
         f('#registration_confirmation_form').submit
-      }
+      end
       expect_logout_link_present
     end
 
@@ -76,9 +76,9 @@ describe "communication channel selenium tests" do
       expect(input).to be_present
       set_value input, "asdf@asdf.com"
       set_value f('#pseudonym_password'), "asdfasdf"
-      expect_new_page_load {
+      expect_new_page_load do
         f('#registration_confirmation_form').submit
-      }
+      end
 
       expect_logout_link_present
     end

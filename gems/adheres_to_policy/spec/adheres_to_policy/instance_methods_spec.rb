@@ -365,9 +365,9 @@ describe AdheresToPolicy::InstanceMethods do
     it "raises argument exception if anything other then one right is provided" do
       non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
-      expect {
+      expect do
         non_context.grants_right?("allowed actor", :asdf, :read)
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     context "caching" do
@@ -390,10 +390,10 @@ describe AdheresToPolicy::InstanceMethods do
           attr_reader :session
 
           extend AdheresToPolicy::ClassMethods
-          set_policy {
+          set_policy do
             given { |_, session| @session = session }
             can :read
-          }
+          end
         end
 
         actor = actor_class.new
@@ -408,10 +408,10 @@ describe AdheresToPolicy::InstanceMethods do
         }
         actor_class = Class.new do
           extend AdheresToPolicy::ClassMethods
-          set_policy {
+          set_policy do
             given { |_| true }
             can :read
-          }
+          end
 
           def call_permission_cache_key_for(*args)
             permission_cache_key_for(*args)

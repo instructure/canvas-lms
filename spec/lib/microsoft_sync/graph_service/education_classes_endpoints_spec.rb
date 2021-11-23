@@ -42,9 +42,9 @@ describe MicrosoftSync::GraphService::EducationClassesEndpoints do
       it 'raises a graceful cancel NotEducationTenant error' do
         klass = MicrosoftSync::Errors::NotEducationTenant
         msg =  /not an Education tenant, so cannot be used/
-        expect {
+        expect do
           endpoints.list
-        }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
+        end.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
       end
     end
   end

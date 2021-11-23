@@ -74,8 +74,8 @@ module Canvas::Plugins::DefaultPlugins
                             settings_partial: 'plugins/microsoft_settings',
                             encrypted_settings: [:application_secret])
     Canvas::Plugin.register('diigo', nil, {
-                              :name => lambda { t :name, 'Diigo' },
-                              :description => lambda { t :description, 'Diigo integration' },
+                              :name => -> { t :name, 'Diigo' },
+                              :description => -> { t :description, 'Diigo integration' },
                               :website => 'https://www.diigo.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -94,8 +94,8 @@ module Canvas::Plugins::DefaultPlugins
                             validator: 'TwitterValidator',
                             encrypted_settings: [:consumer_secret])
     Canvas::Plugin.register('etherpad', :collaborations, {
-                              :name => lambda { t :name, 'EtherPad' },
-                              :description => lambda { t :description, 'EtherPad document sharing' },
+                              :name => -> { t :name, 'EtherPad' },
+                              :description => -> { t :description, 'EtherPad document sharing' },
                               :website => 'http://www.etherpad.org',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -116,8 +116,8 @@ module Canvas::Plugins::DefaultPlugins
                               encrypted_settings: [:client_secret]
                             })
     Canvas::Plugin.register('kaltura', nil, {
-                              :name => lambda { t :name, 'Kaltura' },
-                              :description => lambda { t :description, 'Kaltura video/audio recording and playback' },
+                              :name => -> { t :name, 'Kaltura' },
+                              :description => -> { t :description, 'Kaltura video/audio recording and playback' },
                               :website => 'http://corp.kaltura.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -126,8 +126,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'KalturaValidator'
                             })
     Canvas::Plugin.register('mathman', nil, {
-                              :name => lambda { t :name, 'MathMan' },
-                              :description => lambda { t :description, 'A simple microservice that converts LaTeX formulae to MathML and SVG' },
+                              :name => -> { t :name, 'MathMan' },
+                              :description => -> { t :description, 'A simple microservice that converts LaTeX formulae to MathML and SVG' },
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
                               :version => '1.0.0',
@@ -138,8 +138,8 @@ module Canvas::Plugins::DefaultPlugins
                               }
                             })
     Canvas::Plugin.register('wimba', :web_conferencing, {
-                              :name => lambda { t :name, "Wimba" },
-                              :description => lambda { t :description, "Wimba web conferencing support" },
+                              :name => -> { t :name, "Wimba" },
+                              :description => -> { t :description, "Wimba web conferencing support" },
                               :website => 'http://www.wimba.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -150,8 +150,8 @@ module Canvas::Plugins::DefaultPlugins
                               :encrypted_settings => [:password]
                             })
     Canvas::Plugin.register('big_blue_button', :web_conferencing, {
-                              :name => lambda { t :name, "BigBlueButton" },
-                              :description => lambda { t :description, "BigBlueButton web conferencing support" },
+                              :name => -> { t :name, "BigBlueButton" },
+                              :description => -> { t :description, "BigBlueButton web conferencing support" },
                               :website => 'http://bigbluebutton.org',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -161,8 +161,8 @@ module Canvas::Plugins::DefaultPlugins
                               :encrypted_settings => [:secret]
                             })
     Canvas::Plugin.register('big_blue_button_fallback', nil, {
-                              :name => lambda { t :name, "BigBlueButton Fallback For Migration" },
-                              :description => lambda { t :description, "BigBlueButton previous settings to preserve recordings during migration" },
+                              :name => -> { t :name, "BigBlueButton Fallback For Migration" },
+                              :description => -> { t :description, "BigBlueButton previous settings to preserve recordings during migration" },
                               :website => 'http://bigbluebutton.org',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -174,13 +174,13 @@ module Canvas::Plugins::DefaultPlugins
 
     require_dependency 'cc/importer/cc_worker'
     Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
-      :name => lambda { I18n.t 'canvas_cartridge_name', 'Canvas Cartridge Importer' },
-      :display_name => lambda { I18n.t 'canvas_cartridge_display', 'Canvas Common Cartridge' },
+      :name => -> { I18n.t 'canvas_cartridge_name', 'Canvas Cartridge Importer' },
+      :display_name => -> { I18n.t 'canvas_cartridge_display', 'Canvas Common Cartridge' },
       :author => 'Instructure',
       :author_website => 'http://www.instructure.com',
-      :description => lambda { I18n.t :canvas_cartridge_description, 'This enables converting a canvas export to the intermediary json format to be imported' },
+      :description => -> { I18n.t :canvas_cartridge_description, 'This enables converting a canvas export to the intermediary json format to be imported' },
       :version => '1.0.0',
-      :select_text => lambda { I18n.t :canvas_cartridge_file_description, "Canvas Course Export Package" },
+      :select_text => -> { I18n.t :canvas_cartridge_file_description, "Canvas Course Export Package" },
       :sort_order => 1,
       :settings => {
         :worker => 'CCWorker',
@@ -192,13 +192,13 @@ module Canvas::Plugins::DefaultPlugins
     }
     require_dependency 'canvas/migration/worker/course_copy_worker'
     Canvas::Plugin.register 'course_copy_importer', :export_system, {
-      :name => lambda { I18n.t :course_copy_name, 'Copy Canvas Course' },
-      :display_name => lambda { I18n.t :course_copy_display, 'Course Copy' },
+      :name => -> { I18n.t :course_copy_name, 'Copy Canvas Course' },
+      :display_name => -> { I18n.t :course_copy_display, 'Course Copy' },
       :author => 'Instructure',
       :author_website => 'http://www.instructure.com',
-      :description => lambda { I18n.t :course_copy_description, 'Migration plugin for copying canvas courses' },
+      :description => -> { I18n.t :course_copy_description, 'Migration plugin for copying canvas courses' },
       :version => '1.0.0',
-      :select_text => lambda { I18n.t :course_copy_file_description, "Copy a Canvas Course" },
+      :select_text => -> { I18n.t :course_copy_file_description, "Copy a Canvas Course" },
       :sort_order => 0,
       :settings => {
         :worker => 'CourseCopyWorker',
@@ -211,13 +211,13 @@ module Canvas::Plugins::DefaultPlugins
     }
     require_dependency 'canvas/migration/worker/zip_file_worker'
     Canvas::Plugin.register 'zip_file_importer', :export_system, {
-      :name => lambda { I18n.t :zip_file_name, '.zip file' },
-      :display_name => lambda { I18n.t :zip_file_display, 'File Import' },
+      :name => -> { I18n.t :zip_file_name, '.zip file' },
+      :display_name => -> { I18n.t :zip_file_display, 'File Import' },
       :author => 'Instructure',
       :author_website => 'http://www.instructure.com',
-      :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking .zip archives into course, group, or user files' },
+      :description => -> { I18n.t :zip_file_description, 'Migration plugin for unpacking .zip archives into course, group, or user files' },
       :version => '1.0.0',
-      :select_text => lambda { I18n.t :zip_file_file_description, "Unzip .zip file into folder" },
+      :select_text => -> { I18n.t :zip_file_file_description, "Unzip .zip file into folder" },
       :sort_order => 2,
       :settings => {
         :worker => 'ZipFileWorker',
@@ -229,13 +229,13 @@ module Canvas::Plugins::DefaultPlugins
       },
     }
     Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
-      :name => lambda { I18n.t :common_cartridge_name, 'Common Cartridge Importer' },
-      :display_name => lambda { I18n.t :common_cartridge_display, 'Common Cartridge' },
+      :name => -> { I18n.t :common_cartridge_name, 'Common Cartridge Importer' },
+      :display_name => -> { I18n.t :common_cartridge_display, 'Common Cartridge' },
       :author => 'Instructure',
       :author_website => 'http://www.instructure.com',
-      :description => lambda { I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
+      :description => -> { I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
       :version => '1.0.0',
-      :select_text => lambda { I18n.t :common_cartridge_file_description, "Common Cartridge 1.x Package" },
+      :select_text => -> { I18n.t :common_cartridge_file_description, "Common Cartridge 1.x Package" },
       :settings => {
         :worker => 'CCWorker',
         :migration_partial => 'cc_config',
@@ -249,8 +249,8 @@ module Canvas::Plugins::DefaultPlugins
       },
     }
     Canvas::Plugin.register('grade_export', :sis, {
-                              :name => lambda { t :name, "Grade Export" },
-                              :description => lambda { t :description, 'Grade Export for SIS' },
+                              :name => -> { t :name, "Grade Export" },
+                              :description => -> { t :description, 'Grade Export for SIS' },
                               :website => 'http://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -264,8 +264,8 @@ module Canvas::Plugins::DefaultPlugins
                               :test_cluster_inherit => false
                             })
     Canvas::Plugin.register('i18n', nil, {
-                              :name => lambda { t :name, 'I18n' },
-                              :description => lambda { t :description, 'Custom Locales' },
+                              :name => -> { t :name, 'I18n' },
+                              :description => -> { t :description, 'Custom Locales' },
                               :website => 'https://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -274,8 +274,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'I18nValidator'
                             })
     Canvas::Plugin.register('sis_import', :sis, {
-                              :name => lambda { t :name, 'SIS Import' },
-                              :description => lambda { t :description, 'Import SIS Data' },
+                              :name => -> { t :name, 'SIS Import' },
+                              :description => -> { t :description, 'Import SIS Data' },
                               :website => 'http://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -285,8 +285,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
 
     Canvas::Plugin.register('sessions', nil, {
-                              :name => lambda { t :name, 'Sessions' },
-                              :description => lambda { t :description, 'Manage session timeouts' },
+                              :name => -> { t :name, 'Sessions' },
+                              :description => -> { t :description, 'Manage session timeouts' },
                               :website => 'http://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -297,8 +297,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
 
     Canvas::Plugin.register('assignment_freezer', nil, {
-                              :name => lambda { t :name, 'Assignment Property Freezer' },
-                              :description => lambda { t :description, 'Freeze Assignment Properties on Copy' },
+                              :name => -> { t :name, 'Assignment Property Freezer' },
+                              :description => -> { t :description, 'Freeze Assignment Properties on Copy' },
                               :website => 'http://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -308,8 +308,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
 
     Canvas::Plugin.register('crocodoc', :previews, {
-                              :name => lambda { t :name, 'Crocodoc' },
-                              :description => lambda { t :description, 'Enable Crocodoc as a document preview option' },
+                              :name => -> { t :name, 'Crocodoc' },
+                              :description => -> { t :description, 'Enable Crocodoc as a document preview option' },
                               :website => 'https://crocodoc.com/',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -320,8 +320,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
 
     Canvas::Plugin.register('canvadocs', :previews, {
-                              :name => lambda { t :name, 'Canvadocs' },
-                              :description => lambda { t :description, 'Enable Canvadocs (compatible with Box View) as a document preview option' },
+                              :name => -> { t :name, 'Canvadocs' },
+                              :description => -> { t :description, 'Enable Canvadocs (compatible with Box View) as a document preview option' },
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
                               :version => '1.0.0',
@@ -330,8 +330,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
 
     Canvas::Plugin.register('account_reports', nil, {
-                              :name => lambda { t :name, 'Account Reports' },
-                              :description => lambda { t :description, 'Select account reports' },
+                              :name => -> { t :name, 'Account Reports' },
+                              :description => -> { t :description, 'Select account reports' },
                               :website => 'http://www.instructure.com',
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
@@ -341,8 +341,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'AccountReportsValidator'
                             })
     Canvas::Plugin.register('app_center', nil, {
-                              :name => lambda { t :name, 'App Center' },
-                              :description => lambda { t :description, 'App Center for tracking/installing external tools in Canvas' },
+                              :name => -> { t :name, 'App Center' },
+                              :description => -> { t :description, 'App Center for tracking/installing external tools in Canvas' },
                               :settings_partial => 'plugins/app_center_settings',
                               :settings => {
                                 :base_url => 'https://www.eduappcenter.com',
@@ -353,8 +353,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'AppCenterValidator'
                             })
     Canvas::Plugin.register('pandapub', nil, {
-                              :name => lambda { t :name, 'PandaPub' },
-                              :description => lambda { t :description, 'Pub/Sub service' },
+                              :name => -> { t :name, 'PandaPub' },
+                              :description => -> { t :description, 'Pub/Sub service' },
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
                               :version => '1.0.0',
@@ -368,8 +368,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'PandaPubValidator'
                             })
     Canvas::Plugin.register('vericite', nil, {
-                              :name => lambda { t :name, 'VeriCite' },
-                              :description => lambda { t :description, 'Plagiarism detection service.' },
+                              :name => -> { t :name, 'VeriCite' },
+                              :description => -> { t :description, 'Plagiarism detection service.' },
                               :author => 'VeriCite',
                               :author_website => 'http://www.vericite.com',
                               :version => '1.0.0',
@@ -389,8 +389,8 @@ module Canvas::Plugins::DefaultPlugins
                             })
     Canvas::Plugins::TicketingSystem.register!
     Canvas::Plugin.register('inst_fs', nil, {
-                              :name => lambda { t :name, 'Inst-FS' },
-                              :description => lambda { t :description, 'File service that proxies for S3.' },
+                              :name => -> { t :name, 'Inst-FS' },
+                              :description => -> { t :description, 'File service that proxies for S3.' },
                               :author => 'Instructure',
                               :author_website => 'http://www.instructure.com',
                               :version => '0.0.1',
@@ -402,8 +402,8 @@ module Canvas::Plugins::DefaultPlugins
                               :validator => 'InstFsValidator'
                             })
     Canvas::Plugin.register('unsplash', nil, {
-                              name: lambda { t :name, 'Unsplash' },
-                              description: lambda { t :description, 'Unsplash image search service' },
+                              name: -> { t :name, 'Unsplash' },
+                              description: -> { t :description, 'Unsplash image search service' },
                               author: 'Unsplash',
                               author_website: 'https://unsplash.com/documentation',
                               version: '1.0.0',
@@ -411,8 +411,8 @@ module Canvas::Plugins::DefaultPlugins
                               settings_partial: 'plugins/unsplash_settings'
                             })
     Canvas::Plugin.register('asset_user_access_logs', nil, {
-                              name: lambda { t :name, 'AUA Logger' },
-                              description: lambda { t :description, 'Minimize AUA write pressure' },
+                              name: -> { t :name, 'AUA Logger' },
+                              description: -> { t :description, 'Minimize AUA write pressure' },
                               author: 'Instructure',
                               author_website: 'http://www.instructure.com',
                               version: '1.0.0',

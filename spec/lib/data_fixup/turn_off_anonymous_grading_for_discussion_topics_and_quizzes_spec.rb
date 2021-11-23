@@ -23,16 +23,16 @@ describe DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes do
 
   it 'updates anonymous quizzes to no longer be anonymous' do
     anonymous_quiz = course.assignments.create!(anonymous_grading: true, submission_types: 'online_quiz')
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.to change { anonymous_quiz.reload.anonymous_grading? }.from(true).to(false)
+    end.to change { anonymous_quiz.reload.anonymous_grading? }.from(true).to(false)
   end
 
   it 'updates the updated_at on anonymous quizzes' do
     anonymous_quiz = course.assignments.create!(anonymous_grading: true, submission_types: 'online_quiz')
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.to change { anonymous_quiz.reload.updated_at }
+    end.to change { anonymous_quiz.reload.updated_at }
   end
 
   it 'updates anonymous discussion topics to no longer be anonymous' do
@@ -40,9 +40,9 @@ describe DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes do
       anonymous_grading: true,
       submission_types: 'discussion_topic'
     )
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.to change { anonymous_discussion_topic.reload.anonymous_grading? }.from(true).to(false)
+    end.to change { anonymous_discussion_topic.reload.anonymous_grading? }.from(true).to(false)
   end
 
   it 'updates the updated_at on anonymous discussion topics' do
@@ -50,43 +50,43 @@ describe DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes do
       anonymous_grading: true,
       submission_types: 'discussion_topic'
     )
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.to change { anonymous_discussion_topic.reload.updated_at }
+    end.to change { anonymous_discussion_topic.reload.updated_at }
   end
 
   it 'does not update anonymous assignments that are not quizzes or discussion topics to no longer be anonymous' do
     anonymous_assignment = course.assignments.create!(anonymous_grading: true)
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.not_to change { anonymous_assignment.reload.anonymous_grading? }
+    end.not_to change { anonymous_assignment.reload.anonymous_grading? }
   end
 
   it 'does not update the updated_at for anonymous assignments that are not quizzes or discussion topics' do
     anonymous_assignment = course.assignments.create!(anonymous_grading: true)
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.not_to change { anonymous_assignment.reload.updated_at }
+    end.not_to change { anonymous_assignment.reload.updated_at }
   end
 
   it 'does not update the updated_at for non-anonymous assignments that are not quizzes or discussion topics' do
     assignment = course.assignments.create!
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.not_to change { assignment.reload.updated_at }
+    end.not_to change { assignment.reload.updated_at }
   end
 
   it 'does not update the updated_at for non-anonymous quizzes' do
     quiz = course.assignments.create!(submission_types: 'online_quiz')
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.not_to change { quiz.reload.updated_at }
+    end.not_to change { quiz.reload.updated_at }
   end
 
   it 'does not update the updated_at for non-anonymous discussion topics' do
     discussion_topic = course.assignments.create!(submission_types: 'discussion_topic')
-    expect {
+    expect do
       DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
-    }.not_to change { discussion_topic.reload.updated_at }
+    end.not_to change { discussion_topic.reload.updated_at }
   end
 end

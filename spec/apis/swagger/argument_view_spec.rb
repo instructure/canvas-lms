@@ -211,66 +211,66 @@ describe ArgumentView do
 
       context 'validations' do
         it 'is invalid when the text "NOTICE" is omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('NOTICE ', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+          end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
         end
 
         it 'is invalid when the NOTICE date is omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('2018-01-02 ', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the text "NOTICE" and the NOTICE date are omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('NOTICE 2018-01-02 ', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+          end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
         end
 
         it 'is invalid when the NOTICE date is not in YYYY-MM-DD format' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('2018-01-02', '01-02-2018'), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the text "EFFECTIVE" is omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('EFFECTIVE ', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+          end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
         end
 
         it 'is invalid when the EFFECTIVE date is omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('2018-04-30', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
+          end.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
         end
 
         it 'is invalid when the text "EFFECTIVE" and the EFFECTIVE date are omitted' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub(' EFFECTIVE 2018-04-30', ''), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+          end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
         end
 
         it 'is invalid when the EFFECTIVE date is not in YYYY-MM-DD format' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('2018-04-30', '04-30-2018'), deprecated: true)
-          }.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the EFFECTIVE date is < 90 days after the NOTICE date' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub('2018-04-30', '2018-02-26'), deprecated: true)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected >= 90 days between the `NOTICE` \(2018-01-02\) and `EFFECTIVE` \(2018-02-26\) dates/
           )
         end
 
         it 'is invalid when a description is not provided' do
-          expect {
+          expect do
             ArgumentView.new(valid_text.gsub("\nA description \non multiple lines.", ''), deprecated: true)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
           )
@@ -278,9 +278,9 @@ describe ArgumentView do
 
         it 'is invalid when the description is on the same line as the other content' do
           text = valid_text.gsub("\nA description \non multiple lines.", ' A description.')
-          expect {
+          expect do
             ArgumentView.new(text, deprecated: true)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
           )

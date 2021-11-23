@@ -36,7 +36,7 @@ describe IncomingMailProcessor::SqsMailbox do
   end
 
   let(:queue) { double }
-  let(:sqs_message_body) {
+  let(:sqs_message_body) do
     {
       Message: {
         mail: {
@@ -44,7 +44,7 @@ describe IncomingMailProcessor::SqsMailbox do
         }
       }.to_json
     }.to_json
-  }
+  end
   let(:sqs_message) { double(body: sqs_message_body) }
   let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
 

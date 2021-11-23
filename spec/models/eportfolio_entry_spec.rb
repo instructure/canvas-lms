@@ -32,17 +32,17 @@ describe EportfolioEntry do
     it "validates the length of attributes" do
       @eportfolio_entry.name = @long_string
       @eportfolio_entry.slug = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of slug" do
       @eportfolio_entry.slug = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of name" do
       @eportfolio_entry.name = @long_string
-      expect(lambda { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 
@@ -178,7 +178,7 @@ describe EportfolioEntry do
         end
 
         it "does not mark as spam when neither the title nor the content match their respective offending keywords" do
-          expect {
+          expect do
             entry.update!(name: "my injurious page")
             entry.parse_content(
               section_count: 1,
@@ -188,22 +188,22 @@ describe EportfolioEntry do
               }
             )
             entry.save!
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
 
         it "does not mark as spam if a spam_status already exists" do
           @eportfolio.update!(spam_status: "marked_as_safe")
 
-          expect {
+          expect do
             entry.update!(name: "actually a bad page")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        expect {
+        expect do
           entry.update!(name: "actually a bad page")
-        }.not_to change { spam_status }
+        end.not_to change { spam_status }
       end
     end
   end

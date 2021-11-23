@@ -81,7 +81,7 @@ class CustomData < ActiveRecord::Base
     keys = scope.split('/')
     last = keys.pop
 
-    traverse = ->(hsh, key_idx) do
+    traverse = lambda do |hsh, key_idx|
       return hsh if key_idx == keys.length
 
       k = keys[key_idx]
@@ -106,7 +106,7 @@ class CustomData < ActiveRecord::Base
 
   def delete_hash_data_from_scope(hash, scope)
     keys = scope.split('/')
-    del_frd = ->(hash2) do
+    del_frd = lambda do |hash2|
       k = keys.shift
       if keys.empty?
         raise ArgumentError, 'invalid scope for hash' unless hash2.key?(k)

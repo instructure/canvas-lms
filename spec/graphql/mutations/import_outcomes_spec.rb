@@ -96,9 +96,9 @@ describe Mutations::ImportOutcomes do
   end
 
   let(:target_context) { @course }
-  let(:target_group) {
+  let(:target_group) do
     @course.root_outcome_group
-  }
+  end
   let(:source_context_id) { Account.default.id }
   let(:source_context_type) { "Account" }
   let(:ctx) { { domain_root_account: Account.default, current_user: current_user } }
@@ -551,9 +551,9 @@ describe Mutations::ImportOutcomes do
       # force the creation of root outcome group in the course
       @course.root_outcome_group
 
-      expect {
+      expect do
         exec(outcome_id: get_outcome_id("Root group outcome"))
-      }.to not_change(LearningOutcomeGroup, :count)
+      end.to not_change(LearningOutcomeGroup, :count)
         .and change(ContentTag, :count).by(1)
                                        .and change {
                                               @course.root_outcome_group.child_outcome_links.map(&:content).map(&:title)

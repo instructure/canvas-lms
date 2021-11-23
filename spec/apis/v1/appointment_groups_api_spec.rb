@@ -507,12 +507,12 @@ describe AppointmentGroupsController, type: :request do
   end
 
   types = {
-    'users' => proc {
+    'users' => proc do
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       @ag.appointments.first.reserve_for @student1, @me
-    },
-    'groups' => proc {
+    end,
+    'groups' => proc do
       cat = @course.group_categories.create(name: "foo")
       @ag = AppointmentGroup.create!(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
@@ -521,7 +521,7 @@ describe AppointmentGroupsController, type: :request do
       @ag.appointments.first.reserve_for group1, @me
       group2 = cat.groups.create(:context => @course)
       group2.users << @student2
-    }
+    end
   }
   types.each do |type, block|
     context "#{type.singularize}-level appointment groups" do

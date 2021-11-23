@@ -252,12 +252,12 @@ module Lti
               # create an assignment and line item but no resource link, tool for the ContentTag --
               # ContentExternalTool.from_content_tag(assignment.external_tool_tag, course) is nil
 
-              let(:params_overrides) {
+              let(:params_overrides) do
                 super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
                                 type: "external_tool",
                                 external_tool_url: "http://www.google.com"
                               })
-              }
+              end
 
               it 'sets the assignment submission type to external tool' do
                 expect(item.assignment.submission_types).to eq 'external_tool'
@@ -273,12 +273,12 @@ module Lti
             end
 
             context 'when submission type is invalid' do
-              let(:params_overrides) {
+              let(:params_overrides) do
                 super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
                                 type: "a_bad_submission_type",
                                 external_tool_url: "http://www.google.com"
                               })
-              }
+              end
 
               it 'returns a 400 error response code' do
                 expect(response).to have_http_status(:bad_request)
@@ -287,12 +287,12 @@ module Lti
           end
 
           context 'when submission type is external tool and and tool URL matches a tool' do
-            let(:params_overrides) {
+            let(:params_overrides) do
               super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
                               type: "external_tool",
                               external_tool_url: tool.url
                             })
-            }
+            end
 
             it_behaves_like 'the line item create endpoint'
 

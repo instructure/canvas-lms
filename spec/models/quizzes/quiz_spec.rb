@@ -727,18 +727,18 @@ describe Quizzes::Quiz do
 
     it "destroys results if the quiz_type becomes practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
-      expect {
+      expect do
         @quiz.save!
-      }.to change { LearningOutcomeResult.active.count }.by(-1)
+      end.to change { LearningOutcomeResult.active.count }.by(-1)
     end
 
     it "restores results if the quiz_type changes from practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
       @quiz.save!
       @quiz.quiz_type = "assignment"
-      expect {
+      expect do
         @quiz.save!
-      }.to change { LearningOutcomeResult.active.count }.by(1)
+      end.to change { LearningOutcomeResult.active.count }.by(1)
     end
   end
 

@@ -373,9 +373,9 @@ describe Folder do
 
     it "raises ActiveRecord::RecordNotFound when no record is found" do
       expect(Folder.where(id: 1)).to be_empty, 'precondition'
-      expect {
+      expect do
         Folder.from_context_or_id(nil, 1)
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -504,9 +504,9 @@ describe Folder do
 
     context "when a 'Buttons and Icons' folder does not yet exist" do
       it "creates a folder with BUTTONS_AND_ICONS_UNIQUE_TYPE unique type when one does not exist" do
-        expect {
+        expect do
           subject
-        }.to change {
+        end.to change {
           course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
         }.from(0).to(1)
       end

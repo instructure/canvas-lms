@@ -87,7 +87,7 @@ class GradebookImporter
     e
   end
 
-  CSV::Converters[:decimal_comma_to_period] = ->(field) do
+  CSV::Converters[:decimal_comma_to_period] = lambda do |field|
     if /^-?[0-9.,]+%?$/.match?(field)
       # This field is a pure number or percentage => let's normalize it
       number_parts = field.split(/[,.]/)

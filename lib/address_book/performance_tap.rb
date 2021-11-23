@@ -46,7 +46,7 @@ module AddressBook
     class TapProxy < PaginatedCollection::Proxy
       def initialize(source_collection:, tap_collection:)
         @source_collection = source_collection
-        super lambda { |source_pager|
+        super lambda do |source_pager|
           tap_pager = tap_collection.configure_pager(
             tap_collection.new_pager,
             per_page: source_pager.per_page,
@@ -54,7 +54,7 @@ module AddressBook
           )
           tap_collection.execute_pager(tap_pager)
           source_collection.execute_pager(source_pager)
-        }
+        end
       end
 
       def depth

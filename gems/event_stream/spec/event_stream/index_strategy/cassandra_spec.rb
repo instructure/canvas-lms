@@ -62,7 +62,7 @@ describe EventStream::IndexStrategy::Cassandra do
       table = @table
       base_index = EventStream::Index.new(@stream) do
         self.table table
-        self.entry_proc lambda { |record| record.entry }
+        self.entry_proc ->(record) { record.entry }
       end
       @index = base_index.strategy_for(:cassandra)
     end
@@ -139,9 +139,9 @@ describe EventStream::IndexStrategy::Cassandra do
       before do
         shard_class = Class.new { define_method(:activate) { |&b| b.call } }
 
-        EventStream.current_shard_lookup = lambda {
+        EventStream.current_shard_lookup = lambda do
           shard_class.new
-        }
+        end
 
         # force just one bucket
         @index.index.bucket_size Time.zone.now + 1.minute
@@ -332,9 +332,9 @@ describe EventStream::IndexStrategy::Cassandra do
       before do
         shard_class = Class.new { define_method(:activate) { |&b| b.call } }
 
-        EventStream.current_shard_lookup = lambda {
+        EventStream.current_shard_lookup = lambda do
           shard_class.new
-        }
+        end
 
         # force just one bucket
         @index.index.bucket_size Time.zone.now + 1.minute
@@ -425,7 +425,7 @@ describe EventStream::IndexStrategy::Cassandra do
       end
       base_index = @stream.add_index :thing do
         self.table table
-        self.entry_proc lambda { |record| record.entry }
+        self.entry_proc ->(record) { record.entry }
       end
       @index = base_index.strategy_for(:cassandra)
 
@@ -434,7 +434,7 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     it "translates argument through key_proc if present" do
-      @index.index.key_proc lambda { |entry| entry.key }
+      @index.index.key_proc ->(entry) { entry.key }
       expect(@index).to receive(:for_key).once.with(@key, { :strategy => :cassandra })
       @stream.for_thing(@entry)
     end

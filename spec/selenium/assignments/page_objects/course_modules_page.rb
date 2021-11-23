@@ -57,9 +57,9 @@ module ModulesPage
   def visit_modules_page(course_id)
     get "/courses/#{course_id}/modules"
     # the sidebar is already loading in dom and needs this time before we trigger it's display
-    wait_for(method: nil, timeout: 1) {
+    wait_for(method: nil, timeout: 1) do
       move_module_sidebar
-    }
+    end
   end
 
   def open_move_module_menu(module_name)

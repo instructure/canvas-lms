@@ -21,10 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::ModuleType do
-  let_once(:course) {
+  let_once(:course) do
     course_with_student(active_all: true)
     @course
-  }
+  end
   let_once(:mod) { course.context_modules.create! name: "module", unlock_at: 1.week.from_now }
   let(:module_type) { GraphQLTypeTester.new(mod, current_user: @student) }
 

@@ -47,15 +47,15 @@ class ConversationMessage < ActiveRecord::Base
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("has_attachments") }
   scope :with_media_comments, -> { where("has_media_objects") }
-  scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
+  scope :by_user, ->(user_or_id) { where(:author_id => user_or_id) }
 
   def self.preload_latest(conversation_participants, author = nil)
     return unless conversation_participants.present?
 
-    Shard.partition_by_shard(conversation_participants, lambda { |cp| cp.conversation_id }) do |shard_participants|
-      base_conditions = "(#{shard_participants.map { |cp|
+    Shard.partition_by_shard(conversation_participants, ->(cp) { cp.conversation_id }) do |shard_participants|
+      base_conditions = "(#{shard_participants.map do |cp|
                               "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})"
-                            }.join(" OR ")
+                            end.join(" OR ")
                           }) AND NOT generated
         AND (conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)"
       base_conditions += sanitize_sql([" AND author_id = ?", author.id]) if author
@@ -304,10 +304,10 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def all_forwarded_messages
-    forwarded_messages.inject([]) { |result, message|
+    forwarded_messages.inject([]) do |result, message|
       result << message
       result.concat(message.all_forwarded_messages)
-    }
+    end
   end
 
   def forwardable?

@@ -133,7 +133,7 @@ class Folder < ActiveRecord::Base
 
   scope :active, -> { where("folders.workflow_state<>'deleted'") }
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
-  scope :not_locked, -> {
+  scope :not_locked, lambda {
                        where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
                      }
@@ -209,11 +209,11 @@ class Folder < ActiveRecord::Base
   def update_sub_folders
     return unless @update_sub_folders
 
-    sub_folders.each { |f|
+    sub_folders.each do |f|
       f.reload
       f.full_name = f.full_name(true)
       f.save
-    }
+    end
   end
 
   def clean_up_children

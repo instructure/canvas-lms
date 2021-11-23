@@ -740,9 +740,9 @@ describe Quizzes::SubmissionGrader do
         course_with_student(:active_all => true)
         # @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
         q = { :position => 1, :name => "Question 1", :correct_comments => "", :question_type => "fill_in_multiple_blanks_question", :assessment_question_id => 7903, :incorrect_comments => "", :neutral_comments => "", :id => 1, :points_possible => 50, :question_name => "Question 1", :answers => [], :question_text => "<p><span>Ayo my quality [answer1].</p>" }
-        expect {
+        expect do
           Quizzes::SubmissionGrader.score_question(q, { "question_1_8238a0de6965e6b81a8b9bba5eacd3e2" => "bleh" })
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 

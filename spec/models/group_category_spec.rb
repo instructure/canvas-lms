@@ -675,9 +675,9 @@ describe GroupCategory do
   end
 
   it 'requires a group category to belong to an account or course' do
-    expect {
+    expect do
       GroupCategory.create!(name: 'Test') # don't provide an account or course; should fail
-    }.to raise_error(ActiveRecord::RecordInvalid)
+    end.to raise_error(ActiveRecord::RecordInvalid)
 
     gc = GroupCategory.create(name: 'Test')
     expect(gc.errors.full_messages).to include('Context Must have an account or course ID')
@@ -685,9 +685,9 @@ describe GroupCategory do
   end
 
   it 'makes sure sis_batch_id is valid' do
-    expect {
+    expect do
       GroupCategory.create!(name: 'Test', account: account, sis_batch_id: 1)
-    }.to raise_error(ActiveRecord::InvalidForeignKey)
+    end.to raise_error(ActiveRecord::InvalidForeignKey)
 
     sis_batch = SisBatch.create!(account: account)
     gc = GroupCategory.create!(name: 'Test2', account: account, sis_batch: sis_batch)
@@ -697,9 +697,9 @@ describe GroupCategory do
   it 'makes sure sis_source_id is unique per root_account' do
     GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
 
-    expect {
+    expect do
       GroupCategory.create!(name: 'Test2', account: account, sis_source_id: '1')
-    }.to raise_error(ActiveRecord::RecordInvalid)
+    end.to raise_error(ActiveRecord::RecordInvalid)
 
     new_account = Account.create
     gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)

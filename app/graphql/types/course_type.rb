@@ -224,10 +224,10 @@ module Types
         submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
       end
 
-      (order_by || []).each { |order|
+      (order_by || []).each do |order|
         direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
         submissions = submissions.order("#{order[:field]} #{direction}")
-      }
+      end
 
       submissions
     end
@@ -306,9 +306,9 @@ module Types
           # if `course.image` was a proper AR association, we wouldn't have to
           # do this shard-id stuff
           course.shard.global_id_for(Integer(course.image_id))
-        ).then { |attachment|
+        ).then do |attachment|
           attachment&.public_download_url(1.week)
-        }
+        end
       end
     end
 

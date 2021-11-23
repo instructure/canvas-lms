@@ -131,7 +131,7 @@ class Assignment < ActiveRecord::Base
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }
-  scope :type_quiz_lti, -> {
+  scope :type_quiz_lti, lambda {
     all.primary_shard.activate do
       where("EXISTS (?)",
             ContentTag.where("content_tags.context_id=assignments.id").where(context_type: 'Assignment', content_type: 'ContextExternalTool')
@@ -671,10 +671,10 @@ class Assignment < ActiveRecord::Base
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides
         .where(:set_type => 'Group')
-        .each { |o|
+        .each do |o|
           o.dont_touch_assignment = true
           o.destroy
-        }
+        end
     end
 
     AssignmentOverrideStudent.clean_up_for_assignment(self)
@@ -1226,49 +1226,49 @@ class Assignment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to { |assignment|
+    p.to do |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
       excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
       BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_due_date_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_changed
-    p.to { |assignment|
+    p.to do |assignment|
       BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_created
-    p.to { |assignment|
+    p.to do |assignment|
       BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_created?
-    }
+    end
     p.data { course_broadcast_data }
-    p.filter_asset_by_recipient { |assignment, user|
+    p.filter_asset_by_recipient do |assignment, user|
       assignment.overridden_for(user, skip_clone: true)
-    }
+    end
 
     p.dispatch :submissions_posted
-    p.to { |assignment|
+    p.to do |assignment|
       assignment.course.participating_instructors
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_submissions_posted?
-    }
+    end
     p.data do |record|
       if record.posting_params_for_notifications.present?
         record.posting_params_for_notifications.merge(course_broadcast_data)
@@ -1747,13 +1747,13 @@ class Assignment < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :read) && published? }
     can :read and can :read_own_submission
 
-    given { |user, session|
+    given do |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
         context.grants_right?(user, session, :participate_as_student) &&
         !locked_for?(user) &&
         visible_to_user?(user) &&
         !excused_for?(user)
-    }
+    end
     can :submit
 
     given do |user, session|
@@ -2224,9 +2224,9 @@ class Assignment < ActiveRecord::Base
 
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
-    opts.each_key { |k|
+    opts.each_key do |k|
       opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
-    }
+    end
 
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
@@ -2790,7 +2790,7 @@ class Assignment < ActiveRecord::Base
     peer_reviews
   end
 
-  scope :include_submitted_count, -> {
+  scope :include_submitted_count, lambda {
                                     select(
                                       "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
@@ -2799,7 +2799,7 @@ class Assignment < ActiveRecord::Base
                                     )
                                   }
 
-  scope :include_graded_count, -> {
+  scope :include_graded_count, lambda {
                                  select(
                                    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
@@ -2832,7 +2832,7 @@ class Assignment < ActiveRecord::Base
   }
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
-  scope :for_context_codes, ->(codes) do
+  scope :for_context_codes, lambda { |codes|
     ids = codes.filter_map do |code|
       type, id = parse_asset_string(code)
       next unless type == 'Course'
@@ -2842,9 +2842,9 @@ class Assignment < ActiveRecord::Base
     next none if ids.empty?
 
     for_course(ids)
-  end
-  scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
-  scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
+  }
+  scope :for_course, ->(course_id) { where(:context_type => 'Course', :context_id => course_id) }
+  scope :for_group_category, ->(group_category_id) { where(:group_category_id => group_category_id) }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
     if Account.site_admin.feature_enabled?(:visible_assignments_scope_change)
@@ -2873,20 +2873,20 @@ class Assignment < ActiveRecord::Base
     end
   }
 
-  scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
+  scope :due_before, ->(date) { where("assignments.due_at<?", date) }
 
-  scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
+  scope :due_after, ->(date) { where("assignments.due_at>?", date) }
   scope :undated, -> { where(:due_at => nil) }
 
-  scope :with_just_calendar_attributes, -> {
+  scope :with_just_calendar_attributes, lambda {
     select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
   }
 
-  scope :due_between, lambda { |start, ending| where(:due_at => start..ending) }
+  scope :due_between, ->(start, ending) { where(:due_at => start..ending) }
 
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
-  scope :due_between_with_overrides, ->(start, ending) do
+  scope :due_between_with_overrides, lambda { |start, ending|
     overrides_subquery = AssignmentOverride.where("assignment_id=assignments.id")
                                            .where(due_at_overridden: true, due_at: start..ending)
 
@@ -2901,27 +2901,27 @@ class Assignment < ActiveRecord::Base
         from: true
       )
     end
-  end
+  }
 
-  scope :due_between_for_user, ->(start, ending, user) do
+  scope :due_between_for_user, lambda { |start, ending, user|
     with_user_due_date(user).where(user_due_date: start..ending)
-  end
+  }
 
-  scope :with_user_due_date, ->(user) do
+  scope :with_user_due_date, lambda { |user|
     from("(SELECT s.cached_due_date AS user_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
           WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
-  end
+  }
 
-  scope :with_latest_due_date, -> do
+  scope :with_latest_due_date, lambda {
     from("(SELECT GREATEST(a.due_at, MAX(ao.due_at)) latest_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
           ON ao.assignment_id = a.id
           AND ao.due_at_overridden
           GROUP BY a.id) AS assignments")
-  end
+  }
 
   scope :updated_after, lambda { |*args|
     if args.first
@@ -2961,16 +2961,16 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  scope :expecting_submission, -> do
+  scope :expecting_submission, lambda {
     where.not(submission_types: [nil, ''] + %w[none not_graded on_paper wiki_page])
-  end
+  }
 
   scope :gradeable, -> { where.not(submission_types: %w[not_graded wiki_page]) }
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
-  scope :before, lambda { |date| where("assignments.created_at<?", date) }
+  scope :before, ->(date) { where("assignments.created_at<?", date) }
 
-  scope :not_locked, -> {
+  scope :not_locked, lambda {
     where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
           :now => Time.zone.now)
   }
@@ -2978,32 +2978,32 @@ class Assignment < ActiveRecord::Base
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :published, -> { where(:workflow_state => 'published') }
 
-  scope :duplicating_for_too_long, -> {
+  scope :duplicating_for_too_long, lambda {
     where(
       "workflow_state = 'duplicating' AND duplication_started_at < ?",
       Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
     )
   }
 
-  scope :importing_for_too_long, -> {
+  scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
       Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
     )
   }
 
-  scope :migrating_for_too_long, -> {
+  scope :migrating_for_too_long, lambda {
     where(
       "workflow_state = 'migrating' AND duplication_started_at < ?",
       Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
     )
   }
 
-  scope :quiz_lti, -> {
+  scope :quiz_lti, lambda {
     type_quiz_lti.where(submission_types: "external_tool")
   }
 
-  scope :with_important_dates, -> {
+  scope :with_important_dates, lambda {
     joins("LEFT JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.assignment_id=assignments.id")
       .where(important_dates: true)
       .where(

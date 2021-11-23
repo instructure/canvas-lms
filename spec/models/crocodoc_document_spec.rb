@@ -129,13 +129,13 @@ describe 'CrocodocDocument' do
       cd1 = @crocodoc
       cd2 = attachment.crocodoc_document
 
-      [cd1, cd2].each { |cd|
+      [cd1, cd2].each do |cd|
         expect(cd.permissions_for_user(@submitter)).to eq({
                                                             filter: 'all',
                                                             admin: false,
                                                             editable: true,
                                                           })
-      }
+      end
     end
 
     context "#upload" do

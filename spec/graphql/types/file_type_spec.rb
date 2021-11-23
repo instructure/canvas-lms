@@ -21,10 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::FileType do
-  let_once(:course) {
+  let_once(:course) do
     course_with_teacher(active_all: true)
     @course
-  }
+  end
   let_once(:student) { student_in_course(course: @course) }
   let_once(:file) { attachment_with_context(course) }
   let(:file_type) { GraphQLTypeTester.new(file, current_user: @teacher) }

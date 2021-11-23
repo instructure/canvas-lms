@@ -215,12 +215,12 @@ describe Attachment do
 
         time = Time.now
         # nth attempt won't create more jobs
-        attempts.times {
+        attempts.times do
           time += 1.hour
           Timecop.freeze(time) do
             run_jobs
           end
-        }
+        end
       end
 
       expect(created_jobs.size).to eq attempts
@@ -235,9 +235,9 @@ describe Attachment do
       ]
       allow(Canvadocs).to receive(:enabled?).and_return true
 
-      expects_job_with_tag('Attachment.submit_to_canvadocs') {
+      expects_job_with_tag('Attachment.submit_to_canvadocs') do
         CrocodocDocument.update_process_states
-      }
+      end
     end
   end
 
@@ -294,9 +294,9 @@ describe Attachment do
 
       it "tries again later when upload fails" do
         allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return(nil)
-        expects_job_with_tag('Attachment#submit_to_canvadocs') {
+        expects_job_with_tag('Attachment#submit_to_canvadocs') do
           canvadocable_attachment_model.submit_to_canvadocs
-        }
+        end
       end
 
       it "sends annotatable documents to canvadocs if supported" do

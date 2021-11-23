@@ -146,9 +146,9 @@ describe UserListV2 do
 
   context 'when searching by sis id' do
     it "raises an error without can_read_sis" do
-      expect {
+      expect do
         UserListV2.new('SISID', root_account: @account, search_type: 'sis_user_id', can_read_sis: false)
-      }.to raise_error("cannot read sis ids")
+      end.to raise_error("cannot read sis ids")
     end
 
     it "shows duplicates for two results from the current account and the trusted account" do

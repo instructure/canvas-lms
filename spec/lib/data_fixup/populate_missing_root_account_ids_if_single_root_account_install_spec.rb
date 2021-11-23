@@ -64,9 +64,9 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
     shared_examples_for 'a datafixup that populates missing root account ids' do |model_class|
       it "fills in RA ids for model #{model_class}" do
         record.update_column(:root_account_id, nil)
-        expect {
+        expect do
           described_class.populate_missing_root_account_ids(Account.default.id)
-        }.to change { record.reload.root_account_id }.from(nil).to(Account.default.id)
+        end.to change { record.reload.root_account_id }.from(nil).to(Account.default.id)
       end
     end
 
@@ -89,9 +89,9 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
       it "fills a Conversation record's root_account_ids" do
         record = conversation(user_model)
         record.update_column(:root_account_ids, nil)
-        expect {
+        expect do
           described_class.populate_missing_root_account_ids(Account.default.id)
-        }.to change { record.reload.root_account_ids }.from([]).to([Account.default.id])
+        end.to change { record.reload.root_account_ids }.from([]).to([Account.default.id])
       end
     end
   end

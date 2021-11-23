@@ -75,13 +75,13 @@ describe EventStream::Stream do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
 
-      expect {
+      expect do
         EventStream::Stream.new(database) { self.database database }
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
 
-      expect {
+      expect do
         EventStream::Stream.new(database) { self.table table }
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     context "defaults" do
@@ -436,7 +436,7 @@ describe EventStream::Stream do
         table = @table
         @index = @stream.add_index :thing do
           self.table table
-          entry_proc lambda { |record| record.entry }
+          entry_proc ->(record) { record.entry }
         end
         @index_strategy = @index.strategy_for(:cassandra)
 
@@ -466,13 +466,13 @@ describe EventStream::Stream do
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc lambda { |_record| }
+          @index.entry_proc ->(_record) { }
           expect(@index_strategy).not_to receive(:insert)
           @stream.insert(@record)
         end
 
         it "translates the result of the entry_proc through the key_proc if present" do
-          @index.key_proc lambda { |entry| entry.key }
+          @index.key_proc ->(entry) { entry.key }
           expect(@index_strategy).to receive(:insert).once.with(anything, @key)
           @stream.insert(@record)
         end

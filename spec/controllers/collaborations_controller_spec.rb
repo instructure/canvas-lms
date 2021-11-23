@@ -543,9 +543,9 @@ describe CollaborationsController do
           groups: [Lti::Asset.opaque_identifier_for(group)],
           users: [Lti::Asset.opaque_identifier_for(@teacher)]
         }
-        2.times {
+        2.times do
           put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
-        }
+        end
         collaboration = Collaboration.find(assigns[:collaboration].id)
 
         expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])

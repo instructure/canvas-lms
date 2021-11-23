@@ -61,9 +61,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id, 'Course'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @course_fd
-      }
+      end
     end
   end
 
@@ -76,9 +76,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course_account.id, 'Account'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @account_fd
-      }
+      end
     end
   end
 
@@ -89,9 +89,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id, 'Course'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @account_fd
-      }
+      end
     end
   end
 
@@ -102,9 +102,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id, 'Course'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @parent_account_fd
-      }
+      end
     end
   end
 
@@ -115,9 +115,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @account.id, 'Account'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to eq @parent_account_fd
-      }
+      end
     end
   end
 
@@ -130,9 +130,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id, 'Course'
       )
-      fd_loader.load(@outcome.id + 1).then { |fd|
+      fd_loader.load(@outcome.id + 1).then do |fd|
         expect(fd).to be_nil
-      }
+      end
     end
   end
 
@@ -143,9 +143,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id, 'InvalidContextType'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to be_nil
-      }
+      end
     end
   end
 
@@ -156,9 +156,9 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
         @course.id + 99, 'Course'
       )
-      fd_loader.load(@outcome.id).then { |fd|
+      fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to be_nil
-      }
+      end
     end
   end
 end

@@ -131,7 +131,7 @@ describe "Outcome Reports" do
     rating ||= {}
 
     hide_points = outcome_result&.hide_points
-    hide = lambda { |v| hide_points ? nil : v }
+    hide = ->(v) { hide_points ? nil : v }
 
     expectations = {
       'student name' => user.sortable_name,

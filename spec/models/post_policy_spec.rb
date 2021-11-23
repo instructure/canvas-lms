@@ -60,9 +60,9 @@ describe PostPolicy do
 
         save_time = Time.zone.now
         Timecop.freeze(save_time) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.to change { assignment.updated_at }.to(save_time)
+          end.to change { assignment.updated_at }.to(save_time)
         end
       end
 
@@ -70,9 +70,9 @@ describe PostPolicy do
         course.update!(updated_at: 1.day.ago)
 
         Timecop.freeze(Time.zone.now) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.not_to change { course.updated_at }
+          end.not_to change { course.updated_at }
         end
       end
     end
@@ -85,9 +85,9 @@ describe PostPolicy do
         save_time = Time.zone.now
 
         Timecop.freeze(save_time) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.to change { course.updated_at }.to(save_time)
+          end.to change { course.updated_at }.to(save_time)
         end
       end
     end

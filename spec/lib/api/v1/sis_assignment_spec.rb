@@ -251,17 +251,17 @@ describe Api::V1::SisAssignment do
       it "raises an error when active_assignment_overrides are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id)
 
-        expect {
+        expect do
           generator.sis_assignments_json(assignments, student_overrides: true)
-        }.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
+        end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
       it "raises an error when assignment_override_students are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id).preload(:active_assignment_overrides)
 
-        expect {
+        expect do
           generator.sis_assignments_json(assignments, student_overrides: true)
-        }.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
+        end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
       it "does not list student sis_ids when users are not preloaded" do

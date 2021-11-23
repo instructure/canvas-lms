@@ -273,9 +273,9 @@ class ConferencesController < ApplicationController
   def web_index(conferences)
     conferences = conferences.to_a
     preload_recordings(conferences)
-    @new_conferences, @concluded_conferences = conferences.partition { |conference|
+    @new_conferences, @concluded_conferences = conferences.partition do |conference|
       conference.ended_at.nil?
-    }
+    end
     log_asset_access(["conferences", @context], "conferences", "other")
 
     GuardRail.activate(:secondary) do
@@ -349,10 +349,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json {
+          format.json do
             render :json => WebConference.find(@conference.id).as_json(:permissions => { :user => @current_user, :session => session },
                                                                        :url => named_context_url(@context, :context_conference_url, @conference))
-          }
+          end
         else
           format.html { render :index }
           format.json { render :json => @conference.errors, :status => :bad_request }
@@ -372,10 +372,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json {
+          format.json do
             render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
                                                 :url => named_context_url(@context, :context_conference_url, @conference))
-          }
+          end
         else
           format.html { render :edit }
           format.json { render :json => @conference.errors, :status => :bad_request }

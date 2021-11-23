@@ -858,10 +858,10 @@ module Lti::IMS
           it_behaves_like 'an unprocessable entity'
 
           it 'does not update the submission' do
-            expect {
+            expect do
               result
               send_request
-            }.to_not change { result.submission.reload.score }
+            end.to_not change { result.submission.reload.score }
           end
 
           it 'has the model validation error in the response' do

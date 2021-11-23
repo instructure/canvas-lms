@@ -102,9 +102,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def touch_context_module_after_transaction
-    self.class.connection.after_transaction_commit {
+    self.class.connection.after_transaction_commit do
       touch_context_module
-    }
+    end
   end
   private :touch_context_module_after_transaction
 
@@ -506,7 +506,7 @@ class ContentTag < ActiveRecord::Base
     content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
-  scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
+  scope :for_tagged_url, ->(url, tag) { where(:url => url, :tag => tag) }
   scope :for_context, lambda { |context|
     case context
     when Account

@@ -494,9 +494,9 @@ describe ConversationsController do
       expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.size).to eql 2
-      json.each { |c|
+      json.each do |c|
         expect(c["subject"]).not_to be_nil
-      }
+      end
     end
 
     context "user_notes" do

@@ -216,5 +216,5 @@ class AccountUser < ActiveRecord::Base
     account_ids_for_user(user).include?(account_id)
   end
 
-  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_user, ->(user) { where(:user_id => user) }
 end

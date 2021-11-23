@@ -100,9 +100,9 @@ module Types
                     load_association(:course)
                   ]).then do
         if grading_period_id == DEFAULT_GRADING_PERIOD
-          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
+          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
             load_grades(gp&.id)
-          }
+          end
         else
           load_grades(grading_period_id)
         end

@@ -804,10 +804,10 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
-      account.tap { |a|
+      account.tap do |a|
         a.settings[:mfa_settings] = :optional
         a.save!
-      }
+      end
       v[:account] = Account.find(account.id)
     end
     AdheresToPolicy::Cache.clear
@@ -2441,7 +2441,7 @@ describe Account do
 
     let!(:account) { account_model(settings: before_settings).tap(&:save!) }
     let(:calls) { [] }
-    let(:notifier) { lambda { |*args| calls << args } }
+    let(:notifier) { ->(*args) { calls << args } }
 
     before do
       @old_notifier = CanvasErrors.send(:registry)[:sentry_notification]

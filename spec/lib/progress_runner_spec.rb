@@ -40,10 +40,10 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
 
     completed_message_value = nil
-    progress_runner.completed_message { |completed|
+    progress_runner.completed_message do |completed|
       completed_message_value = completed
       "foo"
-    }
+    end
 
     error_callback_called = false
     progress_runner.error_message do

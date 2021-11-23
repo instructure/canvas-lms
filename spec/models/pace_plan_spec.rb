@@ -91,16 +91,16 @@ describe PacePlan do
 
     it "has a unique constraint for active section pace plans" do
       @course.pace_plans.create! course_section: @course.default_section, workflow_state: 'active'
-      expect {
+      expect do
         @course.pace_plans.create! course_section: @course.default_section, workflow_state: 'active'
-      }.to raise_error(ActiveRecord::RecordNotUnique)
+      end.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
     it "has a unique constraint for active student pace plans" do
       @course.pace_plans.create! user: @student, workflow_state: 'active'
-      expect {
+      expect do
         @course.pace_plans.create! user: @student, workflow_state: 'active'
-      }.to raise_error(ActiveRecord::RecordNotUnique)
+      end.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 

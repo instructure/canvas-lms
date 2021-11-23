@@ -804,9 +804,9 @@ class GradeCalculator
       kept = drop_assignments(group_submissions, group.rules_hash)
       dropped_submissions = (group_submissions - kept).filter_map { |s| s[:submission]&.id }
 
-      score, possible = kept.reduce([0.0, 0.0]) { |(s_sum, p_sum), s|
+      score, possible = kept.reduce([0.0, 0.0]) do |(s_sum, p_sum), s|
         [s_sum.to_d + s[:score].to_d, p_sum.to_d + s[:total].to_d]
-      }
+      end
 
       {
         id: group.id,
@@ -816,9 +816,9 @@ class GradeCalculator
         weight: group.group_weight,
         grade: ((score.to_f / possible * 100).round(2).to_f if possible > 0),
         dropped: dropped_submissions
-      }.tap { |group_grade_info|
+      }.tap do |group_grade_info|
         Rails.logger.debug "GRADES: calculated #{group_grade_info.inspect}"
-      }
+      end
     end
   end
 
@@ -891,9 +891,9 @@ class GradeCalculator
   def keep_helper(submissions, cant_drop, keep, max_total, keep_mode: nil)
     return submissions if submissions.size <= keep
 
-    unpointed, pointed = (submissions + cant_drop).partition { |s|
+    unpointed, pointed = (submissions + cant_drop).partition do |s|
       s[:total].zero?
-    }
+    end
 
     kept = nil
     if pointed.empty? && keep_mode == :lowest
@@ -941,10 +941,10 @@ class GradeCalculator
   end
 
   def big_f(q, submissions, cant_drop, keep, &sort_blk)
-    kept = submissions.map { |s|
+    kept = submissions.map do |s|
       rated_score = s[:score] - (q * s[:total])
       [rated_score, s]
-    }.sort(&sort_blk).first(keep)
+    end.sort(&sort_blk).first(keep)
 
     q_kept = kept.reduce(0) { |sum, (rated_score, _)| sum + rated_score }
     q_cant_drop = cant_drop.reduce(0) { |sum, s| sum + (s[:score] - (q * s[:total])) }
@@ -994,12 +994,12 @@ class GradeCalculator
     dropped = gather_dropped_from_group_scores(group_sums)
 
     if @course.group_weighting_scheme == 'percent'
-      relevant_group_sums = group_sums.reject { |gs|
+      relevant_group_sums = group_sums.reject do |gs|
         gs[:possible].zero? || gs[:possible].nil?
-      }
-      final_grade = relevant_group_sums.reduce(0) { |grade, gs|
+      end
+      final_grade = relevant_group_sums.reduce(0) do |grade, gs|
         grade + ((gs[:score].to_d / gs[:possible]) * gs[:weight].to_d)
-      }
+      end
 
       # scale the grade up if total weights don't add up to 100%
       full_weight = relevant_group_sums.reduce(0) { |w, gs| w + gs[:weight] }

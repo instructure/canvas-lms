@@ -57,7 +57,7 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
 
   validates :context, :workflow_state, presence: true
-  validates_associated :context, :if => lambda { |record| record.validate_context }
+  validates_associated :context, :if => ->(record) { record.validate_context }
   validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
   validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
   validates :comments, length: { maximum: 255, allow_blank: true }
@@ -138,14 +138,14 @@ class CalendarEvent < ActiveRecord::Base
   scope :are_unlocked, -> { where("calendar_events.workflow_state NOT IN ('deleted', 'locked')") }
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :for_context_codes, ->(codes) { where(:context_code => codes) }
 
   # appointments and appointment_participants have the appointment_group and
   # the user as the context, respectively. we are actually interested in
   # grouping them under the effective context (i.e. appointment_group.context).
   # it's the responsibility of the caller to ensure the user has rights to the
   # specified codes (e.g. using User#appointment_context_codes)
-  scope :for_user_and_context_codes, ->(user, codes, section_codes = nil) do
+  scope :for_user_and_context_codes, lambda { |user, codes, section_codes = nil|
     section_codes ||= user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
     # the all_codes check is redundant, but makes the query more efficient
@@ -187,20 +187,20 @@ class CalendarEvent < ActiveRecord::Base
 
     result = result.merge(or_clauses_merged)
     result
-  end
+  }
 
-  scope :not_hidden, -> do
+  scope :not_hidden, lambda {
     where("NOT EXISTS (
       SELECT id
       FROM #{CalendarEvent.quoted_table_name} sub_events
       WHERE sub_events.parent_calendar_event_id=calendar_events.id
         AND sub_events.workflow_state <> 'deleted'
     )")
-  end
+  }
 
   scope :undated, -> { where(:start_at => nil, :end_at => nil) }
 
-  scope :between, lambda { |start, ending| where(:start_at => start..ending) }
+  scope :between, ->(start, ending) { where(:start_at => start..ending) }
   scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now) }
   scope :updated_after, lambda { |*args|
     if args.first
@@ -440,63 +440,63 @@ class CalendarEvent < ActiveRecord::Base
   set_broadcast_policy do
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
-    whenever {
+    whenever do
       !appointment_group && context.available? && just_created && !hidden?
-    }
+    end
     data { course_broadcast_data }
 
     dispatch :event_date_changed
     to { participants(include_observers: true) - [@updating_user] }
-    whenever {
+    whenever do
       !appointment_group &&
         context.available? && (
         changed_in_state(:active, :fields => :start_at) ||
         changed_in_state(:active, :fields => :end_at)
       ) && !hidden?
-    }
+    end
     data { course_broadcast_data }
 
     dispatch :appointment_reserved_by_user
-    to {
+    to do
       appointment_group.instructors +
         User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
-    }
-    whenever {
+    end
+    whenever do
       @updating_user && appointment_group && parent_event &&
         just_created &&
         context == appointment_group.participant_for(@updating_user)
-    }
+    end
     data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_canceled_by_user
-    to {
+    to do
       appointment_group.instructors +
         User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
-    }
-    whenever {
+    end
+    whenever do
       appointment_group && parent_event &&
         deleted? &&
         saved_change_to_workflow_state? &&
         @updating_user &&
         context == appointment_group.participant_for(@updating_user)
-    }
+    end
     data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
 
     dispatch :appointment_reserved_for_user
     to { participants(include_observers: true) - [@updating_user] }
-    whenever {
+    whenever do
       appointment_group && parent_event &&
         just_created
-    }
+    end
     data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_deleted_for_user
     to { participants(include_observers: true) - [@updating_user] }
-    whenever {
+    whenever do
       appointment_group && parent_event &&
         deleted? &&
         saved_change_to_workflow_state?
-    }
+    end
     data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
   end
 
@@ -657,12 +657,12 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session| appointment_group? && context.grants_right?(user, session, :manage) }
     can :manage
 
-    given { |user, session|
+    given do |user, session|
       appointment_group? && (
         grants_right?(user, session, :manage) ||
         (context.grants_right?(user, :reserve) && context.participant_for(user).present?)
       )
-    }
+    end
     can :reserve
 
     given { |user, session| context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }

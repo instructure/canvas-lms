@@ -82,9 +82,9 @@ describe "Importing Learning Outcome Groups" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
     log_data = group_data(migration_id: 'other-migration-id')
-    expect {
+    expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    }.to change(@context.learning_outcome_groups, :count).by(0)
+    end.to change(@context.learning_outcome_groups, :count).by(0)
   end
 
   it "generates a new outcome group when already exists a deleted group with the same name in the same folder" do
@@ -92,9 +92,9 @@ describe "Importing Learning Outcome Groups" do
     expect(@context.learning_outcome_groups.count).to eq 2
     LearningOutcomeGroup.find_by(title: "Stuff").destroy
     log_data = group_data(migration_id: 'other-migration-id')
-    expect {
+    expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    }.to change(@context.learning_outcome_groups, :count).by(1)
+    end.to change(@context.learning_outcome_groups, :count).by(1)
   end
 
   it "does not duplicate an outcome group with the same vendor_guid when it already exists in the context" do

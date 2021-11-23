@@ -443,9 +443,9 @@ describe Rubric do
         end
 
         it 'records a rubric_updated event for the assignment' do
-          expect {
+          expect do
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(event_type: 'rubric_updated').count
           }.by(1)
         end
@@ -475,9 +475,9 @@ describe Rubric do
         let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
         it 'records a rubric_created event for the assignment' do
-          expect {
+          expect do
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
           }.by(1)
         end

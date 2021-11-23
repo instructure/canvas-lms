@@ -526,12 +526,12 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test" })
-        json.each { |c|
+        json.each do |c|
           c.delete("avatar_url")
-          c["participants"].each { |p|
+          c["participants"].each do |p|
             p.delete("avatar_url")
-          }
-        }
+          end
+        end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
         conversation = @me.all_conversations.order("conversation_id DESC").first
@@ -784,12 +784,12 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @billy.id], :body => "test", :group_conversation => true })
-        json.each { |c|
+        json.each do |c|
           c.delete("avatar_url")
-          c["participants"].each { |p|
+          c["participants"].each do |p|
             p.delete("avatar_url")
-          }
-        }
+          end
+        end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
         conversation = @me.all_conversations.order("conversation_id DESC").first
@@ -836,12 +836,12 @@ describe ConversationsController, type: :request do
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
                           { :recipients => [@bob.id], :body => "test" })
           conversation.reload
-          json.each { |c|
+          json.each do |c|
             c.delete("avatar_url")
-            c["participants"].each { |p|
+            c["participants"].each do |p|
               p.delete("avatar_url")
-            }
-          }
+            end
+          end
           json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
           json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
           expect(json).to eql [
@@ -960,12 +960,12 @@ describe ConversationsController, type: :request do
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@billy.id], :body => "test", :forwarded_message_ids => [forwarded_message.id] })
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
-        json.each { |c|
+        json.each do |c|
           c.delete("avatar_url")
-          c["participants"].each { |p|
+          c["participants"].each do |p|
             p.delete("avatar_url")
-          }
-        }
+          end
+        end
         json.each do |c|
           c["messages"].each do |m|
             m["participating_user_ids"].sort!
@@ -1058,12 +1058,12 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :subject => "lunch" })
-        json.each { |c|
+        json.each do |c|
           c.delete("avatar_url")
-          c["participants"].each { |p|
+          c["participants"].each do |p|
             p.delete("avatar_url")
-          }
-        }
+          end
+        end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
         conversation = @me.all_conversations.order("conversation_id DESC").first
@@ -1104,9 +1104,9 @@ describe ConversationsController, type: :request do
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @joe.id], :body => "test", :subject => "dinner" })
         expect(json.size).to eql 2
-        json.each { |c|
+        json.each do |c|
           expect(c["subject"]).to eql 'dinner'
-        }
+        end
       end
 
       it "constrains subject length" do
@@ -1266,9 +1266,9 @@ describe ConversationsController, type: :request do
       json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
                       { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       expect(json).to eql({
@@ -1435,9 +1435,9 @@ describe ConversationsController, type: :request do
         json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
                         { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json' })
         json.delete("avatar_url")
-        json["participants"].each { |p|
+        json["participants"].each do |p|
           p.delete("avatar_url")
-        }
+        end
         json["messages"].each { |m| m["participating_user_ids"].sort! }
         json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
         expected = {
@@ -1536,9 +1536,9 @@ describe ConversationsController, type: :request do
                       { :body => "another" })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       expect(json).to eql({
@@ -1579,9 +1579,9 @@ describe ConversationsController, type: :request do
                       { :body => "another", :recipients => [@billy.id] })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["audience"].sort!
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
@@ -1636,9 +1636,9 @@ describe ConversationsController, type: :request do
                       { :body => "partially hydrogenated context oils", :recipients => [@billy.id], :included_messages => [message.id] })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["audience"].sort!
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
@@ -1685,9 +1685,9 @@ describe ConversationsController, type: :request do
       conversation.reload
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["audience"].sort!
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       expect(json).to eql({
@@ -1740,9 +1740,9 @@ describe ConversationsController, type: :request do
                       { :body => "partially hydrogenated context oils", :included_messages => [message.id] })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["audience"].sort!
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       json["messages"].each { |m| m["participating_user_ids"].sort! }
@@ -1837,9 +1837,9 @@ describe ConversationsController, type: :request do
                       { :recipients => [@jane.id.to_s, "course_#{@course.id}"] })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json["messages"].each { |m| m["participating_user_ids"].sort! }
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       expect(json).to eql({
@@ -1910,9 +1910,9 @@ describe ConversationsController, type: :request do
                       { :conversation => { :subscribed => false, :workflow_state => 'archived' } })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
       expect(json).to eql({
                             "id" => conversation.conversation_id,
@@ -1978,9 +1978,9 @@ describe ConversationsController, type: :request do
                       { :remove => [message.id] })
       conversation.reload
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       json.delete("last_authored_message_at") # This is sometimes not updated. It's a known bug.
 
       expect(json).to eql({
@@ -2016,9 +2016,9 @@ describe ConversationsController, type: :request do
       json = api_call(:delete, "/api/v1/conversations/#{conversation.conversation_id}",
                       { :controller => 'conversations', :action => 'destroy', :id => conversation.conversation_id.to_s, :format => 'json' })
       json.delete("avatar_url")
-      json["participants"].each { |p|
+      json["participants"].each do |p|
         p.delete("avatar_url")
-      }
+      end
       expect(json).to eql({
                             "id" => conversation.conversation_id,
                             "subject" => nil,

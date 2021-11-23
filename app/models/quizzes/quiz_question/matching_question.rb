@@ -57,9 +57,9 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
     answers.each_index do |i|
       answers[i][:answer_matches] = []
       (matches || answers).each do |right|
-        match_answer = answers.find { |a|
+        match_answer = answers.find do |a|
           a[:match_id].to_i == right[:match_id].to_i
-        }
+        end
         match = {
           :responses => 0,
           :text => (right[:right] || right[:text]),

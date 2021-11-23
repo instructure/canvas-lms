@@ -71,9 +71,9 @@ describe EventStream::Backend::ActiveRecord do
       active_record_type ar_cls
       add_index :optional_index do
         table :items_by_optional_index
-        entry_proc lambda { |record| [record.field, record.id] if record.id > 0 }
-        key_proc lambda { |i1, i2| [i1, i2] }
-        ar_scope_proc lambda { |_v1, _v2| ar_cls.where({ key: :val }) }
+        entry_proc ->(record) { [record.field, record.id] if record.id > 0 }
+        key_proc ->(i1, i2) { [i1, i2] }
+        ar_scope_proc ->(_v1, _v2) { ar_cls.where({ key: :val }) }
       end
     end
     s.raise_on_error = true

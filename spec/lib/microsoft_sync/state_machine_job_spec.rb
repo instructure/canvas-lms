@@ -633,9 +633,9 @@ module MicrosoftSync
               { tags: { type: 'microsoft_sync_smj' } },
               :error
             )
-            expect {
+            expect do
               subject.send(:run, :step_initial, nil)
-            }.to raise_error(StateMachineJob::InternalError, /Job step doesn't match state: :step_initial != nil/)
+            end.to raise_error(StateMachineJob::InternalError, /Job step doesn't match state: :step_initial != nil/)
           end
         end
 

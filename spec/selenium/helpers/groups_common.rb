@@ -257,10 +257,10 @@ module GroupsCommon
     click_option('.move-select .move-select__group select', @testgroup[group_destination].name)
     wait_for_animations
     button = f('.move-select button[type="submit"]')
-    keep_trying_until {
+    keep_trying_until do
       button.click
       true
-    }
+    end
     wait_for_ajaximations
   end
 

@@ -98,19 +98,19 @@ class RubricAssociation < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
     p.to { context.students rescue [] }
-    p.whenever { |record|
+    p.whenever do |record|
       record.just_created && !record.context.is_a?(Course)
-    }
+    end
     p.data { course_broadcast_data }
   end
 
   scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
   scope :bookmarked, -> { where(:bookmarked => true) }
-  scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
+  scope :for_purpose, ->(purpose) { where(:purpose => purpose) }
   scope :for_grading, -> { where(:purpose => 'grading') }
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :for_context_codes, ->(codes) { where(:context_code => codes) }
   scope :include_rubric, -> { preload(:rubric) }
-  scope :before, lambda { |date| where("rubric_associations.created_at<?", date) }
+  scope :before, ->(date) { where("rubric_associations.created_at<?", date) }
 
   def assert_uniqueness
     if purpose == 'grading'

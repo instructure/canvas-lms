@@ -165,7 +165,7 @@ describe AuthenticationProvidersController do
       expect(aac).to be_present
     end
 
-    let(:idp_xml) {
+    let(:idp_xml) do
       <<~XML
         <?xml version="1.0"?>
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://sso.school.edu/idp/shibboleth">
@@ -216,7 +216,7 @@ describe AuthenticationProvidersController do
           </IDPSSODescriptor>
         </EntityDescriptor>
       XML
-    }
+    end
 
     it "populates SAML from metadata" do
       post "create", params: { account_id: account.id, auth_type: 'saml', metadata: idp_xml }

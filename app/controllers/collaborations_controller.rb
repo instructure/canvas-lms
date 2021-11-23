@@ -320,7 +320,7 @@ class CollaborationsController < ApplicationController
         if @collaboration.save
           Lti::ContentItemUtil.new(content_item).success_callback if content_item
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-          format.json {
+          format.json do
             render :json => @collaboration.as_json(
               :methods => [:collaborator_ids],
               :permissions => {
@@ -328,7 +328,7 @@ class CollaborationsController < ApplicationController
                 :session => session
               }
             )
-          }
+          end
         else
           Lti::ContentItemUtil.new(content_item).failure_callback if content_item
           flash[:error] = t 'errors.update_failed', "Collaboration update failed"

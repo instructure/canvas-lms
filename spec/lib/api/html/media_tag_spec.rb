@@ -85,13 +85,13 @@ module Api
       end
 
       describe '#as_html5_node' do
-        let(:url_helper) {
+        let(:url_helper) do
           double({
                    media_object_thumbnail_url: "/media/object/thumbnail",
                    media_redirect_url: "/media/redirect",
                    show_media_tracks_url: 'media/track/vtt'
                  })
-        }
+        end
 
         describe 'transforming a video node' do
           let(:media_comment_id) { '42' }
@@ -106,9 +106,9 @@ module Api
           let(:media_tag) do
             MediaTag.new(base_tag, doc, StubbedNode)
           end
-          let(:html5_node) {
+          let(:html5_node) do
             media_tag.as_html5_node(url_helper)
-          }
+          end
 
           specify { expect(html5_node['preload']).to eq('none') }
           specify { expect(html5_node['class']).to eq('instructure_inline_media_comment') }
@@ -152,14 +152,14 @@ module Api
           let(:alt_text) { 'media alt text' }
           let(:base_tag) { double(name: 'audio', inner_html: "inner_html") }
 
-          let(:html5_node) {
+          let(:html5_node) do
             tag = base_tag
             allow(tag).to receive(:[]).with('class').and_return('audio_comment')
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return('24')
             allow(tag).to receive(:[]).with('data-alt').and_return(alt_text)
             media_tag = MediaTag.new(tag, doc, StubbedNode)
             media_tag.as_html5_node(url_helper)
-          }
+          end
 
           specify { expect(html5_node['preload']).to eq('none') }
           specify { expect(html5_node['class']).to eq('instructure_inline_media_comment') }
@@ -178,13 +178,13 @@ module Api
         describe 'from anchor tag' do
           let(:base_tag) { double(name: 'a', attributes: { 'a' => 'b', 'key' => 'val', 'class' => 'someclass' }) }
 
-          let(:anchor_node) {
+          let(:anchor_node) do
             tag = base_tag
             allow(tag).to receive(:[]).with('id').and_return("media_comment_911")
             allow(tag).to receive(:[]).with('class').and_return("none")
             media_tag = MediaTag.new(tag, doc, StubbedNode)
             media_tag.as_anchor_node
-          }
+          end
 
           before do
             mo = double(media_type: 'special')
@@ -204,13 +204,13 @@ module Api
         describe 'from non-anchor tag' do
           let(:base_tag) { double(name: 'video', attributes: { 'a' => 'b', 'key' => 'val' }) }
 
-          let(:anchor_node) {
+          let(:anchor_node) do
             tag = base_tag
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return("119")
             allow(tag).to receive(:[]).with('class').and_return("video")
             media_tag = MediaTag.new(tag, doc, StubbedNode)
             media_tag.as_anchor_node
-          }
+          end
 
           specify { expect(anchor_node.tag_name).to eq('a') }
           specify { expect(anchor_node['href']).to eq("/media_objects/119") }

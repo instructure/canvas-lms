@@ -220,9 +220,9 @@ describe Canvas::CacheRegister do
 
         it "fails trying to clear things that aren't resolvable by to a global id" do
           weird_hash = { :what => @users.first }
-          expect {
+          expect do
             User.clear_cache_keys(weird_hash, :enrollments)
-          }.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")
+          end.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")
         end
 
         it "works with a multi-shard relation" do
@@ -323,9 +323,9 @@ describe Canvas::CacheRegister do
     end
 
     it "checks the key types" do
-      expect {
+      expect do
         Rails.cache.fetch_with_batched_keys("k", batch_object: @user, batched_keys: :blah) { "v" }
-      }.to raise_error("invalid cache_key type 'blah' for User")
+      end.to raise_error("invalid cache_key type 'blah' for User")
     end
   end
 

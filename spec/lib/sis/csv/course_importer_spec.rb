@@ -756,12 +756,12 @@ describe SIS::CSV::CourseImporter do
     it "does not fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
-      expect {
+      expect do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,status,blueprint_course_id",
           "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "allows destroying" do

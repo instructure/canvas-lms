@@ -102,27 +102,27 @@ RSpec.describe Lti::LineItem, type: :model do
       line_item_one = line_item_model(assignment: assignment, coupled: false)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_one.destroy!
-      }.to change(assignment, :workflow_state).from('published').to('deleted')
+      end.to change(assignment, :workflow_state).from('published').to('deleted')
     end
 
     it "doesn't destroy the assignment if the line item is not the first line item" do
       line_item_one = line_item_model(assignment: assignment)
       line_item_two = line_item_model(assignment: assignment, coupled: false)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_two.destroy!
-      }.not_to change(assignment, :workflow_state)
+      end.not_to change(assignment, :workflow_state)
     end
 
     it "doesn't destroy the assignment if the line item is coupled" do
       line_item_one = line_item_model(assignment: assignment, coupled: true)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_one.destroy!
-      }.not_to change(assignment, :workflow_state)
+      end.not_to change(assignment, :workflow_state)
     end
   end
 end

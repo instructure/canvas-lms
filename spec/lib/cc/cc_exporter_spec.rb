@@ -38,9 +38,9 @@ describe "Common Cartridge exporting" do
     content_export.user = user
     content_export.save!
 
-    expect {
+    expect do
       content_export.export(synchronous: true)
-    }.to change(ErrorReport, :count).by 1
+    end.to change(ErrorReport, :count).by 1
 
     expect(content_export.error_messages.length).to eq 1
     error = content_export.error_messages.first

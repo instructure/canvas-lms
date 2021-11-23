@@ -125,10 +125,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     given { |user, session| quiz.grants_right?(user, session, :review_grades) }
     can :read
 
-    given { |user|
+    given do |user|
       user &&
         quiz.context.observer_enrollments.where(user_id: user, associated_user_id: user_id, workflow_state: 'active').exists?
-    }
+    end
     can :read
 
     given { |user, session| quiz.context.grants_right?(user, session, :manage_grades) }
@@ -172,10 +172,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def question_answered?(id)
-    keys = temporary_data.keys.select { |key|
+    keys = temporary_data.keys.select do |key|
       # find keys with answers for this question; skip question_x_marked and _read
       (key =~ /question_#{id}(_|$)/) && key !~ /_(marked|read)$/
-    }
+    end
 
     if keys.present?
       all_present = keys.all? { |key| temporary_data[key].present? }
@@ -792,11 +792,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     (finished_at - started_at + (extra_time || 0)).round
   end
 
-  scope :before, lambda { |date| where("quiz_submissions.created_at<?", date) }
+  scope :before, ->(date) { where("quiz_submissions.created_at<?", date) }
   scope :updated_after, lambda { |date|
     date ? where("quiz_submissions.updated_at>?", date) : all
   }
-  scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
+  scope :for_user_ids, ->(user_ids) { where(:user_id => user_ids) }
   scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
   scope :completed, -> { where(:workflow_state => %w[complete pending_review]) }
@@ -823,26 +823,26 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # are at the bottom of this class.
     p.dispatch :submission_graded
     p.to { ([user] + User.observing_students_in_course(user, context)).uniq(&:id) }
-    p.whenever { |q_sub|
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_graded?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_grade_changed
     p.to { ([user] + User.observing_students_in_course(user, context)).uniq(&:id) }
-    p.whenever { |q_sub|
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_grade_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_needs_grading
     p.to { teachers }
-    p.whenever { |q_sub|
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_needs_grading?
-    }
+    end
     p.data { course_broadcast_data }
   end
 

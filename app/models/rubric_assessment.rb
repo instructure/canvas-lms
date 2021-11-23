@@ -164,10 +164,10 @@ class RubricAssessment < ActiveRecord::Base
                                                                  asset_type: artifact_type
                                                                })
     end
-    requests.each { |a|
+    requests.each do |a|
       a.attributes = { :rubric_assessment => self, :assessor => assessor }
       a.complete
-    }
+    end
   end
   protected :update_assessment_requests
 
@@ -208,13 +208,13 @@ class RubricAssessment < ActiveRecord::Base
     given { |user| user && user_id == user.id }
     can :read
 
-    given { |user|
+    given do |user|
       user &&
         self.user &&
         rubric_association &&
         rubric_association.context.is_a?(Course) &&
         rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
-    }
+    end
     can :read
 
     given { |user, session| rubric_association&.grants_right?(user, session, :manage) }
@@ -223,19 +223,19 @@ class RubricAssessment < ActiveRecord::Base
     given { |user, session| rubric_association&.grants_right?(user, session, :view_rubric_assessments) }
     can :read
 
-    given { |user, session|
+    given do |user, session|
       rubric_association&.grants_right?(user, session, :manage) &&
         (rubric_association.association_object.context.grants_right?(assessor, :manage_rubrics) rescue false)
-    }
+    end
     can :update
 
-    given { |user, session|
+    given do |user, session|
       can_read_assessor_name?(user, session)
-    }
+    end
     can :read_assessor
   end
 
-  scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
+  scope :of_type, ->(type) { where(:assessment_type => type.to_s) }
 
   scope :for_submissions, -> { where(:artifact_type => "Submission") }
   scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade") }

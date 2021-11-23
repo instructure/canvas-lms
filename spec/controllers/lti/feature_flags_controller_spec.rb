@@ -37,11 +37,11 @@ describe Lti::FeatureFlagsController do
     silence_undefined_feature_flag_errors
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
-                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true, autoexpand: true),
-                                                         'javascript_csp' => Feature.new(feature: 'javascript_csp', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true, autoexpand: true),
+                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),
+                                                         'javascript_csp' => Feature.new(feature: 'javascript_csp', applies_to: 'Account', state: 'on', display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),
                                                          'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
                                                          'compact_live_event_payloads' => Feature.new(feature: 'compact_live_event_payloads', applies_to: 'RootAccount', state: 'allowed'),
-                                                         'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'on', display_name: lambda { "SiteAdmin Feature FRD" }, description: lambda { "FRD!!" }, beta: true, autoexpand: true)
+                                                         'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'on', display_name: -> { "SiteAdmin Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true)
                                                        })
   end
 

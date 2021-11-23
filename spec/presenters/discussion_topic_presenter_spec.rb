@@ -23,13 +23,13 @@ describe DiscussionTopicPresenter do
   let(:user)       { user_model }
   let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let(:course)     { course_model }
-  let(:assignment) {
+  let(:assignment) do
     Assignment.new(:title => 'Test Topic',
                    :due_at => Time.now,
                    :lock_at => Time.now + 1.week,
                    :unlock_at => Time.now - 1.week,
                    :submission_types => 'discussion_topic')
-  }
+  end
 
   before do
     allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for)

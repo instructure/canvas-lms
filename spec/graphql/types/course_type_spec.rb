@@ -21,16 +21,16 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
-  let_once(:course) {
+  let_once(:course) do
     course_with_student(active_all: true)
     @course
-  }
+  end
   let(:course_type) { GraphQLTypeTester.new(course, current_user: @student) }
 
   let_once(:other_section) { course.course_sections.create! name: "other section" }
-  let_once(:other_teacher) {
+  let_once(:other_teacher) do
     course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user
-  }
+  end
 
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
@@ -59,10 +59,10 @@ describe Types::CourseType do
   end
 
   context "sis fields" do
-    let_once(:sis_course) {
+    let_once(:sis_course) do
       course.update!(sis_course_id: "SIScourseID")
       course
-    }
+    end
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -92,9 +92,9 @@ describe Types::CourseType do
   end
 
   describe "assignmentsConnection" do
-    let_once(:assignment) {
+    let_once(:assignment) do
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
-    }
+    end
 
     it "only returns visible assignments" do
       expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 1

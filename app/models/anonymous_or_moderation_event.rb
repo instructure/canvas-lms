@@ -73,10 +73,10 @@ class AnonymousOrModerationEvent < ApplicationRecord
   belongs_to :context_external_tool, optional: true
 
   validates :assignment_id, presence: true
-  validates :submission_id, presence: true, if: ->(event) {
+  validates :submission_id, presence: true, if: lambda { |event|
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
-  validates :submission_id, absence: true, unless: ->(event) {
+  validates :submission_id, absence: true, unless: lambda { |event|
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
   validates :event_type, presence: true

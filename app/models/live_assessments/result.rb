@@ -27,7 +27,7 @@ module LiveAssessments
     validates :assessor_id, :assessment_id, :assessed_at, presence: true
     validates :passed, inclusion: { :in => [true, false] }
 
-    scope :for_user, lambda { |user| where(:user_id => user) }
+    scope :for_user, ->(user) { where(:user_id => user) }
 
     set_policy do
       given { |user, session| assessment.grants_right?(user, session, :update) }

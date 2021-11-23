@@ -157,18 +157,18 @@ namespace :db do
       choose do |menu|
         menu.header = "To help our developers better serve you, Instructure would like to collect some usage data about your Canvas installation. You can change this setting at any time."
         menu.prompt = "> "
-        menu.choice("Opt in") {
+        menu.choice("Opt in") do
           gather_data = "opt_in"
           puts "Thank you for participating!"
-        }
-        menu.choice("Only send anonymized data") {
+        end
+        menu.choice("Only send anonymized data") do
           gather_data = "anonymized"
           puts "Thank you for participating in anonymous usage collection."
-        }
-        menu.choice("Opt out completely") {
+        end
+        menu.choice("Opt out completely") do
           gather_data = "opt_out"
           puts "You have opted out."
-        }
+        end
       end
 
       puts "You can change this feature at any time by running the rake task 'rake db:configure_statistics_collection'"

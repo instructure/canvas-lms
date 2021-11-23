@@ -63,15 +63,15 @@ class SubAccountsController < ApplicationController
         @accounts.sort_by! { |a| Canvas::ICU.collation_key(a.name) }
       end
       respond_to do |format|
-        format.html {
+        format.html do
           redirect_to @accounts.first if @accounts.length == 1
-        }
-        format.json {
+        end
+        format.json do
           render :json => @accounts.map { |a|
             { :label => a.name, :url => account_url(a), :id => a.id }
           }
           return
-        }
+        end
       end
     end
 

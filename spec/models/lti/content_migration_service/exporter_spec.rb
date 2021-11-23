@@ -25,14 +25,14 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#export_completed?' do
     let(:course) { course_model }
-    let(:tool) {
+    let(:tool) do
       course.context_external_tools.create!({
                                               name: 'a',
                                               domain: 'lti.example.com',
                                               consumer_key: '12345',
                                               shared_secret: 'sekret',
                                             })
-    }
+    end
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:status_url) { 'https://lti.example.com/export/42/status' }
 
@@ -62,14 +62,14 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#retrieve_export' do
     let(:course) { course_model }
-    let(:tool) {
+    let(:tool) do
       course.context_external_tools.create!({
                                               name: 'a',
                                               domain: 'lti.example.com',
                                               consumer_key: '12345',
                                               shared_secret: 'sekret',
                                             })
-    }
+    end
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:fetch_url) { 'https://lti.example.com/export/42' }
 

@@ -208,7 +208,7 @@ describe 'simply_versioned' do
 
     context "on_load" do
       let(:on_load) do
-        lambda { |model, _version| model.name = 'test override' }
+        ->(model, _version) { model.name = 'test override' }
       end
 
       before do

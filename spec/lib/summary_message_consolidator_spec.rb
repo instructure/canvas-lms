@@ -28,10 +28,10 @@ describe "SummaryMessageConsolidator" do
     expects_job_with_tag('Delayed::Batch.serial', 2) do
       SummaryMessageConsolidator.process
     end
-    messages.each { |m|
+    messages.each do |m|
       expect(m.reload.workflow_state).to eq 'sent'
       expect(m.batched_at).to be_present
-    }
+    end
     queued = created_jobs.map { |j| j.payload_object.jobs.map { |j2| j2.payload_object.args } }.flatten
     expect(queued.map(&:to_i).sort).to eq messages.map(&:id).sort
   end

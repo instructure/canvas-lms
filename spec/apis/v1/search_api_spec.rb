@@ -544,18 +544,18 @@ describe SearchController, type: :request do
         @joe.associate_with_shard(@shard2)
 
         group1 = nil
-        @shard1.activate {
+        @shard1.activate do
           group1 = Group.create(:context => Account.create!, :name => "shard 1 group")
           group1.add_user(@me)
           group1.add_user(@bob)
-        }
+        end
 
         group2 = nil
-        @shard2.activate {
+        @shard2.activate do
           group2 = Group.create(:context => Account.create!, :name => "shard 2 group")
           group2.users = [@me, @joe]
           group2.save!
-        }
+        end
 
         json = api_call(:get, "/api/v1/search/recipients.json?type=group&search=group",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :type => 'group', :search => 'group' })

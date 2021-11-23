@@ -33,9 +33,9 @@ describe AdheresToPolicy::Configuration do
     end
 
     it 'must evaluate the supplied block and return the result' do
-      config.blacklist = -> {
+      config.blacklist = lambda do
         %w[baz qux]
-      }
+      end
 
       expect(config.blacklist).to eq %w[baz qux]
     end

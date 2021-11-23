@@ -60,10 +60,10 @@ class DiscussionEntriesController < ApplicationController
           @entry.context_module_action
           save_attachment
           flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
-          format.html {
+          format.html do
             redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id)
-          }
-          format.json {
+          end
+          format.json do
             json = @entry.as_json(include: :attachment,
                                   methods: [:user_name, :read_state],
                                   permissions: {
@@ -71,7 +71,7 @@ class DiscussionEntriesController < ApplicationController
                                     session: session
                                   })
             render(json: json, status: :created)
-          }
+          end
         else
           respond_to_bad_request(format, 'new')
         end
@@ -115,10 +115,10 @@ class DiscussionEntriesController < ApplicationController
       respond_to do |format|
         if @entry.update(entry_params)
           save_attachment
-          format.html {
+          format.html do
             flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
             redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
-          }
+          end
           format.json { render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
           respond_to_bad_request(format, 'edit')
@@ -165,7 +165,7 @@ class DiscussionEntriesController < ApplicationController
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
       @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
       respond_to do |format|
-        format.atom {
+        format.atom do
           feed = Atom::Feed.new do |f|
             f.title = t :posts_feed_title, "%{title} Posts Feed", :title => @topic.title
             f.links << Atom::Link.new(:href => polymorphic_url([@context, @topic]), :rel => 'self')
@@ -177,8 +177,8 @@ class DiscussionEntriesController < ApplicationController
             feed.entries << e.to_atom
           end
           render :plain => feed.to_xml
-        }
-        format.rss {
+        end
+        format.rss do
           @entries = [@topic] + @discussion_entries
           require 'rss/2.0'
           rss = RSS::Rss.new("2.0")
@@ -193,7 +193,7 @@ class DiscussionEntriesController < ApplicationController
           end
           rss.channel = channel
           render :plain => rss.to_s
-        }
+        end
       end
     end
   end

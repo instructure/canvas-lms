@@ -21,13 +21,13 @@
 module EventStream::AttrConfig
   module ClassMethods
     CASTS = {
-      String => lambda { |_name, value| value.to_s },
-      Integer => lambda { |_name, value| value.to_i },
-      Proc => lambda { |name, value|
+      String => ->(_name, value) { value.to_s },
+      Integer => ->(_name, value) { value.to_i },
+      Proc => lambda do |name, value|
                 return value if value.nil? || value.respond_to?(:call)
 
                 raise(ArgumentError, "Expected attribute #{name} to be a Proc: #{value.class}")
-              }
+              end
     }.freeze
 
     def attr_config_defaults

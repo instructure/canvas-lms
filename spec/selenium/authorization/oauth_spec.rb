@@ -64,10 +64,10 @@ describe "oauth2 flow" do
         oauth_login_fill_out_form
         form = f('.reaccept_terms')
         expect(form).to be_present
-        expect_new_page_load {
+        expect_new_page_load do
           f('[name="user[terms_of_use]"]').click
           submit_form form
-        }
+        end
         expect(f('#modal-box').text).to match(/Specs is requesting access to your account/)
         expect_new_page_load { f('#modal-box .Button--primary').click }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})

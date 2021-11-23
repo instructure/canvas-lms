@@ -209,36 +209,36 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
 
         it "doesn't add a version if last score and url of a submission are same" do
-          expect {
+          expect do
             BasicLTI::BasicOutcomes.process_request(
               tool,
               request_xml(source_id, launch_urls[2], grades[2])
             )
-          }
+          end
             .not_to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }
         end
 
         it "doesn't add a version if last score of a submission is different, but urls are same" do
-          expect {
+          expect do
             BasicLTI::BasicOutcomes.process_request(
               tool,
               request_xml(source_id, launch_urls[2], grades[1])
             )
-          }
+          end
             .not_to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }
         end
 
         it "adds a version if last url of a submission is different" do
-          expect {
+          expect do
             BasicLTI::BasicOutcomes.process_request(
               tool,
               request_xml(source_id, launch_urls[1], grades[2])
             )
-          }
+          end
             .to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }.from(5).to(6)

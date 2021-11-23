@@ -234,6 +234,9 @@ Style/BarePercentLiterals:
   Severity: error
 Style/BlockComments:
   Severity: error
+Style/BlockDelimiters:
+  IgnoredMethods: []
+  Severity: error
 Style/CaseEquality:
   Severity: error
 Style/CaseLikeIf:
@@ -315,6 +318,8 @@ Style/IfUnlessModifier:
 Style/IfWithBooleanLiteralBranches:
   Severity: error
 Style/IfUnlessModifierOfIfUnless:
+  Severity: error
+Style/Lambda:
   Severity: error
 Style/LambdaCall:
   Severity: error
@@ -518,12 +523,6 @@ RSpec/ScatteredSetup: # TODO: investigate if these are required
 RSpec/VerifiedDoubles: # TODO
   Enabled: false
 
-Style/BlockDelimiters: # TODO: autocorrect
-  Enabled: true
-  Exclude:
-    - spec/**/*_spec.rb
-    - spec/shared_examples/**/*.rb
-  AutoCorrect: false
 Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/GuardClause: # TODO
@@ -531,8 +530,6 @@ Style/GuardClause: # TODO
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
   Enabled: false # TODO: autocorrect
-Style/Lambda: # TODO: autocorrect
-  Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
 Style/RescueModifier: # TODO

@@ -186,7 +186,7 @@ module CanvasCache
     end
 
     BoolifySet =
-      lambda { |value|
+      lambda do |value|
         if value && value == "OK"
           true
         elsif value && value == :failure
@@ -194,7 +194,7 @@ module CanvasCache
         else
           false
         end
-      }
+      end
 
     module Client
       def disconnect_if_idle(since_when)

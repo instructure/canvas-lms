@@ -167,11 +167,11 @@ describe "differentiated_assignments" do
     end
 
     it "doesnt allow new records" do
-      expect {
+      expect do
         AssignmentStudentVisibility.create!(user_id: @user.id,
                                             assignment_id: @assignment_id,
                                             course_id: @course.id)
-      }.to raise_error(ActiveRecord::ReadOnlyRecord)
+      end.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow deletion" do

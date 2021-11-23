@@ -119,10 +119,10 @@ module Types
         order_by: order_by,
         current_only: current_only
       ).load(object.id).then do |enrollments|
-        (enrollments || []).select { |enrollment|
+        (enrollments || []).select do |enrollment|
           object == context[:current_user] ||
             enrollment.grants_right?(context[:current_user], context[:session], :read)
-        }
+        end
       end
     end
 
@@ -132,7 +132,7 @@ module Types
       argument :context_type, NotificationPreferencesContextType, required: true
     end
     def notification_preferences_enabled(account_id: nil, course_id: nil, context_type: nil)
-      enabled_for = ->(context) do
+      enabled_for = lambda do |context|
         NotificationPolicyOverride.enabled_for(object, context)
       end
 

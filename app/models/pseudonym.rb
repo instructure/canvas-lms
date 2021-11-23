@@ -156,7 +156,7 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  scope :by_unique_id, lambda { |unique_id| where("LOWER(unique_id)=LOWER(?)", unique_id.to_s) }
+  scope :by_unique_id, ->(unique_id) { where("LOWER(unique_id)=LOWER(?)", unique_id.to_s) }
 
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id

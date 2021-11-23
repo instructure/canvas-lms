@@ -425,10 +425,10 @@ module Importers
                             ContextExternalTool.find_all_for(course, :course_navigation)
                           end
             if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
-                all_tools.detect { |t|
+                all_tools.detect do |t|
                   CC::CCHelper.create_key(t) == tool_mig_id ||
                   CC::CCHelper.create_key(t, global: true) == tool_mig_id
-                })
+                end)
               # translate the migration_id to a real id
               tab['id'] = "context_external_tool_#{tool.id}"
               tab_config << tab

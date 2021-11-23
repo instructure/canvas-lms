@@ -31,7 +31,7 @@ class Collaborator < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :collaboration_invitation
-    p.to {
+    p.to do
       users = group_id.nil? ? [user] : group.users - [user]
       if context.is_a?(Course)
         if context.workflow_state.in?(['available', 'completed'])
@@ -46,14 +46,14 @@ class Collaborator < ActiveRecord::Base
       else
         users
       end
-    }
-    p.whenever { |record|
+    end
+    p.whenever do |record|
       if record.group_id.nil?
         record.just_created && record.collaboration && record.user != record.collaboration.user
       else
         record.just_created && record.collaboration
       end
-    }
+    end
     p.data { course_broadcast_data }
   end
 

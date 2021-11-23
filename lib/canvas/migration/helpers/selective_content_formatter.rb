@@ -188,11 +188,11 @@ module Canvas::Migration::Helpers
       return [] unless course_data['attachments'].present?
 
       remove_name_regex = %r{/[^/]*\z}
-      course_data['attachments'].each { |a|
+      course_data['attachments'].each do |a|
         next unless a['path_name']
 
         a['path_name'].gsub!(remove_name_regex, '')
-      }
+      end
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
       sorted = folder_groups.sort_by(&:first)
       sorted.each do |folder_name, atts|

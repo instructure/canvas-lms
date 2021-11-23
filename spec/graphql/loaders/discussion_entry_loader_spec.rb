@@ -35,9 +35,9 @@ describe Loaders::DiscussionEntryLoader do
       discussion_entry_loader = Loaders::DiscussionEntryLoader.for(
         current_user: @teacher
       )
-      discussion_entry_loader.load(@discussion).then { |discussion_entries|
+      discussion_entry_loader.load(@discussion).then do |discussion_entries|
         expect(discussion_entries).to match @discussion.discussion_entries.reorder(created_at: "desc")
-      }
+      end
     end
   end
 
@@ -122,9 +122,9 @@ describe Loaders::DiscussionEntryLoader do
     GraphQL::Batch.batch do
       Loaders::DiscussionEntryLoader.for(
         current_user: @teacher
-      ).load(@de2).then { |discussion_entries|
+      ).load(@de2).then do |discussion_entries|
         expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id]
-      }
+      end
     end
   end
 
@@ -133,9 +133,9 @@ describe Loaders::DiscussionEntryLoader do
       Loaders::DiscussionEntryLoader.for(
         current_user: @teacher,
         root_entries: true
-      ).load(@discussion).then { |discussion_entries|
+      ).load(@discussion).then do |discussion_entries|
         expect(discussion_entries.count).to match 3
-      }
+      end
     end
   end
 
@@ -145,9 +145,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           search_term: "'"
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries).to match [@de2]
-        }
+        end
       end
     end
 
@@ -156,9 +156,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           search_term: 'eekabo'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries).to match [@de1]
-        }
+        end
       end
     end
 
@@ -167,9 +167,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           search_term: 'student'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries).to match [@de2]
-        }
+        end
       end
     end
 
@@ -178,9 +178,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           search_term: 'goodbye'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries).to match []
-        }
+        end
       end
     end
   end
@@ -217,9 +217,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           filter: 'all'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries).to match @discussion.discussion_entries.reorder(created_at: "desc")
-        }
+        end
       end
     end
 
@@ -233,13 +233,13 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           filter: 'unread'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           # @de1 has a read entry_participant and will be excluded.
           # @de2 has a unread entry_participant and will be included.
           # @de3 is deleted and will be excluded.
           # @de4 has no entry_participant and is considered unread and will be included.
           expect(discussion_entries).to match_array([@de2, @de4])
-        }
+        end
       end
     end
 
@@ -248,9 +248,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           filter: 'deleted'
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries[0].deleted?).to be true
-        }
+        end
       end
     end
   end
@@ -261,9 +261,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           sort_order: :asc
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries[0]).to match @de3
-        }
+        end
       end
     end
 
@@ -272,9 +272,9 @@ describe Loaders::DiscussionEntryLoader do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
           sort_order: :desc
-        ).load(@discussion).then { |discussion_entries|
+        ).load(@discussion).then do |discussion_entries|
           expect(discussion_entries[0]).to match @de4
-        }
+        end
       end
     end
   end

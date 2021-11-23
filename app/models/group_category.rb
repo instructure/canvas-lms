@@ -97,7 +97,7 @@ class GroupCategory < ActiveRecord::Base
 
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
-  scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
+  scope :other_than, ->(cat) { where("group_categories.id<>?", cat.id || 0) }
 
   class << self
     def protected_name_for_context?(name, context)

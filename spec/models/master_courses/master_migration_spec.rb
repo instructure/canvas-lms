@@ -46,9 +46,9 @@ describe MasterCourses::MasterMigration do
       @template.save!
 
       expect_any_instance_of(MasterCourses::MasterMigration).not_to receive(:queue_export_job)
-      expect {
+      expect do
         MasterCourses::MasterMigration.start_new_migration!(@template, @user)
-      }.to raise_error("cannot start new migration while another one is running")
+      end.to raise_error("cannot start new migration while another one is running")
     end
 
     it "still allows if the 'active' migration has been running for a while (and is probably ded)" do

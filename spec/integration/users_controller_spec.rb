@@ -334,11 +334,11 @@ describe UsersController do
       kaltura_client
     end
 
-    let(:media_source_fetcher) {
+    let(:media_source_fetcher) do
       media_source_fetcher = instance_double('MediaSourceFetcher')
       expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
       media_source_fetcher
-    }
+    end
 
     before do
       account = Account.create!

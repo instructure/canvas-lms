@@ -72,20 +72,20 @@ class WikiPage < ActiveRecord::Base
     where('title ILIKE ?', "#{title}%")
   }
 
-  scope :not_ignored_by, ->(user, purpose) do
+  scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
-  end
+  }
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
-  scope :for_courses_and_groups, ->(course_ids, group_ids) do
+  scope :for_courses_and_groups, lambda { |course_ids, group_ids|
     wiki_ids = []
     wiki_ids += Course.where(:id => course_ids).pluck(:wiki_id) if course_ids.any?
     wiki_ids += Group.where(:id => group_ids).pluck(:wiki_id) if group_ids.any?
     where(:wiki_id => wiki_ids)
-  end
+  }
 
-  scope :visible_to_user, ->(user_id) do
+  scope :visible_to_user, lambda { |user_id|
     where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
-  end
+  }
 
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = %i[workflow_state editing_roles notify_of_update].freeze
@@ -126,10 +126,10 @@ class WikiPage < ActiveRecord::Base
 
     if self.title == "Front Page" && new_record?
       baddies = context.wiki_pages.not_deleted.where(title: "Front Page").reject { |p| p.url == "front-page" }
-      baddies.each { |p|
+      baddies.each do |p|
         p.title = to_cased_title.call(p.url)
         p.save_without_broadcasting!
-      }
+      end
     end
     if context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end

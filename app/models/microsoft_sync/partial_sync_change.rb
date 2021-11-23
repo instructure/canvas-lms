@@ -35,7 +35,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
 
   # filter to rows where all values match
   # e.g. with_values_in([:a,:b], [[1,2],[3,4]) -> WHERE (a=1 AND b=2) OR (a=3 AND b=4)
-  scope :with_values_in, ->(columns, values_arrays) do
+  scope :with_values_in, lambda { |columns, values_arrays|
     if values_arrays.empty?
       none
     else
@@ -45,7 +45,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
       end
       where("(#{quoted_columns.join(',')}) IN (#{quoted_values_arrays.join(',')})")
     end
-  end
+  }
 
   def self.upsert_for_enrollment(enrollment)
     e_type =

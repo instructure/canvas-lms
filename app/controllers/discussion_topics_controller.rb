@@ -1089,10 +1089,10 @@ class DiscussionTopicsController < ApplicationController
 
       @topic.destroy
       respond_to do |format|
-        format.html {
+        format.html do
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
           redirect_to named_context_url(@context, @topic.is_announcement ? :context_announcements_url : :context_discussion_topics_url)
-        }
+        end
         format.json { render :json => @topic.as_json(:include => { :user => { :only => :name } }), :status => :ok }
       end
     end

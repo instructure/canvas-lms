@@ -444,7 +444,7 @@ describe UserSearch do
     it 'raises an error if there is a bad enrollment type' do
       course = Course.create!
       student = User.create!
-      bad_scope = lambda { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
+      bad_scope = -> { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
       expect(bad_scope).to raise_error(ArgumentError, 'Invalid Enrollment Type')
     end
 

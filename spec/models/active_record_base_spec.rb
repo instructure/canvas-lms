@@ -213,10 +213,10 @@ describe ActiveRecord::Base do
 
   it "has a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
-    expect {
+    expect do
       User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by('id', 'name')}"
       User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by('id', 'name')}"
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   context "unique_constraint_retry" do
@@ -236,13 +236,14 @@ describe ActiveRecord::Base do
     it "runs twice if it gets a RecordNotUnique" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      expect {
+      # we don't catch the error the second time
+expect do
         User.unique_constraint_retry do
           tries += 1
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
+      end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(Submission.count).to eql 1
       expect(tries).to eql 2
       expect(User.count).to eql @orig_user_count
@@ -251,12 +252,13 @@ describe ActiveRecord::Base do
     it "runs additional times if specified" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      expect {
+      # we don't catch the error the last time
+expect do
         User.unique_constraint_retry(2) do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the last time
+      end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
@@ -279,23 +281,23 @@ describe ActiveRecord::Base do
 
     it "does not eat other ActiveRecord::StatementInvalid exceptions" do
       tries = 0
-      expect {
-        User.unique_constraint_retry {
+      expect do
+        User.unique_constraint_retry do
           tries += 1
           User.connection.execute "this is not valid sql"
-        }
-      }.to raise_error(ActiveRecord::StatementInvalid)
+        end
+      end.to raise_error(ActiveRecord::StatementInvalid)
       expect(tries).to eql 1
     end
 
     it "does not eat any other exceptions" do
       tries = 0
-      expect {
-        User.unique_constraint_retry {
+      expect do
+        User.unique_constraint_retry do
           tries += 1
           raise "oh crap"
-        }
-      }.to raise_error("oh crap")
+        end
+      end.to raise_error("oh crap")
       expect(tries).to eql 1
     end
   end
@@ -470,9 +472,9 @@ describe ActiveRecord::Base do
     end
 
     it "fails with dot in nested column name" do
-      expect {
+      expect do
         User.where(:name => { "users.id" => @user }).first
-      }.to raise_error(TypeError)
+      end.to raise_error(TypeError)
     end
 
     it "does not fail with a dot in column name only" do
@@ -882,13 +884,13 @@ end
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   # create a private pool, with the same config as the regular pool, but ensure
   # max_runtime is set
-  let(:spec) {
+  let(:spec) do
     ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
       'spec',
       ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
       'postgresql_connection'
     )
-  }
+  end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
 
   it "doesn't evict a normal cycle" do

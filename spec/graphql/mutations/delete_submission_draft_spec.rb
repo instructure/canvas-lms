@@ -52,9 +52,9 @@ RSpec.describe Mutations::DeleteSubmissionDraft do
   it "deletes an existing draft on the specified submission" do
     submission.submission_drafts.create!(submission_attempt: 1)
 
-    expect {
+    expect do
       run_mutation
-    }.to change {
+    end.to change {
       submission.reload.submission_drafts.count
     }.from(1).to(0)
   end
@@ -63,9 +63,9 @@ RSpec.describe Mutations::DeleteSubmissionDraft do
     submission.submission_drafts.create!(submission_attempt: 1)
     submission.submission_drafts.create!(submission_attempt: 2)
 
-    expect {
+    expect do
       run_mutation
-    }.to change {
+    end.to change {
       submission.reload.submission_drafts.count
     }.from(2).to(0)
   end

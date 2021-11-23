@@ -46,9 +46,9 @@ describe EventStream::AttrConfig do
     it "errors on accessor with > 1 args" do
       @class.attr_config :field, :default => nil
       obj = @class.new
-      expect {
+      expect do
         obj.field(1, 2)
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     it "allows defaults" do
@@ -92,9 +92,9 @@ describe EventStream::AttrConfig do
       obj.field(nil)
       expect(obj.field).to be_nil
 
-      expect {
+      expect do
         obj.field('value')
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     it "errors when Proc does not return the expected type" do
@@ -103,9 +103,9 @@ describe EventStream::AttrConfig do
       value = -> { [] }
       obj.field(value)
 
-      expect {
+      expect do
         obj.field
-      }.to raise_exception NoMethodError
+      end.to raise_exception NoMethodError
     end
 
     it "skips cast with unknown type" do
@@ -135,9 +135,9 @@ describe EventStream::AttrConfig do
       value = double('value')
       @class.attr_config :field
       @class.new(:field => value)
-      expect {
+      expect do
         @class.new
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     it "runs the value when its a Proc" do
@@ -151,9 +151,9 @@ describe EventStream::AttrConfig do
       @class.attr_config :field
       value = -> {}
       obj = @class.new(:field => value)
-      expect {
+      expect do
         obj.field
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
   end
 end

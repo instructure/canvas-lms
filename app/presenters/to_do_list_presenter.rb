@@ -46,13 +46,13 @@ class ToDoListPresenter
         @needs_submitting.map(&:context) + @needs_reviewing.map(&:context)).uniq
       course_to_permissions = @user.precalculate_permissions_for_courses(deduped_courses, [:manage_grades])
 
-      @needs_grading = @needs_grading.select { |assignment|
+      @needs_grading = @needs_grading.select do |assignment|
         if course_to_permissions
           course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false)
         else
           assignment.context.grants_right?(@user, :manage_grades)
         end
-      }
+      end
     else
       @needs_grading = []
       @needs_moderation = []

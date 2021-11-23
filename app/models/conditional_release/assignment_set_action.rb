@@ -34,7 +34,7 @@ module ConditionalRelease
       self.root_account_id ||= assignment_set.root_account_id
     end
 
-    scope :latest, -> {
+    scope :latest, lambda {
       select('DISTINCT ON (assignment_set_id, student_id) id')
         .order('assignment_set_id, student_id, created_at DESC')
     }

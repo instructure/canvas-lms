@@ -35,9 +35,9 @@ class Canvadoc < ActiveRecord::Base
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 
-    response = Canvas.timeout_protection("canvadocs") {
+    response = Canvas.timeout_protection("canvadocs") do
       canvadocs_api.upload(url, opts)
-    }
+    end
 
     if response && response['id']
       self.document_id = response['id']

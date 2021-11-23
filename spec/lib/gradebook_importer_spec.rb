@@ -2067,13 +2067,13 @@ describe GradebookImporter do
         end
 
         it "works as expected if no override score column is included in the import" do
-          expect {
+          expect do
             importer_with_rows(
               "Student,ID,Section,Assignment 1,Final Score",
               "Cyrus,#{student_with_override.id},My Course,20,0",
               "Ophilia,#{student_without_override.id},My Course,40,0"
             )
-          }.not_to raise_error
+          end.not_to raise_error
         end
       end
     end

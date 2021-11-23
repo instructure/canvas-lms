@@ -200,14 +200,14 @@ class ContextModuleProgression < ActiveRecord::Base
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
-        req_met = !!(subs && subs.any? { |sub|
+        req_met = !!(subs && subs.any? do |sub|
           if sub.workflow_state == 'graded' && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
             false
           elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
             true
           end
-        })
+        end)
 
         calc.check_action!(req, req_met)
       elsif req[:type] == 'min_score'
@@ -490,8 +490,8 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :trigger_completion_events
 
-  scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :for_modules, lambda { |mods| where(:context_module_id => mods) }
+  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_modules, ->(mods) { where(:context_module_id => mods) }
 
   workflow do
     state :locked

@@ -64,9 +64,9 @@ class ApiRouteSet
   end
 
   def method_missing(m, *a, &b)
-    mapper.__send__(m, *a) {
+    mapper.__send__(m, *a) do
       instance_eval(&b) if b
-    }
+    end
   end
 
   def get(path, opts = {})

@@ -134,9 +134,9 @@ describe Mutations::SetFriendlyDescription do
 
     it "do nothing when there isn't friendly description on database" do
       result = nil
-      expect {
+      expect do
         result = exec({ description: "" })
-      }.not_to change(OutcomeFriendlyDescription, :count)
+      end.not_to change(OutcomeFriendlyDescription, :count)
 
       expect(res_field(result, "_id")).to be_nil
     end
@@ -149,9 +149,9 @@ describe Mutations::SetFriendlyDescription do
       )
       friendly_description.destroy
       result = nil
-      expect {
+      expect do
         result = exec({ description: "" })
-      }.not_to change(OutcomeFriendlyDescription, :count)
+      end.not_to change(OutcomeFriendlyDescription, :count)
 
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       friendly_description.reload

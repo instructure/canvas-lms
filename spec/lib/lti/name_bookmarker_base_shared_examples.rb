@@ -23,7 +23,7 @@ RSpec.shared_context 'name_bookmarker_base_shared_examples' do
   shared_examples_for 'a bookmarker for models with names' do
     let(:model_base_scope) { raise 'to be implemented by examples' }
     let(:model_factory_proc) { raise 'to be implemented by examples' }
-    let(:model_name_proc) { lambda { |model| model.name } }
+    let(:model_name_proc) { ->(model) { model.name } }
 
     {
       simple_lowercase: %w[aaa bbb ccc],

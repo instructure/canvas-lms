@@ -79,9 +79,9 @@ class Conversation < ActiveRecord::Base
       :has_media_objects => has_media_objects?,
       :root_account_ids => read_attribute(:root_account_ids)
     }.merge(options)
-    ConversationParticipant.bulk_insert(user_ids.map { |user_id|
+    ConversationParticipant.bulk_insert(user_ids.map do |user_id|
       options.merge({ :user_id => user_id })
-    })
+    end)
   end
 
   def self.initiate(users, private, options = {})

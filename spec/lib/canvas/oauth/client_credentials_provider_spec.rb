@@ -24,9 +24,9 @@ module Canvas::OAuth
     let(:dev_key) { DeveloperKey.create! }
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
-    before {
+    before do
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    end
 
     describe 'generate_token' do
       subject { provider.generate_token }
@@ -87,9 +87,9 @@ module Canvas::OAuth
     let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
     let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
-    before {
+    before do
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    end
 
     describe 'using public jwk url' do
       subject { provider.valid? }
@@ -297,9 +297,9 @@ module Canvas::OAuth
     let(:dev_key) { DeveloperKey.create! client_credentials_audience: "external" }
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
-    before {
+    before do
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    }
+    end
 
     context 'with valid client_id' do
       describe '#error_message' do

@@ -89,12 +89,12 @@ describe SIS::CSV::EnrollmentImporter do
       "S001,test_1,#{name},active,,"
     )
     # the enrollments
-    expect {
+    expect do
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "test_1,user_1,teacher,S001,active,,,"
       )
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it "enrolls users" do

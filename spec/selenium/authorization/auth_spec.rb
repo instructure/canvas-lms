@@ -32,9 +32,9 @@ describe "auth" do
       visit_logout_page
       confirm_logout
 
-      keep_trying_until {
+      keep_trying_until do
         expect(driver.current_url).to match %r{/login/canvas}
-      }
+      end
     end
   end
 end

@@ -210,7 +210,7 @@ class AccountNotification < ActiveRecord::Base
     end
     all_visible_account_ids = nil if account_ids == root_account_ids
 
-    block = ->(_key) do
+    block = lambda do |_key|
       now = Time.now.utc
       start_at = include_past ? now : now.end_of_day
 
@@ -224,7 +224,7 @@ class AccountNotification < ActiveRecord::Base
 
       base_shard = Shard.current
       result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
-        load_by_account = ->(slice_account_ids) do
+        load_by_account = lambda do |slice_account_ids|
           scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at)
                                      .order('start_at DESC')
                                      .preload({ :account => :root_account }, account_notification_roles: :role)
@@ -298,9 +298,9 @@ class AccountNotification < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :account_notification
     p.to { message_recipients }
-    p.whenever { |record|
+    p.whenever do |record|
       record.should_send_message? && record.message_recipients.present?
-    }
+    end
   end
 
   def send_message_not_set_for_site_admin

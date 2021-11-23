@@ -87,10 +87,10 @@ describe "CSP Settings API", type: :request do
       end
 
       it "shows when settings are locked from above" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.enable_csp!
           a.lock_csp!
-        }
+        end
         json = get_csp_settings(@sub)
         expect(json["settings_locked"]).to eq true
       end
@@ -162,10 +162,10 @@ describe "CSP Settings API", type: :request do
 
     context "setting on accounts" do
       it "is blocked by parent account locking" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.enable_csp!
           a.lock_csp!
-        }
+        end
         json = set_csp_setting(@sub, "disabled", 400)
         expect(json["message"]).to eq "cannot set when locked by parent account"
       end
@@ -219,10 +219,10 @@ describe "CSP Settings API", type: :request do
       end
 
       it "unlocks csp" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.enable_csp!
           a.lock_csp!
-        }
+        end
         set_csp_lock(Account.default, false)
         expect(@sub.reload.csp_locked?).to eq false
       end

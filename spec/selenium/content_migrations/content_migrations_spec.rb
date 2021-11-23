@@ -638,10 +638,10 @@ describe "content migrations", :non_parallel do
   end
 
   context "importing LTI content" do
-    let(:import_course) {
+    let(:import_course) do
       account = account_model
       course_with_teacher_logged_in(:account => account).course
-    }
+    end
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
                                                         name: "test lti import tool",

@@ -30,7 +30,7 @@ module LiveAssessments
     validates :title, length: { maximum: maximum_string_length }
     validates :key, length: { maximum: maximum_string_length }
 
-    scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+    scope :for_context, ->(context) { where(:context_id => context, :context_type => context.class.to_s) }
 
     set_policy do
       given do |user, session|

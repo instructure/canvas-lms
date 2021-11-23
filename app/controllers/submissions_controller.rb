@@ -291,10 +291,10 @@ class SubmissionsController < SubmissionsBaseController
       @submission = @assignment.submit_homework(@submission_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
       respond_to do |format|
-        format.html {
+        format.html do
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           redirect_to course_assignment_url(@context, @assignment)
-        }
+        end
         format.json { render :json => e.record.errors, :status => :bad_request }
       end
       return

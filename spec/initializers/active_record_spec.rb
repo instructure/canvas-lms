@@ -142,9 +142,9 @@ module ActiveRecord
           selectors = ["*", "users.*", "users.id, users.updated_at"]
           User.create!
           selectors.each do |selector|
-            expect {
+            expect do
               User.select(selector).find_in_batches(strategy: :id) { nil }
-            }.not_to raise_error
+            end.not_to raise_error
           end
         end
 
@@ -265,10 +265,10 @@ module ActiveRecord
           User.create(name: 'dr who')
           User.create(name: 'dr who')
 
-          expect {
+          expect do
             User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name")
                 .where("u.sortable_name <> users.sortable_name").delete_all
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
     end

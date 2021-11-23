@@ -58,12 +58,12 @@ describe "account admin terms" do
     end
 
     it "validates that you cannot delete a term with courses in it" do
-      expect {
+      expect do
         click_term_action_link(@default_term, '.cant_delete_term_link')
         alert = driver.switch_to.alert
         expect(alert.text).to eq "You can't delete a term that still has classes in it."
         alert.accept
-      }.to change(EnrollmentTerm, :count).by(0)
+      end.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
     end
   end
@@ -102,11 +102,11 @@ describe "account admin terms" do
     it "cancels term creation and validate nothing was created" do
       get "/accounts/#{Account.default.id}/terms"
 
-      expect {
+      expect do
         f('.add_term_link').click
         replace_content(f('#enrollment_term_name_new'), 'false add')
         f('.cancel_button').click
-      }.to change(EnrollmentTerm, :count).by(0)
+      end.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
       check_element_has_focus f(".add_term_link")
     end

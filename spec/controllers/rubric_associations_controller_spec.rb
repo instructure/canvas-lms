@@ -74,9 +74,9 @@ describe RubricAssociationsController do
       end
 
       it 'records a rubric_created event for the assignment' do
-        expect {
+        expect do
           post('create', params: request_params)
-        }.to change {
+        end.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
         }.by(1)
       end
@@ -107,9 +107,9 @@ describe RubricAssociationsController do
         end
 
         it "duplicates the associated rubric" do
-          expect {
+          expect do
             post 'create', params: { course_id: @course2.id, rubric_association: { rubric_id: @rubric.id } }
-          }.to change {
+          end.to change {
             Rubric.count
           }.by(1)
           expect(assigns[:rubric].context).to eq @course2
@@ -155,9 +155,9 @@ describe RubricAssociationsController do
         end
 
         it "does not duplicate the rubric" do
-          expect {
+          expect do
             post 'create', params: { course_id: @course.id, rubric_association: { rubric_id: @rubric.id } }
-          }.to change {
+          end.to change {
             Rubric.count
           }.by(0)
           expect(assigns[:rubric]).to eq @rubric
@@ -244,9 +244,9 @@ describe RubricAssociationsController do
       end
 
       it 'records a rubric_updated event for the assignment' do
-        expect {
+        expect do
           put('update', params: request_params)
-        }.to change {
+        end.to change {
           AnonymousOrModerationEvent.where(
             event_type: 'rubric_updated',
             assignment: assignment
@@ -352,9 +352,9 @@ describe RubricAssociationsController do
       end
 
       it 'creates an AnonymousOrModerationEvent capturing the deletion' do
-        expect {
+        expect do
           delete('destroy', params: { course_id: course.id, id: rubric_association.id })
-        }.to change {
+        end.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_deleted', assignment: assignment, user: teacher).count
         }.by(1)
       end

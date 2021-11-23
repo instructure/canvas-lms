@@ -718,7 +718,7 @@ class ConversationsController < ApplicationController
   def deleted_index
     return render_unauthorized_action unless @current_user.roles(Account.site_admin).include? 'admin'
 
-    query = lambda {
+    query = lambda do
       participants = ConversationMessageParticipant.query_deleted(params['user_id'], params)
 
       Api.paginate(
@@ -728,7 +728,7 @@ class ConversationsController < ApplicationController
       )
 
       participants.map { |p| deleted_conversation_json(p, @current_user, session) }
-    }
+    end
 
     conversation_messages = if params['conversation_id']
                               Conversation.find(params['conversation_id']).shard.activate { query.call }
@@ -1036,9 +1036,9 @@ class ConversationsController < ApplicationController
     audience = conversation.other_participants
     audience_names = audience.map(&:name)
     audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
-    audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
+    audience_context_names = [:courses, :groups].inject([]) do |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
-    }.reject(&:blank?)
+    end.reject(&:blank?)
 
     content += "<hr />"
     content += "<div>#{ERB::Util.h(t('conversation_context', "From a conversation with"))} "

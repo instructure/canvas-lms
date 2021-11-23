@@ -229,7 +229,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[1]).to eq @student.id.to_s
       expect(stats.last[2]).to eq "user_sis_id_01"
 
-      splitter = lambda { |str| str.split(",").map(&:strip) }
+      splitter = ->(str) { str.split(",").map(&:strip) }
       sections = splitter.call(stats.last[3])
       expect(sections).to include("section2")
       expect(sections).to include("Unnamed Course")

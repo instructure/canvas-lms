@@ -770,7 +770,7 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+  scope :for_context, ->(context) { where(:context_id => context, :context_type => context.class.to_s) }
 
   scope :successful, -> { where(:workflow_state => 'imported') }
   scope :running, -> { where(:workflow_state => ['exporting', 'importing']) }
@@ -1078,10 +1078,10 @@ class ContentMigration < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :blueprint_content_added
     p.to { context.participating_admins }
-    p.whenever { |record|
+    p.whenever do |record|
       record.changed_state_to(:imported) && record.for_master_course_import? &&
         record.master_migration && record.master_migration.send_notification?
-    }
+    end
   end
 
   def self.expire_days
@@ -1098,7 +1098,7 @@ class ContentMigration < ActiveRecord::Base
     created_at < ContentMigration.expire_days.days.ago
   end
 
-  scope :expired, -> {
+  scope :expired, lambda {
     if ContentMigration.expire?
       where('created_at < ?', ContentMigration.expire_days.days.ago)
     else

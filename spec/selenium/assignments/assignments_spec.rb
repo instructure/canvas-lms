@@ -710,11 +710,11 @@ describe "assignments" do
       context 'with overrides' do
         before do
           @course.course_sections.create! :name => "HI"
-          @assignment.assignment_overrides.create! { |override|
+          @assignment.assignment_overrides.create! do |override|
             override.set = @course.course_sections.first
             override.due_at = 1.day.ago
             override.due_at_overridden = true
-          }
+          end
         end
 
         it "does not overwrite overrides if published twice from the index page", priority: "2" do
