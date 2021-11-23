@@ -102,7 +102,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
 
     it "adds the help link to custom_help_links" do
       DataFixup::BackfillNewDefaultHelpLink.run(:covid)
-      expect(@account.reload.settings[:custom_help_links].map { |hl| hl[:id] }).to match_array([existing_default_link[:id], new_default_link[:id]])
+      expect(@account.reload.settings[:custom_help_links].pluck(:id)).to match_array([existing_default_link[:id], new_default_link[:id]])
     end
   end
 end

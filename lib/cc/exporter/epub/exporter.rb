@@ -98,9 +98,7 @@ module CC::Exporter::Epub
     end
 
     def item_ids
-      @_item_ids ||= cartridge_json.values_at(*LINKED_RESOURCE_KEY.values).flatten.map do |item|
-        item[:identifier]
-      end
+      @_item_ids ||= cartridge_json.values_at(*LINKED_RESOURCE_KEY.values).flatten.pluck(:identifier)
     end
 
     def get_syllabus_item(identifier)

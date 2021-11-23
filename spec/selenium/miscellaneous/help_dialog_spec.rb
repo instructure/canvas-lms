@@ -102,7 +102,7 @@ describe "help dialog" do
       expect(cm.body).to match(/test message/)
     end
 
-    # TODO reimplement per CNVS-29608, but make sure we're testing at the right level
+    # TODO: reimplement per CNVS-29608, but make sure we're testing at the right level
     it "should allow submitting a ticket"
   end
 

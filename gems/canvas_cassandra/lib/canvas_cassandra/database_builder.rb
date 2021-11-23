@@ -25,7 +25,7 @@ module CanvasCassandra
       raise ArgumentError, "config name required" if config_name.blank?
 
       config = ConfigFile.load('cassandra', environment)
-      config = config && config[config_name]
+      config &&= config[config_name]
       config && config['servers'] && config['keyspace']
     end
 
@@ -40,7 +40,7 @@ module CanvasCassandra
       key = [config_name, environment]
       @connections.fetch(key) do
         config = ConfigFile.load('cassandra', environment).dup
-        config = config && config[config_name]
+        config &&= config[config_name]
         unless config
           @connections[key] = nil
           return nil
@@ -87,7 +87,7 @@ module CanvasCassandra
       setting_key = 'event_stream.read_consistency'
       setting_value = settings_store.get("#{setting_key}.#{database_name}", nil) || settings_store.get(setting_key, nil)
 
-      setting_value if setting_value.present?
+      setting_value.presence
     end
 
     def self.settings_store

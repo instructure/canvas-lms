@@ -43,19 +43,20 @@ class EventStream::Index
   end
 
   def find_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_with(args, options)
   end
 
   def find_ids_with(args, options)
-    strategy = self.strategy_for(options[:strategy])
+    strategy = strategy_for(options[:strategy])
     strategy.find_ids_with(args, options)
   end
 
   def strategy_for(strategy_name)
-    if strategy_name == :active_record
+    case strategy_name
+    when :active_record
       @_ar_decorator ||= EventStream::IndexStrategy::ActiveRecord.new(self)
-    elsif strategy_name == :cassandra
+    when :cassandra
       @_cass_decorator ||= EventStream::IndexStrategy::Cassandra.new(self)
     else
       raise "Unknown Indexing Strategy: #{strategy_name}"

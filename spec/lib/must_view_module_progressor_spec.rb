@@ -156,7 +156,7 @@ describe "MustViewModuleProgressor" do
 
     it "is blocked by sequential progress" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: 'must_contribute'
       )
       mod = sequence[:mod]
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -181,7 +181,7 @@ describe "MustViewModuleProgressor" do
 
     it "can follow sequential progress through already completed non-must-view items" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: 'must_contribute'
       )
       mod = sequence[:mod]
       mod.update_for(@student, :contributed, sequence[:assignment][:tag])
@@ -247,7 +247,7 @@ describe "MustViewModuleProgressor" do
 
     it "proceeds through unpublished assignments for sequential modules" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: 'must_contribute'
       )
       mod = sequence[:mod]
 
@@ -269,7 +269,7 @@ describe "MustViewModuleProgressor" do
     # items can be unpublished separately from their content
     it "proceeds through modules with unpublished content tags" do
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: 'must_contribute'
       )
       mod = sequence[:mod]
 
@@ -318,7 +318,7 @@ describe "MustViewModuleProgressor" do
       second_student = @student
 
       sequence = sequential_module_progression_fixture(
-        assignment_requirement_type: 'must_contribute',
+        assignment_requirement_type: 'must_contribute'
       )
       mod = sequence[:mod]
       assignment = sequence[:assignment][:item]

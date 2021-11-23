@@ -29,7 +29,7 @@ describe NotificationPolicy do
       @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
       e = @course.enroll_student(@student)
       e.accept!
-      Notification.all.each { |n| n.destroy }
+      Notification.all.each(&:destroy)
       Notification.reset_cache!
       @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
     end
@@ -78,7 +78,7 @@ describe NotificationPolicy do
       has_a_broadcast_policy
       set_broadcast_policy do
         dispatch :hello
-        to {
+        to do
           u = User.create
           u.communication_channels.build(
             :path => 'blarg@example.com',
@@ -87,7 +87,7 @@ describe NotificationPolicy do
           u.save!
           u.register
           u
-        }
+        end
         whenever { true }
         data { { course_id: 'this is a real course_id', root_account_id: Account.default.id } }
       end
@@ -223,7 +223,8 @@ describe NotificationPolicy do
       n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2))
       params = { :category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY }
       NotificationPolicy.setup_for(@user, params)
-      n1.reload; n2.reload
+      n1.reload
+      n2.reload
       expect(n1.frequency).to eq Notification::FREQ_IMMEDIATELY
       expect(n2.frequency).to eq Notification::FREQ_IMMEDIATELY
     end
@@ -232,9 +233,9 @@ describe NotificationPolicy do
       notification_model
       hax0r = user_with_communication_channel
       user_with_communication_channel
-      expect {
+      expect do
         NotificationPolicy.setup_for(hax0r, :channel_id => @cc.id, :frequency => Notification::FREQ_IMMEDIATELY, :category => 'test_immediately')
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
       expect(@user.notification_policies.any?).to eq false
     end
 
@@ -324,14 +325,14 @@ describe NotificationPolicy do
       specs_require_sharding
 
       it "finds user categories accross shards" do
-        @shard1.activate {
+        @shard1.activate do
           @shard_user = user_model
           @channel = communication_channel_model(:user => @shard_user)
           NotificationPolicy.delete_all
           @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
           NotificationPolicy.setup_with_default_policies(@shard_user)
           expect(@policy.reload.frequency).to eq Notification::FREQ_NEVER
-        }
+        end
       end
     end
   end

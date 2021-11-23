@@ -23,30 +23,30 @@ require_relative '../../lti2_spec_helper'
 
 describe "Importing assignments" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'assignment'
-      it "imports assignments for #{system}" do
-        data = get_import_data(system, 'assignment')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, 'assignment'
 
-        data[:assignments_to_import] = {}
-        expect {
-          expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
-        }.to change(Assignment, :count).by(0)
+    it "imports assignments for #{system}" do
+      data = get_import_data(system, 'assignment')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        data[:assignments_to_import][data[:migration_id]] = true
-        expect {
-          Importers::AssignmentImporter.import_from_migration(data, context, migration)
-          Importers::AssignmentImporter.import_from_migration(data, context, migration)
-        }.to change(Assignment, :count).by(1)
-        a = Assignment.where(migration_id: data[:migration_id]).first
+      data[:assignments_to_import] = {}
+      expect do
+        expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
+      end.to change(Assignment, :count).by(0)
 
-        expect(a.title).to eq data[:title]
-        expect(a.description).to include(data[:instructions]) if data[:instructions]
-        expect(a.description).to include(data[:description]) if data[:description]
-        a.due_at = Time.at(data[:due_date].to_i / 1000)
-        expect(a.points_possible).to eq data[:grading][:points_possible].to_f
-      end
+      data[:assignments_to_import][data[:migration_id]] = true
+      expect do
+        Importers::AssignmentImporter.import_from_migration(data, context, migration)
+        Importers::AssignmentImporter.import_from_migration(data, context, migration)
+      end.to change(Assignment, :count).by(1)
+      a = Assignment.where(migration_id: data[:migration_id]).first
+
+      expect(a.title).to eq data[:title]
+      expect(a.description).to include(data[:instructions]) if data[:instructions]
+      expect(a.description).to include(data[:description]) if data[:description]
+      a.due_at = Time.at(data[:due_date].to_i / 1000)
+      expect(a.points_possible).to eq data[:grading][:points_possible].to_f
     end
   end
 
@@ -140,9 +140,9 @@ describe "Importing assignments" do
       "due_at" => 1401947999000,
       "peer_reviews_due_at" => 1401947999000
     }
-    expects_job_with_tag('Assignment#do_auto_peer_review') {
+    expects_job_with_tag('Assignment#do_auto_peer_review') do
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
-    }
+    end
   end
 
   it "does not schedule auto peer reviews if dates are shifted (it'll be scheduled later)" do
@@ -161,9 +161,9 @@ describe "Importing assignments" do
     }
     migration = @course.content_migrations.create!
     allow(migration).to receive(:date_shift_options).and_return(true)
-    expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
+    expects_job_with_tag('Assignment#do_auto_peer_review', 0) do
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
-    }
+    end
   end
 
   it "includes turnitin_settings" do
@@ -198,7 +198,7 @@ describe "Importing assignments" do
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
 
-    ["s_paper_check", "journal_check", "exclude_biblio", "exclude_type", "submit_papers_to", "s_view_report"].each do |field|
+    %w[s_paper_check journal_check exclude_biblio exclude_type submit_papers_to s_view_report].each do |field|
       expect(settings[field]).to eq("1")
     end
 
@@ -483,9 +483,9 @@ describe "Importing assignments" do
             let(:extra_line_item_params) { {} }
 
             it 'fails to import' do
-              expect {
+              expect do
                 assignment
-              }.to raise_error(/Client can't be blank/)
+              end.to raise_error(/Client can't be blank/)
             end
           end
         end
@@ -553,10 +553,10 @@ describe "Importing assignments" do
           context 'when the same line items are imported again in an additional run' do
             it "doesn't create the same line items over again" do
               assignment
-              expect {
+              expect do
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
-              }.to_not change { Assignment.count }
+              end.to_not change { Assignment.count }
               expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
                 eq(expected_created_line_items_fields)
             end

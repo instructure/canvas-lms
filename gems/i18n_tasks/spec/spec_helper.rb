@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 begin
-  require '../../spec/coverage_tool.rb'
+  require '../../spec/coverage_tool'
   CoverageTool.start('i18n-tasks-gem')
 rescue LoadError => e
   puts "Error: #{e} "

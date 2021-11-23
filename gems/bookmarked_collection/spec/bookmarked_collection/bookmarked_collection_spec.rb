@@ -417,12 +417,12 @@ describe "BookmarkedCollection" do
         ['deleted', @deleted_collection]
       )
 
-      expect {
+      expect do
         @collection = BookmarkedCollection.merge(
           ['users', @user_collection],
           ['courses', @course_collection]
         )
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
   end
 
@@ -433,9 +433,9 @@ describe "BookmarkedCollection" do
     end
 
     it 'uses proc to calculate key' do
-      BookmarkedCollection.best_unicode_collation_key_proc = lambda { |col|
+      BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
         return "lower(#{col})"
-      }
+      end
 
       expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('lower(key_name)')
     end

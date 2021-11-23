@@ -27,7 +27,7 @@ describe Message do
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
       template = msg.get_template('alert.email.erb')
-      expect(template).to match(%r{An alert has been triggered})
+      expect(template).to match(/An alert has been triggered/)
     end
   end
 
@@ -42,9 +42,9 @@ describe Message do
     end
 
     it 'sanitizes html' do
-      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<~HTML, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
-      ZOMGXSS
+      HTML
       user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
@@ -346,7 +346,7 @@ describe Message do
       end
 
       it "deletes unreachable push endpoints" do
-        ne = double()
+        ne = double
         expect(ne).to receive(:push_json).and_return(false)
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
@@ -359,7 +359,7 @@ describe Message do
       end
 
       it "delivers to each of a user's push endpoints" do
-        ne = double()
+        ne = double
         expect(ne).to receive(:push_json).twice.and_return(true)
         expect(ne).not_to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
@@ -535,7 +535,7 @@ describe Message do
         end
 
         it 'uses the default host url if the asset context wont override it' do
-          message = message_model()
+          message = message_model
           expect(message.from_name).to eq HostUrl.outgoing_email_default_name
         end
 
@@ -759,7 +759,7 @@ describe Message do
       queued = Message.new(id: -1, created_at: Time.zone.now).for_queue
       begin
         queued.deliver
-        raise RuntimeError, "#deliver should have failed because this message does not exist"
+        raise "#deliver should have failed because this message does not exist"
       rescue Delayed::RetriableError => e
         expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
       end

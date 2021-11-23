@@ -41,7 +41,7 @@ if settings.present?
     # thrown to drive client facing behavior.  A good example
     # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
     # should probably be caught and solved...
-    config.excluded_exceptions += %w{
+    config.excluded_exceptions += %w[
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::AccessTokenScopeError
       AuthenticationMethods::LoggedOutError
@@ -50,7 +50,7 @@ if settings.present?
       Turnitin::Errors::SubmissionNotScoredError
       Rack::QueryParser::InvalidParameterError
       PG::UnableToSend
-    }
+    ]
   end
 
   Rails.configuration.to_prepare do

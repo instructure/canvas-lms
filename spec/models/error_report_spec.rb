@@ -76,7 +76,7 @@ describe ErrorReport do
     ErrorReport.create! { |r| r.category = 'george' }
     expect(ErrorReport.categories).to eq ['bob', 'george']
     ErrorReport.create! { |r| r.category = 'fred' }
-    expect(ErrorReport.categories).to eq ['bob', 'fred', 'george']
+    expect(ErrorReport.categories).to eq %w[bob fred george]
   end
 
   it "filters the url when it is assigned" do

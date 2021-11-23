@@ -83,7 +83,7 @@ class EnrollmentsFromUserList
 
   def enroll_user(user)
     return unless user
-    return if @enrolled_users.has_key?(user.id)
+    return if @enrolled_users.key?(user.id)
 
     @enrolled_users[user.id] = true
     enrollment = @course.enroll_user(user, @enrollment_type,

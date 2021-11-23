@@ -27,30 +27,30 @@ describe "RequestContext::Generator" do
   let(:context) { double('Course', class: 'Course', id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.add_meta_header("a2", "test2")
       RequestContext::Generator.add_meta_header("a3", "")
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;a2=test2;"
   end
 
   it "adds request data to X-Canvas-Meta" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, nil)
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
   end
 
   it "adds request and context data to X-Canvas-Meta" do
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, context)
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
   end
 
@@ -77,11 +77,11 @@ describe "RequestContext::Generator" do
       end
     end
     pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false })
-    _, headers, _ = RequestContext::Generator.new(->(_env) {
+    _, headers, _ = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_page_view_meta(pv)
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     f = pv.created_at.try(:utc).try(:iso8601, 2)
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5.0;p=f;f=#{f};"
   end
@@ -94,9 +94,9 @@ describe "RequestContext::Generator" do
 
   it "adds the request_id to X-Request-Context-Id" do
     Thread.current[:context] = nil
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(headers['X-Request-Context-Id']).to be_present
   end
 
@@ -110,9 +110,9 @@ describe "RequestContext::Generator" do
   it "finds the session_id from the rack session and add it to X-Session-Id" do
     Thread.current[:context] = nil
     env['rack.session.options'] = { id: 'abc' }
-    _, headers, = RequestContext::Generator.new(->(_env) {
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(headers['X-Session-Id']).to eq 'abc'
   end
 
@@ -120,9 +120,9 @@ describe "RequestContext::Generator" do
     Timecop.freeze do
       Thread.current[:context] = nil
       env['HTTP_X_REQUEST_START'] = "t=#{(1.minute.ago.to_f * 1000000).to_i}"
-      _, headers, = RequestContext::Generator.new(->(_env) {
+      _, headers, = RequestContext::Generator.new(lambda do |_env|
         [200, {}, []]
-      }).call(env)
+      end).call(env)
       q = headers["X-Canvas-Meta"].match(/q=(\d+)/)[1].to_f
       expect(q / 1000000).to eq 60.0
     end

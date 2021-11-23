@@ -24,7 +24,7 @@ module GraphQLPostgresTimeout
   end
 
   def self.wrap(query)
-    if self.do_not_wrap
+    if do_not_wrap
       yield
     else
       ActiveRecord::Base.transaction do
@@ -32,10 +32,10 @@ module GraphQLPostgresTimeout
         ActiveRecord::Base.connection.execute "SET statement_timeout = #{statement_timeout}"
         yield
       rescue ActiveRecord::StatementInvalid => e
-        if PG::QueryCanceled === e.cause
-          Rails.logger.warn {
+        if e.cause.is_a?(PG::QueryCanceled)
+          Rails.logger.warn do
             "GraphQL Operation failed due to postgres statement_timeout:\n#{query.query_string}"
-          }
+          end
           raise GraphQLPostgresTimeout::Error, "operation timed out"
         end
         raise GraphQL::ExecutionError, "Invalid SQL: #{e.message}"

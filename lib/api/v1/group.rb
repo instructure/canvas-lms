@@ -24,16 +24,16 @@ module Api::V1::Group
   include Api::V1::Tab
 
   API_GROUP_JSON_OPTS = {
-    :only => %w(id name description is_public join_level group_category_id max_membership created_at),
-    :methods => %w(members_count storage_quota_mb),
-  }
+    :only => %w[id name description is_public join_level group_category_id max_membership created_at],
+    :methods => %w[members_count storage_quota_mb],
+  }.freeze
 
   API_GROUP_MEMBERSHIP_JSON_OPTS = {
-    :only => %w(id group_id user_id workflow_state moderator created_at).freeze
+    :only => %w[id group_id user_id workflow_state moderator created_at].freeze
   }.freeze
 
   # permission keys need to be symbols
-  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join, :create_announcement].freeze
+  API_PERMISSIONS_TO_INCLUDE = %i[create_discussion_topic join create_announcement].freeze
 
   def group_json(group, user, session, options = {})
     options.reverse_merge!(include_inactive_users: false)
@@ -50,22 +50,24 @@ module Api::V1::Group
 
     if includes.include?('users')
       group_member_json_limit = Setting.get("group_json_user_cap", "1000").to_i
-      users = group.grants_right?(@current_user, :read_as_admin) ?
-        group.users.order_by_sortable_name.limit(group_member_json_limit).distinct :
-        group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).limit(group_member_json_limit).distinct
+      users = if group.grants_right?(@current_user, :read_as_admin)
+                group.users.order_by_sortable_name.limit(group_member_json_limit).distinct
+              else
+                group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).limit(group_member_json_limit).distinct
+              end
       active_user_ids = nil
       if options[:include_inactive_users]
         active_user_ids = group.participating_users_in_context.pluck('id').to_set
       end
 
       # TODO: this should be switched to user_display_json
-      hash['users'] = users.map { |u|
+      hash['users'] = users.map do |u|
         json = user_json(u, user, session)
         if options[:include_inactive_users] && active_user_ids
           json['active'] = active_user_ids.include?(u.id)
         end
         json
-      }
+      end
     end
     if includes.include?('group_category')
       hash['group_category'] = group.group_category && group_category_json(group.group_category, user, session)

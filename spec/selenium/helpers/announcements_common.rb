@@ -43,7 +43,7 @@ module AnnouncementsCommon
     replace_content(f('input[name=title]'), "First Announcement")
 
     type_in_tiny('textarea[name=message]', 'Hi, this is my first announcement')
-    f(css_checkbox).click if !css_checkbox.nil?
+    f(css_checkbox).click unless css_checkbox.nil?
   end
 
   def reply_to_announcement(announcement_id, text)

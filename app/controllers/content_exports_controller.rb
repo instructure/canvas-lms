@@ -46,12 +46,16 @@ class ContentExportsController < ApplicationController
 
   def create
     export = @context.content_exports_visible_to(@current_user).running.first
-    unless export
+    if export
+      # an export is already running, just return it
+      render_export(export)
+    else
       export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
 
-      if @context.is_a?(Course)
+      case @context
+      when Course
         if params[:export_type] == 'qti'
           export.export_type = ContentExport::QTI
           export.selected_content = params[:copy].to_unsafe_h
@@ -59,7 +63,7 @@ class ContentExportsController < ApplicationController
           export.export_type = ContentExport::COMMON_CARTRIDGE
           export.selected_content = { :everything => true }
         end
-      elsif @context.is_a?(User)
+      when User
         export.export_type = ContentExport::USER_DATA
       end
 
@@ -70,9 +74,6 @@ class ContentExportsController < ApplicationController
       else
         render :json => { :error_message => t('errors.couldnt_create', "Couldn't create content export.") }
       end
-    else
-      # an export is already running, just return it
-      render_export(export)
     end
   end
 
@@ -97,7 +98,7 @@ class ContentExportsController < ApplicationController
   private
 
   def render_export(export)
-    json = export.as_json(:only => [:id, :progress, :workflow_state], :methods => [:error_message])
+    json = export.as_json(:only => %i[id progress workflow_state], :methods => [:error_message])
     json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
     render :json => json
   end

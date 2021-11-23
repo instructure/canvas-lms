@@ -27,7 +27,4 @@ class ValidateAssignmentOverrides < ActiveRecord::Migration[5.0]
         .run(start_at, end_at)
     end
   end
-
-  def self.down
-  end
 end

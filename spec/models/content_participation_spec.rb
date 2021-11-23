@@ -28,31 +28,31 @@ describe ContentParticipation do
 
   describe "create_or_update" do
     it "creates if it doesn't exist" do
-      expect {
+      expect do
         ContentParticipation.create_or_update({
                                                 :content => @content,
                                                 :user => @student,
                                                 :workflow_state => "read",
                                               })
-      }.to change(ContentParticipation, :count).by 1
+      end.to change(ContentParticipation, :count).by 1
     end
 
     it "updates existing if one already exists" do
-      expect {
+      expect do
         ContentParticipation.create_or_update({
                                                 :content => @content,
                                                 :user => @student,
                                                 :workflow_state => "read",
                                               })
-      }.to change(ContentParticipation, :count).by 1
+      end.to change(ContentParticipation, :count).by 1
 
-      expect {
+      expect do
         ContentParticipation.create_or_update({
                                                 :content => @content,
                                                 :user => @student,
                                                 :workflow_state => "unread",
                                               })
-      }.to change(ContentParticipation, :count).by 0
+      end.to change(ContentParticipation, :count).by 0
 
       cp = ContentParticipation.where(:user_id => @student).first
       expect(cp.workflow_state).to eq "unread"
@@ -61,13 +61,13 @@ describe ContentParticipation do
 
   describe "update_participation_count" do
     it "updates the participation count automatically when the workflow state changes" do
-      expect {
+      expect do
         ContentParticipation.create_or_update({
                                                 :content => @content,
                                                 :user => @student,
                                                 :workflow_state => "read",
                                               })
-      }.to change(ContentParticipationCount, :count).by 1
+      end.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
                                               :content => @content,
@@ -79,13 +79,13 @@ describe ContentParticipation do
     end
 
     it "does not update participation count if workflow_state doesn't change" do
-      expect {
+      expect do
         ContentParticipation.create_or_update({
                                                 :content => @content,
                                                 :user => @student,
                                                 :workflow_state => "read",
                                               })
-      }.to change(ContentParticipationCount, :count).by 1
+      end.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
                                               :content => @content,

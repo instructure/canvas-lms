@@ -28,7 +28,10 @@ describe QuestionBanksController do
   end
 
   describe "GET / (#index)" do
-    before { create_course_with_two_question_banks!; user_session(@teacher) }
+    before do
+      create_course_with_two_question_banks!
+      user_session(@teacher)
+    end
 
     it "only includes active question banks" do
       @bank3 = @course.account.assessment_question_banks.create!
@@ -37,9 +40,9 @@ describe QuestionBanksController do
       expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.size).to eq 2
-      expect(json.detect { |bank|
+      expect(json.detect do |bank|
         bank["assessment_question_bank"]["id"] == @bank3.id
-      }).to be_nil
+      end).to be_nil
     end
   end
 

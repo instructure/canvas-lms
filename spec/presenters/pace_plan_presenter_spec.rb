@@ -25,14 +25,14 @@ describe PacePlanPresenter do
       pace_plan_model(course: @course)
 
       @mod1 = @course.context_modules.create! name: 'M1'
-      @a1 = @course.assignments.create! name: 'A1', workflow_state: 'active'
-      @mod1.add_item id: @a1.id, type: 'assignment'
+      @a1 = @course.assignments.create! name: 'A1', points_possible: 100, workflow_state: 'active'
+      @ct1 = @mod1.add_item id: @a1.id, type: 'assignment'
 
       @mod2 = @course.context_modules.create! name: 'M2'
-      @a2 = @course.assignments.create! name: 'A2', workflow_state: 'unpublished'
-      @mod2.add_item id: @a2.id, type: 'assignment'
+      @a2 = @course.assignments.create! name: 'A2', points_possible: 50, workflow_state: 'unpublished'
+      @ct2 = @mod2.add_item id: @a2.id, type: 'assignment'
       @a3 = @course.assignments.create! name: 'A3', workflow_state: 'active'
-      @mod2.add_item id: @a3.id, type: 'assignment'
+      @ct3 = @mod2.add_item id: @a3.id, type: 'assignment'
 
       @course.context_module_tags.each do |tag|
         @pace_plan.pace_plan_module_items.create! module_item: tag
@@ -65,6 +65,8 @@ describe PacePlanPresenter do
       first_module_item = first_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a1.name)
       expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:points_possible]).to eq(100)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
       expect(first_module_item[:module_item_type]).to eq('Assignment')
       expect(first_module_item[:published]).to eq(true)
 
@@ -75,11 +77,15 @@ describe PacePlanPresenter do
       first_module_item = second_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a2.name)
       expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:points_possible]).to eq(50)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
       expect(first_module_item[:module_item_type]).to eq('Assignment')
       expect(first_module_item[:published]).to eq(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
+      expect(second_module_item[:points_possible]).to be_nil
+      expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
       expect(second_module_item[:module_item_type]).to eq('Assignment')
       expect(second_module_item[:published]).to eq(true)
     end
@@ -114,6 +120,8 @@ describe PacePlanPresenter do
       first_module_item = first_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a1.name)
       expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:points_possible]).to eq(100)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
       expect(first_module_item[:module_item_type]).to eq('Assignment')
       expect(first_module_item[:published]).to eq(true)
 
@@ -124,11 +132,15 @@ describe PacePlanPresenter do
       first_module_item = second_module[:items].first
       expect(first_module_item[:assignment_title]).to eq(@a2.name)
       expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:points_possible]).to eq(50)
+      expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
       expect(first_module_item[:module_item_type]).to eq('Assignment')
       expect(first_module_item[:published]).to eq(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
+      expect(second_module_item[:points_possible]).to be_nil
+      expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
       expect(second_module_item[:module_item_type]).to eq('Assignment')
       expect(second_module_item[:published]).to eq(true)
     end

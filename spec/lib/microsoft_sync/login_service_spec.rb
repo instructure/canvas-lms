@@ -36,9 +36,9 @@ describe MicrosoftSync::LoginService do
       end
 
       it 'returns an error "MicrosoftSync not configured"' do
-        expect {
+        expect do
           described_class.new_token('abc')
-        }.to raise_error(/MicrosoftSync not configured/)
+        end.to raise_error(/MicrosoftSync not configured/)
       end
     end
 
@@ -69,7 +69,7 @@ describe MicrosoftSync::LoginService do
           ).and_return(
             status: response_status,
             body: response_body.to_json,
-            headers: { 'Content-type' => 'application/json' },
+            headers: { 'Content-type' => 'application/json' }
           )
         end
 

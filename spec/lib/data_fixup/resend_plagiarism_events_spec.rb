@@ -68,12 +68,12 @@ describe DataFixup::ResendPlagiarismEvents do
       let(:end_time) { 30.minutes.ago }
 
       it 'only resends events for submissions in the given time range' do
-        expect {
+        expect do
           DataFixup::ResendPlagiarismEvents.run(
             start_time: start_time,
             end_time: end_time
           )
-        }.not_to change { Delayed::Job.count }
+        end.not_to change { Delayed::Job.count }
       end
     end
   end

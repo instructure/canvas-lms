@@ -36,14 +36,11 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
     last_squashed_migration_has_run = ActiveRecord::SchemaMigration.where(version: last_squashed_migration_version).exists?
 
     if initial_migration_has_run && !last_squashed_migration_has_run
-      raise <<-ERROR
+      raise <<~TEXT
         You are trying to upgrade from a too-old version of Canvas. Please
         first upgrade to a version that includes database migration
         #{last_squashed_migration_version}.
-      ERROR
+      TEXT
     end
-  end
-
-  def self.down
   end
 end

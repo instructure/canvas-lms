@@ -51,10 +51,10 @@ describe PageView do
   describe "cassandra page views" do
     include_examples "cassandra page views"
     it "stores and load from cassandra" do
-      expect {
+      expect do
         @page_view.request_id = "abcde1"
         @page_view.save!
-      }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+      end.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       expect(PageView.find(@page_view.id)).to eq @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -98,10 +98,10 @@ describe PageView do
       it "stores and load from cassandra when the birth shard is not the default shard" do
         allow(Shard).to receive(:birth).and_return(@shard1)
         @shard2.activate do
-          expect {
+          expect do
             @page_view.request_id = "abcde2"
             @page_view.save!
-          }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+          end.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
           expect(PageView.find(@page_view.id)).to eq @page_view
           expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
         end
@@ -118,7 +118,7 @@ describe PageView do
       4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
       pager = @user.page_views
       expect(pager).to be_a PaginatedCollection::Proxy
-      expect { pager.paginate() }.to raise_exception(ArgumentError)
+      expect { pager.paginate }.to raise_exception(ArgumentError)
       full = pager.paginate(:per_page => 4)
       expect(full.size).to eq 4
       expect(full.next_page).to be_nil
@@ -313,61 +313,73 @@ describe PageView do
 
     describe '#url' do
       subject { super().url }
+
       it { is_expected.to eq request.url }
     end
 
     describe '#user' do
       subject { super().user }
+
       it { is_expected.to eq user }
     end
 
     describe '#controller' do
       subject { super().controller }
+
       it { is_expected.to eq params[:controller] }
     end
 
     describe '#action' do
       subject { super().action }
+
       it { is_expected.to eq params[:action] }
     end
 
     describe '#session_id' do
       subject { super().session_id }
+
       it { is_expected.to eq session[:id] }
     end
 
     describe '#real_user' do
       subject { super().real_user }
+
       it { is_expected.to eq user }
     end
 
     describe '#user_agent' do
       subject { super().user_agent }
+
       it { is_expected.to eq request.user_agent }
     end
 
     describe '#interaction_seconds' do
       subject { super().interaction_seconds }
+
       it { is_expected.to eq 5 }
     end
 
     describe '#created_at' do
       subject { super().created_at }
+
       it { is_expected.not_to be_nil }
     end
 
     describe '#updated_at' do
       subject { super().updated_at }
+
       it { is_expected.not_to be_nil }
     end
 
     describe '#http_method' do
       subject { super().http_method }
+
       it { is_expected.to eq 'get' }
     end
 
     describe '#remote_ip' do
       subject { super().remote_ip }
+
       it { is_expected.to eq '0.0.0.0' }
     end
 
@@ -400,7 +412,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
@@ -415,7 +427,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
@@ -426,7 +438,7 @@ describe PageView do
     end
   end
 
-  describe ".find_by_id" do
+  describe ".find_by" do
     context "db-backed" do
       before :once do
         Setting.set('enable_page_views', 'db')
@@ -434,11 +446,11 @@ describe PageView do
 
       it "returns the existing page view" do
         pv = page_view_model
-        expect(PageView.find_by_id(pv.request_id)).to eq pv
+        expect(PageView.find_by(id: pv.request_id)).to eq pv
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_by_id('unknown')).to be_nil
+        expect(PageView.find_by(id: 'unknown')).to be_nil
       end
     end
 
@@ -447,11 +459,11 @@ describe PageView do
 
       it "returns the existing page view" do
         pv = page_view_model
-        expect(PageView.find_by_id(pv.request_id)).to eq pv
+        expect(PageView.find_by(id: pv.request_id)).to eq pv
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_by_id('unknown')).to be_nil
+        expect(PageView.find_by(id: 'unknown')).to be_nil
       end
     end
   end

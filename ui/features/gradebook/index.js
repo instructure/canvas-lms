@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Gradebook from './react/default_gradebook/Gradebook'
+import GradebookData from './react/default_gradebook/GradebookData'
 
 import('@canvas/context-cards/react/StudentContextCardTrigger')
 
@@ -29,6 +29,7 @@ const settingsModalButtonContainer = document.getElementById(
   'gradebook-settings-modal-button-container'
 )
 const gridColorNode = document.querySelector('[data-component="GridColor"]')
+const viewOptionsMenuNode = document.querySelector("[data-component='ViewOptionsMenu']")
 
 const props = {
   currentUserId: ENV.current_user_id,
@@ -36,9 +37,10 @@ const props = {
   gradebookMenuNode,
   gridColorNode,
   filterNavNode,
+  viewOptionsMenuNode,
   settingsModalButtonContainer,
   gradebookEnv: ENV.GRADEBOOK_OPTIONS
 }
 
-const component = React.createElement(Gradebook, props)
+const component = React.createElement(GradebookData, props)
 ReactDOM.render(component, mountPoint)

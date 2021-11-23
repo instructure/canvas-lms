@@ -47,7 +47,7 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
       expect(attachment1.reload.root_account_id).to be_nil
       expect(attachment2.reload.root_account_id).to be_nil
 
-      DataFixup::PopulateRootAccountIdOnAttachments.from_model(attachment1.id, attachment2.id,)
+      DataFixup::PopulateRootAccountIdOnAttachments.from_model(attachment1.id, attachment2.id)
 
       expect(attachment1.reload.root_account_id).to eq account.id
       expect(attachment2.reload.root_account_id).to eq account.id

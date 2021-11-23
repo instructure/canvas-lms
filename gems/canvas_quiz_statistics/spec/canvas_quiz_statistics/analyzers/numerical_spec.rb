@@ -25,9 +25,9 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
   subject { described_class.new(question_data) }
 
   it 'does not blow up when no responses are provided' do
-    expect {
+    expect do
       expect(subject.run([])).to be_present
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   it_behaves_like 'essay [:responses]'

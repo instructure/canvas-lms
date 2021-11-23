@@ -30,7 +30,7 @@ class DelayedNotification < ActiveRecord::Base
 
   attr_accessor :data
 
-  validates_presence_of :notification_id, :asset_id, :asset_type, :workflow_state
+  validates :notification_id, :asset_id, :asset_type, :workflow_state, presence: true
 
   serialize :recipient_keys
 
@@ -60,17 +60,17 @@ class DelayedNotification < ActiveRecord::Base
     res = []
     if asset
       iterate_to_list do |to_list_slice|
-        slice_res = notification.create_message(self.asset, to_list_slice, data: self.data)
+        slice_res = notification.create_message(asset, to_list_slice, data: data)
         res.concat(slice_res) if Rails.env.test?
       end
     end
-    self.do_process unless self.new_record?
+    do_process unless new_record?
     res
   rescue => e
     Canvas::Errors.capture(e, message: "Delayed Notification processing failed")
     logger.error "delayed notification processing failed: #{e.message}\n#{e.backtrace.join "\n"}"
     self.workflow_state = 'errored'
-    self.save
+    save
     []
   end
 
@@ -90,7 +90,7 @@ class DelayedNotification < ActiveRecord::Base
       # rails de-dups them and only does one query, but if not included twice,
       # they will not show as loaded against both objects.
       includes = if klass == CommunicationChannel
-                   [:notification_policies, :notification_policy_overrides, { user: [:pseudonyms, :notification_policies, :notification_policy_overrides] }]
+                   [:notification_policies, :notification_policy_overrides, { user: %i[pseudonyms notification_policies notification_policy_overrides] }]
                  elsif klass == User
                    [:pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] }, :notification_policies, :notification_policy_overrides]
                  else

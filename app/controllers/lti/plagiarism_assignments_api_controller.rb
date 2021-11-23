@@ -126,13 +126,11 @@ module Lti
     end
 
     def user_related_to_assignment?
-      if user
-        render_unauthorized_action if assignment.context.students.find_by_id(user).blank?
-      end
+      render_unauthorized_action if user && assignment.context.students.find_by(id: user).blank?
     end
 
     def tool_proxy_related_to_assignment?
-      configuration = AssignmentConfigurationToolLookup.find_by_assignment_id(assignment)
+      configuration = AssignmentConfigurationToolLookup.find_by(assignment_id: assignment)
       if configuration
         codes = {
           vendor_code: configuration.tool_vendor_code,

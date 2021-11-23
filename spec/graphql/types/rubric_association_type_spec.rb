@@ -26,22 +26,22 @@ describe Types::RubricAssociationType do
   let_once(:student) { student_in_course(course: course, active_all: true).user }
   let_once(:assignment) { assignment_model(course: course) }
   let_once(:rubric) { rubric_for_course }
-  let_once(:rubric_association) {
+  let_once(:rubric_association) do
     rubric_association_model(
       context: course,
       rubric: rubric,
       association_object: assignment,
       purpose: 'grading'
     )
-  }
-  let_once(:rubric_assessment) {
+  end
+  let_once(:rubric_assessment) do
     rubric_assessment_model(
       user: student,
       assessor: teacher,
       rubric_association: rubric_association,
       assessment_type: 'grading'
     )
-  }
+  end
   let(:submission) { assignment.submissions.where(user: student).first }
   let(:submission_type) { GraphQLTypeTester.new(submission, current_user: teacher) }
 

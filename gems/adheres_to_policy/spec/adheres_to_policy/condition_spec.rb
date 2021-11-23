@@ -43,9 +43,9 @@ describe AdheresToPolicy::Condition do
       thing = double
       expect(thing).to receive(:happened).with(object)
 
-      condition = AdheresToPolicy::Condition.new(proc {
+      condition = AdheresToPolicy::Condition.new(proc do
         thing.happened(self)
-      })
+      end)
       condition.applies?(object, nil, nil)
     end
 
@@ -55,9 +55,9 @@ describe AdheresToPolicy::Condition do
       thing = double
       expect(thing).to receive(:happened).with(user, session)
 
-      condition = AdheresToPolicy::Condition.new(proc { |u, s|
+      condition = AdheresToPolicy::Condition.new(proc do |u, s|
         thing.happened(u, s)
-      })
+      end)
       condition.applies?(nil, user, session)
     end
 
@@ -66,9 +66,9 @@ describe AdheresToPolicy::Condition do
       thing = double
       expect(thing).to receive(:happened).with(user)
 
-      condition = AdheresToPolicy::Condition.new((lambda { |u|
+      condition = AdheresToPolicy::Condition.new((lambda do |u|
         thing.happened(u)
-      }))
+      end))
 
       condition.applies?(nil, user, double)
     end

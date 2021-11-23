@@ -27,8 +27,10 @@ def notification_set(opts = {})
   notification_model({ :subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name" }.merge(notification_opts))
   user_model({ :workflow_state => 'registered' }.merge(user_opts))
   communication_channel_model.confirm!
-  notification_policy_model(:notification => @notification,
-                            :communication_channel => @communication_channel) unless opts[:no_policy]
+  unless opts[:no_policy]
+    notification_policy_model(:notification => @notification,
+                              :communication_channel => @communication_channel)
+  end
 
   @notification.reload
 end
@@ -71,7 +73,7 @@ describe NotificationMessageCreator do
       end
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      paths = messages.collect { |message| message.to }
+      paths = messages.collect(&:to)
       expect(paths).to include(a.path)
       expect(paths).to include(b.path)
       expect(paths).to include(c.path)
@@ -265,7 +267,7 @@ describe NotificationMessageCreator do
 
       @a = assignment_model
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => [u1, u2]).create_message
-      expect(messages.map(&:communication_channel).compact).to eq [cc2] # doesn't include u1's cc
+      expect(messages.filter_map(&:communication_channel)).to eq [cc2] # doesn't include u1's cc
     end
 
     it "makes a delayed message for each user policy with a delayed frequency" do
@@ -280,15 +282,24 @@ describe NotificationMessageCreator do
 
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np| np.frequency = 'never'; np.save! }
+      nps.each do |np|
+        np.frequency = 'never'
+        np.save!
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np| np.frequency = 'daily'; np.save! }
+      nps.each do |np|
+        np.frequency = 'daily'
+        np.save!
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
 
-      nps.each { |np| np.frequency = 'weekly'; np.save! }
+      nps.each do |np|
+        np.frequency = 'weekly'
+        np.save!
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
@@ -353,7 +364,7 @@ describe NotificationMessageCreator do
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       communication_channel(u1, { username: 'user1@example.com', active_cc: true })
-      @a = @course.assignments.create()
+      @a = @course.assignments.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).not_to be_empty
       expect(messages.length).to be(1)
@@ -390,13 +401,13 @@ describe NotificationMessageCreator do
       expect(messages).not_to be_empty
       expect(messages.length).to eql(2)
 
-      expect(all_messages.select { |m|
+      expect(all_messages.count do |m|
         m.to == m1.to and m.notification == m1.notification and m.communication_channel == m1.communication_channel
-      }.length).to eql(2)
+      end).to eql(2)
 
-      expect(all_messages.select { |m|
+      expect(all_messages.count do |m|
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
-      }.length).to eql(2)
+      end).to eql(2)
     end
 
     it "creates stream items" do
@@ -422,16 +433,16 @@ describe NotificationMessageCreator do
       allow(User).to receive(:max_messages_per_day).and_return(1)
       User.max_messages_per_day.times do
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-        expect(messages.select { |m| m.to != 'dashboard' }).not_to be_empty
+        expect(messages.reject { |m| m.to == 'dashboard' }).not_to be_empty
       end
       expect(DelayedMessage.count).to eql(0)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to != 'dashboard' }).to be_empty
+      expect(messages.reject { |m| m.to == 'dashboard' }).to be_empty
       expect(DelayedMessage.count).to eql(1)
       expect(NotificationPolicy.count).to eq 2
       # should not create more dummy policies
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to != 'dashboard' }).to be_empty
+      expect(messages.reject { |m| m.to == 'dashboard' }).to be_empty
       expect(NotificationPolicy.count).to eq 2
     end
 
@@ -451,13 +462,13 @@ describe NotificationMessageCreator do
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD - 1
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 1
+      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 1
 
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
       @communication_channel.save!
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 0
+      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 0
     end
 
     it "persists a message and delayed message for bounced emails" do
@@ -468,7 +479,7 @@ describe NotificationMessageCreator do
       delayed = @communication_channel.delayed_messages.count
       immediate = @communication_channel.messages.count
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      expect(messages.select { |m| m.to == 'valid@example.com' }.size).to eq 0
+      expect(messages.count { |m| m.to == 'valid@example.com' }).to eq 0
       expect(@communication_channel.messages.count).to eq immediate + 1
       expect(@communication_channel.messages.last.workflow_state).to eq 'bounced'
       expect(@communication_channel.delayed_messages.count).to eq delayed + 1
@@ -511,9 +522,9 @@ describe NotificationMessageCreator do
       @notification_policy.save!
       @communication_channel.retire!
 
-      expect {
+      expect do
         NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      }.to change(DelayedMessage, :count).by 0
+      end.to change(DelayedMessage, :count).by 0
     end
 
     it "does not use non-email channels for summary messages" do
@@ -522,9 +533,9 @@ describe NotificationMessageCreator do
       @notification_policy.save!
       @communication_channel.update_attribute(:path_type, 'sms')
 
-      expect {
+      expect do
         NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      }.to change(DelayedMessage, :count).by 0
+      end.to change(DelayedMessage, :count).by 0
     end
 
     context "notification policy overrides" do
@@ -552,7 +563,7 @@ describe NotificationMessageCreator do
         @notification_policy.save!
         NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'daily', @course)
 
-        expect {
+        expect do
           NotificationMessageCreator.new(
             @notification,
             @assignment,
@@ -562,7 +573,7 @@ describe NotificationMessageCreator do
               root_account_id: @user.account.id
             }
           ).create_message
-        }.to change(DelayedMessage, :count).by 1
+        end.to change(DelayedMessage, :count).by 1
       end
 
       it 'uses course overrides over account overrides' do
@@ -626,7 +637,7 @@ describe NotificationMessageCreator do
     end
 
     it "respects user locales" do
-      I18n.backend.stub(:'en-SHOUTY' => { messages: { test_name: { email: { subject: "THIS IS *5*!!!!?!11eleventy1" } } } }) do
+      I18n.backend.stub(:"en-SHOUTY" => { messages: { test_name: { email: { subject: "THIS IS *5*!!!!?!11eleventy1" } } } }) do
         @user.locale = 'en-SHOUTY'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message

@@ -25,7 +25,7 @@ rescue LoadError
 end
 
 begin
-  require '../../spec/coverage_tool.rb'
+  require '../../spec/coverage_tool'
   CoverageTool.start('canvas-partman-gem')
 rescue LoadError => e
   puts "Error: #{e} "
@@ -63,7 +63,7 @@ RSpec.configure do |config|
   end
 
   def count_records(table_name)
-    pg_result = ActiveRecord::Base.connection.select_value <<-SQL
+    pg_result = ActiveRecord::Base.connection.select_value <<~SQL.squish
       SELECT  COUNT(*)
         FROM  #{table_name}
     SQL
@@ -82,7 +82,7 @@ RSpec.configure do |config|
   config.after do
     connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       SchemaHelper.drop_table(partition_table_name)
-    rescue StandardError => e
+    rescue => e
       puts "[WARN] Partition table dropping failed: #{e.message}"
     end
   end

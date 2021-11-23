@@ -96,7 +96,7 @@ describe 'Gradebook Post Policy' do
         expect(Gradebook.grades_posted_option).to be_disabled
       end
 
-      it 'students can see grade', priority: '1', test_id: 3756679 do
+      it 'students can see grade', priority: '1' do
         verify_grade_displayed_on_student_grade_page(@section_one_students.first, '8', @manual_assignment, @course_with_manual_post)
         verify_grade_displayed_on_student_grade_page(@section_two_students.first, '8', @manual_assignment, @course_with_manual_post)
       end
@@ -107,13 +107,13 @@ describe 'Gradebook Post Policy' do
         Gradebook.manually_post_grades(@manual_assignment, 'Everyone', @section2)
       end
 
-      it 'posts for section', priority: '1', test_id: 3756681 do
+      it 'posts for section', priority: '1' do
         @section_two_students.each do |student|
           verify_grade_displayed_on_student_grade_page(student, '8', @manual_assignment, @course_with_manual_post)
         end
       end
 
-      it 'does not post for other section', priority: '1', test_id: 3756681 do
+      it 'does not post for other section', priority: '1' do
         @section_one_students.each do |student|
           user_session(student)
           StudentGradesPage.visit_as_student(@course_with_manual_post)
@@ -122,12 +122,12 @@ describe 'Gradebook Post Policy' do
         end
       end
 
-      it 'hidden pill displayed in submission tray for other section', priority: '1', test_id: 3756681 do
+      it 'hidden pill displayed in submission tray for other section', priority: '1' do
         Gradebook::Cells.open_tray(@section_one_students.first, @manual_assignment)
         expect(element_exists?(Gradebook::GradeDetailTray.hidden_pill_locator, true)).to be_truthy
       end
 
-      it 'Post tray shows unposted count', priority: '1', test_id: 3756684 do
+      it 'Post tray shows unposted count', priority: '1' do
         Gradebook.click_post_grades(@manual_assignment.id)
         expect(PostGradesTray.unposted_count).to eq "2"
       end
@@ -143,11 +143,11 @@ describe 'Gradebook Post Policy' do
         HideGradesTray.hide_grades
       end
 
-      it 'header has hidden icon', priority: '1', test_id: 3756682 do
+      it 'header has hidden icon', priority: '1' do
         expect(Gradebook.assignment_hidden_eye_icon(@manual_assignment.id)).to be_displayed
       end
 
-      it 'student can see hidden icon', priority: '1', test_id: 3756682 do
+      it 'student can see hidden icon', priority: '1' do
         user_session(@section_one_students.second)
         StudentGradesPage.visit_as_student(@course_with_manual_post)
         assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
@@ -159,7 +159,7 @@ describe 'Gradebook Post Policy' do
         expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
       end
 
-      it 'hidden pill displayed in submission tray', priority: '1', test_id: 3756682 do
+      it 'hidden pill displayed in submission tray', priority: '1' do
         Gradebook::Cells.open_tray(@section_two_students.first, @manual_assignment)
         expect(element_exists?(Gradebook::GradeDetailTray.hidden_pill_locator, true)).to be_truthy
       end
@@ -176,7 +176,7 @@ describe 'Gradebook Post Policy' do
         HideGradesTray.hide_grades
       end
 
-      it 'students in section have grades hidden', priority: '1', test_id: 3756683 do
+      it 'students in section have grades hidden', priority: '1' do
         @section_two_students.each do |student|
           user_session(student)
           StudentGradesPage.visit_as_student(@course_with_manual_post)
@@ -185,7 +185,7 @@ describe 'Gradebook Post Policy' do
         end
       end
 
-      it 'students in other section have grades posted', priority: '1', test_id: 3756683 do
+      it 'students in other section have grades posted', priority: '1' do
         @section_one_students.each do |student|
           verify_grade_displayed_on_student_grade_page(student, '8', @manual_assignment, @course_with_manual_post)
         end
@@ -203,11 +203,11 @@ describe 'Gradebook Post Policy' do
       Gradebook.manually_post_grades(@manual_assignment, 'Graded')
     end
 
-    it 'graded students see grades', priority: '1', test_id: 3756680 do
+    it 'graded students see grades', priority: '1' do
       verify_grade_displayed_on_student_grade_page(@graded_student, "8", @manual_assignment, @course_with_manual_post)
     end
 
-    it 'does not post for ungraded', priority: '1', test_id: 3756680 do
+    it 'does not post for ungraded', priority: '1' do
       user_session(@students[3])
       StudentGradesPage.visit_as_student(@course_with_manual_post)
       assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
@@ -227,18 +227,18 @@ describe 'Gradebook Post Policy' do
       Gradebook.manually_post_grades(@manual_assignment, 'Graded', @section2)
     end
 
-    it 'posts graded for section', priority: '1', test_id: 3756681 do
+    it 'posts graded for section', priority: '1' do
       verify_grade_displayed_on_student_grade_page(@section_two_students.first, '8', @manual_assignment, @course_with_manual_post)
     end
 
-    it 'does not post ungraded for section', priority: '1', test_id: 3756681 do
+    it 'does not post ungraded for section', priority: '1' do
       user_session(@section_two_students.second)
       StudentGradesPage.visit_as_student(@course_with_manual_post)
       assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
       expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
     end
 
-    it 'does not post graded for other section', priority: '1', test_id: 3756681 do
+    it 'does not post graded for other section', priority: '1' do
       @section_one_students.each do |student|
         user_session(student)
         StudentGradesPage.visit_as_student(@course_with_manual_post)
@@ -255,7 +255,7 @@ describe 'Gradebook Post Policy' do
       Gradebook::Cells.edit_grade(@course_two_students.first, @auto_assignment, '9')
     end
 
-    it 'grades get posted immediately', priority: '1', test_id: 3756687 do
+    it 'grades get posted immediately', priority: '1' do
       verify_grade_displayed_on_student_grade_page(@course_two_students.first, '9', @auto_assignment, @course_with_auto_post)
     end
   end
@@ -269,7 +269,7 @@ describe 'Gradebook Post Policy' do
       Gradebook::Cells.edit_grade(@section_one_students.first, @manual_assignment, '9')
     end
 
-    it 'posts grade immediately', priority: '1', test_id: 3756685 do
+    it 'posts grade immediately', priority: '1' do
       verify_grade_displayed_on_student_grade_page(@section_one_students.first, '9', @manual_assignment, @course_with_manual_post)
     end
   end

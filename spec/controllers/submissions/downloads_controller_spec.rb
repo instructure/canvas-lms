@@ -94,13 +94,13 @@ describe Submissions::DownloadsController do
       @submission.submitted_at = 3.hours.ago
       @submission.save!
       expect(@submission.attachment).not_to be_nil, 'precondition'
-      expect {
+      expect do
         @submission.with_versioning(explicit: true) do
           @submission.attachment = nil
           @submission.submitted_at = 1.hour.ago
           @submission.save!
         end
-      }.to change(@submission.versions, :count), 'precondition'
+      end.to change(@submission.versions, :count), 'precondition'
       expect(@submission.attachment).to be_nil, 'precondition'
 
       get :show, params: {

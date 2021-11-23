@@ -21,13 +21,13 @@
 require 'spec_helper'
 
 describe GoogleDrive::Client do
-  let(:client_secrets) {
+  let(:client_secrets) do
     {
       'client_id' => "6",
       'client_secret' => "secret",
       'redirect_uri' => "http://example.com/custom"
     }
-  }
+  end
 
   it 'creates a new Google API client' do
     client = described_class.create(client_secrets)

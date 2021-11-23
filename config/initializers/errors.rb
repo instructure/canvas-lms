@@ -27,13 +27,13 @@
 # disabled individually with a setting.
 #
 Rails.configuration.to_prepare do
-  ErrorReport.configure_to_ignore(%w{
+  ErrorReport.configure_to_ignore(%w[
                                     AuthenticationMethods::AccessTokenError
                                     ActionController::InvalidAuthenticityToken
                                     Turnitin::Errors::SubmissionNotScoredError
                                     ActionController::ParameterMissing
                                     SearchTermHelper::SearchTermTooShortError
-                                  })
+                                  ])
 
   # write a database record to our application DB capturing useful info for looking
   # at this error later

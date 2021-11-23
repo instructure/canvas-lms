@@ -243,7 +243,7 @@ describe ContentExport do
     it "sends notifications immediately" do
       communication_channel_model.confirm!
 
-      ['created', 'exporting', 'exported_for_course_copy', 'deleted'].each do |workflow|
+      %w[created exporting exported_for_course_copy deleted].each do |workflow|
         @ce.workflow_state = workflow
         expect { @ce.save! }.to change(DelayedMessage, :count).by 0
         expect(@ce.messages_sent['Content Export Finished']).to be_blank

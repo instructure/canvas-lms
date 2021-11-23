@@ -49,7 +49,7 @@ class Assignment::BulkUpdate
       if base.any?
         assignment.content_being_saved_by(@current_user)
         assignment.updating_user = @current_user
-        assignment.assign_attributes(base.first.slice(*%w(due_at unlock_at lock_at)))
+        assignment.assign_attributes(base.first.slice(*%w[due_at unlock_at lock_at]))
         assignments_to_save << assignment if assignment.changed?
       end
 
@@ -58,7 +58,7 @@ class Assignment::BulkUpdate
         override = assignment.assignment_overrides.detect { |o| o.id == override_data['id'].to_i }
         raise ActiveRecord::RecordNotFound, "invalid assignment override id #{override_data['id']} for assignment #{assignment.id}" unless override
 
-        %w(due_at unlock_at lock_at).each do |date|
+        %w[due_at unlock_at lock_at].each do |date|
           if override_data.key?(date)
             override.send("#{date}=", override_data[date])
             override.send("#{date}_overridden=", true)

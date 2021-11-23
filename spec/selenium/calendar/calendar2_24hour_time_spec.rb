@@ -29,13 +29,13 @@ describe 'calendar2' do
   end
 
   context '12-hour' do
-    it 'shows assignment in 12-hour time', priority: "1", test_id: 467480 do
+    it 'shows assignment in 12-hour time', priority: "1" do
       create_course_assignment
       get '/calendar2'
       expect(f('.fc-time')).to include_text('9p')
     end
 
-    it 'shows event in 12-hour time', priority: "1", test_id: 467479 do
+    it 'shows event in 12-hour time', priority: "1" do
       create_course_event
       get '/calendar2'
       expect(f('.fc-time')).to include_text('9p')
@@ -50,13 +50,13 @@ describe 'calendar2' do
       end
     end
 
-    it 'shows assignment in 24-hour time', priority: "1", test_id: 467478 do
+    it 'shows assignment in 24-hour time', priority: "1" do
       create_course_assignment
       get '/calendar2'
       expect(f('.fc-time')).to include_text('21')
     end
 
-    it 'shows event in 24-hour time', priority: "1", test_id: 467477 do
+    it 'shows event in 24-hour time', priority: "1" do
       create_course_event
       get '/calendar2'
       expect(f('.fc-time')).to include_text('21')

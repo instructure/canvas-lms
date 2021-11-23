@@ -25,7 +25,7 @@ describe Types::MediaSourceType do
     teacher_in_course(active_all: true)
 
     @media_object = media_object(
-      user: @teacher,
+      user: @teacher
     )
   end
 

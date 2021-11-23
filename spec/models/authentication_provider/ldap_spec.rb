@@ -65,7 +65,7 @@ describe AuthenticationProvider::LDAP do
 
     context "statsd" do
       before do
-        @ldap = double()
+        @ldap = double
         allow(@ldap).to receive(:base)
         allow(@aac).to receive(:ldap_connection).and_return(@ldap)
         allow(@aac).to receive(:ldap_filter).and_return(nil)

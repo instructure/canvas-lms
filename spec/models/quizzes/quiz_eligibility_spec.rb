@@ -93,7 +93,7 @@ describe Quizzes::QuizEligibility do
     end
 
     it 'returns false if course is completed' do
-      other_user = user_factory()
+      other_user = user_factory
       @course.enroll_student(other_user, enrollment_state: 'complete')
       allow(@eligibility).to receive(:user).and_return(other_user)
 

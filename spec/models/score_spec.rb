@@ -290,13 +290,13 @@ describe Score do
     it "doesn't allow random classmates to read" do
       score
       student_in_course(active_all: true)
-      expect(score.grants_right? @student, :read).to eq false
+      expect(score.grants_right?(@student, :read)).to eq false
     end
 
     it "doesn't work for yourself if the course is configured badly" do
       @enrollment.course.hide_final_grade = true
       @enrollment.course.save!
-      expect(score.grants_right? @enrollment.user, :read).to eq false
+      expect(score.grants_right?(@enrollment.user, :read)).to eq false
     end
   end
 

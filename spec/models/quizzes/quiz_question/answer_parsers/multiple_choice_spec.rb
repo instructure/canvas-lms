@@ -46,7 +46,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleChoice do
       ]
     end
 
-    let(:question_params) { Hash.new }
+    let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleChoice }
 
     include_examples "All answer parsers"

@@ -65,16 +65,16 @@ describe "conversations new" do
       end
 
       describe 'view filter' do
-        it 'shows submission comments', priority: "2", test_id: 197517 do
+        it 'shows submission comments', priority: "2" do
           expect(conversation_elements.size).to eq 2
         end
 
-        it 'filters by course', priority: "2", test_id: 197518 do
+        it 'filters by course', priority: "2" do
           select_course(@course1.id)
           expect(conversation_elements.size).to eq 1
         end
 
-        it 'filters by submitter', priority: "2", test_id: 197519 do
+        it 'filters by submitter', priority: "2" do
           name = @s2.name
           f('[role=main] header [role=search] input').send_keys(name)
           fj(".ac-result:contains('#{name}')").click
@@ -82,7 +82,7 @@ describe "conversations new" do
         end
       end
 
-      it 'adds new messages to the view', priority: "2", test_id: 197520 do
+      it 'adds new messages to the view', priority: "2" do
         initial_message_count = @submission.submission_comments.count
         conversation_elements[0].click
         wait_for_ajaximations
@@ -91,14 +91,14 @@ describe "conversations new" do
         expect(@submission.reload.submission_comments.count).to eq(initial_message_count + 1)
       end
 
-      it 'marks unread on click', priority: "2", test_id: 197521 do
+      it 'marks unread on click', priority: "2" do
         expect(@submission.read?(@teacher)).to be_falsey
         conversation_elements[0].click
         wait_for_ajaximations
         expect(@submission.read?(@teacher)).to be_truthy
       end
 
-      it 'marks an read/unread', priority: "2", test_id: 197522 do
+      it 'marks an read/unread', priority: "2" do
         expect(@submission.read?(@teacher)).to be_falsey
         toggle = fj('.read-state', conversation_elements[0])
         toggle.click

@@ -37,12 +37,12 @@ module BasicLTI
     # gives instfs about 7 hours to have an outage and eventually take the file
     MAX_ATTEMPTS = 10
 
-    SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
         sourcedid = BasicLTI::Sourcedid.load!(sourceid)
-        raise BasicLTI::Errors::InvalidSourceId, 'Tool is invalid' unless tool == sourcedid.tool
+        raise BasicLTI::Errors::InvalidSourceId.new('Tool is invalid', :tool_invalid) unless tool == sourcedid.tool
 
         return sourcedid.assignment, sourcedid.user
       end
@@ -69,12 +69,12 @@ module BasicLTI
         res.code_major = 'unsupported'
         res.description = 'Legacy request could not be handled. ¯\_(ツ)_/¯'
       end
-      return res
+      res
     end
 
     class LtiResponse
       include TextHelper
-      attr_accessor :code_major, :severity, :description, :body
+      attr_accessor :code_major, :severity, :description, :body, :error_code
 
       def initialize(lti_request)
         @lti_request = lti_request
@@ -92,7 +92,7 @@ module BasicLTI
 
       def operation_ref_identifier
         tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
-        tag && tag.sub(%r{Request$}, '')
+        tag&.sub(/Request$/, '')
       end
 
       def result_score
@@ -141,30 +141,35 @@ module BasicLTI
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_messageRefIdentifier').content = message_ref_identifier
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_operationRefIdentifier').content = operation_ref_identifier
         xml.at_css('imsx_POXBody').inner_html = body if body.present?
+
+        error_code_node = xml.at_css('imsx_POXHeader imsx_statusInfo ext_canvas_error_code')
+        error_code.present? ? error_code_node.content = error_code : error_code_node.remove
+
         xml.to_s
       end
 
       def self.envelope
         return @envelope if @envelope
 
-        @envelope = Nokogiri::XML.parse <<-XML
-      <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-        <imsx_POXHeader>
-          <imsx_POXResponseHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier></imsx_messageIdentifier>
-            <imsx_statusInfo>
-              <imsx_codeMajor></imsx_codeMajor>
-              <imsx_severity>status</imsx_severity>
-              <imsx_description></imsx_description>
-              <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
-              <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
-            </imsx_statusInfo>
-          </imsx_POXResponseHeaderInfo>
-        </imsx_POXHeader>
-        <imsx_POXBody>
-        </imsx_POXBody>
-      </imsx_POXEnvelopeResponse>
+        @envelope = Nokogiri::XML.parse <<~XML
+          <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+            <imsx_POXHeader>
+              <imsx_POXResponseHeaderInfo>
+                <imsx_version>V1.0</imsx_version>
+                <imsx_messageIdentifier></imsx_messageIdentifier>
+                <imsx_statusInfo>
+                  <imsx_codeMajor></imsx_codeMajor>
+                  <imsx_severity>status</imsx_severity>
+                  <imsx_description></imsx_description>
+                  <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
+                  <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
+                  <ext_canvas_error_code></ext_canvas_error_code>
+                </imsx_statusInfo>
+              </imsx_POXResponseHeaderInfo>
+            </imsx_POXHeader>
+            <imsx_POXBody>
+            </imsx_POXBody>
+          </imsx_POXEnvelopeResponse>
         XML
         @envelope.encoding = 'UTF-8'
         @envelope
@@ -177,26 +182,24 @@ module BasicLTI
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
-        source_id = self.sourcedid
+        source_id = sourcedid
 
         begin
           assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue Errors::InvalidSourceId => e
-          self.code_major = 'failure'
-          self.description = e.to_s
+          report_failure(e.code, e.to_s)
           self.body = "<#{operation_ref_identifier}Response />"
           return true
         end
 
-        op = self.operation_ref_identifier.underscore
+        op = operation_ref_identifier.underscore
         # Write results are disabled for concluded users, read results are still allowed
         if op != 'read_result' && !user_enrollment_active?(assignment, user)
-          self.code_major = 'failure'
-          self.description = 'Course not available for student'
+          report_failure(:course_not_available, 'Course not available for student')
           self.body = "<#{operation_ref_identifier}Response />"
           return true
-        elsif self.respond_to?("handle_#{op}", true)
-          return self.send("handle_#{op}", tool, assignment, user)
+        elsif respond_to?("handle_#{op}", true)
+          return send("handle_#{op}", tool, assignment, user)
         end
 
         false
@@ -240,25 +243,38 @@ module BasicLTI
 
       protected
 
+      def report_failure(code, description)
+        self.code_major = "failure"
+        self.description = description
+        self.error_code = code
+      end
+
+      def failure?
+        code_major == "failure"
+      end
+
       def handle_replace_result(tool, assignment, user)
-        text_value = self.result_score
-        score_value = self.result_total_score
-        error_message = nil
+        text_value = result_score
+        score_value = result_total_score
         begin
           new_score = Float(text_value)
         rescue
           new_score = false
-          error_message = text_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result', <<~NO_POINTS, :grade => text_value)
-            Unable to parse resultScore: %{grade}
-          NO_POINTS
+          unless text_value.nil?
+            report_failure(:no_parseable_result_score, I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, :grade => text_value))
+              Unable to parse resultScore: %{grade}
+            TEXT
+          end
         end
         begin
           raw_score = Float(score_value)
         rescue
           raw_score = false
-          error_message ||= score_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~NO_POINTS, :grade => score_value)
-            Unable to parse resultTotalScore: %{grade}
-          NO_POINTS
+          unless score_value.nil? || failure?
+            report_failure(:no_parseable_result_total_score, I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, :grade => score_value))
+              Unable to parse resultTotalScore: %{grade}
+            TEXT
+          end
         end
         submission_hash = {}
         existing_submission = assignment.submissions.where(user_id: user.id).first
@@ -303,38 +319,33 @@ module BasicLTI
               submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
               submission_hash[:grader_id] = -tool.id
             else
-              error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
+              report_failure(:bad_score, I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1"))
             end
-          elsif !error_message && !text && !url && !launch_url
-            error_message = I18n.t('lib.basic_lti.no_score', "No score given")
+          elsif !failure? && !text && !url && !launch_url
+            report_failure(:no_score, I18n.t('lib.basic_lti.no_score', "No score given"))
           end
         end
 
         xml_submitted_at = submission_submitted_at
         submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
         if xml_submitted_at.present? && submitted_at.nil?
-          error_message = I18n.t('Invalid timestamp - timestamp not parseable')
+          report_failure(:timestamp_not_parseable, I18n.t('Invalid timestamp - timestamp not parseable'))
         elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
-          error_message = I18n.t('Invalid timestamp - timestamp in future')
+          report_failure(:timestamp_in_future, I18n.t('Invalid timestamp - timestamp in future'))
         end
         submission_hash[:submitted_at] = submitted_at || Time.zone.now
 
-        if error_message
-          self.code_major = 'failure'
-          self.description = error_message
-        elsif assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
-
+        if !failure? && assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
           unless (submission = existing_submission)
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
           end
-          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~NO_POINTS, :grade => submission_hash[:grade]))
+          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~TEXT, :grade => submission_hash[:grade]))
             An external tool attempted to grade this assignment as %{grade}, but was unable
             to because the assignment has no points possible.
-          NO_POINTS
-          self.code_major = 'failure'
-          self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
-        else
+          TEXT
+          report_failure(:no_points_possible, I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.'))
+        elsif !failure?
           if attachment
             job_options = {
               priority: Delayed::HIGH_PRIORITY,
@@ -349,8 +360,7 @@ module BasicLTI
               user
             )
           elsif !(@submission = self.class.create_homework_submission(submission_hash, assignment, user))
-            self.code_major = 'failure'
-            self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+            report_failure(:no_submission_created, I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.'))
           end
         end
 
@@ -367,16 +377,16 @@ module BasicLTI
 
       def handle_read_result(_, assignment, user)
         @submission = assignment.submission_for_student(user)
-        self.body = %{
-        <readResultResponse>
-          <result>
-            <resultScore>
-              <language>en</language>
-              <textString>#{submission_score}</textString>
-            </resultScore>
-          </result>
-        </readResultResponse>
-      }
+        self.body = <<~XML
+          <readResultResponse>
+            <result>
+              <resultScore>
+                <language>en</language>
+                <textString>#{submission_score}</textString>
+              </resultScore>
+            </result>
+          </readResultResponse>
+        XML
         true
       end
 
@@ -402,14 +412,11 @@ module BasicLTI
         end
 
         def operation_ref_identifier
-          case @params[:lti_message_type].try(:downcase)
-          when 'basic-lis-updateresult'
-            'replaceResult'
-          when 'basic-lis-readresult'
-            'readResult'
-          when 'basic-lis-deleteresult'
-            'deleteResult'
-          end
+          {
+            'basic-lis-updateresult' => 'replaceResult',
+            'basic-lis-readresult' => 'readResult',
+            'basic-lis-deleteresult' => 'deleteResult'
+          }[@params[:lti_message_type].try(:downcase)]
         end
 
         def to_xml
@@ -427,23 +434,23 @@ module BasicLTI
         def self.envelope
           return @envelope if @envelope
 
-          @envelope = Nokogiri::XML.parse <<-XML
-        <message_response>
-          <lti_message_type></lti_message_type>
-          <statusinfo>
-            <codemajor></codemajor>
-            <severity>Status</severity>
-            <codeminor>fullsuccess</codeminor>
-          </statusinfo>
-          <result>
-            <sourcedid></sourcedid>
-            <resultscore>
-              <resultvaluesourcedid>decimal</resultvaluesourdedid>
-              <textstring></textstring>
-              <language>en-US</language>
-            </resultscore>
-          </result>
-        </message_response>
+          @envelope = Nokogiri::XML.parse <<~XML
+            <message_response>
+              <lti_message_type></lti_message_type>
+              <statusinfo>
+                <codemajor></codemajor>
+                <severity>Status</severity>
+                <codeminor>fullsuccess</codeminor>
+              </statusinfo>
+              <result>
+                <sourcedid></sourcedid>
+                <resultscore>
+                  <resultvaluesourcedid>decimal</resultvaluesourdedid>
+                  <textstring></textstring>
+                  <language>en-US</language>
+                </resultscore>
+              </result>
+            </message_response>
           XML
           @envelope.encoding = 'UTF-8'
           @envelope

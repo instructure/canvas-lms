@@ -196,14 +196,14 @@ module Canvas::OAuth
       end
 
       it 'does not put anything else into the json' do
-        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in', 'token_type'])
+        expect(json.keys.sort).to match_array(%w[access_token refresh_token user expires_in token_type])
       end
 
       it 'does not put expires_in in the json when auto_expire_tokens is false' do
         key = token.key
         key.auto_expire_tokens = false
         key.save!
-        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'token_type'])
+        expect(json.keys.sort).to match_array(%w[access_token refresh_token user token_type])
       end
 
       it 'puts real_user in the json when masquerading' do

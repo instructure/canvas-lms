@@ -21,7 +21,7 @@
 describe AuthenticationProvider::Google do
   it 'has valid recognized_params' do
     expect(AuthenticationProvider::Google.recognized_params).to match_array(
-      [:client_id, :client_secret, :mfa_required, :login_attribute, :jit_provisioning, :hosted_domain]
+      %i[client_id client_secret mfa_required login_attribute jit_provisioning hosted_domain]
     )
   end
 

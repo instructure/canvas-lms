@@ -216,7 +216,7 @@ describe AssignmentGroupsController, type: :request do
                             { :controller => 'assignment_groups',
                               :action => 'index', :format => 'json',
                               :course_id => @course.id,
-                              :include => ["assignments", "observed_users", "submission"] })
+                              :include => %w[assignments observed_users submission] })
 
     expect(json.first['assignments'].first['submission'].map { |s| s['user_id'] }).to eql [@observed_student.id]
   end
@@ -337,9 +337,7 @@ describe AssignmentGroupsController, type: :request do
                       },
                       include: ['assignments', 'assignment_visibility'])
       json.each do |ag|
-        ag["assignments"].each do |a|
-          expect(a.has_key?("assignment_visibility")).to eq true
-        end
+        expect(ag["assignments"]).to all(have_key("assignment_visibility"))
       end
     end
   end
@@ -482,7 +480,7 @@ describe AssignmentGroupsController, type: :request do
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates&include[]=can_edit",
                     { controller: 'assignment_groups', action: 'index',
                       format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments', 'all_dates', 'can_edit'] })
+                      include: %w[assignments all_dates can_edit] })
 
     expected = [
       {
@@ -714,9 +712,7 @@ describe AssignmentGroupsApiController, type: :request do
                         assignment_group_id: @group.id.to_s
                       },
                       include: ['assignments', 'assignment_visibility'])
-      json['assignments'].each do |a|
-        expect(a.has_key?("assignment_visibility")).to eq true
-      end
+      expect(json['assignments']).to all(have_key("assignment_visibility"))
     end
 
     it "does not include assignment_visibility when requested as a student" do
@@ -732,7 +728,7 @@ describe AssignmentGroupsApiController, type: :request do
                       },
                       include: ['assignments', 'assignment_visibility'])
       json['assignments'].each do |a|
-        expect(a.has_key?("assignment_visibility")).to eq false
+        expect(a).not_to have_key("assignment_visibility")
       end
     end
 
@@ -944,7 +940,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     context "when an assignment is due in a closed grading period" do
       let(:call_update) do
-        ->(params, expected_status) do
+        lambda do |params, expected_status|
           api_call_as_user(
             @current_user,
             :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",

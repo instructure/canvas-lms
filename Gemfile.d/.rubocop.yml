@@ -1,8 +1,8 @@
 inherit_from:
   - ../.rubocop.yml
 
+Bundler/OrderedGems:
+  Enabled: false # this isn't good for us because of how we pin dependencies
+
 Layout/IndentationConsistency:
   Enabled: false # we purposely indent dependent gems
-
-Rails:
-  Enabled: false # Rails isn't loaded yet

@@ -195,16 +195,16 @@ describe ContentMigration do
       expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
       expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
 
-      attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
-               :automatic_peer_reviews, :anonymous_peer_reviews,
-               :grade_group_students_individually, :allowed_extensions,
-               :position, :peer_review_count, :omit_from_final_grade, :post_to_sis, :allowed_attempts]
+      attrs = %i[turnitin_enabled vericite_enabled turnitin_settings peer_reviews
+                 automatic_peer_reviews anonymous_peer_reviews
+                 grade_group_students_individually allowed_extensions
+                 position peer_review_count omit_from_final_grade post_to_sis allowed_attempts]
 
       run_course_copy
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       attrs.each do |attr|
-        if @assignment[attr].class == Hash
+        if @assignment[attr].instance_of?(Hash)
           expect(@assignment[attr].stringify_keys).to eq new_assignment[attr].stringify_keys
         else
           expect(@assignment[attr]).to eq new_assignment[attr]
@@ -325,9 +325,9 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment.reload
-      [:moderated_grading, :grader_count, :grader_comments_visible_to_graders,
-       :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-       :anonymous_instructor_annotations].each do |attr|
+      %i[moderated_grading grader_count grader_comments_visible_to_graders
+         anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+         anonymous_instructor_annotations].each do |attr|
         expect(new_assignment.send(attr)).to eq @assignment.send(attr)
       end
     end
@@ -433,9 +433,9 @@ describe ContentMigration do
       it "does not copy the attachment if the assignment does not allow annotations" do
         source_assignment.update!(submission_types: "online_text_entry")
 
-        expect {
+        expect do
           run_course_copy
-        }.not_to change {
+        end.not_to change {
           copied_annotation_attachments.count
         }
       end
@@ -760,7 +760,7 @@ describe ContentMigration do
         assign.save!
         @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
         run_course_copy
-        expect(@copy_to.grading_standards.map(&:title)).to eql %w(Two)
+        expect(@copy_to.grading_standards.map(&:title)).to eql %w[Two]
         expect(@copy_to.assignments.first.grading_standard.title).to eql 'Two'
       end
 
@@ -985,7 +985,7 @@ describe ContentMigration do
         let(:assignment) do
           @course.assignments.create!(
             name: 'test assignment',
-            submission_types: 'none',
+            submission_types: 'none'
           )
         end
 

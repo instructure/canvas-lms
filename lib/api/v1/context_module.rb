@@ -26,16 +26,16 @@ module Api::V1::ContextModule
   include Api::V1::Locked
   include Api::V1::Assignment
 
-  MODULE_JSON_ATTRS = %w(id position name unlock_at).freeze
+  MODULE_JSON_ATTRS = %w[id position name unlock_at].freeze
 
-  MODULE_ITEM_JSON_ATTRS = %w(id position title indent).freeze
+  MODULE_ITEM_JSON_ATTRS = %w[id position title indent].freeze
 
   ITEM_TYPE = {
     Assignment: 'assignment',
     Attachment: 'file',
     DiscussionTopic: 'topic',
     Quiz: 'quiz',
-    'Quizzes::Quiz': 'quiz',
+    "Quizzes::Quiz": 'quiz',
     WikiPage: 'page'
   }.freeze
 
@@ -44,7 +44,7 @@ module Api::V1::ContextModule
     hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
     hash['require_sequential_progress'] = !!context_module.require_sequential_progress?
     hash['publish_final_grade'] = context_module.publish_final_grade?
-    hash['prerequisite_module_ids'] = context_module.prerequisites.reject { |p| p[:type] != 'context_module' }.map { |p| p[:id] }
+    hash['prerequisite_module_ids'] = context_module.prerequisites.select { |p| p[:type] == 'context_module' }.pluck(:id)
     if progression
       hash['state'] = progression.workflow_state
       hash['completed_at'] = progression.completed_at
@@ -97,7 +97,7 @@ module Api::V1::ContextModule
 
     # add content_id, if applicable
     # (note that wiki page ids are not exposed by the api)
-    unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
+    unless %w[WikiPage ContextModuleSubHeader ExternalUrl].include? content_tag.content_type
       hash['content_id'] = content_tag.content_id
     end
 
@@ -116,7 +116,7 @@ module Api::V1::ContextModule
     when 'Assignment', 'WikiPage', 'Attachment'
       api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
     when 'ContextExternalTool'
-      if content_tag.content && content_tag.content.tool_id
+      if content_tag.content&.tool_id
         api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => (content_tag.url || content_tag.content.url))
       elsif content_tag.content
         if content_tag.content_id
@@ -149,7 +149,7 @@ module Api::V1::ContextModule
       hash['completion_requirement'] = ch
     end
 
-    has_update_rights = if opts.has_key? :has_update_rights
+    has_update_rights = if opts.key? :has_update_rights
                           opts[:has_update_rights]
                         else
                           context_module.grants_right?(current_user, :update)
@@ -172,7 +172,7 @@ module Api::V1::ContextModule
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    attrs = [:usage_rights, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
+    attrs = %i[usage_rights locked hidden lock_explanation display_name due_at unlock_at lock_at points_possible]
 
     attrs.each do |attr|
       if (val = item.try(attr))
@@ -183,7 +183,7 @@ module Api::V1::ContextModule
     unless opts[:for_admin]
       details[:thumbnail_url] = authenticated_thumbnail_url(item) if item.is_a?(Attachment)
       item_type = ITEM_TYPE[content_tag.content_type.to_sym] || ''
-      lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
+      lock_item = item.respond_to?(:locked_for?) ? item : content_tag
       locked_json(details, lock_item, current_user, item_type)
     end
 

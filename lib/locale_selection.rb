@@ -29,25 +29,25 @@ module LocaleSelection
     # groups cheat and set the context to be the group after get_context runs
     # but before set_locale runs, but we want to do locale lookup based on the
     # actual context.
-    if context && context.is_a?(Group) && context.context
+    if context.is_a?(Group) && context.context
       context = context.context
     end
 
     sources = [
       -> { context.locale if context.try(:is_a?, Course) },
-      -> { user.locale if user && user.locale },
-      -> { session_locale if session_locale },
+      -> { user.locale if user&.locale },
+      -> { session_locale },
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
-      -> {
+      lambda do
         if accept_language && (locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases))
           GuardRail.activate(:primary) do
             user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
           end
           locale
         end
-      },
+      end,
       -> { !ignore_browser_locale && user.try(:browser_locale) },
       -> { I18n.default_locale.to_s }
     ]
@@ -60,20 +60,20 @@ module LocaleSelection
     nil
   end
 
-  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/
-  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/
-  SEPARATOR = /\s*,\s*/
-  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
+  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/.freeze
+  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/.freeze
+  SEPARATOR = /\s*,\s*/.freeze
+  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/.freeze
 
   def infer_browser_locale(accept_language, locales_with_aliases)
-    return nil unless accept_language =~ ACCEPT_LANGUAGE
+    return nil unless ACCEPT_LANGUAGE.match?(accept_language)
 
     supported_locales = locales_with_aliases.keys
 
-    ranges = accept_language.downcase.split(SEPARATOR).map { |range|
+    ranges = accept_language.downcase.split(SEPARATOR).map do |range|
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
       [range.sub(/\s*;.*/, ''), quality]
-    }
+    end
     ranges = ranges.sort_by { |r,| r == '*' ? 1 : -r.count('-') }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest
@@ -137,7 +137,7 @@ module LocaleSelection
   def self.locales_with_aliases
     @locales_with_aliases ||= begin
       locales = I18n.available_locales.map { |l| [l.to_s, nil] }.to_h
-      locales.keys.each do |locale|
+      locales.keys.each do |locale| # rubocop:disable Style/HashEachMethods mutation during iteration
         aliases = Array.wrap(I18n.send(:t, :aliases, locale: locale, default: nil))
         aliases.each do |a|
           locales[a] = locale

@@ -27,18 +27,18 @@ module SIS
       attr_accessor :root_account, :batch, :finished, :counts,
                     :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
 
-      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
+      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i.freeze
 
       # The order of this array is important:
       #  * Account must be imported before Term and Course
       #  * Course must be imported before Section
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
-      IMPORTERS = %i{change_sis_id account term abstract_course course section
+      IMPORTERS = %i[change_sis_id account term abstract_course course section
                      xlist user login enrollment admin group_category group group_membership
-                     grade_publishing_results user_observer}.freeze
+                     grade_publishing_results user_observer].freeze
 
-      HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w{password ssha_password}.freeze
+      HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w[password ssha_password].freeze
 
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
@@ -72,7 +72,7 @@ module SIS
 
         settings = PluginSetting.settings_for_plugin('sis_import')
         parallel = Setting.get("sis_parallel_import/#{@root_account.global_id}_num_strands", nil).presence || "1"
-        if settings.dig(:parallelism).to_i > 1 && settings[:parallelism] != parallel
+        if settings[:parallelism].to_i > 1 && settings[:parallelism] != parallel
           Setting.set("sis_parallel_import/#{@root_account.global_id}_num_strands", settings[:parallelism])
         end
         @rows_for_parallel = nil
@@ -81,7 +81,7 @@ module SIS
       end
 
       def self.process(root_account, opts = {})
-        importer = self.new(root_account, opts)
+        importer = new(root_account, opts)
         importer.process
         importer
       end
@@ -90,23 +90,24 @@ module SIS
         @tmp_dirs = []
         @batch.data[:downloadable_attachment_ids] ||= []
         @files.each do |file|
-          if File.file?(file)
-            if File.extname(file).downcase == '.zip'
-              tmp_dir = Dir.mktmpdir
-              @tmp_dirs << tmp_dir
-              CanvasUnzip::extract_archive(file, tmp_dir)
-              Dir[File.join(tmp_dir, "**/**")].each do |fn|
-                next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
+          next unless File.file?(file)
 
-                file_name = fn[tmp_dir.size + 1..-1]
-                att = create_batch_attachment(File.join(tmp_dir, file_name))
-                process_file(tmp_dir, file_name, att)
-              end
-            elsif File.extname(file).downcase == '.csv'
-              att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).downcase == '.csv'
-              att ||= create_batch_attachment file
-              process_file(File.dirname(file), File.basename(file), att)
+          case File.extname(file).downcase
+          when '.zip'
+            tmp_dir = Dir.mktmpdir
+            @tmp_dirs << tmp_dir
+            CanvasUnzip.extract_archive(file, tmp_dir)
+            Dir[File.join(tmp_dir, "**/**")].each do |fn|
+              next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
+
+              file_name = fn[tmp_dir.size + 1..]
+              att = create_batch_attachment(File.join(tmp_dir, file_name))
+              process_file(tmp_dir, file_name, att)
             end
+          when '.csv'
+            att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?('.csv')
+            att ||= create_batch_attachment file
+            process_file(File.dirname(file), File.basename(file), att)
           end
         end
         remove_instance_variable(:@files)
@@ -143,11 +144,9 @@ module SIS
         rows = 0
         ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS) do |faster_csv|
           while faster_csv.shift
-            unless @read_only
-              if create_importers && rows % @rows_for_parallel == 0
-                @parallel_importers[importer] ||= []
-                @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
-              end
+            if !@read_only && create_importers && rows % @rows_for_parallel == 0
+              @parallel_importers[importer] ||= []
+              @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
             end
             rows += 1
           end
@@ -188,7 +187,7 @@ module SIS
         if @run_immediately
           run_all_importers
         else
-          @parallel_importers = Hash[@parallel_importers.map { |k, v| [k, v.map(&:id)] }] # save as ids in handler
+          @parallel_importers = @parallel_importers.transform_values { |v| v.map(&:id) } # save as ids in handler
           remove_instance_variable(:@csvs) # don't need anymore
           queue_next_importer_set
         end
@@ -210,7 +209,7 @@ module SIS
 
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
-        current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round, 99].min
+        current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.sum(&:count)).round, 99].min
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
@@ -245,10 +244,10 @@ module SIS
           fail_with_error!(e, csv: csv)
         end
       ensure
-        unless @run_immediately || ensure_later
-          if is_last_parallel_importer_of_type?(parallel_importer)
-            queue_next_importer_set unless should_stop_import?
-          end
+        if !(@run_immediately || ensure_later) &&
+           is_last_parallel_importer_of_type?(parallel_importer) &&
+           !should_stop_import?
+          queue_next_importer_set
         end
       end
 
@@ -320,7 +319,7 @@ module SIS
           end
         end
         @parallel_importers.each do |type, importers|
-          @batch.data[:counts][type.to_s.pluralize.to_sym] = importers.map(&:rows_processed).sum
+          @batch.data[:counts][type.to_s.pluralize.to_sym] = importers.sum(&:rows_processed)
         end
         finish
       end
@@ -361,17 +360,17 @@ module SIS
 
       def is_last_parallel_importer_of_type?(parallel_importer)
         importer_type = parallel_importer.importer_type.to_sym
-        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running retry}).exists?
+        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w[queued running retry]).exists?
 
         SisBatch.transaction do
           @batch.reload(:lock => true)
-          if !@batch.data[:completed_importers].include?(importer_type) # check for race condition
+          if @batch.data[:completed_importers].include?(importer_type)
+            false
+          else # check for race condition
             @batch.data[:completed_importers] << importer_type
             @batch.data[:counts][importer_type.to_s.pluralize.to_sym] = @batch.parallel_importers.where(:importer_type => importer_type).sum(:rows_processed).to_i
             @batch.save
             true
-          else
-            false
           end
         end
       end
@@ -390,7 +389,7 @@ module SIS
 
       def process_file(base, file, att)
         csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
-        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
+        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?('.csv')
           unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return

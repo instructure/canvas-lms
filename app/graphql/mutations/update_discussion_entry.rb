@@ -37,14 +37,14 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
       entry.message = Api::Html::Content.process_incoming(input[:message], host: context[:request].host, port: context[:request].port)
     end
 
-    unless input[:remove_attachment].nil?
-      entry.attachment_id = nil if input[:remove_attachment]
+    if !input[:remove_attachment].nil? && input[:remove_attachment]
+      entry.attachment_id = nil
     end
 
-    unless input[:include_reply_preview].nil?
-      if entry.parent_entry && entry.parent_entry.id != entry.root_entry_id
-        entry.include_reply_preview = input[:include_reply_preview]
-      end
+    if !input[:include_reply_preview].nil? &&
+       entry.parent_entry &&
+       entry.parent_entry.id != entry.root_entry_id
+      entry.include_reply_preview = input[:include_reply_preview]
     end
 
     unless input[:file_id].nil?

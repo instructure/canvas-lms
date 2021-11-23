@@ -32,7 +32,7 @@ describe Api::V1::PageView do
 
     @page_views = []
     (1..5).each do |i|
-      @page_views << PageView.new { |p|
+      @page_views << PageView.new do |p|
         p.assign_attributes({
                               :request_id => @request_id,
                               :remote_ip => '10.10.10.10',
@@ -52,7 +52,7 @@ describe Api::V1::PageView do
                               :controller => "controller",
                               :account_id => @domain_root_account.id
                             })
-      }
+      end
     end
     @page_view = @page_views.first
 

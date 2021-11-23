@@ -23,9 +23,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
+  protect_from_forgery :except => %i[create backup record_answer], with: :exception
   before_action :require_context
-  before_action :require_quiz, :only => [:index, :create, :extensions, :show, :update, :log]
+  before_action :require_quiz, :only => %i[index create extensions show update log]
   before_action :require_quiz_submission, :only => [:show, :log]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
@@ -136,7 +136,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     # temporary fix for CNVS-8651 while we rewrite front-end quizzes
     if request.get?
       @quiz = require_quiz
-      user_id = @current_user && @current_user.id
+      user_id = @current_user&.id
       redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
     else
       backup

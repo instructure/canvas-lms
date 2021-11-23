@@ -23,7 +23,7 @@ describe "assignments" do
   include_context "in-process server selenium tests"
 
   context "peer reviews" do
-    it "allows deleting a peer review", priority: "2", test_id: 216382 do
+    it "allows deleting a peer review", priority: "2" do
       skip_if_safari(:alert)
       course_with_teacher_logged_in
       @student1 = student_in_course.user
@@ -44,7 +44,7 @@ describe "assignments" do
       accept_alert
       wait_for_ajaximations
 
-      expect(fj('.student_reviews:first .peer_reviews').text()).to match(/None Assigned/)
+      expect(fj('.student_reviews:first .peer_reviews').text).to match(/None Assigned/)
       keep_trying_until do
         expect(@assignment.reload.submissions.map(&:assessment_requests).flatten.length).to eq 1
       end
@@ -120,7 +120,7 @@ describe "assignments" do
       end
     end
 
-    it "allows an account admin who is also a student to submit a peer review", priority: "2", test_id: 216383 do
+    it "allows an account admin who is also a student to submit a peer review", priority: "2" do
       course_factory(active_course: true)
       admin_logged_in(account: @course.root_account)
       student_in_course(user: @admin)
@@ -152,7 +152,7 @@ describe "assignments" do
     let!(:teacher) { review_course.teachers.first }
     let!(:reviewed) { student_in_course(active_all: true).user }
     let!(:reviewer) { student_in_course(active_all: true).user }
-    let!(:assignment) {
+    let!(:assignment) do
       @assignment = assignment_model({
                                        course: review_course,
                                        peer_reviews: true,
@@ -160,8 +160,8 @@ describe "assignments" do
                                      })
       @assignment.unmute!
       @assignment
-    }
-    let!(:submission) {
+    end
+    let!(:submission) do
       submission_model({
                          assignment: assignment,
                          body: 'submission body',
@@ -171,8 +171,8 @@ describe "assignments" do
                          submission_type: 'online_text_entry',
                          user: reviewed
                        })
-    }
-    let!(:submissionReviewer) {
+    end
+    let!(:submissionReviewer) do
       submission_model({
                          assignment: assignment,
                          body: 'submission body reviewer',
@@ -182,20 +182,20 @@ describe "assignments" do
                          submission_type: 'online_text_entry',
                          user: reviewer
                        })
-    }
-    let!(:comment) {
+    end
+    let!(:comment) do
       submission_comment_model({
                                  author: reviewer,
                                  submission: submission
                                })
-    }
+    end
     let!(:rubric) { rubric_model }
-    let!(:association) {
+    let!(:association) do
       rubric.associate_with(assignment, review_course, {
                               :purpose => 'grading', :use_for_grading => true
                             })
-    }
-    let!(:assessment) {
+    end
+    let!(:assessment) do
       association.assess({
                            :user => reviewed,
                            :assessor => reviewer,
@@ -208,24 +208,24 @@ describe "assignments" do
                              }
                            }
                          })
-    }
+    end
 
     before { assignment.assign_peer_review(reviewer, reviewed) }
 
     context 'when reviewed is logged in' do
       before { user_logged_in(user: reviewed) }
 
-      it 'blocks reviewer name on assignments page', priority: "1", test_id: 216384 do
+      it 'blocks reviewer name on assignments page', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}"
         expect(f("#comment-#{comment.id} .signature")).to include_text("Anonymous User")
       end
 
-      it 'hides comment reviewer name on submission page', priority: "1", test_id: 216385 do
+      it 'hides comment reviewer name on submission page', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text("Anonymous User")
       end
 
-      it 'hides comment reviewer name on rubric popup', priority: "1", test_id: 216386 do
+      it 'hides comment reviewer name on rubric popup', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -236,7 +236,7 @@ describe "assignments" do
     context 'when reviewer is logged in' do
       before { user_logged_in(user: reviewer) }
 
-      it 'shows comment reviewer name on submission page', priority: "1", test_id: 216387 do
+      it 'shows comment reviewer name on submission page', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
@@ -245,12 +245,12 @@ describe "assignments" do
     context 'when teacher is logged in' do
       before { user_logged_in(user: teacher) }
 
-      it 'shows comment reviewer name on submission page', priority: "1", test_id: 216389 do
+      it 'shows comment reviewer name on submission page', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
 
-      it 'shows comment reviewer name on rubric popup', priority: "1", test_id: 216391 do
+      it 'shows comment reviewer name on rubric popup', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -259,7 +259,7 @@ describe "assignments" do
     end
 
     context 'when peer review and plagiarism are enabled' do
-      before {
+      before do
         user_logged_in(user: reviewer)
         # assignment settings
         assignment.vericite_enabled = true
@@ -290,9 +290,9 @@ describe "assignments" do
         submission.turnitin_data = turnitin_data
         submission.turnitin_data_changed!
         submission.save!
-      }
+      end
 
-      it 'shows the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
+      it 'shows the plagiarism report link for reviewer', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f(".turnitin_similarity_score")).to be_displayed
       end

@@ -40,7 +40,7 @@ describe PaginatedCollection do
       expect(items.current_page).to eq 1
       expect(items.per_page).to eq 5
       expect(items.last_page).to eq 1
-      %w(first_page next_page previous_page total_entries).each do |a|
+      %w[first_page next_page previous_page total_entries].each do |a|
         expect(items.send(a)).to be_nil
       end
     end

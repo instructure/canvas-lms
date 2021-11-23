@@ -139,7 +139,7 @@ class ErrorsController < ApplicationController
     error = params[:error]&.to_unsafe_h || {}
 
     # this is a honeypot field to catch spambots. it's hidden via css and should always be empty.
-    return render(nothing: true, status: 400) if error.delete(:username).present?
+    return render(nothing: true, status: :bad_request) if error.delete(:username).present?
 
     error[:user_agent] = request.headers['User-Agent']
     begin

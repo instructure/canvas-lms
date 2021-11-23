@@ -47,8 +47,9 @@ module CollaborationsHelper
   end
 
   def edit_button(collab, user)
-    if !collab.is_a?(ExternalToolCollaboration) || (collab.is_a?(ExternalToolCollaboration) && collab.update_url)
-      render 'collaborations/edit_button', collaboration: collab if can_do(collab, user, :update)
+    if (!collab.is_a?(ExternalToolCollaboration) || collab.update_url) &&
+       can_do(collab, user, :update)
+      render 'collaborations/edit_button', collaboration: collab
     end
   end
 

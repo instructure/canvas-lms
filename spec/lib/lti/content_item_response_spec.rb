@@ -42,7 +42,7 @@ describe Lti::ContentItemResponse do
     end
 
     it 'raises an error if on an invalid export type' do
-      expect {
+      expect do
         described_class.new(
           context,
           controller,
@@ -50,7 +50,7 @@ describe Lti::ContentItemResponse do
           { "assignments" => [assign1.id] },
           'blah'
         )
-      }.to raise_error(Lti::Errors::UnsupportedExportTypeError)
+      end.to raise_error(Lti::Errors::UnsupportedExportTypeError)
     end
   end
 

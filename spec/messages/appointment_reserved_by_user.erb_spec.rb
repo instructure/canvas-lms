@@ -30,12 +30,12 @@ describe 'appointment_reserved_by_user.twitter' do
 
   let(:asset) { @event }
   let(:notification_name) { :appointment_reserved_by_user }
-  let(:message_data) {
+  let(:message_data) do
     {
       data: { updating_user_name: @user.name },
       user: @user
     }
-  }
+  end
 
   context ".email" do
     let(:path_type) { :email }

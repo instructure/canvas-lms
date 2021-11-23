@@ -57,11 +57,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to be absent but was instead present.
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -73,11 +73,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to be present but was instead blank.
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -95,19 +95,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to include "#{text}".
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text not to include "#{text}".
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -131,19 +131,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} not to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -174,7 +174,7 @@ module CustomSeleniumRSpecMatchers
     expected_specified = args.size > 1
     expected = args[1]
 
-    attribute_matcher = ->(actual) do
+    attribute_matcher = lambda do |actual|
       if expected_specified
         actual.respond_to?(:match) ? actual.match(expected) : actual == expected
       else
@@ -251,19 +251,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect}'s aria-disabled attribute to be true.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect}'s aria-disabled attribute to be false.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}"
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -413,7 +413,7 @@ module CustomSeleniumRSpecMatchers
       true
     end
 
-    [:==, :<, :<=, :>=, :>, :===, :=~].each do |operator|
+    %i[== < <= >= > === =~].each do |operator|
       chain operator do |value|
         @operator = operator
         @value = value
@@ -423,10 +423,10 @@ module CustomSeleniumRSpecMatchers
     failure_message do |actual|
       actual_value = actual.call
 
-      unless defined? @operator
-        "expected #{actual_value} to become #{expected}"
-      else
+      if defined? @operator
         "expected #{actual_value} to become #{@operator} #{@value}"
+      else
+        "expected #{actual_value} to become #{expected}"
       end
     end
 
@@ -435,10 +435,10 @@ module CustomSeleniumRSpecMatchers
 
       wait_for(method: :become) do
         disable_implicit_wait do
-          unless defined? @operator
-            actual.call == expected
-          else
+          if defined? @operator
             actual.call.__send__ @operator, @value
+          else
+            actual.call == expected
           end
         end
       end
@@ -454,7 +454,10 @@ module CustomSeleniumRSpecMatchers
       raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
 
       wait_for(method: :become) do
-        disable_implicit_wait { a = actual.call; min < a && a < max }
+        disable_implicit_wait do
+          a = actual.call
+          min < a && a < max
+        end
       end
     end
   end

@@ -26,22 +26,22 @@ describe Types::RubricAssessmentRatingType do
   let_once(:student) { student_in_course(course: course, active_all: true).user }
   let_once(:assignment) { assignment_model(course: course) }
   let_once(:rubric) { rubric_for_course }
-  let_once(:rubric_association) {
+  let_once(:rubric_association) do
     rubric_association_model(
       context: course,
       rubric: rubric,
       association_object: assignment,
       purpose: 'grading'
     )
-  }
-  let!(:rubric_assessment) {
+  end
+  let!(:rubric_assessment) do
     rubric_assessment_model(
       user: student,
       assessor: teacher,
       rubric_association: rubric_association,
       assessment_type: 'grading'
     )
-  }
+  end
   let(:learning_outcome) { outcome_model }
   let(:submission) { assignment.submissions.where(user: student).first }
   let(:submission_type) { GraphQLTypeTester.new(submission, current_user: teacher) }
@@ -72,7 +72,7 @@ describe Types::RubricAssessmentRatingType do
     it 'description' do
       expect(
         submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { description } } }')
-      ).to eq [rubric_assessment.data.map { |r| r[:description] }]
+      ).to eq [rubric_assessment.data.pluck(:description)]
     end
 
     it 'outcome' do
@@ -86,7 +86,7 @@ describe Types::RubricAssessmentRatingType do
     it 'points' do
       expect(
         submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { points } } }')
-      ).to eq [rubric_assessment.data.map { |r| r[:points] }]
+      ).to eq [rubric_assessment.data.pluck(:points)]
     end
   end
 end

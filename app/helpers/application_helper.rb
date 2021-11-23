@@ -62,7 +62,7 @@ module ApplicationHelper
   def context_prefix(code)
     return '/{{ context_type_pluralized }}/{{ context_id }}' unless code
 
-    split = code.split(/_/)
+    split = code.split("_")
     id = split.pop
     type = split.join('_')
     "/#{type.pluralize}/#{id}"
@@ -77,7 +77,7 @@ module ApplicationHelper
       .cache
       .fetch(['short_name_lookup', code].cache_key) do
         Context.find_by_asset_string(code).short_name
-      rescue StandardError
+      rescue
         ''
       end
   end
@@ -111,7 +111,7 @@ module ApplicationHelper
         nil
       end
       opts[-1][:only_path] = true unless opts[-1][:only_path] == false
-      res = self.send name, *opts
+      res = send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]
       begin
@@ -121,7 +121,7 @@ module ApplicationHelper
       end
       opts[:only_path] = true
       opts["#{context_name}_id"] = context.id
-      res = self.url_for opts
+      res = url_for opts
     else
       res = context_name.to_s + opts.to_json.to_s
     end
@@ -140,7 +140,7 @@ module ApplicationHelper
   end
 
   def message_user_path(user, context = nil)
-    context = context || @context
+    context ||= @context
 
     # If context is a group that belongs to a course, use the course as the context instead
     context = context.context if context.is_a?(Group) && context.context.is_a?(Course)
@@ -275,10 +275,12 @@ module ApplicationHelper
       #
       # preloading works similarily for window.deferredBundles only that their
       # execution is delayed until the DOM is ready.
-      concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
-                              container = defer ? 'window.deferredBundles' : 'window.bundles'
-                              "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
-                            }.join("\n") if new_js_bundles.present?
+      if new_js_bundles.present?
+        concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
+                                container = defer ? 'window.deferredBundles' : 'window.bundles'
+                                "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
+                              }.join("\n")
+      end
     end
   end
 
@@ -308,7 +310,7 @@ module ApplicationHelper
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast =
-      (@current_user && @current_user.prefers_high_contrast?) || opts[:force_high_contrast]
+      @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
     variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') +
       (I18n.rtl? ? '_rtl' : '')
   end
@@ -380,26 +382,26 @@ module ApplicationHelper
     tabs.select do |tab|
       if begin
         tab[:id] == @context.class::TAB_COLLABORATIONS
-      rescue StandardError
+      rescue
         false
       end
         Collaboration.any_collaborations_configured?(@context) &&
           !@context.feature_enabled?(:new_collaborations)
       elsif begin
         quiz_lti_tab?(tab)
-      rescue StandardError
+      rescue
         false
       end
         new_quizzes_navigation_placements_enabled?(@context)
       elsif begin
         tab[:id] == @context.class::TAB_COLLABORATIONS_NEW
-      rescue StandardError
+      rescue
         false
       end
         @context.feature_enabled?(:new_collaborations)
       elsif begin
         tab[:id] == @context.class::TAB_CONFERENCES
-      rescue StandardError
+      rescue
         false
       end
         feature_enabled?(:web_conferences)
@@ -408,7 +410,7 @@ module ApplicationHelper
           (
             begin
               @context.class::TAB_SETTINGS
-            rescue StandardError
+            rescue
               nil
             end
           )
@@ -427,7 +429,7 @@ module ApplicationHelper
 
   def embedded_chat_url
     chat_tool = active_external_tool_by_id('chat')
-    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
+    return unless chat_tool&.url && chat_tool.custom_fields['mini_view_url']
 
     uri = URI.parse(chat_tool.url)
     uri.path = chat_tool.custom_fields['mini_view_url']
@@ -436,7 +438,7 @@ module ApplicationHelper
 
   def embedded_chat_enabled
     chat_tool = active_external_tool_by_id('chat')
-    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] &&
+    chat_tool&.url && chat_tool.custom_fields['mini_view_url'] &&
       Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
   end
 
@@ -537,9 +539,9 @@ module ApplicationHelper
 
   def hash_get(hash, key, default = nil)
     if hash
-      if hash[key.to_s] != nil
+      if !hash[key.to_s].nil?
         hash[key.to_s]
-      elsif hash[key.to_sym] != nil
+      elsif !hash[key.to_sym].nil?
         hash[key.to_sym]
       else
         default
@@ -640,7 +642,7 @@ module ApplicationHelper
   end
 
   def inline_media_comment_link(comment = nil)
-    if comment && comment.media_comment_id
+    if comment&.media_comment_id
       raw "<a href=\"#\" class=\"instructure_inline_media_comment no-underline\" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>"
     end
   end
@@ -653,7 +655,7 @@ module ApplicationHelper
     uri =
       begin
         URI.parse(src)
-      rescue StandardError
+      rescue
         nil
       end
     if uri
@@ -684,23 +686,23 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
-    if opts.has_key?(:all_folders)
-      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by { |f| f.parent_folder_id }
+    if opts.key?(:all_folders)
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by(&:parent_folder_id)
     end
 
     folders.each do |folder|
       opts[:options_so_far] <<
         "<option value=\"#{folder.id}\" #{'selected' if opts[:selected_folder_id] == folder.id}>#{'&nbsp;' * opts[:indent_width] * opts[:depth]}#{'- ' if opts[:depth] > 0}#{html_escape folder.name}</option>"
-      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
-        child_folders =
-          if opts[:sub_folders]
-            opts[:sub_folders][folder.id] || []
-          else
-            folder.active_sub_folders.by_position
-          end
-        if child_folders.any?
-          folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
+      next unless opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+
+      child_folders =
+        if opts[:sub_folders]
+          opts[:sub_folders][folder.id] || []
+        else
+          folder.active_sub_folders.by_position
         end
+      if child_folders.any?
+        folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
@@ -723,19 +725,16 @@ module ApplicationHelper
   def cache(name = {}, options = {}, &block)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
-      name = name + "/#{I18n.locale}" if name.is_a?(String)
+      name += "/#{I18n.locale}" if name.is_a?(String)
     end
     super
   end
 
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    mapped =
-      groups.map do |g|
-        { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
-      end
-
-    mapped
+    groups.map do |g|
+      { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
+    end
   end
 
   def show_feedback_link?
@@ -773,7 +772,7 @@ module ApplicationHelper
   end
 
   def help_link_data
-    { 'track-category': 'help system', 'track-label': 'help button' }
+    { "track-category": 'help system', "track-label": 'help button' }
   end
 
   def help_link
@@ -835,7 +834,7 @@ module ApplicationHelper
     # for finding which values to show in the theme editor
     return @brand_account if opts[:ignore_parents]
 
-    if !@brand_account
+    unless @brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
@@ -958,13 +957,14 @@ module ApplicationHelper
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
   def accessible_date_format(format = 'datetime')
-    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
+    unless ACCEPTABLE_FORMAT_TYPES.include?(format)
       raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
     end
 
-    if format == 'date'
+    case format
+    when 'date'
       I18n.t('#helpers.accessible_date_only_format', 'YYYY-MM-DD')
-    elsif format == 'time'
+    when 'time'
       I18n.t('#helpers.accessible_time_only_format', 'hh:mm')
     else
       I18n.t('#helpers.accessible_date_format', 'YYYY-MM-DD hh:mm')
@@ -985,7 +985,7 @@ module ApplicationHelper
   # cache key, so that we don't make an overly-long cache key.
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
-    keys = collection.map { |element| element.cache_key }
+    keys = collection.map(&:cache_key)
     Digest::MD5.hexdigest(keys.join('/'))
   end
 
@@ -1019,10 +1019,12 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url =
-      @domain_root_account.settings[
-        "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
-      ] if ApplicationController.test_cluster_name
+    if ApplicationController.test_cluster_name
+      url =
+        @domain_root_account.settings[
+          "#{ApplicationController.test_cluster_name}_dashboard_url".to_sym
+        ]
+    end
     url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user
@@ -1064,7 +1066,8 @@ module ApplicationHelper
         @csp_context_is_submission = false
         attachment = @attachment || @context
         if attachment.is_a?(Attachment)
-          if attachment.context_type == 'User'
+          case attachment.context_type
+          when 'User'
             # search for an attachment association
             aas =
               attachment
@@ -1081,10 +1084,10 @@ module ApplicationHelper
               @csp_context_is_submission = true
               courses.first
             end
-          elsif attachment.context_type == 'Submission'
+          when 'Submission'
             @csp_context_is_submission = true
             attachment.submission.assignment.course
-          elsif attachment.context_type == 'Course'
+          when 'Course'
             attachment.course
           else
             brand_config_account
@@ -1174,7 +1177,7 @@ module ApplicationHelper
   # Returns true if the current_path starts with the given value
   def active_path?(to_test)
     # Make sure to not include account external tools
-    if controller.controller_name == 'external_tools' && Account === @context
+    if controller.controller_name == 'external_tools' && @context.is_a?(Account)
       false
     else
       request.fullpath.start_with?(to_test)

@@ -83,7 +83,7 @@ module Canvas
       end
 
       def mime_for(path)
-        ext = path.extname[1..-1]
+        ext = path.extname[1..]
         # Mime::Type.lookup_by_extension doesn't have some types (like svg), so fall back to others
         content_type = Mime::Type.lookup_by_extension(ext) || Rack::Mime.mime_type(".#{ext}") || MIME::Types.type_for(ext).first
         content_type = 'text/css; charset=utf-8' if content_type == 'text/css'
@@ -93,9 +93,7 @@ module Canvas
       def options_for(path)
         options = { acl: 'public-read', content_type: mime_for(path).to_s }
         if fingerprinted?(path)
-          options.merge!({
-                           cache_control: "public, max-age=#{1.year}"
-                         })
+          options[:cache_control] = "public, max-age=#{1.year}"
         end
 
         options

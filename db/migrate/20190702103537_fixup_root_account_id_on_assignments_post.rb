@@ -22,7 +22,7 @@ class FixupRootAccountIdOnAssignmentsPost < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def up
-    DataFixup::PopulateRootAccountIdForAssignments.run()
+    DataFixup::PopulateRootAccountIdForAssignments.run
     change_column_null :assignments, :root_account_id, false
   end
 

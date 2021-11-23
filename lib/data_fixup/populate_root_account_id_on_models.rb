@@ -67,9 +67,9 @@ module DataFixup::PopulateRootAccountIdOnModels
       # Attachment is handled differently than other fix ups, it is triggered in the populate_overrides
       Attachment => [],
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
-      CalendarEvent => [:context_course, :context_group, :context_course_section],
+      CalendarEvent => %i[context_course context_group context_course_section],
       CommunicationChannel => [], # has override
-      ContentMigration => [:account, :course, :group],
+      ContentMigration => %i[account course group],
       ContentParticipation => :content,
       ContentParticipationCount => :course,
       ContentShare => [:course, :group],
@@ -88,7 +88,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       DiscussionTopicParticipant => :discussion_topic,
       EnrollmentState => :enrollment,
       Favorite => :context,
-      Folder => [:account, :course, :group],
+      Folder => %i[account course group],
       GradingPeriod => :grading_period_group,
       GradingPeriodGroup => [{ root_account: Account.resolved_root_account_id_sql }, :course],
       GradingStandard => :context,
@@ -140,7 +140,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.dependencies
     {
       AssetUserAccess => [:attachment, :calendar_event],
-      Attachment => [:account, :assessment_question, :assignment, :course, :group, :submission],
+      Attachment => %i[account assessment_question assignment course group submission],
       CommunicationChannel => :user,
       LearningOutcome => :content_tag,
       User => :user_account_association,
@@ -207,7 +207,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   # Multiple root account tables ("root_account_ids" not "root_account_id") not supported.
   def self.nonexistent_associations_to_fill_with_zeros
     @nonexistent_associations_to_fill_with_zeros ||= {
-      CalendarEvent => [:context_course, :context_group, :context_course_section],
+      CalendarEvent => %i[context_course context_group context_course_section],
     }
   end
 
@@ -251,14 +251,14 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
       end
 
-      if populate_overrides.key?(table)
-        Array(populate_overrides[table]).each do |override_module|
-          next unless override_module.respond_to?(:populate_table) &&
-                      override_module.respond_to?(:run_populate_table?)
-          next unless override_module.run_populate_table?
+      next unless populate_overrides.key?(table)
 
-          send_later_backfill_strand(:populate_root_account_ids_override_table, table, override_module)
-        end
+      Array(populate_overrides[table]).each do |override_module|
+        next unless override_module.respond_to?(:populate_table) &&
+                    override_module.respond_to?(:run_populate_table?)
+        next unless override_module.run_populate_table?
+
+        send_later_backfill_strand(:populate_root_account_ids_override_table, table, override_module)
       end
     end
   end
@@ -315,9 +315,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     # we want a hash of tables with their associated column names
     case association
     when Hash
-      association.each_with_object({}) do |(assoc, column), memo|
-        memo[assoc.to_sym] = column
-      end
+      association.transform_keys(&:to_sym)
     when Array
       association.reduce({}) { |memo, assoc| memo.merge(hash_association(assoc)) }
     when String, Symbol
@@ -409,8 +407,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     end
 
     # These rows can be filled with zeros. If they aren't filled, the table isn't filled
-    if (zeros_criteria = fill_with_zeros_criteria[table])
-      return false if empty_root_account_column_scope(table).where(*zeros_criteria).any?
+    if (zeros_criteria = fill_with_zeros_criteria[table]) &&
+       empty_root_account_column_scope(table).where(*zeros_criteria).any?
+      return false
     end
 
     true

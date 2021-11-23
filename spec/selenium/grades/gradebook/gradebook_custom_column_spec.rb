@@ -33,7 +33,7 @@ describe "Gradebook - custom columns" do
     @course.custom_gradebook_columns.create! opts
   end
 
-  it "shows custom columns", priority: "2", test_id: 164225 do
+  it "shows custom columns", priority: "2" do
     hidden = custom_column title: "hidden", hidden: true
     col = custom_column
     col.update_order([col.id, hidden.id])
@@ -50,7 +50,7 @@ describe "Gradebook - custom columns" do
     expect(Gradebook.slick_custom_column_cell_selector.count { |c| c.text == "123456" }).to eq 1
   end
 
-  it "lets you show and hide the teacher notes column", priority: "1", test_id: 3253279 do
+  it "lets you show and hide the teacher notes column", priority: "1" do
     Gradebook.visit(@course)
     # create the notes column
     Gradebook.select_view_dropdown

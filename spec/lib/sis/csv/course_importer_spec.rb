@@ -33,7 +33,7 @@ describe SIS::CSV::CourseImporter do
     )
     expect(Course.count).to eq before_count + 1
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["No course_id given for a course",
                           "Improper status \"inactive\" for course C003",
                           "No short_name given for course C004",
@@ -56,7 +56,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
     )
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 
@@ -368,7 +368,7 @@ describe SIS::CSV::CourseImporter do
       "c2,s1,active",
       "c3,s2,active"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A001').first
       expect(c.name).to eq 'Test Course 1'
       expect(c.course_code).to eq 'TC 101'
@@ -381,7 +381,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,2011-04-12 00:00:00,2011-05-12 00:00:00"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -394,7 +394,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,,"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -466,7 +466,7 @@ describe SIS::CSV::CourseImporter do
       "c2,s1,active",
       "c3,s2,active"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A001').first
       expect(c.name).to eq 'Test Course 1'
       expect(c.course_code).to eq 'TC 101'
@@ -479,7 +479,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,2011-04-12 00:00:00,2011-05-12 00:00:00"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -492,7 +492,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "c1,TC 102,Test Course 2,A002,T002,active,,"
     )
-    Course.where(sis_source_id: ['c1', 'c2', 'c3']).each do |c|
+    Course.where(sis_source_id: %w[c1 c2 c3]).each do |c|
       expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
@@ -632,9 +632,9 @@ describe SIS::CSV::CourseImporter do
       "test_2,TC 102,Test Course 102,,,active,blended",
       "test_3,TC 103,Test Course 103,,,active,on_campus"
     )
-    expect(Course.find_by_sis_source_id('test_1').course_format).to eq 'online'
-    expect(Course.find_by_sis_source_id('test_2').course_format).to eq 'blended'
-    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'on_campus'
+    expect(Course.find_by(sis_source_id: 'test_1').course_format).to eq 'online'
+    expect(Course.find_by(sis_source_id: 'test_2').course_format).to eq 'blended'
+    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'on_campus'
 
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,course_format",
@@ -642,15 +642,15 @@ describe SIS::CSV::CourseImporter do
       "test_2,TC 102,Test Course 102,,,active,\"\"",
       "test_3,TC 103,Test Course 103,,,active,blended"
     )
-    expect(Course.find_by_sis_source_id('test_1').course_format).not_to be_present
-    expect(Course.find_by_sis_source_id('test_2').course_format).not_to be_present
-    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
+    expect(Course.find_by(sis_source_id: 'test_1').course_format).not_to be_present
+    expect(Course.find_by(sis_source_id: 'test_2').course_format).not_to be_present
+    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'blended'
 
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_3,TC 103,Test Course 103,,,active"
     )
-    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
+    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'blended'
   end
 
   it 'rejects invalid course_format' do
@@ -683,7 +683,7 @@ describe SIS::CSV::CourseImporter do
     )
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
-      "student_user,user1,User,Uno,user@example.com,active",
+      "student_user,user1,User,Uno,user@example.com,active"
     )
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
@@ -756,12 +756,12 @@ describe SIS::CSV::CourseImporter do
     it "does not fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
-      expect {
+      expect do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,status,blueprint_course_id",
           "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "allows destroying" do
@@ -901,7 +901,7 @@ describe SIS::CSV::CourseImporter do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status,homeroom_course",
           "test_1,TC 101,Test Course 101,,,active,false",
-          "test_2,TC 101,Test Course 101,,,active,1",
+          "test_2,TC 101,Test Course 101,,,active,1"
         )
         expect(course1.reload).not_to be_homeroom_course
         expect(course2.reload).to be_homeroom_course
@@ -915,7 +915,7 @@ describe SIS::CSV::CourseImporter do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,account_id,term_id,status",
           "test_1,TC 101,Test Course 101,,,active",
-          "test_2,TC 101,Test Course 101,,,active",
+          "test_2,TC 101,Test Course 101,,,active"
         )
         expect(course1.reload).to be_homeroom_course
         expect(course2.reload).not_to be_homeroom_course

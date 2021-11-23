@@ -156,11 +156,11 @@ class Login::CanvasController < ApplicationController
       return render :json => { :errors => [message] }, :status => :bad_request
     end
 
-    if mobile_device?
-      flash[:error] = message
-    else
-      flash[:error] = { html: message, timeout: 15000 }
-    end
+    flash[:error] = if mobile_device?
+                      message
+                    else
+                      { html: message, timeout: 15000 }
+                    end
     @errored = true
     @headers = false
     maybe_render_mobile_login :bad_request

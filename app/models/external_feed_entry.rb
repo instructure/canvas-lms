@@ -26,11 +26,11 @@ class ExternalFeedEntry < ActiveRecord::Base
   belongs_to :asset, polymorphic: [:discussion_topic]
 
   before_save :infer_defaults
-  validates_presence_of :external_feed_id, :workflow_state
-  validates :title, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
-  validates :message, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
-  validates :source_url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
-  validates :url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :external_feed_id, :workflow_state, presence: true
+  validates :title, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :message, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :source_url, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :url, length: { maximum: maximum_text_length, allow_blank: true }
   validates :author_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: false }
   validates :author_url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: false }
   validates :author_email, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: false }
@@ -42,8 +42,8 @@ class ExternalFeedEntry < ActiveRecord::Base
   protected :infer_defaults
 
   def update_feed_attributes(opts)
-    self.update(opts)
-    @feed_entry_updated = self.changed?
+    update(opts)
+    @feed_entry_updated = changed?
   end
 
   def entry_changed?
@@ -60,5 +60,7 @@ class ExternalFeedEntry < ActiveRecord::Base
     state :cancelled
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 end

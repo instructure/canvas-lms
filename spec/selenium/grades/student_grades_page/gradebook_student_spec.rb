@@ -101,14 +101,14 @@ describe 'Student Gradebook' do
     end
   end
 
-  it 'shows assignment details', priority: '1', test_id: 164023 do
+  it 'shows assignment details', priority: '1' do
     init_course_with_students 3
     user_session(@teacher)
 
     means = []
     [0, 3, 6].each do |i|
       # the format below ensures that 18.0 is displayed as 18.
-      mean = format('%g' % (('%.2f' % (grades[i, 3].inject { |a, e| a + e }.to_f / 3))))
+      mean = format('%g' % (('%.2f' % (grades[i, 3].sum.to_f / 3))))
       means.push mean
     end
 
@@ -136,7 +136,7 @@ describe 'Student Gradebook' do
     f('#show_all_details_button').click
     details = ff('[id^="grade_info"]')
     details.each do |detail|
-      expect(detail.css_value 'display').to eq 'none'
+      expect(detail.css_value('display')).to eq 'none'
     end
   end
 
@@ -145,7 +145,7 @@ describe 'Student Gradebook' do
     it_behaves_like 'Student Gradebook View'
   end
 
-  it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
+  it 'calculates grades based on graded assignments', priority: '1' do
     init_course_with_students
     user_session(@teacher)
 
@@ -159,7 +159,7 @@ describe 'Student Gradebook' do
     expect(f('.final_grade .grade')).to include_text '66.67%'
   end
 
-  it 'follows grade dropping rules', test_id: 164009, priority: '1' do
+  it 'follows grade dropping rules', priority: '1' do
     add_teacher_and_student
     @group = @course.assignment_groups.create!(name: 'Group1', rules: 'drop_lowest:1')
 
@@ -182,7 +182,7 @@ describe 'Student Gradebook' do
 
   context 'Comments' do
     # create a course, publish and enroll teacher and student
-    let_once(:test_course) { course_factory() }
+    let_once(:test_course) { course_factory }
     let_once(:teacher) { user_factory(active_all: true) }
     let_once(:student) { user_factory(active_all: true) }
     let_once(:published_course) do
@@ -214,7 +214,7 @@ describe 'Student Gradebook' do
     # leave a comment as a teacher
     let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job') }
 
-    it 'displays comments from a teacher on student grades page', priority: "1", test_id: 537621 do
+    it 'displays comments from a teacher on student grades page', priority: "1" do
       user_session(student)
       get "/courses/#{published_course.id}/grades"
 
@@ -226,7 +226,7 @@ describe 'Student Gradebook' do
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end
 
-    it 'does not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
+    it 'does not display comments from a teacher on student grades page if assignment is muted', priority: "1" do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
@@ -234,14 +234,14 @@ describe 'Student Gradebook' do
       expect(f("#comments_thread_#{assignment.id}")).not_to include_text('good job')
     end
 
-    it 'displays comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
+    it 'displays comments from a teacher on assignment show page if assignment is muted', priority: "1" do
       user_session(student)
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
       expect(fj('.comments.module .comment:first')).to include_text('good job')
     end
 
-    it 'does not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
+    it 'does not display comments from a teacher on assignment show page if assignment is muted', priority: "1" do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
@@ -261,7 +261,7 @@ describe 'Student Gradebook' do
       @assignment0 = @course.assignments.create!(
         name: "Physics Alpha Assign",
         due_at: Time.now.utc + 3.days,
-        assignment_group: group0,
+        assignment_group: group0
       )
 
       @quiz = @course.quizzes.create!(

@@ -174,7 +174,7 @@ describe "calendar2" do
         expect(page_title.text).to eq 'future event'
       end
 
-      it "lets the group members create a calendar event for the group", priority: "1", test_id: 323330 do
+      it "lets the group members create a calendar event for the group", priority: "1" do
         group = @course.groups.create!(name: "Test Group")
         group.add_user @student
         group.save!

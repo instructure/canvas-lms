@@ -24,11 +24,11 @@ module SearchTermHelper
     def search_by_attribute(scope, attr, search_term)
       if search_term.present?
         SearchTermHelper.validate_search_term(search_term)
-        if scope.respond_to?(:where)
-          scope = scope.where(wildcard("#{self.table_name}.#{attr}", search_term))
-        else
-          scope = scope.select { |item| item.matches_attribute?(attr, search_term) }
-        end
+        scope = if scope.respond_to?(:where)
+                  scope.where(wildcard("#{table_name}.#{attr}", search_term))
+                else
+                  scope.select { |item| item.matches_attribute?(attr, search_term) }
+                end
       end
       scope
     end

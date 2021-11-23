@@ -26,7 +26,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 begin
-  require '../../spec/coverage_tool.rb'
+  require '../../spec/coverage_tool'
   CoverageTool.start("canvas")
 rescue LoadError => e
   puts "Error: #{e}"

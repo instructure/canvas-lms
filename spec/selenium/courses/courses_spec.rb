@@ -44,9 +44,9 @@ describe "courses" do
         visit_course(@course)
         unpublish_btn.click
 
-        wait_for(method: nil, timeout: 5) {
+        wait_for(method: nil, timeout: 5) do
           assert_flash_notice_message('successfully updated')
-        }
+        end
         expect(unpublish_btn).to have_class('disabled')
       end
 

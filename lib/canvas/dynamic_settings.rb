@@ -32,7 +32,7 @@ module Canvas
       # these used to be in an initializer, but initializing this
       # library in 2 places seems like a recipe for confusion, so
       # config/initializers/consul.rb got moved in here
-      reloader = -> do
+      reloader = lambda do
         settings = ConfigFile.load("consul").dup
 
         if settings.present?

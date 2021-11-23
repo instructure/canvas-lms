@@ -53,7 +53,7 @@ describe "Blueprint association settings" do
   end
 
   context "in the blueprint association settings" do
-    it "courses show in the 'To be Added' area", priority: "2", test_id: 3077486 do
+    it "courses show in the 'To be Added' area", priority: "2" do
       open_associations
       open_courses_list
       row = f('tr[data-testid="bca-table__course-row"]')
@@ -64,7 +64,7 @@ describe "Blueprint association settings" do
       expect(element).to be
     end
 
-    it "leaving the search bar shouldn't close the courses tab", priority: "2", test_id: 3096112 do
+    it "leaving the search bar shouldn't close the courses tab", priority: "2" do
       open_associations
       open_courses_list
       element = f('input', f('.bca-course-filter')) # .find_element(css: 'input')
@@ -73,7 +73,7 @@ describe "Blueprint association settings" do
       expect(f('.bca-table__wrapper')).to be_displayed
     end
 
-    it "course search dropdowns are populated", priority: "2", test_id: 3072438 do
+    it "course search dropdowns are populated", priority: "2" do
       open_associations
       open_courses_list
 

@@ -19,7 +19,7 @@
 #
 
 module Canvas::Plugins::Validators::KalturaValidator
-  CAN_BE_BLANK = [:cache_play_list_seconds, :rtmp_domain]
+  CAN_BE_BLANK = [:cache_play_list_seconds, :rtmp_domain].freeze
 
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
@@ -36,7 +36,7 @@ module Canvas::Plugins::Validators::KalturaValidator
 
       if settings[:cache_play_list_seconds].blank?
         settings[:cache_play_list_seconds] = nil
-      elsif settings[:cache_play_list_seconds] =~ /\A\d*\z/
+      elsif /\A\d*\z/.match?(settings[:cache_play_list_seconds])
         settings[:cache_play_list_seconds] = settings[:cache_play_list_seconds].to_i
       else
         plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.need_integer', 'Please enter an integer for the play list cache'))

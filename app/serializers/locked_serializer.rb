@@ -55,7 +55,7 @@ module LockedSerializer
 
   def filter(keys)
     excluded = if serializer_option(:skip_lock_tests)
-                 [:lock_info, :lock_explanation, :locked_for_user]
+                 %i[lock_info lock_explanation locked_for_user]
                elsif !locked_for_hash
                  [:lock_info, :lock_explanation]
                else

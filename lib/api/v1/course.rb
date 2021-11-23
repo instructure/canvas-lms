@@ -34,6 +34,7 @@ module Api::V1::Course
     settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments?
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
     settings[:allow_student_discussion_reporting] = course.allow_student_discussion_reporting?
+    settings[:allow_student_anonymous_discussion_topics] = course.allow_student_anonymous_discussion_topics?
     settings[:filter_speed_grader_by_student_group] = course.filter_speed_grader_by_student_group?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
@@ -106,7 +107,7 @@ module Api::V1::Course
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
       if includes.include?('grading_periods')
         hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
-          api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+          api_json(gp, user, session, :only => %w[id title start_date end_date workflow_state])
         end
       end
       if includes.include?('course_progress')
@@ -119,7 +120,7 @@ module Api::V1::Course
         hash['sections'] = if enrollments.any?
                              section_enrollments_json(enrollments)
                            else
-                             course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
+                             course.course_sections.map { |section| section.attributes.slice(*%w[id name start_at end_at]) }
                            end
       end
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
@@ -165,7 +166,7 @@ module Api::V1::Course
   end
 
   def copy_status_json(import, course, user, session)
-    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state integration_id))
+    hash = api_json(import, user, session, :only => %w[id progress created_at workflow_state integration_id])
 
     # the type of object for course copy changed but we don't want the api to change
     # so map the workflow states to the old ones
@@ -180,11 +181,11 @@ module Api::V1::Course
   end
 
   def add_helper_dependant_entries(hash, course, builder)
-    request = self.respond_to?(:request) ? self.request : nil
+    request = respond_to?(:request) ? self.request : nil
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
     hash['syllabus_body'] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
-    hash['time_zone'] = course.time_zone && course.time_zone.tzinfo.name
+    hash['time_zone'] = course.time_zone&.tzinfo&.name
     hash
   end
 
@@ -215,7 +216,7 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      scope = TeacherEnrollment.where.not(:workflow_state => %w{deleted rejected}).where(:course_id => courses).distinct.select(:user_id, :course_id)
+      scope = TeacherEnrollment.where.not(:workflow_state => %w[deleted rejected]).where(:course_id => courses).distinct.select(:user_id, :course_id)
       teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|

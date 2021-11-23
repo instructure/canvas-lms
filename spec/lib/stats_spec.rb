@@ -48,7 +48,7 @@ describe Stats do
                                 eql(sum),
                                 be_within(0.0000000001).of(mean),
                                 be_within(0.0000000001).of(var),
-                                be_within(0.0000000001).of(Math::sqrt(var)),
+                                be_within(0.0000000001).of(Math.sqrt(var)),
                                 eql(histogram)
     end
 

@@ -23,8 +23,8 @@
 
 module Lti
   class ContentItemResponse
-    MEDIA_TYPES = [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes, :files]
-    SUPPORTED_EXPORT_TYPES = %w(common_cartridge)
+    MEDIA_TYPES = %i[assignments discussion_topics modules module_items pages quizzes files].freeze
+    SUPPORTED_EXPORT_TYPES = %w[common_cartridge].freeze
 
     def initialize(context, controller, current_user, media_types, export_type)
       @context = context
@@ -68,10 +68,8 @@ module Lti
     end
 
     def tag
-      unless @tag
-        if @media_types.include? :module_items
-          @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
-        end
+      if !@tag && @media_types.include?(:module_items)
+        @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
       end
       @tag
     end

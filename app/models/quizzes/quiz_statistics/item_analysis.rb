@@ -22,7 +22,7 @@ require 'csv'
 
 class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
   def generatable?
-    !self.quiz.survey?
+    !quiz.survey?
   end
 
   def readable_type

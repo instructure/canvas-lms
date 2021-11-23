@@ -39,7 +39,7 @@ module Lti
         {
           lti_message_type: 'ContentItemSelection',
           lti_version: 'LTI-1p0',
-          content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
+          content_items: Rails.root.join('spec/fixtures/lti/content_items.json').read,
           data: Canvas::Security.create_jwt({ content_item_id: "3" }),
           lti_msg: '',
           lti_log: '',
@@ -66,7 +66,7 @@ module Lti
       context 'content-item unique json serialization' do
         let(:launch_url) { "http://test.com/test" }
         let(:secret) { 'secret' }
-        let(:signed_params) {
+        let(:signed_params) do
           {
             :oauth_callback => "about:blank",
             :oauth_consumer_key => "key",
@@ -77,21 +77,21 @@ module Lti
             :oauth_signature => "TL8PLA/V43D21+JkGg8i9Cj+Dqg=",
             "lti_message_type" => "ContentItemSelection",
             "lti_version" => "LTI-1p0",
-            "content_items" => "{\"@graph\":[{\"windowTarget\":\"\",\"text\":\"Arch Linux\",\"title\":\"Its your " +
-              "computer\",\"url\":\"http://lti-tool-provider-example.dev/messages/blti\"" +
-              ",\"thumbnail\":{\"height\":128,\"width\":128,\"@id\"" +
-              ":\"http://www.runeaudio.com/assets/img/banner-archlinux.png\"}" +
-              ",\"placementAdvice\":{\"displayHeight\":600,\"displayWidth\":800" +
-              ",\"presentationDocumentTarget\":\"iframe\"},\"mediaType\"" +
-              ":\"application/vnd.ims.lti.v1.ltilink\",\"@type\":\"LtiLinkItem\",\"@id\"" +
-              ":\"http://lti-tool-provider-example.dev/messages/blti\"}],\"@context\"" +
-              ":\"http://purl.imsglobal.org/ctx/lti/v1/ContentItem\"}",
+            "content_items" => "{\"@graph\":[{\"windowTarget\":\"\",\"text\":\"Arch Linux\",\"title\":\"Its your " \
+                               "computer\",\"url\":\"http://lti-tool-provider-example.dev/messages/blti\"" \
+                               ",\"thumbnail\":{\"height\":128,\"width\":128,\"@id\"" \
+                               ":\"http://www.runeaudio.com/assets/img/banner-archlinux.png\"}" \
+                               ",\"placementAdvice\":{\"displayHeight\":600,\"displayWidth\":800" \
+                               ",\"presentationDocumentTarget\":\"iframe\"},\"mediaType\"" \
+                               ":\"application/vnd.ims.lti.v1.ltilink\",\"@type\":\"LtiLinkItem\",\"@id\"" \
+                               ":\"http://lti-tool-provider-example.dev/messages/blti\"}],\"@context\"" \
+                               ":\"http://purl.imsglobal.org/ctx/lti/v1/ContentItem\"}",
             "lti_msg" => "",
             "lti_log" => "",
             "lti_errormsg" => "",
             "lti_errorlog" => ""
           }
-        }
+        end
 
         it "validates the message" do
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
@@ -103,7 +103,7 @@ module Lti
 
       it "returns the same value if called multiple times" do
         enable_cache do
-          expect(2.times.map { |_| subject.valid? }).to eq [true, true]
+          expect(Array.new(2) { subject.valid? }).to eq [true, true]
         end
       end
 

@@ -83,7 +83,7 @@ describe NotificationFailureProcessor do
 
       @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
 
-      sns_client = double()
+      sns_client = double
       expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s }))
       expect(sns_client).to receive(:create_platform_endpoint).twice.and_return({ endpoint_arn: bad_arn }, { endpoint_arn: good_arn })
       bad_ne = @at.notification_endpoints.new(token: 'token1') # order matters

@@ -19,7 +19,7 @@
 #
 
 describe "Session Timeout" do
-  context " when sessions timeout is set to 30 minutes" do
+  context "when sessions timeout is set to 30 minutes" do
     before do
       plugin_setting = PluginSetting.new(:name => "sessions", :settings => { "session_timeout" => "30" })
       plugin_setting.save!

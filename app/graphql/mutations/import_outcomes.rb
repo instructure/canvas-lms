@@ -102,7 +102,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
           "Outcome %{outcome_id} is not available in context %{context_type}#%{context_id}",
           outcome_id: outcome_id,
           context_id: target_context.id.to_s,
-          context_type: target_context.class.name,
+          context_type: target_context.class.name
         )
       end
 
@@ -310,15 +310,15 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     else
       if input[:target_context_type].blank? && input[:target_context_id].blank?
         raise GraphQL::ExecutionError, I18n.t(
-          "You must provide targetGroupId or targetContextId and targetContextType",
+          "You must provide targetGroupId or targetContextId and targetContextType"
         )
       elsif input[:target_context_type].blank? && input[:target_context_id].present?
         raise GraphQL::ExecutionError, I18n.t(
-          "targetContextType required if targetContextId provided",
+          "targetContextType required if targetContextId provided"
         )
       elsif input[:target_context_type].present? && input[:target_context_id].blank?
         raise GraphQL::ExecutionError, I18n.t(
-          "targetContextId required if targetContextType provided",
+          "targetContextId required if targetContextType provided"
         )
       end
 

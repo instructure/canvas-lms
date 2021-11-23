@@ -155,7 +155,7 @@ class ConferencesController < ApplicationController
   before_action { |c| c.active_tab = "conferences" }
   before_action :require_config, except: [:for_user]
   before_action :reject_student_view_student
-  before_action :get_conference, :except => [:index, :create, :for_user]
+  before_action :get_conference, :except => %i[index create for_user]
 
   # @API List conferences
   # Retrieve the paginated list of conferences for this context
@@ -177,9 +177,11 @@ class ConferencesController < ApplicationController
     return unless @current_user
 
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = @context.grants_right?(@current_user, :manage_content) ?
-      @context.web_conferences.active :
-      @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+    conferences = if @context.grants_right?(@current_user, :manage_content)
+                    @context.web_conferences.active
+                  else
+                    @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+                  end
     conferences = conferences.with_config_for(context: @context).order("created_at DESC, id DESC")
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
   end
@@ -271,9 +273,9 @@ class ConferencesController < ApplicationController
   def web_index(conferences)
     conferences = conferences.to_a
     preload_recordings(conferences)
-    @new_conferences, @concluded_conferences = conferences.partition { |conference|
+    @new_conferences, @concluded_conferences = conferences.partition do |conference|
       conference.ended_at.nil?
-    }
+    end
     log_asset_access(["conferences", @context], "conferences", "other")
 
     GuardRail.activate(:secondary) do
@@ -332,7 +334,7 @@ class ConferencesController < ApplicationController
           return redirect_to(urls.first[:url])
         end
       end
-      return redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
+      redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
     end
   end
 
@@ -347,10 +349,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json {
+          format.json do
             render :json => WebConference.find(@conference.id).as_json(:permissions => { :user => @current_user, :session => session },
                                                                        :url => named_context_url(@context, :context_conference_url, @conference))
-          }
+          end
         else
           format.html { render :index }
           format.json { render :json => @conference.errors, :status => :bad_request }
@@ -370,10 +372,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json {
+          format.json do
             render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
                                                 :url => named_context_url(@context, :context_conference_url, @conference))
-          }
+          end
         else
           format.html { render :edit }
           format.json { render :json => @conference.errors, :status => :bad_request }
@@ -404,7 +406,7 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
       end
     end
-  rescue StandardError => e
+  rescue => e
     Canvas::Errors.capture(e)
     flash[:error] = t("There was an error joining the conference.")
     redirect_to named_context_url(@context, :context_conferences_url)

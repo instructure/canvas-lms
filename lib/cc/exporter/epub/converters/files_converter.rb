@@ -83,7 +83,7 @@ module CC::Exporter::Epub::Converters
       attr_reader :data, :original_path
 
       def to_h
-        return {
+        {
           identifier: data['identifier'],
           local_path: local_path,
           file_name: File.basename(local_path),
@@ -129,7 +129,7 @@ module CC::Exporter::Epub::Converters
           file_basename = CGI.escape(file_basename) unless @export_type == :web_zip
           path_args = [
             CC::Exporter::Epub::FILE_PATH,
-            File.dirname(original_path.match(/#{WEB_RESOURCES_FOLDER}\/(.+)$/)[1]),
+            File.dirname(original_path.match(%r{#{WEB_RESOURCES_FOLDER}/(.+)$}o)[1]),
             file_basename
           ].reject do |path_part|
             path_part.match(/^\.$/)

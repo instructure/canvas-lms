@@ -115,7 +115,7 @@ describe GradingPeriodsController, type: :request do
             format: 'json',
             course_id: @course.id,
             id: @grading_period.id.to_s
-          },
+          }
         )
       end
 

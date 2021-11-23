@@ -36,7 +36,7 @@ describe 'Taking a quiz as a student' do
       )
     end
 
-    it 'prevents taking the quiz', priority: 1, test_id: 140615 do
+    it 'prevents taking the quiz', priority: 1 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation')).to include_text "This quiz is locked " \
@@ -52,7 +52,7 @@ describe 'Taking a quiz as a student' do
       )
     end
 
-    it 'prevents taking the quiz', priority: 1, test_id: 140616 do
+    it 'prevents taking the quiz', priority: 1 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation')).to include_text "This quiz was locked " \
@@ -67,7 +67,7 @@ describe 'Taking a quiz as a student' do
       )
     end
 
-    it 'allows taking the quiz', priority: 1, test_id: 428627 do
+    it 'allows taking the quiz', priority: 1 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f('#take_quiz_link')).to be_truthy
     end

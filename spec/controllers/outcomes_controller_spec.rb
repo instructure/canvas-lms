@@ -78,9 +78,9 @@ describe OutcomesController do
       user_session(@admin)
       get 'index', params: { :account_id => @account.id }
       permissions = assigns[:js_env][:PERMISSIONS]
-      [
-        :manage_outcomes, :manage_rubrics, :can_manage_courses, :import_outcomes, :manage_proficiency_scales,
-        :manage_proficiency_calculations
+      %i[
+        manage_outcomes manage_rubrics can_manage_courses import_outcomes manage_proficiency_scales
+        manage_proficiency_calculations
       ].each do |permission|
         expect(permissions).to have_key(permission)
       end
@@ -333,10 +333,10 @@ describe OutcomesController do
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
       expect(assigns[:outcome][:short_description]).to eql("A short description")
-      expect(@course.learning_outcome_links.map { |n| n.content }.include?(assigns[:outcome])).to be_truthy
+      expect(@course.learning_outcome_links.map(&:content).include?(assigns[:outcome])).to be_truthy
 
       @course.learning_outcome_groups.each do |group|
-        if group.child_outcome_links.map { |n| n.content }.include?(assigns[:outcome])
+        if group.child_outcome_links.map(&:content).include?(assigns[:outcome])
           expect(group).to eql(@course.root_outcome_group)
         end
       end
@@ -359,10 +359,10 @@ describe OutcomesController do
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
       expect(assigns[:outcome][:short_description]).to eql("A short description")
-      expect(@course.learning_outcome_links.map { |n| n.content }.include?(assigns[:outcome])).to be_truthy
+      expect(@course.learning_outcome_links.map(&:content).include?(assigns[:outcome])).to be_truthy
 
       @course.learning_outcome_groups.each do |group|
-        if group.child_outcome_links.map { |n| n.content }.include?(assigns[:outcome])
+        if group.child_outcome_links.map(&:content).include?(assigns[:outcome])
           expect(group).to eql(outcome_group)
         end
       end

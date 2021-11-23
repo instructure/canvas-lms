@@ -22,7 +22,7 @@ class StubbedClient
     events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
     puts "Events #{events} put to stream #{stream_name}: #{records}"
     OpenStruct.new(
-      records: records.map { OpenStruct.new(error_code: 'failure', error_message: 'this fails') }
+      records: records.map { OpenStruct.new(error_code: nil) }
     )
   end
 
@@ -37,14 +37,14 @@ Rails.configuration.to_prepare do
   LiveEvents.statsd = InstStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get('live_events_max_queue_size', 5000).to_i }
   LiveEvents.settings = -> { Canvas::DynamicSettings.find('live-events', default_ttl: 2.hours) }
-  LiveEvents.aws_credentials = ->(settings) {
+  LiveEvents.aws_credentials = lambda do |settings|
     if settings['vault_credential_path']
       Canvas::Vault::AwsCredentialProvider.new(settings['vault_credential_path'])
     else
       nil
     end
-  }
-  LiveEvents.stream_client = StubbedClient if ENV['STUB_LIVE_EVENTS_KINESIS']
+  end
+  LiveEvents.stream_client =  ->(settings) { StubbedClient if settings['stub_kinesis'] }
   # sometimes this async worker thread grabs a connection on a Setting read or similar.
   # We need it to be released or the main thread can have a real problem.
   LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }

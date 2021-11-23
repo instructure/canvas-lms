@@ -31,7 +31,7 @@ describe "Outcome Reports" do
     end
 
     def match_outcome(outcome)
-      object_type = outcome.class == LearningOutcome ? 'canvas_outcome' : 'canvas_outcome_group'
+      object_type = outcome.instance_of?(LearningOutcome) ? 'canvas_outcome' : 'canvas_outcome_group'
       vendor_guid = outcome.vendor_guid || "#{object_type}:#{outcome.id}"
       match_row('vendor_guid' => vendor_guid)
     end
@@ -79,7 +79,7 @@ describe "Outcome Reports" do
         header: true
       }
       admin = account_admin_user(account: account)
-      expected_headers = ['vendor_guid', 'object_type', 'title']
+      expected_headers = %w[vendor_guid object_type title]
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 
       preparsed_report = run_report('outcome_export_csv', preparsed_report_options)

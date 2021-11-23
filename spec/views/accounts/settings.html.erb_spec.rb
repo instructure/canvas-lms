@@ -221,7 +221,7 @@ describe "accounts/settings.html.erb" do
     end
 
     def do_render(user, account = nil)
-      account = @account unless account
+      account ||= @account
       view_context(account, user)
       render
     end
@@ -506,7 +506,7 @@ describe "accounts/settings.html.erb" do
 
     def expect_threshold_to_be(value)
       expect(response).to have_tag(
-        "select#account_settings_smart_alerts_threshold" +
+        "select#account_settings_smart_alerts_threshold" \
         "  option[value=\"#{value}\"][selected]"
       )
     end
@@ -679,7 +679,7 @@ describe "accounts/settings.html.erb" do
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css('#account_course_template_id')
       expect(select.css('option').map { |o| o['value'] }).to eq ["", "0", c.id.to_s]
-      expect(select.css('option').map { |o| o['disabled'] }).to eq ["disabled", "disabled", "disabled"]
+      expect(select.css('option').map { |o| o['disabled'] }).to eq %w[disabled disabled disabled]
     end
   end
 end

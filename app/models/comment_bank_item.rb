@@ -32,7 +32,7 @@ class CommentBankItem < ActiveRecord::Base
     given { |user| self.user == user }
     can :delete and can :read and can :update
 
-    given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
+    given { |user, session| course.grants_right?(user, session, :manage_grades) }
     can :create
   end
 end

@@ -29,7 +29,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
@@ -42,37 +42,37 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :read_question_banks) &&
-        self.context.grants_right?(user, session, :manage_assignments)
+      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :read_question_banks) &&
+        context.grants_right?(user, session, :manage_assignments)
     end
     can :read and can :create and can :update and can :delete and can :manage
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :read_question_banks) &&
-        self.context.grants_right?(user, session, :manage_assignments_add)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :read_question_banks) &&
+        context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :read_question_banks) &&
-        self.context.grants_right?(user, session, :manage_assignments_edit)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :read_question_banks) &&
+        context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :read and can :update and can :manage
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :read_question_banks) &&
-        self.context.grants_right?(user, session, :manage_assignments_delete)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :read_question_banks) &&
+        context.grants_right?(user, session, :manage_assignments_delete)
     end
     can :read and can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :read_question_banks) }
+    given { |user, session| context.grants_right?(user, session, :read_question_banks) }
     can :read
 
-    given { |user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
+    given { |user| user && assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
   end
 
@@ -89,37 +89,37 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def cached_context_short_name
-    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
-      self.context.short_name rescue ""
+    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+      context.short_name rescue ""
     end
   end
 
   def assessment_question_count
-    self.assessment_questions.active.count
+    assessment_questions.active.count
   end
 
   def context_code
-    "#{self.context_type.underscore}_#{self.context_id}"
+    "#{context_type.underscore}_#{context_id}"
   end
 
   def infer_defaults
-    self.title = t(:default_title, "No Name - %{course}", :course => self.context.name) if self.title.blank?
+    self.title = t(:default_title, "No Name - %{course}", :course => context.name) if title.blank?
   end
 
   def alignments=(alignments)
     # empty string from controller or empty hash
-    if alignments.empty?
-      outcomes = []
-    else
-      outcomes = context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
-    end
+    outcomes = if alignments.empty?
+                 []
+               else
+                 context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
+               end
 
     # delete alignments that aren't in the list anymore
     if outcomes.empty?
       learning_outcome_alignments.update_all(:workflow_state => 'deleted')
     else
       learning_outcome_alignments
-        .where("learning_outcome_id NOT IN (?)", outcomes)
+        .where.not(learning_outcome_id: outcomes)
         .update_all(:workflow_state => 'deleted')
     end
 
@@ -149,7 +149,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def bookmarked_for?(user)
-    user && self.assessment_question_bank_users.where(user_id: user).exists?
+    user && assessment_question_bank_users.where(user_id: user).exists?
   end
 
   def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids = [], duplicate_index = 0)
@@ -168,7 +168,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    self.save
+    save
   end
 
   # clear out all questions so that the bank can be replaced. this is currently

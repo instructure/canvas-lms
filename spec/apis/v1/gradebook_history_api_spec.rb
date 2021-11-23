@@ -162,18 +162,18 @@ describe GradebookHistoryApiController, type: :request do
     end
 
     def create_versions
-      @submission1.with_versioning(:explicit => true) {
+      @submission1.with_versioning(:explicit => true) do
         @submission1.update!(:graded_at => Time.zone.now, :grader_id => @grader.id, :score => 100)
-      }
-      @submission2.with_versioning(:explicit => true) {
+      end
+      @submission2.with_versioning(:explicit => true) do
         @submission2.update!(:graded_at => Time.zone.now, :grader_id => @super_grader.id, :score => 90)
-      }
-      @submission3.with_versioning(:explicit => true) {
+      end
+      @submission3.with_versioning(:explicit => true) do
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
-      }
-      @submission4.with_versioning(:explicit => true) {
+      end
+      @submission4.with_versioning(:explicit => true) do
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
-      }
+      end
     end
 
     it 'returns all applicable versions' do
@@ -214,9 +214,9 @@ describe GradebookHistoryApiController, type: :request do
     end
 
     it 'orders the most recent versions first' do
-      @submission3.with_versioning(:explicit => true) {
+      @submission3.with_versioning(:explicit => true) do
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
-      }
+      end
 
       json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json", {
                                 :controller => 'gradebook_history_api',
@@ -231,9 +231,9 @@ describe GradebookHistoryApiController, type: :request do
     end
 
     it 'optionally restricts by assignment_id' do
-      @submission4.with_versioning(:explicit => true) {
+      @submission4.with_versioning(:explicit => true) do
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
-      }
+      end
 
       json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?assignment_id=#{@assignment2.id}", {
                                 :controller => 'gradebook_history_api',
@@ -248,9 +248,9 @@ describe GradebookHistoryApiController, type: :request do
     end
 
     it 'optionally restricts by user_id' do
-      @submission4.with_versioning(:explicit => true) {
+      @submission4.with_versioning(:explicit => true) do
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
-      }
+      end
 
       json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?user_id=#{@student1.id}", {
                                 :controller => 'gradebook_history_api',
@@ -265,9 +265,9 @@ describe GradebookHistoryApiController, type: :request do
     end
 
     it 'optionally reverses ordering to oldest version first' do
-      @submission3.with_versioning(:explicit => true) {
+      @submission3.with_versioning(:explicit => true) do
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
-      }
+      end
 
       json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?ascending=1", {
                                 :controller => 'gradebook_history_api',

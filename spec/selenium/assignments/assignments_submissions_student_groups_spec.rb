@@ -32,14 +32,14 @@ describe 'submissions' do
     end
 
     context 'file upload' do
-      it 'Submitting Group Assignments - Warning', priority: "2", test_id: 56753 do
+      it 'Submitting Group Assignments - Warning', priority: "2" do
         create_assignment_for_group('online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         expect(f('.group_submission_alert')).to include_text('Keep in mind, this submission will count for')
       end
 
-      it 'Submitting Group Assignments - File Upload', priority: "1", test_id: 238164 do
+      it 'Submitting Group Assignments - File Upload', priority: "1" do
         create_assignment_for_group('online_upload')
         add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
                  @student, 'example.pdf')
@@ -59,7 +59,7 @@ describe 'submissions' do
         expect(f('#sidebar_content .header')).to include_text 'Submitted!'
       end
 
-      it 'Submitting Group Assignments - No File Warning', priority: "1", test_id: 238165 do
+      it 'Submitting Group Assignments - No File Warning', priority: "1" do
         skip('investigate in CCI-182')
         create_assignment_for_group('online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"

@@ -35,15 +35,15 @@ class Canvadoc < ActiveRecord::Base
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 
-    response = Canvas.timeout_protection("canvadocs") {
+    response = Canvas.timeout_protection("canvadocs") do
       canvadocs_api.upload(url, opts)
-    }
+    end
 
     if response && response['id']
       self.document_id = response['id']
       self.process_state = response['status']
       self.has_annotations = opts[:annotatable]
-      self.save!
+      save!
     elsif response.nil?
       raise UploadTimeout, "no response received (request timed out?)"
     else
@@ -52,9 +52,9 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions
-        .preload(submission: :assignment)
-        .map(&:submission)
+    canvadocs_submissions
+      .preload(submission: :assignment)
+      .map(&:submission)
   end
 
   def available?

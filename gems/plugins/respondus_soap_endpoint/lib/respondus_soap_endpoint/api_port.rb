@@ -213,6 +213,6 @@ module RespondusSoapEndpoint
        { :request_style => :rpc, :request_use => :encoded,
          :response_style => :rpc, :response_use => :encoded,
          :faults => {} }]
-    ]
+    ].freeze
   end
 end

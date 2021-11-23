@@ -692,16 +692,16 @@ describe "MessageableUser::Calculator" do
 
       it "partitions groups by shard" do
         group1 = nil
-        @shard1.activate {
+        @shard1.activate do
           course_with_student(:account => Account.create!, :user => @viewing_user, :active_all => true)
           group1 = group(:group_context => @course)
-        }
+        end
 
         group2 = nil
-        @shard2.activate {
+        @shard2.activate do
           course_with_student(:account => Account.create!, :user => @viewing_user, :active_all => true)
           group2 = group(:group_context => @course)
-        }
+        end
 
         Enrollment.limit_privileges_to_course_section!(group1.context, @viewing_user, true)
         Enrollment.limit_privileges_to_course_section!(group2.context, @viewing_user, true)

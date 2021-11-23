@@ -125,7 +125,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
     end
 
     it "retrieves messages using a stride and offset" do
-      foo, bar, baz = ["foo", "bar", "baz"].map do |msg|
+      foo, bar, baz = %w[foo bar baz].map do |msg|
         m = double(pop: "#{msg} body")
         expect(m).to receive(:uidl).twice.and_return(msg)
         m

@@ -45,7 +45,7 @@ if config[:components].present?
 
   module Marginalia::RakeTask
     def execute(args = nil)
-      previous, Marginalia::Comment.rake_task = Marginalia::Comment.rake_task, self.name
+      previous, Marginalia::Comment.rake_task = Marginalia::Comment.rake_task, name
       super
     ensure
       Marginalia::Comment.rake_task = previous

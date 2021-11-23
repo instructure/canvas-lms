@@ -59,7 +59,7 @@ module Qti
         get_all_answers_from_body
       end
 
-      get_feedback()
+      get_feedback
       ensure_correct_format
 
       @question
@@ -71,11 +71,11 @@ module Qti
       @question[:answers].each do |answer|
         answer[:left] = answer[:text] if answer[:text].present?
         answer[:left_html] = answer[:html] if answer[:html].present?
-        if answer[:match_id] &&
-           @question[:matches] &&
-           (match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] })
-          answer[:right] = match[:text]
-        end
+        next unless answer[:match_id] &&
+                    @question[:matches] &&
+                    (match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] })
+
+        answer[:right] = match[:text]
       end
 
       if @question[:answers].any? { |a| Nokogiri::HTML5(a[:right].to_s).at_css('img') }
@@ -83,7 +83,7 @@ module Qti
           # raise warning if the left hand side of the answers also has images
           @question[:import_warnings] ||= []
           @question[:import_warnings] << I18n.t(:qti_img_matching_question, "Imported matching question contains images on both sides, which is unsupported")
-        elsif @question[:matches].any? { |m| m[:match_id].present? && !@question[:answers].any? { |a| a[:match_id] == m[:match_id] } }
+        elsif @question[:matches].any? { |m| m[:match_id].present? && @question[:answers].none? { |a| a[:match_id] == m[:match_id] } }
           # or if there are distractors
           @question[:import_warnings] ||= []
           @question[:import_warnings] << I18n.t(:qti_img_matching_question_distractors, "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors")
@@ -114,11 +114,11 @@ module Qti
         match = {}
         @question[:matches] << match
         match_map[sc['identifier']] = match
-        if sc['identifier'] =~ /(\d+)/
-          match[:match_id] = $1.to_i
-        else
-          match[:match_id] = unique_local_id
-        end
+        match[:match_id] = if sc['identifier'] =~ /(\d+)/
+                             $1.to_i
+                           else
+                             unique_local_id
+                           end
         match[:text] = sc.text.strip
       end
     end
@@ -141,11 +141,11 @@ module Qti
           answer_mig_id = get_node_att(match, 'variable', 'identifier')
           match_mig_id = match.at_css('baseValue[baseType=identifier]').text rescue nil
         end
-        if (answer = answer_map[answer_mig_id])
-          answer[:feedback_id] = get_feedback_id(r_if)
-          if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && (match = match_map[match_mig_id])
-            answer[:match_id] = match[:match_id]
-          end
+        next unless (answer = answer_map[answer_mig_id])
+
+        answer[:feedback_id] = get_feedback_id(r_if)
+        if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && (match = match_map[match_mig_id])
+          answer[:match_id] = match[:match_id]
         end
       end
     end
@@ -165,16 +165,16 @@ module Qti
     def get_respondus_matches
       @question[:answers].each do |answer|
         @doc.css('responseIf, responseElseIf').each do |r_if|
-          if r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
-            match = {}
-            @question[:matches] << match
-            migration_id = r_if.at_css('match baseValue').text
-            match[:text] = clear_html((@doc.at_css("simpleChoice[identifier=#{migration_id}] p") || @doc.at_css("simpleChoice[identifier=#{migration_id}] div")).text)
-            match[:match_id] = unique_local_id
-            answer[:match_id] = match[:match_id]
-            answer.delete :migration_id
-            break
-          end
+          next unless r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+
+          match = {}
+          @question[:matches] << match
+          migration_id = r_if.at_css('match baseValue').text
+          match[:text] = clear_html((@doc.at_css("simpleChoice[identifier=#{migration_id}] p") || @doc.at_css("simpleChoice[identifier=#{migration_id}] div")).text)
+          match[:match_id] = unique_local_id
+          answer[:match_id] = match[:match_id]
+          answer.delete :migration_id
+          break
         end
       end
       all_matches = @doc.css('simpleChoice p, simpleChoice div').map { |e| clear_html(e.text) }
@@ -218,9 +218,9 @@ module Qti
       right = @doc.css('div.RIGHT_MATCH_BLOCK div').size
       return unless left > 0 && right > 0
 
-      return @doc.css('div.RESPONSE_BLOCK div').size == left &&
-             @doc.css('responseProcessing responseCondition match').size == left &&
-             @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
+      @doc.css('div.RESPONSE_BLOCK div').size == left &&
+        @doc.css('responseProcessing responseCondition match').size == left &&
+        @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
     end
 
     def get_all_answers_for_crazy_n_squared_match_by_index_thing
@@ -236,7 +236,7 @@ module Qti
         answer[:comments] = ""
         resp_id = ci['responseIdentifier']
         match_node = @doc.at_css("responseCondition match baseValue[identifier=#{resp_id}]")
-        choice_id = match_node && match_node.inner_text
+        choice_id = match_node&.inner_text
         match_index = nil
         if choice_id
           ci.css('simpleChoice').each_with_index do |sc, j|
@@ -285,13 +285,11 @@ module Qti
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
-            if response_if.name =~ /response(Else)?If/
-              if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
-                match_id = get_node_val(match, 'baseValue', '').strip
-                answer[:match_id] = match_map[match_id]
-                break
-              end
-            end
+            next unless /response(Else)?If/.match?(response_if.name) && response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+
+            match_id = get_node_val(match, 'baseValue', '').strip
+            answer[:match_id] = match_map[match_id]
+            break
           end
         end
       end
@@ -302,11 +300,11 @@ module Qti
         match_id, answer_id = pair.text.split
         match = @question[:matches].detect { |m| m[:match_id] == match_map[match_id.strip] }
         answer = @question[:matches].detect { |m| m[:match_id] == match_map[answer_id.strip] }
-        if answer && match
-          @question[:matches].delete(answer)
-          answer[:match_id] = match[:match_id]
-          @question[:answers] << answer
-        end
+        next unless answer && match
+
+        @question[:matches].delete(answer)
+        answer[:match_id] = match[:match_id]
+        @question[:answers] << answer
       end
     end
 
@@ -314,9 +312,9 @@ module Qti
     def check_for_meta_matches
       if (long_matches = @doc.search('instructureMetadata matchingMatch'))
         @question[:matches].each_with_index do |match, i|
-          match[:text] = long_matches[i].text.strip.gsub(/ +/, " ") if long_matches[i]
+          match[:text] = long_matches[i].text.strip.squeeze(' ') if long_matches[i]
         end
-        if long_matches.size > 0 && long_matches.size != @question[:matches].size
+        if !long_matches.empty? && long_matches.size != @question[:matches].size
           @question[:qti_warning] = "The matching options for this question may have been incorrectly imported."
         end
       end

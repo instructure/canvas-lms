@@ -36,7 +36,7 @@ describe "Gradebook - arrange by due date" do
     Gradebook.visit(@course)
   end
 
-  it "validates arrange columns by due date option", priority: "1", test_id: 3253270 do
+  it "validates arrange columns by due date option", priority: "1" do
     expected_text = "–"
 
     Gradebook.open_view_menu_and_arrange_by_menu
@@ -65,7 +65,7 @@ describe "Gradebook - arrange by due date" do
     expect(Gradebook.popover_menu_item_checked?('Due Date - Oldest to Newest')).to eq 'true'
   end
 
-  it "puts assignments with no due date last when sorting by due date and VDD", priority: "2", test_id: 251038 do
+  it "puts assignments with no due date last when sorting by due date and VDD", priority: "2" do
     assignment2 = @course.assignments.where(title: 'second assignment').first
     assignment3 = @course.assignments.where(title: 'assignment three').first
     # create 1 section
@@ -84,7 +84,7 @@ describe "Gradebook - arrange by due date" do
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(3)')).to include_text(@assignment.title)
   end
 
-  it "arranges columns by due date when multiple due dates are present", priority: "2", test_id: 378823 do
+  it "arranges columns by due date when multiple due dates are present", priority: "2" do
     assignment3 = @course.assignments.where(title: 'assignment three').first
     # create 2 sections
     @section_a = @course.course_sections.create!(name: 'Section A')

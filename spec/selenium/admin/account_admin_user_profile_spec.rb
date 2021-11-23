@@ -42,19 +42,19 @@ describe "admin account people profile" do
       search_username_input.send_keys("Test")
     end
 
-    it "allow searching for a user to merge with another user", priority: "1", test_id: 3647794 do
+    it "allow searching for a user to merge with another user", priority: "1" do
       expect(username_search_suggestions).to include_text @user2.name
       expect(username_search_suggestions).not_to include_text @user3.name
     end
 
-    it "displays full user name when a user is selected from suggestions", priority: "1", test_id: 3647794 do
+    it "displays full user name when a user is selected from suggestions", priority: "1" do
       choose_suggested_username(@user2.name).click
 
       expect(selected_user.text).to eq "Test User2"
       expect(select_user_button.attribute('href')).to include "/admin_merge?pending_user_id=#{@user2.id}"
     end
 
-    it "navigates to user details page when user is selected", priority: "1", test_id: 3647794 do
+    it "navigates to user details page when user is selected", priority: "1" do
       choose_suggested_username(@user2.name).click
       select_user_button.click
 

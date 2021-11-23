@@ -35,7 +35,7 @@ module CanvasErrors
         run_at: Time.zone.now,
         max_attempts: 1,
         tag: "TAG",
-        current_shard: double(id: 1),
+        current_shard: double(id: 1)
       )
     end
 

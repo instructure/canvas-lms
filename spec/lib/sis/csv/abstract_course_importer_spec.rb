@@ -105,7 +105,7 @@ describe SIS::CSV::AbstractCourseImporter do
       "C001,Hum101,Humanities,A001,T001,active"
     )
     expect(AbstractCourse.count).to eq before_count + 1
-    AbstractCourse.last.tap { |c|
+    AbstractCourse.last.tap do |c|
       expect(c.sis_source_id).to eq "C001"
       expect(c.short_name).to eq "Hum101"
       expect(c.name).to eq "Humanities"
@@ -113,7 +113,7 @@ describe SIS::CSV::AbstractCourseImporter do
       expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
       expect(c.workflow_state).to eq 'active'
-    }
+    end
   end
 
   it 'allows instantiations of abstract courses' do
@@ -133,7 +133,7 @@ describe SIS::CSV::AbstractCourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
       "C001,,,,,active,AC001"
     )
-    Course.last.tap { |c|
+    Course.last.tap do |c|
       expect(c.sis_source_id).to eq "C001"
       expect(c.abstract_course).to eq AbstractCourse.find_by(sis_source_id: "AC001")
       expect(c.short_name).to eq "Hum101"
@@ -141,7 +141,7 @@ describe SIS::CSV::AbstractCourseImporter do
       expect(c.enrollment_term).to eq EnrollmentTerm.find_by(name: "Winter13")
       expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
-    }
+    end
   end
 
   it 'skips references to nonexistent abstract courses' do
@@ -162,7 +162,7 @@ describe SIS::CSV::AbstractCourseImporter do
       ]
     end
     SisBatchError.where(root_account: @account).delete_all
-    Course.last.tap { |c|
+    Course.last.tap do |c|
       expect(c.sis_source_id).to eq "C001"
       expect(c.abstract_course).to be_nil
       expect(c.short_name).to eq "shortname"
@@ -170,7 +170,7 @@ describe SIS::CSV::AbstractCourseImporter do
       expect(c.enrollment_term).to eq @account.default_enrollment_term
       expect(c.account).to eq @account
       expect(c.root_account).to eq @account
-    }
+    end
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "AC001,Hum101,Humanities,A001,T001,active"
@@ -179,7 +179,7 @@ describe SIS::CSV::AbstractCourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
       "C001,shortname,longname,,,active,AC001"
     )
-    Course.last.tap { |c|
+    Course.last.tap do |c|
       expect(c.sis_source_id).to eq "C001"
       expect(c.abstract_course).to eq AbstractCourse.find_by(sis_source_id: "AC001")
       expect(c.short_name).to eq "shortname"
@@ -187,7 +187,7 @@ describe SIS::CSV::AbstractCourseImporter do
       expect(c.enrollment_term).to eq EnrollmentTerm.find_by(name: "Winter13")
       expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
-    }
+    end
   end
 
   it "supports falling back to a fallback account if the primary one doesn't exist" do
@@ -201,9 +201,9 @@ describe SIS::CSV::AbstractCourseImporter do
       "C001,Hum101,Humanities,NOEXIST,T001,active,A001"
     )
     expect(AbstractCourse.count).to eq before_count + 1
-    AbstractCourse.last.tap { |c|
+    AbstractCourse.last.tap do |c|
       expect(c.account).to eq Account.find_by(name: "TestAccount")
       expect(c.root_account).to eq @account
-    }
+    end
   end
 end

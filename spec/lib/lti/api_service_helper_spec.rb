@@ -25,18 +25,16 @@ module Lti
     include ApiServiceHelper
 
     attr_accessor :request
+    attr_reader :tool_proxy
 
     def initialize(request)
       @request = request
-    end
-
-    def tool_proxy
-      @tool_proxy
     end
   end
 
   describe ApiServiceHelper do
     subject { TestClass.new(request) }
+
     let(:request) do
       m = double('request')
       allow(m).to receive_messages(authorization: "")
@@ -48,9 +46,9 @@ module Lti
     end
     let(:course) { Course.create }
     let(:root_account) { Account.create }
-    let(:product_family) {
+    let(:product_family) do
       Lti::ProductFamily.create!(vendor_code: 'a', product_code: 'b', vendor_name: 'c', root_account: root_account)
-    }
+    end
 
     before do
       @tool_proxy = ToolProxy.create!(

@@ -127,7 +127,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
         selection.save!
         selection.create_moderation_event(@current_user)
         changed_submission_ids.push(map[:submission].id)
-        selection_json = selection.as_json(include_root: false, only: %w(assignment_id student_id selected_provisional_grade_id))
+        selection_json = selection.as_json(include_root: false, only: %w[assignment_id student_id selected_provisional_grade_id])
 
         unless @assignment.can_view_student_names?(@current_user)
           selection_json.delete(:student_id)
@@ -197,7 +197,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     # related student is selected.
     submission.touch
 
-    json = selection.as_json(include_root: false, only: %w(assignment_id student_id selected_provisional_grade_id))
+    json = selection.as_json(include_root: false, only: %w[assignment_id student_id selected_provisional_grade_id])
     unless @assignment.can_view_student_names?(@current_user)
       json.delete(:student_id)
       json[:anonymous_id] = submission.anonymous_id

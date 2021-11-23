@@ -25,14 +25,14 @@ class CanvasPartmanTest::WeekEvent < ActiveRecord::Base
   self.table_name = 'partman_week_events'
 
   def self.create_schema
-    self.drop_schema
+    drop_schema
 
-    CanvasPartmanTest::SchemaHelper.create_table(self.table_name.to_sym) do |t|
+    CanvasPartmanTest::SchemaHelper.create_table(table_name.to_sym) do |t|
       t.datetime :created_at
     end
   end
 
   def self.drop_schema
-    CanvasPartmanTest::SchemaHelper.drop_table(self.table_name.to_sym, cascade: true)
+    CanvasPartmanTest::SchemaHelper.drop_table(table_name.to_sym, cascade: true)
   end
 end
