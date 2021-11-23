@@ -294,6 +294,21 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.todo_date).to eq todo_date
     end
 
+    context "anonymous discussions" do
+      before do
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json",
+                   :course_id => @course.to_param },
+                 { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded",
+                   :anonymous_state => "full_anonymity" })
+        @topic = @course.discussion_topics.order(:id).last
+      end
+
+      it "creates a fully anonymous discussion" do
+        expect(@topic["anonymous_state"]).to eq "full_anonymity"
+      end
+    end
+
     context "publishing" do
       it "creates a draft state topic" do
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
