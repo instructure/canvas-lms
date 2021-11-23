@@ -265,6 +265,35 @@ describe "dashboard" do
       expect(todo_list).to include_text(quiz_title)
     end
 
+    context "todo link" do
+      before do
+        assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
+        student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
+        @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+        assignment.reload
+        assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+        assignment.reload
+      end
+
+      it "opens in a new tab if open_todos_in_new_tab is enabled" do
+        @teacher.enable_feature!(:open_todos_in_new_tab)
+        enable_cache do
+          get "/"
+          link = f('.to-do-list > li > a')
+          expect(link.attribute('target')).to eq('_blank')
+        end
+      end
+
+      it "opens in same tab if open_todos_in_new_tab is disabled" do
+        @teacher.disable_feature!(:open_todos_in_new_tab)
+        enable_cache do
+          get "/"
+          link = f('.to-do-list > li > a')
+          expect(link.attribute('target')).to be_empty
+        end
+      end
+    end
+
     context "course menu customization" do
       it "always has a link to the courses page (with customizations)", priority: "1" do
         course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })

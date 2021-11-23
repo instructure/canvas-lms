@@ -439,3 +439,8 @@ gradebook_show_first_last_names:
   display_name: Separate columns for first/last names in Gradebook
   description: Show account setting to allow viewing and exporting of student first and last names
     in separate columns in the gradebook.
+open_todos_in_new_tab:
+  applies_to: User
+  state: allowed_on
+  display_name: Open to-do items in a new tab
+  description: When enabled, this setting automatically opens teacher to-do items in a new tab.

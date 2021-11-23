@@ -197,7 +197,8 @@ const defaultProps = {
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
   canAddObservee: false,
-  observerList: MOCK_OBSERVER_LIST
+  observerList: MOCK_OBSERVER_LIST,
+  openTodosInNewTab: true
 }
 
 beforeAll(() => {
