@@ -1339,6 +1339,34 @@ export const updateOutcomeMocks = ({
       query: UPDATE_LEARNING_OUTCOME,
       variables: {
         input: {
+          id: '3',
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: {
+        updateLearningOutcome: {
+          __typename: 'UpdateLearningOutcomePayload',
+          learningOutcome: {
+            __typename: 'LearningOutcome',
+            _id: '1',
+            title,
+            displayName,
+            description
+          },
+          errors: null
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
           id: '2',
           title,
           displayName,
