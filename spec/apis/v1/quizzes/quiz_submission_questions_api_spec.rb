@@ -241,11 +241,6 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       assert_status(401)
     end
 
-    it "allows teacher access even if quiz is OQAAT" do
-      api_index({}, { raw: true })
-      assert_status(200)
-    end
-
     it "denies access to another student" do
       student_in_course
       api_index({}, { raw: true })

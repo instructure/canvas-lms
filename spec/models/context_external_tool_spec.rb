@@ -745,12 +745,6 @@ describe ContextExternalTool do
 
         it { is_expected.to eq nil }
       end
-
-      context 'when the context argument is blank' do
-        let(:arguments) { [nil, tool.context] }
-
-        it { is_expected.to eq nil }
-      end
     end
   end
 

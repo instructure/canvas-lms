@@ -65,20 +65,24 @@ describe Api::V1::QuizSubmissionQuestion do
       Array.new(3) { create_question "multiple_choice" }
     end
 
-    let(:submission_data) do
-      {}
+    context "with submission_data as a hash" do
+      let(:submission_data) do
+        {}
+      end
+
+      it "returns json" do
+        is_expected.to be_a Hash
+      end
     end
 
-    it "returns json" do
-      is_expected.to be_a Hash
-    end
+    context "with submission_data as an array" do
+      let(:submission_data) do
+        []
+      end
 
-    let(:submission_data) do
-      []
-    end
-
-    it "handles submitted submission_data" do
-      is_expected.to be_a Hash
+      it "handles submitted submission_data" do
+        is_expected.to be_a Hash
+      end
     end
   end
 

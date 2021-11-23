@@ -416,11 +416,6 @@ describe WikiPage do
         expect(@page.grants_right?(@user, :read)).to be_truthy
       end
 
-      it 'is given read rights, unless hidden from students' do
-        @page.workflow_state = 'unpublished'
-        expect(@page.grants_right?(@user, :read)).to be_falsey
-      end
-
       it 'is given read rights, unless unpublished' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@user, :read)).to be_falsey

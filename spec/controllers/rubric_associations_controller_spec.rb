@@ -206,15 +206,6 @@ describe RubricAssociationsController do
       expect(response).to be_successful
     end
 
-    it "updates the association" do
-      course_with_teacher_logged_in(:active_all => true)
-      rubric_association_model(:user => @user, :context => @course)
-      put 'update', params: { :course_id => @course.id, :id => @rubric_association.id, :rubric_association => { :title => "some association" } }
-      expect(assigns[:association]).not_to be_nil
-      expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_successful
-    end
-
     describe 'AnonymousOrModerationEvent creation for auditable assignments' do
       let(:course) { Course.create! }
       let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }

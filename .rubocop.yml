@@ -391,10 +391,6 @@ RSpec/PredicateMatcher:
 RSpec/ReceiveCounts:
   Severity: convention
   AutoCorrect: false
-RSpec/RepeatedExample:
-  Severity: convention
-RSpec/RepeatedExampleGroupBody:
-  Severity: convention
 RSpec/ReturnFromStub:
   Severity: convention
   AutoCorrect: false

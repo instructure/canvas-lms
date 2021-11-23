@@ -1282,11 +1282,11 @@ describe SpeedGrader::Assignment do
       end
 
       it "excludes provisional grade submission comments from other graders" do
-        expect(comment_ids).not_to include(ta_comment.id.to_s)
+        expect(comment_ids).not_to include(ta_provisional_comment.id.to_s)
       end
 
       it "excludes provisional grade submission comments from the final grader" do
-        expect(comment_ids).not_to include(final_grader_comment.id.to_s)
+        expect(comment_ids).not_to include(final_grader_provisional_comment.id.to_s)
       end
     end
   end
