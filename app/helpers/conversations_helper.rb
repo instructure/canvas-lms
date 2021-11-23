@@ -146,6 +146,17 @@ module ConversationsHelper
       conversation_id: conversation_id,
       strict_checks: !Account.site_admin.grants_right?(current_user, session, :send_messages)
     )
+
+    # include users that were already part of the given conversation
+    if conversation_id && conversation_id != ""
+      unknown_users = users - known.pluck(:id)
+      conversation_participant_ids = Conversation.find(conversation_id).participants.pluck(:id)
+      unknown_users = unknown_users.select do |unknown_user|
+        conversation_participant_ids.include?(unknown_user)
+      end
+      known.concat(unknown_users.map { |id| MessageableUser.find(id) })
+    end
+
     contexts.each { |c| known.concat(current_user.address_book.known_in_context(c)) }
     @recipients = known.uniq(&:id)
     @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
