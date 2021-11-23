@@ -155,9 +155,11 @@ class OutcomeGroupsApiController < ApplicationController
   def redirect
     return unless can_read_outcomes
 
-    @outcome_group = @context ?
-      @context.root_outcome_group :
-      LearningOutcomeGroup.global_root_outcome_group
+    @outcome_group = if @context
+                       @context.root_outcome_group
+                     else
+                       LearningOutcomeGroup.global_root_outcome_group
+                     end
     redirect_to polymorphic_path [:api_v1, @context || :global, :outcome_group], :id => @outcome_group.id
   end
 
@@ -361,6 +363,13 @@ class OutcomeGroupsApiController < ApplicationController
     # preload the links' outcomes' contexts.
     ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
 
+    if context&.root_account&.feature_enabled?(:improved_outcomes_management) && Account.site_admin.feature_enabled?(:outcomes_friendly_description)
+      account = @context.is_a?(Account) ? @context : @context.account
+      course = @context.is_a?(Course) ? @context : nil
+      friendly_descriptions = resolve_friendly_descriptions(account, course, @links.map(&:content_id)).map { |description| [description.learning_outcome_id, description.description] }
+      outcome_params[:friendly_descriptions] = friendly_descriptions.to_h
+    end
+
     # render to json and serve
     render :json => outcome_links_json(@links, @current_user, session, outcome_params)
   end
@@ -561,8 +570,8 @@ class OutcomeGroupsApiController < ApplicationController
     begin
       @outcome_link.destroy
       render :json => outcome_link_json(@outcome_link, @current_user, session)
-    rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
-      render :json => { 'message' => error.message }, :status => :bad_request
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
+      render :json => { 'message' => e.message }, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request
     end

@@ -36,8 +36,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     t('#quizzes.quiz_statistics.types.student_analysis', 'Student Analysis')
   end
 
-  class TemporaryUser < Struct.new(:id, :short_name)
-  end
+  TemporaryUser = Struct.new(:id, :short_name)
 
   # returns a blob of stats junk like this:
   # {
@@ -66,12 +65,12 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     #  "answers"=> [{"id"=>6782},...],
     #  "assessment_question_id"=>1022,
     # }, ...}
-    questions = Hash[
+    questions =
       (quiz.quiz_data || []).map { |q| q[:questions] || q }
                             .flatten
                             .select { |q| q[:answers] }
-                            .map { |q| [q[:id], q] }
-    ]
+                            .index_by { |q| q[:id] }
+
     stats = {}
     found_ids = {}
     score_counter = Stats::Counter.new
@@ -96,7 +95,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         stats[:submission_logged_out_users] << temp_user
         temp_users[sub.temporary_user_code] = temp_user
       end
-      if !found_ids[sub.id]
+      unless found_ids[sub.id]
         percentile = (sub.score.to_f / quiz_points * 100).round
         stats[:unique_submission_count] += 1
         stats[:submission_scores][percentile] += 1
@@ -117,21 +116,21 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_score_stdev] = score_counter.standard_deviation
-    if submissions.size > 0
-      stats[:submission_correct_count_average] = correct_cnt.to_f / submissions.size
-      stats[:submission_incorrect_count_average] = incorrect_cnt.to_f / submissions.size
-      stats[:submission_duration_average] = total_duration.to_f / submissions.size
-    else
+    if submissions.empty?
       stats[:submission_correct_count_average] =
         stats[:submission_incorrect_count_average] =
           stats[:submission_duration_average] = 0
+    else
+      stats[:submission_correct_count_average] = correct_cnt.to_f / submissions.size
+      stats[:submission_incorrect_count_average] = incorrect_cnt.to_f / submissions.size
+      stats[:submission_duration_average] = total_duration.to_f / submissions.size
     end
 
     assessment_questions = if questions_hash.any? { |_, q| q[:assessment_question_id] }
-                             Hash[
-                               AssessmentQuestion.where(:id => questions_hash.keys)
-                                                 .map { |aq| [aq.id, aq] }
-                             ]
+
+                             AssessmentQuestion.where(:id => questions_hash.keys)
+                                               .index_by(&:id)
+
                            else
                              {}
                            end
@@ -148,7 +147,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
     end
 
-    questions_hash.keys.each do |id|
+    questions_hash.each_key do |id|
       obj = questions[id]
       unless obj
         obj = questions_hash[id]
@@ -157,11 +156,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           obj[:name] = aq_name if aq_name
         end
       end
-      if obj[:answers] && obj[:question_type] != 'text_only_question'
-        stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
-        stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
-        stats[:questions] << ['question', stat]
-      end
+      next unless obj[:answers] && obj[:question_type] != 'text_only_question'
+
+      stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
+      stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
+      stats[:questions] << ['question', stat]
     end
 
     stats
@@ -170,13 +169,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   def preload_attachments(submissions)
     ids = submissions.map(&:submission_data).flatten.compact.select do |hash|
       hash[:attachment_ids].present?
-    end.map do |hash|
-      hash[:attachment_ids]
-    end.flatten
-    @attachments = Hash[Attachment.where(:id => ids).map do |a|
-      [a.id, a]
-    end
-    ]
+    end.pluck(:attachment_ids).flatten
+    @attachments = Attachment.where(:id => ids).index_by(&:id)
   end
 
   def attachment_csv(answer)
@@ -216,11 +210,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         quiz_data.each do |question|
           next if question['entry_type'] == 'quiz_group'
 
-          if !found_question_ids[question[:id]]
-            columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
-            columns << question[:points_possible]
-            found_question_ids[question[:id]] = true
-          end
+          next if found_question_ids[question[:id]]
+
+          columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
+          columns << question[:points_possible]
+          found_question_ids[question[:id]] = true
         end
       end
       last_question_index = columns.length - 1
@@ -278,25 +272,26 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           strip_html_answers(question)
           answer_item = question && question[:answers]&.detect { |a| a[:id] == answer[:answer_id] }
           answer_item ||= answer
-          if question[:question_type] == 'fill_in_multiple_blanks_question'
-            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
-            row << blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
-          elsif question[:question_type] == 'multiple_answers_question'
-            row << question[:answers].map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
-          elsif question[:question_type] == 'multiple_dropdowns_question'
-            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
+          case question[:question_type]
+          when 'fill_in_multiple_blanks_question'
+            blank_ids = question[:answers].pluck(:blank_id).uniq
+            row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.join(',')
+          when 'multiple_answers_question'
+            row << question[:answers].filter_map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.join(',')
+          when 'multiple_dropdowns_question'
+            blank_ids = question[:answers].pluck(:blank_id).uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
-            row << answer_ids.map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
-          elsif question[:question_type] == 'calculated_question'
+            row << answer_ids.filter_map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.join(',')
+          when 'calculated_question'
             list = question[:answers].take(1).flat_map do |ans|
-              ans[:variables] && ans[:variables].map do |variable|
+              ans[:variables]&.map do |variable|
                 [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, '\=>') }.join('=>')
               end
             end
             list << answer[:text]
             row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
-          elsif question[:question_type] == 'matching_question'
-            answer_ids = question[:answers].map { |a| a[:id] }
+          when 'matching_question'
+            answer_ids = question[:answers].pluck(:id)
             answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
             row << answer_and_matches.map do |answer_id, match_id|
               res = []
@@ -305,9 +300,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
               res << (match[:right] || match[:text])
               res.map { |s| (s || '').gsub(/=>/, '\=>') }.join('=>').gsub(/,/, '\,')
             end.join(',')
-          elsif question[:question_type] == 'numerical_question'
+          when 'numerical_question'
             row << (answer && answer[:text])
-          elsif question[:question_type] == 'file_upload_question'
+          when 'file_upload_question'
 
             row << attachment_csv(answer)
           else
@@ -316,8 +311,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           row.push(html_to_text(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
-        row << submission.submission_data.select { |a| a[:correct] }.length
-        row << submission.submission_data.reject { |a| a[:correct] }.length
+        row << submission.submission_data.count { |a| a[:correct] }
+        row << submission.submission_data.count { |a| !a[:correct] }
         row << submission.score
         csv << row
       end
@@ -343,7 +338,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    subs = submissions.preload(:versions).map do |qs|
+    subs = submissions.preload(:versions, :user).map do |qs|
       includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
     subs = subs.flatten.compact.select do |s|
@@ -353,10 +348,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def strip_html_answers(question)
-    return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
+    return if !question || !question[:answers] || !(%w[multiple_choice_question multiple_answers_question].include? question[:question_type])
 
-    for answer in question[:answers] do
-      answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
+    question[:answers].each do |answer|
+      answer[:text] = strip_tags(answer[:html]) if answer[:html].present? && answer[:text].blank?
     end
   end
 
@@ -413,17 +408,17 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     }
     strip_html_answers(question)
 
-    question[:user_ids] = responses.map { |r| r[:user_id] }
+    question[:user_ids] = responses.pluck(:user_id)
     question[:response_values] = responses.map { |r| strip_tags(r[:text].to_s) }
     question[:responses] = responses.size
 
     question = Quizzes::QuizQuestion::Base.from_question_data(question).stats(responses)
     none = {
-      :responses => question[:responses] - question[:answers].map { |a| a[:responses] || 0 }.sum,
+      :responses => question[:responses] - question[:answers].sum { |a| a[:responses] || 0 },
       :id => "none",
       :weight => 0,
       :text => I18n.t('statistics.no_answer', "No Answer"),
-      :user_ids => question[:user_ids] - question[:answers].map { |a| a[:user_ids] }.flatten
+      :user_ids => question[:user_ids] - question[:answers].pluck(:user_ids).flatten
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0
     question.to_hash.with_indifferent_access

@@ -51,7 +51,7 @@ describe SIS::CSV::GroupCategoryImporter do
     process_csv_data(
       "group_category_id,category_name,status",
       "gc1,Some Category,active",
-      "gc1,Other Category,active",
+      "gc1,Other Category,active"
     )
     expect(GroupCategory.all.length).to eq(1)
   end

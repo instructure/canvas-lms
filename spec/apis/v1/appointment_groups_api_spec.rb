@@ -33,13 +33,13 @@ describe AppointmentGroupsController, type: :request do
     @user = @me
   end
 
-  expected_fields = [
-    'appointments_count', 'context_codes', 'created_at', 'description',
-    'end_at', 'html_url', 'id', 'location_address', 'location_name',
-    'max_appointments_per_participant', 'min_appointments_per_participant',
-    'participant_type', 'participant_visibility',
-    'participants_per_appointment', 'requiring_action', 'start_at',
-    'sub_context_codes', 'title', 'updated_at', 'url', 'workflow_state'
+  expected_fields = %w[
+    appointments_count context_codes created_at description
+    end_at html_url id location_address location_name
+    max_appointments_per_participant min_appointments_per_participant
+    participant_type participant_visibility
+    participants_per_appointment requiring_action start_at
+    sub_context_codes title updated_at url workflow_state
   ]
 
   it 'returns manageable appointment groups' do

@@ -55,7 +55,7 @@ describe PseudonymsController, type: :request do
       end
 
       it "returns multiple pseudonyms if they exist" do
-        %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
         json = api_call(:get, @account_path, @account_path_options, {
                           :user => { :id => @student.id }
                         })
@@ -63,7 +63,7 @@ describe PseudonymsController, type: :request do
       end
 
       it "paginates results" do
-        %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
         json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ :per_page => '1' }), {
                           :user => { :id => @student.id }
                         })
@@ -85,7 +85,7 @@ describe PseudonymsController, type: :request do
       end
 
       it "does not included deleted pseudonyms" do
-        %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
         to_delete = @student.pseudonyms.create!(:unique_id => "to-delete@example.com")
         to_delete.destroy
 

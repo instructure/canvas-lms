@@ -123,7 +123,7 @@ module Lti::IMS
           end
 
           context do
-            let(:params_overrides) { super().merge(timestamp: 1.day.from_now) }
+            let(:params_overrides) { super().merge(timestamp: 1.day.from_now.iso8601(3)) }
 
             it 'does not update the created_at timestamp' do
               result
@@ -883,15 +883,23 @@ module Lti::IMS
           it_behaves_like 'an unprocessable entity'
         end
 
-        context 'when timestamp is not a string' do
-          let(:params_overrides) { super().merge(timestamp: Time.zone.now.to_i) }
+        context 'when timestamp is a timestamp, but not an iso8601 timestamp' do
+          # this is an epoch timestamp that correctly parses using Time.zone.parse
+          # into 10 Oct 3022, which is not desired behavior. it's also further in
+          # the future than the current time, which returns a different exception
+          # and obscures this behavior
+          let(:timestamp) { 3022101316 }
+          let(:params_overrides) { super().merge(timestamp: timestamp) }
 
           it_behaves_like 'a bad request'
         end
 
-        context 'when submitted_at extension is not a string' do
+        context 'when submitted_at extension is a timestamp, but not an is08601 timestamp' do
+          # this is an epoch timestamp that correctly parses using Time.zone.parse
+          # into 10 Oct 1637, which is not desired behavior
+          let(:timestamp) { 1637101316 }
           let(:params_overrides) do
-            super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now.to_i })
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: timestamp })
           end
 
           it_behaves_like 'a bad request'

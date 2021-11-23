@@ -79,7 +79,7 @@ describe Mutations::CreateLearningOutcomeGroup do
           ),
           context
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'createLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'createLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq title
@@ -100,7 +100,7 @@ describe Mutations::CreateLearningOutcomeGroup do
           ),
           { current_user: site_admin_user }
         )
-        expect(result.dig('errors')).to be_nil
+        expect(result['errors']).to be_nil
         expect(result.dig('data', 'createLearningOutcomeGroup', 'errors')).to be_nil
         data = result.dig('data', 'createLearningOutcomeGroup', 'learningOutcomeGroup')
         expect(data['title']).to eq title
@@ -113,7 +113,7 @@ describe Mutations::CreateLearningOutcomeGroup do
 
   context 'Errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createLearningOutcomeGroup', 'errors')
+      errors = result['errors'] || result.dig('data', 'createLearningOutcomeGroup', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end

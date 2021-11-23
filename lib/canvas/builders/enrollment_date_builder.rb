@@ -117,11 +117,11 @@ module Canvas::Builders
     end
 
     def course_is_restricted?
-      @course && @course.restrict_enrollments_to_course_dates
+      @course&.restrict_enrollments_to_course_dates
     end
 
     def section_is_restricted?
-      @section && @section.restrict_enrollments_to_section_dates
+      @section&.restrict_enrollments_to_section_dates
     end
 
     def enrollment_is_restricted?

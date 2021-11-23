@@ -50,7 +50,7 @@ describe "gradebook - logged in as a student" do
       StudentGradesPage.visit_as_student(@course)
     end
 
-    it 'displays total grades as points', priority: "2", test_id: 164229 do
+    it 'displays total grades as points', priority: "2" do
       expect(StudentGradesPage.final_grade).to include_text("10")
     end
 
@@ -92,7 +92,7 @@ describe "gradebook - logged in as a student" do
         StudentGradesPage.visit_as_teacher(@course, @student)
       end
 
-      it 'only shows assignments that belong to the selected grading period', priority: "1", test_id: 2528639 do
+      it 'only shows assignments that belong to the selected grading period', priority: "1" do
         StudentGradesPage.select_period_by_name(past_period_name)
         expect_new_page_load { StudentGradesPage.click_apply_button }
         expect(StudentGradesPage.assignment_titles).to include(past_assignment_name)

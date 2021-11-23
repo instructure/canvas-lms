@@ -66,7 +66,7 @@ describe('Module', () => {
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(
-      queryByRole('cell', {name: 'Assignments : Basic encryption/decryption'})
+      queryByRole('cell', {name: 'Assignments : Basic encryption/decryption 100 pts'})
     ).toBeInTheDocument()
     expect(queryAllByRole('cell', {name: /Days :/})[0]).toBeInTheDocument()
     expect(queryByRole('cell', {name: 'Due Date : 9/3/2021'})).toBeInTheDocument()

@@ -37,7 +37,7 @@ describe 'when a quiz is published' do
     context 'when on the course home page' do
       before { get "/courses/#{@course.id}" }
 
-      it 'To Do List includes published, untaken quizzes that are due soon for students', priority: "1", test_id: 140613 do
+      it 'To Do List includes published, untaken quizzes that are due soon for students', priority: "1" do
         wait_for_ajaximations
         expect(f('#planner-todosidebar-item-list')).to include_text 'Test Quiz'
       end

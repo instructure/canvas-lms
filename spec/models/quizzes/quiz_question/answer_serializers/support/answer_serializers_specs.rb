@@ -37,9 +37,11 @@ shared_examples_for 'Answer Serializers' do
     options = respond_to?(:factory_options) ? factory_options : {}
 
     # can't test for #arity directly since it might be an optional parameter
-    data = factory.parameters.include?([:opt, :options]) ?
-      factory.call(options) :
-      factory.call
+    data = if factory.parameters.include?([:opt, :options])
+             factory.call(options)
+           else
+             factory.call
+           end
 
     # we'll manually assign an ID of 5 so that we won't have to use variables
     # like "#{question_id}" all over the place, a readability thing that's all

@@ -34,7 +34,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
@@ -169,7 +169,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i(access_token token_type expires_in scope).each do |key|
+        %i[access_token token_type expires_in scope].each do |key|
           expect(subject).to have_key key
         end
       end
@@ -304,11 +304,13 @@ module Canvas::OAuth
     context 'with valid client_id' do
       describe '#error_message' do
         subject { provider.error_message }
+
         it { is_expected.to be_empty }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
+
         it { is_expected.to be true }
       end
 
@@ -318,7 +320,7 @@ module Canvas::OAuth
         it { is_expected.to be_a Hash }
 
         it 'has the correct expected keys' do
-          %i(access_token token_type expires_in scope).each do |key|
+          %i[access_token token_type expires_in scope].each do |key|
             expect(subject).to have_key key
           end
         end
@@ -330,11 +332,13 @@ module Canvas::OAuth
 
       describe '#error_message' do
         subject { provider.error_message }
+
         it { is_expected.to eq("Unknown client_id") }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
+
         it { is_expected.to be false }
       end
     end

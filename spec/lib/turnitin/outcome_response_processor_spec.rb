@@ -105,7 +105,7 @@ module Turnitin
           allow(original_submission_response).to receive(:headers).and_return({})
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
-          mock = double()
+          mock = double
           expect_any_instance_of(subject.class).to receive(:delay).with(
             max_attempts: subject.class.max_attempts,
             priority: Delayed::LOW_PRIORITY,

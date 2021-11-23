@@ -107,7 +107,7 @@ module Lti
           expect(profile.services_offered.to_s).to include restricted_service
         end
 
-        it 'can include additional services ' do
+        it 'can include additional capabilities' do
           restricted_cap = "vnd.Canvas.OriginalityReport.url"
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tcp.uuid}",
               params: { tool_consumer_profile_id: tcp.uuid, account_id: account.id },

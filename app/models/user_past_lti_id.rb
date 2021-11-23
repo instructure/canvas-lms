@@ -44,7 +44,7 @@
 #
 class UserPastLtiId < ActiveRecord::Base
   belongs_to :user
-  belongs_to :context, polymorphic: [:account, :course, :group]
+  belongs_to :context, polymorphic: %i[account course group]
 
   # regular pre-loaders will not work because they will load past_lti_ids for
   # the user in all contexts instead of just the context we want.
@@ -52,7 +52,7 @@ class UserPastLtiId < ActiveRecord::Base
   # user_merge, but we still want to avoid the N+1
   def self.manual_preload_past_lti_ids(objects, object_context)
     # collaborators are allowed to not have a user, so we compact them here.
-    users = objects.first.is_a?(User) ? objects : objects.map(&:user).compact
+    users = objects.first.is_a?(User) ? objects : objects.filter_map(&:user)
     past_lti_ids = UserPastLtiId.where(user_id: users, context: object_context).group_by(&:user_id)
     users.each do |user|
       past_lti_id = past_lti_ids[user.id]

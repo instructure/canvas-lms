@@ -110,28 +110,28 @@ module DifferentiatedAssignments
       end
 
       def enroll_first_student
-        student = self.first_student
+        student = first_student
         enroll_student_in_section_a(student)
-        add_user_to_group(group: self.student_group_x, user: student, is_leader: true)
+        add_user_to_group(group: student_group_x, user: student, is_leader: true)
       end
 
       def enroll_second_student
-        student = self.second_student
+        student = second_student
         enroll_student_in_section_b(student)
-        add_user_to_group(group: self.student_group_x, user: student)
+        add_user_to_group(group: student_group_x, user: student)
       end
 
       def enroll_third_student
-        student = self.third_student
+        student = third_student
         enroll_student_in_section_a(student)
         enroll_student_in_section_b(student)
-        add_user_to_group(group: self.student_group_y, user: student, is_leader: true)
+        add_user_to_group(group: student_group_y, user: student, is_leader: true)
       end
 
       def enroll_fourth_student
-        student = self.fourth_student
+        student = fourth_student
         enroll_student_in_section_c(student)
-        add_user_to_group(group: self.student_group_y, user: student)
+        add_user_to_group(group: student_group_y, user: student)
       end
 
       def enroll_student_in_section_a(student)
@@ -168,11 +168,11 @@ module DifferentiatedAssignments
       end
 
       def enroll_first_observer
-        enroll_observer(self.first_observer, self.first_student)
+        enroll_observer(first_observer, first_student)
       end
 
       def enroll_third_observer
-        enroll_observer(self.third_observer, self.third_student)
+        enroll_observer(third_observer, third_student)
       end
 
       def enroll_observer(an_observer, student_to_observe)

@@ -82,8 +82,8 @@ describe "assignment" do
       expect(AssignmentCreateEditPage.limited_attempts_input.attribute('value')).to eq "1"
 
       # increase attempts count
-      AssignmentCreateEditPage.increase_attempts_btn.click()
-      AssignmentCreateEditPage.assignment_save_button.click()
+      AssignmentCreateEditPage.increase_attempts_btn.click
+      AssignmentCreateEditPage.assignment_save_button.click
       wait_for_ajaximations
 
       expect(AssignmentPage.allowed_attempts_count.text).to include "2"

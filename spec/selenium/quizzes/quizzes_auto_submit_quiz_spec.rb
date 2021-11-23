@@ -45,7 +45,7 @@ describe 'taking a quiz' do
     context 'when the quiz has a lock date', custom_timeout: 45 do
       let(:quiz) { quiz_create(course: @course) }
 
-      it 'automatically submits the quiz once the quiz is locked, and does not mark it "late"', priority: "1", test_id: 209407 do
+      it 'automatically submits the quiz once the quiz is locked, and does not mark it "late"', priority: "1" do
         auto_submit_quiz(quiz)
 
         verify_quiz_is_locked

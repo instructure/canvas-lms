@@ -87,13 +87,13 @@ module CC
         'xmlns:lticm' => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
         'xmlns:lticp' => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
         'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:schemaLocation' => %w(
+        'xsi:schemaLocation' => %w[
           http://www.imsglobal.org/xsd/imslticc_v1p3.xsd
           http://www.imsglobal.org/xsd/imslticp_v1p0
           imslticp_v1p0.xsd http://www.imsglobal.org/xsd/imslticm_v1p0
           imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0
           imsbasiclti_v1p0p1.xsd
-        ).join(' ')
+        ].join(' ')
       ) do |cartridge_basiclti_link|
         # Basic elements
         cartridge_basiclti_link.blti :title, tool.name
@@ -101,9 +101,9 @@ module CC
 
         # URL element (choose secure or not based on protocol)
         case tool.url
-        when /^http:\/\//
+        when %r{^http://}
           cartridge_basiclti_link.blti :launch_url, tool.url
-        when /^https:\/\//
+        when %r{^https://}
           cartridge_basiclti_link.blti :secure_launch_url, tool.url
         end
 

@@ -24,6 +24,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   include_context 'lti_1_3_spec_helper'
 
   subject { response }
+
   let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account: account) }
   let_once(:student) do
@@ -181,7 +182,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     context 'when the response is not a success' do
       subject { json_parse['errors'].first['message'] }
 
-      let(:stubbed_response) { double() }
+      let(:stubbed_response) { double }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
@@ -379,6 +380,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
   describe '#create' do
     subject { post :create, params: params }
+
     let(:dev_key_id) { nil }
 
     it_behaves_like 'an action that requires manage developer keys', true
@@ -413,7 +415,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:dev_key_params) { super().merge(redirect_uris: nil) }
 
       it 'returns a 400' do
-        expect(post :create, params: params).to have_http_status :bad_request
+        expect(post(:create, params: params)).to have_http_status :bad_request
       end
     end
   end

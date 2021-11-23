@@ -33,14 +33,12 @@ module Lti
     def valid?
       @valid ||= begin
         valid = lti_message_authenticator.valid_signature?
-        valid &&= Security::check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
+        valid &&= Security.check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
         valid
       end
     end
 
-    def message
-      lti_message_authenticator.message
-    end
+    delegate :message, to: :lti_message_authenticator
 
     private
 
@@ -52,7 +50,7 @@ module Lti
       @shared_secret ||=
         if @version.strip == 'LTI-1p0'
           tool = ContextExternalTool.where(consumer_key: @params[:oauth_consumer_key]).first
-          tool && tool.shared_secret
+          tool&.shared_secret
         end
     end
 

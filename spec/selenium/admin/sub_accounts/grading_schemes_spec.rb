@@ -34,20 +34,20 @@ describe "sub account grading schemes" do
   end
 
   describe "grading schemes" do
-    it "adds a grading scheme", priority: "1", test_id: 238155 do
+    it "adds a grading scheme", priority: "1" do
       should_add_a_grading_scheme
     end
 
-    it "edits a grading scheme", priority: "1", test_id: 238156 do
+    it "edits a grading scheme", priority: "1" do
       should_edit_a_grading_scheme(account, url)
     end
 
-    it "deletes a grading scheme", priority: "1", test_id: 238160 do
+    it "deletes a grading scheme", priority: "1" do
       skip_if_safari(:alert)
       should_delete_a_grading_scheme(account, url)
     end
 
-    it 'disables add grading scheme button during update', priority: "2", test_id: 164232 do
+    it 'disables add grading scheme button during update', priority: "2" do
       simple_grading_standard(account)
       get url
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
@@ -55,7 +55,7 @@ describe "sub account grading schemes" do
       expect(f('#react_grading_tabs .add_standard_button')).to have_class('disabled')
     end
 
-    it 'disables other grading schemes from being edited', priority: "2", test_id: 307626 do
+    it 'disables other grading schemes from being edited', priority: "2" do
       2.times do
         simple_grading_standard(account)
       end
@@ -65,7 +65,7 @@ describe "sub account grading schemes" do
       expect(f('.disabled-buttons')).to be_truthy
     end
 
-    it 'allows all available grading schemes to be edited on page load', priority: "2", test_id: 310145 do
+    it 'allows all available grading schemes to be edited on page load', priority: "2" do
       2.times do
         simple_grading_standard(account)
       end
@@ -80,19 +80,19 @@ describe "sub account grading schemes" do
       create_simple_standard_and_edit(account, url)
     end
 
-    it "adds a grading scheme item", priority: "1", test_id: 238157 do
+    it "adds a grading scheme item", priority: "1" do
       should_add_a_grading_scheme_item
     end
 
-    it "edits a grading scheme item", priority: "1", test_id: 238158 do
+    it "edits a grading scheme item", priority: "1" do
       should_edit_a_grading_scheme_item
     end
 
-    it "deletes a grading scheme item", priority: "1", test_id: 238159 do
+    it "deletes a grading scheme item", priority: "1" do
       should_delete_a_grading_scheme_item
     end
 
-    it "does not update when invalid scheme input is given", priority: "1", test_id: 238162 do
+    it "does not update when invalid scheme input is given", priority: "1" do
       should_not_update_invalid_grading_scheme_input
     end
   end

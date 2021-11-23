@@ -50,9 +50,11 @@ module Types
     field :avatar_url, UrlType, null: true
 
     def avatar_url
-      object.account.service_enabled?(:avatars) ?
-        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false) :
+      if object.account.service_enabled?(:avatars)
+        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
+      else
         nil
+      end
     end
 
     field :email, String, null: true
@@ -246,9 +248,9 @@ module Types
     #
     # alternatively, figure out what kind of permissions a person needs to view
     # another user's groups?
-    field :groups, [GroupType], <<~DESC, null: true
+    field :groups, [GroupType], <<~MD, null: true
       **NOTE**: this only returns groups for the currently logged-in user.
-    DESC
+    MD
     def groups
       if object == current_user
         # FIXME: this only returns groups on the current shard.  it should
@@ -301,15 +303,24 @@ module Types
     def submission_comments_connection
       return unless object == current_user
 
-      load_association(:all_courses).then do |courses|
-        Submission.where('submission_comments_count > 0').where(course: courses).flat_map { |submission| submission.visible_submission_comments_for(current_user) }
+      submission_comments = []
+      stream_item_instances = current_user.visible_stream_item_instances(only_active_courses: true)
+
+      Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
+        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
+                                          asset_type: 'Submission')
+                                   .select('asset_id')
+        submission_comments += SubmissionComment.preload(submission: { assignment: :context })
+                                                .where(submission_id: submission_ids)
       end
+
+      submission_comments
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
-      argument :query, String, <<~DOC, required: false
+      argument :query, String, <<~MD, required: false
         Only include comments that match the query string.
-      DOC
+      MD
       argument :limit, Integer, required: false
     end
     def comment_bank_items_connection(query: nil, limit: nil)

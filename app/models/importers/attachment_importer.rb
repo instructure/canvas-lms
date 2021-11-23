@@ -27,35 +27,31 @@ module Importers
     class << self
       def process_migration(data, migration)
         created_usage_rights_map = {}
-        attachments = data['file_map'] ? data['file_map'] : {}
+        attachments = data['file_map'] || {}
         attachments = attachments.with_indifferent_access
-        attachments.values.each do |att|
-          if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
-            begin
-              import_from_migration(att, migration.context, migration, nil, created_usage_rights_map)
-            rescue
-              migration.add_import_warning(I18n.t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
-            end
+        attachments.each_value do |att|
+          next unless !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
+
+          begin
+            import_from_migration(att, migration.context, migration, nil, created_usage_rights_map)
+          rescue
+            migration.add_import_warning(I18n.t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
           end
         end
 
-        if data[:locked_folders]
-          data[:locked_folders].each do |path|
-            # TODO i18n
-            if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
-              f.locked = true
-              f.save
-            end
+        data[:locked_folders]&.each do |path|
+          # TODO: i18n
+          if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
+            f.locked = true
+            f.save
           end
         end
 
-        if data[:hidden_folders]
-          data[:hidden_folders].each do |path|
-            # TODO i18n
-            if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
-              f.workflow_state = 'hidden'
-              f.save
-            end
+        data[:hidden_folders]&.each do |path|
+          # TODO: i18n
+          if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
+            f.workflow_state = 'hidden'
+            f.save
           end
         end
       end

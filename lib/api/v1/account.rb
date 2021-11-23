@@ -36,7 +36,7 @@ module Api::V1::Account
   end
 
   def account_json(account, user, session, includes, read_only = false)
-    attributes = %w(id name parent_account_id root_account_id workflow_state uuid)
+    attributes = %w[id name parent_account_id root_account_id workflow_state uuid]
     if read_only
       return api_json(account, user, session, :only => attributes).tap do |hash|
         hash['root_account_id'] = nil if account.root_account?
@@ -44,7 +44,7 @@ module Api::V1::Account
       end
     end
 
-    methods = %w(default_storage_quota_mb default_user_storage_quota_mb default_group_storage_quota_mb)
+    methods = %w[default_storage_quota_mb default_user_storage_quota_mb default_group_storage_quota_mb]
     api_json(account, user, session, :only => attributes, :methods => methods).tap do |hash|
       hash['root_account_id'] = nil if account.root_account?
       hash['default_time_zone'] = account.default_time_zone.tzinfo.name
@@ -66,7 +66,7 @@ module Api::V1::Account
         end
       end
       if includes.include?('services') && account.grants_right?(user, session, :manage_account_settings)
-        hash['services'] = Hash[Account.services_exposed_to_ui_hash(nil, user, account).keys.map { |k| [k, account.service_enabled?(k)] }]
+        hash['services'] = Account.services_exposed_to_ui_hash(nil, user, account).keys.index_with { |k| account.service_enabled?(k) }
       end
 
       Api::V1::Account.extensions.each do |extension|

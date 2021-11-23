@@ -19,11 +19,11 @@
 #
 
 module Canvas::Migration::Worker
-  class Base < Struct.new(:migration_id)
+  Base = Struct.new(:migration_id) do
     def on_permanent_failure(error)
       if migration_id
         cm = ContentMigration.where(id: migration_id).first
-        cm.fail_with_error!(error) if cm
+        cm&.fail_with_error!(error)
       end
     end
   end
@@ -82,8 +82,8 @@ module Canvas::Migration::Worker
 
   def self.clear_exported_data(folder)
     config = ConfigFile.load('external_migration')
-    if !config || !config[:keep_after_complete]
-      FileUtils::rm_rf(folder) if File.exist?(folder)
+    if (!config || !config[:keep_after_complete]) && File.exist?(folder)
+      FileUtils.rm_rf(folder)
     end
   rescue
     Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"

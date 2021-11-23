@@ -41,7 +41,7 @@ class SubmissionCommentsApiController < ApplicationController
       submission_comment.updating_user = @current_user
       submission_comment.reload unless submission_comment.update(submission_comment_params)
 
-      return render json: submission_comment_json(
+      render json: submission_comment_json(
         submission_comment,
         @current_user
       )
@@ -76,7 +76,7 @@ class SubmissionCommentsApiController < ApplicationController
       submission_comment.updating_user = @current_user
       submission_comment.destroy!
 
-      return render json: comment_data
+      render json: comment_data
     end
   end
 
@@ -141,7 +141,7 @@ class SubmissionCommentsApiController < ApplicationController
           # author is instructors, so check post_policies, if submission is not posted
           # and not set to automatically post, don't notify anyone.
           if assignment.post_manually? && !submission.posted?
-            return render json: {}, status: 200
+            return render json: {}, status: :ok
           end
         else # author is a student or admin
           # always notify instructor
@@ -152,7 +152,7 @@ class SubmissionCommentsApiController < ApplicationController
                                    assignment.submissions.where(user_id: submission.group.users.select(:id)).index_by(&:user_id)
                                  else
                                    # if the user is the author there are no more people to notify.
-                                   return render json: {}, status: 200 if author == user
+                                   return render json: {}, status: :ok if author == user
 
                                    { user.id => submission }
                                  end
@@ -166,7 +166,7 @@ class SubmissionCommentsApiController < ApplicationController
           broadcast_annotation_notification(submission: sub, to_list: to_list, data: broadcast_data(author), teacher: false)
         end
 
-        render json: {}, status: 200
+        render json: {}, status: :ok
       end
     end
   end

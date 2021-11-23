@@ -445,7 +445,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       Timecop.travel(5.minutes.ago) do
         # prepare some exceptions
         @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
-        @minions.first.syllabus_body = 'go away'; @minions.first.save!
+        @minions.first.syllabus_body = 'go away'
+        @minions.first.save!
         @minions.last.assignments.first.update_attribute :points_possible, 11
 
         # now push some incremental changes
@@ -456,7 +457,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @quiz = @master.quizzes.create! :title => 'TestQuiz'
         @file.update_attribute :display_name, 'I Can Rename Files Too'
         @assignment.destroy
-        @master.syllabus_body = 'syllablah frd'; @master.save!
+        @master.syllabus_body = 'syllablah frd'
+        @master.save!
       end
       run_master_migration(:copy_settings => true)
     end
@@ -582,7 +584,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @file.update_attribute(:display_name, 'Renamed')
         @folder.update_attribute(:name, 'Blergh')
         @new_page = @master.wiki_pages.create! :title => 'New News'
-        @master.syllabus_body = "srslywat"; @master.save!
+        @master.syllabus_body = "srslywat"
+        @master.save!
 
         json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
                                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',

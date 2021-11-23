@@ -26,13 +26,13 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(%{
+      inspect_source(<<~RUBY)
         class KnightsController < ApplicationController
           def find_sword
             sleep 999
           end
         end
-      })
+      RUBY
       expect(cop.offenses.size).to eq(1)
       expect(cop.messages.first).to match(/tie up this process/)
       expect(cop.offenses.first.severity.name).to eq(:error)
@@ -45,13 +45,13 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(%{
+      inspect_source(<<~RUBY)
         describe "Alerts" do
           it "should validate the form" do
             sleep 2
           end
         end
-      })
+      RUBY
       expect(cop.offenses.size).to eq(1)
       expect(cop.messages.first).to match(/consider: Timecop/)
       expect(cop.offenses.first.severity.name).to eq(:warning)
@@ -64,13 +64,13 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(%{
+      inspect_source(<<~RUBY)
         class BookmarkService < UserService
           def find_bookmarks(query)
             sleep Time.now - last_get
           end
         end
-      })
+      RUBY
       expect(cop.offenses.size).to eq(1)
       expect(cop.messages.first).to eq("Avoid using sleep.")
       expect(cop.offenses.first.severity.name).to eq(:warning)

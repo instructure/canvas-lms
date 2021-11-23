@@ -121,7 +121,7 @@ module ConditionalRelease
       attrs
     end
 
-    def arrange_items(items, &_block)
+    def arrange_items(items)
       if items.present?
         items.map.with_index(1) do |item, position|
           item[:position] = position if item.present?

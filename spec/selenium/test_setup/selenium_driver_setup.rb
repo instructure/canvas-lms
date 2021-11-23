@@ -108,7 +108,7 @@ module SeleniumDriverSetup
         ].each(&:join)
       rescue Selenium::WebDriver::Error::WebDriverError
         driver.quit if saucelabs_test_run?
-      rescue StandardError
+      rescue
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("
         # if either one fails, it's before any specs run, so we can bail
@@ -123,12 +123,12 @@ module SeleniumDriverSetup
     end
 
     def shutdown
-      server.shutdown if server
+      server&.shutdown
       if driver
         driver.close
         driver.quit
       end
-    rescue StandardError
+    rescue
       nil
     end
 
@@ -261,7 +261,7 @@ module SeleniumDriverSetup
     rescue error_class => e
       puts "Attempt #{tries += 1} got error: #{e}"
       if tries >= how_many
-        $stderr.puts "Giving up"
+        warn "Giving up"
         failure_proc ? failure_proc.call : raise
       else
         sleep delay
@@ -410,7 +410,7 @@ module SeleniumDriverSetup
 
       puts "found available port: #{app_host_and_port}"
     ensure
-      s.close() if s
+      s&.close()
     end
 
     def start_webserver
@@ -429,7 +429,7 @@ module SeleniumDriverSetup
       end.to_app
     end
 
-    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}.freeze
     def asset_request?(url)
       url =~ ASSET_PATH
     end

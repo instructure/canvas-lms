@@ -108,7 +108,7 @@ describe Rubric do
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'new', 'worst']
+            expect(rubric_criterion.ratings.map(&:description)).to eq %w[best new worst]
             expect(rubric_criterion.ratings.map(&:points)).to eq [10, 5, 0]
           end
 
@@ -619,7 +619,7 @@ describe Rubric do
           title: "my rubric"
         )
 
-        expect(rubric.criteria.pluck(:description)).to eq ["ddddd", "bbbbb", "aaaaa", "ccccc"]
+        expect(rubric.criteria.pluck(:description)).to eq %w[ddddd bbbbb aaaaa ccccc]
       end
 
       it "sorts ratings within each criterion by the number of points in descending order" do
@@ -638,7 +638,7 @@ describe Rubric do
         )
 
         criterion = rubric.criteria.first
-        expect(criterion[:ratings].pluck(:description)).to eq ["good", "ok", "bad"]
+        expect(criterion[:ratings].pluck(:description)).to eq %w[good ok bad]
       end
 
       it "sorts ratings with the same number of points by description" do

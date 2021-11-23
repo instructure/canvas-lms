@@ -112,7 +112,7 @@ module SisGradePassbackCommon
 
     @course.grading_standard_enabled = true
     @course.save!
-    GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map { |x| getuser(x).id }, @course.id)
+    GradeCalculator.recompute_final_score(%w[S1 S2 S3 S4].map { |x| getuser(x).id }, @course.id)
     @course.reload
 
     @plugin = Canvas::Plugin.find!('grade_export')

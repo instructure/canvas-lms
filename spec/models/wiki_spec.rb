@@ -92,7 +92,7 @@ describe Wiki do
     end
 
     context 'default permissions' do
-      [:update, :create_page, :delete_page, :update_page, :view_unpublished_items].each do |perm|
+      %i[update create_page delete_page update_page view_unpublished_items].each do |perm|
         it "gives #{perm} rights to teachers" do
           course_with_teacher
           expect(@course.wiki.grants_right?(@teacher, perm)).to be_truthy

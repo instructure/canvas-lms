@@ -67,7 +67,7 @@ describe "Services API", type: :request do
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
                     :controller => "services_api", :action => "start_kaltura_session", :format => "json")
-    expect(json.delete_if { |k| %w(serverTime).include?(k) }).to eq({
+    expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       'ks' => "new_session_id_here",
                                                                       'subp_id' => '10000',
                                                                       'partner_id' => '100',
@@ -82,7 +82,7 @@ describe "Services API", type: :request do
     json = api_call(:post, "/api/v1/services/kaltura_session",
                     :controller => "services_api", :action => "start_kaltura_session",
                     :format => "json", :include_upload_config => 1)
-    expect(json.delete_if { |k| %w(serverTime).include?(k) }).to eq({
+    expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       'ks' => "new_session_id_here",
                                                                       'subp_id' => '10000',
                                                                       'partner_id' => '100',

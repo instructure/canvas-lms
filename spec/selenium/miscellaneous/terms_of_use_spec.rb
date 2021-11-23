@@ -30,12 +30,12 @@ describe "terms of use test" do
     user_with_pseudonym(active_user: true)
   end
 
-  it "does not require a user to accept the terms if they haven't changed", priority: "1", test_id: 268275 do
+  it "does not require a user to accept the terms if they haven't changed", priority: "1" do
     login
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
-  it "does not require a user to accept the terms if already logged in when they change", priority: "2", test_id: 268712 do
+  it "does not require a user to accept the terms if already logged in when they change", priority: "2" do
     create_session(@pseudonym)
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
@@ -76,7 +76,7 @@ describe "terms of use test" do
     end
   end
 
-  it "requires a user to accept the terms if they have changed", priority: "1", test_id: 268933 do
+  it "requires a user to accept the terms if they have changed", priority: "1" do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
@@ -112,7 +112,7 @@ describe "terms of use test" do
     expect(account.require_acceptance_of_terms?(@user.reload)).to be_falsey
   end
 
-  it "prevents them from using canvas if the terms have changed", priority: "1", test_id: 268934 do
+  it "prevents them from using canvas if the terms have changed", priority: "1" do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
@@ -154,7 +154,7 @@ describe "terms of use SOC2 compliance test" do
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
-  it "grandfathers in previously registered users without prompting them to reaccept the terms", priority: "1", test_id: 268936 do
+  it "grandfathers in previously registered users without prompting them to reaccept the terms", priority: "1" do
     # Create a user before SOC2 implemented
     before_soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
 

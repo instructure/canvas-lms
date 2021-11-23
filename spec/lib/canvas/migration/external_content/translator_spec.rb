@@ -67,7 +67,7 @@ describe Canvas::Migration::ExternalContent::Translator do
 
     it "is able to search for all of the types in the course" do
       # make sure none of the types asplode the fallback logic
-      described_class::TYPES_TO_CLASSES.values.each do |obj_class|
+      described_class::TYPES_TO_CLASSES.each_value do |obj_class|
         expect(@translator.get_canvas_id_from_migration_id(obj_class, "some_migration_id")).to eq described_class::NOT_FOUND
       end
     end

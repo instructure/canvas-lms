@@ -52,7 +52,7 @@ class DocviewerAuditEventsController < ApplicationController
         annotation_id: event_params[:annotation_id],
         context: event_params[:context],
         related_annotation_id: event_params[:related_annotation_id]
-      },
+      }
     )
 
     respond_to do |format|
@@ -76,7 +76,7 @@ class DocviewerAuditEventsController < ApplicationController
   def check_jwt_token
     Canvas::Security.decode_jwt(params[:token], [Canvadoc.jwt_secret])
   rescue
-    return render json: { message: 'JWT signature invalid' }, status: :unauthorized
+    render json: { message: 'JWT signature invalid' }, status: :unauthorized
   end
 
   def docviewer_audit_event_params

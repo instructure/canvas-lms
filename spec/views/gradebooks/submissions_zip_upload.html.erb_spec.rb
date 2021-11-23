@@ -39,6 +39,6 @@ describe "/gradebooks/submissions_zip_upload", type: :view do
   it "includes a link back to the gradebook (gradebook by default)" do
     render 'gradebooks/submissions_zip_upload'
 
-    expect(view.content_for(:right_side)).to match(/a.+?href="\/courses\/#{@course.id}\/gradebook"/)
+    expect(view.content_for(:right_side)).to match(%r{a.+?href="/courses/#{@course.id}/gradebook"})
   end
 end

@@ -31,7 +31,7 @@ describe "submissions" do
       course_with_teacher_logged_in
     end
 
-    it "allows media comments", priority: "1", test_id: 237032 do
+    it "allows media comments", priority: "1" do
       stub_kaltura
 
       student_in_course
@@ -47,7 +47,7 @@ describe "submissions" do
       expect(number_of_comments).to eq 2
     end
 
-    it "displays the grade in grade field", priority: "1", test_id: 237033 do
+    it "displays the grade in grade field", priority: "1" do
       student_in_course
       assignment = create_assignment
       assignment.grade_student @student, grade: 2, grader: @teacher
@@ -61,7 +61,7 @@ describe "submissions" do
       course_with_teacher_logged_in
     end
 
-    it "allows a student view student to view/submit assignments", priority: "1", test_id: 237034 do
+    it "allows a student view student to view/submit assignments", priority: "1" do
       @assignment = @course.assignments.create(
         :title => 'Cool Assignment',
         :points_possible => 10,
@@ -86,7 +86,7 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Submitted!"
     end
 
-    it "allows a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
+    it "allows a student view student to submit file upload assignments", priority: "1" do
       @assignment = @course.assignments.create(
         :title => 'Cool Assignment',
         :points_possible => 10,

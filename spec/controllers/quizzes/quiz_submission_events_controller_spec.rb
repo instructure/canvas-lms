@@ -40,7 +40,7 @@ describe Quizzes::QuizSubmissionEventsController do
     end
 
     it "requires authorization" do
-      subject()
+      subject
 
       expect(response).to be_redirect
       expect(response).to redirect_to("/login")
@@ -49,7 +49,7 @@ describe Quizzes::QuizSubmissionEventsController do
     it "lets the teacher in" do
       user_session(@teacher)
 
-      subject()
+      subject
 
       expect(response).to be_successful
     end
@@ -57,7 +57,7 @@ describe Quizzes::QuizSubmissionEventsController do
     it "does not let the student in" do
       user_session(@student)
 
-      subject()
+      subject
 
       expect(response).to be_client_error
     end
@@ -74,7 +74,7 @@ describe Quizzes::QuizSubmissionEventsController do
       it "redirects away" do
         user_session(@teacher)
 
-        subject()
+        subject
 
         expect(response).to be_redirect
         expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/history?user_id=#{@student.id}")

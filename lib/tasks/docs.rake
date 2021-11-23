@@ -6,7 +6,7 @@ begin
   require 'config/initializers/json'
 
   DOC_DIR     = File.join(%w[public doc api])
-  API_DOC_DIR = File.expand_path(Rails.root + DOC_DIR)
+  API_DOC_DIR = Rails.root.join(DOC_DIR).expand_path
   DOC_OPTIONS = {
     # turning this on will show all the appendixes of all
     # controllers in the All Resources page

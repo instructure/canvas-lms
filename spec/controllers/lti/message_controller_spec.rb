@@ -25,11 +25,11 @@ module Lti
   describe MessageController do
     include_context 'lti2_spec_helper'
     let(:enabled_capability) {
-      %w(ToolConsumerInstance.guid
+      %w[ToolConsumerInstance.guid
          Message.documentTarget
          Message.locale
          Membership.role
-         Context.id)
+         Context.id]
     }
 
     let(:default_resource_handler) do
@@ -497,7 +497,7 @@ module Lti
         end
 
         it 'does custom variable expansion for tool settings' do
-          parameters = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url).map do |key|
+          parameters = %w[LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url].map do |key|
             ::IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json
@@ -531,7 +531,7 @@ module Lti
         end
 
         it 'adds module item substitutions' do
-          parameters = %w(Canvas.module.id Canvas.moduleItem.id).map do |key|
+          parameters = %w[Canvas.module.id Canvas.moduleItem.id].map do |key|
             ::IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json

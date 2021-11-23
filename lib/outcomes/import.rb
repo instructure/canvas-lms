@@ -54,9 +54,10 @@ module Outcomes
       check_object(object)
 
       type = object[:object_type]
-      if type == 'outcome'
+      case type
+      when 'outcome'
         import_outcome(object)
-      elsif type == 'group'
+      when 'group'
         import_group(object)
       else
         raise InvalidDataError, I18n.t(
@@ -258,7 +259,7 @@ module Outcomes
           missing = guids - parents.map(&:vendor_guid)
           raise InvalidDataError, I18n.t(
             'Parent references not found prior to this row: %{missing}',
-            missing: missing.inspect,
+            missing: missing.inspect
           )
         end
       end

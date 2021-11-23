@@ -44,7 +44,7 @@ describe "master courses banner" do
         @copy_page = @minion.wiki_pages.last
       end
 
-      it "locks down the content and shows banner", priority: "2", test_id: 3248172 do
+      it "locks down the content and shows banner", priority: "2" do
         change_blueprint_settings(@master, content: true)
         get "/courses/#{@master.id}/pages/#{@original_page.id}"
         f('.bpc-lock-toggle button').click
@@ -55,7 +55,7 @@ describe "master courses banner" do
         assert_flash_warning_message("You are not allowed to edit the page")
       end
 
-      it "shows locked banner when locking", priority: "2", test_id: 3248173 do
+      it "shows locked banner when locking", priority: "2" do
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/pages/#{@original_page.id}"
         f('.bpc-lock-toggle button').click
@@ -73,7 +73,7 @@ describe "master courses banner" do
         @copy_assmt = @minion.assignments.last
       end
 
-      it "locks down the content and show banner", priority: "2", test_id: 3127585 do
+      it "locks down the content and show banner", priority: "2" do
         change_blueprint_settings(@master, content: true)
         get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
         f('.bpc-lock-toggle button').click
@@ -86,7 +86,7 @@ describe "master courses banner" do
         expect(f('#blueprint-lock-banner')).to include_text('Content')
       end
 
-      it "shows locked banner when locking", priority: "1", test_id: 3127589 do
+      it "shows locked banner when locking", priority: "1" do
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
         f('.bpc-lock-toggle button').click
@@ -103,7 +103,7 @@ describe "master courses banner" do
         @copy_disc = @minion.discussion_topics.last
       end
 
-      it "shows locked banner when locking", priority: "2", test_id: 3263121 do
+      it "shows locked banner when locking", priority: "2" do
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/discussion_topics/#{@original_disc.id}"
         f('.bpc-lock-toggle button').click
@@ -121,7 +121,7 @@ describe "master courses banner" do
         @copy_quiz = @minion.quizzes.last
       end
 
-      it "shows locked banner when locking", priority: "2", test_id: 3263119 do
+      it "shows locked banner when locking", priority: "2" do
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
         f('.bpc-lock-toggle button').click

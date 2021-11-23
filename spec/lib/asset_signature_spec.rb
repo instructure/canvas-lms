@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SomeModel < Struct.new(:id); end
+SomeModel = Struct.new(:id)
 
 describe AssetSignature do
   def example_encode(classname, id)

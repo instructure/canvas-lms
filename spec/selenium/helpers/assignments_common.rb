@@ -221,7 +221,7 @@ module AssignmentsCommon
   end
 
   def create_post_grades_tool(opts = {})
-    post_grades_tool = @course.context_external_tools.create!(
+    @course.context_external_tools.create!(
       name: opts[:name] || 'test tool',
       domain: 'example.com',
       url: 'http://example.com/lti',
@@ -233,7 +233,6 @@ module AssignmentsCommon
         }
       }
     )
-    post_grades_tool
   end
 
   def click_cog_to_edit

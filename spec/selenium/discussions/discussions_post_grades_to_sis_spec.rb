@@ -46,13 +46,13 @@ describe "sync grades to sis" do
       @discussion_topic = DiscussionTopic.last
     end
 
-    it "shows post grades to sis box checked", priority: "1", test_id: 150520 do
+    it "shows post grades to sis box checked", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
       expect(f('#assignment_post_to_sis')).to be_enabled
     end
   end
 
-  it "does not display Sync to SIS option when feature not configured", priority: "1", test_id: 246614 do
+  it "does not display Sync to SIS option when feature not configured", priority: "1" do
     mock_feature_flag(:post_grades, false)
     get "/courses/#{@course.id}/discussion_topics/new"
     f('#use_for_grading').click
@@ -88,7 +88,7 @@ describe "sync grades to sis" do
       expect(f('.post-grades-dialog')).to be_displayed
     end
 
-    it "syncs grades in a sync grades to SIS discussion", priority: "1", test_id: 150521 do
+    it "syncs grades in a sync grades to SIS discussion", priority: "1" do
       @assignment.due_at = Time.zone.now.advance(days: 3)
       @course.discussion_topics.create!(user: @admin,
                                         title: 'Sync to SIS discussion',
@@ -98,7 +98,7 @@ describe "sync grades to sis" do
       expect(f('.assignments-to-post-count').text).to include("You are ready to sync 1 assignment")
     end
 
-    it "asks for due dates in gradebook if due date is not given", priority: "1", test_id: 244916 do
+    it "asks for due dates in gradebook if due date is not given", priority: "1" do
       @course.discussion_topics.create!(user: @admin,
                                         title: 'Sync to SIS discussion',
                                         message: 'Discussion topic message',

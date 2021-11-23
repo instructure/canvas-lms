@@ -31,7 +31,7 @@ class UserListV2
   # - only search on particular columns
   # - don't worry about whether we can create users or not: they either exist or they don't
 
-  SEARCH_TYPES = %w{unique_id sis_user_id cc_path}.freeze
+  SEARCH_TYPES = %w[unique_id sis_user_id cc_path].freeze
 
   def initialize(list_in, root_account: Account.default, search_type: nil, current_user: nil, can_read_sis: false)
     @errors = []
@@ -136,19 +136,19 @@ class UserListV2
 
     @addresses.each do |a|
       address = @lowercase ? a[:address].downcase : a[:address]
-      unless grouped_results.key?(address)
-        if (name = a.delete(:name))
-          a[:user_name] = name
-        end
-        @missing_results << a
+      next if grouped_results.key?(address)
+
+      if (name = a.delete(:name))
+        a[:user_name] = name
       end
+      @missing_results << a
     end
   end
 
   def add_additional_data_for_duplicates
     return unless @duplicate_results.any?
 
-    duplicate_user_ids = @duplicate_results.map { |set| set.map { |h| h[:user_id] } }.flatten.uniq
+    duplicate_user_ids = @duplicate_results.map { |set| set.pluck(:user_id) }.flatten.uniq
     user_map = User.where(:id => duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
 
     @duplicate_results.each do |set|
@@ -157,8 +157,8 @@ class UserListV2
 
         dup_hash[:email] = user.email
         pseudonym = SisPseudonym.for(user, @root_account, type: :trusted, require_sis: false)
-        if @can_read_sis
-          dup_hash[:sis_user_id] = pseudonym.sis_user_id if pseudonym
+        if @can_read_sis && pseudonym
+          dup_hash[:sis_user_id] = pseudonym.sis_user_id
         end
         dup_hash[:login_id] = pseudonym.unique_id if pseudonym
       end
@@ -196,7 +196,7 @@ class UserListV2
         Pseudonym.associated_shards_for_column(:integration_id, address)
     end
 
-    ids = @addresses.map { |a| a[:address] }
+    ids = @addresses.pluck(:address)
     search_for_results(restricted_shards) do |account_ids|
       rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account)
                       .pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
@@ -250,14 +250,14 @@ class UserListV2
              .where("LOWER(path) IN (?)", email_paths)
              .to_a
 
-      ccs.map do |cc|
+      ccs.filter_map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
 
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
         [path, cc.user_id, cc.user.uuid, p.account_id, cc.user.name, p.account.name]
-      end.compact
+      end
     end
     @lowercase = true
   end

@@ -28,9 +28,7 @@ class Attachments::S3Storage
     @attachment = attachment
   end
 
-  def bucket
-    attachment.bucket
-  end
+  delegate :bucket, to: :attachment
 
   def exists?
     attachment.s3object.exists?
@@ -42,8 +40,8 @@ class Attachments::S3Storage
     # so there's a bit of a cost here
     return if attachment.instfs_hosted?
 
-    if !exists?
-      if !attachment.size
+    unless exists?
+      unless attachment.size
         attachment.size = bucket.object(old_full_filename).content_length
       end
       options = { acl: attachment.attachment_options[:s3_access] }

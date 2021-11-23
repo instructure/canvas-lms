@@ -43,14 +43,14 @@ module RuboCop
           end
         end
 
-        DISALLOWED_METHOD_NAMES = [
-          :remove,
-          :remove_column,
-          :remove_columns,
-          :remove_belongs_to,
-          :remove_reference,
-          :remove_references,
-          :remove_timestamps
+        DISALLOWED_METHOD_NAMES = %i[
+          remove
+          remove_column
+          remove_columns
+          remove_belongs_to
+          remove_reference
+          remove_references
+          remove_timestamps
         ].freeze
 
         private

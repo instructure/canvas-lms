@@ -37,7 +37,7 @@ module Lti::Concerns
       return if error_message.blank?
 
       log_error(error_message)
-      raise OembedAuthorizationError.new error_message
+      raise OembedAuthorizationError, error_message
     end
 
     def log_error(message)
@@ -110,7 +110,7 @@ module Lti::Concerns
           associated_tool.shared_secret
         )
       rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm
-        raise OembedAuthorizationError.new 'Error validating oembed_token signature'
+        raise OembedAuthorizationError, 'Error validating oembed_token signature'
       end
     end
 

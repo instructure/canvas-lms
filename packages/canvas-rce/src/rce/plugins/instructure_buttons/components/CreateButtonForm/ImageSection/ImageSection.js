@@ -32,6 +32,8 @@ import {IconCropSolid} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {View} from '@instructure/ui-view'
 
 export const ImageSection = () => {
   const [openCropModal, setOpenCropModal] = useState(false)
@@ -49,12 +51,21 @@ export const ImageSection = () => {
             <Flex.Item shouldGrow>
               <Flex>
                 <Flex.Item margin="0 small 0 0">
-                  <PreviewIcon variant="large" testId="selected-image-preview" image={state.currentImage}/>
-                </Flex.Item>
-                <Flex.Item>
-                  <Text>{!state.currentImage && formatMessage('None Selected')}</Text>
+                  <PreviewIcon
+                    variant="large"
+                    testId="selected-image-preview"
+                    image={state.image}
+                    loading={state.loading}
+                  />
                 </Flex.Item>
               </Flex>
+            </Flex.Item>
+            <Flex.Item>
+              <View maxWidth="200px" as="div">
+                <TruncateText>
+                  <Text>{state.imageName ? state.imageName : formatMessage('None Selected')}</Text>
+                </TruncateText>
+              </View>
             </Flex.Item>
             <Flex.Item>
               <ModeSelect dispatch={dispatch} />
@@ -62,7 +73,7 @@ export const ImageSection = () => {
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          {!!allowedModes[state.mode] && React.createElement(allowedModes[state.mode])}
+          {!!allowedModes[state.mode] && React.createElement(allowedModes[state.mode], {dispatch})}
         </Flex.Item>
         <Flex.Item>
           <Button

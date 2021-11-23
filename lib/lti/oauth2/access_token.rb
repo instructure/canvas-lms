@@ -35,7 +35,7 @@ module Lti
         new(aud: aud, sub: decoded_jwt[:sub], jwt: jwt, shard_id: decoded_jwt[:shard_id])
       rescue Canvas::Security::TokenExpired => e
         raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+      rescue => e
         raise InvalidTokenError, e
       end
 
@@ -59,7 +59,7 @@ module Lti
         raise
       rescue Canvas::Security::TokenExpired => e
         raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+      rescue => e
         raise InvalidTokenError, e
       end
 
@@ -91,7 +91,7 @@ module Lti
       end
 
       def check_required_assertions(assertion_keys)
-        missing_assertions = (%w(iss sub exp aud iat nbf jti) - assertion_keys)
+        missing_assertions = (%w[iss sub exp aud iat nbf jti] - assertion_keys)
         if missing_assertions.present?
           raise InvalidTokenError, "the following assertions are missing: #{missing_assertions.join(',')}"
         end

@@ -21,8 +21,8 @@ module ConditionalRelease
   class AssignmentSetAction < ActiveRecord::Base
     include Deletion
 
-    validates :action, inclusion: { in: %w(assign unassign) }
-    validates :source, inclusion: { in: %w(grade_change select_assignment_set) }
+    validates :action, inclusion: { in: %w[assign unassign] }
+    validates :source, inclusion: { in: %w[grade_change select_assignment_set] }
     validates :student_id, presence: true
     validates :actor_id, presence: true
     validates :assignment_set_id, presence: true
@@ -42,7 +42,7 @@ module ConditionalRelease
     def self.current_assignments(student_id_or_ids, sets = nil)
       conditions = { student_id: student_id_or_ids }
       conditions[:assignment_set] = sets if sets
-      self.where(id: self.latest.where(conditions), action: 'assign')
+      where(id: latest.where(conditions), action: 'assign')
     end
 
     def self.create_from_sets(assigned, unassigned, opts = {})

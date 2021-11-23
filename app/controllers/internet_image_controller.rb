@@ -102,7 +102,7 @@ class InternetImageController < ApplicationController
       ["#{request.protocol}#{request.host_with_port}#{request.path}?#{url.query}", link.attr_pairs]
     end
     response.headers['Link'] = LinkHeader.new(new_links).to_s
-    json = search_results.dig('results').map do |sr|
+    json = search_results['results'].map do |sr|
       {
         id: Canvas::Security.url_key_encrypt_data(sr.dig('links', 'download_location')),
         description: sr['description'],
@@ -136,8 +136,8 @@ class InternetImageController < ApplicationController
       return render json: { message: 'Could not find image.  Please check the id and try again' }, status: :bad_request
     end
     confirm_download = HTTParty.head(url, { headers: { "Authorization" => "Client-ID #{unsplash_config[:access_key]}" } })
-    if confirm_download.code == 404 && confirm_download.dig('errors').present?
-      return render json: { message: confirm_download.dig('errors')&.join(', ') }, status: :not_found
+    if confirm_download.code == 404 && confirm_download['errors'].present?
+      return render json: { message: confirm_download['errors']&.join(', ') }, status: :not_found
     end
     return render json: { message: 'Confirmation success. Thank you.' } if confirm_download.success?
 

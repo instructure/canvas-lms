@@ -26,7 +26,7 @@ describe "plugins ui" do
     site_admin_logged_in
   end
 
-  it 'has plugins default to disabled when no plugin_setting exits', priority: "1", test_id: 268053 do
+  it 'has plugins default to disabled when no plugin_setting exits', priority: "1" do
     get '/plugins/etherpad'
     expect(is_checked('#plugin_setting_disabled')).to be_truthy
 
@@ -41,7 +41,7 @@ describe "plugins ui" do
     expect(is_checked('#plugin_setting_disabled')).to be_truthy
   end
 
-  it 'has plugin settings not disabled when set', priority: "1", test_id: 268054 do
+  it 'has plugin settings not disabled when set', priority: "1" do
     get '/plugins/etherpad'
     expect(is_checked('#plugin_setting_disabled')).to be_truthy
     multiple_accounts_select
@@ -76,11 +76,11 @@ describe "plugins ui" do
   end
 
   def multiple_accounts_select
-    if !f("#plugin_setting_disabled").displayed?
+    unless f("#plugin_setting_disabled").displayed?
       f("#accounts_select option:nth-child(2)").click
       expect(f("#plugin_setting_disabled")).to be_displayed
     end
-    if !f(".save_button").enabled?
+    unless f(".save_button").enabled?
       f(".copy_settings_button").click
     end
   end

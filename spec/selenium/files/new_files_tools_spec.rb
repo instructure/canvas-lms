@@ -50,7 +50,7 @@ describe "files page with tools" do
       query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
       expect(query_params["launch_type"]).to eq "file_index_menu"
       expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
-      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(["audio", "document", "image", "video"])
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(%w[audio document image video])
       expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "document"
       expect(query_params["com_instructure_course_available_canvas_resources"]).to be_blank
     end

@@ -435,16 +435,16 @@
         "message": "Arraste a alça. Use as setas para cima e para baixo para redimensionar"
     },
     "due_5d7267be": {
-        "message": "Vencimento:"
+        "message": "Data limite:"
     },
     "due_date_124fdd99": {
-        "message": "Vencimento: { date }"
+        "message": "Data limite: { date }"
     },
     "due_multiple_dates_cc0ee3f5": {
-        "message": "Vencimento: Várias datas"
+        "message": "Data limite: Várias datas"
     },
     "due_when_7eed10c6": {
-        "message": "Vencimento: { when }"
+        "message": "Data limite: { when }"
     },
     "edit_c5fbea07": {
         "message": "Editar"
@@ -873,7 +873,7 @@
         "message": "Próxima página"
     },
     "no_due_dates_assigned_e8f5bac8": {
-        "message": "Nenhuma data de vencimento atribuída"
+        "message": "Nenhuma data limite atribuída"
     },
     "no_e16d9132": {
         "message": "Não"

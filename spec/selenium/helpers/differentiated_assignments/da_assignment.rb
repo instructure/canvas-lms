@@ -26,7 +26,7 @@ module DifferentiatedAssignments
 
     def initialize(assignees)
       initialize_assignees(assignees)
-      super(course: DifferentiatedAssignments.the_course, title: "Assignment for #{self.assignees_list}")
+      super(course: DifferentiatedAssignments.the_course, title: "Assignment for #{assignees_list}")
     end
   end
 end

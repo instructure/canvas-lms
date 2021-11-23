@@ -130,11 +130,11 @@ module Calendar2Common
 
   def change_calendar(direction = :next)
     css_selector = case direction
-                   when :next then
+                   when :next
                      '.navigate_next'
-                   when :prev then
+                   when :prev
                      '.navigate_prev'
-                   when :today then
+                   when :today
                      '.navigate_today'
                    else
                      raise "unrecognized direction #{direction}"

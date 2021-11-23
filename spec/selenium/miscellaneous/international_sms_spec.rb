@@ -29,7 +29,7 @@ describe "international sms" do
       @user.account.enable_feature!(:international_sms)
     end
 
-    it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do
+    it 'shows a disclaimer for international numbers', priority: "1" do
       # All selections except those in this array should include the text messaging rate disclaimer
       no_disclaimer = Array[
           'Select Country or Region',
@@ -56,7 +56,7 @@ describe "international sms" do
       end
     end
 
-    it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
+    it 'allows a phone number to be entered', priority: "1" do
       get '/profile/settings'
 
       find('.add_contact_link').click

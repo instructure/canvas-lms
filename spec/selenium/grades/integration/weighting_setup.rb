@@ -51,7 +51,7 @@ module WeightingSetup
     @a4.grade_student(@student, grade: 16, grader: @teacher)
   end
 
-  def create_weighted_grading_periods()
+  def create_weighted_grading_periods
     # :sigh: ... in the case of SRGB, the grading period dropdown behavior
     # is "interesting"... specifically 1. only the first change event
     # records your preference, 2. if its value doesn't change, no

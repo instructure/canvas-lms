@@ -92,7 +92,7 @@ describe Quizzes::QuizStatisticsSerializer do
     oldest = 5.days.ago
 
     allow(statistics.student_analysis).to receive_messages(created_at: oldest)
-    allow(statistics.item_analysis).to receive_messages(created_at: oldest + 1.days)
+    allow(statistics.item_analysis).to receive_messages(created_at: oldest + 1.day)
 
     @json = subject.as_json[:quiz_statistics].stringify_keys
     expect(@json['generated_at']).to eq oldest

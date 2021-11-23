@@ -27,7 +27,7 @@ describe "sub account basic settings" do
 
   include_examples "settings basic tests", :sub_account
 
-  it "disables inherited settings if locked by a parent account", priority: "1", test_id: 250007 do
+  it "disables inherited settings if locked by a parent account", priority: "1" do
     parent = Account.default
     parent.settings[:restrict_student_future_view] = { locked: true, value: true }
     parent.save!

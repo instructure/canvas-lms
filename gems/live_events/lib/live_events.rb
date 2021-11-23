@@ -68,7 +68,7 @@ module LiveEvents
     end
 
     # Post an event for the current account.
-    def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil) # rubocop:disable Rails/SmartTimeZone
+    def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil)
       if LiveEvents::Client.config
         context ||= materialized_context
         client.post_event(event_name, payload, time, context, partition_key)
@@ -76,9 +76,7 @@ module LiveEvents
     end
 
     def truncate(string)
-      if string
-        string.truncate(Setting.get('live_events_text_max_length', 8192).to_i, separator: ' ')
-      end
+      string&.truncate(Setting.get('live_events_text_max_length', 8192).to_i, separator: ' ')
     end
 
     def worker
@@ -96,7 +94,11 @@ module LiveEvents
 
     def stream_client=(s_client)
       @old_stream_client = @stream_client
-      @stream_client = s_client
+      @stream_client = if s_client.is_a? Proc
+                         s_client.call(settings)
+                       else
+                         s_client
+                       end
     end
 
     private

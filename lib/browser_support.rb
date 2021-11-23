@@ -29,7 +29,7 @@ BrowserSupport = Struct.new(:browser, :version) do
     end
 
     def configuration
-      @configuration ||= YAML.load_file(File.expand_path('../../config/browsers.yml', __FILE__))
+      @configuration ||= YAML.load_file(File.expand_path('../config/browsers.yml', __dir__))
     end
 
     def minimum_browsers

@@ -85,7 +85,7 @@ module Lti::IMS
       end
 
       def post_instfs_progress(url, params)
-        jwt = CGI::parse(URI(url).query)['token'].first
+        jwt = CGI.parse(URI(url).query)['token'].first
         jwt_params = Canvas::Security.decode_jwt(jwt, ["jwt signing key"])
         form_data = params[:form_data]
         instfs_params = { name: form_data[:filename], instfs_uuid: 1, content_type: form_data[:content_type], token: @token }
@@ -110,7 +110,7 @@ module Lti::IMS
           attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
           expect(result.submission.attachments.count).to eq 0
 
-          line_item_params.merge!(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
           upload_url = nil
           upload_params = nil
           # get params sent to instfs for easier mocking of the instfs return request

@@ -28,7 +28,7 @@ module Canvas::Migration
     OVERVIEW_JSON = "overview.json"
     ALL_FILES_ZIP = "all_files.zip"
 
-    COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :tab_configuration, :syllabus_body, :storage_quota]
+    COURSE_NO_COPY_ATTS = %i[name course_code start_at conclude_at grading_standard_id tab_configuration syllabus_body storage_quota].freeze
 
     QUIZ_FILE_DIRECTORY = "Quiz Files"
 
@@ -37,7 +37,7 @@ module Canvas::Migration
 
       # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
       # or an integer epoch * 1000
-      if timestamp.to_s.match(/^-?[0-9.]+$/)
+      if timestamp.to_s.match?(/^-?[0-9.]+$/)
         timestamp = timestamp.to_i / 1000 rescue 0
         t = nil
         if timestamp > 0
@@ -59,7 +59,7 @@ module Canvas::Migration
       error[:object] = object if object
       @errors << error
       object[:error_message] = message if object
-      if @scraper and @scraper.page
+      if @scraper&.page
         error[:error_url] = @scraper.page.uri.to_s
         error[:page_body] = @scraper.page.body
       end
@@ -68,15 +68,15 @@ module Canvas::Migration
     end
 
     def unique_quiz_dir
-      if content_migration
-        if (a = content_migration.attachment)
-          key = "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
-        else
-          key = content_migration.id.to_s
-        end
-      else
-        key = "data_#{rand(10000)}" # should only happen in testing
-      end
+      key = if content_migration
+              if (a = content_migration.attachment)
+                "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
+              else
+                content_migration.id.to_s
+              end
+            else
+              "data_#{rand(10000)}" # should only happen in testing
+            end
       "#{QUIZ_FILE_DIRECTORY}/#{key}"
     end
 
@@ -91,7 +91,7 @@ module Canvas::Migration
     end
 
     def set_progress(progress)
-      if content_migration && content_migration.respond_to?(:update_conversion_progress)
+      if content_migration.respond_to?(:update_conversion_progress)
         content_migration.update_conversion_progress(progress)
       end
     end
@@ -101,11 +101,11 @@ module Canvas::Migration
     end
 
     def find_export_dir
-      if @settings[:content_migration_id] && @settings[:user_id]
-        slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
-      else
-        slug = "export_#{rand(10000)}"
-      end
+      slug = if @settings[:content_migration_id] && @settings[:user_id]
+               "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
+             else
+               "export_#{rand(10000)}"
+             end
 
       path = create_export_dir(slug)
       i = 1
@@ -119,16 +119,16 @@ module Canvas::Migration
 
     def create_export_dir(slug)
       config = ConfigFile.load('external_migration')
-      if config && config[:data_folder]
-        folder = config[:data_folder]
-      else
-        folder = Dir.tmpdir
-      end
+      folder = if config && config[:data_folder]
+                 config[:data_folder]
+               else
+                 Dir.tmpdir
+               end
       File.join(folder, slug)
     end
 
     def make_export_dir
-      FileUtils::mkdir_p @base_export_dir
+      FileUtils.mkdir_p @base_export_dir
     end
 
     # Does a JSON export of the courses
@@ -190,11 +190,12 @@ module Canvas::Migration
         end
 
         a[:questions].each do |q|
-          if q[:question_type] == "question_reference"
+          case q[:question_type]
+          when "question_reference"
             if should_prepend?(:assessment_questions, q[:migration_id], existing_ids)
               q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
             end
-          elsif q[:question_type] == "question_group"
+          when "question_group"
             if q[:question_bank_migration_id].present? && should_prepend?(:assessment_question_banks, q[:question_bank_migration_id], existing_ids)
               q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id], prepend_value)
             end
@@ -213,12 +214,11 @@ module Canvas::Migration
         next unless m[:items]
 
         m[:items].each do |i|
-          if i[:linked_resource_type] =~ /assessment|quiz/i
-            if should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
-              i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
-              i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
-            end
-          end
+          next unless /assessment|quiz/i.match?(i[:linked_resource_type]) &&
+                      should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
+
+          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
         end
       end
     end
@@ -229,7 +229,7 @@ module Canvas::Migration
       file_name = File.expand_path(file_name)
       @course[:overview_file_path] = file_name
       logger.debug "Writing the overview course json file to: #{file_name}"
-      File.open(file_name, 'w') { |file| file << overview().to_json }
+      File.open(file_name, 'w') { |file| file << overview.to_json }
       file_name
     end
 
@@ -249,17 +249,15 @@ module Canvas::Migration
       if outcome[:type] == "learning_outcome_group"
         if selectable_outcomes
           log = { migration_id: outcome[:migration_id], title: outcome[:title], child_groups: child_groups }
-          (parent_children ? parent_children : overview[:learning_outcome_groups]) << log
+          (parent_children || overview[:learning_outcome_groups]) << log
         end
       else
         lo = { migration_id: outcome[:migration_id], title: outcome[:title] }
         lo[:parent_migration_id] = parent_migration_id if selectable_outcomes
         overview[:learning_outcomes] << lo
       end
-      if outcome[:outcomes]
-        outcome[:outcomes].each do |sub_outcome|
-          overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
-        end
+      outcome[:outcomes]&.each do |sub_outcome|
+        overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
       end
       overview
     end
@@ -293,24 +291,22 @@ module Canvas::Migration
 
       if @course[:assessments]
         @overview[:assessments] = []
-        if @course[:assessments][:assessments]
-          @course[:assessments][:assessments].each do |a|
-            assmnt = {}
-            dates << a[:due_date] if a[:due_date]
-            @overview[:assessments] << assmnt
-            assmnt[:quiz_name] = a[:quiz_name]
-            assmnt[:quiz_name] ||= a[:title]
-            assmnt[:title] = a[:title]
-            assmnt[:title] ||= a[:quiz_name]
-            assmnt[:migration_id] = a[:migration_id]
-            assmnt[:type] = a[:type]
-            assmnt[:max_points] = a[:max_points]
-            assmnt[:duration] = a[:duration]
-            assmnt[:error_message] = a[:error_message] if a[:error_message]
-            if a[:assignment] && a[:assignment][:migration_id]
-              assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
-              ensure_linked_assignment(a[:assignment], quiz_migration_id: a[:migration_id])
-            end
+        @course[:assessments][:assessments]&.each do |a|
+          assmnt = {}
+          dates << a[:due_date] if a[:due_date]
+          @overview[:assessments] << assmnt
+          assmnt[:quiz_name] = a[:quiz_name]
+          assmnt[:quiz_name] ||= a[:title]
+          assmnt[:title] = a[:title]
+          assmnt[:title] ||= a[:quiz_name]
+          assmnt[:migration_id] = a[:migration_id]
+          assmnt[:type] = a[:type]
+          assmnt[:max_points] = a[:max_points]
+          assmnt[:duration] = a[:duration]
+          assmnt[:error_message] = a[:error_message] if a[:error_message]
+          if a[:assignment] && a[:assignment][:migration_id]
+            assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
+            ensure_linked_assignment(a[:assignment], quiz_migration_id: a[:migration_id])
           end
         end
       end
@@ -474,7 +470,7 @@ module Canvas::Migration
         end
       end
 
-      if dates.length > 0
+      unless dates.empty?
         @overview[:start_timestamp] ||= dates.min
         @overview[:end_timestamp] ||= dates.max
       end

@@ -22,7 +22,7 @@ require 'active_support'
 # this is a weird thing we have to do to avoid a weird circular
 # require problem
 _x = ActiveSupport::Deprecation
-ActiveSupport::Dependencies.autoload_paths << File.expand_path("../autoload", __FILE__)
+ActiveSupport::Dependencies.autoload_paths << File.expand_path('autoload', __dir__)
 ActiveSupport::Dependencies.hook!
 
 require 'autoextend'

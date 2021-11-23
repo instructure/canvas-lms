@@ -58,7 +58,7 @@ describe "blueprint courses quizzes" do
         user_session(@master_teacher)
       end
 
-      it "locks down the associated course's quizzes fields", test_id: 3127593, priority: 2 do
+      it "locks down the associated course's quizzes fields", priority: 2 do
         change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
         f('.bpc-lock-toggle button').click

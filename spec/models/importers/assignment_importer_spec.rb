@@ -23,30 +23,30 @@ require_relative '../../lti2_spec_helper'
 
 describe "Importing assignments" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'assignment'
-      it "imports assignments for #{system}" do
-        data = get_import_data(system, 'assignment')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, 'assignment'
 
-        data[:assignments_to_import] = {}
-        expect {
-          expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
-        }.to change(Assignment, :count).by(0)
+    it "imports assignments for #{system}" do
+      data = get_import_data(system, 'assignment')
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        data[:assignments_to_import][data[:migration_id]] = true
-        expect {
-          Importers::AssignmentImporter.import_from_migration(data, context, migration)
-          Importers::AssignmentImporter.import_from_migration(data, context, migration)
-        }.to change(Assignment, :count).by(1)
-        a = Assignment.where(migration_id: data[:migration_id]).first
+      data[:assignments_to_import] = {}
+      expect {
+        expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
+      }.to change(Assignment, :count).by(0)
 
-        expect(a.title).to eq data[:title]
-        expect(a.description).to include(data[:instructions]) if data[:instructions]
-        expect(a.description).to include(data[:description]) if data[:description]
-        a.due_at = Time.at(data[:due_date].to_i / 1000)
-        expect(a.points_possible).to eq data[:grading][:points_possible].to_f
-      end
+      data[:assignments_to_import][data[:migration_id]] = true
+      expect {
+        Importers::AssignmentImporter.import_from_migration(data, context, migration)
+        Importers::AssignmentImporter.import_from_migration(data, context, migration)
+      }.to change(Assignment, :count).by(1)
+      a = Assignment.where(migration_id: data[:migration_id]).first
+
+      expect(a.title).to eq data[:title]
+      expect(a.description).to include(data[:instructions]) if data[:instructions]
+      expect(a.description).to include(data[:description]) if data[:description]
+      a.due_at = Time.at(data[:due_date].to_i / 1000)
+      expect(a.points_possible).to eq data[:grading][:points_possible].to_f
     end
   end
 
@@ -198,7 +198,7 @@ describe "Importing assignments" do
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
 
-    ["s_paper_check", "journal_check", "exclude_biblio", "exclude_type", "submit_papers_to", "s_view_report"].each do |field|
+    %w[s_paper_check journal_check exclude_biblio exclude_type submit_papers_to s_view_report].each do |field|
       expect(settings[field]).to eq("1")
     end
 

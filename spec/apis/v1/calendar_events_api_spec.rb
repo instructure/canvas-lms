@@ -28,14 +28,14 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context 'events' do
-    expected_fields = [
-      'all_context_codes', 'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
-      'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
-      'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
-      'title', 'type', 'updated_at', 'url', 'workflow_state', 'context_name', 'context_color'
+    expected_fields = %w[
+      all_context_codes all_day all_day_date child_events child_events_count comments
+      context_code created_at description duplicates end_at hidden html_url
+      id location_address location_name parent_event_id start_at
+      title type updated_at url workflow_state context_name context_color
     ]
-    expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'available_slots', 'participants_per_appointment', 'reserve_url', 'participant_type', 'effective_context_code'])
-    expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'effective_context_code', 'participant_type'])
+    expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
+    expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
     expected_reserved_fields = (expected_slot_fields + ['reserved', 'reserve_comments'])
     expected_reservation_fields = expected_reservation_event_fields - ['child_events']
 
@@ -128,7 +128,7 @@ describe CalendarEventsApiController, type: :request do
                           :start_at => "2018-09-19T21:00:00Z",
                           :end_at => "2018-09-19T22:00:00Z"
                         }
-                      });
+                      })
       expect(json.first[1]).to eql "cannot create event for deleted course"
     end
 
@@ -272,7 +272,7 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course.asset_string]
 
       # second context the user cannot access
-      course_factory()
+      course_factory
       @course.calendar_events.create(:title => "unauthorized_course", :start_at => '2012-01-08 12:00:00')
       contexts.push(@course.asset_string)
 
@@ -557,7 +557,7 @@ describe CalendarEventsApiController, type: :request do
           expect(ejson.keys).to include 'child_events'
           expect(ejson['child_events'].size).to eql ejson['child_events_count']
           expect(ejson['child_events'].size).to eql 3
-          expect(ejson['child_events'].select { |e| e['url'] }.size).to eql 1
+          expect(ejson['child_events'].count { |e| e['url'] }).to eql 1
           own_reservation = ejson['child_events'].select { |e| e['own_reservation'] }
           expect(own_reservation.size).to eql 1
           expect(own_reservation.first.keys).to match_array((expected_reservation_fields + ['own_reservation', 'user']))
@@ -1247,7 +1247,7 @@ describe CalendarEventsApiController, type: :request do
     it 'apis translate event descriptions in ics' do
       allow(HostUrl).to receive(:default_host).and_return('www.example.com')
       should_translate_user_content(@course, false) do |content|
-        @course.calendar_events.create!(:description => content, :start_at => Time.now + 1.hours, :end_at => Time.now + 2.hours)
+        @course.calendar_events.create!(:description => content, :start_at => Time.now + 1.hour, :end_at => Time.now + 2.hours)
         json = api_call(:get, "/api/v1/courses/#{@course.id}",
                         :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)
         get json['calendar']['ics']
@@ -1423,7 +1423,7 @@ describe CalendarEventsApiController, type: :request do
                           }
                         })
         conference = CalendarEvent.find(json['id']).web_conference
-        expect(conference.settings[:default_return_url]).to match(/\/courses\/#{@course.id}$/)
+        expect(conference.settings[:default_return_url]).to match(%r{/courses/#{@course.id}$})
         expect(conference.user).to eq @user
       end
 
@@ -1535,10 +1535,10 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context 'assignments' do
-    expected_fields = [
-      'all_day', 'all_day_date', 'assignment', 'context_code', 'created_at',
-      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'type', 'updated_at',
-      'url', 'workflow_state', 'context_name', 'context_color'
+    expected_fields = %w[
+      all_day all_day_date assignment context_code created_at
+      description end_at html_url id start_at title type updated_at
+      url workflow_state context_name context_color
     ]
 
     it 'returns assignments within the given date range' do
@@ -1706,11 +1706,17 @@ describe CalendarEventsApiController, type: :request do
 
         @pub1 = @course1.assignments.create(:title => 'published assignment 1')
         @pub2 = @course2.assignments.create(:title => 'published assignment 2')
-        [@pub1, @pub2].each { |a| a.workflow_state = 'published'; a.save! }
+        [@pub1, @pub2].each { |a|
+          a.workflow_state = 'published'
+          a.save!
+        }
 
         @unpub1 = @course1.assignments.create(:title => 'unpublished assignment 1')
         @unpub2 = @course2.assignments.create(:title => 'unpublished assignment 2')
-        [@unpub1, @unpub2].each { |a| a.workflow_state = 'unpublished'; a.save! }
+        [@unpub1, @unpub2].each { |a|
+          a.workflow_state = 'unpublished'
+          a.save!
+        }
       end
 
       context 'for teachers' do
@@ -1788,7 +1794,10 @@ describe CalendarEventsApiController, type: :request do
           @only_vis_to_o, @not_only_vis_to_o = (1..2).map { @course.assignments.create(:title => 'test assig', :workflow_state => 'published', :due_at => '2012-01-07 12:00:00') }
           @only_vis_to_o.only_visible_to_overrides = true
           @only_vis_to_o.save!
-          [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
+          [@only_vis_to_o, @not_only_vis_to_o].each { |a|
+            a.workflow_state = 'published'
+            a.save!
+          }
 
           create_section_override_for_assignment(@only_vis_to_o, { course_section: @section })
         end
@@ -1855,6 +1864,7 @@ describe CalendarEventsApiController, type: :request do
             expect(json.size).to eql 1
           end
         end
+
         context 'in a section only' do
           it "shows events for all active assignment" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
@@ -2448,7 +2458,7 @@ describe CalendarEventsApiController, type: :request do
 
                 @assignment1 = @default_assignment
                 @assignment2 = @course2.assignments.create!(:title => 'Override2', :due_at => '2012-01-13 12:00:00Z')
-                [@assignment1, @assignment2].each { |a| a.save! }
+                [@assignment1, @assignment2].each(&:save!)
 
                 @student1_enrollment = StudentEnrollment.create!(:user => @student, :workflow_state => 'active', :course_section => @course1.default_section, :course => @course1)
                 @student2_enrollment = StudentEnrollment.create!(:user => @student2, :workflow_state => 'active', :course_section => @course2.default_section, :course => @course2)
@@ -2918,9 +2928,9 @@ describe CalendarEventsApiController, type: :request do
                  controller: 'calendar_events_api',
                  action: 'save_selected_contexts',
                  format: 'json',
-                 selected_contexts: ['course_1', 'course_2', 'course_3']
+                 selected_contexts: %w[course_1 course_2 course_3]
                })
-      expect(@user.reload.get_preference(:selected_calendar_contexts)).to eq(['course_1', 'course_2', 'course_3'])
+      expect(@user.reload.get_preference(:selected_calendar_contexts)).to eq(%w[course_1 course_2 course_3])
     end
   end
 
@@ -2965,7 +2975,7 @@ describe CalendarEventsApiController, type: :request do
                       })
 
       context = json['contexts'].find do |c|
-        c['sections'] && c['sections'].find do |s|
+        c['sections']&.find do |s|
           s['id'] == @section.id.to_s
         end
       end

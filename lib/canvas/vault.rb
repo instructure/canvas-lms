@@ -53,9 +53,9 @@ module Canvas::Vault
         cache_ttl = fetched_lease_value / 2
         LocalCache.write(cache_key, cached_data, expires_in: cache_ttl)
       end
-      return cached_data
-    rescue => exception
-      Canvas::Errors.capture_exception(:vault, exception)
+      cached_data
+    rescue => e
+      Canvas::Errors.capture_exception(:vault, e)
       stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
       return stale_value if stale_value.present?
 

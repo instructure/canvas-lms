@@ -279,7 +279,7 @@ describe Importers::ContextExternalToolImporter do
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
 
-      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '2', '3', '4']
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq %w[1 2 3 4]
     end
 
     it "searches for existing tools if setting enabled" do

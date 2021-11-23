@@ -32,7 +32,7 @@ module Api
       end
 
       def has_media_comment?
-        !media_id.blank?
+        media_id.present?
       end
 
       # (outgoing) turn anchor tags with media comments into html5 elements
@@ -62,8 +62,8 @@ module Api
         node_builder.new('a', doc).tap do |n|
           if tag_is_an_anchor?
             tag.attributes.each { |k, v| n[k] = v }
-            unless already_has_av_comment?
-              n['class'] += " #{media_object.media_type}_comment" if media_object
+            if !already_has_av_comment? && media_object
+              n['class'] += " #{media_object.media_type}_comment"
             end
           else
             n['class'] = "instructure_inline_media_comment #{tag.name}_comment"
@@ -79,8 +79,8 @@ module Api
 
       def media_id
         if tag_is_an_anchor?
-          media_comment_regex = %r{^media_comment_}
-          return '' unless tag['id'] && tag['id'].match(media_comment_regex)
+          media_comment_regex = /^media_comment_/
+          return '' unless tag['id']&.match(media_comment_regex)
 
           tag['id'].sub(media_comment_regex, '')
         else

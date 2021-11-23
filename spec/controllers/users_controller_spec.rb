@@ -105,13 +105,13 @@ describe UsersController do
       end
 
       it 'creates a login message' do
-        expect(assigns[:lti_launch].params.keys).to match_array [
-          "iss",
-          "login_hint",
-          "target_link_uri",
-          "lti_message_hint",
-          "canvas_region",
-          "client_id"
+        expect(assigns[:lti_launch].params.keys).to match_array %w[
+          iss
+          login_hint
+          target_link_uri
+          lti_message_hint
+          canvas_region
+          client_id
         ]
       end
 
@@ -146,7 +146,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       allow(settings_mock).to receive(:enabled?).and_return(true)
 
@@ -155,7 +155,10 @@ describe UsersController do
 
       allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
       allow(SecureRandom).to receive(:hex).and_return('abc123')
-      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s| state = s; "http://example.com/redirect" }
+      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s|
+                                       state = s
+                                       "http://example.com/redirect"
+                                     }
 
       get :oauth, params: { service: "google_drive", return_to: "http://example.com" }
 
@@ -170,7 +173,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -194,7 +197,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
@@ -214,7 +217,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double()
+      settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization')
       allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
@@ -282,7 +285,7 @@ describe UsersController do
 
     it "sorts the results of manageable_courses by name" do
       course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
-      %w(c d a).each do |name|
+      %w[c d a].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
       end
 
@@ -290,7 +293,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+      expect(courses.map { |c| c['label'] }).to eq %w[a B c d]
     end
 
     it "sorts the results of manageable_courses by term with default term first then alphabetically" do
@@ -299,11 +302,11 @@ describe UsersController do
       future_term = EnrollmentTerm.create(start_at: 1.day.from_now, root_account: @teacher.account)
       past_term = EnrollmentTerm.create(start_at: 1.day.ago, root_account: @teacher.account)
       # Future terms
-      %w(b a).each do |name|
+      %w[b a].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => future_term.id)
       end
       # Past terms
-      %w(d c).each do |name|
+      %w[d c].each do |name|
         course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
       end
 
@@ -311,7 +314,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(E c d a b)
+      expect(courses.map { |c| c['label'] }).to eq %w[E c d a b]
     end
 
     it "does not include courses that an admin can't content-manage" do
@@ -332,7 +335,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+      expect(courses.map { |c| c['label'] }).to eq %w[A C]
     end
 
     it "does not include courses that an admin doesn't have rights to see" do
@@ -349,7 +352,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c['label'] }).to eq %w(A C)
+      expect(courses.map { |c| c['label'] }).to eq %w[A C]
     end
 
     context "query matching" do
@@ -428,7 +431,7 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
 
-        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1', 'MyCourse2', 'MyCourse3', "MyOldCourse"].sort
+        expect(courses.map { |c| c['course_code'] }.sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
       it "includes concluded courses for admins when passing include = 'concluded'" do
@@ -439,7 +442,7 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
 
-        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1', 'MyCourse2', 'MyCourse3', "MyOldCourse"].sort
+        expect(courses.map { |c| c['course_code'] }.sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
       it "includes courses with overridden dates as not concluded for teachers if the course period is active" do
@@ -1864,7 +1867,7 @@ describe UsersController do
 
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
-      teachers = teacher_enrollments.map { |e| e.user }
+      teachers = teacher_enrollments.map(&:user)
       expect(teachers).to be_include(@teacher)
       expect(teachers).not_to be_include(@designer)
     end
@@ -1981,7 +1984,7 @@ describe UsersController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
@@ -2075,7 +2078,7 @@ describe UsersController do
       get 'admin_split', params: { :user_id => user1.id }
       expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
       expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
-      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].map { |user| user[:id] }).to eq([user2.id])
+      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].pluck(:id)).to eq([user2.id])
     end
   end
 
@@ -2435,7 +2438,10 @@ describe UsersController do
 
   describe "#invite_users" do
     it 'does not work without ability to manage students or admins on course' do
-      Account.default.tap { |a| a.settings[:open_registration] = true; a.save! }
+      Account.default.tap { |a|
+        a.settings[:open_registration] = true
+        a.save!
+      }
       course_with_student_logged_in(:active_all => true)
 
       post 'invite_users', params: { :course_id => @course.id }
@@ -2551,7 +2557,7 @@ describe UsersController do
         @current_user = @user
         get 'user_dashboard'
         courses = assigns[:js_env][:STUDENT_PLANNER_COURSES]
-        expect(courses.map { |c| c[:id] }).to eq [@course.id]
+        expect(courses.pluck(:id)).to eq [@course.id]
       end
 
       it "sets ENV.STUDENT_PLANNER_GROUPS" do
@@ -2561,7 +2567,7 @@ describe UsersController do
         group.add_user(@current_user, 'accepted', true)
         get 'user_dashboard'
         groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
-        expect(groups.map { |g| g[:id] }).to eq [group.id]
+        expect(groups.pluck(:id)).to eq [group.id]
       end
     end
 

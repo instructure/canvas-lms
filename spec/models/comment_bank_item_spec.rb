@@ -61,7 +61,7 @@ describe CommentBankItem, type: :model do
     describe 'read/update/delete' do
       it 'is allowed for the creator' do
         aggregate_failures do
-          [:read, :update, :delete].each do |permission|
+          %i[read update delete].each do |permission|
             expect(subject.grants_right?(user, permission)).to be(true)
           end
         end
@@ -69,7 +69,7 @@ describe CommentBankItem, type: :model do
 
       it 'is not allowed for other users' do
         user2 = user_model
-        [:read, :update, :delete].each do |permission|
+        %i[read update delete].each do |permission|
           expect(subject.grants_right?(user2, permission)).to be(false)
         end
       end

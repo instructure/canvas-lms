@@ -48,7 +48,7 @@ module AnnouncementHelpers
   end
 
   def view_announcement_detail
-    fj(stream_announcement).click()
-    fj(announcement_title).click()
+    fj(stream_announcement).click
+    fj(announcement_title).click
   end
 end

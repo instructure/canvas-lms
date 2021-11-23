@@ -29,7 +29,7 @@ class CanvasPartmanTest::Zoo < ActiveRecord::Base
            dependent: :destroy
 
   def self.create_schema
-    self.drop_schema
+    drop_schema
 
     SchemaHelper.create_table :partman_zoos do |t|
       t.timestamps null: false

@@ -44,7 +44,7 @@ describe "submissions" do
       user_session(@student)
     end
 
-    it "lets a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
+    it "lets a student submit a text entry", :xbrowser, priority: "1" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -56,7 +56,7 @@ describe "submissions" do
       expect(f("#content")).not_to contain_css(".error_text")
     end
 
-    it "does not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
+    it "does not let a student submit a text entry with no text entered", priority: "2" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -66,7 +66,7 @@ describe "submissions" do
       expect(f(".error_text")).to be
     end
 
-    it "does not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
+    it "does not break when you open and close the media comment dialog", priority: "1" do
       stub_kaltura
       # pending("failing because it is dependant on an external kaltura system")
 
@@ -94,7 +94,7 @@ describe "submissions" do
       submit_form('#submit_media_recording_form')
     end
 
-    it "does not allow blank media submission", priority: "1", test_id: 237021 do
+    it "does not allow blank media submission", priority: "1" do
       skip_if_safari(:alert)
       stub_kaltura
       # pending("failing because it is dependant on an external kaltura system")
@@ -107,7 +107,7 @@ describe "submissions" do
       driver.switch_to.alert.accept
     end
 
-    it "allows you to submit a file", priority: "1", test_id: 237022 do
+    it "allows you to submit a file", priority: "1" do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       _filename, fullpath, _data = get_file("testfile1.txt")
@@ -155,7 +155,7 @@ describe "submissions" do
       expect(element_exists?('.attachment_wrapper')).to be_falsy
     end
 
-    it "does not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
+    it "does not allow a user to submit a file-submission assignment without attaching a file", priority: "1" do
       skip('investigate in LA-843')
       skip_if_safari(:alert)
       @assignment.submission_types = 'online_upload'
@@ -194,7 +194,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "does not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1", test_id: 237024 do
+    it "does not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1" do
       @assignment.submission_types = 'online_upload'
       @assignment.allowed_extensions = ['bash']
       @assignment.save!
@@ -217,7 +217,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "shows as not turned in when submission was auto created in speedgrader", priority: "1", test_id: 237025 do
+    it "shows as not turned in when submission was auto created in speedgrader", priority: "1" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
@@ -230,7 +230,7 @@ describe "submissions" do
       expect(f('.submit_assignment_link')).to include_text "Start Assignment"
     end
 
-    it "does not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
+    it "does not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
@@ -260,7 +260,7 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: yes"
     end
 
-    it "does not allow blank submissions for text entry", priority: "1", test_id: 237026 do
+    it "does not allow blank submissions for text entry", priority: "1" do
       @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -306,7 +306,7 @@ describe "submissions" do
       expect(submission.reload.body).to eq "<p>#{body_html}</p>"
     end
 
-    it "does not allow a submission with only comments", priority: "1", test_id: 237027 do
+    it "does not allow a submission with only comments", priority: "1" do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
       @assignment.update(:submission_types => "online_text_entry")
@@ -328,7 +328,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "does not allow peer reviewers to see turnitin scores/reports", priority: "1", test_id: 237028 do
+    it "does not allow peer reviewers to see turnitin scores/reports", priority: "1" do
       @student1 = @user
       @assignment.submission_types = 'online_upload'
       @assignment.save!
@@ -373,7 +373,7 @@ describe "submissions" do
       end
     end
 
-    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029
+    it "should submit an assignment and validate confirmation information", priority: "1"
 
     context 'with Canvadocs enabled' do
       before(:once) do
@@ -383,7 +383,7 @@ describe "submissions" do
                                           "disabled" => false }
       end
 
-      it "shows preview link after submitting a canvadocable file type", priority: "1", test_id: 587302 do
+      it "shows preview link after submitting a canvadocable file type", priority: "1" do
         @assignment.submission_types = 'online_upload'
         @assignment.save!
 
@@ -412,7 +412,7 @@ describe "submissions" do
         driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
       end
 
-      it "allows uploaded files to be used for submission", priority: "1", test_id: 237030 do
+      it "allows uploaded files to be used for submission", priority: "1" do
         local_storage!
 
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
@@ -437,7 +437,7 @@ describe "submissions" do
         expect(f('.details')).to include_text "html-editing-test.html"
       end
 
-      it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
+      it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1" do
         skip_if_safari(:alert)
         filename = "hello-world.sh"
         fixture_fn = "files/#{filename}"
@@ -533,12 +533,12 @@ describe "submissions" do
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 
-      it 'indicates as excused on the assignment page', priority: "1", test_id: 201937 do
+      it 'indicates as excused on the assignment page', priority: "1" do
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         expect(f("#sidebar_content .header")).to include_text 'Excused!'
       end
 
-      it 'indicates as excused on the submission details page', priority: "1", test_id: 201937 do
+      it 'indicates as excused on the submission details page', priority: "1" do
         get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
         expect(f("#content .submission_details .entered_grade")).to include_text 'Excused'
       end
@@ -594,7 +594,7 @@ describe "submissions" do
       include_examples "shows as excused"
     end
 
-    it 'does not allow submissions', priority: "1", test_id: 197048 do
+    it 'does not allow submissions', priority: "1" do
       @assignment = @course.assignments.create!(
         title: 'assignment 1',
         submission_types: 'online_text_entry'

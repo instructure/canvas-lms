@@ -26,7 +26,7 @@ module Quizzes
   # lazy loading for STI models ( https://guides.rubyonrails.org/autoloading_and_reloading_constants.html#single-table-inheritance ).
   module Preloader
     def self.preload_quiz_questions
-      Dir[Rails.root + "app/models/quizzes/quiz_question/*_question.rb"].each do |f|
+      Dir[Rails.root.join("app/models/quizzes/quiz_question/*_question.rb")].each do |f|
         filename = f.split("/").last
         snake_case_const = filename.split(".").first
         ::Quizzes.const_get("QuizQuestion::#{snake_case_const.camelize}")

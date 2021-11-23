@@ -49,12 +49,12 @@ module SIS
         raise ImportError, "No abstract_course_id given for an abstract course" if abstract_course_id.blank?
         raise ImportError, "No short_name given for abstract course #{abstract_course_id}" if short_name.blank?
         raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?
-        raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless status =~ /\Aactive|\Adeleted/i
+        raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless /\Aactive|\Adeleted/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         course = AbstractCourse.where(root_account_id: @root_account, sis_source_id: abstract_course_id).take
         course ||= AbstractCourse.new
-        if !course.stuck_sis_fields.include?(:enrollment_term_id)
+        unless course.stuck_sis_fields.include?(:enrollment_term_id)
           course.enrollment_term = @root_account.enrollment_terms.where(sis_source_id: term_id).take || @root_account.default_enrollment_term
         end
         course.root_account = @root_account
@@ -71,9 +71,10 @@ module SIS
         course.short_name = short_name if short_name.present? && (course.new_record? || !course.stuck_sis_fields.include?(:short_name))
 
         course.sis_source_id = abstract_course_id
-        if status =~ /active/i
+        case status
+        when /active/i
           course.workflow_state = 'active'
-        elsif status =~ /deleted/i
+        when /deleted/i
           course.workflow_state = 'deleted'
         end
 

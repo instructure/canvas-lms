@@ -223,7 +223,7 @@ describe Group do
       @group.save!
       user_model
 
-      ['invited', 'requested', 'accepted'].each do |workflow_state|
+      %w[invited requested accepted].each do |workflow_state|
         @group.add_user(@user, workflow_state)
         expect(@group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first).not_to be_nil
       end
@@ -374,7 +374,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [true, false, false]
+      expect([group1, group2, group3].map(&:auto_accept?)).to eq [true, false, false]
     end
 
     it "is false unless the group is student organized or a community" do
@@ -385,7 +385,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [false, true, true]
+      expect([group1, group2, group3].map(&:auto_accept?)).to eq [false, true, true]
     end
   end
 
@@ -397,7 +397,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [true, true, false]
+      expect([group1, group2, group3].map(&:allow_join_request?)).to eq [true, true, false]
     end
 
     it "is false unless the group is student organized or a community" do
@@ -408,7 +408,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [false, true, true]
+      expect([group1, group2, group3].map(&:allow_join_request?)).to eq [false, true, true]
     end
   end
 
@@ -580,7 +580,7 @@ describe Group do
   end
 
   it "as_json should include group_category" do
-    course_factory()
+    course_factory
     gc = group_category(name: "Something")
     group = Group.create(:group_category => gc)
     hash = group.as_json
@@ -709,20 +709,20 @@ describe Group do
 
         it 'returns the plugin names' do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Conferences)")
+          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Big blue button Wimba (Conferences)")
         end
       end
 
       context 'when WebConferences are not enabled' do
         it "returns Conferences" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
+          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Conferences")
         end
       end
     end
 
     it "lets members see everything" do
-      expect(@group.tabs_available(@student).map { |t| t[:id] }).to eql [
+      expect(@group.tabs_available(@student).pluck(:id)).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -736,7 +736,7 @@ describe Group do
     end
 
     it "lets admins see everything" do
-      expect(@group.tabs_available(@teacher).map { |t| t[:id] }).to eql [
+      expect(@group.tabs_available(@teacher).pluck(:id)).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -750,7 +750,7 @@ describe Group do
     end
 
     it "does not let nobodies see conferences" do
-      expect(@group.tabs_available(nil).map { |t| t[:id] }).not_to include Group::TAB_CONFERENCES
+      expect(@group.tabs_available(nil).pluck(:id)).not_to include Group::TAB_CONFERENCES
     end
   end
 

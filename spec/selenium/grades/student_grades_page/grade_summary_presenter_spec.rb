@@ -30,7 +30,7 @@ describe GradeSummaryPresenter do
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
 
-      a1, a2 = 2.times.map { @course.assignments.create! points_possible: 10 }
+      a1, a2 = Array.new(2) { @course.assignments.create! points_possible: 10 }
       a1.grade_student @student, grade: 10, grader: @teacher
       a2.grade_student @student, grade: 10, grader: @teacher
       a2.destroy
@@ -46,7 +46,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:observed_courses) do
-      2.times.map { course_factory(active_course: true, active_all: true) }
+      Array.new(2) { course_factory(active_course: true, active_all: true) }
     end
     let(:active_element) { driver.execute_script('return document.activeElement') }
 
@@ -69,7 +69,7 @@ describe GradeSummaryPresenter do
       expect(f('#course_select_menu')).to be_displayed
     end
 
-    it 'maintains focus on show what-if/revert to original buttons', priority: 2, test_id: 229660 do
+    it 'maintains focus on show what-if/revert to original buttons', priority: 2 do
       student_submission.student_entered_score = 8
       student_submission.save!
 

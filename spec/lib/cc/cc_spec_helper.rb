@@ -33,6 +33,6 @@ def get_cc_export_file(rel_path)
 end
 
 def get_ccc_schema
-  xsd_filename = File.join(File.expand_path(File.dirname(__FILE__)), '../../../lib/cc/xsd/cccv1p0.xsd')
+  xsd_filename = File.join(__dir__, '../../../lib/cc/xsd/cccv1p0.xsd')
   Nokogiri::XML::Schema(File.read(xsd_filename))
 end

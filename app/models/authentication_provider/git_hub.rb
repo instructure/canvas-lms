@@ -32,16 +32,16 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   end
 
   def self.login_attributes
-    ['id', 'email', 'login'].freeze
+    %w[id email login].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'email',
-      'id',
-      'login',
-      'name'
+    %w[
+      email
+      id
+      login
+      name
     ].freeze
   end
 

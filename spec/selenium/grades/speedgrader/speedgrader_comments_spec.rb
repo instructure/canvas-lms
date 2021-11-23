@@ -41,7 +41,7 @@ describe "speed grader" do
   end
 
   context "alerts" do
-    it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+    it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
       student_in_course(active_user: true).user
       Speedgrader.visit(@course.id, @assignment.id)
       replace_content(Speedgrader.new_comment_text_area, "oh no i forgot to save this comment!")
@@ -59,7 +59,7 @@ describe "speed grader" do
         stub_kaltura
       end
 
-      it "has options for audio and video recording", priority: "1", test_id: 283754 do
+      it "has options for audio and video recording", priority: "1" do
         Speedgrader.visit(@course.id, @assignment.id)
 
         # check media comment
@@ -80,7 +80,7 @@ describe "speed grader" do
       expect(f("#comment_attachments")).not_to contain_css("input")
     end
 
-    it "creates a comment on assignment", priority: "1", test_id: 283754 do
+    it "creates a comment on assignment", priority: "1" do
       Speedgrader.visit(@course.id, @assignment.id)
 
       # add comment
@@ -90,7 +90,7 @@ describe "speed grader" do
       expect(Speedgrader.new_comment_text_area.text).to be_empty
     end
 
-    it 'displays attachments', test_id: 3058055, priority: "1" do
+    it 'displays attachments', priority: "1" do
       _filename, fullpath, _data = get_file("amazing_file.txt")
       Speedgrader.visit(@course.id, @assignment.id)
       Speedgrader.add_comment_attachment(fullpath)
@@ -100,7 +100,7 @@ describe "speed grader" do
       expect(Speedgrader.attachment_link).to be_displayed
     end
 
-    it "shows comment post time", priority: "1", test_id: 283755 do
+    it "shows comment post time", priority: "1" do
       Speedgrader.visit(@course.id, @assignment.id)
 
       # add comment
@@ -117,7 +117,7 @@ describe "speed grader" do
       expect(Speedgrader.fetch_comment_posted_at_by_index(0)).to include_text(expected_posted_at)
     end
 
-    it "properly shows avatar images only if avatars are enabled on the account", priority: "1", test_id: 283756 do
+    it "properly shows avatar images only if avatars are enabled on the account", priority: "1" do
       # enable avatars
       @account = Account.default
       @account.enable_service(:avatars)
@@ -139,7 +139,7 @@ describe "speed grader" do
         Speedgrader.uncheck_hide_student_name
       end
 
-      it "hides student names and avatar images", priority: "1", test_id: 283757 do
+      it "hides student names and avatar images", priority: "1" do
         # enable avatars
         @account = Account.default
         @account.enable_service(:avatars)
@@ -173,7 +173,7 @@ describe "speed grader" do
         @en.reactivate
       end
 
-      it "creates comments", test_id: 1407014, priority: "1" do
+      it "creates comments", priority: "1" do
         @teacher1.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
         @teacher1.save
 
@@ -241,7 +241,7 @@ describe "speed grader" do
     end
 
     describe 'saving a draft comment' do
-      it 'when going to the next student', test_id: 1407005, priority: "1" do
+      it 'when going to the next student', priority: "1" do
         expect {
           Speedgrader.click_next_student_btn
           wait_for_ajaximations
@@ -250,7 +250,7 @@ describe "speed grader" do
         }.by(1)
       end
 
-      it 'when going to the previous student', test_id: 1407006, priority: "1" do
+      it 'when going to the previous student', priority: "1" do
         expect {
           Speedgrader.click_next_or_prev_student :previous
           wait_for_ajaximations
@@ -259,7 +259,7 @@ describe "speed grader" do
         }.by(1)
       end
 
-      it 'when choosing a student from the dropdown', test_id: 1407007, priority: "1" do
+      it 'when choosing a student from the dropdown', priority: "1" do
         expect {
           Speedgrader.select_student @student2
           wait_for_ajaximations
@@ -268,7 +268,7 @@ describe "speed grader" do
         }.by(1)
       end
 
-      it 'when going back to the assignment', test_id: 1407008, priority: "1" do
+      it 'when going back to the assignment', priority: "1" do
         expect {
           Speedgrader.assignment_link.click
           dismiss_alert
@@ -280,13 +280,13 @@ describe "speed grader" do
     end
 
     describe 'notice on auto-saving a draft comment' do
-      it 'is displayed', test_id: 1407009, priority: "1" do
+      it 'is displayed', priority: "1" do
         Speedgrader.click_next_student_btn
 
         expect(Speedgrader.comment_saved_alert).to be_displayed
       end
 
-      it 'can be dismissed', test_id: 1407010, priority: "1" do
+      it 'can be dismissed', priority: "1" do
         Speedgrader.click_next_student_btn
         wait_for_ajaximations
 
@@ -300,11 +300,11 @@ describe "speed grader" do
         Speedgrader.clear_new_comment
       end
 
-      it 'has an asterisk prepended to the comment', test_id: 1407011, priority: "1" do
+      it 'has an asterisk prepended to the comment', priority: "1" do
         expect(Speedgrader.draft_comment_markers.size).to eq(Speedgrader.draft_comments.size)
       end
 
-      it 'has a link to publish a comment for the teacher who is logged in', test_id: 1407012, priority: "1" do
+      it 'has a link to publish a comment for the teacher who is logged in', priority: "1" do
         comment_elements = Speedgrader.draft_comments
         comment_elements_by_author = {}
 
@@ -328,7 +328,7 @@ describe "speed grader" do
         Speedgrader.clear_new_comment
       end
 
-      it 'increases the number of published comments', test_id: 1407013, priority: "1" do
+      it 'increases the number of published comments', priority: "1" do
         skip_if_safari(:alert)
 
         expect {
@@ -461,7 +461,7 @@ describe "speed grader" do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    it 'does not allow non-group comments to be seen by group', priority: "1", test_id: 728596 do
+    it 'does not allow non-group comments to be seen by group', priority: "1" do
       Speedgrader.select_student(@student_1)
       expect(Speedgrader.comment_list).to include(@private_comment_1)
       expect(Speedgrader.comment_list).not_to include(@private_comment_2)
@@ -470,7 +470,7 @@ describe "speed grader" do
       expect(Speedgrader.comment_list).to include(@private_comment_2)
     end
 
-    it 'allows group-comments to be seen by whole group', priority: "1", test_id: 728611 do
+    it 'allows group-comments to be seen by whole group', priority: "1" do
       Speedgrader.select_student(@student_1)
       expect(Speedgrader.comment_list).to include(@group_comment_1)
       expect(Speedgrader.comment_list).to include(@group_comment_2)

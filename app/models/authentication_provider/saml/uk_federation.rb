@@ -31,7 +31,7 @@ class AuthenticationProvider::SAML::UKFederation < AuthenticationProvider::SAML:
     protected
 
     def cert
-      Rails.root.join("config", "saml", "ukfederation.pem").read
+      Rails.root.join("config/saml/ukfederation.pem").read
     end
   end
 end

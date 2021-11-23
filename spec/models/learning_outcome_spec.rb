@@ -137,8 +137,16 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align')
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align', tags: { type: @rubric.class.name })
+      expect(InstStatsd::Statsd).to have_received(:increment).with('feature_flag_check', any_args).at_least(:once)
+    end
+
+    it "adding outcomes to an AssessmentQuestionBank should increment datadog counter" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      @question_bank = AssessmentQuestionBank.create(:context => @course)
+      @outcome.align(@question_bank, @course, mastery_score: 0.5)
+      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align', tags: { type: @question_bank.class.name })
+      expect(InstStatsd::Statsd).to have_received(:increment).with('feature_flag_check', any_args).at_least(:once)
     end
 
     it "allows learning outcome rows in the rubric" do
@@ -636,11 +644,11 @@ describe LearningOutcome do
       @outcome.save!
 
       rubric.reload
-      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to match_array([
-                                                                                       "Exceeds Expectations",
-                                                                                       "Meets Expectations",
-                                                                                       "Does Not Meet Expectations"
-                                                                                     ])
+      expect(rubric.data.first[:ratings].pluck(:description)).to match_array([
+                                                                               "Exceeds Expectations",
+                                                                               "Meets Expectations",
+                                                                               "Does Not Meet Expectations"
+                                                                             ])
     end
   end
 
@@ -671,11 +679,11 @@ describe LearningOutcome do
 
     context "illegal calculation ints" do
       context "per method" do
-        calc_method = [
-          'decaying_average',
-          'n_mastery',
-          'highest',
-          'latest'
+        calc_method = %w[
+          decaying_average
+          n_mastery
+          highest
+          latest
         ]
 
         calc_method.each do |method|
@@ -1018,8 +1026,14 @@ describe LearningOutcome do
       )
     end
 
-    let(:c1) { course_with_teacher; @course }
-    let(:c2) { course_with_teacher; @course }
+    let(:c1) {
+      course_with_teacher
+      @course
+    }
+    let(:c2) {
+      course_with_teacher
+      @course
+    }
 
     let(:add_student) do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }

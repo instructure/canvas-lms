@@ -100,7 +100,7 @@ describe OutcomeCalculationMethod, type: :model do
 
   describe 'as_json' do
     it 'includes expected keys' do
-      expect(subject.as_json.keys).to match_array(['id', 'calculation_method', 'calculation_int', 'context_type', 'context_id'])
+      expect(subject.as_json.keys).to match_array(%w[id calculation_method calculation_int context_type context_id])
     end
   end
 

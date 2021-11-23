@@ -32,8 +32,7 @@ import {
   fetchImportantInfos,
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom,
-  groupImportantDates,
-  parseObserverList
+  groupImportantDates
 } from '../utils'
 
 import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
@@ -856,25 +855,5 @@ describe('groupImportantDates', () => {
     expect(event.type).toBe('event')
     expect(event.url).toBe('http://localhost:3000/calendar?event_id=99&include_contexts=course_30')
     expect(event.start).toBe('2021-06-30T07:00:00Z')
-  })
-})
-
-describe('parseObserverList', () => {
-  it('transforms attribute names', () => {
-    const users = parseObserverList([
-      {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
-      {id: '6', name: 'Student 6'}
-    ])
-    expect(users.length).toBe(2)
-    expect(users[0].id).toBe('4')
-    expect(users[0].name).toBe('Student 4')
-    expect(users[0].avatarUrl).toBe('https://url_here')
-    expect(users[1].id).toBe('6')
-    expect(users[1].name).toBe('Student 6')
-  })
-
-  it('returns empty list if no observers passed', () => {
-    const users = parseObserverList([])
-    expect(users.length).toBe(0)
   })
 })

@@ -187,13 +187,13 @@ describe Folder do
     not_locked = [
       Folder.root_folders(@course).first,
       @course.folders.create!(:name => "not locked 1", :locked => false),
-      @course.folders.create!(:name => "not locked 2", :lock_at => 1.days.from_now),
-      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.days.ago)
+      @course.folders.create!(:name => "not locked 2", :lock_at => 1.day.from_now),
+      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.day.ago)
     ]
     locked = [
       @course.folders.create!(:name => "locked 1", :locked => true),
-      @course.folders.create!(:name => "locked 2", :lock_at => 1.days.ago),
-      @course.folders.create!(:name => "locked 3", :lock_at => 1.days.ago, :unlock_at => 1.days.from_now)
+      @course.folders.create!(:name => "locked 2", :lock_at => 1.day.ago),
+      @course.folders.create!(:name => "locked 3", :lock_at => 1.day.ago, :unlock_at => 1.day.from_now)
     ]
     expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
     expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
@@ -296,12 +296,12 @@ describe Folder do
 
     it "includes all files for teachers" do
       teacher_in_course active_all: true
-      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
+      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w[normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt]
     end
 
     it "excludes locked and hidden files for students" do
       student_in_course active_all: true
-      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
+      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w[normal.txt date_restricted_unlocked.txt]
     end
   end
 

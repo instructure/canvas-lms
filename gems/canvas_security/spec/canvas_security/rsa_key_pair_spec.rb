@@ -24,12 +24,12 @@ describe CanvasSecurity::RSAKeyPair do
   describe "initialize" do
     it 'generates a public key of default size 2048' do
       keys = CanvasSecurity::RSAKeyPair.new
-      expect(/\d+/.match(keys.public_key.to_text())[0]).to eq "2048"
+      expect(/\d+/.match(keys.public_key.to_text)[0]).to eq "2048"
     end
 
     it 'generates a private key of default size 2048' do
       keys = CanvasSecurity::RSAKeyPair.new
-      expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "2048"
+      expect(/\d+/.match(keys.private_key.to_text)[0]).to eq "2048"
     end
   end
 end

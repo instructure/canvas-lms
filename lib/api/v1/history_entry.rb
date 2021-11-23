@@ -22,7 +22,7 @@ module Api::V1::HistoryEntry
   include Api::V1::Json
 
   def history_entry_json(page_view, asset_user_access, user, session)
-    entry = api_json(asset_user_access, user, session, only: %w(asset_code context_type context_id))
+    entry = api_json(asset_user_access, user, session, only: %w[asset_code context_type context_id])
     entry['visited_at'] = page_view.created_at
     if asset_user_access.category == 'files' && page_view.url.include?('verifier')
       strip_verifier = Addressable::URI.parse(page_view.url)

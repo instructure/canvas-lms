@@ -39,14 +39,14 @@ describe "announcements" do
       @reply = @announcement.discussion_entries.create!(user: student_2, message: 'hello from student 2')
     end
 
-    it "hides replies if user hasn't posted", priority: "1", test_id: 150533 do
+    it "hides replies if user hasn't posted", priority: "1" do
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
       info_text = "Replies are only visible to those who have posted at least one reply."
       expect(f('#discussion_subentries span').text).to eq info_text
       ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(@reply.message) }
     end
 
-    it "shows replies if user has posted", priority: "1", test_id: 3293301 do
+    it "shows replies if user has posted", priority: "1" do
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
       f('.discussion-reply-action').click
       wait_for_ajaximations
@@ -62,12 +62,12 @@ describe "announcements" do
       course_with_student_logged_in
     end
 
-    it "does not show an announcements section if there are no announcements", priority: "1", test_id: 150534 do
+    it "does not show an announcements section if there are no announcements", priority: "1" do
       get "/courses/#{@course.id}"
       expect(f("#content")).not_to contain_css(".announcements active")
     end
 
-    it "validates that a student can not see an announcement with a delayed posting date", priority: "1", test_id: 220376 do
+    it "validates that a student can not see an announcement with a delayed posting date", priority: "1" do
       announcement_title = 'Hi there!'
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)
       get "/courses/#{@course.id}/announcements"
@@ -79,7 +79,7 @@ describe "announcements" do
       expect(f(".ic-announcement-row h3")).to include_text(announcement_title)
     end
 
-    it "does not allow a student to close/open announcement for comments or delete an announcement", priority: "1", test_id: 220377 do
+    it "does not allow a student to close/open announcement for comments or delete an announcement", priority: "1" do
       announcement_title = "Announcement 1"
       @course.announcements.create!(:title => announcement_title, :message => "Hey")
       get "/courses/#{@course.id}/announcements"
@@ -89,7 +89,7 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css('.discussion_actions ul.al-options')
     end
 
-    it "has deleted announcement removed from student account", priority: "1", test_id: 220379 do
+    it "has deleted announcement removed from student account", priority: "1" do
       @announcement = @course.announcements.create!(:title => 'delete me', :message => 'Here is my message')
       get "/courses/#{@course.id}/announcements/"
       expect(f(".ic-announcement-row h3")).to include_text('delete me')
@@ -98,7 +98,7 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css(".ic-announcement-row h3")
     end
 
-    it "removes notifications from unenrolled courses", priority: "1", test_id: 220380 do
+    it "removes notifications from unenrolled courses", priority: "1" do
       enable_cache do
         @student.enrollments.first.update_attribute(:workflow_state, 'active')
         @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')
@@ -112,7 +112,7 @@ describe "announcements" do
       end
     end
 
-    it "allows rating when enabled", priority: "1", test_id: 603587 do
+    it "allows rating when enabled", priority: "1" do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
@@ -131,7 +131,7 @@ describe "announcements" do
       expect(f('.discussion-rate-action--checked')).to be_displayed
     end
 
-    it "doesn't allow rating when not enabled", priority: "1", test_id: 603588 do
+    it "doesn't allow rating when not enabled", priority: "1" do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: false)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 

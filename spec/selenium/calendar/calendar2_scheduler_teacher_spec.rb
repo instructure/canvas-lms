@@ -38,7 +38,7 @@ describe "scheduler" do
       user_session(@teacher)
     end
 
-    it "validates the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
+    it "validates the appointment group shows on all views after a student signed up", priority: "1" do
       date = Time.zone.today.to_s
       create_appointment_group(:new_appointments => [
                                  [date + ' 12:00:00', date + ' 13:00:00'],

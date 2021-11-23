@@ -199,11 +199,11 @@ describe Role do
       @base_types = Role::ENROLLMENT_TYPES
       @custom_roles = {}
       @base_types.each do |bt|
-        if bt == 'DesignerEnrollment'
-          @custom_roles[bt] = custom_role(bt, "custom #{bt}", :account => @sub_account)
-        else
-          @custom_roles[bt] = custom_role(bt, "custom #{bt}")
-        end
+        @custom_roles[bt] = if bt == 'DesignerEnrollment'
+                              custom_role(bt, "custom #{bt}", :account => @sub_account)
+                            else
+                              custom_role(bt, "custom #{bt}")
+                            end
       end
     end
 
@@ -252,7 +252,7 @@ describe Role do
     end
 
     it "includes inactive roles" do
-      @account.roles.each { |r| r.deactivate! }
+      @account.roles.each(&:deactivate!)
       all = Role.all_enrollment_roles_for_account(@sub_account, true)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
@@ -298,7 +298,7 @@ describe Role do
       end
 
       describe "does all the addable/deleteable by user stuff right" do
-        roles_to_test = %w(designer observer ta teacher student)
+        roles_to_test = %w[designer observer ta teacher student]
         role_names = {
           "designer" => "DesignerEnrollment",
           "observer" => "ObserverEnrollment",

@@ -35,7 +35,7 @@ describe 'individual view' do
       refresh_page
     end
     SRGB.select_student(@student)
-    SRGB.total_score()
+    SRGB.total_score
   end
 
   let(:individual_view) { true }

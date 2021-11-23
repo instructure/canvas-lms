@@ -165,7 +165,7 @@ describe AcademicBenchmark do
     expect(@cm.migration_issues.count).to eq 0
     expect(@cm.workflow_state).to eq 'imported'
 
-    verify_full_import()
+    verify_full_import
   end
 
   it "rejects creating global outcomes if no permissions" do

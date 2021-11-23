@@ -235,6 +235,7 @@ shared_examples_for "an object whose dates are overridable" do
         expect(overridable.reload.has_active_overrides?).to eq true
       end
     end
+
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
@@ -267,7 +268,7 @@ shared_examples_for "an object whose dates are overridable" do
 
         dates_hash = overridable.dates_hash_visible_to(@teacher)
         expect(dates_hash.size).to eq 3
-        expect(dates_hash.map { |d| d[:title] }).to eq [nil, "Summer session", "2 students"]
+        expect(dates_hash.pluck(:title)).to eq [nil, "Summer session", "2 students"]
       end
     end
 

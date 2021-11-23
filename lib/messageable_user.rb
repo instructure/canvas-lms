@@ -19,7 +19,7 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'updated_at', 'pronouns', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map { |col| "users.#{col}" }
+  COLUMNS = %w[id updated_at pronouns short_name name avatar_image_url avatar_image_source].map { |col| "users.#{col}" }
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
@@ -146,8 +146,8 @@ class MessageableUser < User
   after_find :populate_common_contexts
 
   def include_common_contexts_from(other)
-    combine_common_contexts(self.global_common_courses, other.global_common_courses)
-    combine_common_contexts(self.global_common_groups, other.global_common_groups)
+    combine_common_contexts(global_common_courses, other.global_common_courses)
+    combine_common_contexts(global_common_groups, other.global_common_groups)
   end
 
   def serializable_hash(options = {})
@@ -206,7 +206,7 @@ class MessageableUser < User
         id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
-          <<~SQL,
+          <<~SQL.squish,
             #{User.sortable_name_order_by_clause} > ? OR
             #{User.sortable_name_order_by_clause} = ? AND users.id > ?
           SQL

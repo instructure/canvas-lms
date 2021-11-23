@@ -35,13 +35,13 @@ describe "scheduler" do
       course_with_teacher_logged_in
     end
 
-    it 'shows Appointment Group tab with new scheduler feature flag turned on', priority: "1", test_id: 2937134 do
+    it 'shows Appointment Group tab with new scheduler feature flag turned on', priority: "1" do
       get "/calendar"
       f('#create_new_event_link').click
       expect(f('#edit_event_tabs')).to contain_css('.edit_appointment_group_option')
     end
 
-    it 'shows correct title when editing an appointment group', priority: "1", test_id: 2953905 do
+    it 'shows correct title when editing an appointment group', priority: "1" do
       title = 'Ultimate AG'
       create_appointment_group title: title
       get "/calendar"
@@ -52,7 +52,7 @@ describe "scheduler" do
       expect(fj("span.ui-dialog-title:contains('Edit #{title}')")).not_to be_nil
     end
 
-    it 'creates an Appointment Group with the feature flag ON', priority: "1", test_id: 2981262 do
+    it 'creates an Appointment Group with the feature flag ON', priority: "1" do
       title = 'my appt'
       location = 'office'
       start_time_text = '02'
@@ -93,7 +93,7 @@ describe "scheduler" do
       expect(last_group.end_at.strftime("%I")).to eq end_time_text
     end
 
-    it 'shows page for editing Appointment Groups', priority: "1", test_id: 2953905 do
+    it 'shows page for editing Appointment Groups', priority: "1" do
       create_appointment_group(contexts: [@course])
       get "/calendar2"
       # navigate to the next month for end of month
@@ -103,7 +103,7 @@ describe "scheduler" do
       expect(f('.EditPage')).to include_text("Edit new appointment group")
     end
 
-    it 'does not show the Find Appointment button for the teacher', priority: "1", test_id: 2936794 do
+    it 'does not show the Find Appointment button for the teacher', priority: "1" do
       create_appointment_group title: "appointment1"
       get "/calendar"
       expect(f('#select-course-component')).not_to contain_css("#FindAppointmentButton")
