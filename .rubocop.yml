@@ -393,8 +393,6 @@ RSpec/RepeatedExampleGroupBody:
   Severity: convention
 RSpec/RepeatedExampleGroupDescription:
   Severity: convention
-RSpec/RepeatedIncludeExample:
-  Severity: convention
 RSpec/ReturnFromStub:
   Severity: convention
   AutoCorrect: false
