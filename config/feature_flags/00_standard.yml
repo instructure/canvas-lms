@@ -77,7 +77,6 @@ disable_alert_timeouts:
       Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
       user as much time as they need to read the notification over and dismiss it when they are finished.
   applies_to: User
-  autoexpand: true
 disable_celebrations:
   type: setting
   state: hidden
@@ -95,7 +94,6 @@ disable_keyboard_shortcuts:
     Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
     will have an improved experience with these shortcuts turned off.
   applies_to: User
-  autoexpand: true
 disable_lti_post_only:
   state: hidden
   display_name: Don't Move LTI Query Params to POST Body
@@ -179,7 +177,6 @@ high_contrast:
       High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
-  autoexpand: true
 important_dates:
   state: hidden
   display_name: Important Dates
