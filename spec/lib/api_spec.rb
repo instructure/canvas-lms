@@ -589,10 +589,6 @@ describe Api do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
-    it "scopes to accounts by default if :is_not_scoped_to_account doesn't exist" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
-    end
-
     it "fails if we're scoping to an account and the scope isn't provided" do
       expect(-> { Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, {}, Account.default) }).to raise_error("missing scope for collection")
     end

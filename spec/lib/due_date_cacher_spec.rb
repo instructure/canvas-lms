@@ -317,7 +317,7 @@ describe DueDateCacher do
 
     it "accepts a user ID" do
       expect do
-        DueDateCacher.with_executing_user(student) do
+        DueDateCacher.with_executing_user(student.id) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
       end.not_to raise_error

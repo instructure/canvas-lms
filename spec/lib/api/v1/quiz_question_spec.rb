@@ -110,7 +110,6 @@ describe Api::V1::QuizQuestion do
       it { is_expected.not_to include("correct_comments_html") }
       it { is_expected.not_to include("incorrect_comments_html") }
       it { is_expected.not_to include("neutral_comments_html") }
-      it { is_expected.not_to include("answers") }
       it { is_expected.to include("variables") }
       it { is_expected.to include("answer_tolerance") }
       it { is_expected.to include("formula_decimal_places") }

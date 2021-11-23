@@ -418,12 +418,6 @@ describe ExternalToolsController, type: :request do
         expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
       end
 
-      it "can add a sub-account tool as a favorite for a sub-account" do
-        add_favorite_tool(@sub_account, @root_tool)
-        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
-        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
-      end
-
       it "adds to existing favorites for a sub-account inherited from a root account" do
         add_favorite_tool(Account.default, @root_tool)
         add_favorite_tool(@sub_account, @sub_tool)

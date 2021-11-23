@@ -254,21 +254,6 @@ describe "Enrollment::QueryBuilder" do
           options[:course_workflow_state] = 'deleted'
           expect(conditions).to be_nil
         end
-
-        it "returns all invitation enrollments in non-deleted courses" do
-          options[:course_workflow_state] = 'available'
-          result = enrollments.where(conditions)
-          expect(matches_for(result)).to eq [
-            %w[creation_pending available StudentEnrollment],
-            %w[creation_pending available TeacherEnrollment],
-            %w[creation_pending claimed StudentEnrollment],
-            %w[creation_pending claimed TeacherEnrollment],
-            %w[invited available StudentEnrollment],
-            %w[invited available TeacherEnrollment],
-            %w[invited claimed StudentEnrollment],
-            %w[invited claimed TeacherEnrollment]
-          ]
-        end
       end
 
       it_should_behave_like "enforce_course_workflow_state"

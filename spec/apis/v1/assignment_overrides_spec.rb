@@ -170,11 +170,6 @@ describe AssignmentOverridesController, type: :request do
       assert_status(404)
     end
 
-    it "excludes due_at/all_day/all_day_date/lock_at/unlock_at when not overridden" do
-      json = api_show_override(@course, @assignment, @override)
-      validate_override_json(@override, json)
-    end
-
     it "includes unlock_at when overridden" do
       @override.override_unlock_at(4.days.ago)
       @override.save!

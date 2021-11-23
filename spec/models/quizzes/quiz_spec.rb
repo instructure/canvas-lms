@@ -2403,11 +2403,7 @@ describe Quizzes::Quiz do
         end
 
         context 'without students' do
-          it 'shows the quiz if there is an override' do
-            expect(@quiz.visible_to_user?(@observer)).to be_truthy
-          end
-
-          it 'shows the quiz even if there is no override' do
+          it 'shows the quiz' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
         end

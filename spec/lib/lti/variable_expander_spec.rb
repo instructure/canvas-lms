@@ -1736,7 +1736,7 @@ module Lti
 
         it 'has substitution for $vnd.instructure.User.current_uuid' do
           allow(user).to receive(:uuid).and_return('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
-          exp_hash = { test: '$vnd.instructure.User.uuid' }
+          exp_hash = { test: '$vnd.instructure.User.current_uuid' }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
         end

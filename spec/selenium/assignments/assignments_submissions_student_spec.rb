@@ -557,19 +557,6 @@ describe "submissions" do
       include_examples "shows as excused"
     end
 
-    context "a previously graded online assignment" do
-      let_once(:assignment) do
-        @course.assignments.create!(title: "Assignment", submission_types: 'online_text_entry', points_possible: 20)
-      end
-
-      before(:once) do
-        assignment.submit_homework(@student, { submission_type: 'online_text_entry' })
-        assignment.grade_student @student, excuse: true, grader: @teacher
-      end
-
-      include_examples "shows as excused"
-    end
-
     context "an unsubmitted online assignment" do
       let_once(:assignment) do
         @course.assignments.create!(title: "Assignment", submission_types: 'online_text_entry', points_possible: 20)

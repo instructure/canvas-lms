@@ -68,14 +68,6 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
         expect { question.correct_answer_parts(user_answer) }.not_to raise_error
       end
 
-      it 'handles "answer[:margin]"' do
-        answer_data = {
-          numerical_answer_type: "exact_answer"
-        }
-        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
-      end
-
       it 'handles "answer[:approximate]"' do
         answer_data = {
           numerical_answer_type: "precision_answer"

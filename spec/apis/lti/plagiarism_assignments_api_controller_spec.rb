@@ -97,12 +97,6 @@ module Lti
         expect(response).to be_not_found
       end
 
-      it 'returns an assignment by lti id' do
-        get "#{endpoint}/#{assignment.id}", headers: request_headers
-        parsed_body = JSON.parse(response.body)
-        expect(parsed_body).to eq expected_assignment
-      end
-
       it 'returns an assignment by Canvas id' do
         get "#{endpoint}/#{assignment.id}", headers: request_headers
         parsed_body = JSON.parse(response.body)

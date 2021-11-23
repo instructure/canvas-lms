@@ -165,17 +165,6 @@ describe OAuth2ProviderController do
         expect(response.location).to match(%r{https://example.com})
       end
 
-      it 'accepts the deprecated name of scopes for scope param' do
-        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
-        get :auth,
-            params: { client_id: key.id,
-                      redirect_uri: 'https://example.com',
-                      response_type: 'code',
-                      scope: '/auth/userinfo' }
-        expect(response).to be_redirect
-        expect(response.location).to match(%r{https://example.com})
-      end
-
       it 'does not reuse userinfo tokens for other scopes' do
         @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth, params: { client_id: key.id,

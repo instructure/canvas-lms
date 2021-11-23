@@ -168,15 +168,6 @@ describe IncomingMail::MessageHandler do
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
-        it "saves and delivers the message with proper input" do
-          message = double("original message with invalid context", original_message_attributes.merge({ context: double("context") }))
-          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
-          expect_any_instance_of(Message).to receive(:save)
-          expect_any_instance_of(Message).to receive(:deliver)
-
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-        end
-
         it "does not send a message if the incoming message has no from" do
           invalid_incoming_message = double("invalid incoming message", incoming_message_attributes.merge(from: nil, reply_to: nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)

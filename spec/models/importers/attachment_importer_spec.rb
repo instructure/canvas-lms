@@ -160,23 +160,6 @@ module Importers
         Importers::AttachmentImporter.process_migration(data, migration)
       end
 
-      it "does not import files if there is a file_to_import key" do
-        data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              files_to_import: {
-              }
-            }
-          }
-        }
-
-        expect(::Attachment).not_to receive(:where)
-
-        Importers::AttachmentImporter.process_migration(data, migration)
-      end
-
       it 'sets locked, file_state, and display_name when present' do
         data = {
           'file_map' => {
