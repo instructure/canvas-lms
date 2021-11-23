@@ -4,5 +4,5 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'paginated_collection', path: '../paginated_collection'
 gem 'json_token', path: '../json_token'
+gem 'paginated_collection', path: '../paginated_collection'
