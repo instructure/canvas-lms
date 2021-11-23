@@ -33,19 +33,19 @@ describe LatePolicy do
 
     # Numericality
     it do
-      is_expected.to validate_numericality_of(:late_submission_minimum_percent)
+      expect(subject).to validate_numericality_of(:late_submission_minimum_percent)
         .is_greater_than_or_equal_to(0)
         .is_less_than_or_equal_to(100)
     end
 
     it do
-      is_expected.to validate_numericality_of(:missing_submission_deduction)
+      expect(subject).to validate_numericality_of(:missing_submission_deduction)
         .is_greater_than_or_equal_to(0)
         .is_less_than_or_equal_to(100)
     end
 
     it do
-      is_expected.to validate_numericality_of(:late_submission_deduction)
+      expect(subject).to validate_numericality_of(:late_submission_deduction)
         .is_greater_than_or_equal_to(0)
         .is_less_than_or_equal_to(100)
     end

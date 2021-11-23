@@ -36,7 +36,7 @@ describe ModeratedGrading::ProvisionalGrade do
   it { is_expected.to be_valid }
 
   it do
-    is_expected.to have_one(:selection)
+    expect(subject).to have_one(:selection)
       .with_foreign_key(:selected_provisional_grade_id)
       .class_name('ModeratedGrading::Selection')
   end

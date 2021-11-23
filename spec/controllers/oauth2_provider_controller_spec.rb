@@ -406,7 +406,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(302)
+            expect(subject).to have_http_status(302)
           end
         end
 
@@ -415,7 +415,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(302)
+            expect(subject).to have_http_status(302)
           end
         end
       end
@@ -701,7 +701,7 @@ describe OAuth2ProviderController do
           end
 
           it 'rejects by default' do
-            is_expected.to redirect_to('https://example.com?error=invalid_request&error_description=assertion+method+not+supported+for+this+grant_type')
+            expect(subject).to redirect_to('https://example.com?error=invalid_request&error_description=assertion+method+not+supported+for+this+grant_type')
           end
 
           context "with external audience key" do

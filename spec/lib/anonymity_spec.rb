@@ -58,7 +58,7 @@ describe Anonymity do
       it 'queries the passed in existing_anonymous_ids' do
         allow(Anonymity).to receive(:generate_short_id).and_return(short_id)
         expect(existing_anonymous_ids_fake).to receive(:include?).with(short_id).and_return(false)
-        is_expected.to eql short_id
+        expect(subject).to eql short_id
       end
     end
   end

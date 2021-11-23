@@ -109,13 +109,13 @@ RSpec.describe GradebookSettingsController, type: :controller do
           it { is_expected.to have(5).items } # ensure we add specs for new additions
 
           it do
-            is_expected.to include({
-                                     'late' => '#000000',
-                                     'missing' => '#000001',
-                                     'resubmitted' => '#000002',
-                                     'dropped' => '#000003',
-                                     'excused' => '#000004'
-                                   })
+            expect(subject).to include({
+                                         'late' => '#000000',
+                                         'missing' => '#000001',
+                                         'resubmitted' => '#000002',
+                                         'dropped' => '#000003',
+                                         'excused' => '#000004'
+                                       })
           end
         end
       end

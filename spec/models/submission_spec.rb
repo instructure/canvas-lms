@@ -81,7 +81,7 @@ describe Submission do
     end
 
     it 'only contains submissions with anonymous_ids' do
-      is_expected.to contain_exactly(@first_assignment_submission.anonymous_id)
+      expect(subject).to contain_exactly(@first_assignment_submission.anonymous_id)
     end
   end
 
@@ -3590,22 +3590,22 @@ describe Submission do
 
     it "does not include submissions that neither have grades nor hidden comments" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
-      is_expected.not_to include(submission)
+      expect(subject).not_to include(submission)
     end
 
     it "includes submissions with hidden comments" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: true)
-      is_expected.to include(submission)
+      expect(subject).to include(submission)
     end
 
     it "includes submissions with a grade" do
       assignment.grade_student(@student, grader: @teacher, grade: 10)
-      is_expected.to include(submission)
+      expect(subject).to include(submission)
     end
 
     it "includes submissions that are excused" do
       assignment.grade_student(@student, grader: @teacher, excused: true)
-      is_expected.to include(submission)
+      expect(subject).to include(submission)
     end
   end
 
@@ -3621,12 +3621,12 @@ describe Submission do
 
     it "does not include submissions without a hidden comment" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
-      is_expected.not_to include(submission)
+      expect(subject).not_to include(submission)
     end
 
     it "includes submissions with hidden comments" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: true)
-      is_expected.to include(submission)
+      expect(subject).to include(submission)
     end
   end
 
@@ -3644,7 +3644,7 @@ describe Submission do
     end
 
     it 'only contains submissions that have anonymous_ids' do
-      is_expected.to contain_exactly(submission_with_anonymous_id)
+      expect(subject).to contain_exactly(submission_with_anonymous_id)
     end
   end
 
@@ -3660,15 +3660,15 @@ describe Submission do
     let(:whenever_submission) { whenever_assignment.submission_for_student(student) }
 
     it "includes submissions with a due date in the past" do
-      is_expected.to include(past_submission)
+      expect(subject).to include(past_submission)
     end
 
     it "excludes submissions with a due date in the future" do
-      is_expected.not_to include(future_submission)
+      expect(subject).not_to include(future_submission)
     end
 
     it "excludes submissions without a due date" do
-      is_expected.not_to include(whenever_submission)
+      expect(subject).not_to include(whenever_submission)
     end
   end
 
