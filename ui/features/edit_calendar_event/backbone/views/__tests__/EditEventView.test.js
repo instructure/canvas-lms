@@ -163,6 +163,14 @@ describe('EditEventView', () => {
       ).toBeInTheDocument()
     })
 
+    it('is shown in a k5 homeroom', () => {
+      window.ENV.K5_HOMEROOM_COURSE = true
+      render()
+      expect(
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+      ).toBeInTheDocument()
+    })
+
     it('is shown and checked in a k5 subject with event already marked as important', () => {
       window.ENV.K5_SUBJECT_COURSE = true
       render({important_dates: true})

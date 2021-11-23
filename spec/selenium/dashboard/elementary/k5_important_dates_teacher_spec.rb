@@ -176,13 +176,14 @@ describe "teacher k5 dashboard important dates" do
       expect(is_checked(calendar_mark_important_dates_selector)).to be_truthy
     end
 
-    it "shows Mark Important dates on Assignment Calendar tab when subject calendar selected", custom_timeout: 20 do
+    it "shows Mark Important dates on Assignment Calendar tab when homeroom and subject calendar selected", custom_timeout: 20 do
       get "/calendar"
 
       click_calendar_add
 
       click_edit_assignment
-      expect(assignment_important_dates_block).not_to be_displayed
+      click_assignment_calendar_subject(@homeroom_course.name)
+      expect(assignment_important_dates_block).to be_displayed
 
       click_assignment_calendar_subject(@subject_course.name)
 
