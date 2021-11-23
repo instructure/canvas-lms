@@ -55,9 +55,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleAnswers do
       expect(answer).to be_present
       expect(answer[:responses]).to eq(1)
     end
-  end
 
-  describe '[:answers][]' do
     describe '[:responses]' do
       it 'counts students who picked this answer' do
         stats = subject.run([{ answer_5514: '1' }])

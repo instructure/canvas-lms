@@ -494,6 +494,68 @@ describe OutcomeResultsController do
           get_rollups(sort_by: 'outcome', sort_outcome_id: 'NaN')
           expect(response).not_to be_successful
         end
+
+        it 'sorts rollups by ascending rollup score' do
+          get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id)
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json['rollups'], [@student2, @student1, @student3])
+          expect_score_order(json['rollups'], [1, 3, nil])
+        end
+
+        it 'sorts rollups by descending rollup score' do
+          get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: 'desc')
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json['rollups'], [@student1, @student2, @student3])
+          expect_score_order(json['rollups'], [3, 1, nil])
+        end
+
+        context 'with pagination' do
+          def expect_students_in_pagination(page, students, scores, sort_order = 'asc')
+            get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: sort_order, per_page: 1, page: page)
+            expect(response).to be_successful
+            json = parse_response(response)
+            expect_user_order(json['rollups'], students)
+            expect_score_order(json['rollups'], scores)
+          end
+
+          context 'ascending' do
+            it 'return student2 in first page' do
+              expect_students_in_pagination(1, [@student2], [1])
+            end
+
+            it 'return student1 in second page' do
+              expect_students_in_pagination(2, [@student1], [3])
+            end
+
+            it 'return student3 in third page' do
+              expect_students_in_pagination(3, [@student3], [nil])
+            end
+
+            it 'return no student in fourth page' do
+              expect_students_in_pagination(4, [], [])
+            end
+          end
+
+          context 'descending' do
+            it 'return student1 in first page' do
+              expect_students_in_pagination(1, [@student1], [3], 'desc')
+            end
+
+            it 'return student2 in second page' do
+              expect_students_in_pagination(2, [@student2], [1], 'desc')
+            end
+
+            it 'return student3 in third page' do
+              expect_students_in_pagination(3, [@student3], [nil], 'desc')
+            end
+
+            it 'return no student in fourth page' do
+              expect_students_in_pagination(4, [], [], 'desc')
+            end
+          end
+        end
       end
 
       def expect_user_order(rollups, users)
@@ -632,70 +694,6 @@ describe OutcomeResultsController do
                 expect_students_in_pagination(4, [], include: ['users'])
                 expect(json['linked']['users'].length).to be 0
               end
-            end
-          end
-        end
-      end
-
-      context 'by outcome' do
-        it 'sorts rollups by ascending rollup score' do
-          get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id)
-          expect(response).to be_successful
-          json = parse_response(response)
-          expect_user_order(json['rollups'], [@student2, @student1, @student3])
-          expect_score_order(json['rollups'], [1, 3, nil])
-        end
-
-        it 'sorts rollups by descending rollup score' do
-          get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: 'desc')
-          expect(response).to be_successful
-          json = parse_response(response)
-          expect_user_order(json['rollups'], [@student1, @student2, @student3])
-          expect_score_order(json['rollups'], [3, 1, nil])
-        end
-
-        context 'with pagination' do
-          def expect_students_in_pagination(page, students, scores, sort_order = 'asc')
-            get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: sort_order, per_page: 1, page: page)
-            expect(response).to be_successful
-            json = parse_response(response)
-            expect_user_order(json['rollups'], students)
-            expect_score_order(json['rollups'], scores)
-          end
-
-          context 'ascending' do
-            it 'return student2 in first page' do
-              expect_students_in_pagination(1, [@student2], [1])
-            end
-
-            it 'return student1 in second page' do
-              expect_students_in_pagination(2, [@student1], [3])
-            end
-
-            it 'return student3 in third page' do
-              expect_students_in_pagination(3, [@student3], [nil])
-            end
-
-            it 'return no student in fourth page' do
-              expect_students_in_pagination(4, [], [])
-            end
-          end
-
-          context 'descending' do
-            it 'return student1 in first page' do
-              expect_students_in_pagination(1, [@student1], [3], 'desc')
-            end
-
-            it 'return student2 in second page' do
-              expect_students_in_pagination(2, [@student2], [1], 'desc')
-            end
-
-            it 'return student3 in third page' do
-              expect_students_in_pagination(3, [@student3], [nil], 'desc')
-            end
-
-            it 'return no student in fourth page' do
-              expect_students_in_pagination(4, [], [], 'desc')
             end
           end
         end

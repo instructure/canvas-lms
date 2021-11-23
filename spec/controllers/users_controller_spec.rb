@@ -1797,56 +1797,54 @@ describe UsersController do
       end
     end
 
-    context "across shards" do
-      context "with cross-shard grading periods" do
-        specs_require_sharding
+    context "with cross-shard grading periods" do
+      specs_require_sharding
 
-        let(:test_course) { course_factory(active_all: true) }
-        let(:student1) { user_factory(active_all: true) }
-        let(:student2) { user_factory(active_all: true) }
-        let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
-        let!(:grading_period) do
-          grading_period_group.grading_periods.create!(
+      let(:test_course) { course_factory(active_all: true) }
+      let(:student1) { user_factory(active_all: true) }
+      let(:student2) { user_factory(active_all: true) }
+      let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
+      let!(:grading_period) do
+        grading_period_group.grading_periods.create!(
+          title: "Some Semester",
+          start_date: 3.months.ago,
+          end_date: 2.months.from_now
+        )
+      end
+      let(:assignment_due_in_grading_period) do
+        test_course.assignments.create!(
+          due_at: 10.days.from_now(grading_period.start_date),
+          points_possible: 10
+        )
+      end
+      let(:another_test_course) { course_factory(active_all: true) }
+      let(:test_student) do
+        student = user_factory(active_all: true)
+        course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
+        course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
+        student
+      end
+
+      it 'uses global ids for grading periods' do
+        course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
+        @shard1.activate do
+          account = Account.create!
+          @course2 = course_factory(active_all: true, account: account)
+          course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
+          grading_period_group2 = group_helper.legacy_create_for_course(@course2)
+          @grading_period2 = grading_period_group2.grading_periods.create!(
             title: "Some Semester",
             start_date: 3.months.ago,
             end_date: 2.months.from_now
           )
         end
-        let(:assignment_due_in_grading_period) do
-          test_course.assignments.create!(
-            due_at: 10.days.from_now(grading_period.start_date),
-            points_possible: 10
-          )
-        end
-        let(:another_test_course) { course_factory(active_all: true) }
-        let(:test_student) do
-          student = user_factory(active_all: true)
-          course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
-          course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
-          student
-        end
 
-        it 'uses global ids for grading periods' do
-          course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
-          @shard1.activate do
-            account = Account.create!
-            @course2 = course_factory(active_all: true, account: account)
-            course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
-            grading_period_group2 = group_helper.legacy_create_for_course(@course2)
-            @grading_period2 = grading_period_group2.grading_periods.create!(
-              title: "Some Semester",
-              start_date: 3.months.ago,
-              end_date: 2.months.from_now
-            )
-          end
+        user_session(student1)
 
-          user_session(student1)
-
-          get 'grades'
-          expect(response).to be_successful
-          selected_period_id = assigns[:grading_periods][@course2.id][:selected_period_id]
-          expect(selected_period_id).to eq @grading_period2.id
-        end
+        get 'grades'
+        expect(response).to be_successful
+        selected_period_id = assigns[:grading_periods][@course2.id][:selected_period_id]
+        expect(selected_period_id).to eq @grading_period2.id
       end
     end
 

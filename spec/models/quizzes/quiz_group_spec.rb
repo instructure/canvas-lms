@@ -37,7 +37,7 @@ describe Quizzes::QuizGroup do
   end
 
   describe "#actual_pick_count" do
-    context "with a question bank" do
+    context "with a small question bank" do
       it "returns the correct pick count if there aren't enough questions" do
         course_factory
         quiz = @course.quizzes.create!(:title => "some quiz")

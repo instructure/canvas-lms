@@ -273,7 +273,7 @@ describe GradebookExporter do
         end
       end
 
-      context "when Final Grade Override is not enabled" do
+      context "when Final Grade Override is not enabled on the course" do
         before(:once) do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
@@ -290,7 +290,7 @@ describe GradebookExporter do
         end
       end
 
-      context "when Final Grade Override is not enabled" do
+      context "when Final Grade Override is not enabled as a feature" do
         it "excludes the Override Score headers" do
           actual_headers = CSV.parse(csv, headers: true).headers
           expect(actual_headers).not_to include("Override Grade")

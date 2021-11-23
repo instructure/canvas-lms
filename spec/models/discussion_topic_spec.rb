@@ -2177,6 +2177,10 @@ describe DiscussionTopic do
   end
 
   describe "reply_from" do
+    before(:once) do
+      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
+    end
+
     it "ignores responses in deleted account" do
       account = Account.create!
       @teacher = course_with_teacher(:active_all => true, :account => account).user
@@ -2228,6 +2232,16 @@ describe DiscussionTopic do
       @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
       student_in_course(:course => @course).accept!
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+    end
+
+    it 'returns entry for valid arguments' do
+      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
+      expect(val).to be_a_kind_of DiscussionEntry
+    end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
     end
   end
 
@@ -2556,22 +2570,6 @@ describe DiscussionTopic do
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
       expect(@topic.entries_for_feed(@student, true)).to_not be_empty
-    end
-  end
-
-  describe 'reply_from' do
-    before(:once) do
-      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
-    end
-
-    it 'returns entry for valid arguments' do
-      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
-      expect(val).to be_a_kind_of DiscussionEntry
-    end
-
-    it 'raises InvalidParticipant for invalid participants' do
-      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
     end
   end
 

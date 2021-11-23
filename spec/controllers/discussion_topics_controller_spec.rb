@@ -1012,9 +1012,7 @@ describe DiscussionTopicsController do
       get 'new', params: { :course_id => @course.id }
       expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
     end
-  end
 
-  describe "GET 'new'" do
     it "creates a default assignment group if none exist" do
       user_session(@teacher)
       get :new, params: { course_id: @course.id }

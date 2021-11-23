@@ -705,12 +705,12 @@ describe Attachment do
       end
     end
 
-    context "s3" do
+    context "s3 storage" do
       include_examples "purgatory"
       before { s3_storage! }
     end
 
-    context "s3" do
+    context "local storage" do
       include_examples "purgatory"
       before { local_storage! }
     end

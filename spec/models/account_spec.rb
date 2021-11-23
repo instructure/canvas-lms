@@ -861,6 +861,38 @@ describe Account do
         expect(@course.grants_right?(@user, :read_sis)).to eq true
       end
     end
+
+    it "returns sub account ids recursively when another shard is active" do
+      a = Account.default
+      subs = []
+      sub = Account.create!(name: 'sub', parent_account: a)
+      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
+      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
+      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+      @shard1.activate do
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
+      end
+    end
+
+    it "properly returns site admin permissions regardless of active shard" do
+      enable_cache do
+        user_factory
+        site_admin = Account.site_admin
+        site_admin.account_users.create!(user: @user)
+
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+
+        user_factory
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
+      end
+    end
   end
 
   # TODO: deprecated; need to look into removing this setting
@@ -937,22 +969,6 @@ describe Account do
     subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
     expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
-  end
-
-  context "sharding" do
-    specs_require_sharding
-    it "returns sub account ids recursively when another shard is active" do
-      a = Account.default
-      subs = []
-      sub = Account.create!(name: 'sub', parent_account: a)
-      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
-      @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
-        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
-      end
-    end
   end
 
   it "returns the correct user count" do
@@ -1268,29 +1284,6 @@ describe Account do
       user_factory
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
-    end
-  end
-
-  context "sharding" do
-    specs_require_sharding
-
-    it "properly returns site admin permissions regardless of active shard" do
-      enable_cache do
-        user_factory
-        site_admin = Account.site_admin
-        site_admin.account_users.create!(user: @user)
-
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-
-        user_factory
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-      end
     end
   end
 

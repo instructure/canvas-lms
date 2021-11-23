@@ -958,7 +958,7 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.visible_enrollments_for' do
+  describe '.visible_enrollments_for basic cases' do
     before do
       @override = assignment_override_model
       @overrides = [@override]

@@ -157,6 +157,99 @@ describe CoursesController do
         expect(assigns[:past_enrollments]).to eql([])
         expect(assigns[:future_enrollments]).to eql([])
       end
+
+      it "includes courses with no applicable start/end dates" do
+        # no dates at all
+        enrollment1 = student_in_course active_all: true, course_name: 'A'
+
+        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.from_now,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'B'
+        course2.offer!
+        enrollment2 = student_in_course user: @student, course: course2, active_all: true
+
+        # future date that doesn't count
+        course3 = Account.default.courses.create! start_at: 1.week.from_now, conclude_at: 2.weeks.from_now,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'C'
+        course3.offer!
+        enrollment3 = student_in_course user: @student, course: course3, active_all: true
+
+        user_session(@student)
+        get_index
+        expect(response).to be_successful
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "includes courses with current start/end dates" do
+        course1 = Account.default.courses.create! start_at: 1.week.ago, conclude_at: 1.week.from_now,
+                                                  restrict_enrollments_to_course_dates: true,
+                                                  name: 'A'
+        course1.offer!
+        enrollment1 = student_in_course course: course1
+
+        enrollment2 = course_with_student user: @student, course_name: 'B', active_all: true
+        current_term = Account.default.enrollment_terms.create! name: 'current term', start_at: 1.month.ago, end_at: 1.month.from_now
+        enrollment2.course.enrollment_term = current_term
+        enrollment2.course.save!
+
+        user_session(@student)
+        get_index
+        expect(response).to be_successful
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "includes 'invited' enrollments, and list them before 'active'" do
+        enrollment1 = course_with_student course_name: 'Z'
+        @student.register!
+        @course.offer!
+        enrollment1.invite!
+
+        enrollment2 = course_with_student user: @student, course_name: 'A', active_all: true
+
+        user_session(@student)
+        get_index
+        expect(response).to be_successful
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "includes unpublished courses" do
+        enrollment = course_with_student
+        expect(@course).to be_unpublished
+        enrollment.invite!
+
+        user_session(@student)
+        get_index
+        expect(response).to be_successful
+        expect(assigns[:past_enrollments]).to be_empty
+        expect(assigns[:current_enrollments]).to eq [enrollment]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      describe "unpublished_courses" do
+        it "lists unpublished courses after published" do
+          # unpublished course
+          course1 = Account.default.courses.create! name: 'A'
+          enrollment1 = course_with_student user: @student, course: course1
+          enrollment1.invite!
+          expect(course1).to be_unpublished
+
+          # published course
+          course2 = Account.default.courses.create! name: 'Z'
+          course2.offer!
+          course_with_student course: course2, user: @student, active_all: true
+
+          user_session(@student)
+          get_index
+          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
+        end
+      end
     end
 
     describe 'past_enrollments' do
@@ -422,101 +515,6 @@ describe CoursesController do
           user_session(@student)
           get_index
           expect(assigns[:past_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
-        end
-      end
-    end
-
-    describe 'current_enrollments' do
-      it "includes courses with no applicable start/end dates" do
-        # no dates at all
-        enrollment1 = student_in_course active_all: true, course_name: 'A'
-
-        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.from_now,
-                                                  restrict_enrollments_to_course_dates: false,
-                                                  name: 'B'
-        course2.offer!
-        enrollment2 = student_in_course user: @student, course: course2, active_all: true
-
-        # future date that doesn't count
-        course3 = Account.default.courses.create! start_at: 1.week.from_now, conclude_at: 2.weeks.from_now,
-                                                  restrict_enrollments_to_course_dates: false,
-                                                  name: 'C'
-        course3.offer!
-        enrollment3 = student_in_course user: @student, course: course3, active_all: true
-
-        user_session(@student)
-        get_index
-        expect(response).to be_successful
-        expect(assigns[:past_enrollments]).to be_empty
-        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
-        expect(assigns[:future_enrollments]).to be_empty
-      end
-
-      it "includes courses with current start/end dates" do
-        course1 = Account.default.courses.create! start_at: 1.week.ago, conclude_at: 1.week.from_now,
-                                                  restrict_enrollments_to_course_dates: true,
-                                                  name: 'A'
-        course1.offer!
-        enrollment1 = student_in_course course: course1
-
-        enrollment2 = course_with_student user: @student, course_name: 'B', active_all: true
-        current_term = Account.default.enrollment_terms.create! name: 'current term', start_at: 1.month.ago, end_at: 1.month.from_now
-        enrollment2.course.enrollment_term = current_term
-        enrollment2.course.save!
-
-        user_session(@student)
-        get_index
-        expect(response).to be_successful
-        expect(assigns[:past_enrollments]).to be_empty
-        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
-        expect(assigns[:future_enrollments]).to be_empty
-      end
-
-      it "includes 'invited' enrollments, and list them before 'active'" do
-        enrollment1 = course_with_student course_name: 'Z'
-        @student.register!
-        @course.offer!
-        enrollment1.invite!
-
-        enrollment2 = course_with_student user: @student, course_name: 'A', active_all: true
-
-        user_session(@student)
-        get_index
-        expect(response).to be_successful
-        expect(assigns[:past_enrollments]).to be_empty
-        expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
-        expect(assigns[:future_enrollments]).to be_empty
-      end
-
-      it "includes unpublished courses" do
-        enrollment = course_with_student
-        expect(@course).to be_unpublished
-        enrollment.invite!
-
-        user_session(@student)
-        get_index
-        expect(response).to be_successful
-        expect(assigns[:past_enrollments]).to be_empty
-        expect(assigns[:current_enrollments]).to eq [enrollment]
-        expect(assigns[:future_enrollments]).to be_empty
-      end
-
-      describe "unpublished_courses" do
-        it "lists unpublished courses after published" do
-          # unpublished course
-          course1 = Account.default.courses.create! name: 'A'
-          enrollment1 = course_with_student user: @student, course: course1
-          enrollment1.invite!
-          expect(course1).to be_unpublished
-
-          # published course
-          course2 = Account.default.courses.create! name: 'Z'
-          course2.offer!
-          course_with_student course: course2, user: @student, active_all: true
-
-          user_session(@student)
-          get_index
-          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
         end
       end
     end

@@ -118,7 +118,7 @@ describe "syllabus" do
     end
   end
 
-  context "as an authenticated non-course user" do
+  context "as an authenticated non-course user for authenticated file verifiers" do
     before do
       user_factory(active_all: true)
       user_session(@user)

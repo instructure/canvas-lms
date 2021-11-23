@@ -188,65 +188,99 @@ describe Enrollment do
   end
 
   describe '#destroy' do
-    before(:once) do
-      @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
-      assignment = @course.assignments.create!
-      @override = assignment.assignment_overrides.create!
-      @override.assignment_override_students.create!(user: @enrollment.user)
-    end
-
-    let(:override_student) { @override.assignment_override_students.unscope(:where).find_by(user_id: @enrollment.user) }
-
-    it 'does not destroy assignment override students on the user if other enrollments' \
-       'for the user exist in the course' do
-      @course.enroll_user(
-        @enrollment.user,
-        'StudentEnrollment',
-        section: @course.course_sections.create!,
-        allow_multiple_enrollments: true
-      )
-      @enrollment.destroy
-      expect(override_student).to be_present
-      expect(override_student).to be_active
-    end
-
-    it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
-      @enrollment.destroy
-      expect(override_student).to be_deleted
-    end
-
-    context 'when the user is a final grader' do
+    context "with overrides" do
       before(:once) do
-        @teacher = User.create!
-        @another_teacher = User.create!
-        @course.enroll_teacher(@teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
-        @course.enroll_teacher(@another_teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
-        2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher, grader_count: 2) }
-        @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher, grader_count: 2)
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        assignment = @course.assignments.create!
+        @override = assignment.assignment_overrides.create!
+        @override.assignment_override_students.create!(user: @enrollment.user)
       end
 
-      it 'removes the user as final grader from all course assignments' do
-        expect { @course.enrollments.find_by!(user: @teacher).destroy }.to change {
-          @course.assignments.order(:created_at).pluck(:final_grader_id)
-        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id]).to([nil, nil, nil, @another_teacher.id])
+      let(:override_student) { @override.assignment_override_students.unscope(:where).find_by(user_id: @enrollment.user) }
+
+      it 'does not destroy assignment override students on the user if other enrollments for the user exist in the course' do
+        @course.enroll_user(
+          @enrollment.user,
+          'StudentEnrollment',
+          section: @course.course_sections.create!,
+          allow_multiple_enrollments: true
+        )
+        @enrollment.destroy
+        expect(override_student).to be_present
+        expect(override_student).to be_active
       end
 
-      it 'does not remove the user as final grader from assignments if the user ' \
-         'has other active enrollments of the same type' do
-        section_one = @course.course_sections.create!
-        @course.enroll_teacher(@teacher, active_all: true, allow_multiple_enrollments: true, section: section_one)
-        expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
-          @course.assignments.order(:created_at).pluck(:final_grader_id)
-        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+      it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
+        @enrollment.destroy
+        expect(override_student).to be_deleted
       end
 
-      it 'does not remove the user as final grader from assignments if the user ' \
-         'has other active instructor enrollments' do
-        @course.enroll_ta(@teacher, active_all: true, allow_multiple_enrollments: true)
-        expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
-          @course.assignments.order(:created_at).pluck(:final_grader_id)
-        }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+      context 'when the user is a final grader' do
+        before(:once) do
+          @teacher = User.create!
+          @another_teacher = User.create!
+          @course.enroll_teacher(@teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
+          @course.enroll_teacher(@another_teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
+          2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher, grader_count: 2) }
+          @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher, grader_count: 2)
+        end
+
+        it 'removes the user as final grader from all course assignments' do
+          expect { @course.enrollments.find_by!(user: @teacher).destroy }.to change {
+            @course.assignments.order(:created_at).pluck(:final_grader_id)
+          }.from([nil, @teacher.id, @teacher.id, @another_teacher.id]).to([nil, nil, nil, @another_teacher.id])
+        end
+
+        it 'does not remove the user as final grader from assignments if the user has other active enrollments of the same type' do
+          section_one = @course.course_sections.create!
+          @course.enroll_teacher(@teacher, active_all: true, allow_multiple_enrollments: true, section: section_one)
+          expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
+            @course.assignments.order(:created_at).pluck(:final_grader_id)
+          }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+        end
+
+        it 'does not remove the user as final grader from assignments if the user has other active instructor enrollments' do
+          @course.enroll_ta(@teacher, active_all: true, allow_multiple_enrollments: true)
+          expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
+            @course.assignments.order(:created_at).pluck(:final_grader_id)
+          }.from([nil, @teacher.id, @teacher.id, @another_teacher.id])
+        end
       end
+    end
+
+    it "updates user_account_associations" do
+      course_with_teacher(:active_all => 1)
+      expect(@user.associated_accounts).to eq [Account.default]
+      @enrollment.destroy
+      expect(@user.associated_accounts.reload).to eq []
+    end
+
+    it "removes assignment overrides if they are only linked to this enrollment" do
+      course_with_student
+      assignment = assignment_model(:course => @course)
+      ao = AssignmentOverride.new
+      ao.assignment = assignment
+      ao.title = "ADHOC OVERRIDE"
+      ao.workflow_state = "active"
+      ao.set_type = "ADHOC"
+      ao.save!
+      assignment.reload
+      override_student = ao.assignment_override_students.build
+      override_student.user = @user
+      override_student.save!
+
+      expect(ao.workflow_state).to eq("active")
+      @user.enrollments.destroy_all
+
+      ao.reload
+      expect(ao.workflow_state).to eq("deleted")
+    end
+
+    it "destroys associated scores" do
+      @enrollment.save
+      score = @enrollment.scores.create!
+      @enrollment.destroy
+      expect(score.reload).to be_deleted
     end
   end
 
@@ -1200,6 +1234,31 @@ describe Enrollment do
       expect(@course.grants_right?(@enrollment.user, :read)).to eql(true)
       expect(@course.grants_right?(@enrollment.user, :post_to_forum)).to eql(false)
     end
+
+    it "grants read rights to account members with the ability to read_roster" do
+      role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
+      user = account_admin_user(:role => role)
+      RoleOverride.create!(:context => Account.default, :permission => :read_roster,
+                           :role => role, :enabled => true)
+      @enrollment.save
+
+      expect(@enrollment.user.grants_right?(user, :read)).to eq false
+      expect(@enrollment.grants_right?(user, :read)).to eq true
+    end
+
+    it "is able to read grades if the course grants management rights to the enrollment" do
+      @new_user = user_model
+      @enrollment.save
+      expect(@enrollment.grants_right?(@new_user, :read_grades)).to be_falsey
+      @course.enroll_teacher(@new_user)
+      @enrollment.reload
+      AdheresToPolicy::Cache.clear
+      expect(@enrollment.grants_right?(@user, :read_grades)).to be_truthy
+    end
+
+    it "allows the user itself to read its own grades" do
+      expect(@enrollment.grants_right?(@user, :read_grades)).to be_truthy
+    end
   end
 
   context "typed_enrollment" do
@@ -1412,33 +1471,6 @@ describe Enrollment do
     it "links to the enrollment" do
       link_path = @enrollment.to_atom.links.first.to_s
       expect(link_path).to eql("/courses/#{@enrollment.course.id}/enrollments/#{@enrollment.id}")
-    end
-  end
-
-  context "permissions" do
-    it "grants read rights to account members with the ability to read_roster" do
-      role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
-      user = account_admin_user(:role => role)
-      RoleOverride.create!(:context => Account.default, :permission => :read_roster,
-                           :role => role, :enabled => true)
-      @enrollment.save
-
-      expect(@enrollment.user.grants_right?(user, :read)).to eq false
-      expect(@enrollment.grants_right?(user, :read)).to eq true
-    end
-
-    it "is able to read grades if the course grants management rights to the enrollment" do
-      @new_user = user_model
-      @enrollment.save
-      expect(@enrollment.grants_right?(@new_user, :read_grades)).to be_falsey
-      @course.enroll_teacher(@new_user)
-      @enrollment.reload
-      AdheresToPolicy::Cache.clear
-      expect(@enrollment.grants_right?(@user, :read_grades)).to be_truthy
-    end
-
-    it "allows the user itself to read its own grades" do
-      expect(@enrollment.grants_right?(@user, :read_grades)).to be_truthy
     end
   end
 
@@ -2688,43 +2720,6 @@ describe Enrollment do
           end
         end
       end
-    end
-  end
-
-  describe "#destroy" do
-    it "updates user_account_associations" do
-      course_with_teacher(:active_all => 1)
-      expect(@user.associated_accounts).to eq [Account.default]
-      @enrollment.destroy
-      expect(@user.associated_accounts.reload).to eq []
-    end
-
-    it "removes assignment overrides if they are only linked to this enrollment" do
-      course_with_student
-      assignment = assignment_model(:course => @course)
-      ao = AssignmentOverride.new
-      ao.assignment = assignment
-      ao.title = "ADHOC OVERRIDE"
-      ao.workflow_state = "active"
-      ao.set_type = "ADHOC"
-      ao.save!
-      assignment.reload
-      override_student = ao.assignment_override_students.build
-      override_student.user = @user
-      override_student.save!
-
-      expect(ao.workflow_state).to eq("active")
-      @user.enrollments.destroy_all
-
-      ao.reload
-      expect(ao.workflow_state).to eq("deleted")
-    end
-
-    it "destroys associated scores" do
-      @enrollment.save
-      score = @enrollment.scores.create!
-      @enrollment.destroy
-      expect(score.reload).to be_deleted
     end
   end
 

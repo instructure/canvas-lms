@@ -166,6 +166,8 @@ describe "discussions" do
     end
 
     context "as a student" do
+      let(:account) { course.account }
+
       before do
         user_session(student)
       end
@@ -255,14 +257,6 @@ describe "discussions" do
             end
           end
         end
-      end
-    end
-
-    context "as a student" do
-      let(:account) { course.account }
-
-      before do
-        user_session(student)
       end
 
       context 'in an account group' do

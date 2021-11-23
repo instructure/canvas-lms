@@ -268,7 +268,7 @@ shared_examples_for "advantage services" do
     end
 
     # another negative test, this time where :course and :tool are in completely disjoint account hierarchy branches
-    context 'with course attached to sub-account and tool attached to another sub-account thereof' do
+    context 'with course attached to sub-account and tool attached to another sub-account' do
       # child 1
       let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
       # child 2

@@ -316,7 +316,7 @@ describe Rubric do
     expect(r3.title).to eql "rubric"
   end
 
-  context "#update_with_association" do
+  context "#update_with_association group 1" do
     before :once do
       course_with_teacher
       assignment_model(points_possible: 20)
