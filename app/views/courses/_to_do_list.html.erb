@@ -41,7 +41,7 @@ show_legacy_todo_list ||= false
           <a
             class="item"
             href="<%= assignment.gradebook_path %>"
-            target="_blank"
+            <% if @current_user.feature_enabled?(:open_todos_in_new_tab) %>target="_blank"<% end %>
             data-track-category="dashboard"
             data-track-label="todo needs grading"
           >

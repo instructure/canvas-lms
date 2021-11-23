@@ -537,7 +537,8 @@ class UsersController < ApplicationController
                CAN_ADD_OBSERVEE: @current_user
                           .profile
                           .tabs_available(@current_user, :root_account => @domain_root_account)
-                          .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                          .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
+               OPEN_TEACHER_TODOS_IN_NEW_TAB: @current_user.feature_enabled?(:open_todos_in_new_tab)
              })
 
       # prefetch dashboard cards with the right observer url param

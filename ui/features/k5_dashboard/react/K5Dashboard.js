@@ -141,7 +141,8 @@ export const K5Dashboard = ({
   selectedContextsLimit,
   parentSupportEnabled,
   observerList,
-  canAddObservee
+  canAddObservee,
+  openTodosInNewTab
 }) => {
   const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -372,7 +373,11 @@ export const K5Dashboard = ({
               />
             )}
             {currentUserRoles.includes('teacher') && (
-              <TodosPage timeZone={timeZone} visible={currentTab === TAB_IDS.TODO} />
+              <TodosPage
+                timeZone={timeZone}
+                openTodosInNewTab={openTodosInNewTab}
+                visible={currentTab === TAB_IDS.TODO}
+              />
             )}
           </K5DashboardContext.Provider>
         </Flex.Item>
@@ -421,7 +426,8 @@ K5Dashboard.propTypes = {
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
-  canAddObservee: PropTypes.bool.isRequired
+  canAddObservee: PropTypes.bool.isRequired,
+  openTodosInNewTab: PropTypes.bool.isRequired
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
