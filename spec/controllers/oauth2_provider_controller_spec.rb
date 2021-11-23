@@ -378,25 +378,25 @@ describe OAuth2ProviderController do
             expect(subject).to redirect_to('https://example.com?error=invalid_client&error_description=unknown+client')
           end
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is missing' do
           let(:client_id) { nil }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is not found' do
           let(:client_id) { 0 }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is not an integer' do
           let(:client_id) { 'a' }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
       end
 
@@ -406,7 +406,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            expect(subject).to have_http_status(302)
+            expect(subject).to have_http_status(:found)
           end
         end
 
@@ -415,7 +415,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            expect(subject).to have_http_status(302)
+            expect(subject).to have_http_status(:found)
           end
         end
       end
@@ -424,7 +424,7 @@ describe OAuth2ProviderController do
         let(:before_post) { success_setup }
         let(:overrides) { success_params }
 
-        it { is_expected.to have_http_status(200) }
+        it { is_expected.to have_http_status(:ok) }
 
         it 'outputs the token json if everything checks out' do
           json = JSON.parse(response.body)
@@ -435,7 +435,7 @@ describe OAuth2ProviderController do
         context 'with global_id as client_id' do
           let(:client_id) { key.global_id }
 
-          it { is_expected.to have_http_status(200) }
+          it { is_expected.to have_http_status(:ok) }
         end
       end
 
@@ -451,7 +451,7 @@ describe OAuth2ProviderController do
         context 'missing grant_type' do
           let(:grant_type) { nil }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
       end
     end
@@ -613,7 +613,7 @@ describe OAuth2ProviderController do
         context 'with aud as an array' do
           let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host'), 'doesnotexist'] }
 
-          it { is_expected.to have_http_status 200 }
+          it { is_expected.to have_http_status :ok }
         end
 
         context 'with a port in the aud' do
@@ -621,13 +621,13 @@ describe OAuth2ProviderController do
 
           before { request.host = 'test.host:3000' }
 
-          it { is_expected.to have_http_status 200 }
+          it { is_expected.to have_http_status :ok }
         end
 
         context 'with bad exp' do
           let(:exp) { 1.minute.ago.to_i }
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
         end
 
         context 'with iat in the future by a small amount' do
@@ -636,7 +636,7 @@ describe OAuth2ProviderController do
 
           it 'returns an access token' do
             Timecop.freeze(future_iat_time - 5.seconds) do
-              expect(subject).to have_http_status 200
+              expect(subject).to have_http_status :ok
             end
           end
         end
@@ -644,12 +644,12 @@ describe OAuth2ProviderController do
         context 'with bad iat' do
           let(:iat) { 1.minute.from_now.to_i }
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
 
           context 'with iat too far in future' do
             let(:iat) { 6.minutes.from_now.to_i }
 
-            it { is_expected.to have_http_status 302 }
+            it { is_expected.to have_http_status :found }
           end
         end
 
@@ -661,7 +661,7 @@ describe OAuth2ProviderController do
             other_key.save!
           end
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
         end
 
         context 'with missing assertion' do
@@ -680,12 +680,12 @@ describe OAuth2ProviderController do
         context 'with same token' do
           it 'returns 200' do
             enable_cache do
-              expect(subject).to have_http_status 200
+              expect(subject).to have_http_status :ok
               Setting.set('oauth.allowed_timestamp_future_skew', 0.seconds)
 
               parameters = { grant_type: 'client_credentials' }.merge(client_credentials_params)
               post :token, params: parameters
-              expect(response).to have_http_status 200
+              expect(response).to have_http_status :ok
             end
           end
         end
@@ -710,7 +710,7 @@ describe OAuth2ProviderController do
               key.save!
             end
 
-            it { is_expected.to have_http_status 200 }
+            it { is_expected.to have_http_status :ok }
           end
         end
       end
