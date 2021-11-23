@@ -19,24 +19,25 @@
 
 # This initializer is for the Sentry exception tracking system.
 #
-# "Raven" is the ruby library that is the client to sentry, and it's
-# config file would be "config/raven.yml". If that config doesn't exist,
+# Sentry's config file would be "config/sentry.yml". If that config doesn't exist,
 # nothing happens.  If it *does*, we register a callback with Canvas::Errors
 # so that every time an exception is reported, we can fire off a sentry
 # call to track it and aggregate it for us.
-settings = ConfigFile.load("raven")
+settings = ConfigFile.load("sentry")
 
 if settings.present?
-  require "raven/base"
-  Raven.configure do |config|
-    config.logger = Rails.logger
-    config.silence_ready = true
+  return if Canvas::Plugin.value_to_boolean(Setting.get("sentry_disabled", "false"))
+
+  Sentry.init do |config|
     config.dsn = settings[:dsn]
-    config.current_environment = Canvas.environment
-    config.tags = settings.fetch(:tags, {}).merge("canvas_revision" => Canvas.revision)
+    config.environment = Canvas.environment
     config.release = Canvas.revision
-    config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
-    config.sanitize_credit_cards = false
+
+    filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+    config.before_send = lambda do |event, _|
+      filter.filter(event.to_hash)
+    end
+
     # this array should only contain exceptions that are intentionally
     # thrown to drive client facing behavior.  A good example
     # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
@@ -52,6 +53,8 @@ if settings.present?
       PG::UnableToSend
     ]
   end
+
+  Sentry.set_tags(settings.fetch(:tags, {}))
 
   Rails.configuration.to_prepare do
     Setting.get("ignorable_errors", "").split(",").each do |error|
