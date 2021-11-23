@@ -412,8 +412,6 @@ RSpec/VariableName:
   Severity: convention
 RSpec/VerifiedDoubles:
   Enabled: false
-RSpec/VoidExpect:
-  Severity: convention
 
 Style/AccessModifierDeclarations:
   Severity: convention
