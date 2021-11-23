@@ -425,9 +425,9 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
       it "does not update the submission's posted_at date when it is already posted" do
         submission.update!(posted_at: 1.day.ago)
-        expect {
+        expect do
           subject.commit_history('url', '77', -1)
-        }.not_to change { submission.reload.posted_at }
+        end.not_to change { submission.reload.posted_at }
       end
     end
   end

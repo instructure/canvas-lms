@@ -28,11 +28,11 @@ describe AuthenticationProvider::SAML::InCommon do
       allow_any_instance_of(AuthenticationProvider::SAML).to receive(:download_metadata).and_return(nil)
     end
 
-    let!(:saml) {
+    let!(:saml) do
       Account.default.authentication_providers.create!(auth_type: 'saml',
                                                        metadata_uri: subject::URN,
                                                        idp_entity_id: 'urn:mace:incommon:myschool.edu')
-    }
+    end
 
     it "does nothing if there aren't any InCommon providers" do
       saml.destroy

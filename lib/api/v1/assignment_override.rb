@@ -138,7 +138,7 @@ module Api::V1::AssignmentOverride
         students = students.uniq if students.is_a?(Array)
 
         # make sure they were all valid
-        found_ids = students.map { |s|
+        found_ids = students.map do |s|
           [
             s.id.to_s,
             s.global_id.to_s,
@@ -147,7 +147,7 @@ module Api::V1::AssignmentOverride
             ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
             ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack('H*')}" if s.pseudonym && s.pseudonym.sis_user_id)
           ]
-        }.flatten.compact
+        end.flatten.compact
         bad_ids = student_ids.map(&:to_s) - found_ids
         errors << "unknown student ids: #{bad_ids.inspect}" unless bad_ids.empty?
       end
@@ -391,10 +391,10 @@ module Api::V1::AssignmentOverride
     # get the student overrides the user can't see and ensure those overrides are included
     visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
     invisible_user_ids = context.enrollments.where.not(:user_id => visible_user_ids).distinct.pluck(:user_id)
-    invisible_override_ids = existing_overrides.select { |ov|
+    invisible_override_ids = existing_overrides.select do |ov|
       ov.set_type == 'ADHOC' &&
         !ov.visible_student_overrides(visible_user_ids)
-    }.map(&:id)
+    end.map(&:id)
     [invisible_user_ids, invisible_override_ids]
   end
 

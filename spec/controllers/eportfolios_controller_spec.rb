@@ -54,12 +54,12 @@ describe EportfoliosController do
 
       let(:fake_signing_secret) { "asdfasdfasdfasdfasdfasdfasdfasdf" }
       let(:fake_encryption_secret) { "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
-      let(:fake_secrets) {
+      let(:fake_secrets) do
         {
           "signing-secret" => fake_signing_secret,
           "encryption-secret" => fake_encryption_secret
         }
-      }
+      end
 
       before do
         allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
@@ -99,10 +99,10 @@ describe EportfoliosController do
     end
 
     it "prevents creation for unverified users if account requires it" do
-      Account.default.tap { |a|
+      Account.default.tap do |a|
         a.settings[:require_confirmed_email] = true
         a.save!
-      }
+      end
 
       user_session(@user)
       post 'create', params: { :eportfolio => { :name => "some portfolio" } }

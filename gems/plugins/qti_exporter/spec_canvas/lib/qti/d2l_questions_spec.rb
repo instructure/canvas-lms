@@ -55,10 +55,10 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:right]
       end
       # compare everything else without the ids
-      hash[:answers].each { |a|
+      hash[:answers].each do |a|
         a.delete(:id)
         a.delete(:match_id)
-      }
+      end
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq D2LExpected::MATCHING
     end

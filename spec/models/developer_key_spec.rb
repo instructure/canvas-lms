@@ -1084,10 +1084,10 @@ describe DeveloperKey do
     let(:asymmetric_keypair) { CanvasSecurity::RSAKeyPair.new.to_jwk }
     let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
 
-    before {
+    before do
       # set up assymetric key
       allow(Canvas::OAuth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
-    }
+    end
 
     it "defaults to internal symmetric encryption with no audience set" do
       expect(subject.client_credentials_audience).to be_nil

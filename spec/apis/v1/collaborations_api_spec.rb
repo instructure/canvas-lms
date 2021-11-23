@@ -139,12 +139,12 @@ describe CollaborationsController, type: :request do
     end
 
     let(:url) { "/api/v1/collaborations/#{@collaboration.to_param}/members.json" }
-    let(:url_options) {
+    let(:url_options) do
       { :controller => 'collaborations',
         :action => 'members',
         :id => @collaboration.to_param,
         :format => 'json' }
-    }
+    end
 
     describe 'a group member' do
       it 'sees group members' do

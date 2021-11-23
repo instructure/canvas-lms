@@ -71,7 +71,7 @@ RSpec.describe "Api::V1::Outcome" do
       end
 
       let(:check_outcome_json) do
-        ->(outcome) do
+        lambda do |outcome|
           expect(outcome['title']).to eq(outcome_params[:title])
           expect(outcome['calculation_method']).to eq(outcome_params[:calculation_method])
           expect(outcome['calculation_int']).to eq(outcome_params[:calculation_int])
@@ -133,7 +133,7 @@ RSpec.describe "Api::V1::Outcome" do
 
     context "outcome links json" do
       let(:check_outcome_link_json) do
-        ->(outcome, course, outcome_link) do
+        lambda do |outcome, course, outcome_link|
           expect(outcome_link['outcome']['id']).to eq(outcome.id)
           expect(outcome_link['outcome']['title']).to eq(outcome_params[:title])
           expect(outcome_link['outcome']['vendor_guid']).to eq(outcome_params[:vendor_guid])

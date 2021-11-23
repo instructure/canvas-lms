@@ -433,9 +433,9 @@ describe ContentMigration do
       it "does not copy the attachment if the assignment does not allow annotations" do
         source_assignment.update!(submission_types: "online_text_entry")
 
-        expect {
+        expect do
           run_course_copy
-        }.not_to change {
+        end.not_to change {
           copied_annotation_attachments.count
         }
       end

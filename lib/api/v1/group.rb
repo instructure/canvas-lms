@@ -61,13 +61,13 @@ module Api::V1::Group
       end
 
       # TODO: this should be switched to user_display_json
-      hash['users'] = users.map { |u|
+      hash['users'] = users.map do |u|
         json = user_json(u, user, session)
         if options[:include_inactive_users] && active_user_ids
           json['active'] = active_user_ids.include?(u.id)
         end
         json
-      }
+      end
     end
     if includes.include?('group_category')
       hash['group_category'] = group.group_category && group_category_json(group.group_category, user, session)

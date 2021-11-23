@@ -37,7 +37,7 @@ class CourseSection < ActiveRecord::Base
   has_many :course_account_associations
   has_many :calendar_events, :as => :context, :inverse_of => :context
   has_many :assignment_overrides, :as => :set, :dependent => :destroy
-  has_many :discussion_topic_section_visibilities, -> {
+  has_many :discussion_topic_section_visibilities, lambda {
     where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
   }, dependent: :destroy
   has_many :discussion_topics, :through => :discussion_topic_section_visibilities
@@ -175,11 +175,11 @@ class CourseSection < ActiveRecord::Base
     given { |user, session| course.grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
-    given { |user, session|
+    given do |user, session|
       user &&
         course.sections_visible_to(user).where(:id => self).exists? &&
         course.grants_right?(user, session, :read_roster)
-    }
+    end
     can :read
 
     given { |user, session| course.grants_right?(user, session, :manage_grades) }
@@ -395,7 +395,7 @@ class CourseSection < ActiveRecord::Base
 
   scope :active, -> { where("course_sections.workflow_state<>'deleted'") }
 
-  scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
+  scope :sis_sections, ->(account, *source_ids) { where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 
   def common_to_users?(users)
     users.all? { |user| student_enrollments.active.for_user(user).exists? }

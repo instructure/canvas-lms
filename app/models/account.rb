@@ -122,10 +122,10 @@ class Account < ActiveRecord::Base
     sql, conds = [], []
     contexts = additional_contexts + account_chain
     contexts.delete(self) unless include_self
-    contexts.each { |c|
+    contexts.each do |c|
       sql << "context_type = ? AND context_id = ?"
       conds += [c.class.to_s, c.id]
-    }
+    end
     conds.unshift(sql.join(" OR "))
     AssessmentQuestionBank.where(conds)
   end
@@ -178,9 +178,9 @@ class Account < ActiveRecord::Base
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
   validates :workflow_state, presence: true
-  validate :no_active_courses, if: lambda { |a| a.workflow_state_changed? && !a.active? }
-  validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
-  validate :validate_help_links, if: lambda { |a| a.settings_changed? }
+  validate :no_active_courses, if: ->(a) { a.workflow_state_changed? && !a.active? }
+  validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
+  validate :validate_help_links, if: ->(a) { a.settings_changed? }
   validate :validate_course_template, if: ->(a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
 
   include StickySisFields
@@ -1145,11 +1145,11 @@ class Account < ActiveRecord::Base
     account_roles = available_custom_account_roles(include_inactive)
     account_roles << Role.get_built_in_role('AccountAdmin', root_account_id: resolved_root_account_id)
     if user
-      account_roles.select! { |role|
+      account_roles.select! do |role|
         au = account_users.new
         au.role_id = role.id
         au.grants_right?(user, :create)
-      }
+      end
     end
     account_roles
   end
@@ -1247,10 +1247,10 @@ class Account < ActiveRecord::Base
       shard.activate do
         all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
           # this is a plain ruby hash to keep the cached portion as small as possible
-          account_users.active.each_with_object({}) { |au, result|
+          account_users.active.each_with_object({}) do |au, result|
             result[au.user_id] ||= []
             result[au.user_id] << [au.id, au.role_id]
-          }
+          end
         end
         (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
           au = AccountUser.new
@@ -2010,7 +2010,7 @@ class Account < ActiveRecord::Base
   scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
   scope :non_root_accounts, -> { where.not(root_account_id: [0, nil]) }
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
-  scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
+  scope :name_like, ->(name) { where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
 
   def self.resolved_root_account_id_sql(table = table_name)
@@ -2071,7 +2071,7 @@ class Account < ActiveRecord::Base
   end
 
   def create_default_objects
-    work = -> do
+    work = lambda do
       default_enrollment_term
       enable_canvas_authentication
       TermsOfService.ensure_terms_for_account(self, true) if root_account? && !TermsOfService.skip_automatic_terms_creation
@@ -2135,10 +2135,10 @@ class Account < ActiveRecord::Base
     User.where(id: user_account_associations.select(:user_id))
         .where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%")
         .find_in_batches do |batch|
-      users = batch.reject { |user|
+      users = batch.reject do |user|
         user.preferences[:dashboard_view].nil? ||
           user.dashboard_view(self) == default_dashboard_view
-      }
+      end
       users.each do |user|
         user.preferences.delete(:dashboard_view)
         user.save!

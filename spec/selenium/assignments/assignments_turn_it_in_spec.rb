@@ -76,12 +76,12 @@ describe "assignments turn it in" do
 
   it "creates turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
-    expect {
+    # although we "saved" the dialog, we haven't actually posted anything yet
+expect do
       get "/courses/#{@course.id}/assignments/new"
       f('#assignment_name').send_keys('test assignment')
       change_turnitin_settings
-    }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
-
+    end.to_not change { Assignment.count }
     expect_new_page_load { submit_form('#edit_assignment_form') }
     expect(Assignment.last.turnitin_settings).to eq expected_settings
   end

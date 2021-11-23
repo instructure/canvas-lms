@@ -218,14 +218,14 @@ module PostgreSQLAdapterExtensions
     checks = []
 
     if options.is_a?(Hash)
-      checks << lambda { |i| i.name == options[:name].to_s } if options.key?(:name)
+      checks << ->(i) { i.name == options[:name].to_s } if options.key?(:name)
       column_names = index_column_names(options[:column])
     else
       column_names = index_column_names(options)
     end
 
     if column_names.present?
-      checks << lambda { |i| index_name(table_name, i.columns) == index_name(table_name, column_names) }
+      checks << ->(i) { index_name(table_name, i.columns) == index_name(table_name, column_names) }
     end
 
     raise ArgumentError, "No name or columns specified" if checks.none?

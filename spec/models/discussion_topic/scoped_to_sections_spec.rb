@@ -42,17 +42,17 @@ describe DiscussionTopic::ScopedToSections do
       let(:consumer) { double }
 
       it 'fails' do
-        expect {
+        expect do
           described_class.for(consumer, context, user, scope)
-        }.to raise_error "Invalid consumer #{consumer.class}"
+        end.to raise_error "Invalid consumer #{consumer.class}"
       end
     end
   end
 
   describe '#scope' do
-    let_once(:announcement) {
+    let_once(:announcement) do
       context.announcements.create!(:user => @teacher, message: 'hello')
-    }
+    end
     let_once(:scope) { context.active_announcements }
 
     context 'with an instructor' do

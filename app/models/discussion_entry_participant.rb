@@ -190,7 +190,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   scope :read, -> { where(:workflow_state => 'read') }
-  scope :existing_participants, ->(user, entry_id) {
+  scope :existing_participants, lambda { |user, entry_id|
     select([:id, :discussion_entry_id])
       .where(user_id: user, discussion_entry_id: entry_id)
   }

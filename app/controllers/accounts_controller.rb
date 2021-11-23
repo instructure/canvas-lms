@@ -393,10 +393,10 @@ class AccountsController < ApplicationController
         @redirect_on_unauth = true
         return course_user_search
       end
-      format.json {
+      format.json do
         render :json => account_json(@account, @current_user, session, params[:includes] || [],
                                      !@account.grants_right?(@current_user, session, :manage))
-      }
+      end
     end
   end
 

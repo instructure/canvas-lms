@@ -62,14 +62,14 @@ module CsvDiff
     protected
 
     def insert(table, row1, csv, header_order)
-      add = ->(row) {
+      add = lambda do |row|
         # We need to turn this row into an array of known order, so that fields
         # are guaranteed to be in the same order from both csvs.
         key = Marshal.dump(row.fields(*@key_fields))
         fields = row.fields(*header_order)
         data = Marshal.dump(fields)
         @db.execute("insert or replace into #{table} (key, data) values (?, ?)", [key, data])
-      }
+      end
 
       add.call(row1)
       csv.each { |row| add.call(row) }

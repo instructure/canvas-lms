@@ -1656,13 +1656,13 @@ class UsersController < ApplicationController
       end
 
       respond_to do |format|
-        format.json {
+        format.json do
           if user.save
             render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
           else
             render(json: user.errors, status: :bad_request)
           end
-        }
+        end
       end
     end
   end

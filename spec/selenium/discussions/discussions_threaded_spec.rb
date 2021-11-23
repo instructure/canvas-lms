@@ -117,11 +117,11 @@ describe "threaded discussions" do
 
     it "allows edits to discussion with replies", priority: "1" do
       reply_depth = 3
-      reply_depth.times { |i|
+      reply_depth.times do |i|
         @topic.discussion_entries.create!(user: @student,
                                           message: "new threaded reply #{i} from student",
                                           parent_entry: DiscussionEntry.last)
-      }
+      end
       Discussion.visit(@course, @topic)
       expect_new_page_load { f('.edit-btn').click }
       edit_topic('edited title', 'edited message')

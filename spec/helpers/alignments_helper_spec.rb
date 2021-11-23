@@ -30,15 +30,15 @@ describe AlignmentsHelper do
     assignment_model
   end
 
-  let_once(:outcome) {
+  let_once(:outcome) do
     @course.created_learning_outcomes.create!(title: 'outcome')
-  }
+  end
 
-  let_once(:account_outcome) {
+  let_once(:account_outcome) do
     @account.created_learning_outcomes.create!(title: 'account outcome!')
-  }
+  end
 
-  let_once(:alignment) {
+  let_once(:alignment) do
     tag = ContentTag.create(
       content: outcome,
       context: outcome.context,
@@ -46,9 +46,9 @@ describe AlignmentsHelper do
     )
     outcome.alignments << tag
     tag
-  }
+  end
 
-  let_once(:graded_alignment) {
+  let_once(:graded_alignment) do
     tag = ContentTag.create(
       content: @assignment,
       context: outcome.context,
@@ -56,7 +56,7 @@ describe AlignmentsHelper do
     )
     outcome.alignments << tag
     tag
-  }
+  end
 
   describe "outcome_alignment_url" do
     context "without an alignment" do
@@ -87,9 +87,9 @@ describe AlignmentsHelper do
     end
 
     context "with an alignment" do
-      let(:string) {
+      let(:string) do
         link_to_outcome_alignment(@course, outcome, alignment)
-      }
+      end
 
       it "does not include an icon-* html class" do
         expect(string.include?('icon-')).to be_truthy
@@ -116,9 +116,9 @@ describe AlignmentsHelper do
       end
 
       it "includes 1 data-* attribute" do
-        expect(html.keys.select { |k|
+        expect(html.keys.select do |k|
           k.include?('data-')
-        }).to include('data-url')
+        end).to include('data-url')
       end
 
       it "is hidden" do
@@ -140,9 +140,9 @@ describe AlignmentsHelper do
       end
 
       it "data-ids & data-url attributes" do
-        expect(html.keys.select { |k|
+        expect(html.keys.select do |k|
           k.include?('data-')
-        }).to include('data-id', 'data-url')
+        end).to include('data-id', 'data-url')
       end
 
       it "is not hidden" do
@@ -161,19 +161,19 @@ describe AlignmentsHelper do
     end
 
     context "with a rubric association" do
-      before(:once) {
+      before(:once) do
         rubric_association_model({
                                    purpose: "grading"
                                  })
-      }
+      end
 
       let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "has html 'data-has-rubric-association' data attritbute" do
-        expect(html.keys.find { |k|
+        expect(html.keys.find do |k|
           k.include?('data-has-rubric-association')
-        }).to be_truthy
+        end).to be_truthy
       end
     end
   end

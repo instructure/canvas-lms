@@ -36,11 +36,11 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
   end
 
   let(:legacy_group_for_sub_account) do
-    ->(sub_account) {
+    lambda do |sub_account|
       group = sub_account.grading_period_groups.build(group_helper.valid_attributes)
       group.save(validate: false)
       group
-    }
+    end
   end
 
   before do

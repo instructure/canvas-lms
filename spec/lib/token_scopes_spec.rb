@@ -58,14 +58,14 @@ describe TokenScopes do
     end
 
     describe "generated_scopes" do
-      let!(:generated_scopes) {
+      let!(:generated_scopes) do
         TokenScopes.all_scopes - [
           TokenScopes::USER_INFO_SCOPE[:scope],
           TokenScopes::CD2_SCOPE[:scope],
           *TokenScopes::LTI_SCOPES.keys,
           *TokenScopes::LTI_HIDDEN_SCOPES.keys
         ]
-      }
+      end
 
       it "formats the scopes with url:http_verb|api_path" do
         generated_scopes.each do |scope|

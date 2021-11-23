@@ -138,9 +138,9 @@ describe GradingPeriodGroup do
     context "when given a course" do
       it "is expected to fail" do
         course = account.courses.create!
-        expect {
+        expect do
           GradingPeriodGroup.for(course)
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
     end
   end

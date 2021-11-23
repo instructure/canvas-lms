@@ -156,14 +156,14 @@ describe SIS::CSV::ImportRefactored do
       ",U008,student,S008S,deleted,",
       ",U009,student,S005S,deleted,"
     )
-    expect {
+    expect do
       process_csv_data_cleanly(
         "group_id,name,account_id,status",
         "G001,Group 1,,available",
         "G002,Group 2,,deleted",
         "G003,Group 3,,closed"
       )
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it 'supports sis stickiness overriding' do
@@ -334,11 +334,11 @@ describe SIS::CSV::ImportRefactored do
   end
 
   it "does not invalidly break up UTF-8 characters" do
-    expect {
+    expect do
       process_csv_data_cleanly(
         File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/utf8.csv"))
       )
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it "ignores BOM chars" do

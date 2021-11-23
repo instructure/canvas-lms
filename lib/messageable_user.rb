@@ -100,10 +100,10 @@ class MessageableUser < User
   end
 
   def self.individual_recipients(recipients)
-    recipients.select { |id|
+    recipients.select do |id|
       !id.is_a?(String) ||
         id =~ Calculator::INDIVIDUAL_RECIPIENT
-    }.map(&:to_i)
+    end.map(&:to_i)
   end
 
   def common_groups

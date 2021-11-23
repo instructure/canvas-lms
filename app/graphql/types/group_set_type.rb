@@ -65,7 +65,7 @@ module Types
 
     field :groups_connection, GroupType.connection_type, null: true
     def groups_connection
-      Loaders::AssociationLoader.for(GroupCategory, :context).load(set).then {
+      Loaders::AssociationLoader.for(GroupCategory, :context).load(set).then do
         # this permission matches the REST api, but is probably too strict.
         # students are able to see groups in the canvas ui, so probably should
         # be able to see them here too
@@ -74,7 +74,7 @@ module Types
         else
           nil
         end
-      }
+      end
     end
 
     field :sis_id, String, null: true

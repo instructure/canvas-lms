@@ -61,7 +61,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy, inverse_of: :discussion_topic
   has_many :discussion_entry_drafts, dependent: :destroy, inverse_of: :discussion_topic
-  has_many :rated_discussion_entries, -> {
+  has_many :rated_discussion_entries, lambda {
                                         order(
                                           Arel.sql('COALESCE(parent_id, 0)'), Arel.sql('COALESCE(rating_sum, 0) DESC'), :created_at
                                         )
@@ -78,7 +78,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
-  has_many :discussion_topic_section_visibilities, -> {
+  has_many :discussion_topic_section_visibilities, lambda {
     where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
   }, inverse_of: :discussion_topic, dependent: :destroy
   has_many :course_sections, :through => :discussion_topic_section_visibilities, :dependent => :destroy
@@ -695,21 +695,21 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
-  scope :not_ignored_by, ->(user, purpose) do
+  scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)", Ignore.where(asset_type: 'DiscussionTopic', user_id: user, purpose: purpose)
       .where("asset_id=discussion_topics.id"))
-  end
+  }
 
-  scope :todo_date_between, ->(starting, ending) do
+  scope :todo_date_between, lambda { |starting, ending|
     where("(discussion_topics.type = 'Announcement' AND posted_at BETWEEN :start_at and :end_at)
            OR todo_date BETWEEN :start_at and :end_at", { start_at: starting, end_at: ending })
-  end
-  scope :for_courses_and_groups, ->(course_ids, group_ids) do
+  }
+  scope :for_courses_and_groups, lambda { |course_ids, group_ids|
     where("(discussion_topics.context_type = 'Course'
           AND discussion_topics.context_id IN (?))
           OR (discussion_topics.context_type = 'Group'
           AND discussion_topics.context_id IN (?))", course_ids, group_ids)
-  end
+  }
 
   class QueryError < StandardError
     attr_accessor :status_code
@@ -726,7 +726,7 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # Takes in an array of section objects, and it is required that they all belong
   # to the same course.  At least one section must be provided.
-  scope :in_sections, ->(course_sections) do
+  scope :in_sections, lambda { |course_sections|
     course_ids = course_sections.pluck(:course_id).uniq
     if course_ids.length != 1
       raise QueryError, I18n.t("Searching for announcements in sections must span exactly one course")
@@ -742,9 +742,9 @@ class DiscussionTopic < ActiveRecord::Base
              (discussion_section_visibilities.workflow_state = 'active' AND
               discussion_section_visibilities.course_section_id IN (:course_sections))",
              { :course_sections => course_sections.pluck(:id) }).distinct
-  end
+  }
 
-  scope :visible_to_student_sections, ->(student) {
+  scope :visible_to_student_sections, lambda { |student|
     visibility_scope = DiscussionTopicSectionVisibility.active
                                                        .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
                                                        .where("EXISTS (?)", Enrollment.active_or_pending.where(:user_id => student)
@@ -756,15 +756,15 @@ class DiscussionTopic < ActiveRecord::Base
   scope :only_discussion_topics, -> { where(:type => nil) }
   scope :for_subtopic_refreshing, -> { where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at") }
   scope :active, -> { where("discussion_topics.workflow_state<>'deleted'") }
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :for_context_codes, ->(codes) { where(:context_code => codes) }
 
-  scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
+  scope :before, ->(date) { where("discussion_topics.created_at<?", date) }
 
   scope :by_position, -> { order("discussion_topics.position ASC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :by_posted_at, -> {
+  scope :by_posted_at, lambda {
     order(Arel.sql(<<~SQL.squish))
       COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
@@ -1142,10 +1142,10 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and discussion_entries.active.empty? && available_for?(user) && !root_topic_id && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
     can :delete
 
-    given { |user, session|
+    given do |user, session|
       !locked_for?(user, :check_policies => true) &&
         context.grants_right?(user, session, :post_to_forum) && visible_for?(user) && can_participate_in_course?(user)
-    }
+    end
     can :reply
 
     given { |user, session| user_can_create(user, session) }
@@ -1289,10 +1289,10 @@ class DiscussionTopic < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
     p.to { users_with_permissions(active_participants_with_visibility) }
-    p.whenever { |record|
+    p.whenever do |record|
       record.send_notification_for_context? and
         ((record.just_created && record.active?) || record.changed_state(:active, record.is_announcement ? :post_delayed : :unpublished))
-    }
+    end
     p.data { course_broadcast_data }
   end
 

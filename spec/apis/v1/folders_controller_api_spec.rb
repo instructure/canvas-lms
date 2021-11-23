@@ -226,14 +226,14 @@ describe "Folders API", type: :request do
 
   describe "#buttons_and_icons_folder" do
     it "creates a buttons and icons folder for the course" do
-      expect {
+      expect do
         api_call(
           :get,
           "/api/v1/courses/#{@course.id}/folders/buttons_and_icons",
           @folders_path_options.merge(action: "buttons_and_icons_folder", course_id: @course.id.to_param).except(:id),
           {}
         )
-      }.to change {
+      end.to change {
         @course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
       }.from(0).to(1)
     end

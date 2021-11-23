@@ -425,14 +425,14 @@ class ContentMigrationsController < ApplicationController
   # @returns [Migrator]
   def available_migrators
     systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
-    json = systems.map { |p|
+    json = systems.map do |p|
       {
         :type => p.id,
         :requires_file_upload => !!p.settings[:requires_file_upload],
         :name => p.meta['select_text'].call,
         :required_settings => p.settings[:required_settings] || []
       }
-    }
+    end
 
     render :json => json
   end

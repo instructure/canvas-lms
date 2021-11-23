@@ -495,7 +495,7 @@ class CoursesController < ApplicationController
   def index
     GuardRail.activate(:secondary) do
       respond_to do |format|
-        format.html {
+        format.html do
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
@@ -515,11 +515,11 @@ class CoursesController < ApplicationController
           end
 
           render stream: can_stream_template?
-        }
+        end
 
-        format.json {
+        format.json do
           render json: courses_for_user(@current_user)
-        }
+        end
       end
     end
   end
@@ -910,7 +910,7 @@ class CoursesController < ApplicationController
             @course.sync_homeroom_participation
           end
           format.html { redirect_to @course }
-          format.json {
+          format.json do
             render :json => course_json(
               @course,
               @current_user,
@@ -923,7 +923,7 @@ class CoursesController < ApplicationController
               nil,
               prefer_friendly_name: false
             )
-          }
+          end
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
@@ -2475,7 +2475,7 @@ class CoursesController < ApplicationController
         end
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, { :user => [:communication_channel, :pseudonym] }])
-        json = @enrollments.map { |e|
+        json = @enrollments.map do |e|
           { 'enrollment' =>
             { 'associated_user_id' => e.associated_user_id,
               'communication_channel_id' => e.user.communication_channel.try(:id),
@@ -2490,7 +2490,7 @@ class CoursesController < ApplicationController
               'workflow_state' => e.workflow_state,
               'role_id' => e.role_id,
               'already_enrolled' => e.already_enrolled } }
-        }
+        end
         render :json => json
       else
         render :json => "", :status => :bad_request
@@ -3216,10 +3216,10 @@ class CoursesController < ApplicationController
 
   def render_update_success
     respond_to do |format|
-      format.html {
+      format.html do
         flash[:notice] = t('notices.updated', 'Course was successfully updated.')
         redirect_to(params[:continue_to].presence || course_url(@course))
-      }
+      end
       format.json do
         if api_request?
           render :json => course_json(@course, @current_user, session, [:hide_final_grades], nil)

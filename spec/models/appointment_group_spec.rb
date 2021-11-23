@@ -313,18 +313,18 @@ describe AppointmentGroup do
       # teacher can't reserve anything for himself
       visible_groups = AppointmentGroup.reservable_by(@teacher).sort_by(&:id)
       expect(visible_groups).to eql []
-      @groups.each { |g|
+      @groups.each do |g|
         expect(g.grants_right?(@teacher, :reserve)).to be_falsey
         expect(g.eligible_participant?(@teacher)).to be_falsey
-      }
+      end
 
       # nor can the ta
       visible_groups = AppointmentGroup.reservable_by(@ta).sort_by(&:id)
       expect(visible_groups).to eql []
-      @groups.each { |g|
+      @groups.each do |g|
         expect(g.grants_right?(@ta, :reserve)).to be_falsey
         expect(g.eligible_participant?(@ta)).to be_falsey
-      }
+      end
 
       # student can reserve course-level ones, as well as section-specific ones
       visible_groups = AppointmentGroup.reservable_by(@student).sort_by(&:id)

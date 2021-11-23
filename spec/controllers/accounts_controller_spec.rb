@@ -774,7 +774,7 @@ describe AccountsController do
       let(:account) { account_model }
       let(:sub_account) { account_model(root_account: account) }
       let(:site_admin) { site_admin_user }
-      let(:payload) {
+      let(:payload) do
         {
           account: {
             settings: {
@@ -783,14 +783,14 @@ describe AccountsController do
             }
           }
         }
-      }
+      end
 
       it 'accepts changes made by a siteadmin to a root account' do
         user_session(site_admin)
 
-        expect {
+        expect do
           post 'update', format: 'json', params: { id: account.id, **payload }
-        }.to change {
+        end.to change {
           account.reload.settings.fetch(:enable_fullstory, true)
         }.from(true).to(false).and change {
           account.reload.settings.fetch(:enable_google_analytics, true)
@@ -800,9 +800,9 @@ describe AccountsController do
       it 'ignores changes made to the site_admin account' do
         user_session(site_admin)
 
-        expect {
+        expect do
           post 'update', format: 'json', params: { id: Account.site_admin.id, **payload }
-        }.to not_change {
+        end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
         }.and not_change {
           account.reload.settings.fetch(:enable_google_analytics, true)
@@ -812,9 +812,9 @@ describe AccountsController do
       it 'ignores changes to sub accounts' do
         user_session(site_admin)
 
-        expect {
+        expect do
           post 'update', format: 'json', params: { id: sub_account.id, **payload }
-        }.to not_change {
+        end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
         }.and not_change {
           account.reload.settings.fetch(:enable_google_analytics, true)
@@ -824,9 +824,9 @@ describe AccountsController do
       it 'ignores changes from regular admins' do
         user_session(account_admin_user(account: account))
 
-        expect {
+        expect do
           post 'update', format: 'json', params: { id: account.id, **payload }
-        }.to not_change {
+        end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
         }.and not_change {
           account.reload.settings.fetch(:enable_google_analytics, true)
@@ -1437,9 +1437,9 @@ describe AccountsController do
 
       before do
         @account = Account.create!
-        create_courses(letters_in_random_order.map { |i|
+        create_courses(letters_in_random_order.map do |i|
           { enrollment_term_id: @account.enrollment_terms.create!(name: i).id }
-        }, account: @account)
+        end, account: @account)
         admin_logged_in(@account)
       end
 

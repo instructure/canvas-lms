@@ -340,9 +340,9 @@ describe Mutations::PostAssignmentGrades do
 
     it "broadcasts a notification when posting to everyone" do
       execute_query(mutation_str(assignment_id: assignment.id), context)
-      expect {
+      expect do
         post_submissions_job.invoke_job
-      }.to change {
+      end.to change {
         submissions_posted_messages.count
       }.by(1)
     end
@@ -350,18 +350,18 @@ describe Mutations::PostAssignmentGrades do
     it "broadcasts a notification when posting to everyone graded" do
       assignment.grade_student(student, grader: teacher, score: 1)
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
-      expect {
+      expect do
         post_submissions_job.invoke_job
-      }.to change {
+      end.to change {
         submissions_posted_messages.count
       }.by(1)
     end
 
     it "broadcasts a notification when posting to everyone by sections" do
       execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section.id]), context)
-      expect {
+      expect do
         post_submissions_job.invoke_job
-      }.to change {
+      end.to change {
         submissions_posted_messages.count
       }.by(1)
     end
@@ -369,9 +369,9 @@ describe Mutations::PostAssignmentGrades do
     it "broadcasts a notification when posting to everyone graded by sections" do
       assignment.grade_student(student_in_section, grader: teacher, score: 1)
       execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section.id], graded_only: true), context)
-      expect {
+      expect do
         post_submissions_job.invoke_job
-      }.to change {
+      end.to change {
         submissions_posted_messages.count
       }.by(1)
     end

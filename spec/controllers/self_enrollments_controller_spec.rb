@@ -47,10 +47,10 @@ describe SelfEnrollmentsController do
 
     it "redirects to login if auth_discovery_url is present and authentication_provider isn't specified" do
       account_with_cas(account: Account.default)
-      Account.default.tap { |a|
+      Account.default.tap do |a|
         a.settings[:auth_discovery_url] = "http://www.example.com/discovery"
         a.save!
-      }
+      end
 
       get 'new', params: { self_enrollment_code: @course.self_enrollment_code }
       expect(response).to redirect_to login_url
@@ -58,10 +58,10 @@ describe SelfEnrollmentsController do
 
     it "renders directly if auth_discovery_url is present and canvas authentication_provider is specified" do
       account_with_cas(account: Account.default)
-      Account.default.tap { |a|
+      Account.default.tap do |a|
         a.settings[:auth_discovery_url] = "http://www.example.com/discovery"
         a.save!
-      }
+      end
 
       get 'new', params: { self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'canvas' }
       expect(response).to be_successful

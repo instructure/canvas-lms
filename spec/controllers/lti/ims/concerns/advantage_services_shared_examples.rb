@@ -91,9 +91,9 @@ shared_examples_for "advantage services" do
 
     context 'with unbound developer key' do
       let(:before_send_request) do
-        -> {
+        lambda do
           developer_key.developer_key_account_bindings.first.update! workflow_state: 'off'
-        }
+        end
       end
 
       it_behaves_like 'mime_type check'

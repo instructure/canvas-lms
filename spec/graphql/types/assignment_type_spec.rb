@@ -69,10 +69,10 @@ describe Types::AssignmentType do
   end
 
   context "sis field" do
-    let_once(:sis_assignment) {
+    let_once(:sis_assignment) do
       assignment.update!(sis_source_id: "sisAssignment")
       assignment
-    }
+    end
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -371,14 +371,14 @@ describe Types::AssignmentType do
       course_with_teacher
       assignment_model(group_category: 'GROUPS!')
       @group_category.create_groups(2)
-      2.times {
+      2.times do
         student_in_course
         @group_category.groups.first.add_user(@user)
-      }
-      2.times {
+      end
+      2.times do
         student_in_course
         @group_category.groups.last.add_user(@user)
-      }
+      end
       @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')
       @assignment.submit_homework(@group_category.groups.last.users.first, body: 'Submit!')
 
@@ -608,11 +608,11 @@ describe Types::AssignmentType do
         assignment_type.resolve("lockInfo { isLocked }")
       ).to eq false
 
-      %i[lockAt unlockAt canView].each { |field|
+      %i[lockAt unlockAt canView].each do |field|
         expect(
           assignment_type.resolve("lockInfo { #{field} }")
         ).to eq nil
-      }
+      end
     end
 
     it "works when lock_info is a hash" do

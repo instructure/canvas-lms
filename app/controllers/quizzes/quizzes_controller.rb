@@ -341,7 +341,7 @@ class Quizzes::QuizzesController < ApplicationController
                                                            @current_user),
         :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@context),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
-        :SECTION_LIST => sections.map { |section|
+        :SECTION_LIST => sections.map do |section|
           {
             :id => section.id,
             :name => section.name,
@@ -349,7 +349,7 @@ class Quizzes::QuizzesController < ApplicationController
             :end_at => section.end_at,
             :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
           }
-        },
+        end,
         :QUIZZES_URL => course_quizzes_url(@context),
         :QUIZ_IP_FILTERS_URL => api_v1_course_quiz_ip_filters_url(@context, @quiz),
         :CONTEXT_ACTION_SOURCE => :quizzes,
@@ -615,7 +615,7 @@ class Quizzes::QuizzesController < ApplicationController
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
       respond_to do |format|
-        format.html {
+        format.html do
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
 
@@ -627,7 +627,7 @@ class Quizzes::QuizzesController < ApplicationController
                  })
 
           render :statistics_cqs
-        }
+        end
       end
     end
   end

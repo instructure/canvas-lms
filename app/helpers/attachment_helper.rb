@@ -48,9 +48,9 @@ module AttachmentHelper
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
     end
-    attrs.map { |attr, val|
+    attrs.map do |attr, val|
       %(data-#{attr}="#{ERB::Util.html_escape(val)}")
-    }.join(" ").html_safe
+    end.join(" ").html_safe
   end
 
   def media_preview_attributes(attachment, attrs = {})

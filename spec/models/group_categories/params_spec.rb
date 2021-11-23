@@ -23,9 +23,9 @@ require_dependency "group_categories/params"
 
 module GroupCategories
   describe Params do
-    let(:param_options) {
+    let(:param_options) do
       { boolean_translator: BooleanTranslator }
-    }
+    end
 
     def build_params(args)
       Params.new(args, param_options)

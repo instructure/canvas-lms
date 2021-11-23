@@ -28,37 +28,37 @@ describe Lti::LtiOutboundAdapter do
   let(:resource_type) { :lti_launch_type }
   let(:tool_url) { 'http://www.tool.com/launch/url?firstname=rory' }
 
-  let(:tool) {
+  let(:tool) do
     ContextExternalTool.new.tap do |tool|
       allow(tool).to receive(:id).and_return('tool_id')
       tool.url = tool_url
     end
-  }
+  end
 
   let(:user) { User.create! }
 
-  let(:context) {
+  let(:context) do
     Course.new.tap do |course|
       allow(course).to receive(:id).and_return('course_id')
       course.root_account = account
       course.account = account
     end
-  }
+  end
 
-  let(:assignment) {
+  let(:assignment) do
     Assignment.new.tap do |assignment|
       allow(assignment).to receive(:id).and_return('assignment_id')
     end
-  }
+  end
 
   let(:subject) { adapter }
   let(:adapter) { Lti::LtiOutboundAdapter.new(tool, user, context) }
   let(:lti_consumer_instance) { LtiOutbound::LTIConsumerInstance.new }
-  let(:lti_context) {
+  let(:lti_context) do
     LtiOutbound::LTIContext.new.tap do |lti_context|
       lti_context.consumer_instance = lti_consumer_instance
     end
-  }
+  end
   let(:lti_user) { LtiOutbound::LTIUser.new }
   let(:lti_tool) { LtiOutbound::LTITool.new }
   let(:lti_assignment) { LtiOutbound::LTIAssignment.new }
@@ -302,9 +302,9 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect {
+      expect do
         adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
+      end.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
     end
   end
 
@@ -320,9 +320,9 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect {
+      expect do
         adapter.generate_post_payload_for_homework_submission(assignment)
-      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling prepare_tool_launch')
+      end.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling prepare_tool_launch')
     end
   end
 

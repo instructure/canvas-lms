@@ -95,9 +95,9 @@ describe RoleOverride do
   it "does not fail when a context's associated accounts are missing" do
     group_model
     allow(@group).to receive(:account).and_return(nil)
-    expect {
+    expect do
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   it "updates the roles updated_at timestamp on save" do
@@ -549,10 +549,10 @@ describe RoleOverride do
       end
 
       it "allows with account_allows on" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.enable_user_notes = true
           a.save!
-        }
+        end
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
       end

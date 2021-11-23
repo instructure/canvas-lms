@@ -152,7 +152,7 @@ module Api::V1::CalendarEvent
         end
         can_manage = event.grants_right?(user, session, :manage)
 
-        hash["child_events"] = events.map { |e|
+        hash["child_events"] = events.map do |e|
           e.parent_event = event
           calendar_event_json(e, user, session,
                               :include => appointment_group ? ['participants'] : [],
@@ -161,7 +161,7 @@ module Api::V1::CalendarEvent
                               :url_override => can_manage,
                               :child_events_count => 0,
                               :effective_context => options[:effective_context])
-        }
+        end
       end
     end
 
@@ -228,13 +228,13 @@ module Api::V1::CalendarEvent
 
     hash['participant_count'] = group.appointments_participants.count if include.include?('participant_count')
     if include.include?('reserved_times')
-      hash['reserved_times'] = group.reservations_for(user).map { |event|
+      hash['reserved_times'] = group.reservations_for(user).map do |event|
         {
           :id => event.id,
           :start_at => event.start_at,
           :end_at => event.end_at
         }
-      }
+      end
     end
     hash['context_codes'] = group.context_codes_for_user(user)
     hash['all_context_codes'] = group.context_codes if include.include?('all_context_codes') && group.grants_right?(user, session, :manage)
@@ -250,7 +250,7 @@ module Api::V1::CalendarEvent
         ActiveRecord::Associations::Preloader.new.preload(all_child_events, :context)
         user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
       end
-      hash['appointments'] = appointments_scope.map { |event|
+      hash['appointments'] = appointments_scope.map do |event|
         calendar_event_json(event, user, session,
                             :context => group,
                             :appointment_group => group,
@@ -258,7 +258,7 @@ module Api::V1::CalendarEvent
                             :include => include & ['child_events'],
                             :effective_context => @context,
                             :for_scheduler => true)
-      }
+      end
     end
     hash['appointments_count'] = group.appointments.size
     hash['participant_type'] = group.participant_type

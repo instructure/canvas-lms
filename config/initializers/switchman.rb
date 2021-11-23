@@ -102,7 +102,7 @@ Rails.application.config.after_initialize do
       end
     end
 
-    scope :in_region, ->(region) do
+    scope :in_region, lambda { |region|
       next in_current_region if region.nil?
 
       dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
@@ -128,16 +128,16 @@ Rails.application.config.after_initialize do
           where.not(database_server_id: dbs_not_in_this_region)
         end
       end
-    end
+    }
 
-    scope :in_current_region, -> do
+    scope :in_current_region, lambda {
       # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
       # either way there's only one shard, and we always want to see it
       return [default] unless default.is_a?(Switchman::Shard)
       return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
 
       in_region(ApplicationController.region)
-    end
+    }
   end
 
   Switchman::DatabaseServer.class_eval do

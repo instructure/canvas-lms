@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 RSpec.shared_examples "DiscussionType" do
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
-  let(:permissions) {
+  let(:permissions) do
     [
       {
         value: 'attach',
@@ -79,23 +79,23 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'speedGrader',
-        allowed: ->(user) {
+        allowed: lambda do |user|
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
             return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
           else
             return permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
-        }
+        end
       },
       {
         value: 'peerReview',
-        allowed: ->(user) {
+        allowed: lambda do |user|
           discussion.assignment_id &&
             discussion.assignment.published? &&
             discussion.assignment.has_peer_reviews? &&
             discussion.assignment.grants_right?(user, :grade)
-        }
+        end
       },
       {
         value: 'showRubric',
@@ -103,35 +103,35 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'addRubric',
-        allowed: ->(user) {
+        allowed: lambda do |user|
           !discussion.assignment_id.nil? &&
             discussion.assignment.rubric.nil? &&
             discussion.assignment.grants_right?(user, :update)
-        }
+        end
       },
       {
         value: 'openForComments',
-        allowed: ->(user) {
+        allowed: lambda do |user|
           !discussion.comments_disabled? &&
             discussion.locked &&
             discussion.grants_right?(user, :moderate_forum)
-        }
+        end
       },
       {
         value: 'closeForComments',
-        allowed: ->(user) {
+        allowed: lambda do |user|
           discussion.can_lock? &&
             !discussion.comments_disabled? &&
             !discussion.locked &&
             discussion.grants_right?(user, :moderate_forum)
-        }
+        end
       },
       {
         value: 'copyAndSendTo',
         allowed: ->(user) { discussion.context.grants_right?(user, :read_as_admin) }
       }
     ]
-  }
+  end
 
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s

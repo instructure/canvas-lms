@@ -95,14 +95,14 @@ describe AssessmentQuestion do
 
   it "translates links to be readable w/ verifier" do
     @attachments = {}
-    attachment_tag = lambda { |key|
+    attachment_tag = lambda do |key|
       @attachments[key] ||= []
       a = @course.attachments.build(:filename => "foo-#{key}.gif")
       a.content_type = 'image/gif'
       a.save!
       @attachments[key] << a
       "<img src=\"/courses/#{@course.id}/files/#{a.id}/download\">"
-    }
+    end
     data = {
       :name => 'test question',
       :question_type => 'multiple_choice_question',

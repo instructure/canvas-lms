@@ -346,7 +346,7 @@ describe "Outcome Groups API", type: :request do
 
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
-        ->(outcome, can_edit) do
+        lambda do |outcome, can_edit|
           expect(outcome).to include({
                                        "id" => @outcome.id,
                                        "vendor_guid" => @outcome.vendor_guid,
@@ -362,7 +362,7 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
+        lambda do |outcome_link, context, group, assessed, can_edit, can_unlink|
           expect(outcome_link).to include({
                                             "context_type" => context.class.to_s,
                                             "context_id" => context.id,
@@ -1016,7 +1016,7 @@ describe "Outcome Groups API", type: :request do
 
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
-        ->(outcome) do
+        lambda do |outcome|
           expect(outcome).to include({
                                        "id" => @outcome.id,
                                        "vendor_guid" => @outcome.vendor_guid,
@@ -1032,7 +1032,7 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(outcome_link, context, group, assessed, can_unlink) do
+        lambda do |outcome_link, context, group, assessed, can_unlink|
           expect(outcome_link).to include({
                                             "context_type" => context.class.to_s,
                                             "context_id" => context.id,

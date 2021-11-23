@@ -48,7 +48,7 @@ class GroupMembership < ActiveRecord::Base
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(:moderator => true) }
-  scope :active_for_context_and_users, ->(context, users) {
+  scope :active_for_context_and_users, lambda { |context, users|
     joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available' })
   }
 
@@ -65,26 +65,26 @@ class GroupMembership < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
     p.to { user }
-    p.whenever { |record|
+    p.whenever do |record|
       record.just_created &&
         record.accepted? &&
         record.group &&
         record.group.context_available? &&
         record.group&.can_participate?(user) &&
         record.sis_batch_id.blank?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :new_context_group_membership_invitation
     p.to { user }
-    p.whenever { |record|
+    p.whenever do |record|
       record.just_created &&
         record.invited? &&
         record.group &&
         record.group.context_available? &&
         record.group&.can_participate?(user) &&
         record.sis_batch_id.blank?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :group_membership_accepted
@@ -99,12 +99,12 @@ class GroupMembership < ActiveRecord::Base
 
     p.dispatch :new_student_organized_group
     p.to { group.context.participating_admins }
-    p.whenever { |record|
+    p.whenever do |record|
       record.group.context.is_a?(Course) &&
         record.just_created &&
         record.group.group_memberships.count == 1 &&
         record.group.student_organized?
-    }
+    end
     p.data { course_broadcast_data }
   end
 

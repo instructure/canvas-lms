@@ -21,14 +21,14 @@ require 'spec_helper'
 
 describe Twitter::Messenger do
   let(:message) { double }
-  let(:twitter_service) {
+  let(:twitter_service) do
     double({
              token: "twitter_token",
              secret: "twitter_secret",
              service_user_name: "twitter_name",
              service_user_id: "twitter_id"
            })
-  }
+  end
   let(:id) { "ABC123" }
   let(:messenger) { Twitter::Messenger.new(message, twitter_service, 'host', id) }
 

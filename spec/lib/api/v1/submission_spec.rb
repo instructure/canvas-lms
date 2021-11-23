@@ -38,11 +38,11 @@ describe Api::V1::Submission do
   let(:user) { User.create! }
   let(:course) { Course.create! }
   let(:assignment) { course.assignments.create! }
-  let(:teacher) {
+  let(:teacher) do
     teacher = User.create!
     course.enroll_teacher(teacher)
     teacher
-  }
+  end
   let(:session) { {} }
   let(:context) { nil }
   let(:params) { { includes: [field] } }
@@ -122,7 +122,7 @@ describe Api::V1::Submission do
       let(:field) { 'submission_status' }
       let(:submission) { assignment.submissions.build(user: user) }
       let(:submission_status) do
-        ->(submission) do
+        lambda do |submission|
           json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
           json.fetch(field)
         end
@@ -161,9 +161,9 @@ describe Api::V1::Submission do
       it "can be Submitted by workflow state" do
         # make it not submitted first, since submission is already submitted? => true
         submission.workflow_state = 'deleted'
-        expect {
+        expect do
           submission.workflow_state = 'submitted'
-        }.to change { submission_status.call(submission) }.from(:unsubmitted).to(:submitted)
+        end.to change { submission_status.call(submission) }.from(:unsubmitted).to(:submitted)
       end
 
       it "can be Submitted by submission type" do
@@ -300,7 +300,7 @@ describe Api::V1::Submission do
     describe "grading status" do
       let(:field) { 'grading_status' }
       let(:grading_status) do
-        ->(submission) do
+        lambda do |submission|
           json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
           json.fetch(field)
         end

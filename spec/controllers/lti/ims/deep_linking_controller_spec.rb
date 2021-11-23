@@ -453,7 +453,7 @@ module Lti
 
         context 'when content items that contain line items are received' do
           let(:course) { course_model(account: account) }
-          let(:context_external_tool) {
+          let(:context_external_tool) do
             ContextExternalTool.create!(
               context: course.account,
               url: 'http://tool.url/login',
@@ -463,7 +463,7 @@ module Lti
               developer_key: developer_key,
               settings: { use_1_3: true }
             )
-          }
+          end
 
           let(:params) { super().merge({ course_id: course.id, placement: 'course_assignments_menu' }) }
           let(:launch_url) { 'http://tool.url/launch' }

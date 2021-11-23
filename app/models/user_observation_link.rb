@@ -31,7 +31,7 @@ class UserObservationLink < ActiveRecord::Base
 
   after_create :create_linked_enrollments
 
-  validate :not_same_user, :if => lambda { |uo| uo.changed? }
+  validate :not_same_user, :if => ->(uo) { uo.changed? }
   validates :user_id, :observer_id, :root_account_id, presence: true
 
   scope :active, -> { where.not(workflow_state: 'deleted') }

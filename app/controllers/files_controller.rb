@@ -1219,10 +1219,10 @@ class FilesController < ApplicationController
 
       @attachment.destroy
       respond_to do |format|
-        format.html {
+        format.html do
           require_context
           redirect_to named_context_url(@context, :context_files_url)
-        }
+        end
         if api_request?
           format.json { render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true }) }
         else

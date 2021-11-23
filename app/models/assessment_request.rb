@@ -57,26 +57,26 @@ class AssessmentRequest < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
     p.to { assessor }
-    p.whenever {
+    p.whenever do
       should_send_reminder? && active_rubric_association?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
     p.to { assessor }
-    p.whenever {
+    p.whenever do
       should_send_reminder? && !active_rubric_association?
-    }
+    end
     p.data { course_broadcast_data }
   end
 
   scope :incomplete, -> { where(:workflow_state => 'assigned') }
   scope :complete, -> { where(:workflow_state => 'completed') }
-  scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
-  scope :for_assessor, lambda { |assessor_id| where(:assessor_id => assessor_id) }
-  scope :for_asset, lambda { |asset_id| where(:asset_id => asset_id) }
-  scope :for_assignment, lambda { |assignment_id| eager_load(:submission).where(:submissions => { :assignment_id => assignment_id }) }
-  scope :for_courses, lambda { |courses| eager_load(:submission).where(:submissions => { :course_id => courses }) }
+  scope :for_assessee, ->(user_id) { where(:user_id => user_id) }
+  scope :for_assessor, ->(assessor_id) { where(:assessor_id => assessor_id) }
+  scope :for_asset, ->(asset_id) { where(:asset_id => asset_id) }
+  scope :for_assignment, ->(assignment_id) { eager_load(:submission).where(:submissions => { :assignment_id => assignment_id }) }
+  scope :for_courses, ->(courses) { eager_load(:submission).where(:submissions => { :course_id => courses }) }
 
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",
@@ -85,9 +85,9 @@ class AssessmentRequest < ActiveRecord::Base
   }
 
   set_policy do
-    given { |user, session|
+    given do |user, session|
       can_read_assessment_user_name?(user, session)
-    }
+    end
     can :read_assessment_user
   end
 

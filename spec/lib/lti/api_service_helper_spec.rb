@@ -46,9 +46,9 @@ module Lti
     end
     let(:course) { Course.create }
     let(:root_account) { Account.create }
-    let(:product_family) {
+    let(:product_family) do
       Lti::ProductFamily.create!(vendor_code: 'a', product_code: 'b', vendor_name: 'c', root_account: root_account)
-    }
+    end
 
     before do
       @tool_proxy = ToolProxy.create!(

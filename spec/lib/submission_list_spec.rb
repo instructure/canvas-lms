@@ -72,11 +72,11 @@ describe SubmissionList do
 
     @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
-    subs.each { |s|
+    subs.each do |s|
       s.created_at = 3.days.ago
       s.updated_at = 3.days.ago
       s.save
-    }
+    end
     @some_assignment.grade_student(@student, { excuse: true, grader: @teacher })
     @days = SubmissionList.days(@course)
     submissions = @days[0].graders[0].assignments[0].submissions

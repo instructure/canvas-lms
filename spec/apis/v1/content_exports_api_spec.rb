@@ -892,10 +892,10 @@ describe ContentExportsApiController, type: :request do
 
       it "creates a group file export" do
         json = {}
-        expect {
+        expect do
           json = api_call_as_user(t_teacher, :post, "/api/v1/groups/#{t_group.id}/content_exports?export_type=zip",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', group_id: t_group.to_param, export_type: 'zip' })
-        }.to change(Delayed::Job, :count).by(1)
+        end.to change(Delayed::Job, :count).by(1)
         export = t_group.content_exports.find(json['id'])
         expect(export.export_type).to eq 'zip'
       end
@@ -931,10 +931,10 @@ describe ContentExportsApiController, type: :request do
 
       it "creates a user file export" do
         json = {}
-        expect {
+        expect do
           json = api_call_as_user(t_student, :post, "/api/v1/users/#{t_student.id}/content_exports?export_type=zip",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', user_id: t_student.to_param, export_type: 'zip' })
-        }.to change(Delayed::Job, :count).by(1)
+        end.to change(Delayed::Job, :count).by(1)
         export = t_student.content_exports.find(json['id'])
         expect(export.export_type).to eq 'zip'
       end

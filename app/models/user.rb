@@ -233,8 +233,8 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| joins(:user_account_associations).where(:user_account_associations => { :account_id => account }).shard(account.shard) }
-  scope :recently_logged_in, -> {
+  scope :of_account, ->(account) { joins(:user_account_associations).where(:user_account_associations => { :account_id => account }).shard(account.shard) }
+  scope :recently_logged_in, lambda {
     eager_load(:pseudonyms)
       .where("pseudonyms.current_login_at>?", 1.month.ago)
       .order("pseudonyms.current_login_at DESC")
@@ -265,11 +265,11 @@ class User < ActiveRecord::Base
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
 
-  scope :has_current_student_enrollments, -> do
+  scope :has_current_student_enrollments, lambda {
     where("EXISTS (?)",
           Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
               .where("enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment'"))
-  end
+  }
 
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }
 
@@ -752,7 +752,7 @@ class User < ActiveRecord::Base
     service = service.service if service.is_a?(UserService)
     eager_load(:user_services).where(:user_services => { :service => service.to_s })
   }
-  scope :enrolled_before, lambda { |date| where("enrollments.created_at<?", date) }
+  scope :enrolled_before, ->(date) { where("enrollments.created_at<?", date) }
 
   def group_memberships_for(context)
     groups.where('groups.context_id' => context,
@@ -1200,7 +1200,7 @@ class User < ActiveRecord::Base
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
 
     common_shards = associated_shards & user.associated_shards
-    search_method = ->(shard) do
+    search_method = lambda do |shard|
       # new users with creation pending enrollments don't have account associations
       if associated_accounts.shard(shard).empty? && common_shards.length == 1 && !unavailable?
         account.grants_right?(user, sought_right)
@@ -2210,17 +2210,17 @@ class User < ActiveRecord::Base
         Array(opts[:contexts]).each do |context|
           items.concat(
             Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
-                              :expires_in => expires_in) {
+                              :expires_in => expires_in) do
               recent_stream_items(:context => context)
-            }
+            end
           )
         end
         items.sort_by(&:id).reverse
       else
         # no context in cache key
-        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) {
+        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), :expires_in => expires_in) do
           recent_stream_items
-        }
+        end
       end
     end
   end
@@ -2678,9 +2678,9 @@ class User < ActiveRecord::Base
     end
 
     # Return ids relative for the current shard
-    context_ids.map { |id|
+    context_ids.map do |id|
       Shard.relative_id_for(id, shard, Shard.current)
-    }
+    end
   end
 
   def menu_courses(enrollment_uuid = nil, opts = {})

@@ -174,9 +174,9 @@ describe "Enrollment::BatchStateUpdater" do
           MicrosoftSync::Group.create!(course: course2)
           MicrosoftSync::Group.create!(course: course3)
 
-          expect {
+          expect do
             Enrollment::BatchStateUpdater.sync_microsoft_group([course2, course3], @course.root_account)
-          }.to change { Delayed::Job.count }.by 2
+          end.to change { Delayed::Job.count }.by 2
         end
       end
     end

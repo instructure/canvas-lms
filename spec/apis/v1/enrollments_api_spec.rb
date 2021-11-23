@@ -1033,9 +1033,9 @@ describe EnrollmentsApiController, type: :request do
           let(:observer) { User.create! }
 
           student_grade = lambda do |json|
-            student_json = json.find { |e|
+            student_json = json.find do |e|
               e["type"] == "StudentEnrollment"
-            }
+            end
             if student_json
               student_json["grades"]["final_score"]
             end
@@ -2294,9 +2294,9 @@ describe EnrollmentsApiController, type: :request do
       shared_examples_for 'numeric pagination' do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
-          enrollments = %w[observer student ta teacher].inject([]) { |res, type|
+          enrollments = %w[observer student ta teacher].inject([]) do |res, type|
             res + @course.send("#{type}_enrollments").preload(:user)
-          }.map do |e|
+          end.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
               'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2361,9 +2361,9 @@ describe EnrollmentsApiController, type: :request do
       shared_examples_for 'bookmarked pagination' do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
-          enrollments = %w[observer student ta teacher].inject([]) { |res, type|
+          enrollments = %w[observer student ta teacher].inject([]) do |res, type|
             res + @course.send("#{type}_enrollments").preload(:user)
-          }.map do |e|
+          end.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
               'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2765,7 +2765,7 @@ describe EnrollmentsApiController, type: :request do
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w[StudentEnrollment TeacherEnrollment]))
         enrollments = (@course.student_enrollments + @course.teacher_enrollments).sort_by { |e| [e.type, e.user.sortable_name] }
 
-        expect(json).to eq(enrollments.map { |e|
+        expect(json).to eq(enrollments.map do |e|
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2808,7 +2808,7 @@ describe EnrollmentsApiController, type: :request do
             )
           end
           h
-        })
+        end)
       end
 
       it "returns an empty array when no user enrollments match a filter" do

@@ -54,65 +54,65 @@ describe DeprecatedMethodView do
   context 'validations' do
     it 'is invalid when the text "NOTICE" is omitted' do
       text = valid_text.gsub('NOTICE ', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+      end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
     end
 
     it 'is invalid when the NOTICE date is omitted' do
       text = valid_text.gsub('2018-01-02 ', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
+      end.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
     end
 
     it 'is invalid when the text "NOTICE" and the NOTICE date are omitted' do
       text = valid_text.gsub('NOTICE 2018-01-02 ', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+      end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
     end
 
     it 'is invalid when the NOTICE date is not in YYYY-MM-DD format' do
       text = valid_text.gsub('2018-01-02', '01-02-2018')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
+      end.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
     end
 
     it 'is invalid when the text "EFFECTIVE" is omitted' do
       text = valid_text.gsub('EFFECTIVE ', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+      end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
     end
 
     it 'is invalid when the EFFECTIVE date is omitted' do
       text = valid_text.gsub('2018-04-30', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
+      end.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
     end
 
     it 'is invalid when the text "EFFECTIVE" and the EFFECTIVE date are omitted' do
       text = valid_text.gsub(' EFFECTIVE 2018-04-30', '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+      end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
     end
 
     it 'is invalid when the EFFECTIVE date is not in YYYY-MM-DD format' do
       text = valid_text.gsub('2018-04-30', '04-30-2018')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
+      end.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
     end
 
     it 'is invalid when the EFFECTIVE date is < 90 days after the NOTICE date' do
       text = valid_text.gsub('2018-04-30', '2018-02-26')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(
+      end.to raise_error(
         ArgumentError,
         /Expected >= 90 days between the `NOTICE` \(2018-01-02\) and `EFFECTIVE` \(2018-02-26\) dates/
       )
@@ -120,9 +120,9 @@ describe DeprecatedMethodView do
 
     it 'is invalid when a description is not provided' do
       text = valid_text.gsub("\nA description \non multiple lines.", '')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(
+      end.to raise_error(
         ArgumentError,
         /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
       )
@@ -130,9 +130,9 @@ describe DeprecatedMethodView do
 
     it 'is invalid when the description is on the same line as the other content' do
       text = valid_text.gsub("\nA description \non multiple lines.", ' A description.')
-      expect {
+      expect do
         DeprecatedMethodView.new(double(text: text))
-      }.to raise_error(
+      end.to raise_error(
         ArgumentError,
         /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
       )

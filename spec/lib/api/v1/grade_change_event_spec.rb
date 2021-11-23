@@ -64,12 +64,12 @@ describe Api::V1::GradeChangeEvent do
     course_with_teacher(account: @domain_root_account)
     course_with_student(course: @course)
 
-    @page_view = PageView.new { |p|
+    @page_view = PageView.new do |p|
       p.assign_attributes({
                             :request_id => @request_id,
                             :remote_ip => '10.10.10.10'
                           })
-    }
+    end
 
     allow(PageView).to receive_messages(
       :find_by => @page_view,

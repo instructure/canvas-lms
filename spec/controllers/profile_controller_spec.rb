@@ -255,9 +255,9 @@ describe ProfileController do
 
     it "lets you remove set pronouns" do
       @user.update(pronouns: 'he_him')
-      expect {
+      expect do
         put 'update_profile', params: { :pronouns => nil }, format: 'json'
-      }.to change {
+      end.to change {
         @user.reload.pronouns
       }.from('He/Him').to(nil)
       expect(response).to be_successful

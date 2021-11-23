@@ -424,9 +424,9 @@ class Group < ActiveRecord::Base
       :updated_at => current_time,
       :root_account_id => root_account_id
     }.merge(options)
-    GroupMembership.bulk_insert(users.map { |user|
+    GroupMembership.bulk_insert(users.map do |user|
       options.merge({ :user_id => user.id, :uuid => CanvasSlug.generate_securish_uuid })
-    })
+    end)
   end
 
   def invite_user(user)
@@ -519,10 +519,10 @@ class Group < ActiveRecord::Base
         can :read_roster and
         can :view_unpublished_items
 
-      given { |user, session|
+      given do |user, session|
         user && has_member?(user) &&
           (!context || context.is_a?(Account) || context.grants_any_right?(user, session, :send_messages, :send_messages_all))
-      }
+      end
       can :send_messages and can :send_messages_all
 
       # if I am a member of this group and I can moderate_forum in the group's context

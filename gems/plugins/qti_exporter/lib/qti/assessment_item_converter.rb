@@ -116,11 +116,11 @@ module Qti
         end
 
         text_nodes = @doc.css(selectors.join(','))
-        text_nodes = text_nodes.reject { |node|
+        text_nodes = text_nodes.reject do |node|
           node.inner_html.strip.empty? ||
             EXCLUDED_QUESTION_TEXT_CLASSES.any? { |c| c.casecmp(node['class'].to_s) == 0 } ||
             node.at_css('choiceInteraction') || node.at_css('associateInteraction')
-        }
+        end
 
         if !text_nodes.empty?
           @question[:question_text] = ''

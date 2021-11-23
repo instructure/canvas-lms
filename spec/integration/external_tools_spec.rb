@@ -160,10 +160,10 @@ describe "External Tools" do
     @tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
     @tool.save!
 
-    Account.default.tap { |a|
+    Account.default.tap do |a|
       a.settings[:require_confirmed_email] = true
       a.save!
-    }
+    end
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_redirect
     expect(response.location).to eq root_url

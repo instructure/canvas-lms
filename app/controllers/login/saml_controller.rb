@@ -202,7 +202,7 @@ class Login::SamlController < ApplicationController
   def destroy
     aac = message = nil
     key_to_certificate = {}
-    log_key_used = ->(key) do
+    log_key_used = lambda do |key|
       fingerprint = Digest::SHA1.hexdigest(key_to_certificate[key].to_der).gsub(/(\h{2})(?=\h)/, '\1:')
       logger.info "Received signed SAML LogoutRequest from #{message.issuer.id} using certificate #{fingerprint}"
     end

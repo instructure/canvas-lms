@@ -26,9 +26,9 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
   validates :user_id, uniqueness: { :scope => :custom_gradebook_column_id }
 
   set_policy do
-    given { |user|
+    given do |user|
       custom_gradebook_column.grants_right? user, :manage
-    }
+    end
     can :update
   end
 

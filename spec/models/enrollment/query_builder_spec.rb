@@ -51,7 +51,7 @@ describe "Enrollment::QueryBuilder" do
         }
       end)
 
-      enrollment_ids = create_records(Enrollment, matrix.each_with_index.map { |(e_state, _, type), i|
+      enrollment_ids = create_records(Enrollment, matrix.each_with_index.map do |(e_state, _, type), i|
         {
           user_id: user.id,
           course_id: course_ids[i],
@@ -63,7 +63,7 @@ describe "Enrollment::QueryBuilder" do
           created_at: now,
           updated_at: now,
         }
-      })
+      end)
 
       enrollment_ids.each_with_index do |id, i|
         enrollment_map[id] = matrix[i]

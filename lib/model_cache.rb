@@ -88,9 +88,9 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.transform_values { |v|
+    @cache = lookups.transform_values do |v|
       prepare_lookups(v)
-    }
+    end
     yield
   ensure
     @cache = nil

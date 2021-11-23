@@ -43,26 +43,26 @@ describe "graphql pg statement_timeouts" do
   context "queries" do
     it "works when fast" do
       make_stuff_slow
-      expect {
+      expect do
         CanvasSchema.execute(query, context: { current_user: @teacher })
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "fails when slow" do
       make_stuff_slow
       Setting.set('graphql_statement_timeout', 1)
-      expect {
+      expect do
         CanvasSchema.execute(query, context: { current_user: @teacher })
-      }.to raise_error(GraphQLPostgresTimeout::Error)
+      end.to raise_error(GraphQLPostgresTimeout::Error)
     end
   end
 
   context "mutations" do
     it "works when fast" do
       make_stuff_slow
-      expect {
+      expect do
         CanvasSchema.execute(mutation, context: { current_user: @teacher })
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "fails when slow" do

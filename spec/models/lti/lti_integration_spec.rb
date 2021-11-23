@@ -19,7 +19,7 @@
 #
 
 describe "LTI integration tests" do
-  let(:canvas_tool) {
+  let(:canvas_tool) do
     ContextExternalTool.new.tap do |canvas_tool|
       canvas_tool.context = root_account
       canvas_tool.url = 'http://launch/url'
@@ -43,18 +43,18 @@ describe "LTI integration tests" do
         'custom_variable_person_name_given' => '$Person.name.given',
       }
     end
-  }
+  end
 
   let_once(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
 
-  let_once(:canvas_course) {
+  let_once(:canvas_course) do
     course_factory(active_course: true, course_name: 'my course').tap do |course|
       course.course_code = 'abc'
       course.sis_source_id = 'course_sis_id'
       course.root_account = root_account
       course.save!
     end
-  }
+  end
 
   let_once(:root_account) { Account.create!(name: 'root_account') }
 
@@ -205,14 +205,14 @@ describe "LTI integration tests" do
     end
 
     it "sets the locale if I18n.localizer exists" do
-      I18n.localizer = lambda { :es }
+      I18n.localizer = -> { :es }
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
       expect(hash['launch_presentation_locale']).to eq 'es'
-      I18n.localizer = lambda { :en }
+      I18n.localizer = -> { :en }
     end
 
     it "adds account info in launch data for account navigation" do

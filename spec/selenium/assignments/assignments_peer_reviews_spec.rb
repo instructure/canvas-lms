@@ -152,7 +152,7 @@ describe "assignments" do
     let!(:teacher) { review_course.teachers.first }
     let!(:reviewed) { student_in_course(active_all: true).user }
     let!(:reviewer) { student_in_course(active_all: true).user }
-    let!(:assignment) {
+    let!(:assignment) do
       @assignment = assignment_model({
                                        course: review_course,
                                        peer_reviews: true,
@@ -160,8 +160,8 @@ describe "assignments" do
                                      })
       @assignment.unmute!
       @assignment
-    }
-    let!(:submission) {
+    end
+    let!(:submission) do
       submission_model({
                          assignment: assignment,
                          body: 'submission body',
@@ -171,8 +171,8 @@ describe "assignments" do
                          submission_type: 'online_text_entry',
                          user: reviewed
                        })
-    }
-    let!(:submissionReviewer) {
+    end
+    let!(:submissionReviewer) do
       submission_model({
                          assignment: assignment,
                          body: 'submission body reviewer',
@@ -182,20 +182,20 @@ describe "assignments" do
                          submission_type: 'online_text_entry',
                          user: reviewer
                        })
-    }
-    let!(:comment) {
+    end
+    let!(:comment) do
       submission_comment_model({
                                  author: reviewer,
                                  submission: submission
                                })
-    }
+    end
     let!(:rubric) { rubric_model }
-    let!(:association) {
+    let!(:association) do
       rubric.associate_with(assignment, review_course, {
                               :purpose => 'grading', :use_for_grading => true
                             })
-    }
-    let!(:assessment) {
+    end
+    let!(:assessment) do
       association.assess({
                            :user => reviewed,
                            :assessor => reviewer,
@@ -208,7 +208,7 @@ describe "assignments" do
                              }
                            }
                          })
-    }
+    end
 
     before { assignment.assign_peer_review(reviewer, reviewed) }
 
@@ -259,7 +259,7 @@ describe "assignments" do
     end
 
     context 'when peer review and plagiarism are enabled' do
-      before {
+      before do
         user_logged_in(user: reviewer)
         # assignment settings
         assignment.vericite_enabled = true
@@ -290,7 +290,7 @@ describe "assignments" do
         submission.turnitin_data = turnitin_data
         submission.turnitin_data_changed!
         submission.save!
-      }
+      end
 
       it 'shows the plagiarism report link for reviewer', priority: "1" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"

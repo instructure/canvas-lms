@@ -46,12 +46,12 @@ class OutcomeCalculationMethod < ApplicationRecord
     message: "calculation_method must be one of #{CALCULATION_METHODS}"
   }
   validates :calculation_int, inclusion: {
-    in: ->(model) {
+    in: lambda do |model|
       VALID_CALCULATION_INTS[model.calculation_method].presence || [nil] # if valid ints == [], value must be nil
-    },
-    if: ->(model) {
+    end,
+    if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
-    },
+    end,
     message: "invalid calculation_int for this calculation_method"
   }
 

@@ -1817,10 +1817,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.settings[:enable_profiles] = true
           a.save!
-        }
+        end
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         json = api_call(:put, @path, @path_options, {
@@ -1840,10 +1840,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile with email" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.settings[:enable_profiles] = true
           a.save!
-        }
+        end
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         email = 'dudd@example.com'
@@ -2022,10 +2022,10 @@ describe "Users API", type: :request do
     end
 
     let(:path) { "/api/v1/users/#{@student.to_param}/settings" }
-    let(:path_options) {
+    let(:path_options) do
       { controller: 'users', action: 'settings', format: 'json',
         id: @student.to_param }
-    }
+    end
 
     context "an admin user" do
       it "is able to view other users' settings" do
@@ -2083,13 +2083,13 @@ describe "Users API", type: :request do
     let(:scope2) { 'something-different' }
     let(:path) { "/api/v1/users/#{@student.to_param}/custom_data/#{scope}" }
     let(:path2) { "/api/v1/users/#{@student.to_param}/custom_data/#{scope2}" }
-    let(:path_opts_put) {
+    let(:path_opts_put) do
       { controller: 'custom_data',
         action: 'set_data',
         format: 'json',
         user_id: @student.to_param,
         scope: scope }
-    }
+    end
     let(:path_opts_get) { path_opts_put.merge({ action: 'get_data' }) }
     let(:path_opts_del) { path_opts_put.merge({ action: 'delete_data' }) }
     let(:path_opts_put2) { path_opts_put.merge({ scope: scope2 }) }
@@ -2890,7 +2890,7 @@ describe "Users API", type: :request do
   end
 
   describe 'POST pandata_events_token' do
-    let(:fake_secrets) {
+    let(:fake_secrets) do
       {
         "url" => "https://example.com/pandata/events",
         "ios-key" => "IOS_key",
@@ -2898,7 +2898,7 @@ describe "Users API", type: :request do
         "android-key" => "ANDROID_key",
         "android-secret" => "surrendernoworpreparetofight"
       }
-    }
+    end
 
     before do
       allow(Canvas::DynamicSettings).to receive(:find)

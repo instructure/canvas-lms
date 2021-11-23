@@ -47,8 +47,8 @@ class Rubric < ActiveRecord::Base
   simply_versioned
 
   scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }
-  scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
-  scope :before, lambda { |date| where("rubrics.created_at<?", date) }
+  scope :matching, ->(search) { where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
+  scope :before, ->(date) { where("rubrics.created_at<?", date) }
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
   set_policy do
@@ -193,10 +193,10 @@ class Rubric < ActiveRecord::Base
   def touch_associations
     if alignments_need_update?
       # associations might need to update their alignments also
-      rubric_associations.bookmarked.each { |ra|
+      rubric_associations.bookmarked.each do |ra|
         ra.skip_updating_points_possible = @skip_updating_points_possible
         ra.save
-      }
+      end
     end
   end
 

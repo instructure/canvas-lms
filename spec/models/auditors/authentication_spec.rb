@@ -22,12 +22,12 @@ require_relative '../../cassandra_spec_helper'
 
 describe Auditors::Authentication do
   before do
-    shard_class = Class.new {
+    shard_class = Class.new do
       define_method(:activate) { |&b| b.call }
-    }
-    EventStream.current_shard_lookup = lambda {
+    end
+    EventStream.current_shard_lookup = lambda do
       shard_class.new
-    }
+    end
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
   end
 

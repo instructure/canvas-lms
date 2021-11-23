@@ -206,7 +206,7 @@ class Role < ActiveRecord::Base
   scope :for_courses, -> { where(:base_role_type => ENROLLMENT_TYPES) }
   scope :for_accounts, -> { where(:base_role_type => ACCOUNT_TYPES) }
   scope :full_account_admin, -> { where(base_role_type: 'AccountAdmin') }
-  scope :custom_account_admin_with_permission, ->(permission) do
+  scope :custom_account_admin_with_permission, lambda { |permission|
     where(base_role_type: 'AccountMembership')
       .where("EXISTS (
       SELECT 1
@@ -215,7 +215,7 @@ class Role < ActiveRecord::Base
         AND role_overrides.permission = ?
         AND role_overrides.enabled = ?
     )", permission, true)
-  end
+  }
 
   # Returns a list of hashes for each base enrollment type, and each will have a
   # custom_roles key, each will look like:
@@ -298,7 +298,7 @@ class Role < ActiveRecord::Base
     granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
     manageable = manageable_roles_by_user(user, context) unless granular_admin
     addable, deleteable = add_delete_roles_by_user(user, context) if granular_admin
-    role_data.each_with_object([]) { |role, roles|
+    role_data.each_with_object([]) do |role, roles|
       is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
       is_addable = addable.include?(role[:base_role_name]) if granular_admin
       is_deleteable = deleteable.include?(role[:base_role_name]) if granular_admin
@@ -318,7 +318,7 @@ class Role < ActiveRecord::Base
         end
         roles << custom_role
       end
-    }
+    end
   end
 
   def self.role_data(course, user, include_inactive = false)

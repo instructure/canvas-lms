@@ -26,16 +26,16 @@ module Lti
 
     specs_require_sharding
 
-    let(:course) {
+    let(:course) do
       Course.new.tap do |c|
         c.root_account = root_account
         c.account = account
       end
-    }
+    end
     let(:root_account) { Account.create! }
-    let(:account) {
+    let(:account) do
       Account.create!(root_account: root_account)
-    }
+    end
     let(:user) { User.create! }
 
     def set_up_persistance!

@@ -427,23 +427,23 @@ describe CalendarEventsApiController, type: :request do
         ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         event1 = ag1.appointments.first
         student_ids = []
-        3.times {
+        3.times do
           event1.reserve_for(student_in_course(:course => @course, :active_all => true).user, @me)
           student_ids << @user.id
-        }
+        end
 
         cat = @course.group_categories.create(name: "foo")
         ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
         event2 = ag2.appointments.first
         group_ids = []
         group_student_ids = []
-        3.times {
+        3.times do
           g = cat.groups.create(:context => @course)
           g.users << user_factory
           event2.reserve_for(g, @me)
           group_ids << g.id
           group_student_ids << @user.id
-        }
+        end
 
         @user = @me
         json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@course.asset_string}", {
@@ -1706,17 +1706,17 @@ describe CalendarEventsApiController, type: :request do
 
         @pub1 = @course1.assignments.create(:title => 'published assignment 1')
         @pub2 = @course2.assignments.create(:title => 'published assignment 2')
-        [@pub1, @pub2].each { |a|
+        [@pub1, @pub2].each do |a|
           a.workflow_state = 'published'
           a.save!
-        }
+        end
 
         @unpub1 = @course1.assignments.create(:title => 'unpublished assignment 1')
         @unpub2 = @course2.assignments.create(:title => 'unpublished assignment 2')
-        [@unpub1, @unpub2].each { |a|
+        [@unpub1, @unpub2].each do |a|
           a.workflow_state = 'unpublished'
           a.save!
-        }
+        end
       end
 
       context 'for teachers' do
@@ -1794,10 +1794,10 @@ describe CalendarEventsApiController, type: :request do
           @only_vis_to_o, @not_only_vis_to_o = (1..2).map { @course.assignments.create(:title => 'test assig', :workflow_state => 'published', :due_at => '2012-01-07 12:00:00') }
           @only_vis_to_o.only_visible_to_overrides = true
           @only_vis_to_o.save!
-          [@only_vis_to_o, @not_only_vis_to_o].each { |a|
+          [@only_vis_to_o, @not_only_vis_to_o].each do |a|
             a.workflow_state = 'published'
             a.save!
-          }
+          end
 
           create_section_override_for_assignment(@only_vis_to_o, { course_section: @section })
         end
@@ -3030,12 +3030,12 @@ describe CalendarEventsApiController, type: :request do
       timetables = { "all" => [{ :weekdays => "monday, thursday", :start_time => "2:00 pm",
                                  :end_time => "3:30 pm", :location_name => location_name }] }
 
-      expect {
+      expect do
         api_call(:post, @path, {
                    :course_id => @course.id.to_param, :controller => 'calendar_events_api',
                    :action => 'set_course_timetable', :format => 'json'
                  }, { :timetables => timetables })
-      }.to change(Delayed::Job, :count).by(1)
+      end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
 
@@ -3061,12 +3061,12 @@ describe CalendarEventsApiController, type: :request do
         "sis_section_id:#{section2.sis_source_id}" => [{ :weekdays => "Thu", :start_time => "3:30 pm", :end_time => "4:30 pm" }]
       }
 
-      expect {
+      expect do
         api_call(:post, @path, {
                    :course_id => @course.id.to_param, :controller => 'calendar_events_api',
                    :action => 'set_course_timetable', :format => 'json'
                  }, { :timetables => timetables })
-      }.to change(Delayed::Job, :count).by(2)
+      end.to change(Delayed::Job, :count).by(2)
 
       run_jobs
 
@@ -3115,12 +3115,12 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "is able to create a bunch of events directly from a list" do
-      expect {
+      expect do
         api_call(:post, @path, {
                    :course_id => @course.id.to_param, :controller => 'calendar_events_api',
                    :action => 'set_course_timetable_events', :format => 'json'
                  }, { :events => @events })
-      }.to change(Delayed::Job, :count).by(1)
+      end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
 
@@ -3130,12 +3130,12 @@ describe CalendarEventsApiController, type: :request do
 
     it "is able to create events for a course section" do
       section = @course.course_sections.create!
-      expect {
+      expect do
         api_call(:post, @path, {
                    :course_id => @course.id.to_param, :controller => 'calendar_events_api',
                    :action => 'set_course_timetable_events', :format => 'json'
                  }, { :events => @events, :course_section_id => section.id.to_param })
-      }.to change(Delayed::Job, :count).by(1)
+      end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
 

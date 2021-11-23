@@ -118,9 +118,9 @@ module Canvas
 
     base_path = File.expand_path(dirname)
     base_path.gsub(%r{/lib/[^/]*$}, '')
-    ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
+    ActiveSupport::Dependencies.autoload_once_paths.reject! do |p|
       p[0, base_path.length] == base_path
-    }
+    end
   end
 
   def self.revision
@@ -133,7 +133,7 @@ module Canvas
                 end
   end
 
-  DEFAULT_RETRY_CALLBACK = ->(ex, tries) {
+  DEFAULT_RETRY_CALLBACK = lambda do |ex, tries|
     Rails.logger.debug do
       {
         error_class: ex.class,
@@ -143,7 +143,7 @@ module Canvas
         message: "Retrying service call!"
       }.to_json
     end
-  }
+  end
 
   DEFAULT_RETRIABLE_OPTIONS = {
     interval: ->(attempts) { 0.5 + (4**(attempts - 1)) }, # Sleeps: 0.5, 4.5, 16.5
@@ -153,10 +153,10 @@ module Canvas
   def self.retriable(opts = {}, &block)
     if opts[:on_retry]
       original_callback = opts[:on_retry]
-      opts[:on_retry] = ->(ex, tries) {
+      opts[:on_retry] = lambda do |ex, tries|
         original_callback.call(ex, tries)
         DEFAULT_RETRY_CALLBACK.call(ex, tries)
-      }
+      end
     end
     options = DEFAULT_RETRIABLE_OPTIONS.merge(opts)
     Retriable.retriable(options, &block)

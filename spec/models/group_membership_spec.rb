@@ -64,15 +64,15 @@ describe GroupMembership do
 
   context "section homogeneity" do
     # can't use 'course' because it is defined in spec_helper, so use 'course1'
-    let_once(:course1) {
+    let_once(:course1) do
       course_with_teacher(:active_all => true)
       @course
-    }
-    let_once(:student) {
+    end
+    let_once(:student) do
       student = user_model
       course1.enroll_student(student)
       student
-    }
+    end
     let_once(:group_category) { GroupCategory.student_organized_for(course1) }
     let_once(:group) { course1.groups.create(:group_category => group_category) }
     let_once(:group_membership) { group.group_memberships.create(:user => student) }
@@ -89,9 +89,9 @@ describe GroupMembership do
     end
 
     it "passes validation on update" do
-      expect {
+      expect do
         group_membership.save!
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
@@ -406,9 +406,9 @@ describe GroupMembership do
       membership = group.group_memberships.create!(user: user)
       membership.root_account_id = nil
 
-      expect {
+      expect do
         membership.save!
-      }.to change {
+      end.to change {
         membership.root_account_id
       }.from(nil).to(group.root_account_id)
     end
@@ -418,9 +418,9 @@ describe GroupMembership do
 
       expect(membership.group).not_to receive(:root_account_id)
 
-      expect {
+      expect do
         membership.save!
-      }.not_to change {
+      end.not_to change {
         GroupMembership.find(membership.id).root_account_id
       }
     end

@@ -21,12 +21,12 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::ExternalUrlType do
-  let_once(:course) {
+  let_once(:course) do
     course_with_teacher(active_all: true)
     @course
-  }
+  end
   let_once(:context_module) { course.context_modules.create! name: 'Module 1' }
-  let_once(:module_item) {
+  let_once(:module_item) do
     context_module.content_tags.create!(
       content_id: 0,
       tag_type: 'context_module',
@@ -36,7 +36,7 @@ describe Types::ExternalUrlType do
       title: 'Test Title',
       url: 'https://google.com'
     )
-  }
+  end
 
   it "works" do
     expected = { "data" => { "moduleItem" => { "content" => { "url" => module_item.url } } } }

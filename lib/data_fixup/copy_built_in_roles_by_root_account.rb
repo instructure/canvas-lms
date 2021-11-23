@@ -29,13 +29,13 @@ module DataFixup::CopyBuiltInRolesByRootAccount
       root_account_ids -= existing_root_ids # some root accounts might have already had their own copies made if they were created postdeploy
       return unless root_account_ids.any?
 
-      new_role_data = root_account_ids.flat_map { |id|
-        Role::BASE_TYPES.map { |type|
+      new_role_data = root_account_ids.flat_map do |id|
+        Role::BASE_TYPES.map do |type|
           {
             :name => type, :base_role_type => type, :root_account_id => id, :workflow_state => "built_in", :created_at => Time.now.utc, :updated_at => Time.now.utc
           }
-        }
-      }
+        end
+      end
       Role.bulk_insert(new_role_data)
 
       # and datafixup references to the old built in roles

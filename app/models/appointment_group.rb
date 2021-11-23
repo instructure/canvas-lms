@@ -87,13 +87,13 @@ class AppointmentGroup < ActiveRecord::Base
 
   def new_appointments=(appointments)
     appointments = appointments.values if appointments.is_a?(Hash)
-    @new_appointments = appointments.map { |start_at, end_at|
+    @new_appointments = appointments.map do |start_at, end_at|
       next unless start_at && end_at
 
       a = self.appointments.build(:start_at => start_at, :end_at => end_at)
       a.context = self
       a
-    }
+    end
   end
   attr_accessor :validation_event_override
   attr_accessor :cancel_reason
@@ -152,14 +152,14 @@ class AppointmentGroup < ActiveRecord::Base
                                                .flatten.map(&:asset_string)
         @new_sub_context_codes -= disallowed_sub_context_codes
 
-        new_sub_contexts = @new_sub_context_codes.filter_map { |code|
+        new_sub_contexts = @new_sub_context_codes.filter_map do |code|
           next unless code =~ /\Acourse_section_(.*)/
 
           cs = CourseSection.where(id: $1).first
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
-        }
+        end
       end
     end
 
@@ -168,9 +168,9 @@ class AppointmentGroup < ActiveRecord::Base
     if @new_contexts.present? && !((appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
              (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
              !new_record?)
-      self.appointment_group_contexts += @new_contexts.map { |c|
+      self.appointment_group_contexts += @new_contexts.map do |c|
         AppointmentGroupContext.new :context => c, :appointment_group => self
-      }
+      end
       @contexts_changed = true
     end
 
@@ -238,33 +238,33 @@ class AppointmentGroup < ActiveRecord::Base
   }
   scope :current, -> { where("end_at>=?", Time.zone.now) }
   scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now) }
-  scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
+  scope :intersecting, ->(start_date, end_date) { where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
-    given { |user|
+    given do |user|
       active? && participant_for(user)
-    }
+    end
     can :reserve and can :read
 
-    given { |user|
+    given do |user|
       next false if deleted?
       next false unless active_contexts.any? { |c| c.grants_right? user, :manage_calendar }
 
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
-        user_visible_section_ids = contexts.map { |c|
+        user_visible_section_ids = contexts.map do |c|
           c.section_visibilities_for(user).pluck(:course_section_id)
-        }.flatten
+        end.flatten
         next true if (sub_context_ids - user_visible_section_ids).empty?
       end
       contexts.any? { |c| c.enrollment_visibility_level_for(user) == :full }
-    }
+    end
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
       can :create and can :update and can :delete
 
-    given { |user|
+    given do |user|
       participant_visibility == 'protected' && grants_right?(user, :reserve)
-    }
+    end
     can :read_appointment_participants
   end
 
@@ -470,9 +470,9 @@ class AppointmentGroup < ActiveRecord::Base
       # participants_per_appointment can change after the fact, so a given
       # could exceed it and we can't just say:
       #   appointments.size * participants_per_appointment
-      filtered_appointments.inject(0) { |total, appointment|
+      filtered_appointments.inject(0) do |total, appointment|
         total + [participants_per_appointment - appointment.child_events.size, 0].max
-      }
+      end
     end
   end
 

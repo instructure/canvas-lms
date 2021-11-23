@@ -59,7 +59,7 @@ class Collaboration < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user|
+    given do |user|
       user &&
         !new_record? &&
         (user_id == user.id ||
@@ -69,7 +69,7 @@ class Collaboration < ActiveRecord::Base
              .where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
                             collaborators.collaboration_id = ?', user, self).exists?)
-    }
+    end
     can :read
 
     given { |user, session| context.grants_right?(user, session, :create_collaborations) }
@@ -78,19 +78,19 @@ class Collaboration < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :manage_content) }
     can :read and can :update and can :delete
 
-    given { |user, session|
+    given do |user, session|
       user && user_id == user.id &&
         context.grants_right?(user, session, :create_collaborations)
-    }
+    end
     can :read and can :update and can :delete
   end
 
   scope :active, -> { where("collaborations.workflow_state<>'deleted'") }
 
-  scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
+  scope :after, ->(date) { where("collaborations.updated_at>?", date) }
 
-  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
-  scope :for_context, lambda { |context| where(context_type: context.class.reflection_type_name, context_id: context) }
+  scope :for_context_codes, ->(context_codes) { where(:context_code => context_codes) }
+  scope :for_context, ->(context) { where(context_type: context.class.reflection_type_name, context_id: context) }
 
   # These methods should be implemented in child classes.
 

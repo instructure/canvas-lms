@@ -24,9 +24,9 @@ describe "Api::V1::CustomGradebookColumn" do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     @col = @course.custom_gradebook_columns.create! title: "blah", position: 2
-    @datum = @col.custom_gradebook_column_data.build(content: "asdf").tap { |d|
+    @datum = @col.custom_gradebook_column_data.build(content: "asdf").tap do |d|
       d.user_id = @student.id
-    }
+    end
   end
 
   describe "custom_gradebook_column_json" do

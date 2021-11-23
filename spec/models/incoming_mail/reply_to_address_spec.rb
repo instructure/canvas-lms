@@ -126,9 +126,9 @@ describe IncomingMail::ReplyToAddress do
       message = double
       IncomingMail::ReplyToAddress.address_pool = []
 
-      expect {
+      expect do
         IncomingMail::ReplyToAddress.address_from_pool(message)
-      }.to raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
+      end.to raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
     end
 
     it 'randomly selects a pool address if the message has no id' do

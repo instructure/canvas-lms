@@ -44,9 +44,9 @@ class NotificationPolicy < ActiveRecord::Base
     end
   }
 
-  scope :by_frequency, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
+  scope :by_frequency, ->(freq) { where(:frequency => Array(freq).map(&:to_s)) }
 
-  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
 
   def self.setup_for(user, params)
     # Check for user preference settings first. Some communication related options are available on the page.

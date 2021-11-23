@@ -159,10 +159,10 @@ describe Moodle::Converter do
       expect(question.question_data[:neutral_comments]).to eq 'Calculated Question General Feedback'
 
       # add warnings because these question types seem to be ambiguously structured in moodle
-      warnings = @cm.migration_issues.select { |w|
+      warnings = @cm.migration_issues.select do |w|
         w.description == "Possible answers will need to be regenerated for Formula question" &&
           w.fix_issue_html_url.include?("question_#{question.assessment_question_id}_question_text")
-      }
+      end
       expect(warnings.count).to eq 1
     end
 
@@ -309,10 +309,10 @@ describe Moodle::Converter do
       expect(question.question_data[:question_type]).to eq 'multiple_dropdowns_question'
 
       # add warnings because these question types seem to be ambiguously structured in moodle
-      warnings = @cm.migration_issues.select { |w|
+      warnings = @cm.migration_issues.select do |w|
         w.description == "Multiple Dropdowns question may have been imported incorrectly" &&
           w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
-      }
+      end
       expect(warnings.count).to eq 1
     end
 

@@ -114,7 +114,7 @@ class AnnouncementsController < ApplicationController
         render :plain => feed.to_xml
       end
 
-      format.rss {
+      format.rss do
         @announcements = announcements
         require 'rss/2.0'
         rss = RSS::Rss.new("2.0")
@@ -134,7 +134,7 @@ class AnnouncementsController < ApplicationController
         end
         rss.channel = channel
         render :plain => rss.to_s
-      }
+      end
     end
   end
 end

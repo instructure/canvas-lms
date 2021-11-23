@@ -92,7 +92,7 @@ describe OutcomeImportsApiController, type: :request do
   describe "imports within group" do
     let(:group) { LearningOutcomeGroup.create!(title: "test", context: @account) }
 
-    let(:make_api_call) {
+    let(:make_api_call) do
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports/group/#{group.id}",
                { :controller => 'outcome_imports_api', :action => 'create', :format => 'json',
                  :account_id => @account.id.to_s, :learning_outcome_group_id => group.id.to_s },
@@ -100,16 +100,16 @@ describe OutcomeImportsApiController, type: :request do
                  :attachment => fixture_file_upload("files/outcomes/test_outcomes_no_groups.csv", 'text/csv') })
 
       run_jobs
-    }
+    end
 
     it { expect { make_api_call }.to change { group.child_outcome_links.count }.by(1) }
 
     it { expect { make_api_call }.to change { LearningOutcome.count }.by(1) }
 
-    it {
+    it do
       make_api_call
       expect(group.child_outcome_links.first.content).to eq(LearningOutcome.first)
-    }
+    end
   end
 
   it "allows raw post without content-type" do

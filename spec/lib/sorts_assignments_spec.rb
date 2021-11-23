@@ -29,7 +29,7 @@ describe SortsAssignments do
   let(:no_due_date) { double({ :id => 4, :due_at => nil }) }
   let(:due_in_one_week) { double({ :id => 5, :due_at => 1.week.from_now }) }
   let(:due_in_two_weeks) { double({ :id => 6, :due_at => 2.weeks.from_now }) }
-  let(:assignments) {
+  let(:assignments) do
     [
       due_yesterday,
       due_today,
@@ -38,7 +38,7 @@ describe SortsAssignments do
       due_in_two_weeks,
       no_due_date
     ]
-  }
+  end
 
   describe "past" do
     it "and_return an array of assignments that are due before now" do
@@ -129,12 +129,12 @@ describe SortsAssignments do
     let(:bad_count_query) { double(count: -1) }
 
     before do
-      assignments.each { |assignment|
+      assignments.each do |assignment|
         allow(assignment).to receive_messages(
           :grants_right? => true,
           :expects_submission? => true
         )
-      }
+      end
 
       allow(Assignments::NeedsGradingCountQuery).to receive_messages(new: one_count_query)
     end
@@ -164,7 +164,7 @@ describe SortsAssignments do
     let(:user) { double }
     let(:session) { double }
     let(:submissions) { [] }
-    let(:sorted_assignments) {
+    let(:sorted_assignments) do
       SortsAssignments.by_due_date({
                                      :assignments => assignments,
                                      :user => user,
@@ -172,16 +172,16 @@ describe SortsAssignments do
                                      :upcoming_limit => 1.week.from_now,
                                      :submissions => []
                                    })
-    }
+    end
 
     before do
-      assignments.each { |assignment|
+      assignments.each do |assignment|
         allow(assignment).to receive_messages(
           :grants_right? => true,
           :expects_submission? => true,
           :submission_for_student => { id: nil }
         )
-      }
+      end
     end
 
     it "raises an IndexError if a required field is not passed" do
@@ -234,14 +234,14 @@ describe SortsAssignments do
   end
 
   describe "without_graded_submission" do
-    let(:submission1) {
+    let(:submission1) do
       double(:assignment_id => due_yesterday.id,
              :without_graded_submission? => false)
-    }
-    let(:submission2) {
+    end
+    let(:submission2) do
       double(:assignment_id => due_today.id,
              :without_graded_submission? => false)
-    }
+    end
     let(:submissions) { [submission1, submission2] }
     let(:assignments) { [due_yesterday, due_today] }
 
@@ -263,10 +263,10 @@ describe SortsAssignments do
     let(:user) { double }
 
     before do
-      assignments.each { |assignment|
+      assignments.each do |assignment|
         allow(assignment).to receive(:expects_submission?).and_return true
         allow(assignment).to receive(:grants_right?).and_return false
-      }
+      end
     end
 
     it "includes assignments where assignment not expecting a submission and don't grant rights to user" do
@@ -302,12 +302,12 @@ describe SortsAssignments do
 
     before do
       allow(course).to receive_messages(:grants_right? => true)
-      assignments.each { |assignment|
+      assignments.each do |assignment|
         allow(assignment).to receive_messages(
           :expects_submission? => true,
           :submission_for_student => { id: nil }
         )
-      }
+      end
     end
 
     it "only includes assignments that current user has permission to view" do

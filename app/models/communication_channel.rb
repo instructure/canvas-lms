@@ -43,8 +43,8 @@ class CommunicationChannel < ActiveRecord::Base
   validates :path, :path_type, :user, :workflow_state, presence: true
   validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
-  validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
-  validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
+  validate :validate_email, if: ->(cc) { cc.path_type == TYPE_EMAIL && cc.new_record? }
+  validate :not_otp_communication_channel, :if => ->(cc) { cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
   after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
 
@@ -193,26 +193,26 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :confirm_registration
     p.to { self }
-    p.whenever { |record|
+    p.whenever do |record|
       @send_confirmation and
         (record.workflow_state == 'active' ||
           (record.workflow_state == 'unconfirmed' and (user.pre_registered? || user.creation_pending?))) and
         path_type == TYPE_EMAIL
-    }
+    end
 
     p.dispatch :confirm_email_communication_channel
     p.to { self }
-    p.whenever { |record|
+    p.whenever do |record|
       @send_confirmation and
         record.workflow_state == 'unconfirmed' and user.registered? and
         path_type == TYPE_EMAIL
-    }
-    p.data {
+    end
+    p.data do
       {
         root_account_id: @root_account.global_id,
         from_host: HostUrl.context_host(@root_account)
       }
-    }
+    end
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
@@ -220,18 +220,18 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
-    p.whenever { |record|
+    p.whenever do |record|
       @send_confirmation and
         record.workflow_state == 'unconfirmed' and
         (path_type == TYPE_SMS or path_type == TYPE_SLACK) and
         !user.creation_pending?
-    }
-    p.data {
+    end
+    p.data do
       {
         root_account_id: @root_account.global_id,
         from_host: HostUrl.context_host(@root_account)
       }
-    }
+    end
   end
 
   def uniqueness_of_path
@@ -408,8 +408,8 @@ class CommunicationChannel < ActiveRecord::Base
              .order(Arel.sql("#{rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 
-  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
-  scope :of_type, lambda { |type| where(:path_type => type) }
+  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
+  scope :of_type, ->(type) { where(:path_type => type) }
 
   # the only way this is used is if a user adds a communication channel in their
   # profile from the default account. In this space, there is currently a

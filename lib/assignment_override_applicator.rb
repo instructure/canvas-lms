@@ -235,9 +235,9 @@ module AssignmentOverrideApplicator
         context.section_visibilities_for(
           user,
           excluded_workflows: ['deleted', 'completed']
-        ).select { |v|
+        ).select do |v|
           %w[StudentEnrollment ObserverEnrollment StudentViewEnrollment].include? v[:type]
-        }.pluck(:course_section_id).uniq
+        end.pluck(:course_section_id).uniq
     end
 
     if assignment_or_quiz.assignment_overrides.loaded?
@@ -284,9 +284,9 @@ module AssignmentOverrideApplicator
     end
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
-    %i[id updated_at created_at].each { |attr|
+    %i[id updated_at created_at].each do |attr|
       clone[attr] = assignment.send(attr)
-    }
+    end
     copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
 

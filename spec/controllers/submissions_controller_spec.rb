@@ -1084,12 +1084,12 @@ describe SubmissionsController do
       context 'when there are multiple originality reports' do
         let(:submission2) { assignment.submit_homework(test_student, body: 'hello world') }
         let(:report_url2) { 'http://www.another-test-score.com/' }
-        let(:originality_report2) {
+        let(:originality_report2) do
           OriginalityReport.create!(attachment: nil,
                                     submission: submission2,
                                     originality_score: 0.4,
                                     originality_report_url: report_url2)
-        }
+        end
 
         it 'can use attempt number to find the report url for text entry submissions' do
           originality_report2 # Create immediately

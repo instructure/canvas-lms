@@ -98,10 +98,10 @@ module YARD::Templates::Helpers::BaseHelper
   def lookup_topic(controller_path)
     controller = nil
     topic = options[:resources].find do |_r, cs|
-      cs.any? { |c|
+      cs.any? do |c|
         controller = c if c.path.to_s == controller_path
         !controller.nil?
-      }
+      end
     end
 
     [topic, controller]

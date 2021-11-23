@@ -36,13 +36,13 @@ describe "discussions" do
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:group_category) { course.group_categories.create!(name: 'group category') }
-  let(:assignment) {
+  let(:assignment) do
     course.assignments.create!(
       name: 'assignment',
       # submission_types: 'discussion_topic',
       assignment_group: assignment_group
     )
-  }
+  end
 
   before do
     stub_rcs_config

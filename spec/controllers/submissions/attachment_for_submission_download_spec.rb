@@ -40,9 +40,9 @@ describe Submissions::AttachmentForSubmissionDownload do
   describe '#attachment' do
     it 'raises ActiveRecord::RecordNotFound when download_id is not present' do
       expect(@options).not_to have_key(:download_id)
-      expect {
+      expect do
         subject.attachment
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     context 'when attachment belongs to a submission' do
@@ -66,13 +66,13 @@ describe Submissions::AttachmentForSubmissionDownload do
 
       it 'returns prior attachment' do
         expect(@submission.attachment).not_to be_nil, 'precondition'
-        expect {
+        expect do
           @submission.with_versioning(explicit: true) do
             @submission.attachment = nil
             @submission.submitted_at = 1.hour.ago
             @submission.save
           end
-        }.to change(@submission.versions, :count), 'precondition'
+        end.to change(@submission.versions, :count), 'precondition'
         @submission.reload
         expect(@submission.attachment).to be_nil, 'precondition'
         @options = { download: @attachment.id }

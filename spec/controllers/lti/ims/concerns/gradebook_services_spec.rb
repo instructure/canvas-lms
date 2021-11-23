@@ -182,12 +182,12 @@ module Lti
         end
 
         context 'when resource link id points to wrong assignment' do
-          let(:valid_params) {
+          let(:valid_params) do
             a2 = assignment.clone
             a2.lti_context_id = nil
             a2.save
             { course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id }
-          }
+          end
 
           it 'fails to match assignment tool' do
             get :index, params: valid_params

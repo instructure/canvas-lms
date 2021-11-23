@@ -742,12 +742,12 @@ describe ExternalToolsController do
         tool
       end
 
-      let(:launch_hash) {
+      let(:launch_hash) do
         lti_launch = assigns[:lti_launch]
         decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
         cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
         JSON.parse(cached_launch)
-      }
+      end
 
       before do
         lti_1_3_tool
@@ -770,21 +770,21 @@ describe ExternalToolsController do
           )
         end
 
-        let(:rl) {
+        let(:rl) do
           Lti::ResourceLink.create!(
             context_external_tool: lti_1_3_tool,
             context: @course,
             custom: { abc: 'def', expans: '$Canvas.user.id' }
           )
-        }
+        end
 
-        let(:get_page) {
+        let(:get_page) do
           get 'retrieve', params: {
             course_id: @course.id,
             url: 'http://www.example.com/launch',
             resource_link_lookup_uuid: rl.lookup_uuid
           }
-        }
+        end
 
         it 'sets the custom parameters in the launch hash' do
           get_page

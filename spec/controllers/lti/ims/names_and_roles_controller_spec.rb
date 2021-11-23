@@ -40,12 +40,12 @@ describe Lti::IMS::NamesAndRolesController do
     let!(:student_enrollment_3) { student_in_course(course: course, active_all: true) }
     let!(:student_enrollment_4) { student_in_course(course: course, active_all: true) }
     let!(:student_enrollment_5) { student_in_course(course: course, active_all: true) }
-    let!(:student_enrollments) {
+    let!(:student_enrollments) do
       [student_enrollment_1, student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5]
-    }
-    let!(:enrollments) {
+    end
+    let!(:enrollments) do
       super().push(student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5)
-    }
+    end
     let(:rlid_param_1) { SecureRandom.hex }
     let(:rlid_param_2) { SecureRandom.hex }
     let!(:assignment_with_rlid_1) { assignment_with_rlid(rlid_param_1) }
@@ -1040,14 +1040,14 @@ describe Lti::IMS::NamesAndRolesController do
           leader
         end
         # student 1 is our leader, add another rando student as group member 1
-        let!(:group_membership_1) {
+        let!(:group_membership_1) do
           group_membership_model(group: group_record, user: student_in_course(course: course, active_all: true).user)
-        }
+        end
         let!(:group_membership_2) { group_membership_model(group: group_record, user: student_enrollment_2.user) }
         # to test 'narrowing', leave student 3 out, add another rando student as group member 3
-        let!(:group_membership_3) {
+        let!(:group_membership_3) do
           group_membership_model(group: group_record, user: student_in_course(course: course, active_all: true).user)
-        }
+        end
         let!(:group_membership_4) { group_membership_model(group: group_record, user: student_enrollment_4.user) }
         let!(:group_membership_5) { group_membership_model(group: group_record, user: student_enrollment_5.user) }
         let!(:enrollments) do # cant just append to super() b/c this gets clobbered by 'assignment context'

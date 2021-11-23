@@ -69,7 +69,7 @@ class DeveloperKey < ActiveRecord::Base
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
   scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
-  scope :site_admin_lti, ->(key_ids) do
+  scope :site_admin_lti, lambda { |key_ids|
     # Select site admin shard developer key ids
     site_admin_key_ids = key_ids.select do |id|
       Shard.local_id_for(id).second == Account.site_admin.shard
@@ -81,7 +81,7 @@ class DeveloperKey < ActiveRecord::Base
                                           .pluck(:developer_key_id)
       where(id: lti_key_ids)
     end
-  end
+  }
 
   workflow do
     state :active do

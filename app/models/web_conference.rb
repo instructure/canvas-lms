@@ -45,7 +45,7 @@ class WebConference < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
+  scope :for_context_codes, ->(context_codes) { where(:context_code => context_codes) }
 
   scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct['conference_type'] }) }
 
@@ -80,9 +80,9 @@ class WebConference < ActiveRecord::Base
 
   def user_settings
     @user_settings ||=
-      self.class.user_setting_fields.keys.index_with { |key|
+      self.class.user_setting_fields.keys.index_with do |key|
         settings[key]
-      }
+      end
   end
 
   def lti?
@@ -141,9 +141,9 @@ class WebConference < ActiveRecord::Base
 
   def default_settings
     @default_settings ||=
-      self.class.user_setting_fields.each_with_object({}) { |(name, data), hash|
+      self.class.user_setting_fields.each_with_object({}) do |(name, data), hash|
         hash[name] = data[:default] if data[:default]
-      }
+      end
   end
 
   def self.user_setting_field(name, options)
@@ -451,7 +451,7 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
-  scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
+  scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
     given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) }
@@ -548,7 +548,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.plugin_types
-    plugins.filter_map { |plugin|
+    plugins.filter_map do |plugin|
       next unless plugin.enabled? &&
                   (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
                   klass < base_class
@@ -560,7 +560,7 @@ class WebConference < ActiveRecord::Base
         :name => plugin.name,
         :plugin => plugin
       ).with_indifferent_access
-    }
+    end
   end
 
   def self.config(context: nil, class_name: nil)

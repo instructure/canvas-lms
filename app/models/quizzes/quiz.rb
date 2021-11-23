@@ -1145,11 +1145,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   scope :include_assignment, -> { preload(:assignment) }
-  scope :before, lambda { |date| where("quizzes.created_at<?", date) }
+  scope :before, ->(date) { where("quizzes.created_at<?", date) }
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
-  scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+  scope :for_course, ->(course_id) { where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |student_ids, course_ids|
@@ -1168,7 +1168,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
-  scope :ungraded_with_user_due_date, ->(user) do
+  scope :ungraded_with_user_due_date, lambda { |user|
     from("(WITH overrides AS (
           SELECT DISTINCT ON (o.quiz_id, o.user_id) *
           FROM (
@@ -1201,12 +1201,12 @@ class Quizzes::Quiz < ActiveRecord::Base
         FROM #{Quizzes::Quiz.quoted_table_name} q
         INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes")
       .not_for_assignment
-  end
+  }
 
-  scope :ungraded_due_between_for_user, ->(start, ending, user) do
+  scope :ungraded_due_between_for_user, lambda { |start, ending, user|
     ungraded_with_user_due_date(user)
       .where(user_due_date: start..ending)
-  end
+  }
 
   # Return quizzes (up to limit) that do not have any submissions
   scope :need_submitting_info, lambda { |user_id, limit|
@@ -1219,7 +1219,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       .preload(:context)
   }
 
-  scope :not_locked, -> {
+  scope :not_locked, lambda {
     where("(quizzes.unlock_at IS NULL OR quizzes.unlock_at<:now) AND (quizzes.lock_at IS NULL OR quizzes.lock_at>:now)",
           :now => Time.zone.now)
   }

@@ -1019,7 +1019,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.truncate_filename(filename, max_len, &block)
-    block ||= lambda { |str, len| str[0...len] }
+    block ||= ->(str, len) { str[0...len] }
     ext_index = filename.rindex('.')
     if ext_index
       ext = block.call(filename[ext_index..], (max_len / 2) + 1)
@@ -1281,32 +1281,32 @@ class Attachment < ActiveRecord::Base
     given { |user, session| context&.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
 
-    given { |user, session|
+    given do |user, session|
       user_can_read_through_context?(user, session) && !locked_for?(user, :check_policies => true)
-    }
+    end
     can :read and can :download
 
-    given { |_user, session|
+    given do |_user, session|
       (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (context.respond_to?(:is_public_to_auth_users?) && context.is_public_to_auth_users?)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
-    }
+    end
     can :read
 
-    given { |_user, session|
+    given do |_user, session|
       (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (context.respond_to?(:is_public_to_auth_users?) && context.is_public_to_auth_users?)) &&
         !locked_for?(u, :check_policies => true) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
-    }
+    end
     can :download
 
-    given { |user|
+    given do |user|
       owner = self.user
       context_type == 'Assignment' && user == owner
-    }
+    end
     can :attach_to_submission_comment
   end
 
@@ -1419,7 +1419,7 @@ class Attachment < ActiveRecord::Base
   scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
-  scope :not_locked, -> {
+  scope :not_locked, lambda {
     where("attachments.locked IS NOT TRUE
       AND (attachments.lock_at IS NULL OR attachments.lock_at>?)
       AND (attachments.unlock_at IS NULL OR attachments.unlock_at<?)", Time.now.utc, Time.now.utc)

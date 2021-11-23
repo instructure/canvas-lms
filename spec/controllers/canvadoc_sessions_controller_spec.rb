@@ -150,9 +150,9 @@ describe CanvadocSessionsController do
 
     it "successfully signed the blob" do
       post :create, params: params
-      expect {
+      expect do
         extract_blob(canvadocs_session_url_params["hmac"], canvadocs_session_url_params["blob"])
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "creates a CanvadocsAnnotationContext when one does not exist" do
@@ -161,9 +161,9 @@ describe CanvadocSessionsController do
 
       user_session(new_student)
 
-      expect {
+      expect do
         post :create, params: { submission_attempt: "draft", submission_id: new_submission.id }
-      }.to change {
+      end.to change {
         new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
       }.by(1)
     end

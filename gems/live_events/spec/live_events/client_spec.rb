@@ -92,9 +92,9 @@ describe LiveEvents::Client do
     end
 
     it "loads custom creds" do
-      LiveEvents.aws_credentials = ->(settings) {
+      LiveEvents.aws_credentials = lambda do |settings|
         settings['value_to_return']
-      }
+      end
 
       res = LiveEvents::Client.aws_config({
                                             'custom_aws_credentials' => 'true',

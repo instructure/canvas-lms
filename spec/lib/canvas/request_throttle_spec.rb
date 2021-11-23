@@ -28,7 +28,7 @@ describe 'RequestThrottle' do
   let(:request_header_token) { request_user_2.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session.options' => { id: 'sess1' } }) }
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
-  let(:inner_app) { lambda { |_env| response } }
+  let(:inner_app) { ->(_env) { response } }
   let(:throttler) { RequestThrottle.new(inner_app) }
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
@@ -394,11 +394,11 @@ describe 'RequestThrottle' do
         it "still decrements when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
-            expect {
+            expect do
               @bucket.reserve_capacity(20) do
                 raise "oh noes"
               end
-            }.to raise_error(RuntimeError)
+            end.to raise_error(RuntimeError)
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
           end
         end

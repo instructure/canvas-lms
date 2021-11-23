@@ -29,7 +29,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
                            :dependent => :destroy
   has_one :progress, :as => 'context', :dependent => :destroy
 
-  scope :report_type, lambda { |type| where(:report_type => type) }
+  scope :report_type, ->(type) { where(:report_type => type) }
 
   REPORTS = %w[student_analysis item_analysis].freeze
 

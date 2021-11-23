@@ -111,10 +111,10 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
     Speedgrader.enter_rubric_points('1')
     button = Speedgrader.save_rubric_button
-    keep_trying_until {
+    keep_trying_until do
       button.click
       true
-    }
+    end
     wait_for_ajaximations
     expect(Speedgrader.rubric_comment_for_row("no outcome row")).to include_text to_comment
   end

@@ -33,7 +33,7 @@ describe ExternalContentController do
 
   describe "POST success/external_tool_dialog" do
     describe 'js_env setting' do
-      let(:params) {
+      let(:params) do
         {
           service: 'external_tool_dialog',
           course_id: c.id,
@@ -46,7 +46,7 @@ describe ExternalContentController do
           lti_errormsg: 'some lti error message',
           lti_errorlog: 'some lti error log'
         }
-      }
+      end
 
       let!(:c) { course_factory }
 

@@ -196,7 +196,7 @@ describe OAuth2ProviderController do
       end
 
       context 'when "prompt=none"' do
-        let(:params) {
+        let(:params) do
           {
             client_id: key.id,
             redirect_uri: 'https://example.com',
@@ -204,7 +204,7 @@ describe OAuth2ProviderController do
             scope: '/auth/userinfo',
             prompt: 'none'
           }
-        }
+        end
 
         it 'redirects to the redirect uri if the user already has remember-me token' do
           @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })

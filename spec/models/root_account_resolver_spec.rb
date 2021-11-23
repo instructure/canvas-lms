@@ -64,9 +64,9 @@ describe RootAccountResolver do
     it 'assigns it on save if it is not set' do
       subject = test_class.new(nil)
 
-      expect {
+      expect do
         subject.save
-      }.to change {
+      end.to change {
         subject.root_account_id
       }.from(nil).to(1337)
     end
@@ -74,9 +74,9 @@ describe RootAccountResolver do
     it 'preserves it on save if it was already set' do
       subject = test_class.new(666)
 
-      expect {
+      expect do
         subject.save
-      }.not_to change {
+      end.not_to change {
         subject.root_account_id
       }
     end
@@ -90,9 +90,9 @@ describe RootAccountResolver do
     it 'assigns it on save if it is not set' do
       subject = test_class.new(nil)
 
-      expect {
+      expect do
         subject.save
-      }.to change {
+      end.to change {
         subject.root_account_id
       }.from(nil).to(9000)
     end
@@ -100,9 +100,9 @@ describe RootAccountResolver do
     it 'preserves it on save if it was already set' do
       subject = test_class.new(666)
 
-      expect {
+      expect do
         subject.save
-      }.not_to change {
+      end.not_to change {
         subject.root_account_id
       }
     end

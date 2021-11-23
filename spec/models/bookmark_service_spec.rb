@@ -77,14 +77,14 @@ describe BookmarkService do
     it "rescues silently if something happens during the process" do
       allow(@bookmark_service).to receive(:diigo_post_bookmark).and_raise(ArgumentError)
 
-      expect {
+      expect do
         @bookmark_service.post_bookmark(
           :title => 'some title',
           :url => 'google.com',
           :comments => 'some comments',
           :tags => %w[some tags]
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 end

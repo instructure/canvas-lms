@@ -268,15 +268,15 @@ describe MicrosoftSync::GraphService::Http do
 
       it 'fails immediately if DEFAULT_N_INTERMITTENT_RETRIES is 0' do
         stub_const('MicrosoftSync::GraphService::Http::DEFAULT_N_INTERMITTENT_RETRIES', 0)
-        expect {
+        expect do
           subject.request(:post, 'foo/bar', body: { hello: 'world' })
-        }.to raise_error(error_class)
+        end.to raise_error(error_class)
       end
 
       it 'fails immediately if retries: 0 is passed in' do
-        expect {
+        expect do
           subject.request(:post, 'foo/bar', retries: 0, body: { hello: 'world' })
-        }.to raise_error(error_class)
+        end.to raise_error(error_class)
       end
     end
 
@@ -318,9 +318,9 @@ describe MicrosoftSync::GraphService::Http do
         let(:status) { status_code }
 
         it 'raises the error immediately and does not retry' do
-          expect {
+          expect do
             subject.request(:post, 'foo/bar', body: { hello: 'world' })
-          }.to raise_error(error_class)
+          end.to raise_error(error_class)
         end
       end
     end

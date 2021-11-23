@@ -90,9 +90,9 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
       answer_keys[answer[:blank_id]] = answers.length - 1
     end
     answers.each do |found_answer|
-      @question_data.answers.select { |a|
+      @question_data.answers.select do |a|
         a[:blank_id] == found_answer[:blank_id]
-      }.each do |sub_answer|
+      end.each do |sub_answer|
         correct = sub_answer[:weight] == 100
         match = {
           :responses => 0,

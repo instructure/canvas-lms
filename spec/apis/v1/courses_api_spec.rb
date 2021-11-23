@@ -1457,10 +1457,10 @@ describe CoursesController, type: :request do
       end
 
       it "doesn't allow creating a published course for unverified users if account requires it" do
-        Account.default.tap { |a|
+        Account.default.tap do |a|
           a.settings[:require_confirmed_email] = true
           a.save!
-        }
+        end
         @course.update_attribute(:workflow_state, "claimed")
 
         json = api_call(:put, @path, @params, { :offer => 1 }, {}, { :expected_status => 401 })
@@ -3336,12 +3336,12 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :include => ['enrollments'])
         # helper
-        check_json = lambda { |user, *enrollments|
+        check_json = lambda do |user, *enrollments|
           j = json.find { |x| x['id'] == user.id }
           expect(j.delete('enrollments').map { |e| e['id'] }.sort)
             .to eq enrollments.map(&:id)
           expect(j).to eq api_json_response(user, :only => user_api_fields)
-        }
+        end
         # expect
         check_json.call(@ta, @ta_enroll1, @ta_enroll2)
         check_json.call(@student1, @student1_enroll)
@@ -4251,14 +4251,14 @@ describe CoursesController, type: :request do
       @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
       @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
       pseudonym(@student1) # no login info
-      pseudonym(@student2).tap { |p|
+      pseudonym(@student2).tap do |p|
         p.current_login_at = 1.day.ago
         p.save!
-      }
-      pseudonym(@student3).tap { |p|
+      end
+      pseudonym(@student3).tap do |p|
         p.current_login_at = 2.days.ago
         p.save!
-      }
+      end
     end
 
     it "includes the last_login information" do
@@ -4341,17 +4341,17 @@ describe CoursesController, type: :request do
     end
 
     it "creates a new test student if one does not exist" do
-      expect {
+      expect do
         api_response
-      }.to change { StudentViewEnrollment.where(course_id: course.id).count }.by(1)
+      end.to change { StudentViewEnrollment.where(course_id: course.id).count }.by(1)
     end
 
     it "does not create a new test student if one already exists" do
       course.student_view_student
 
-      expect {
+      expect do
         api_response
-      }.not_to change { StudentViewEnrollment.where(course_id: course.id).count }
+      end.not_to change { StudentViewEnrollment.where(course_id: course.id).count }
     end
 
     it "returns unauthorized if the caller does not have permission to use the student view" do

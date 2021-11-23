@@ -49,14 +49,14 @@ describe "speed grader submissions" do
       expect(f('#assignment_url')).to include_text(@assignment.title)
 
       # check for assignment text in speed grader iframe
-      check_first_student = -> do
+      check_first_student = lambda do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student.name)
         in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission.body)
         end
       end
 
-      check_second_student = -> do
+      check_second_student = lambda do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student_2.name)
         in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission_2.body)

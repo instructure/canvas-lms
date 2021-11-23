@@ -296,11 +296,11 @@ describe CC::CCHelper do
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with('xyzzy').and_return(nil)
       @course.media_objects.create!(:media_id => 'xyzzy')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
-      expect {
+      expect do
         @exporter.html_content(<<~HTML)
           <p><a id='media_comment_xyzzy' class='instructure_inline_media_comment'>this is a media comment</a></p>
         HTML
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 end

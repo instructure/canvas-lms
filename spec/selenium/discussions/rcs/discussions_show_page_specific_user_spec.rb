@@ -29,13 +29,13 @@ describe "discussions" do
   let(:student_topic) { course.discussion_topics.create!(user: student, title: 'student topic title', message: 'student topic message') }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
-  let(:assignment) {
+  let(:assignment) do
     course.assignments.create!(
       name: 'assignment',
       # submission_types: 'discussion_topic',
       assignment_group: assignment_group
     )
-  }
+  end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: 'assignment topic title',

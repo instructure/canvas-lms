@@ -24,7 +24,7 @@ require_relative 'address_book/messageable_user'
 # see AddressBook::Base for primary documentation of the interface
 module AddressBook
   STRATEGIES = {
-    'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda { I18n.t('MessageableUser library') } }.freeze,
+    'messageable_user' => { implementation: AddressBook::MessageableUser, label: -> { I18n.t('MessageableUser library') } }.freeze,
   }.freeze
   DEFAULT_STRATEGY = 'messageable_user'
 

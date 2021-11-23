@@ -294,9 +294,9 @@ RSpec.describe SubmissionCommentsController do
         end
 
         it 'does not create an event when a comment is saved as a draft' do
-          expect {
+          expect do
             patch(:update, params: { id: draft_comment.id, submission_comment: { comment: 'update!!!!!' } })
-          }.not_to change(audit_events, :count)
+          end.not_to change(audit_events, :count)
         end
 
         context 'when publishing an existing draft' do
@@ -323,9 +323,9 @@ RSpec.describe SubmissionCommentsController do
 
       it 'does not create an event when the assignment is not auditable' do
         assignment.update!(anonymous_grading: false)
-        expect {
+        expect do
           patch(:update, params: { id: comment.id, submission_comment: { comment: 'update!!!!!!!' } })
-        }.not_to change(audit_events, :count)
+        end.not_to change(audit_events, :count)
       end
     end
   end

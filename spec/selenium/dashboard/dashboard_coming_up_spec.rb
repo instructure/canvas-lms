@@ -39,7 +39,7 @@ describe "dashboard" do
     end
 
     it "puts locked graded discussions / quizzes in the coming up list only", priority: "1" do
-      check_list_text = ->(list_element, text, should_have_text = true) do
+      check_list_text = lambda do |list_element, text, should_have_text = true|
         if should_have_text
           expect(list_element).to include_text(text)
         else

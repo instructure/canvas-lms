@@ -51,9 +51,9 @@ class Enrollment < ActiveRecord::Base
   validates :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id, presence: true
   validates :limit_privileges_to_course_section, inclusion: { :in => [true, false] }
   validates :associated_user_id, inclusion: { :in => [nil],
-                                              :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
+                                              :unless => ->(enrollment) { enrollment.type == 'ObserverEnrollment' },
                                               :message => "only ObserverEnrollments may have an associated_user_id" }
-  validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
+  validate :cant_observe_self, :if => ->(enrollment) { enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?
   validate :valid_course?
@@ -197,40 +197,40 @@ class Enrollment < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :enrollment_invitation
     p.to { user }
-    p.whenever { |record|
+    p.whenever do |record|
       !record.self_enrolled &&
         record.course &&
         record.user.registered? &&
         !record.observer? &&
         ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
-    }
+    end
 
     p.dispatch :enrollment_registration
     p.to { user.communication_channel }
-    p.whenever { |record|
+    p.whenever do |record|
       !record.self_enrolled &&
         record.course &&
         !record.user.registered? &&
         ((record.invited? && (record.just_created || record.saved_change_to_workflow_state?)) || @re_send_confirmation)
-    }
+    end
 
     p.dispatch :enrollment_notification
     p.to { user }
-    p.whenever { |record|
+    p.whenever do |record|
       !record.self_enrolled &&
         record.course &&
         !record.course.created? &&
         !record.observer? &&
         record.just_created && record.active?
-    }
+    end
 
     p.dispatch :enrollment_accepted
     p.to { course.participating_admins.restrict_to_sections([course_section_id]) - [user] }
-    p.whenever { |record|
+    p.whenever do |record|
       record.course &&
         !record.observer? &&
         !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
-    }
+    end
   end
 
   def dispatch_invitations_later
@@ -244,13 +244,13 @@ class Enrollment < ActiveRecord::Base
 
   scope :active, -> { where("enrollments.workflow_state<>'deleted'") }
 
-  scope :admin, -> {
+  scope :admin, lambda {
                   select(:course_id)
                     .joins(:course)
                     .where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment') AND (courses.workflow_state IN ('created', 'claimed') OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))")
                 }
 
-  scope :instructor, -> {
+  scope :instructor, lambda {
                        select(:course_id)
                          .joins(:course)
                          .where("enrollments.type IN ('TeacherEnrollment','TaEnrollment') AND (courses.workflow_state IN ('created', 'claimed') OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))")
@@ -268,19 +268,19 @@ class Enrollment < ActiveRecord::Base
 
   scope :not_of_observer_type, -> { where.not(:type => "ObserverEnrollment") }
 
-  scope :student, -> {
+  scope :student, lambda {
                     select(:course_id)
                       .joins(:course)
                       .where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => 'available' })
                   }
 
-  scope :student_in_claimed_or_available, -> {
+  scope :student_in_claimed_or_available, lambda {
                                             select(:course_id)
                                               .joins(:course)
                                               .where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => %w[available claimed created] })
                                           }
 
-  scope :all_student, -> {
+  scope :all_student, lambda {
                         eager_load(:course)
                           .where("(enrollments.type = 'StudentEnrollment'
               AND enrollments.workflow_state IN ('invited', 'active', 'completed')
@@ -290,7 +290,7 @@ class Enrollment < ActiveRecord::Base
               AND courses.workflow_state != 'deleted')")
                       }
 
-  scope :not_deleted, -> {
+  scope :not_deleted, lambda {
     joins(:course)
       .where("(courses.workflow_state<>'deleted') AND (enrollments.workflow_state<>'deleted')")
   }
@@ -1247,10 +1247,10 @@ class Enrollment < ActiveRecord::Base
     given { |user| self.user == user }
     can :read and can :read_grades
 
-    given { |user, session|
+    given do |user, session|
       course.students_visible_to(user, include: :priors).where(:id => user_id).exists? &&
         course.grants_any_right?(user, session, :manage_grades, :view_all_grades)
-    }
+    end
     can :read and can :read_grades
 
     given { |user| course.observer_enrollments.where(user_id: user, associated_user_id: user_id).exists? }
@@ -1268,7 +1268,7 @@ class Enrollment < ActiveRecord::Base
     where("enrollments.created_at<?", date)
   }
 
-  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_user, ->(user) { where(:user_id => user) }
 
   scope :for_courses_with_user_name, lambda { |courses|
     where(:course_id => courses)
@@ -1281,34 +1281,34 @@ class Enrollment < ActiveRecord::Base
   scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
 
   scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.state = 'active'") }
-  scope :invited_by_date, -> {
+  scope :invited_by_date, lambda {
                             joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                     .where("enrollment_states.state IN ('invited', 'pending_invited')")
                           }
-  scope :active_or_pending_by_date, -> {
+  scope :active_or_pending_by_date, lambda {
                                       joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                               .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
                                     }
-  scope :invited_or_pending_by_date, -> {
+  scope :invited_or_pending_by_date, lambda {
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
-  scope :not_inactive_by_date, -> {
+  scope :not_inactive_by_date, lambda {
                                  joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                          .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
                                }
 
-  scope :active_or_pending_by_date_ignoring_access, -> {
+  scope :active_or_pending_by_date_ignoring_access, lambda {
                                                       joins(:enrollment_state)
                                                         .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
                                                     }
-  scope :not_inactive_by_date_ignoring_access, -> {
+  scope :not_inactive_by_date_ignoring_access, lambda {
                                                  joins(:enrollment_state)
                                                    .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
                                                }
-  scope :new_or_active_by_date, -> {
+  scope :new_or_active_by_date, lambda {
                                   joins(:enrollment_state)
                                     .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active', 'creation_pending')")
                                 }

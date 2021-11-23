@@ -248,10 +248,10 @@ module CanvasCassandra
           args << ttl_seconds
           statement << " USING TTL ?"
         end
-        update_cql = updates.map { |key, val|
+        update_cql = updates.map do |key, val|
           args << val
           "#{key} = ?"
-        }.join(", ")
+        end.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
         args.concat [execute_options]

@@ -96,10 +96,10 @@ describe "context modules" do
       f('.edit_module_link', mod1).click
       wait_for_ajaximations
       add_button = f(".add_prerequisite_link")
-      2.times {
+      2.times do
         add_button.click
         wait_for_animations
-      }
+      end
       links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
       expect(links.size).to eq 2
       links[1].click

@@ -337,13 +337,13 @@ describe BigBlueButtonConference do
   end
 
   describe "config fallback" do
-    let(:bbb_config) {
+    let(:bbb_config) do
       {
         :domain => "bbb_new.instructure.com",
         :secret_dec => "new_secret",
         :use_fallback => true,
       }
-    }
+    end
 
     before do
       old_config = {

@@ -38,6 +38,6 @@ describe Lti::MessageHandlerNameBookmarker do
       Lti::MessageHandler.joins(:resource_handler)
     end
 
-    let(:model_name_proc) { lambda { |message_handler| message_handler.resource_handler.name } }
+    let(:model_name_proc) { ->(message_handler) { message_handler.resource_handler.name } }
   end
 end

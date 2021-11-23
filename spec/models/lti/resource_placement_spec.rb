@@ -51,7 +51,7 @@ module Lti
     end
 
     describe 'update_tabs_and_return_item_banks_tab' do
-      let(:tabs_with_item_banks) {
+      let(:tabs_with_item_banks) do
         [
           {
             :id => "context_external_tool_1",
@@ -64,9 +64,9 @@ module Lti
             :args => [2, 1]
           }
         ]
-      }
+      end
 
-      let(:tabs_without_item_banks) {
+      let(:tabs_without_item_banks) do
         [
           {
             :id => "context_external_tool_1",
@@ -79,7 +79,7 @@ module Lti
             :args => [2, 1]
           }
         ]
-      }
+      end
 
       it 'updates item banks tab label' do
         tabs = tabs_with_item_banks

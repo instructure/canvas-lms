@@ -102,10 +102,10 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
     input_fields = self.class.arguments.values.map { |a| [a.keyword, a.name] }.to_h
 
     {
-      errors: model.errors.entries.map { |attribute, message|
+      errors: model.errors.entries.map do |attribute, message|
         key = override_keys.key?(attribute) ? override_keys[attribute] : attribute
         [input_fields[key], message]
-      }
+      end
     }
   end
 end

@@ -66,7 +66,7 @@ module Lti
       context 'content-item unique json serialization' do
         let(:launch_url) { "http://test.com/test" }
         let(:secret) { 'secret' }
-        let(:signed_params) {
+        let(:signed_params) do
           {
             :oauth_callback => "about:blank",
             :oauth_consumer_key => "key",
@@ -91,7 +91,7 @@ module Lti
             "lti_errormsg" => "",
             "lti_errorlog" => ""
           }
-        }
+        end
 
         it "validates the message" do
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)

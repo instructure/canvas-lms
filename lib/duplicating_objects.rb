@@ -52,9 +52,9 @@ module DuplicatingObjects
     end
     title_base = is_multiple_copy ? potential_title.gsub(/\d+$/, '') : potential_title + " "
     title_search_term = title_base[0...-1]
-    conflicting_titles = entity.get_potentially_conflicting_titles(title_search_term).map { |x|
+    conflicting_titles = entity.get_potentially_conflicting_titles(title_search_term).map do |x|
       normalize_title(x)
-    }
+    end
     return potential_title unless conflicting_titles.include?(normalize_title(potential_title))
 
     loop do

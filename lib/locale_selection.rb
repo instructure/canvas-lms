@@ -40,14 +40,14 @@ module LocaleSelection
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
-      -> {
+      lambda do
         if accept_language && (locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases))
           GuardRail.activate(:primary) do
             user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
           end
           locale
         end
-      },
+      end,
       -> { !ignore_browser_locale && user.try(:browser_locale) },
       -> { I18n.default_locale.to_s }
     ]
@@ -70,10 +70,10 @@ module LocaleSelection
 
     supported_locales = locales_with_aliases.keys
 
-    ranges = accept_language.downcase.split(SEPARATOR).map { |range|
+    ranges = accept_language.downcase.split(SEPARATOR).map do |range|
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
       [range.sub(/\s*;.*/, ''), quality]
-    }
+    end
     ranges = ranges.sort_by { |r,| r == '*' ? 1 : -r.count('-') }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest

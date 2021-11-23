@@ -59,13 +59,13 @@ module CustomAlertActions
 
     yield
 
-    keep_trying_until {
+    keep_trying_until do
       driver.execute_script(<<~JS)
         var value = window.canvasTestAlertFired;
         window.canvasTestAlertFired = false;
         return value;
       JS
-    }
+    end
 
     driver.execute_script(<<~JS)
       window.alert = window.canvasTestSavedAlert;

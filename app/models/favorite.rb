@@ -22,7 +22,7 @@ class Favorite < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_account, class_name: "Account", inverse_of: :favorites
   validates :context_type, inclusion: { :allow_nil => true, :in => ['Course', 'Group'].freeze }
-  scope :by, lambda { |type| where(:context_type => type) }
+  scope :by, ->(type) { where(:context_type => type) }
 
   before_create :populate_root_account_id
   after_save :touch_user

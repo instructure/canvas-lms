@@ -42,10 +42,10 @@ describe SearchController do
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:name, 'bob')
       other = User.create(:name => 'billy')
-      @course.enroll_student(other).tap { |e|
+      @course.enroll_student(other).tap do |e|
         e.workflow_state = 'active'
         e.save!
-      }
+      end
 
       group = @course.groups.create(:name => 'group')
       group.users << other
@@ -61,10 +61,10 @@ describe SearchController do
       @user.update_attribute(:name, 'billy')
       other = User.create(:name => 'bob')
       other.update_attribute(:workflow_state, 'creation_pending')
-      @course.enroll_student(other).tap { |e|
+      @course.enroll_student(other).tap do |e|
         e.workflow_state = 'invited'
         e.save!
-      }
+      end
 
       get 'recipients', params: {
         :search => 'b', :type => 'user', :skip_visibility_checks => true,

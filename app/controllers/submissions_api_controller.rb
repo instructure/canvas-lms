@@ -530,9 +530,9 @@ class SubmissionsApiController < ApplicationController
         end
 
         student_submissions = submissions_for_user[student.id] || []
-        student_submissions = student_submissions.select { |s|
+        student_submissions = student_submissions.select do |s|
           assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
-        }
+        end
 
         if assignments.present?
           student_submissions.each do |submission|
@@ -584,14 +584,14 @@ class SubmissionsApiController < ApplicationController
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       Version.preload_version_number(submissions)
-      result = submissions.select { |s|
+      result = submissions.select do |s|
         assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
-      }.map { |s|
+      end.map do |s|
         s.assignment = assignments_hash[s.assignment_id]
         visible_assignments = assignment_visibilities.fetch(s.user_id, [])
         s.visible_to_user = visible_assignments.include? s.assignment_id
         submission_json(s, s.assignment, @current_user, session, @context, includes, params)
-      }
+      end
     end
 
     render :json => result
@@ -911,9 +911,9 @@ class SubmissionsApiController < ApplicationController
         comment[:provisional] = value_to_boolean(submission[:provisional])
         if (file_ids = params[:comment][:file_ids])
           attachments = Attachment.where(id: file_ids).to_a
-          attachable = attachments.all? { |a|
+          attachable = attachments.all? do |a|
             a.grants_right?(@current_user, :attach_to_submission_comment)
-          }
+          end
           unless attachable
             render_unauthorized_action
             return

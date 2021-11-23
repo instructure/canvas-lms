@@ -31,9 +31,9 @@ describe ContentZipper do
       s3.update_attribute :sortable_name, 'trolololo'
       s4.update_attribute :sortable_name, 'ünicodemân'
       assignment_model(course: @course)
-      [s1, s2, s3, s4].each { |s|
+      [s1, s2, s3, s4].each do |s|
         submission_model user: s, assignment: @assignment, body: "blah"
-      }
+      end
       attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
@@ -50,9 +50,9 @@ describe ContentZipper do
       filename = attachment.reload.full_filename
 
       Zip::File.foreach(filename) do |f|
-        expect {
+        expect do
           expected_file_patterns.delete_if { |expected_pattern| f.name =~ expected_pattern }
-        }.to change { expected_file_patterns.size }.by(-1)
+        end.to change { expected_file_patterns.size }.by(-1)
       end
 
       expect(expected_file_patterns).to be_empty
@@ -226,9 +226,9 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_names = [/group0/, /group1/]
       Zip::File.foreach(attachment.full_filename) do |f|
-        expect {
+        expect do
           expected_file_names.delete_if { |expected_name| f.name =~ expected_name }
-        }.to change { expected_file_names.size }.by(-1)
+        end.to change { expected_file_names.size }.by(-1)
       end
     end
 
@@ -487,9 +487,9 @@ describe ContentZipper do
         user: user,
         workflow_state: "to_be_zipped"
       )
-      expect {
+      expect do
         ContentZipper.new.zip_eportfolio(attachment, eportfolio)
-      }.to_not raise_error
+      end.to_not raise_error
     end
 
     context "with restricted permissions" do

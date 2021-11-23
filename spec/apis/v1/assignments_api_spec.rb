@@ -1696,7 +1696,7 @@ describe AssignmentsApiController, type: :request do
         url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
               "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}"
 
-        expect {
+        expect do
           api_call_as_user(
             @teacher, :post,
             url,
@@ -1713,7 +1713,7 @@ describe AssignmentsApiController, type: :request do
             {},
             { :expected_status => 200 }
           )
-        }.to change { course_copied.assignments.where(duplicate_of_id: assignment.id).count }.by 1
+        end.to change { course_copied.assignments.where(duplicate_of_id: assignment.id).count }.by 1
         duplicated_assignments = course_copied.assignments.where(duplicate_of_id: assignment.id)
         expect(duplicated_assignments.count).to eq 2
         new_assignment = duplicated_assignments.where.not(id: failed_assignment.id).first
@@ -1915,7 +1915,7 @@ describe AssignmentsApiController, type: :request do
     it "does not allow assignment titles longer than 255 characters" do
       name_too_long = "a" * 256
 
-      expect {
+      expect do
         raw_api_call(:post,
                      "/api/v1/courses/#{@course.id}/assignments.json",
                      {
@@ -1926,7 +1926,7 @@ describe AssignmentsApiController, type: :request do
                      },
                      { :assignment => { 'name' => name_too_long } })
         assert_status(400)
-      }.not_to change(Assignment, :count)
+      end.not_to change(Assignment, :count)
     end
 
     it "does not allow modifying turnitin_enabled when not enabled on the context" do
@@ -3507,14 +3507,14 @@ describe AssignmentsApiController, type: :request do
       it "does not remove the assignment's annotatable_attachment_id when submission_types is not a param" do
         @assignment.update!(annotatable_attachment: @attachment)
 
-        expect {
+        expect do
           api_call(
             :put,
             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
             endpoint_params,
             { assignment: { name: "unrelated change to attachment" } }
           )
-        }.not_to change {
+        end.not_to change {
           @assignment.reload.annotatable_attachment_id
         }
       end
@@ -5991,9 +5991,9 @@ describe AssignmentsApiController, type: :request do
 
       it "updates the updated_at of related AssessmentRequests when anonymous_peer_reviews changes" do
         params = ActionController::Parameters.new({ "anonymous_peer_reviews" => "1" })
-        expect {
+        expect do
           update_from_params(@assignment, params, @teacher)
-        }.to change {
+        end.to change {
           @assessment_request.reload.updated_at
         }
       end
@@ -6001,9 +6001,9 @@ describe AssignmentsApiController, type: :request do
       it "does not update the updated_at of related AssessmentRequests when anonymous_peer_reviews does not change" do
         @assignment.update!(anonymous_peer_reviews: true)
         params = ActionController::Parameters.new({ "anonymous_peer_reviews" => "1" })
-        expect {
+        expect do
           update_from_params(@assignment, params, @teacher)
-        }.not_to change {
+        end.not_to change {
           @assessment_request.reload.updated_at
         }
       end

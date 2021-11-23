@@ -79,9 +79,9 @@ module PermissionsHelper
         permissions.each do |permission|
           perm_hash = all_permissions_data[course.account_id]
           course_permissions[permission] = !!(perm_hash &&
-            (enabled_for_account_admin(perm_hash, permission) || grouped_enrollments[course.id].any? { |e|
+            (enabled_for_account_admin(perm_hash, permission) || grouped_enrollments[course.id].any? do |e|
                enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)
-             }))
+             end))
         end
 
         # load some other permissions that we can possibly skip calculating - we can't say for sure they're false but we can mark them true

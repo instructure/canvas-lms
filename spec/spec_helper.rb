@@ -146,7 +146,7 @@ if ENV['ENABLE_AXE_SELENIUM'] == '1'
   require 'stormbreaker'
   Stormbreaker.install!
   Stormbreaker.configure do |config|
-    config.driver = lambda { SeleniumDriverSetup.driver }
+    config.driver = -> { SeleniumDriverSetup.driver }
     config.skip = [:"color-contrast", :"duplicate-id"]
     config.rules = %i[wcag2a wcag2aa section508]
     if ENV['RSPEC_PROCESSES']

@@ -478,10 +478,10 @@ describe "Default Account Reports" do
         csv = reports["Default Term.csv"]
         expect(csv.size).to eq 4
         expect(
-          csv.all? { |student|
+          csv.all? do |student|
             ["Math 101", "Fun 404"].include?(student["course"])
             student["grading period set"] == "Grading Periods"
-          }
+          end
         ).to eq true
 
         jason1, jason2, mike1, mike2 = csv

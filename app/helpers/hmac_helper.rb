@@ -26,9 +26,9 @@ module HmacHelper
 
     blob = JSON.parse(json)
 
-    expected_values.each { |k, v|
+    expected_values.each do |k, v|
       raise Error, "invalid value for #{k}" if blob[k] != v
-    }
+    end
 
     blob
   end

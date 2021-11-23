@@ -652,9 +652,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["courses"] = true
         # all I care about is that it didn't throw a database error due to ambiguous columns
-        expect {
+        expect do
           read_report("sis_export_csv", { params: parameters, account: @sub_account })
-        }.not_to raise_error
+        end.not_to raise_error
       end
 
       it "runs the provisioning report on a sub account" do

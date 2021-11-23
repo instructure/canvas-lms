@@ -26,7 +26,7 @@ describe Types::DiscussionEntryType do
   let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
   let(:discussion_sub_entry_type) { GraphQLTypeTester.new(sub_entry, current_user: @teacher) }
-  let(:permissions) {
+  let(:permissions) do
     [
       {
         value: 'delete',
@@ -41,7 +41,7 @@ describe Types::DiscussionEntryType do
         allowed: proc { discussion_entry.discussion_topic.allow_rating && !discussion_entry.deleted? }
       }
     ]
-  }
+  end
 
   it 'works' do
     expect(discussion_entry_type.resolve("_id")).to eq discussion_entry.id.to_s

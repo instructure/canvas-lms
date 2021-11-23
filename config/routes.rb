@@ -20,9 +20,9 @@
 full_path_glob = '(/*full_path)'
 
 # allow plugins to prepend routes
-Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
+Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each do |pre_routes|
   load pre_routes
-}
+end
 
 CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
@@ -261,26 +261,26 @@ CanvasRails::Application.routes.draw do
       get 'moderate' => 'assignments#show_moderate'
 
       get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_previews#show',
-                                                 constraints: ->(request) do
+                                                 constraints: lambda { |request|
                                                                 request.query_parameters.key?(:preview) && request.format == :html
-                                                              end
+                                                              }
 
       get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_downloads#show',
-                                                 constraints: ->(request) do
+                                                 constraints: lambda { |request|
                                                                 request.query_parameters.key?(:download)
-                                                              end
+                                                              }
 
       get 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#show', as: :anonymous_submission
 
       get 'submissions/:id', to: 'submissions/previews#show',
-                             constraints: ->(request) do
+                             constraints: lambda { |request|
                                             request.query_parameters.key?(:preview) && request.format == :html
-                                          end
+                                          }
 
       get 'submissions/:id', to: 'submissions/downloads#show',
-                             constraints: ->(request) do
+                             constraints: lambda { |request|
                                             request.query_parameters.key?(:download)
-                                          end
+                                          }
 
       put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
       put 'anonymous_submissions/:anonymous_id/reassign', to: 'anonymous_submissions#redo_submission'

@@ -31,7 +31,7 @@ class PacePlanModuleItem < ActiveRecord::Base
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }
   scope :not_deleted, -> { joins(:module_item).merge(ContentTag.not_deleted) }
-  scope :ordered, -> {
+  scope :ordered, lambda {
                     joins(module_item: :context_module)
                       .order('context_modules.position, context_modules.id, content_tags.position, content_tags.id')
                   }

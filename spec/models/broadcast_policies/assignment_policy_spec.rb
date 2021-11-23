@@ -21,12 +21,12 @@ require_dependency "broadcast_policies/assignment_policy"
 
 module BroadcastPolicies
   describe AssignmentPolicy do
-    let(:context) {
+    let(:context) do
       ctx = double
       allow(ctx).to receive(:available?).and_return(true)
       allow(ctx).to receive(:concluded?).and_return(false)
       ctx
-    }
+    end
     let(:assignment) do
       double(:context => context,
              :published? => true, :muted? => false, :created_at => 4.hours.ago,
@@ -61,13 +61,13 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_created?).to be_falsey
       end
 
-      specify {
-        wont_send_when {
+      specify do
+        wont_send_when do
           allow(assignment).to receive(:just_created).and_return false
           allow(assignment).to receive(:workflow_state_before_last_save).and_return 'published'
           allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
-        }
-      }
+        end
+      end
 
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }

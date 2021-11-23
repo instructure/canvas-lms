@@ -282,24 +282,24 @@ describe NotificationMessageCreator do
 
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
+      nps.each do |np|
         np.frequency = 'never'
         np.save!
-      }
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
+      nps.each do |np|
         np.frequency = 'daily'
         np.save!
-      }
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
 
-      nps.each { |np|
+      nps.each do |np|
         np.frequency = 'weekly'
         np.save!
-      }
+      end
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
@@ -401,13 +401,13 @@ describe NotificationMessageCreator do
       expect(messages).not_to be_empty
       expect(messages.length).to eql(2)
 
-      expect(all_messages.count { |m|
+      expect(all_messages.count do |m|
         m.to == m1.to and m.notification == m1.notification and m.communication_channel == m1.communication_channel
-      }).to eql(2)
+      end).to eql(2)
 
-      expect(all_messages.count { |m|
+      expect(all_messages.count do |m|
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
-      }).to eql(2)
+      end).to eql(2)
     end
 
     it "creates stream items" do
@@ -522,9 +522,9 @@ describe NotificationMessageCreator do
       @notification_policy.save!
       @communication_channel.retire!
 
-      expect {
+      expect do
         NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      }.to change(DelayedMessage, :count).by 0
+      end.to change(DelayedMessage, :count).by 0
     end
 
     it "does not use non-email channels for summary messages" do
@@ -533,9 +533,9 @@ describe NotificationMessageCreator do
       @notification_policy.save!
       @communication_channel.update_attribute(:path_type, 'sms')
 
-      expect {
+      expect do
         NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      }.to change(DelayedMessage, :count).by 0
+      end.to change(DelayedMessage, :count).by 0
     end
 
     context "notification policy overrides" do
@@ -563,7 +563,7 @@ describe NotificationMessageCreator do
         @notification_policy.save!
         NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'daily', @course)
 
-        expect {
+        expect do
           NotificationMessageCreator.new(
             @notification,
             @assignment,
@@ -573,7 +573,7 @@ describe NotificationMessageCreator do
               root_account_id: @user.account.id
             }
           ).create_message
-        }.to change(DelayedMessage, :count).by 1
+        end.to change(DelayedMessage, :count).by 1
       end
 
       it 'uses course overrides over account overrides' do

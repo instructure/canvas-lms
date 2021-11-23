@@ -315,18 +315,18 @@ describe ObserverAlert do
       end
 
       it "creates an alert for submissions manually marked as missing when the assignment has no due date" do
-        expect {
+        expect do
           ObserverAlert.create_assignment_missing_alerts
-        }.to change {
+        end.to change {
           ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
         }.by(1)
       end
 
       it "does not create an alert for missing submissions if one has already been created" do
         ObserverAlert.create_assignment_missing_alerts
-        expect {
+        expect do
           ObserverAlert.create_assignment_missing_alerts
-        }.not_to change {
+        end.not_to change {
           ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
         }
       end
@@ -339,9 +339,9 @@ describe ObserverAlert do
       ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: 'assignment_missing')
 
       course.assignments.create!(title: 'missing', due_at: 1.hour.ago, submission_types: 'online_text_entry')
-      expect {
+      expect do
         ObserverAlert.create_assignment_missing_alerts
-      }.to change {
+      end.to change {
         ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
       }.by(1)
     end
@@ -353,9 +353,9 @@ describe ObserverAlert do
       ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: 'assignment_missing')
 
       course.assignments.create!(title: 'missing', due_at: 2.days.ago, submission_types: 'online_text_entry')
-      expect {
+      expect do
         ObserverAlert.create_assignment_missing_alerts
-      }.not_to change {
+      end.not_to change {
         ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
       }
     end

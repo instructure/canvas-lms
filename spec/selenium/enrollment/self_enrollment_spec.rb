@@ -61,9 +61,9 @@ describe "self enrollment" do
       f("#student_name").send_keys('new guy')
       expect(f("a.terms_link")).to be_displayed # terms of use link should be populated by js
       driver.execute_script("$('#enroll_form label[for=selfEnrollmentAuthRegLoginAgreeTerms]').click()") # because clicking the label clicks on the links in the label
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -80,9 +80,9 @@ describe "self enrollment" do
       move_to_click('#initial_action label[for=selfEnrollmentAuthRegLogin]') # have to click the label for selenium-webdriver 2.53.0
       wait_for_ajaximations
       f("#student_password").send_keys("asdfasdf")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -93,9 +93,9 @@ describe "self enrollment" do
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
       expect(f("#content")).not_to contain_css("input[name='pseudonym[unique_id]']")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -110,9 +110,9 @@ describe "self enrollment" do
       move_to_click('#initial_action label[for=selfEnrollmentAuthRegLogin]')
       wait_for_ajaximations
       f("#student_password").send_keys("asdfasdf")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('#enroll_form p').text).to include("You are already enrolled")
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
@@ -144,9 +144,9 @@ describe "self enrollment" do
 
       f("#student_email").send_keys("existing@example.com")
       f("#student_password").send_keys("asdfasdf")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -157,9 +157,9 @@ describe "self enrollment" do
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
       expect(f("#content")).not_to contain_css("input[name='pseudonym[unique_id]']")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -172,9 +172,9 @@ describe "self enrollment" do
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys("existing@example.com")
       f("#student_password").send_keys("asdfasdf")
-      expect_new_page_load {
+      expect_new_page_load do
         submit_form("#enroll_form")
-      }
+      end
       expect(f('#enroll_form p').text).to include("You are already enrolled")
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
@@ -186,9 +186,9 @@ describe "self enrollment" do
     let(:active_course) { true }
     let(:set_up_course) { nil }
     let(:primary_action) { "Go to the Course" }
-    let(:assert_valid_dashboard) {
+    let(:assert_valid_dashboard) do
       expect(f('#global_nav_courses_link')).to include_text("Courses")
-    }
+    end
 
     context "with open registration" do
       include_examples "open registration"
@@ -201,16 +201,16 @@ describe "self enrollment" do
 
   context "in a not-yet-started course" do
     let(:active_course) { true }
-    let(:set_up_course) {
+    let(:set_up_course) do
       @course.start_at = 1.week.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-    }
+    end
     let(:primary_action) { "Go to your Dashboard" }
-    let(:assert_valid_dashboard) {
+    let(:assert_valid_dashboard) do
       expect(f('#global_nav_courses_link')).to include_text("Courses") # show for future course
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
-    }
+    end
 
     context "with open registration" do
       include_examples "open registration"
@@ -225,10 +225,10 @@ describe "self enrollment" do
     let(:active_course) { false }
     let(:set_up_course) { nil }
     let(:primary_action) { "Go to your Dashboard" }
-    let(:assert_valid_dashboard) {
+    let(:assert_valid_dashboard) do
       expect(f('#global_nav_courses_link')).to include_text("Courses")
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
-    }
+    end
 
     context "with open registration" do
       include_examples "open registration"

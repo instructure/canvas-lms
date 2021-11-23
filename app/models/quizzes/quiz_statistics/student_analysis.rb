@@ -77,9 +77,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     questions_hash = {}
     quiz_points = [quiz.current_points_possible.to_f, 1.0].max
     stats[:questions] = []
-    stats[:multiple_attempts_exist] = submissions.any? { |s|
+    stats[:multiple_attempts_exist] = submissions.any? do |s|
       s.attempt && s.attempt > 1
-    }
+    end
     stats[:submission_user_ids] = Set.new
     stats[:submission_logged_out_users] = []
     stats[:submission_scores] = Hash.new(0)
@@ -402,10 +402,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     question[:response_values] = []
     question[:unexpected_response_values] = []
     question[:user_ids] = []
-    question[:answers].each { |a|
+    question[:answers].each do |a|
       a[:responses] = 0
       a[:user_ids] = []
-    }
+    end
     strip_html_answers(question)
 
     question[:user_ids] = responses.pluck(:user_id)

@@ -54,7 +54,7 @@ describe CanvasKaltura::ClientV3 do
   before do
     CanvasKaltura.cache = double(read: nil)
     CanvasKaltura.logger = double.as_null_object
-    CanvasKaltura.timeout_protector_proc = lambda { |_options, &block| block.call }
+    CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
     create_config
     WebMock.enable!
   end

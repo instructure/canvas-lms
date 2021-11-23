@@ -1218,9 +1218,9 @@ class CalendarEventsApiController < ApplicationController
     courses_to_filter_assignments = other.
                                     # context can sometimes be a user, so must filter those out
                                     select { |context| context.is_a? Course }
-                                         .reject { |course|
+                                         .reject do |course|
       courses_to_not_filter.include?(course.id)
-    }
+    end
 
     # in courses with diff assignments on, only show the visible assignments
     scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')

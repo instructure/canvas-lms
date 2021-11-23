@@ -174,7 +174,7 @@ module SeleniumDriverSetup
     end
 
     def webdriver_failure_proc
-      -> do
+      lambda do
         # ensure we quit frd, cuz it's not going to work (otherwise rspec
         # would keep retrying on subsequent groups/examples)
         RSpec.world.wants_to_quit = true

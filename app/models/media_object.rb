@@ -333,9 +333,9 @@ class MediaObject < ActiveRecord::Base
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
+  scope :by_media_id, ->(media_id) { where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
 
-  scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
+  scope :by_media_type, ->(media_type) { where(:media_type => media_type) }
 
   workflow do
     state :active

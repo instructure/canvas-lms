@@ -57,7 +57,7 @@ class ExternalFeed < ActiveRecord::Base
     write_attribute(:header_match, str.to_s.strip.presence)
   end
 
-  scope :to_be_polled, ->(start) {
+  scope :to_be_polled, lambda { |start|
     where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", start).order(:refresh_at)
   }
 

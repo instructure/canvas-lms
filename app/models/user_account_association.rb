@@ -31,7 +31,7 @@ class UserAccountAssociation < ActiveRecord::Base
   resolves_root_account through: :account
 
   scope :for_root_accounts, -> { where('root_account_id = account_id') }
-  scope :for_user_id, lambda { |user_id| where('user_id =?', user_id) }
+  scope :for_user_id, ->(user_id) { where('user_id =?', user_id) }
 
   def for_root_account?
     account_id == root_account_id

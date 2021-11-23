@@ -599,7 +599,7 @@ describe "Outcomes API", type: :request do
 
           method_to_int.each do |method, int|
             it "does not allow updating the calculation_int to an illegal value for the calculation_method '#{method}'" do
-              expect {
+              expect do
                 api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                          { :controller => 'outcomes_api',
                            :action => 'update',
@@ -611,9 +611,9 @@ describe "Outcomes API", type: :request do
                            :calculation_method => method,
                            :calculation_int => int[:good] })
                 @outcome.reload
-              }.to change { @outcome.calculation_int }.to(int[:good])
+              end.to change { @outcome.calculation_int }.to(int[:good])
 
-              expect {
+              expect do
                 api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                          { :controller => 'outcomes_api',
                            :action => 'update',
@@ -627,7 +627,7 @@ describe "Outcomes API", type: :request do
                          {},
                          { :expected_status => 400 })
                 @outcome.reload
-              }.to_not change { @outcome.calculation_int }
+              end.to_not change { @outcome.calculation_int }
 
               expect(@outcome.calculation_method).to eql(method)
             end
@@ -991,7 +991,7 @@ describe "Outcomes API", type: :request do
           end
 
           let(:update_outcome_api) do
-            ->(attrs) do
+            lambda do |attrs|
               api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                        { :controller => 'outcomes_api',
                          :action => 'update',

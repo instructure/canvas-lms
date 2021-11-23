@@ -237,10 +237,10 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     context 'when g4 title and o6 short_description is updated with a letter that will proceed others' do
-      before {
+      before do
         g4.update!(title: 'A Group 2.2')
         o6.update!(short_description: 'A Outcome 4.3')
-      }
+      end
 
       it 'returns the g4s outcomes first and o6 should be first before other Outcomes 4.x' do
         outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)

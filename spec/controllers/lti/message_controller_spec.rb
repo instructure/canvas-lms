@@ -24,13 +24,13 @@ require_dependency "lti/message_controller"
 module Lti
   describe MessageController do
     include_context 'lti2_spec_helper'
-    let(:enabled_capability) {
+    let(:enabled_capability) do
       %w[ToolConsumerInstance.guid
          Message.documentTarget
          Message.locale
          Membership.role
          Context.id]
-    }
+    end
 
     let(:default_resource_handler) do
       ResourceHandler.create!(

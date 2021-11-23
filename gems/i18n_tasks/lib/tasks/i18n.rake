@@ -41,7 +41,7 @@ namespace :i18n do
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
     def deep_sort_hash_by_keys(value)
-      sort = ->(node) do
+      sort = lambda do |node|
         case node
         when Hash
           node.keys.sort.index_with do |key|
@@ -154,9 +154,9 @@ namespace :i18n do
 
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
     # formats and stuff for all languages (en included) into the common scope_file
-    core_translations = I18n.available_locales.each_with_object({}) { |locale, h1|
+    core_translations = I18n.available_locales.each_with_object({}) do |locale, h1|
       h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
-    }
+    end
     dump_translations.call('_core_en', { 'en' => core_translations.delete('en') })
     dump_translations.call('_core', core_translations)
   end
@@ -284,9 +284,9 @@ namespace :i18n do
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
       new_strings = if last_export[:data]
-                      current_strings.each_with_object({}) { |(k, v), h|
+                      current_strings.each_with_object({}) do |(k, v), h|
                         h[k] = v unless last_export[:data][k] == v
-                      }
+                      end
                     else
                       current_strings
                     end
@@ -366,9 +366,9 @@ namespace :i18n do
 
     next if complete_translations.nil?
 
-    File.open("config/locales/#{import.language}.yml", "w") { |f|
+    File.open("config/locales/#{import.language}.yml", "w") do |f|
       f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
-    }
+    end
   end
 
   desc "Imports new translations, ignores missing or unexpected keys"
@@ -389,7 +389,7 @@ namespace :i18n do
   end
 
   def remove_dynamic_translations(translations)
-    process = ->(node) do
+    process = lambda do |node|
       case node
       when Hash
         node.delete_if { |_k, v| process.call(v).nil? }
@@ -425,13 +425,13 @@ namespace :i18n do
     end
     raise "got no translations" if complete_translations.nil?
 
-    File.open("config/locales/#{import.language}.yml", "w") { |f|
+    File.open("config/locales/#{import.language}.yml", "w") do |f|
       f.write <<~YAML
         # This YAML file is auto-generated from a Transifex import.
         # Do not edit it by hand, your changes will be overwritten.
       YAML
       f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
-    }
+    end
 
     puts({
       language: import.language,

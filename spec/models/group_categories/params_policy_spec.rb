@@ -26,9 +26,9 @@ module GroupCategories
                                  :group_limit, :create_group_count, :create_group_member_count, :assign_unassigned_members, :group_by_section)
 
   describe ParamsPolicy do
-    let(:populate_options) {
+    let(:populate_options) do
       { boolean_translator: BooleanTranslator }
-    }
+    end
 
     describe 'intializer' do
       it 'accepts a category and context' do

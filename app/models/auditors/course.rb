@@ -120,16 +120,16 @@ class Auditors::Course
 
     add_index :course do
       table :courses_by_course
-      entry_proc lambda { |record| record.course }
-      key_proc lambda { |course| course.global_id }
-      ar_scope_proc lambda { |course| course_ar_type.where(course_id: course.id) }
+      entry_proc ->(record) { record.course }
+      key_proc ->(course) { course.global_id }
+      ar_scope_proc ->(course) { course_ar_type.where(course_id: course.id) }
     end
 
     add_index :account do
       table :courses_by_account
-      entry_proc lambda { |record| record.account }
-      key_proc lambda { |account| account.global_id }
-      ar_scope_proc lambda { |account| course_ar_type.where(account_id: account.id) }
+      entry_proc ->(record) { record.account }
+      key_proc ->(account) { account.global_id }
+      ar_scope_proc ->(account) { course_ar_type.where(account_id: account.id) }
     end
   end
 

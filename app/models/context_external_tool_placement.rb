@@ -22,5 +22,5 @@ class ContextExternalToolPlacement < ActiveRecord::Base
 
   validates :placement_type, inclusion: { :in => Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) }
 
-  scope :for_type, lambda { |type| where(:placement_type => type) }
+  scope :for_type, ->(type) { where(:placement_type => type) }
 end

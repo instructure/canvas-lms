@@ -41,21 +41,21 @@ class GradingPeriod < ActiveRecord::Base
   after_save :recompute_scores, if: :dates_or_weight_or_workflow_state_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
-  scope :current, -> do
+  scope :current, lambda {
     now = Time.zone.now.change(sec: 0)
     where(
       "date_trunc('minute', grading_periods.end_date) >= ? AND date_trunc('minute', grading_periods.start_date) < ?",
       now,
       now
     )
-  end
+  }
 
   scope :closed, -> { where("grading_periods.close_date < ?", Time.zone.now) }
   scope :open, -> { where("grading_periods.close_date IS NULL OR grading_periods.close_date >= ?", Time.zone.now) }
 
-  scope :grading_periods_by, ->(context_with_ids) do
+  scope :grading_periods_by, lambda { |context_with_ids|
     joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)
-  end
+  }
 
   set_policy do
     %i[read create update delete].each do |permission|
@@ -227,14 +227,14 @@ class GradingPeriod < ActiveRecord::Base
     @_skip_not_overlapping_validator
   end
 
-  scope :overlaps, ->(from, to) do
+  scope :overlaps, lambda { |from, to|
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
     where(
       "((date_trunc('minute', end_date) > ?) and (date_trunc('minute', start_date) < ?))",
       from&.change(sec: 0),
       to&.change(sec: 0)
     )
-  end
+  }
 
   def not_overlapping
     if overlapping?

@@ -35,10 +35,10 @@ describe Quizzes::QuizGroupsController, type: :request do
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
-    let(:new_quiz_group) {
+    let(:new_quiz_group) do
       @quiz.reload
       @quiz.quiz_groups.first
-    }
+    end
 
     it "creates a question group for a quiz" do
       api_create_quiz_group('name' => 'testing')

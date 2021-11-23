@@ -189,10 +189,10 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Post object for the path with json-formatted params
     def format_post(path, params)
-      Net::HTTP::Post.new(path).tap { |req|
+      Net::HTTP::Post.new(path).tap do |req|
         req["Content-Type"] = "application/json"
         req.body = params.to_json
-      }
+      end
     end
   end
 

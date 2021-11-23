@@ -104,11 +104,11 @@ class Submission < ActiveRecord::Base
   has_many :attachment_associations, :as => :context, :inverse_of => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
-  has_one :rubric_assessment, -> do
+  has_one :rubric_assessment, lambda {
     joins(:rubric_association)
       .where(assessment_type: 'grading')
       .where(rubric_associations: { workflow_state: 'active' })
-  end, as: :artifact, inverse_of: :artifact
+  }, as: :artifact, inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
   has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
@@ -147,22 +147,22 @@ class Submission < ActiveRecord::Base
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :for_enrollments, ->(enrollments) { where(user_id: enrollments.select(:user_id)) }
   scope :with_comments, -> { preload(:submission_comments) }
-  scope :unread_for, ->(user_id) do
+  scope :unread_for, lambda { |user_id|
     joins(:content_participations)
       .where(user_id: user_id, content_participations: { workflow_state: 'unread', user_id: user_id })
-  end
-  scope :after, lambda { |date| where("submissions.created_at>?", date) }
-  scope :before, lambda { |date| where("submissions.created_at<?", date) }
-  scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
-  scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
+  }
+  scope :after, ->(date) { where("submissions.created_at>?", date) }
+  scope :before, ->(date) { where("submissions.created_at<?", date) }
+  scope :submitted_before, ->(date) { where("submitted_at<?", date) }
+  scope :submitted_after, ->(date) { where("submitted_at>?", date) }
   scope :with_point_data, -> { where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL") }
 
-  scope :postable, -> {
+  scope :postable, lambda {
     all.primary_shard.activate do
       graded.union(with_hidden_comments)
     end
   }
-  scope :with_hidden_comments, -> {
+  scope :with_hidden_comments, lambda {
     where("EXISTS (?)", SubmissionComment.where("submission_id = submissions.id AND hidden = true"))
   }
 
@@ -181,7 +181,7 @@ class Submission < ActiveRecord::Base
   scope :for_course, ->(course) { where(course_id: course) }
   scope :for_assignment, ->(assignment) { where(assignment: assignment) }
 
-  scope :missing, -> do
+  scope :missing, lambda {
     joins(:assignment)
       .where(<<~SQL.squish)
         /* excused submissions cannot be missing */
@@ -205,9 +205,9 @@ class Submission < ActiveRecord::Base
           )
         )
       SQL
-  end
+  }
 
-  scope :late, -> do
+  scope :late, lambda {
     left_joins(:quiz_submission)
       .where("
       submissions.excused IS NOT TRUE AND (
@@ -217,9 +217,9 @@ class Submission < ActiveRecord::Base
            AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
       )
     ")
-  end
+  }
 
-  scope :not_late, -> do
+  scope :not_late, lambda {
     left_joins(:quiz_submission)
       .where("
       submissions.excused IS TRUE OR (
@@ -230,7 +230,7 @@ class Submission < ActiveRecord::Base
           OR quiz_submissions.workflow_state <> 'complete')
       )
     ")
-  end
+  }
 
   GradedAtBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :graded_at)
   IdBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :id)
@@ -302,7 +302,7 @@ class Submission < ActiveRecord::Base
     graded? != (send("workflow_state_before_last_save") == 'graded')
   end
 
-  scope :needs_grading, -> {
+  scope :needs_grading, lambda {
     all.primary_shard.activate do
       joins(:assignment)
         .joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id
@@ -313,7 +313,7 @@ class Submission < ActiveRecord::Base
     end
   }
 
-  scope :needs_grading_count, -> {
+  scope :needs_grading_count, lambda {
     select("COUNT(submissions.id)")
       .needs_grading
   }
@@ -410,9 +410,9 @@ class Submission < ActiveRecord::Base
   has_a_broadcast_policy
 
   simply_versioned :explicit => true,
-                   :when => lambda { |model| model.new_version_needed? },
-                   :on_create => lambda { |_model, version| SubmissionVersion.index_version(version) },
-                   :on_load => lambda { |model, version| model&.cached_due_date = version.versionable&.cached_due_date }
+                   :when => ->(model) { model.new_version_needed? },
+                   :on_create => ->(_model, version) { SubmissionVersion.index_version(version) },
+                   :on_load => ->(model, version) { model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.
@@ -559,14 +559,14 @@ class Submission < ActiveRecord::Base
 
   def user_can_peer_review_plagiarism?(user)
     assignment.peer_reviews &&
-      assignment.current_submissions_and_assessors[:submissions].select { |submission|
+      assignment.current_submissions_and_assessors[:submissions].select do |submission|
         # first filter by submissions for the requested reviewer
         user.id == submission.user_id &&
           submission.assigned_assessments
-      }.any? { |submission|
+      end.any? do |submission|
         # next filter the assigned assessments by the submission user_id being reviewed
         submission.assigned_assessments.any? { |review| user_id == review.user_id }
-      }
+      end
   end
 
   def user_can_read_grade?(user, session = nil, for_plagiarism: false)
@@ -1859,58 +1859,58 @@ class Submission < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_assignment_submitted_late?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_submitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_assignment_submitted?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_resubmitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_assignment_resubmitted?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :group_assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_group_assignment_submitted_late?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_graded
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_submission_graded?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_grade_changed
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_submission_grade_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_posted
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
-    p.whenever { |submission|
+    p.whenever do |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission)
                                          .should_dispatch_submission_posted?
-    }
+    end
     p.data { course_broadcast_data }
   end
 
@@ -1998,11 +1998,11 @@ class Submission < ActiveRecord::Base
 
   scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
 
-  scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
+  scope :in_workflow_state, ->(provided_state) { where(:workflow_state => provided_state) }
 
   scope :having_submission, -> { where.not(submissions: { submission_type: nil }) }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
-  scope :not_placeholder, -> {
+  scope :not_placeholder, lambda {
     active.where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL or submissions.workflow_state = 'graded'")
   }
 
@@ -2012,7 +2012,7 @@ class Submission < ActiveRecord::Base
   scope :include_versions, -> { preload(:versions) }
   scope :include_submission_comments, -> { preload(:submission_comments) }
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
-  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_user, ->(user) { where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
 
   def assignment_visible_to_user?(user, opts = {})
@@ -2759,9 +2759,9 @@ class Submission < ActiveRecord::Base
             ).with_indifferent_access
 
             if (file_ids = user_data[:file_ids])
-              attachments = Attachment.where(id: file_ids).to_a.select { |a|
+              attachments = Attachment.where(id: file_ids).to_a.select do |a|
                 a.grants_right?(grader, :attach_to_submission_comment)
-              }
+              end
               attachments.each { |a| a.ok_for_submission_comment = true }
               comment[:attachments] = attachments if attachments.any?
             end

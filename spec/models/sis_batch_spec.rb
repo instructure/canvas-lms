@@ -362,10 +362,10 @@ test_1,TC 101,Test Course 101,,term1,deleted
     describe "with non-standard batches" do
       it "only queues one 'process_all_for_account' job and run together" do
         SisBatch.valid_import_types["silly_sis_batch"] = {
-          :callback => lambda { |batch|
+          :callback => lambda do |batch|
                          batch.data[:silliness_complete] = true
                          batch.finish(true)
-                       }
+                       end
         }
         enable_cache do
           batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
@@ -407,7 +407,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
   end
 
   describe 'when the job dies' do
-    let!(:batch) {
+    let!(:batch) do
       batch = nil
       track_jobs do
         batch = create_csv_data(['abc'])
@@ -416,11 +416,11 @@ test_1,TC 101,Test Course 101,,term1,deleted
         batch
       end
       batch
-    }
+    end
 
-    let!(:job) {
+    let!(:job) do
       created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
-    }
+    end
 
     before do
       track_jobs { job.reschedule }
@@ -608,9 +608,9 @@ s2,test_1,section2,active),
 
     describe "with cursor based find_each" do
       it "removes only from the specific term if it is given" do
-        Course.transaction {
+        Course.transaction do
           test_remove_specific_term
-        }
+        end
       end
     end
 

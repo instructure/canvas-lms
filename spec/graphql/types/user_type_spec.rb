@@ -339,14 +339,14 @@ describe Types::UserType do
 
   context "groups" do
     before(:once) do
-      @user_group_ids = (1..5).map {
+      @user_group_ids = (1..5).map do
         group_with_user({ user: @student, active_all: true }).group_id.to_s
-      }
-      @deleted_user_group_ids = (1..3).map {
+      end
+      @deleted_user_group_ids = (1..3).map do
         group = group_with_user({ user: @student, active_all: true })
         group.destroy
         group.group_id.to_s
-      }
+      end
     end
 
     it "fetches the groups associated with a user" do

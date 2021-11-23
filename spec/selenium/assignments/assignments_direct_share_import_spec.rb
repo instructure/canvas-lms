@@ -31,7 +31,7 @@ describe 'assignments' do
   include SendToDialogPage
   include AccountContentSharePage
 
-  let(:setup) {
+  let(:setup) do
     # Two Courses
     @course1 = Course.create!(:name => "First Course1")
     @course2 = Course.create!(:name => "Second Course2")
@@ -58,48 +58,48 @@ describe 'assignments' do
     @course3 = Course.create!(:name => "Third Course3", :start_at => 1.month.ago, :conclude_at => 1.week.ago, :enrollment_term => @term)
     @course3.enroll_teacher(@teacher1, :enrollment_state => 'active')
     @course3.enroll_teacher(@teacher2, :enrollment_state => 'active')
-  }
+  end
 
-  let(:copy_assignment_to_course2) {
+  let(:copy_assignment_to_course2) do
     course_search_dropdown.click
     course_search_dropdown.send_keys('course')
     wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
     copy_button.click
     run_jobs
-  }
+  end
 
-  let(:select_course) {
+  let(:select_course) do
     course_search_dropdown.click
     course_search_dropdown.send_keys('course')
     wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
-  }
+  end
 
-  let(:send_item) {
+  let(:send_item) do
     user_search.click
     user_search.send_keys("teac")
     user_dropdown(@teacher2.name).click
     send_button.click
     run_jobs
-  }
+  end
 
-  let(:select_course_in_tray) {
+  let(:select_course_in_tray) do
     course_search_dropdown.click
     course_search_dropdown.send_keys('course')
     wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
-  }
+  end
 
-  let(:select_module_in_tray) {
+  let(:select_module_in_tray) do
     module_search_dropdown.click
     module_dropdown_item(@module1.name).click
-  }
+  end
 
-  let(:select_course_and_module_in_tray) {
+  let(:select_course_and_module_in_tray) do
     select_course_in_tray
     select_module_in_tray
-  }
+  end
 
   describe 'direct share feature' do
     before(:once) do

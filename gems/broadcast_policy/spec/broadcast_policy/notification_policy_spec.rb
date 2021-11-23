@@ -28,13 +28,13 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   let(:test_notification) { double(:test_notification) }
-  let(:test_connection_class) {
-    Class.new {
+  let(:test_connection_class) do
+    Class.new do
       def after_transaction_commit
         yield
       end
-    }
-  }
+    end
+  end
 
   before do
     BroadcastPolicy.notifier = MockNotifier.new

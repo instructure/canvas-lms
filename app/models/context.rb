@@ -123,10 +123,10 @@ module Context
     possible_types = {
       files: -> { respond_to?(:attachments) && attachments.active.exists? },
       modules: -> { respond_to?(:context_modules) && context_modules.active.exists? },
-      quizzes: -> {
+      quizzes: lambda do
                  (respond_to?(:quizzes) && quizzes.active.exists?) ||
                    (respond_to?(:assignments) && assignments.active.quiz_lti.exists?)
-               },
+               end,
       assignments: -> { respond_to?(:assignments) && assignments.active.exists? },
       pages: -> { respond_to?(:wiki_pages) && wiki_pages.active.exists? },
       conferences: -> { respond_to?(:web_conferences) && web_conferences.active.exists? },

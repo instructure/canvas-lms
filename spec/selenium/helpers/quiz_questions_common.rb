@@ -90,9 +90,9 @@ module QuizQuestionsCommon
   end
 
   def accept_cant_go_back_warning
-    expect_new_page_load {
+    expect_new_page_load do
       fj("button:contains('Begin').ui-button").click
-    }
+    end
     wait_for_ajaximations
   end
 
@@ -114,30 +114,30 @@ module QuizQuestionsCommon
   end
 
   def it_should_have_sidebar_navigation
-    expect_new_page_load {
+    expect_new_page_load do
       fj("#question_list a:contains('Question 2')").click
-    }
+    end
 
     it_should_be_on_second_question
 
-    expect_new_page_load {
+    expect_new_page_load do
       fj("#question_list a:contains('Question 1')").click
-    }
+    end
     wait_for_ajaximations
     it_should_be_on_first_question
   end
 
   def click_next_button
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.next-question").click
-    }
+    end
     wait_for_ajaximations
   end
 
   def click_previous_button
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.previous-question").click
-    }
+    end
     wait_for_ajaximations
   end
 
@@ -171,11 +171,11 @@ module QuizQuestionsCommon
   end
 
   def click_next_button_and_accept_warning
-    expect_new_page_load {
+    expect_new_page_load do
       f("button.next-question").click
       expect(driver.switch_to.alert.text).to include "leave it blank?"
       driver.switch_to.alert.accept
-    }
+    end
   end
 
   def submit_finished_quiz

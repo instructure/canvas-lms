@@ -51,10 +51,10 @@ module Lti
       a
     end
 
-    let(:student) {
+    let(:student) do
       course_with_student(active_all: true, course: course)
       @user
-    }
+    end
 
     let(:aud) { host }
 

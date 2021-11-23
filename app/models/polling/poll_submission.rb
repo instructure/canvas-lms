@@ -28,12 +28,12 @@ module Polling
     validates :poll, :poll_choice, :poll_session, :user, presence: true
     validates :user_id,
               uniqueness: { scope: :poll_session_id,
-                            message: -> {
+                            message: lambda do
                                        t(
                                          'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
                                          'can only submit one choice per poll session.'
                                        )
-                                     } }
+                                     end }
 
     validate :poll_choices_belong_to_poll
     validate :poll_is_published

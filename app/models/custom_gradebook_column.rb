@@ -47,9 +47,9 @@ class CustomGradebookColumn < ActiveRecord::Base
   scope :not_deleted, -> { where("workflow_state != 'deleted'") }
 
   set_policy do
-    given { |user, session|
+    given do |user, session|
       course.grants_any_right?(user, session, :view_all_grades, :manage_grades)
-    }
+    end
     can :read, :manage
   end
 

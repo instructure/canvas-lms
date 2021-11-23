@@ -75,9 +75,9 @@ describe CutyCapt do
       ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
 
       allow(CutyCapt).to receive(:cuty_arguments).and_return(["/bin/sleep", "60"])
-      expect {
+      expect do
         Timeout.timeout(10) { CutyCapt.snapshot_url("http://google.com/") }
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 

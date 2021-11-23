@@ -204,11 +204,11 @@ describe "speed grader" do
       end
 
       it 'decreases the number of published comments' do
-        expect {
+        expect do
           Speedgrader.delete_comment[0].click
           accept_alert
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.published.count
         }.by(-1)
       end
@@ -242,38 +242,38 @@ describe "speed grader" do
 
     describe 'saving a draft comment' do
       it 'when going to the next student', priority: "1" do
-        expect {
+        expect do
           Speedgrader.click_next_student_btn
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.draft.count
         }.by(1)
       end
 
       it 'when going to the previous student', priority: "1" do
-        expect {
+        expect do
           Speedgrader.click_next_or_prev_student :previous
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.draft.count
         }.by(1)
       end
 
       it 'when choosing a student from the dropdown', priority: "1" do
-        expect {
+        expect do
           Speedgrader.select_student @student2
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.draft.count
         }.by(1)
       end
 
       it 'when going back to the assignment', priority: "1" do
-        expect {
+        expect do
           Speedgrader.assignment_link.click
           dismiss_alert
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.draft.count
         }.by(1)
       end
@@ -331,11 +331,11 @@ describe "speed grader" do
       it 'increases the number of published comments', priority: "1" do
         skip_if_safari(:alert)
 
-        expect {
+        expect do
           Speedgrader.publish_draft_link.click
           accept_alert
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.published.count
         }.by(1)
       end
@@ -362,11 +362,11 @@ describe "speed grader" do
       end
 
       it 'decreases the number of draft comments' do
-        expect {
+        expect do
           Speedgrader.draft_comment_delete_button.first.click
           accept_alert
           wait_for_ajaximations
-        }.to change {
+        end.to change {
           SubmissionComment.draft.count
         }.by(-1)
       end

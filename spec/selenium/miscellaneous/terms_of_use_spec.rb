@@ -83,10 +83,10 @@ describe "terms of use test" do
     login
     form = f('.reaccept_terms')
     expect(form).to be_present
-    expect_new_page_load {
+    expect_new_page_load do
       f('[name="user[terms_of_use]"]').click
       submit_form form
-    }
+    end
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
@@ -105,10 +105,10 @@ describe "terms of use test" do
     expect(ff('.error_box').any?(&:displayed?)).to be_truthy
     expect(account.require_acceptance_of_terms?(@user.reload)).to be_truthy
 
-    expect_new_page_load {
+    expect_new_page_load do
       f('[name="user[terms_of_use]"]').click
       submit_form form
-    }
+    end
     expect(account.require_acceptance_of_terms?(@user.reload)).to be_falsey
   end
 
@@ -146,10 +146,10 @@ describe "terms of use SOC2 compliance test" do
     expect(form).to be_present
 
     # accept the terms
-    expect_new_page_load {
+    expect_new_page_load do
       f('[name="user[terms_of_use]"]').click
       submit_form form
-    }
+    end
 
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end

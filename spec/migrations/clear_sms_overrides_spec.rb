@@ -27,9 +27,9 @@ describe ClearSmsOverrides do
   it "clears the global setting" do
     Setting.set('allowed_sms_notification_categories', 'foobar')
 
-    expect {
+    expect do
       migration.change
-    }.to change {
+    end.to change {
       Setting.get('allowed_sms_notification_categories', nil)
     }.from('foobar').to(nil)
   end

@@ -60,16 +60,16 @@ class Profile < ActiveRecord::Base
 
   def self.data(field, options = {})
     options[:type] ||= :string
-    define_method(field) {
+    define_method(field) do
       data.key?(field) ? data[field] : data[field] = options[:default]
-    }
-    define_method("#{field}=") { |value|
+    end
+    define_method("#{field}=") do |value|
       data_before_type_cast[field] = value
       data[field] = sanitize_data(value, options)
-    }
-    define_method("#{field}_before_type_cast") {
+    end
+    define_method("#{field}_before_type_cast") do
       data_before_type_cast[field]
-    }
+    end
   end
 
   def sanitize_data(value, options)

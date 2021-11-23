@@ -212,9 +212,9 @@ describe 'CommunicationChannels API', type: :request do
       before { @user = @someone }
 
       it 'is able to create its own channels' do
-        expect {
+        expect do
           api_call(:post, @path, @path_options, @post_params)
-        }.to change(CommunicationChannel, :count).by(1)
+        end.to change(CommunicationChannel, :count).by(1)
       end
 
       it 'is not able to create channels for others' do

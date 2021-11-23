@@ -282,9 +282,9 @@ describe User do
     end
 
     let(:context_keys) do
-      @contexts.map { |context|
+      @contexts.map do |context|
         StreamItemCache.recent_stream_items_key(@teacher, context.class.base_class.name, context.id)
-      }
+      end
     end
 
     it "creates cache keys for each context" do
@@ -443,9 +443,9 @@ describe User do
 
     context 'when there is a single root account association' do
       it 'updates root_account_ids with the root account' do
-        expect {
+        expect do
           user.update_root_account_ids
-        }.to change {
+        end.to change {
           user.root_account_ids
         }.from([]).to([root_account.global_id])
       end
@@ -456,9 +456,9 @@ describe User do
         before { communication_channel.update(root_account_ids: nil) }
 
         it 'updates root_account_ids on associated communication channels' do
-          expect {
+          expect do
             user.update_root_account_ids
-          }.to change {
+          end.to change {
             user.communication_channels.first.root_account_ids
           }.from([]).to([root_account.id])
         end
@@ -480,9 +480,9 @@ describe User do
       end
 
       it 'updates root_account_ids with all root accounts' do
-        expect {
+        expect do
           user.update_root_account_ids
-        }.to change {
+        end.to change {
           user.root_account_ids&.sort
         }.from([]).to(
           [root_account.id, shard_two_root_account.global_id].sort
@@ -497,7 +497,7 @@ describe User do
       expect(user.user_account_associations).to eq []
       account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
-      sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
+      sort_account_associations = ->(a, b) { a.keys.first <=> b.keys.first }
 
       User.update_account_associations([user], :incremental => true, :precalculated_associations => { account1.id => 0 })
       expect(user.user_account_associations.reload.map { |aa| { aa.account_id => aa.depth } }).to eq [{ account1.id => 0 }]
@@ -2762,37 +2762,37 @@ describe User do
     end
 
     describe ":reset_mfa" do
-      let(:account1) {
+      let(:account1) do
         a = Account.default
         a.settings[:admins_can_view_notifications] = true
         a.save!
         a
-      }
+      end
       let(:account2) { Account.create! }
 
-      let(:sally) {
+      let(:sally) do
         account_admin_user(
           user: student_in_course(account: account2).user,
           account: account1
         )
-      }
+      end
 
-      let(:bob) {
+      let(:bob) do
         student_in_course(
           user: student_in_course(account: account2).user,
           course: course_factory(account: account1)
         ).user
-      }
+      end
 
       let(:charlie) { student_in_course(account: account1).user }
 
-      let(:alice) {
+      let(:alice) do
         account_admin_user_with_role_changes(
           account: account1,
           role: custom_account_role('StrongerAdmin', account: account1),
           role_changes: { view_notifications: true }
         )
-      }
+      end
 
       it "grants non-admins :reset_mfa on themselves" do
         pseudonym(charlie, account: account1)
@@ -2852,37 +2852,37 @@ describe User do
     end
 
     describe ":merge" do
-      let(:account1) {
+      let(:account1) do
         a = Account.default
         a.settings[:admins_can_view_notifications] = true
         a.save!
         a
-      }
+      end
       let(:account2) { Account.create! }
 
-      let(:sally) {
+      let(:sally) do
         account_admin_user(
           user: student_in_course(account: account2).user,
           account: account1
         )
-      }
+      end
 
-      let(:bob) {
+      let(:bob) do
         student_in_course(
           user: student_in_course(account: account2).user,
           course: course_factory(account: account1)
         ).user
-      }
+      end
 
       let(:charlie) { student_in_course(account: account2).user }
 
-      let(:alice) {
+      let(:alice) do
         account_admin_user_with_role_changes(
           account: account1,
           role: custom_account_role('StrongerAdmin', account: account1),
           role_changes: { view_notifications: true }
         )
-      }
+      end
 
       it "grants admins :merge on themselves" do
         pseudonym(sally, account: account1)

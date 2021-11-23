@@ -45,9 +45,9 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
         expected_root_account_id = Account.find(expected_root_account_id).global_id if sharded
 
-        expect {
+        expect do
           DataFixup::PopulateRootAccountIdOnModels.run
-        }.to change { record.reload.root_account_id }.from(nil).to(expected_root_account_id)
+        end.to change { record.reload.root_account_id }.from(nil).to(expected_root_account_id)
         expect(expected_root_account_id).to be_present
       end
     end
@@ -63,9 +63,9 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
 
       it 'populates the root_account_id to 0' do
-        expect {
+        expect do
           DataFixup::PopulateRootAccountIdOnModels.run
-        }.to change { record.reload.root_account_id }.from(nil).to(0)
+        end.to change { record.reload.root_account_id }.from(nil).to(0)
       end
     end
 

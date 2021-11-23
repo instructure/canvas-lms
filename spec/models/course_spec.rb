@@ -801,7 +801,7 @@ describe Course do
     # should throw rails validation error instead of db invalid statement error
     @course = Course.create_unique
     @course.sis_source_id = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-    expect(lambda { @course.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+    expect(-> { @course.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
   end
 
   it "always has a uuid, if it was created" do
@@ -1571,9 +1571,9 @@ describe Course do
       assignment = course.assignments.create!
       assignment.ensure_post_policy(post_manually: true)
 
-      expect {
+      expect do
         course.apply_post_policy!(post_manually: true)
-      }.not_to change {
+      end.not_to change {
         PostPolicy.find_by!(assignment: assignment).updated_at
       }
     end
@@ -1582,9 +1582,9 @@ describe Course do
       course.apply_post_policy!(post_manually: true)
       anonymous_assignment = course.assignments.create!(anonymous_grading: true)
 
-      expect {
+      expect do
         course.apply_post_policy!(post_manually: false)
-      }.not_to change {
+      end.not_to change {
         PostPolicy.find_by!(assignment: anonymous_assignment).post_manually
       }
     end
@@ -1597,9 +1597,9 @@ describe Course do
         moderated_grading: true
       )
 
-      expect {
+      expect do
         course.apply_post_policy!(post_manually: false)
-      }.not_to change {
+      end.not_to change {
         PostPolicy.find_by(assignment: moderated_assignment).post_manually
       }
     end
@@ -2204,10 +2204,10 @@ describe Course, "gradebook_to_csv" do
   context "sort order" do
     before :once do
       course_with_teacher active_all: true
-      _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map { |name|
+      _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map do |name|
         student_in_course(:name => name)
         @student
-      }
+      end
       zed.update_attribute :sortable_name, "aaaaaa zed"
 
       test_student_enrollment = student_in_course(:name => "Test Student")
@@ -2591,9 +2591,9 @@ describe Course, "gradebook_to_csv_in_background" do
       end
 
       @shard1.activate do
-        expect {
+        expect do
           Attachment.find(@attachment_id).public_download_url
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
   end
@@ -3504,7 +3504,7 @@ describe Course, 'grade_publishing' do
       it 'checks whether or not grade export is enabled - failure' do
         allow(@plugin).to receive(:enabled?).and_return(false)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-        expect(lambda { @course.publish_final_grades(@user) }).to raise_error("final grade publishing disabled")
+        expect(-> { @course.publish_final_grades(@user) }).to raise_error("final grade publishing disabled")
       end
 
       it 'updates all student enrollments with pending and a last update status' do
@@ -3663,7 +3663,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3676,7 +3676,7 @@ describe Course, 'grade_publishing' do
                                                                                 "post2",
                                                                                 "test/mime2"]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
@@ -3700,14 +3700,14 @@ describe Course, 'grade_publishing' do
         allow(Course).to receive(:valid_grade_export_types).and_return(
           {
             "instructure_csv" => {
-              callback: lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+              callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                 expect(course).to eq @course
                 expect(enrollments.sort_by(&:id)).to eq(@student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' })
                 expect(publishing_pseudonym).to eq @pseudonym
                 expect(publishing_user).to eq @user
                 @checked = true
                 return []
-              }
+              end
             }
           }
         )
@@ -3728,14 +3728,14 @@ describe Course, 'grade_publishing' do
         @checked = false
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "instructure_csv" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments).to eq [@student_enrollments.first]
                                                                              expect(publishing_pseudonym).to eq @pseudonym
                                                                              expect(publishing_user).to eq @user
                                                                              @checked = true
                                                                              return []
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         @course.send_final_grades_to_endpoint @user, @student_enrollments.first.user_id
@@ -3744,7 +3744,7 @@ describe Course, 'grade_publishing' do
 
       it "makes sure grade publishing is enabled" do
         allow(@plugin).to receive(:enabled?).and_return(false)
-        expect(lambda { @course.send_final_grades_to_endpoint nil }).to raise_error("final grade publishing disabled")
+        expect(-> { @course.send_final_grades_to_endpoint nil }).to raise_error("final grade publishing disabled")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["final grade publishing disabled"] * 6) + [nil] + (["final grade publishing disabled"] * 2)
       end
@@ -3752,7 +3752,7 @@ describe Course, 'grade_publishing' do
       it "makes sure an endpoint is defined" do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = ""
-        expect(lambda { @course.send_final_grades_to_endpoint nil }).to raise_error("endpoint undefined")
+        expect(-> { @course.send_final_grades_to_endpoint nil }).to raise_error("endpoint undefined")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["endpoint undefined"] * 6) + [nil] + (["endpoint undefined"] * 2)
       end
@@ -3765,7 +3765,7 @@ describe Course, 'grade_publishing' do
         @user = user_factory
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-        expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("publishing disallowed for this publishing user")
+        expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("publishing disallowed for this publishing user")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["publishing disallowed for this publishing user"] * 6) + [nil] + (["publishing disallowed for this publishing user"] * 2)
       end
@@ -3778,7 +3778,7 @@ describe Course, 'grade_publishing' do
         @user = user_factory
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-        expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("grade publishing requires a grading standard")
+        expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("grade publishing requires a grading standard")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["grade publishing requires a grading standard"] * 6) + [nil] + (["grade publishing requires a grading standard"] * 2)
       end
@@ -3787,7 +3787,7 @@ describe Course, 'grade_publishing' do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @plugin_settings[:format_type] = "invalid_Format"
-        expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("unknown format type: invalid_Format")
+        expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("unknown format type: invalid_Format")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["unknown format type: invalid_Format"] * 6) + [nil] + (["unknown format type: invalid_Format"] * 2)
       end
@@ -3799,7 +3799,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3812,7 +3812,7 @@ describe Course, 'grade_publishing' do
                                                                                 "post2",
                                                                                 "test/mime2"]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
@@ -3862,7 +3862,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3878,13 +3878,13 @@ describe Course, 'grade_publishing' do
                                                                                 "post3",
                                                                                 "test/mime3"]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).and_raise("waaah fail")
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-        expect(lambda { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+        expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[published published published published error unpublishable unpublished unpublishable error]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq ([nil] * 4) + ["waaah fail"] + ([nil] * 3) + ["waaah fail"]
       end
@@ -3896,7 +3896,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3912,13 +3912,13 @@ describe Course, 'grade_publishing' do
                                                                                 "post3",
                                                                                 "test/mime3"]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {}).and_raise("waaah fail")
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).and_raise("waaah fail")
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-        expect(lambda { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+        expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[published error published error error unpublishable unpublished unpublishable error]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
       end
@@ -3930,12 +3930,12 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |*|
+                                                                           :callback => lambda do |*|
                                                                              raise "waaah fail"
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
-        expect(lambda { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+        expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[error error error error error error unpublished error error]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["waaah fail"] * 6) + [nil] + (["waaah fail"] * 2)
       end
@@ -3947,7 +3947,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3960,7 +3960,7 @@ describe Course, 'grade_publishing' do
                                                                                 "post2",
                                                                                 "test/mime2"]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", { "header_param" => "header_value" })
@@ -3976,7 +3976,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                           :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                              expect(course).to eq @course
                                                                              expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                              expect(publishing_pseudonym).to eq @pseudonym
@@ -3989,7 +3989,7 @@ describe Course, 'grade_publishing' do
                                                                                 nil,
                                                                                 nil]
                                                                              ]
-                                                                           }
+                                                                           end
                                                                          }
                                                                        })
         expect(SSLCommon).not_to receive(:post_data)
@@ -4314,12 +4314,12 @@ describe Course, 'grade_publishing' do
     def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
         :name => "test export",
-        :callback => lambda { |course, _enrollments, publishing_user, publishing_pseudonym|
+        :callback => lambda do |course, _enrollments, publishing_user, publishing_pseudonym|
                        expect(course).to eq @course
                        expect(publishing_pseudonym).to eq @pseudonym
                        expect(publishing_user).to eq @user
                        return [[[], "test-jt-data", "application/jtmimetype"]]
-                     },
+                     end,
         :requires_grading_standard => false, :requires_publishing_pseudonym => true
       }
 
@@ -4351,7 +4351,7 @@ describe Course, 'grade_publishing' do
 
     it 'does not allow grade publishing for a user that is disallowed' do
       @user = User.new
-      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+      expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'does not allow grade publishing for a user with a pseudonym in the wrong account' do
@@ -4359,7 +4359,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account = account_model
       @pseudonym.sis_user_id = "U1"
       @pseudonym.save!
-      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+      expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'does not allow grade publishing for a user with a pseudonym without a sis id' do
@@ -4367,7 +4367,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.sis_user_id = nil
       @pseudonym.save!
-      expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+      expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
     it 'does not publish empty csv' do
@@ -6200,9 +6200,9 @@ describe Course, "#student_annotation_documents_folder" do
   end
 
   it "creates a folder if not already existent" do
-    expect {
+    expect do
       @course.student_annotation_documents_folder
-    }.to change {
+    end.to change {
       Folder.where(course: @course, name: "Student Annotation Documents").count
     }.by(1)
   end
@@ -6233,9 +6233,9 @@ describe Course, "#student_annotation_documents_folder" do
     old_folder = @course.student_annotation_documents_folder
     old_folder.destroy
 
-    expect {
+    expect do
       @course.student_annotation_documents_folder
-    }.to change {
+    end.to change {
       Folder.where(course: @course, name: "Student Annotation Documents").count
     }.by(1)
   end

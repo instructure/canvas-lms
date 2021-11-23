@@ -196,9 +196,9 @@ describe AssignmentUtil do
 
   describe 'process_due_date_reminder' do
     let(:submission_for) do
-      ->(user) {
+      lambda do |user|
         Submission.find_by(assignment_id: assignment.id, user_id: user.id)
-      }
+      end
     end
 
     it 'alerts students who have not submitted' do

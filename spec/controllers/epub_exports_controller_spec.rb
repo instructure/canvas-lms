@@ -125,14 +125,14 @@ describe EpubExportsController do
       end
 
       it "creates one epub_export" do
-        expect {
+        expect do
           api_call_as_user(@student, :post, url, {
                              action: :create,
                              controller: :epub_exports,
                              course_id: @course.id,
                              format: 'json'
                            })
-        }.to change { EpubExport.count }.from(0).to(1)
+        end.to change { EpubExport.count }.from(0).to(1)
       end
     end
 
@@ -144,7 +144,7 @@ describe EpubExportsController do
       end
 
       it "does not create one epub_export" do
-        expect {
+        expect do
           api_call_as_user(@student, :post, url, {
                              action: :create,
                              controller: :epub_exports,
@@ -153,7 +153,7 @@ describe EpubExportsController do
                            }, {}, {}, {
                              expected_status: 422
                            })
-        }.not_to change { EpubExport.count }
+        end.not_to change { EpubExport.count }
       end
     end
   end

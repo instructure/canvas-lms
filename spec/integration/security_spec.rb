@@ -187,17 +187,17 @@ describe "security" do
     end
 
     it "destroys the token both user agent and server side on logout" do
-      expect {
+      expect do
         post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                         "pseudonym_session[password]" => "asdfasdf",
                                         "pseudonym_session[remember_me]" => "1" }
-      }.to change(SessionPersistenceToken, :count).by(1)
+      end.to change(SessionPersistenceToken, :count).by(1)
       c = cookies['pseudonym_credentials']
       expect(c).to be_present
 
-      expect {
+      expect do
         delete "/logout"
-      }.to change(SessionPersistenceToken, :count).by(-1)
+      end.to change(SessionPersistenceToken, :count).by(-1)
       expect(cookies['pseudonym_credentials']).not_to be_present
       expect(SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(c))).to be_nil
     end

@@ -33,7 +33,7 @@ module RootAccountResolver
   def resolves_root_account(through:)
     resolver = case through
                when Symbol
-                 ->(instance) do
+                 lambda do |instance|
                    source = instance.send(through)
 
                    case source

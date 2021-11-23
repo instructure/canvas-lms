@@ -97,10 +97,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     AssignmentOverrideStudent
       .where(assignment: assignment)
       .where.not(user_id: valid_student_ids)
-      .each { |aos|
+      .each do |aos|
       aos.assignment_override.skip_broadcasts = true
       aos.destroy
-    }
+    end
   end
 
   attr_writer :no_enrollment

@@ -180,19 +180,19 @@ class ContextModulesController < ApplicationController
             flash[:warning] = t('Module Item is locked.')
             return redirect_to named_context_url(@context, :context_context_modules_url)
           else
-            options = rule[:assignment_sets].map { |set|
+            options = rule[:assignment_sets].map do |set|
               option = {
                 setId: set[:id]
               }
 
-              option[:assignments] = (set[:assignments] || set[:assignment_set_associations]).map { |a|
+              option[:assignments] = (set[:assignments] || set[:assignment_set_associations]).map do |a|
                 assg = assignment_json(a[:model], @current_user, session)
                 assg[:assignmentId] = a[:assignment_id]
                 assg
-              }
+              end
 
               option
-            }
+            end
 
             js_env({
                      CHOOSE_MASTERY_PATH_DATA: {

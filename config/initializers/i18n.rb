@@ -251,7 +251,7 @@ module NumberLocalizer
 end
 I18n.singleton_class.include(NumberLocalizer)
 
-I18n.send(:extend, Module.new {
+I18n.send(:extend, Module.new do
   attr_accessor :localizer
 
   # Public: If a localizer has been set, use it to set the locale and then
@@ -303,7 +303,7 @@ I18n.send(:extend, Module.new {
   def dow_offset
     backend.send(:lookup, locale.to_s, "dow_offset") || 0
   end
-})
+end)
 
 # see also corresponding extractor logic in
 # i18n_extraction/i18nliner_extensions

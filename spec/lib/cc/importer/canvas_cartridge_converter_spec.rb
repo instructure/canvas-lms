@@ -1609,17 +1609,17 @@ describe "matching question reordering" do
     expect(@course.assessment_questions.count).to eq 3
 
     broken1 = @course.assessment_questions.where(migration_id: "m20b544d870a086de6e59b79e6dd9186cf_quiz_question").first
-    mi1 = @migration.migration_issues.detect { |mi|
+    mi1 = @migration.migration_issues.detect do |mi|
       mi.description ==
         "Imported matching question contains images on both sides, which is unsupported"
-    }
+    end
     expect(mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text")).to eq true
 
     broken2 = @course.assessment_questions.where(migration_id: "m22b544d870a086de6e59b79e6dd9186be_quiz_question").first
-    mi2 = @migration.migration_issues.detect { |mi|
+    mi2 = @migration.migration_issues.detect do |mi|
       mi.description ==
         "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
-    }
+    end
     expect(mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text")).to eq true
 
     fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first

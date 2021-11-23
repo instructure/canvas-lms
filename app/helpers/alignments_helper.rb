@@ -42,9 +42,9 @@ module AlignmentsHelper
         url: outcome_alignment_url(
           context, outcome, alignment
         )
-      }.delete_if { |_, v|
+      }.delete_if do |_, v|
         v.blank?
-      }
+      end
     }
     options[:style] = hidden unless alignment
 

@@ -38,6 +38,6 @@ Mime::Type.register 'application/vnd.openxmlformats-officedocument.spreadsheetml
 Mime::Type.register_alias 'text/html', :fbml unless defined? Mime::FBML
 
 # Custom LTI Advantage MIME types
-standard_json_parser = lambda { |body| JSON.parse(body) }
+standard_json_parser = ->(body) { JSON.parse(body) }
 ActionDispatch::Request.parameter_parsers[:lineitem] = standard_json_parser
 ActionDispatch::Request.parameter_parsers[:score] = standard_json_parser

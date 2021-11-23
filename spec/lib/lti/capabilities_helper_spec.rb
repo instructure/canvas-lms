@@ -73,7 +73,7 @@ module Lti
 
     let(:invalid_enabled_caps) { %w[InvalidCap.Foo AnotherInvalid.Bar] }
     let(:valid_enabled_caps) { %w[ToolConsumerInstance.guid Membership.role CourseSection.sourcedId] }
-    let(:supported_capabilities) {
+    let(:supported_capabilities) do
       %w[ToolConsumerInstance.guid
          Canvas.term.name
          CourseSection.sourcedId
@@ -116,7 +116,7 @@ module Lti
          com.instructure.User.observees
          com.instructure.User.sectionNames
          com.instructure.Observee.sisIds]
-    }
+    end
 
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

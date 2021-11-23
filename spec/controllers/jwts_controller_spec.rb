@@ -24,11 +24,11 @@ describe JwtsController do
   let(:token_user) { user_with_pseudonym }
   let(:other_user) { user_with_pseudonym }
   let(:translate_token) do
-    ->(resp) {
+    lambda do |resp|
       utf8_token_string = json_parse(resp.body)['token']
       decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
       return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
-    }
+    end
   end
 
   describe "#generate" do

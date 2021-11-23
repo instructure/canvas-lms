@@ -940,7 +940,7 @@ describe AssignmentGroupsApiController, type: :request do
 
     context "when an assignment is due in a closed grading period" do
       let(:call_update) do
-        ->(params, expected_status) do
+        lambda do |params, expected_status|
           api_call_as_user(
             @current_user,
             :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",

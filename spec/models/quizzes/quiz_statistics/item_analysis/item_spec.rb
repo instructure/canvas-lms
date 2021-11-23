@@ -32,14 +32,14 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
     end
   end
 
-  before(:once) {
+  before(:once) do
     simple_quiz_with_submissions %w[T T A], %w[T T A], %w[T F A], %w[T T B], %w[T T]
-  }
+  end
 
-  let(:item) {
+  let(:item) do
     @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
     @summary.sorted_items.last
-  }
+  end
 
   describe "#num_respondents" do
     it "returns all respondents" do

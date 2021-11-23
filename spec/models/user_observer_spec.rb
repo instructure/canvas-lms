@@ -27,9 +27,9 @@ describe UserObservationLink do
   end
 
   it "does not allow a user to observe oneself" do
-    expect {
+    expect do
       UserObservationLink.create_or_restore(observer: student, student: student, root_account: Account.default)
-    }.to raise_error(ActiveRecord::RecordInvalid)
+    end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it 'restores deleted observees instead of creating a new one' do
@@ -190,16 +190,16 @@ describe UserObservationLink do
     end
 
     it "does not attempt to add a duplicate observer enrollment" do
-      expect {
+      expect do
         @course.enroll_student student, role: @custom_student_role
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "recycles an existing deleted observer enrollment" do
       @observer_enrollment.destroy
-      expect {
+      expect do
         @course.enroll_student student, role: @custom_student_role
-      }.not_to raise_error
+      end.not_to raise_error
       expect(@observer_enrollment.reload).to be_active
     end
   end

@@ -338,10 +338,10 @@ describe "outcomes" do
           # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
           outcome = LearningOutcome.find_by(context: @course, short_description: 'Outcome', description: '<p>Standard Desc</p>')
           # Small delay between button click and model population in db
-          keep_trying_until {
+          keep_trying_until do
             fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: 'Friendly Desc')
             expect(fd).to be_truthy
-          }
+          end
         end
 
         it 'edits an outcome\'s friendly description' do
