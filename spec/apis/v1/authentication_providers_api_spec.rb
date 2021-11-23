@@ -253,79 +253,7 @@ describe "AuthenticationProviders API", type: :request do
                       expected_status: 400)
       expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
     end
-  end
 
-  context "/show" do
-    def call_show(id, status = 200)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-               { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-               {}, {}, :expected_status => status)
-    end
-
-    it "returns saml aac" do
-      aac = @account.authentication_providers.create!(@saml_hash)
-      json = call_show(aac.id)
-
-      @saml_hash['id'] = aac.id
-      @saml_hash['position'] = 1
-      @saml_hash['login_handle_name'] = nil
-      @saml_hash['change_password_url'] = nil
-      @saml_hash['requested_authn_context'] = nil
-      @saml_hash['login_attribute'] = 'NameID'
-      @saml_hash['unknown_user_url'] = nil
-      @saml_hash['parent_registration'] = false
-      @saml_hash['metadata_uri'] = nil
-      @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-      @saml_hash['strip_domain_from_login_attribute'] = false
-      @saml_hash['mfa_required'] = false
-      expect(json).to eq @saml_hash
-    end
-
-    it "returns ldap aac" do
-      aac = @account.authentication_providers.create!(@ldap_hash)
-      json = call_show(aac.id)
-
-      @ldap_hash.delete 'auth_password'
-      @ldap_hash['id'] = aac.id
-      @ldap_hash['auth_port'] = nil
-      @ldap_hash['auth_base'] = nil
-      @ldap_hash['auth_over_tls'] = 'start_tls'
-      @ldap_hash['identifier_format'] = nil
-      @ldap_hash['position'] = 1
-      @ldap_hash['mfa_required'] = false
-      expect(json).to eq @ldap_hash
-    end
-
-    it "returns cas aac" do
-      aac = @account.authentication_providers.create!(@cas_hash)
-      json = call_show(aac.id)
-
-      @cas_hash['log_in_url'] = nil
-      @cas_hash['id'] = aac.id
-      @cas_hash['position'] = 1
-      @cas_hash['unknown_user_url'] = nil
-      @cas_hash['federated_attributes'] = {}
-      @cas_hash['mfa_required'] = false
-      expect(json).to eq @cas_hash
-    end
-
-    it "404s" do
-      call_show(0, 404)
-    end
-
-    it "returns unauthorized error" do
-      course_with_student(:course => @course)
-      call_show(0, 401)
-    end
-
-    it "allows seeing the canvas auth type for any authenticated user" do
-      @account.authentication_providers.create!(auth_type: 'canvas')
-      course_with_student(:course => @course)
-      call_show('canvas')
-    end
-  end
-
-  context "/update" do
     def call_update(id, params, status = 200)
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
                       { :controller => 'authentication_providers', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
@@ -424,6 +352,76 @@ describe "AuthenticationProviders API", type: :request do
 
       aac.reload
       expect(aac).not_to be_mfa_required
+    end
+  end
+
+  context "/show" do
+    def call_show(id, status = 200)
+      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
+               { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+               {}, {}, :expected_status => status)
+    end
+
+    it "returns saml aac" do
+      aac = @account.authentication_providers.create!(@saml_hash)
+      json = call_show(aac.id)
+
+      @saml_hash['id'] = aac.id
+      @saml_hash['position'] = 1
+      @saml_hash['login_handle_name'] = nil
+      @saml_hash['change_password_url'] = nil
+      @saml_hash['requested_authn_context'] = nil
+      @saml_hash['login_attribute'] = 'NameID'
+      @saml_hash['unknown_user_url'] = nil
+      @saml_hash['parent_registration'] = false
+      @saml_hash['metadata_uri'] = nil
+      @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+      @saml_hash['strip_domain_from_login_attribute'] = false
+      @saml_hash['mfa_required'] = false
+      expect(json).to eq @saml_hash
+    end
+
+    it "returns ldap aac" do
+      aac = @account.authentication_providers.create!(@ldap_hash)
+      json = call_show(aac.id)
+
+      @ldap_hash.delete 'auth_password'
+      @ldap_hash['id'] = aac.id
+      @ldap_hash['auth_port'] = nil
+      @ldap_hash['auth_base'] = nil
+      @ldap_hash['auth_over_tls'] = 'start_tls'
+      @ldap_hash['identifier_format'] = nil
+      @ldap_hash['position'] = 1
+      @ldap_hash['mfa_required'] = false
+      expect(json).to eq @ldap_hash
+    end
+
+    it "returns cas aac" do
+      aac = @account.authentication_providers.create!(@cas_hash)
+      json = call_show(aac.id)
+
+      @cas_hash['log_in_url'] = nil
+      @cas_hash['id'] = aac.id
+      @cas_hash['position'] = 1
+      @cas_hash['unknown_user_url'] = nil
+      @cas_hash['federated_attributes'] = {}
+      @cas_hash['mfa_required'] = false
+      expect(json).to eq @cas_hash
+    end
+
+    it "404s" do
+      call_show(0, 404)
+    end
+
+    it "returns unauthorized error" do
+      course_with_student(:course => @course)
+      call_show(0, 401)
+    end
+
+    it "allows seeing the canvas auth type for any authenticated user" do
+      @account.authentication_providers.create!(auth_type: 'canvas')
+      course_with_student(:course => @course)
+      call_show('canvas')
     end
   end
 

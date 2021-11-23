@@ -441,30 +441,6 @@ describe UserContent, type: :request do
         url = "/users/#{@user.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
         confirm_url_stability(url)
       end
-    end
-
-    context "with verified user-context file links" do
-      before do
-        user_factory
-        attachment_model :context => @user
-      end
-
-      def confirm_url_stability(url)
-        link = %(<a href="#{url}">what</a>a>)
-        html = tester.process_incoming_html_content(link)
-        doc = Nokogiri::HTML5.fragment(html)
-        expect(doc.at_css('a')['href']).to eq url
-      end
-
-      it "ignores them when scoped to the file" do
-        url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-        confirm_url_stability(url)
-      end
-
-      it "ignores them when scoped to the user" do
-        url = "/users/#{@user.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-        confirm_url_stability(url)
-      end
 
       it "ignores them when they include the host" do
         url = "http://somedomain.instructure.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"

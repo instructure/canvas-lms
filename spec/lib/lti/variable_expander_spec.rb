@@ -1420,7 +1420,7 @@ module Lti
         end
       end
 
-      context 'context is a course with an assignment' do
+      context 'context is a course with an assignment and a user' do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
 
         it 'has substitution for $Canvas.assignment.id' do

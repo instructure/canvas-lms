@@ -137,9 +137,7 @@ describe DatadogRumHelper do
       datadog_rum_config.data.delete(:sample_rate_percentage)
       expect(include_datadog_rum_js?).to be(false)
     end
-  end
 
-  describe "#include_datadog_rum_js?" do
     it "renders the datadog rum js partial when it will be included" do
       expect(self).to receive(:include_datadog_rum_js?).and_return(true)
       expect(self).to receive(:render).with(partial: "shared/datadog_rum_js")

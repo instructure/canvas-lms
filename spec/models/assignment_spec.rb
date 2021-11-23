@@ -2707,6 +2707,8 @@ describe Assignment do
       @assignment.unmute!
     end
 
+    let(:assignment) { assignment_model(course: @course) }
+
     it "hides grading comments if assignment is muted and commenter is teacher" do
       @assignment.mute!
       @assignment.update_submission(@user, comment: 'hi', author: @teacher)
@@ -2847,6 +2849,72 @@ describe Assignment do
           @assignment.update_submission(@student, commenter: @second_teacher, comment: 'hi', provisional: true)
 
           expect(@assignment.moderation_graders).to have(3).items
+        end
+      end
+    end
+
+    it "raises an error if original_student is nil" do
+      expect do
+        assignment.update_submission(nil)
+      end.to raise_error "Student Required"
+    end
+
+    context "when the student is not in a group" do
+      let!(:associate_student_and_submission) do
+        assignment.submissions.find_by user: @student
+      end
+      let(:update_submission_response) { assignment.update_submission(@student) }
+
+      it "returns an Array" do
+        expect(update_submission_response.class).to eq Array
+      end
+
+      it "returns a collection of submissions" do
+        assignment.update_submission(@student).first
+        expect(update_submission_response.first.class).to eq Submission
+      end
+    end
+
+    context "when the student is in a group" do
+      let!(:create_a_group_with_a_submitted_assignment) do
+        setup_assignment_with_group
+        @assignment.submit_homework(
+          @u1,
+          submission_type: "online_text_entry",
+          body: "Some text for you"
+        )
+      end
+
+      context "when a comment is submitted" do
+        let(:update_assignment_with_comment) do
+          @assignment.update_submission(
+            @u2,
+            comment: "WAT?",
+            group_comment: true,
+            user_id: @course.teachers.first.id
+          )
+        end
+
+        it "returns an Array" do
+          expect(update_assignment_with_comment).to be_an_instance_of Array
+        end
+
+        it "creates a comment for each student in the group" do
+          expect do
+            update_assignment_with_comment
+          end.to change { SubmissionComment.count }.by(@u1.groups.first.users.count)
+        end
+
+        it "creates comments with the same group_comment_id" do
+          update_assignment_with_comment
+          comments = SubmissionComment.last(@u1.groups.first.users.count)
+          expect(comments.first.group_comment_id).to eq comments.last.group_comment_id
+        end
+      end
+
+      context "when a comment is not submitted" do
+        it "returns an Array" do
+          expect(@assignment.update_submission(@u2).class).to eq Array
         end
       end
     end
@@ -7407,76 +7475,6 @@ describe Assignment do
       context 'when a comment is not submitted' do
         it 'returns an Array' do
           expect(@assignment.add_submission_comment(@u2).class).to eq Array
-        end
-      end
-    end
-  end
-
-  describe "#update_submission" do
-    let(:assignment) { assignment_model(course: @course) }
-
-    it "raises an error if original_student is nil" do
-      expect do
-        assignment.update_submission(nil)
-      end.to raise_error "Student Required"
-    end
-
-    context "when the student is not in a group" do
-      let!(:associate_student_and_submission) do
-        assignment.submissions.find_by user: @student
-      end
-      let(:update_submission_response) { assignment.update_submission(@student) }
-
-      it "returns an Array" do
-        expect(update_submission_response.class).to eq Array
-      end
-
-      it "returns a collection of submissions" do
-        assignment.update_submission(@student).first
-        expect(update_submission_response.first.class).to eq Submission
-      end
-    end
-
-    context "when the student is in a group" do
-      let!(:create_a_group_with_a_submitted_assignment) do
-        setup_assignment_with_group
-        @assignment.submit_homework(
-          @u1,
-          submission_type: "online_text_entry",
-          body: "Some text for you"
-        )
-      end
-
-      context "when a comment is submitted" do
-        let(:update_assignment_with_comment) do
-          @assignment.update_submission(
-            @u2,
-            comment: "WAT?",
-            group_comment: true,
-            user_id: @course.teachers.first.id
-          )
-        end
-
-        it "returns an Array" do
-          expect(update_assignment_with_comment).to be_an_instance_of Array
-        end
-
-        it "creates a comment for each student in the group" do
-          expect do
-            update_assignment_with_comment
-          end.to change { SubmissionComment.count }.by(@u1.groups.first.users.count)
-        end
-
-        it "creates comments with the same group_comment_id" do
-          update_assignment_with_comment
-          comments = SubmissionComment.last(@u1.groups.first.users.count)
-          expect(comments.first.group_comment_id).to eq comments.last.group_comment_id
-        end
-      end
-
-      context "when a comment is not submitted" do
-        it "returns an Array" do
-          expect(@assignment.update_submission(@u2).class).to eq Array
         end
       end
     end
