@@ -186,8 +186,37 @@ module ReadOnlySecondaryStub
     Thread.current[:stubbed_guard_rail_env] = nil
   end
 
+  def datbase_username
+    Rails.configuration.database_configuration.dig('test', 'username') ||
+      `whoami`.strip
+  end
+
+  def readonly_user_exists?
+    return @read_only_user if instance_variable_defined?(:@read_only_user)
+
+    @read_only_user = !!ActiveRecord::Base.connection.select_value("SELECT 1 AS one FROM pg_roles WHERE pg_roles.rolname='canvas_readonly_user'")
+  end
+
+  def readonly_user_can_read?
+    return @literate if instance_variable_defined?(:@literate)
+
+    sql = "SELECT privilege_type FROM information_schema.table_privileges WHERE grantee ='canvas_readonly_user' AND table_name = 'courses'"
+    @literate = ActiveRecord::Base.connection.select_values(sql).include?("SELECT")
+  end
+
+  def test_db_name
+    ActiveRecord::Base.connection.current_database
+  end
+
   def switch_role!(env)
-    ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+    if readonly_user_exists? && readonly_user_can_read?
+      ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+    else
+      puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
+      puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
+      puts "psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}"
+      puts "RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306"
+    end
   end
 
   def environment
