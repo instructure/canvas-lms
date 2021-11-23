@@ -9,7 +9,7 @@ When things go wrong, we want to know about it.  When things error out in expect
 
 ### Where do we capture exceptions for analysis?
 
-The short answer is that they get sent to [sentry](https://www.sentry.io). Mostly we use the default sentry-raven integration (see config/initializers/sentry.rb in canvas-lms).  This means that any time an UNHANDLED exception pops all the way out of the rails process, we’ll tell sentry.
+The short answer is that they get sent to [sentry](https://www.sentry.io). Mostly we use the Sentry integration (see config/initializers/sentry.rb in canvas-lms).  This means that any time an UNHANDLED exception pops all the way out of the rails process, we’ll tell Sentry.
 
 We also sometimes report errors that we handle if it’s important to report them (because it’s unexpected) but also not explode (because we’re in the middle of doing something important that is continuable).  See page view logging in canvas for an example: `app/controllers/application_controller.rb`.  Because we register sentry as a callback from Canvas Errors, things that we send there also get sent to Sentry.  An error can be captured from anywhere using the capture method:
 

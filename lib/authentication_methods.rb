@@ -304,6 +304,9 @@ module AuthenticationMethods
     end
 
     logger.info "[AUTH] final user: #{@current_user&.id}"
+    if Sentry.initialized? && !Rails.env.test?
+      Sentry.set_user({ id: @current_user&.global_id, ip_address: request.remote_ip }.compact)
+    end
     @current_user
   end
   private :load_user
