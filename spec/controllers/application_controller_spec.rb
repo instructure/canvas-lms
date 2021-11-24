@@ -123,13 +123,15 @@ RSpec.describe ApplicationController do
       end
 
       it "auto-sets timezone and locale" do
-        I18n.locale = :fr
-        Time.zone = "Alaska"
-        expect(@controller.js_env[:LOCALE]).to eq "fr"
-        expect(@controller.js_env[:BIGEASY_LOCALE]).to eq "fr_FR"
-        expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq "fr"
-        expect(@controller.js_env[:MOMENT_LOCALE]).to eq "fr"
-        expect(@controller.js_env[:TIMEZONE]).to eq "America/Juneau"
+        I18n.with_locale(:fr) do
+          Time.use_zone("Alaska") do
+            expect(@controller.js_env[:LOCALE]).to eq "fr"
+            expect(@controller.js_env[:BIGEASY_LOCALE]).to eq "fr_FR"
+            expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq "fr"
+            expect(@controller.js_env[:MOMENT_LOCALE]).to eq "fr"
+            expect(@controller.js_env[:TIMEZONE]).to eq "America/Juneau"
+          end
+        end
       end
 
       describe "user flags" do
@@ -189,10 +191,11 @@ RSpec.describe ApplicationController do
       end
 
       it "sets the contextual timezone from the context" do
-        Time.zone = "Mountain Time (US & Canada)"
-        controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
-        controller.js_env({})
-        expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
+        Time.use_zone("Mountain Time (US & Canada)") do
+          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+          controller.js_env({})
+          expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
+        end
       end
 
       it "allows multiple items" do
@@ -310,7 +313,8 @@ RSpec.describe ApplicationController do
           "camera *",
           "midi *",
           "encrypted-media *",
-          "autoplay *"
+          "autoplay *",
+          "clipboard-write *"
         ]
       end
 

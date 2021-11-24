@@ -39,7 +39,8 @@ module Lti
             "camera *",
             "midi *",
             "encrypted-media *",
-            "autoplay *"
+            "autoplay *",
+            "clipboard-write *"
           ]
         end
       end
@@ -57,6 +58,7 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
           ]
         end
       end
@@ -73,7 +75,8 @@ module Lti
             "camera *",
             "midi *",
             "encrypted-media *",
-            "autoplay *"
+            "autoplay *",
+            "clipboard-write *"
           ]
         end
       end
@@ -91,6 +94,7 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
           ]
         end
       end
@@ -107,7 +111,8 @@ module Lti
             "camera *",
             "midi *",
             "encrypted-media *",
-            "autoplay *"
+            "autoplay *",
+            "clipboard-write *"
           ]
         end
       end
@@ -125,6 +130,7 @@ module Lti
             midi
             encrypted-media
             autoplay
+            clipboard-write
           ]
         end
       end
