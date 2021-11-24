@@ -266,7 +266,7 @@ describe Quizzes::Quiz do
     end
   end
 
-  it_should_behave_like 'Canvas::DraftStateValidations'
+  it_behaves_like 'Canvas::DraftStateValidations'
 
   it "infers the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,

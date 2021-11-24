@@ -177,7 +177,7 @@ describe "Enrollment::QueryBuilder" do
         end
       end
 
-      it_should_behave_like "enforce_course_workflow_state"
+      it_behaves_like "enforce_course_workflow_state"
     end
 
     context "with :invited" do
@@ -256,7 +256,7 @@ describe "Enrollment::QueryBuilder" do
         end
       end
 
-      it_should_behave_like "enforce_course_workflow_state"
+      it_behaves_like "enforce_course_workflow_state"
     end
 
     %i[deleted rejected completed creation_pending inactive].each do |state|
@@ -276,7 +276,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it_should_behave_like "enforce_course_workflow_state"
+        it_behaves_like "enforce_course_workflow_state"
       end
     end
 
