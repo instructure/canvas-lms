@@ -1481,6 +1481,10 @@ CanvasRails::Application.routes.draw do
         delete "users/:user_id/observees/:observee_id", action: :destroy
       end
 
+      scope(controller: :login) do
+        get 'login/session_token', action: :session_token, as: :login_session_token
+      end
+
       scope(controller: :observer_alerts_api) do
         get "users/:user_id/observer_alerts/unread_count", action: :alerts_count
         get "users/:user_id/observer_alerts/:student_id", action: :alerts_by_student, as: "observer_alerts_by_student"
