@@ -121,18 +121,18 @@ describe "conversations new" do
           conversation_elements[0].click
         end
 
-        it "shows submission comments in submissions page and inbox", priority: "2", test_id: pick_test_id(context, student: "122983", teacher: "2634986") do
+        it "shows submission comments in submissions page and inbox", priority: "2" do
           expect(@submission.submission_comments.count).to eq(2)
           expect(ff('.message-content > li').size).to eq(2)
         end
 
-        it 'shows only the reply button', priority: "2", test_id: pick_test_id(context, student: "2642300", teacher: "2642302") do
+        it 'shows only the reply button', priority: "2" do
           # make sure there is no cog menu
           expect(f('.message-detail-actions')).not_to contain_css('.inline-block')
           expect(f('#submission-reply-btn')).to be_present
         end
 
-        it 'shows replies in the submission comments', priority: "2", test_id: pick_test_id(context, student: "2642301", teacher: "2642303") do
+        it 'shows replies in the submission comments', priority: "2" do
           reply_to_submission_comment
           expect(ffj('.message-item-view').length).to eq(3)
           expect(@submission.submission_comments.count).to eq(3)

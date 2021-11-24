@@ -24,10 +24,10 @@ require_relative 'shared_examples_common'
 # Shared Examples
 # ======================================================================================================================
 
-shared_examples 'profile_settings_page' do |context|
+shared_examples 'profile_settings_page' do
   include SharedExamplesCommon
 
-  it 'gives option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
+  it 'gives option to change profile pic', priority: "2" do
     enable_avatars(false)
     get "/profile/settings"
     driver.action.move_to(f('.avatar.profile_pic_link.none')).perform
@@ -41,10 +41,10 @@ shared_examples 'profile_settings_page' do |context|
   end
 end
 
-shared_examples 'profile_user_about_page' do |context|
+shared_examples 'profile_user_about_page' do
   include SharedExamplesCommon
 
-  it 'gives option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
+  it 'gives option to change profile pic', priority: "2" do
     enable_avatars(false)
     get "/about/#{@user.id}"
 
@@ -57,10 +57,10 @@ shared_examples 'profile_user_about_page' do |context|
   end
 end
 
-shared_examples 'user settings page change pic window' do |context|
+shared_examples 'user settings page change pic window' do
   include SharedExamplesCommon
 
-  it 'allows user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'allows user to click to change profile pic', priority: "1" do
     skip('ADMIN-2680')
     enable_avatars(true)
     get '/profile/settings'
@@ -89,10 +89,10 @@ shared_examples 'user settings page change pic window' do |context|
   end
 end
 
-shared_examples 'with gravatar settings' do |context|
+shared_examples 'with gravatar settings' do
   include SharedExamplesCommon
 
-  it 'does not allow user to see gravatar when disabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'does not allow user to see gravatar when disabled', priority: "1" do
     enable_avatars(false)
     get '/profile/settings'
 
@@ -101,7 +101,7 @@ shared_examples 'with gravatar settings' do |context|
     expect(fj('.nav.nav-pills li')).not_to include_text("From Gravatar")
   end
 
-  it 'allows user to see gravatar when enabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'allows user to see gravatar when enabled', priority: "1" do
     enable_avatars(true)
     get '/profile/settings'
 
@@ -112,10 +112,10 @@ shared_examples 'with gravatar settings' do |context|
   end
 end
 
-shared_examples 'user settings change pic cancel' do |context|
+shared_examples 'user settings change pic cancel' do
   include SharedExamplesCommon
 
-  it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, student: 68939, teacher: 372132, admin: 372133) do
+  it 'closes window when cancel button is pressed', priority: "1" do
     enable_avatars(false)
     get '/profile/settings'
 

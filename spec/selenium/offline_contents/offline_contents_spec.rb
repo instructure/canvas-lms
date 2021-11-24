@@ -38,7 +38,7 @@ describe "offline contents" do
     end
 
     it_behaves_like 'show courses for ePub generation', :teacher
-    it_behaves_like 'generate and download ePub', :teacher
+    it_behaves_like 'generate and download ePub'
   end
 
   context "as a student" do
@@ -49,6 +49,6 @@ describe "offline contents" do
     end
 
     it_behaves_like 'show courses for ePub generation', :student
-    it_behaves_like 'generate and download ePub', :student
+    it_behaves_like 'generate and download ePub'
   end
 end

@@ -28,12 +28,12 @@ describe 'profile_pics' do
       course_with_student_logged_in
     end
 
-    it_behaves_like 'profile_settings_page', :student
+    it_behaves_like 'profile_settings_page'
 
-    it_behaves_like 'profile_user_about_page', :student
+    it_behaves_like 'profile_user_about_page'
 
-    it_behaves_like 'user settings page change pic window', :student
+    it_behaves_like 'user settings page change pic window'
 
-    it_behaves_like 'user settings change pic cancel', :student
+    it_behaves_like 'user settings change pic cancel'
   end
 end

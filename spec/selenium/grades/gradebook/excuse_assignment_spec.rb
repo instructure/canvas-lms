@@ -156,7 +156,7 @@ describe 'Excuse an Assignment' do
 
   shared_examples 'Basic Behavior' do |view|
     context 'Group Assignments', :group do
-      it 'preserves assignment excused status', priority: "1", test_id: view == 'srgb' ? 216318 : 207117 do
+      it 'preserves assignment excused status', priority: "1" do
         course_with_teacher_logged_in
         group_test_setup 4, 1, 1
 
@@ -192,7 +192,7 @@ describe 'Excuse an Assignment' do
         expect(score_values).to eq %w[15 Excused 15 15]
       end
 
-      it 'excuses assignments on individual basis', priority: "1", test_id: view == 'srgb' ? 209405 : 209384 do
+      it 'excuses assignments on individual basis', priority: "1" do
         course_with_teacher_logged_in
         group_test_setup 2, 1, 1
 
@@ -233,7 +233,7 @@ describe 'Excuse an Assignment' do
       end
     end
 
-    it 'formats excused grade like dropped assignment', priority: "1", test_id: view == 'srgb' ? 216380 : 197051 do
+    it 'formats excused grade like dropped assignment', priority: "1" do
       assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
 
       if view == 'srgb'
@@ -262,7 +262,7 @@ describe 'Excuse an Assignment' do
     end
 
     %w[percent letter_grade gpa_scale points].each do |type|
-      it "is not included in grade calculations with type '#{type}'", priority: "1", test_id: view == 'srgb' ? 216379 : 1196596 do
+      it "is not included in grade calculations with type '#{type}'", priority: "1" do
         a1 = @course.assignments.create! title: 'Excuse Me', grading_type: type, points_possible: 20
         a2 = @course.assignments.create! title: 'Don\'t Excuse Me', grading_type: type, points_possible: 20
 
