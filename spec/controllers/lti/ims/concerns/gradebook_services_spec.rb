@@ -109,21 +109,29 @@ module Lti
         context "with uuid that first digit matches user_id" do
           before { user.enrollments.first.update!(workflow_state: "active") }
 
-          let(:valid_params) { { course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id } }
+          let(:some_lti_id) do
+            "#{user.id}a000000"[0...8] + "-1234-1234-1234-e1214b67696d"
+          end
+          let(:valid_params) { { course_id: context.id, user_id: some_lti_id, line_item_id: line_item.id } }
 
           it "fails to find user" do
             get :index, params: valid_params
             expect(response.code).to eq "422"
             expect(JSON.parse(response.body)["errors"]["message"]).to eq("User not found in course or is not a student")
           end
+
+          it "still uses such a user_id to look up by lti_id" do
+            User.where(id: user.id).update_all lti_id: some_lti_id
+            get :index, params: valid_params
+
+            expect(response.code).to eq "200"
+            expect(parsed_response_body["user_id"]).to eq user.id
+          end
         end
 
         context "when two students with enrollments were merged" do
           let_once(:user_to_merge) { student_in_course(course: context).user }
           let(:lti_id) { user_to_merge.lti_id }
-          let(:valid_params) do
-            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
-          end
 
           before do
             user.enrollments.first.update!(workflow_state: "active")
@@ -132,11 +140,30 @@ module Lti
             UserMerge.from(user_to_merge).into(user)
           end
 
-          it "successfuly find the active user using the user past lti id" do
-            get :index, params: valid_params
+          context "when using the user_id parameter (LTI spec)" do
+            let(:valid_params) do
+              { course_id: context.id, user_id: lti_id, line_item_id: line_item.id }
+            end
 
-            expect(response.code).to eq "200"
-            expect(parsed_response_body["user_id"]).to eq user.id
+            it "successfuly finds the active user using the user past lti id" do
+              get :index, params: valid_params
+
+              expect(response.code).to eq "200"
+              expect(parsed_response_body["user_id"]).to eq user.id
+            end
+          end
+
+          context "when using the userId parameter (backwards compatibility)" do
+            let(:valid_params) do
+              { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+            end
+
+            it "successfuly finds the active user using the user past lti id" do
+              get :index, params: valid_params
+
+              expect(response.code).to eq "200"
+              expect(parsed_response_body["user_id"]).to eq user.id
+            end
           end
         end
 

@@ -97,6 +97,15 @@ describe Lti::IMS::ResultsController do
         expect(json.first["userId"]).to eq result.user.lti_id
       end
 
+      context "with user_id being the user's lti_id" do
+        let(:params_overrides) { super().merge(user_id: result.user.lti_id) }
+
+        it "returns the user result" do
+          send_request
+          expect(json.map { |res| res["userId"] }).to eq [result.user.lti_id]
+        end
+      end
+
       context "with non-existent user" do
         let(:params_overrides) { super().merge(user_id: User.maximum(:id) + 1) }
 
