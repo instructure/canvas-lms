@@ -49,7 +49,7 @@ module Turnitin
         sub = lti_assignment.submit_homework(
           lti_student,
           attachments: [attachment],
-          submission_type: 'online_upload',
+          submission_type: 'online_upload'
         )
         sub.turnitin_data = { attachment.asset_string => { outcome_response: outcome_response_json } }
         sub.save!

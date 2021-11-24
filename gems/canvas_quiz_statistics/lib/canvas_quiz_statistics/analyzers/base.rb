@@ -48,7 +48,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def self.question_type
-      (self.name.demodulize.underscore + '_question').to_sym
+      (name.demodulize.underscore + '_question').to_sym
     end
 
     private

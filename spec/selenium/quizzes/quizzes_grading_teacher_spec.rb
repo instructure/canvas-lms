@@ -38,7 +38,7 @@ describe 'Grading quizzes' do
       context 'when on the course home page' do
         before { get "/courses/#{@course.id}" }
 
-        it 'To Do List includes quizzes with submissions that need grading', priority: "1", test_id: 140614 do
+        it 'To Do List includes quizzes with submissions that need grading', priority: "1" do
           expect(f('.right-side-list.to-do-list')).to include_text 'Grade Quiz Me!'
         end
       end
@@ -53,7 +53,7 @@ describe 'Grading quizzes' do
           select_different_correct_answer(1)
         end
 
-        it 'shows the regrade options', priority: "1", test_id: 140622 do
+        it 'shows the regrade options', priority: "1" do
           # verify presence of regrade alert
           expect(fj('.ui-dialog:visible .alert')).to include_text 'Choose a regrade option' \
                                                                   ' for students who have already taken the quiz'
@@ -68,7 +68,7 @@ describe 'Grading quizzes' do
           expect(f('.correct_answer .regrade_option_text').text).to eq option_text
         end
 
-        it 'remembers the selected regrade option', priority: "1", test_id: 140625 do
+        it 'remembers the selected regrade option', priority: "1" do
           select_regrade_option
           save_question
 
@@ -79,7 +79,7 @@ describe 'Grading quizzes' do
       end
 
       context 'after deleting an answer to a quiz question' do
-        it 'doesn\'t offer regrade options', priority: "1", test_id: 140626 do
+        it 'doesn\'t offer regrade options', priority: "1" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
           dismiss_flash_messages # can interfere w/ our hovering
           click_questions_tab
@@ -127,7 +127,7 @@ describe 'Grading quizzes' do
         @quiz = seed_quiz_with_submission(1, student: @student, question_data: question_data)
       end
 
-      it "doesn't show the 'Q' icon for spacer text-only questions", priority: "1", test_id: 377893 do
+      it "doesn't show the 'Q' icon for spacer text-only questions", priority: "1" do
         get "/courses/#{@course.id}/gradebook"
         expect(f("#gradebook_grid")).not_to contain_css(".icon-quiz")
       end

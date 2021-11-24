@@ -43,9 +43,7 @@ class Thumbnail < ActiveRecord::Base
     "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
   end
 
-  def bucket
-    self.attachment.bucket
-  end
+  delegate :bucket, to: :attachment
 
   def cached_s3_url
     @cached_s3_url = authenticated_s3_url(expires_in: 144.hours)

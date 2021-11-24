@@ -69,11 +69,11 @@ module CC::Importer::Standard
           add_course_file(sub_file)
         end
 
-        if main_file[:path_name].present?
-          main_file[:file_name] = File.basename main_file[:path_name]
-          main_file[:type] = 'FILE_TYPE'
-          add_course_file(main_file, true)
-        end
+        next unless main_file[:path_name].present?
+
+        main_file[:file_name] = File.basename main_file[:path_name]
+        main_file[:type] = 'FILE_TYPE'
+        add_course_file(main_file, true)
       end
 
       new_assignments.each do |a|
@@ -100,11 +100,11 @@ module CC::Importer::Standard
 
           file_path = @package_root.item_path(val[:path_name])
           if File.exist?(file_path)
-            zipfile.add(val[:path_name], file_path) if !File.directory?(file_path)
+            zipfile.add(val[:path_name], file_path) unless File.directory?(file_path)
           else
             web_file_path = @package_root.item_path(WEB_RESOURCES_FOLDER, val[:path_name])
             if File.exist?(web_file_path)
-              zipfile.add(val[:path_name], web_file_path) if !File.directory?(web_file_path)
+              zipfile.add(val[:path_name], web_file_path) unless File.directory?(web_file_path)
             else
               val[:errored] = true
             end

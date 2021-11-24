@@ -26,7 +26,7 @@ module Api
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
 
-        content = self.new(html, host: host, port: port)
+        content = new(html, host: host, port: port)
         # shortcut html documents that definitely don't have anything we're interested in
         return html unless content.might_need_modification?
 
@@ -36,8 +36,8 @@ module Api
       def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
         return html if html.blank?
 
-        self.new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
-            .rewritten_html(url_helper)
+        new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
+          .rewritten_html(url_helper)
       end
 
       attr_reader :html
@@ -86,7 +86,7 @@ module Api
           node.replace(tag.as_anchor_node)
         end
 
-        return parsed_html.to_s
+        parsed_html.to_s
       end
 
       # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
@@ -133,7 +133,7 @@ module Api
 
       def add_css_and_js_overrides
         return parsed_html unless @include_mobile
-        return parsed_html unless @account && @account.effective_brand_config
+        return parsed_html unless @account&.effective_brand_config
 
         overrides = @account.effective_brand_config.css_and_js_overrides
         self.class.add_overrides_to_html(parsed_html, overrides)
@@ -158,7 +158,7 @@ module Api
 
       private
 
-      APPLICABLE_ATTRS = %w{href src}.freeze
+      APPLICABLE_ATTRS = %w[href src].freeze
 
       def scrub_links!(node)
         APPLICABLE_ATTRS.each do |attr|

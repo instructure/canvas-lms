@@ -60,7 +60,7 @@ def returns
 
   response_info = object.tag(:returns)
   case response_info.text
-  when %r{\[(.*)\]}
+  when /\[(.*)\]/
     @object_name = $1.strip
     @is_list = true
   else

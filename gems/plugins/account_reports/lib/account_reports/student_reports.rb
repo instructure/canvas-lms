@@ -35,11 +35,9 @@ module AccountReports
       # force the window of time to be limited to 2 weeks
 
       # if both dates are specified use them or change the start date if range is over 2 week
-      if start_at && end_at
-        if end_at - start_at > 2.weeks.to_i
-          @start = end_at - 2.weeks
-          @account_report.parameters["start_at"] = @start
-        end
+      if start_at && end_at && end_at - start_at > 2.weeks.to_i
+        @start = end_at - 2.weeks
+        @account_report.parameters["start_at"] = @start
       end
 
       # if no end date is specified, make one 2 weeks after the start date
@@ -80,11 +78,10 @@ module AccountReports
 
     def enrollment_states_string
       if enrollment_states
-        states = Array(enrollment_states).join(' ')
+        Array(enrollment_states).join(' ')
       else
-        states = 'all'
+        'all'
       end
-      states
     end
 
     def students_with_no_submissions
@@ -199,7 +196,7 @@ module AccountReports
             )
         )}, start_at)
       else
-        data = data.where("enrollments.last_activity_at IS NULL")
+        data = data.where(enrollments: { last_activity_at: nil })
         data = data.where(%{NOT EXISTS (
           SELECT 1 AS ONE
           FROM #{Enrollment.quoted_table_name} AS other_ens
@@ -287,7 +284,7 @@ module AccountReports
     # shows last_activity_at on enrollments for users with
     # enrollments in this account
 
-    # note: activity on other root accounts' enrollments will not show
+    # NOTE: activity on other root accounts' enrollments will not show
     def last_enrollment_activity
       report_extra_text
 

@@ -29,9 +29,9 @@ module Canvas
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/
       # long sequence/run of chars
       if policy[:max_sequence]
-        candidates = (value.length - policy[:max_sequence]).times.map { |i|
+        candidates = Array.new(value.length - policy[:max_sequence]) do |i|
           Regexp.new(Regexp.escape(value[i, policy[:max_sequence] + 1]))
-        }
+        end
         record.errors.add attr, "sequence" if candidates.any? { |candidate| SEQUENCES.grep(candidate).present? }
       end
     end
@@ -57,7 +57,7 @@ module Canvas
     end
 
     # per http://www.prweb.com/releases/2012/10/prweb10046001.htm
-    COMMON_PASSWORDS = %w{
+    COMMON_PASSWORDS = %w[
       password
       123456
       12345678
@@ -83,6 +83,6 @@ module Canvas
       ninja
       mustang
       password1
-    }
+    ].freeze
   end
 end

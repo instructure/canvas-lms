@@ -48,7 +48,8 @@ describe UsersController do
       end
 
       it 'is false when there is a real avatar image' do
-        @user.avatar_image_url = 'https://canvas.instructure.com/avi.png'; @user.save!
+        @user.avatar_image_url = 'https://canvas.instructure.com/avi.png'
+        @user.save!
         get '/'
         expect(assigns(:js_env)[:current_user][:avatar_image_url]).to eq @user.avatar_image_url
         expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to eq false

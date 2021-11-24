@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::FileType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) do
+    course_with_teacher(active_all: true)
+    @course
+  end
   let_once(:student) { student_in_course(course: @course) }
   let_once(:file) { attachment_with_context(course) }
   let(:file_type) { GraphQLTypeTester.new(file, current_user: @teacher) }
@@ -132,7 +135,7 @@ describe Types::FileType do
       other_submission = other_assignment.submit_homework(
         @student,
         body: 'Attempt 1',
-        submitted_at: 2.hours.ago,
+        submitted_at: 2.hours.ago
       )
       resp = @resolver.resolve('submissionPreviewUrl(submissionId: "' + other_submission.id.to_s + '")')
       expect(resp).to be_nil

@@ -36,7 +36,7 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    it "allows saving of section announcement", test_id: 3469728, priority: "1" do
+    it "allows saving of section announcement", priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -48,7 +48,7 @@ describe "announcements" do
                                             .individual_announcement_url(Announcement.last))
     end
 
-    it "does not allow empty sections", test_id: 3469730, priority: "1" do
+    it "does not allow empty sections", priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -103,14 +103,14 @@ describe "announcements" do
         @context = @course
       end
 
-      it "starts a new topic", priority: "1", test_id: 150528 do
+      it "starts a new topic", priority: "1" do
         get url
 
         expect_new_page_load { f('#add_announcement').click }
         edit_announcement(@topic_title, 'new topic')
       end
 
-      it "adds an attachment to a new topic", priority: "1", test_id: 150529 do
+      it "adds an attachment to a new topic", priority: "1" do
         topic_title = 'new topic with file'
         get new_url
         wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
@@ -120,7 +120,7 @@ describe "announcements" do
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "performs front-end validation for message", priority: "1", test_id: 220366 do
+      it "performs front-end validation for message", priority: "1" do
         skip("Skip for now -- message box is not emitted with enhanced RCE LS-1851")
 
         topic_title = 'new topic with file'
@@ -134,7 +134,7 @@ describe "announcements" do
         expect(ff('.error_box').any? { |box| box.text.include?("A message is required") }).to be_truthy
       end
 
-      it "adds an attachment to a graded topic", priority: "1", test_id: 220367 do
+      it "adds an attachment to a graded topic", priority: "1" do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
         if what_to_create == DiscussionTopic
           what_to_create.last.update(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
@@ -146,7 +146,7 @@ describe "announcements" do
         add_attachment_and_validate
       end
 
-      it "edits a topic", priority: "1", test_id: 150530 do
+      it "edits a topic", priority: "1" do
         edit_name = 'edited discussion name'
         topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
         get "#{url}/#{topic.id}"
@@ -156,7 +156,7 @@ describe "announcements" do
       end
     end
 
-    it "creates a delayed announcement with an attachment", priority: "1", test_id: 150531 do
+    it "creates a delayed announcement with an attachment", priority: "1" do
       AnnouncementNewEdit.visit_new(@course)
       f('input[type=checkbox][name=delay_posting]').click
       replace_content(f('input[name=title]'), "First Announcement")
@@ -184,7 +184,7 @@ describe "announcements" do
       )
     end
 
-    it "allows delay post date edit with disabled comments", priority: "2", test_id: 3035859 do
+    it "allows delay post date edit with disabled comments", priority: "2" do
       time_new = format_time_for_view(Time.zone.today + 1.day)
       disable_comments_on_announcements
       announcement = @course.announcements.create!(
@@ -196,7 +196,7 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text(time_new)
     end
 
-    it "removes delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do
+    it "removes delayed_post_at when unchecking delay_posting", priority: "1" do
       topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
@@ -208,7 +208,7 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "lets a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
+    it "lets a teacher add a new entry to its own announcement", priority: "1" do
       create_announcement
       get [@course, @announcement]
       f('.discussion-reply-action').click
@@ -219,7 +219,7 @@ describe "announcements" do
       expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
-    it "shows announcements to student view student", priority: "1", test_id: 220373 do
+    it "shows announcements to student view student", priority: "1" do
       create_announcement
       enter_student_view
       get "/courses/#{@course.id}/announcements"
@@ -228,7 +228,7 @@ describe "announcements" do
       expect(announcement.find_element(:css, '.ic-announcement-row__content')).to include_text(@announcement.message)
     end
 
-    it "always sees student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
+    it "always sees student replies when 'initial post required' is turned on", priority: "1" do
       skip_if_chrome('Student view breaks this test')
       student_entry = 'this is my reply'
 
@@ -245,7 +245,7 @@ describe "announcements" do
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end
 
-    it "creates an announcement that requires an initial post", priority: "1", test_id: 3293292 do
+    it "creates an announcement that requires an initial post", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f('input[name=title]'), 'title')
       type_in_tiny('textarea[name=message]', 'hi')

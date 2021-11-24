@@ -36,13 +36,13 @@ describe Quizzes::QuizRegrader::Regrader do
     1.upto(4).map { |i| double(:quiz_question_id => i, :regrade_option => 'full_credit') }
   end
 
-  let(:quiz) {
+  let(:quiz) do
     double(:quiz_questions => questions,
            :id => 1,
            :version_number => 1,
            :current_quiz_question_regrades => current_quiz_question_regrades,
            :quiz_submissions => submissions)
-  }
+  end
 
   let(:quiz_regrade) { double(:id => 1, :quiz => quiz) }
 

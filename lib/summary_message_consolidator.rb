@@ -44,7 +44,7 @@ class SummaryMessageConsolidator
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|
-          dm_ids = dm_ids & updated_ids
+          dm_ids &= updated_ids
           next unless dm_ids.any?
 
           DelayedMessage.delay(priority: Delayed::LOWER_PRIORITY).summarize(dm_ids)

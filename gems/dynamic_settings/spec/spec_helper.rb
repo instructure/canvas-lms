@@ -24,7 +24,7 @@ Rails.env = 'test'
 
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|

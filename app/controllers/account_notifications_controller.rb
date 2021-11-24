@@ -77,8 +77,8 @@
 class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
   before_action :require_user
-  before_action :require_account_admin, only: [:create, :update, :destroy]
-  before_action :check_user_param, only: [:user_index_deprecated, :user_close_notification_deprecated, :show_deprecated]
+  before_action :require_account_admin, only: %i[create update destroy]
+  before_action :check_user_param, only: %i[user_index_deprecated user_close_notification_deprecated show_deprecated]
 
   # @API Index of active global notification for the user
   # Returns a list of all global notifications in the account for the current user

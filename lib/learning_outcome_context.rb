@@ -82,7 +82,7 @@ module LearningOutcomeContext
       return unless root
 
       self.class.connection.after_transaction_commit do
-        root.update! title: self.name
+        root.update! title: name
       end
     end
   end

@@ -50,12 +50,12 @@ describe "Conferences API", type: :request do
     end
 
     it "lists all the conferences" do
-      @conferences = (1..2).map { |i|
+      @conferences = (1..2).map do |i|
         @course.web_conferences.create!(:conference_type => 'Wimba',
                                         :duration => 60,
                                         :user => @teacher,
                                         :title => "Wimba #{i}")
-      }
+      end
 
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
         .merge(action: 'index', course_id: @course.to_param))
@@ -65,12 +65,12 @@ describe "Conferences API", type: :request do
     it "does not list conferences for disabled plugins" do
       plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
-      @conferences = ['AdobeConnect', 'Wimba'].map { |ct|
+      @conferences = ['AdobeConnect', 'Wimba'].map do |ct|
         @course.web_conferences.create!(:conference_type => ct,
                                         :duration => 60,
                                         :user => @teacher,
                                         :title => ct)
-      }
+      end
       plugin.disabled = true
       plugin.save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
@@ -80,12 +80,12 @@ describe "Conferences API", type: :request do
 
     it "only lists conferences the user is a participant of" do
       @user = @student
-      @conferences = (1..2).map { |i|
+      @conferences = (1..2).map do |i|
         @course.web_conferences.create!(:conference_type => 'Wimba',
                                         :duration => 60,
                                         :user => @teacher,
                                         :title => "Wimba #{i}")
-      }
+      end
       @conferences[0].users << @user
       @conferences[0].save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
@@ -97,12 +97,12 @@ describe "Conferences API", type: :request do
       @user = @student
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
-      @conferences = (1..2).map { |i|
+      @conferences = (1..2).map do |i|
         @group.web_conferences.create!(:conference_type => 'Wimba',
                                        :duration => 60,
                                        :user => @teacher,
                                        :title => "Wimba #{i}")
-      }
+      end
       json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options
         .merge(action: 'index', group_id: @group.to_param))
       expect(json).to eq api_conferences_json(@conferences.reverse.map { |c| WebConference.find(c.id) }, @group, @student)

@@ -36,12 +36,12 @@ describe "Gradebook" do
       user_session(@teacher)
     end
 
-    it 'allows pass grade on assignments worth 0 points', priority: "1", test_id: 330310 do
+    it 'allows pass grade on assignments worth 0 points', priority: "1" do
       Gradebook.visit(@course)
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq 'Complete'
     end
 
-    it 'displays pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
+    it 'displays pass/fail correctly when total points possible is changed', priority: "1" do
       @assignment.update(points_possible: 1)
       Gradebook.visit(@course)
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq 'Complete'

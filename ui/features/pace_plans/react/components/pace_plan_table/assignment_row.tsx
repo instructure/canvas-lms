@@ -271,9 +271,23 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     return (
       <Flex alignItems="center">
         <View margin="0 x-small 0 0">{this.renderAssignmentIcon()}</View>
-        <Text weight="bold">
-          <TruncateText>{this.props.pacePlanItem.assignment_title}</TruncateText>
-        </Text>
+        <div>
+          <Text weight="bold">
+            <a href={this.props.pacePlanItem.assignment_link} style={{color: 'inherit'}}>
+              <TruncateText>{this.props.pacePlanItem.assignment_title}</TruncateText>
+            </a>
+          </Text>
+          {typeof this.props.pacePlanItem.points_possible === 'number' && (
+            <span className="pace-plans-assignment-row-points-possible">
+              <Text size="x-small">
+                {I18n.t(
+                  {one: '1 pt', other: '%{count} pts'},
+                  {count: this.props.pacePlanItem.points_possible}
+                )}
+              </Text>
+            </span>
+          )}
+        </div>
       </Flex>
     )
   }

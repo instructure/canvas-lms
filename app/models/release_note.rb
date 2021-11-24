@@ -284,7 +284,7 @@ class ReleaseNote
   class << self
     def find(ids, include_langs: false)
       ids_arr = Array.wrap(ids)
-      return [] if ids_arr.length == 0
+      return [] if ids_arr.empty?
 
       res = ddb_client.batch_get_item(request_items: { ddb_table_name => {
                                         keys: ids_arr.map do |id|

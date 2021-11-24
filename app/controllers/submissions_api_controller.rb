@@ -207,11 +207,11 @@
 class SubmissionsApiController < ApplicationController
   before_action :get_course_from_section, :require_context, :require_user
   batch_jobs_in_actions :only => [:update, :update_anonymous], :batch => { :priority => Delayed::LOW_PRIORITY }
-  before_action :ensure_submission, :only => [:show,
-                                              :document_annotations_read_state,
-                                              :mark_document_annotations_read,
-                                              :rubric_comments_read_state,
-                                              :mark_rubric_comments_read]
+  before_action :ensure_submission, :only => %i[show
+                                                document_annotations_read_state
+                                                mark_document_annotations_read
+                                                rubric_comments_read_state
+                                                mark_rubric_comments_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -389,7 +389,7 @@ class SubmissionsApiController < ApplicationController
       # can view observees
       allowed_student_ids = @context.observer_enrollments
                                     .where(:user_id => @current_user.id, :workflow_state => 'active')
-                                    .where("associated_user_id IS NOT NULL")
+                                    .where.not(associated_user_id: nil)
                                     .pluck(:associated_user_id)
 
       # can view self?
@@ -409,7 +409,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
-      return render json: { error: 'too many students' }, status: 400
+      return render json: { error: 'too many students' }, status: :bad_request
     end
 
     enrollments = (@section || @context).all_student_enrollments
@@ -431,11 +431,11 @@ class SubmissionsApiController < ApplicationController
     end
 
     if value_to_boolean(params[:post_to_sis])
-      if student_ids.is_a?(Array)
-        student_ids = enrollments.where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
-      else
-        student_ids = student_ids.where.not(sis_batch_id: nil)
-      end
+      student_ids = if student_ids.is_a?(Array)
+                      enrollments.where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
+                    else
+                      student_ids.where.not(sis_batch_id: nil)
+                    end
     end
 
     includes = Array(params[:include])
@@ -472,18 +472,18 @@ class SubmissionsApiController < ApplicationController
     assignments_hash = assignments.index_by(&:id)
 
     if params[:submitted_since].present?
-      if params[:submitted_since] !~ Api::ISO8601_REGEX
-        return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: 400)
-      else
+      if Api::ISO8601_REGEX.match?(params[:submitted_since])
         submitted_since_date = Time.zone.parse(params[:submitted_since])
+      else
+        return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: :bad_request)
       end
     end
 
     if params[:graded_since].present?
-      if params[:graded_since] !~ Api::ISO8601_REGEX
-        return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: 400)
-      else
+      if Api::ISO8601_REGEX.match?(params[:graded_since])
         graded_since_date = Time.zone.parse(params[:graded_since])
+      else
+        return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: :bad_request)
       end
     end
 
@@ -530,9 +530,9 @@ class SubmissionsApiController < ApplicationController
         end
 
         student_submissions = submissions_for_user[student.id] || []
-        student_submissions = student_submissions.select { |s|
+        student_submissions = student_submissions.select do |s|
           assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
-        }
+        end
 
         if assignments.present?
           student_submissions.each do |submission|
@@ -584,14 +584,14 @@ class SubmissionsApiController < ApplicationController
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       Version.preload_version_number(submissions)
-      result = submissions.select { |s|
+      result = submissions.select do |s|
         assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
-      }.map { |s|
+      end.map do |s|
         s.assignment = assignments_hash[s.assignment_id]
         visible_assignments = assignment_visibilities.fetch(s.user_id, [])
         s.visible_to_user = visible_assignments.include? s.assignment_id
         submission_json(s, s.assignment, @current_user, session, @context, includes, params)
-      }
+      end
     end
 
     render :json => result
@@ -622,7 +622,7 @@ class SubmissionsApiController < ApplicationController
         )
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
-        return render_unauthorized_action
+        render_unauthorized_action
       end
     end
   end
@@ -849,7 +849,7 @@ class SubmissionsApiController < ApplicationController
           graded_just_now = true
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
-          return render json: { error: e.to_s }, status: 400
+          return render json: { error: e.to_s }, status: :bad_request
         end
         @submission = @submissions.first
       else
@@ -886,8 +886,8 @@ class SubmissionsApiController < ApplicationController
 
         # prepend each key with "criterion_", which is required by the current
         # RubricAssociation#assess code.
-        assessment.keys.each do |crit_name|
-          assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
+        assessment.transform_keys! do |crit_name|
+          "criterion_#{crit_name}"
         end
 
         @rubric_assessment = @assignment.rubric_association.assess(
@@ -911,9 +911,9 @@ class SubmissionsApiController < ApplicationController
         comment[:provisional] = value_to_boolean(submission[:provisional])
         if (file_ids = params[:comment][:file_ids])
           attachments = Attachment.where(id: file_ids).to_a
-          attachable = attachments.all? { |a|
+          attachable = attachments.all? do |a|
             a.grants_right?(@current_user, :attach_to_submission_comment)
-          }
+          end
           unless attachable
             render_unauthorized_action
             return
@@ -929,7 +929,7 @@ class SubmissionsApiController < ApplicationController
       @submission.reload
       bulk_load_attachments_and_previews([@submission])
 
-      includes = %w(submission_comments)
+      includes = %w[submission_comments]
       includes.concat(Array.wrap(params[:include]) & ['visibility'])
       includes << 'provisional_grades' if submission[:provisional]
 
@@ -1127,8 +1127,8 @@ class SubmissionsApiController < ApplicationController
         json = can_view_student_names ? user_display_json(submission.user, @context) : anonymous_user_display_json(submission.anonymous_id)
         if include_pg
           selection = submission.provisional_grades.find(&:selection)
-          json.merge!(in_moderation_set: selection.present?,
-                      selected_provisional_grade_id: selection&.provisional_grade_id)
+          json[:in_moderation_set] = selection.present?
+          json[:selected_provisional_grade_id] = selection&.provisional_grade_id
           pg_list = submission_provisional_grades_json(
             course: @context,
             assignment: @assignment,
@@ -1137,7 +1137,7 @@ class SubmissionsApiController < ApplicationController
             avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
             includes: includes
           )
-          json.merge!({ provisional_grades: pg_list })
+          json[:provisional_grades] = pg_list
         end
         json
       }

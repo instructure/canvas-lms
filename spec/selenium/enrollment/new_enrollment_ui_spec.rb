@@ -33,7 +33,7 @@ describe "New Enrollment" do
     communication_channel(@user2, { username: 'user2@example.com', active_cc: true })
   end
 
-  it "opens new enroll dialog", priority: "1", test_id: 3077472 do
+  it "opens new enroll dialog", priority: "1" do
     user_session(@teacher)
     get "/courses/#{@course.id}/users"
     add_people_button.click
@@ -41,7 +41,7 @@ describe "New Enrollment" do
     expect(next_button).to have_attribute('disabled', 'true')
   end
 
-  it "adds new users", priority: "1", test_id: 3077477 do
+  it "adds new users", priority: "1" do
     user_session(@teacher)
     get "/courses/#{@course.id}/users"
     add_people_button.click

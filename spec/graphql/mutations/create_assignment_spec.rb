@@ -122,7 +122,7 @@ describe Mutations::CreateAssignment do
       query << "#{graphql_name}: #{update_value}\n"
     end
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     assignment = Assignment.find(result.dig('data', 'createAssignment', 'assignment', '_id'))
     test_attrs.each do |graphql_name, assignment_name, _initial_value, _update_value, graphql_result, assignment_result = graphql_result|
@@ -144,7 +144,7 @@ describe Mutations::CreateAssignment do
         finalGraderId: "#{@teacher.to_param}"
       }
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'assignment', 'name')).to eq 'moderated grading test assignment'
     expect(result.dig('data', 'createAssignment', 'assignment', 'moderatedGrading', 'enabled')).to eq true
@@ -180,7 +180,7 @@ describe Mutations::CreateAssignment do
         automaticReviews: true
       }
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'assignment', 'peerReviews', 'enabled')).to eq true
     expect(result.dig('data', 'createAssignment', 'assignment', 'peerReviews', 'count')).to eq 2
@@ -206,7 +206,7 @@ describe Mutations::CreateAssignment do
       name: "assignment in group"
       assignmentGroupId: "#{new_assignment_group.to_param}"
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'assignment', 'assignmentGroup', '_id')).to eq new_assignment_group.id.to_s
 
@@ -221,7 +221,7 @@ describe Mutations::CreateAssignment do
       name: "assignment in module"
       moduleIds: ["#{course_module1.id}"]
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'assignment', 'modules').length).to eq 1
     expect(result.dig('data', 'createAssignment', 'assignment', 'modules', 0, "_id")).to eq course_module1.id.to_s
@@ -279,7 +279,7 @@ describe Mutations::CreateAssignment do
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"
     GQL
-    errors = result.dig('errors')
+    errors = result['errors']
     expect(errors).to_not be_nil
     expect(errors.first['message']).to include "Argument 'name' on InputObject 'CreateAssignmentInput' is required"
   end
@@ -297,7 +297,7 @@ describe Mutations::CreateAssignment do
       courseId: "0"
       name: "nope"
     GQL
-    errors = result.dig('errors')
+    errors = result['errors']
     expect(errors).to_not be_nil
     expect(errors[0]['message']).to include 'invalid course'
   end
@@ -307,7 +307,7 @@ describe Mutations::CreateAssignment do
       courseId: "#{@course.to_param}"
       name: "I don't have permission to create this"
     GQL
-    errors = result.dig('errors')
+    errors = result['errors']
     expect(errors).to_not be_nil
     expect(errors[0]['message']).to include 'invalid course'
   end

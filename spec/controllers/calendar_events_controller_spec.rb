@@ -167,7 +167,7 @@ describe CalendarEventsController do
 
     include_examples 'accepts web_conference' do
       let(:make_request) do
-        ->(params) do
+        lambda do |params|
           post 'create',
                params: {
                  course_id: @course.id,
@@ -196,7 +196,7 @@ describe CalendarEventsController do
 
     include_examples 'accepts web_conference' do
       let(:make_request) do
-        ->(params) do
+        lambda do |params|
           get 'edit', params: { course_id: @course.id, id: @event.id, web_conference: params }
         end
       end
@@ -281,7 +281,7 @@ describe CalendarEventsController do
 
     include_examples 'accepts web_conference' do
       let(:make_request) do
-        ->(params) do
+        lambda do |params|
           put 'update',
               params: {
                 course_id: @course.id,

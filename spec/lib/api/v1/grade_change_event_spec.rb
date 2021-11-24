@@ -64,15 +64,15 @@ describe Api::V1::GradeChangeEvent do
     course_with_teacher(account: @domain_root_account)
     course_with_student(course: @course)
 
-    @page_view = PageView.new { |p|
+    @page_view = PageView.new do |p|
       p.assign_attributes({
                             :request_id => @request_id,
                             :remote_ip => '10.10.10.10'
                           })
-    }
+    end
 
     allow(PageView).to receive_messages(
-      :find_by_id => @page_view,
+      :find_by => @page_view,
       :find_all_by_id => [@page_view]
     )
 
@@ -148,7 +148,7 @@ describe Api::V1::GradeChangeEvent do
   it "is formatted as an array of compound grade change event hashes" do
     json_hash = subject.grade_change_events_compound_json(@events, @user, @session)
 
-    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq %i[events linked links]
 
     expect(json_hash[:links]).to eq({
                                       "events.assignment" => "#{subject.url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
@@ -160,7 +160,7 @@ describe Api::V1::GradeChangeEvent do
 
     expect(json_hash[:events]).to eq subject.grade_change_events_json(@events, @user, @session)
 
-    expect(json_hash[:linked].keys.sort).to eq [:assignments, :courses, :page_views, :users]
+    expect(json_hash[:linked].keys.sort).to eq %i[assignments courses page_views users]
     linked = json_hash[:linked]
     expect(linked[:assignments].size).to eql(1)
     expect(linked[:courses].size).to eql(1)
@@ -171,11 +171,11 @@ describe Api::V1::GradeChangeEvent do
   it "handles an empty result set" do
     json_hash = subject.grade_change_events_compound_json([], @user, @session)
 
-    expect(json_hash.keys.sort).to eq [:events, :linked, :links]
+    expect(json_hash.keys.sort).to eq %i[events linked links]
 
     expect(json_hash[:events]).to eq subject.grade_change_events_json([], @user, @session)
 
-    expect(json_hash[:linked].keys.sort).to eq [:assignments, :courses, :page_views, :users]
+    expect(json_hash[:linked].keys.sort).to eq %i[assignments courses page_views users]
     linked = json_hash[:linked]
     expect(linked[:assignments].size).to be_zero
     expect(linked[:courses].size).to be_zero

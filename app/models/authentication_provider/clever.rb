@@ -28,16 +28,16 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   end
 
   def self.recognized_params
-    super + [:login_attribute, :district_id, :jit_provisioning].freeze
+    super + %i[login_attribute district_id jit_provisioning].freeze
   end
 
   def self.login_attributes
-    ['id', 'sis_id', 'email', 'student_number', 'teacher_number', 'state_id', 'district_username'].freeze
+    %w[id sis_id email student_number teacher_number state_id district_username].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    (login_attributes + ['first_name', 'last_name', 'home_language']).freeze
+    (login_attributes + %w[first_name last_name home_language]).freeze
   end
 
   # Rename db field

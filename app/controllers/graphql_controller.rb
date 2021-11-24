@@ -99,7 +99,7 @@ class GraphQLController < ApplicationController
     unless @authenticated_with_inst_access_token
       render(
         json: { errors: [{ message: "InstAccess token auth required" }] },
-        status: 401
+        status: :unauthorized
       )
     end
   end

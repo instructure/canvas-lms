@@ -43,7 +43,7 @@ describe "Gradebook with grading periods" do
         user_session(@teacher)
       end
 
-      it 'assignment in ended grading period should be gradable', test_id: 2947119, priority: "1" do
+      it 'assignment in ended grading period should be gradable', priority: "1" do
         assign = @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
         Gradebook.visit(@course)
 
@@ -64,7 +64,7 @@ describe "Gradebook with grading periods" do
         show_grading_periods_filter(@admin)
       end
 
-      it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
+      it 'assignment in closed grading period should be gradable', priority: "1" do
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
         Gradebook.visit(@course)
 
@@ -75,7 +75,7 @@ describe "Gradebook with grading periods" do
       end
     end
 
-    it 'assignment in closed gp should not be gradable', test_id: 2947118, priority: "1" do
+    it 'assignment in closed gp should not be gradable', priority: "1" do
       user_session(@teacher)
 
       assign = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")

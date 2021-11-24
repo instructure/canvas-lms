@@ -34,7 +34,7 @@ describe "context modules" do
         get "/courses/#{@course.id}"
       end
 
-      it "renders as course home page", priority: "1", test_id: 126740 do
+      it "renders as course home page", priority: "1" do
         create_modules(1)
         @course.default_view = 'modules'
         @course.save!
@@ -42,13 +42,13 @@ describe "context modules" do
         expect(f('.add_module_link').text).not_to be_nil
       end
 
-      it "adds a new module", priority: "1", test_id: 126704 do
+      it "adds a new module", priority: "1" do
         add_module('New Module')
         mod = @course.context_modules.first
         expect(mod.name).to eq 'New Module'
       end
 
-      it "publishes an unpublished module", priority: "1", test_id: 280195 do
+      it "publishes an unpublished module", priority: "1" do
         add_module('New Module')
         expect(f('.context_module')).to have_class('unpublished_module')
         expect(@course.context_modules.count).to eq 1
@@ -72,7 +72,7 @@ describe "context modules" do
         wait_for_modules_ui
       end
 
-      it "unpublishes a published module", priority: "1", test_id: 280196 do
+      it "unpublishes a published module", priority: "1" do
         mod = @course.context_modules.first
         expect(mod).to be_published
         unpublish_module
@@ -80,7 +80,7 @@ describe "context modules" do
         expect(mod).to be_unpublished
       end
 
-      it "edits a module", priority: "1", test_id: 126738 do
+      it "edits a module", priority: "1" do
         edit_text = 'Module Edited'
         f('.ig-header-admin .al-trigger').click
         f('.edit_module_link').click
@@ -92,7 +92,7 @@ describe "context modules" do
         expect(f('.context_module > .header')).to include_text(edit_text)
       end
 
-      it "deletes a module", priority: "1", test_id: 126736 do
+      it "deletes a module", priority: "1" do
         skip_if_safari(:alert)
         f('.ig-header-admin .al-trigger').click
         f('.delete_module_link').click
@@ -103,12 +103,12 @@ describe "context modules" do
         expect(f('.context_module > .header')).not_to be_displayed
       end
 
-      it "adds an assignment to a module", priority: "1", test_id: 126723 do
+      it "adds an assignment to a module", priority: "1" do
         add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment Title')
         expect(fln('New Assignment Title')).to be_displayed
       end
 
-      it "adds a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
+      it "adds a assignment item to a module, publish new assignment refresh page and verify", priority: "2" do
         # this test basically verifies that the published icon is accurate after a page refresh
         mod = @course.context_modules.first
         assignment = @course.assignments.create!(title: "assignment 1")
@@ -126,7 +126,7 @@ describe "context modules" do
         expect(tag).to be_published
       end
 
-      it "adds a quiz to a module", priority: "1", test_id: 126719 do
+      it "adds a quiz to a module", priority: "1" do
         mod = @course.context_modules.first
         quiz = @course.quizzes.create!(title: "New Quiz Title")
         mod.add_item({ id: quiz.id, type: 'quiz' })
@@ -134,7 +134,7 @@ describe "context modules" do
         verify_persistence('New Quiz Title')
       end
 
-      it "adds a content page item to a module", priority: "1", test_id: 126708 do
+      it "adds a content page item to a module", priority: "1" do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "New Page Title")
         mod.add_item({ id: page.id, type: 'wiki_page' })
@@ -142,7 +142,7 @@ describe "context modules" do
         verify_persistence('New Page Title')
       end
 
-      it "adds a content page item to a module and publish new page", priority: "2", test_id: 441357 do
+      it "adds a content page item to a module and publish new page", priority: "2" do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "PAGE 2")
         page.unpublish!

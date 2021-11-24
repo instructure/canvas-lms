@@ -19,7 +19,7 @@
 
 require 'json/jwt'
 
-Oj.optimize_rails()
+Oj.optimize_rails
 
 Oj.default_options = { mode: :rails, escape_mode: :xss_safe, bigdecimal_as_decimal: true }
 

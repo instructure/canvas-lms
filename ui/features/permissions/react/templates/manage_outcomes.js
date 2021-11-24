@@ -40,9 +40,9 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Feature Preview'),
+      title: I18n.t('Feature Option'),
       description: I18n.t(
-        'If the Account and Course Level Outcome Mastery Scales feature preview is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
       )
     },
     {
@@ -72,9 +72,9 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Feature Preview'),
+      title: I18n.t('Feature Option'),
       description: I18n.t(
-        'If the Account and Course Level Outcome Mastery Scales feature preview is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
       )
     },
     {

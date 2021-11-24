@@ -50,7 +50,7 @@ class Login::OtpController < ApplicationController
   end
 
   def send_via_sms
-    return render status: 400, text: "can't change destination until you're logged in" unless configuring?
+    return render status: :bad_request, text: "can't change destination until you're logged in" unless configuring?
 
     if params[:otp_login].try(:[], :otp_communication_channel_id)
       cc = @current_user.communication_channels.sms.unretired.find(params[:otp_login][:otp_communication_channel_id])
@@ -129,11 +129,11 @@ class Login::OtpController < ApplicationController
   end
 
   def destroy
-    if params[:user_id] == 'self'
-      user = @current_user
-    else
-      user = User.find(params[:user_id])
-    end
+    user = if params[:user_id] == 'self'
+             @current_user
+           else
+             User.find(params[:user_id])
+           end
     return unless authorized_action(user, @current_user, :reset_mfa)
 
     user.otp_secret_key = nil

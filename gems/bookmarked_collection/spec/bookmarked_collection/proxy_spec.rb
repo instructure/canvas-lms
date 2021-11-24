@@ -40,7 +40,7 @@ describe BookmarkedCollection::Proxy do
     end
 
     it 'requires per_page parameter' do
-      expect { @proxy.paginate() }.to raise_error(ArgumentError)
+      expect { @proxy.paginate }.to raise_error(ArgumentError)
     end
 
     it('ignores total_entries parameter') do
@@ -127,7 +127,7 @@ describe BookmarkedCollection::Proxy do
 
       it "transforms the items" do
         pager = @proxy.paginate(per_page: 3)
-        expect(pager).to eql(3.times.map { |_| 'transformed' })
+        expect(pager).to eql(['transformed'] * 3)
         expect(pager.next_bookmark).to be_nil
       end
 

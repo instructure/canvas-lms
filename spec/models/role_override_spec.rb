@@ -95,9 +95,9 @@ describe RoleOverride do
   it "does not fail when a context's associated accounts are missing" do
     group_model
     allow(@group).to receive(:account).and_return(nil)
-    expect {
+    expect do
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   it "updates the roles updated_at timestamp on save" do
@@ -549,7 +549,10 @@ describe RoleOverride do
       end
 
       it "allows with account_allows on" do
-        Account.default.tap { |a| a.enable_user_notes = true; a.save! }
+        Account.default.tap do |a|
+          a.enable_user_notes = true
+          a.save!
+        end
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
       end
@@ -595,11 +598,11 @@ describe RoleOverride do
       let(:permission) { RoleOverride.permissions[:manage_proficiency_calculations] }
 
       it 'is enabled by default for account admins' do
-        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+        expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
       it 'is available to account admins, account memberships, teachers, and designers' do
-        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment)
+        expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment]
       end
     end
 
@@ -607,11 +610,11 @@ describe RoleOverride do
       let(:permission) { RoleOverride.permissions[:manage_proficiency_scales] }
 
       it 'is enabled by default for account admins' do
-        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+        expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
       it 'is available to account admins, account memberships, teachers, and designers' do
-        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment)
+        expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment]
       end
     end
 
@@ -619,11 +622,11 @@ describe RoleOverride do
       let(:permission) { RoleOverride.permissions[:select_final_grade] }
 
       it 'is enabled by default for account admins, teachers, and TAs' do
-        expect(permission[:true_for]).to match_array %w(AccountAdmin TeacherEnrollment TaEnrollment)
+        expect(permission[:true_for]).to match_array %w[AccountAdmin TeacherEnrollment TaEnrollment]
       end
 
       it 'is available to account admins, account memberships, teachers, and TAs' do
-        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
+        expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment]
       end
     end
 
@@ -631,11 +634,11 @@ describe RoleOverride do
       let(:permission) { RoleOverride.permissions[:view_audit_trail] }
 
       it 'is enabled by default for teachers, TAs and admins' do
-        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+        expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
       it 'is available to teachers, TAs, admins and account memberships' do
-        expect(permission[:available_to]).to match_array %w(TeacherEnrollment AccountAdmin AccountMembership)
+        expect(permission[:available_to]).to match_array %w[TeacherEnrollment AccountAdmin AccountMembership]
       end
     end
   end

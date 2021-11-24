@@ -31,10 +31,10 @@ module Types
     argument :states, [SubmissionStateType], required: false,
                                              default_value: DEFAULT_SUBMISSION_HISTORY_STATES
 
-    argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
+    argument :include_current_submission, Boolean, <<~MD, required: false, default_value: true
       If the most current submission should be included in the submission
       history results. Defaults to true.
-    DESC
+    MD
   end
 
   class SubmissionType < ApplicationObjectType

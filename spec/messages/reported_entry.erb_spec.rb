@@ -36,8 +36,8 @@ describe 'reported_reply' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
-      expect(msg.body).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
     end
   end
 end

@@ -21,12 +21,12 @@
 require "spec_helper"
 
 describe CanvasCassandra do
-  let(:conn) { double() }
+  let(:conn) { double }
 
   let(:db) do
     CanvasCassandra::Database.allocate.tap do |db|
       db.send(:instance_variable_set, :@db, conn)
-      db.send(:instance_variable_set, :@logger, double().as_null_object)
+      db.send(:instance_variable_set, :@logger, double.as_null_object)
       allow(db).to receive(:sanitize).and_return("")
     end
   end
@@ -99,7 +99,10 @@ describe CanvasCassandra do
       db.batch { db.update("1") }
 
       expect(db).to receive(:execute).with("BEGIN BATCH UPDATE ? ? UPDATE ? ? APPLY BATCH", 1, 2, 3, 4, {})
-      db.batch { db.update("UPDATE ? ?", 1, 2); db.update("UPDATE ? ?", 3, 4) }
+      db.batch do
+        db.update("UPDATE ? ?", 1, 2)
+        db.update("UPDATE ? ?", 3, 4)
+      end
     end
 
     it "does not batch up execute statements" do
@@ -224,9 +227,9 @@ describe CanvasCassandra do
     end
 
     it "does not allow changing a primary key component" do
-      expect {
+      expect do
         db.update_record("test_table", { :id => 5, :sub_id => "sub!" }, { :name => "test", :id => 5, :sub_id => ["old", "sub!"] }, {})
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
   end
 

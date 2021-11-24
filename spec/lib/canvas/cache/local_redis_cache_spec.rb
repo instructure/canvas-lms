@@ -101,14 +101,14 @@ module Canvas
           c2 = new_redis_client
           sleep(0.1) until lock_taken # make sure t1 goes first
           v2 = c2.fetch(cache_key, expires_in: 30.seconds, race_condition_ttl: 10.seconds) do
-            raise RuntimeError, "should have waited for t1"
+            raise "should have waited for t1"
           end
         end
         t3 = Thread.new do
           c3 = new_redis_client
           sleep(0.1) until lock_taken # make sure t1 goes first
           v3 = c3.fetch(cache_key, expires_in: 30.seconds, race_condition_ttl: 10.seconds) do
-            raise RuntimeError, "should have waited for t1"
+            raise "should have waited for t1"
           end
         end
         t1.join

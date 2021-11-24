@@ -53,7 +53,7 @@ module Factories
     @root2 = @topic.reply_from(:user => @student, :html => "root2")
     @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
     @reply2_attachment = attachment_model(:context => @course)
-    @reply2 = @root1.reply_from(:user => @teacher, :html => <<-HTML)
+    @reply2 = @root1.reply_from(:user => @teacher, :html => <<~HTML)
       <p><a href="/courses/#{@course.id}/files/#{@reply2_attachment.id}/download">This is a file link</a></p>
       <p>This is a video:
         <a class='instructure_inline_media_comment' id='media_comment_0_abcde' href='#'>link</a>

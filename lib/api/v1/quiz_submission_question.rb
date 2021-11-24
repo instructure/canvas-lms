@@ -21,7 +21,7 @@
 module Api::V1::QuizSubmissionQuestion
   include Api::V1::QuizQuestion
 
-  INCLUDABLES = %w[quiz_question]
+  INCLUDABLES = %w[quiz_question].freeze
 
   # @param [Array<QuizQuestion>] quiz_questions
   # @param [Hash] submission_data
@@ -32,7 +32,7 @@ module Api::V1::QuizSubmissionQuestion
   # @param [Boolean] meta[:censored] if answer correctness should be censored out
   def quiz_submission_questions_json(quiz_questions, quiz_submission, meta = {})
     meta[:censored] ||= true
-    quiz_questions = Array(quiz_questions) unless quiz_questions.kind_of?(Array)
+    quiz_questions = Array(quiz_questions) unless quiz_questions.is_a?(Array)
     includes = (meta[:includes] || []) & INCLUDABLES
 
     data = {}

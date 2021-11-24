@@ -78,7 +78,7 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
         submission_ids: submission_ids,
         posting_params: posting_params
       )
-      return { assignment: assignment, progress: progress, sections: sections }
+      { assignment: assignment, progress: progress, sections: sections }
     else
       raise GraphQL::ExecutionError, "Error posting assignment grades"
     end

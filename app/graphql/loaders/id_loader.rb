@@ -46,11 +46,11 @@ class Loaders::IDLoader < GraphQL::Batch::Loader
 
   # :nodoc:
   def perform(ids)
-    Shard.partition_by_shard(ids) { |sharded_ids|
-      @scope.where(id: sharded_ids).each { |o|
+    Shard.partition_by_shard(ids) do |sharded_ids|
+      @scope.where(id: sharded_ids).each do |o|
         fulfill(o.global_id, o)
-      }
-    }
+      end
+    end
     ids.each { |id| fulfill(id, nil) unless fulfilled?(id) }
   end
 end

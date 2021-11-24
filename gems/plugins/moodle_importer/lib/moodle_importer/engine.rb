@@ -36,7 +36,7 @@ module Moodle
           :migration_partial => 'moodle_config',
           :worker => 'CCWorker',
           :provides => { :moodle_1_9 => Moodle::Converter, :moodle_2 => Moodle::Converter },
-          :valid_contexts => %w{Account Course}
+          :valid_contexts => %w[Account Course]
         }
       }
     end

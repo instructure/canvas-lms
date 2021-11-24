@@ -20,7 +20,7 @@
 
 describe Lti::LtiAssignmentCreator do
   it "converts an assignment into an lti_assignment" do
-    assignment = Assignment.new()
+    assignment = Assignment.new
     allow(assignment).to receive(:id).and_return(123)
     assignment.title = 'name'
     assignment.points_possible = 10
@@ -36,7 +36,7 @@ describe Lti::LtiAssignmentCreator do
   end
 
   it "sets the correct return type for lti assignment launches" do
-    assignment = Assignment.new()
+    assignment = Assignment.new
     assignment.submission_types = 'external_tool'
     lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
 
@@ -44,7 +44,7 @@ describe Lti::LtiAssignmentCreator do
   end
 
   it "correctly maps return types" do
-    assignment = Assignment.new()
+    assignment = Assignment.new
     assignment.submission_types = 'online_upload,online_url'
     lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
 

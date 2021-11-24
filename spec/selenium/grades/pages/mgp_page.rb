@@ -229,15 +229,15 @@ module GradingStandards
       all_sets.each do |title|
         if title.text == set_name then return title end
       end
-      return nil
+      nil
     end
 
     def grading_period_set_displayed?(set_name)
       set = find_set(set_name)
       if set.nil?
-        return false
+        false
       else
-        return set.displayed?
+        set.displayed?
       end
     end
 
@@ -249,13 +249,13 @@ module GradingStandards
       all_periods.each do |period|
         if period.text == period_name then return period end
       end
-      return nil
+      nil
     end
 
     def add_grading_period_link_displayed?
       link = add_grading_period_link
       if link.nil?
-        return false
+        false
       else
         link.displayed?
       end
@@ -264,7 +264,7 @@ module GradingStandards
     def grading_period_displayed?(period_name)
       period = find_period(period_name)
       if period.nil?
-        return false
+        false
       else
         period.displayed?
       end

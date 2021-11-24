@@ -478,10 +478,10 @@ describe "Default Account Reports" do
         csv = reports["Default Term.csv"]
         expect(csv.size).to eq 4
         expect(
-          csv.all? { |student|
+          csv.all? do |student|
             ["Math 101", "Fun 404"].include?(student["course"])
             student["grading period set"] == "Grading Periods"
-          }
+          end
         ).to eq true
 
         jason1, jason2, mike1, mike2 = csv
@@ -527,7 +527,7 @@ describe "Default Account Reports" do
         section2 = @course2.course_sections.create! name: "section 2"
         @course2.enroll_student(@user2, section: section2,
                                         workflow_state: "active",
-                                        allow_multiple_enrollments: true).tap { |e| e.accept }
+                                        allow_multiple_enrollments: true).tap(&:accept)
 
         reports = read_report("mgp_grade_export_csv",
                               params: { enrollment_term_id: @default_term.id },

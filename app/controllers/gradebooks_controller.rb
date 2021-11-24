@@ -32,7 +32,7 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics, :update_final_grade_overrides]
+  before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
   include K5Mode
 
@@ -122,7 +122,7 @@ class GradebooksController < ApplicationController
       json
     end
 
-    grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
+    grading_period = @grading_periods&.find { |period| period[:id] == gp_id }
 
     ags_json = light_weight_ags_json(@presenter.groups, { student: @presenter.student })
     root_account = @context.root_account
@@ -220,13 +220,13 @@ class GradebooksController < ApplicationController
         @rubric_context = Context.find_by_asset_string(params[:context_code])
       end
       @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@rubric_context) }
-      data = @rubric_associations.map { |ra|
+      data = @rubric_associations.map do |ra|
         json = ra.as_json(methods: [:context_name], include: { :rubric => { :include_root => false } })
         # return shard-aware context codes
         json["rubric_association"]["context_code"] = ra.context.asset_string
         json["rubric_association"]["rubric"]["context_code"] = ra.rubric.context.asset_string
         json
-      }
+      end
       render :json => StringifyIds.recursively_stringify_ids(data)
     else
       render :json => @rubric_contexts
@@ -287,7 +287,7 @@ class GradebooksController < ApplicationController
   private :show_learning_mastery
 
   def post_grades_ltis
-    @post_grades_ltis ||= self.external_tools.map { |tool| external_tool_detail(tool) }
+    @post_grades_ltis ||= external_tools.map { |tool| external_tool_detail(tool) }
   end
 
   def external_tool_detail(tool)
@@ -323,7 +323,7 @@ class GradebooksController < ApplicationController
       [@context, :external_tool],
       id: launch_definition[:definition_id],
       display: 'borderless',
-      launch_type: 'post_grades',
+      launch_type: 'post_grades'
     )
   end
 
@@ -331,7 +331,7 @@ class GradebooksController < ApplicationController
     polymorphic_url(
       [@context, :basic_lti_launch_request],
       message_handler_id: launch_definition[:definition_id],
-      display: 'borderless',
+      display: 'borderless'
     )
   end
 
@@ -457,6 +457,7 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
+      show_message_students_with_observers_dialog: show_message_students_with_observers_dialog?,
       show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
@@ -480,7 +481,7 @@ class GradebooksController < ApplicationController
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    ag_includes = [:assignments, :assignment_visibility, :grades_published]
+    ag_includes = %i[assignments assignment_visibility grades_published]
 
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
@@ -567,6 +568,7 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
+      show_message_students_with_observers_dialog: show_message_students_with_observers_dialog?,
       show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
@@ -639,7 +641,7 @@ class GradebooksController < ApplicationController
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?
-        render nothing: true, status: 400
+        render nothing: true, status: :bad_request
         return
       end
 
@@ -658,8 +660,8 @@ class GradebooksController < ApplicationController
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
       submissions.select! { |submission| valid_user_ids.include? submission[:user_id].to_i }
 
-      user_ids = submissions.map { |submission| submission[:user_id] }
-      assignment_ids = submissions.map { |submission| submission[:assignment_id] }
+      user_ids = submissions.pluck(:user_id)
+      assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
       assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
@@ -692,7 +694,7 @@ class GradebooksController < ApplicationController
           end
         end
         begin
-          if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+          if %i[grade score excuse excused].any? { |k| submission.key? k }
             # if it's a percentage graded assignment, we need to ensure there's a
             # percent sign on the end. eventually this will probably be done in
             # the javascript.
@@ -706,7 +708,7 @@ class GradebooksController < ApplicationController
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
-          if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+          if %i[comment media_comment_id comment_attachments].any? { |k| submission.key? k }
             submission[:commenter] = @current_user
             submission[:hidden] = submission_record&.hide_grade_from_student?
 
@@ -831,7 +833,7 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader
-    if !@context.allows_speed_grader?
+    unless @context.allows_speed_grader?
       flash[:notice] = t(:speed_grader_disabled, 'SpeedGrader is disabled for this course')
       return redirect_to(course_gradebook_path(@context))
     end
@@ -886,7 +888,7 @@ class GradebooksController < ApplicationController
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: true,
-          help_url: I18n.t(:'community.instructor_guide_speedgrader'),
+          help_url: I18n.t(:"community.instructor_guide_speedgrader"),
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string,
@@ -983,7 +985,7 @@ class GradebooksController < ApplicationController
     if params[:selected_section_id]
       section_to_show = if params[:selected_section_id] == 'all'
                           nil
-                        elsif @context.active_course_sections.exists?(id: params[:selected_section_id])
+                        elsif @context.active_course_sections.where(id: params[:selected_section_id]).exists?
                           params[:selected_section_id]
                         end
 
@@ -1243,9 +1245,9 @@ class GradebooksController < ApplicationController
     ) { |period| period_as_assignment(period, options) }
   end
 
-  def as_assignments(objects = nil, options = {})
+  def as_assignments(objects = nil, options = {}, &block)
     fakes = []
-    fakes.concat(objects.map { |object| yield(object) }) if objects && block_given?
+    fakes.concat(objects.map(&block)) if objects && block
     fakes << total_as_assignment(options) unless options[:exclude_total]
     fakes
   end

@@ -87,7 +87,7 @@ module CC::Exporter::WebZip
     def filter_and_clean_files(files)
       export_files = filter_for_export_safe_items(files, :attachments)
       cleanup_files = files - export_files
-      cleanup_files.select { |file_data| file_data[:exists] }.map { |file_data| file_data[:path_to_file] }.uniq.each { |path| File.delete(path) }
+      cleanup_files.select { |file_data| file_data[:exists] }.pluck(:path_to_file).uniq.each { |path| File.delete(path) }
       export_files
     end
 
@@ -252,7 +252,7 @@ module CC::Exporter::WebZip
           name: mod.name,
           status: user_module_status(mod),
           unlockDate: unlock_date,
-          prereqs: mod.prerequisites.map { |pre| pre[:id] }.select { |id| active_module_ids.include?(id) },
+          prereqs: mod.prerequisites.pluck(:id).select { |id| active_module_ids.include?(id) },
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
           exportId: create_key(mod),
@@ -387,7 +387,7 @@ module CC::Exporter::WebZip
     def map_canvas_objects_to_export_ids
       canvas_object_export_hash = {}
       @discussion_quiz_export_id_map = {}
-      [:wiki_pages, :assignments, :discussion_topics, :quizzes].each do |type|
+      %i[wiki_pages assignments discussion_topics quizzes].each do |type|
         type_export_hash, assignment_export_hash = map_object_type_to_export_ids(type)
         canvas_object_export_hash[type] = type_export_hash
         canvas_object_export_hash[:assignments] ||= {}
@@ -441,8 +441,8 @@ module CC::Exporter::WebZip
 
     def file_path(item_content)
       folder = item_content&.folder&.full_name || ''
-      local_folder = folder.sub(/\/?course files\/?/, '')
-      local_folder.length > 0 ? "/#{local_folder}/" : '/'
+      local_folder = folder.sub(%r{/?course files/?}, '')
+      local_folder.empty? ? '/' : "/#{local_folder}/"
     end
 
     def dist_package_path

@@ -2702,7 +2702,7 @@ describe Enrollment do
     it "removes assignment overrides if they are only linked to this enrollment" do
       course_with_student
       assignment = assignment_model(:course => @course)
-      ao = AssignmentOverride.new()
+      ao = AssignmentOverride.new
       ao.assignment = assignment
       ao.title = "ADHOC OVERRIDE"
       ao.workflow_state = "active"
@@ -2741,7 +2741,7 @@ describe Enrollment do
       @course.start_at = 4.days.ago
       @term.start_at = 3.days.ago
       @section.created_at = 2.days.ago
-      @course.created_at = 1.days.ago
+      @course.created_at = 1.day.ago
     end
 
     it "utilizes to enrollment_dates if it has a value" do
@@ -2794,7 +2794,7 @@ describe Enrollment do
       @section = @enrollment.course_section
 
       # 5 different possible times, make sure they're distinct
-      @enrollment_date_end_at = 1.days.ago
+      @enrollment_date_end_at = 1.day.ago
       @enrollment.end_at = 2.days.ago
       @section.end_at = 3.days.ago
       @course.conclude_at = 4.days.ago
@@ -3367,9 +3367,9 @@ describe Enrollment do
       @enrollment.destroy
       @assignment.destroy
 
-      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change do
         Submission.active.where(assignment_id: @assignment, user_id: @student.id).count
-      })
+      end)
     end
 
     it "infers the appropriate workflow state for unsubmitted submissions when restoring them" do
@@ -3436,9 +3436,9 @@ describe Enrollment do
       @enrollment.destroy
       assignment_group = @course.assignment_groups.active.first
       assignment_group.destroy
-      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change do
         @enrollment.scores.where(assignment_group_id: assignment_group).count
-      })
+      end)
     end
 
     it "restores scores for grading periods that are still active" do
@@ -3465,9 +3465,9 @@ describe Enrollment do
       )
       @enrollment.destroy
       grading_period.destroy
-      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change do
         @enrollment.scores.where(grading_period_id: grading_period).count
-      })
+      end)
     end
 
     it "does not restore scores for grading periods that are not associated with the course" do
@@ -3480,9 +3480,9 @@ describe Enrollment do
       )
       @enrollment.destroy
       @course.enrollment_term.update!(grading_period_group_id: nil)
-      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change do
         @enrollment.scores.where(grading_period_id: grading_period).count
-      })
+      end)
     end
   end
 

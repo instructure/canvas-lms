@@ -78,7 +78,7 @@ describe NotificationPreferencesController, type: :request do
       assert_jsonapi_compliance(json, 'categories')
       categories = json['categories']
       expect(categories.length).to eq 3
-      expect(categories).to eq ["announcements", "registration", "announcement_created_by_you"]
+      expect(categories).to eq %w[announcements registration announcement_created_by_you]
       expect(@cc.notification_policies.count).to eq 3
     end
   end

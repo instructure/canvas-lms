@@ -77,7 +77,7 @@ describe "login logout test" do
     expect(driver.current_url).to eq expected_url
   end
 
-  it "validates forgot my password functionality for email account", priority: "1", test_id: 126922 do
+  it "validates forgot my password functionality for email account", priority: "1" do
     user_with_pseudonym({ :active_user => true })
     go_to_forgot_password
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)

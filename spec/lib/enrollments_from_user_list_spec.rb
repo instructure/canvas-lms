@@ -22,11 +22,11 @@ require "spec_helper"
 
 describe EnrollmentsFromUserList do
   def list_to_parse
-    %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>}
+    %(david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>)
   end
 
   def list_to_parse_with_repeats
-    %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com}
+    %(david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com)
   end
 
   before do

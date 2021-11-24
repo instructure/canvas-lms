@@ -102,7 +102,10 @@ const view = new EditView({
   lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
   announcementsLocked,
   homeroomCourse: window.ENV.K5_HOMEROOM_COURSE,
-  react_discussions_post: ENV.REACT_DISCUSSIONS_POST
+  isEditing: model.id,
+  anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
+  react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
+  allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics
 })
 view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 

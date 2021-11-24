@@ -82,7 +82,7 @@ module CanvasPandaPub
       http = Net::HTTP.new(@uri.host, @uri.port)
       http.use_ssl = (@uri.scheme == "https")
 
-      unless @worker.push(channel, Proc.new { http.request(request, body) })
+      unless @worker.push(channel, proc { http.request(request, body) })
         @logger.warn("dropped pandapub notification for #{channel}")
       end
     end

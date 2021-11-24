@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 unless defined? BASE_FIXTURE_DIR
-  BASE_FIXTURE_DIR = File.expand_path(File.dirname(__FILE__)) + '/fixtures/'
+  BASE_FIXTURE_DIR = __dir__ + '/fixtures/'
   CANVAS_FIXTURE_DIR = BASE_FIXTURE_DIR + 'canvas/'
   VISTA_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb_vista/'
   BB8_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb8/'

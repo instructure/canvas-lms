@@ -119,7 +119,7 @@ describe Mutations::UpdateAssignment do
   end
 
   def assert_no_errors_and_get_overrides(result)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateAssignment', 'errors')).to be_nil
     expect(result.dig('data', 'updateAssignment', 'assignment', '_id')).to eq @assignment_id.to_s
     result.dig('data', 'updateAssignment', 'assignment', 'assignmentOverrides', 'nodes')
@@ -183,7 +183,7 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "one of student_ids, group_id, or course_section_id is required"
   end
 
@@ -353,7 +353,7 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "Validation failed: Set has already been taken"
   end
 

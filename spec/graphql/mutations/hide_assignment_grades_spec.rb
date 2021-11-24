@@ -82,7 +82,7 @@ describe Mutations::HideAssignmentGrades do
       now = Time.zone.now
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher, grades_published_at: now)
       result = execute_query(mutation_str(assignment_id: assignment.id), context)
-      expect(result.dig("errors")).to be nil
+      expect(result["errors"]).to be nil
     end
 
     describe "hiding the grades" do

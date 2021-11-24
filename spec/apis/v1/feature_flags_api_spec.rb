@@ -43,7 +43,7 @@ describe "Feature Flags API", type: :request do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
                                                          'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'allowed'),
-                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true, autoexpand: true),
+                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),
                                                          'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
                                                          'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
                                                          'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true, pending_enforcement: true),
@@ -139,34 +139,34 @@ describe "Feature Flags API", type: :request do
       json += api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features?per_page=3&page=2",
                                { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param, per_page: '3', page: '2' })
       expect(json.size).to eql 5
-      expect(json.map { |f| f['feature'] }.sort).to match_array %w(account_feature course_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
+      expect(json.map { |f| f['feature'] }.sort).to match_array %w[account_feature course_feature root_account_feature root_opt_in_feature compact_live_event_payloads]
     end
 
     it "returns only relevant features" do
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
                               { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_sub_account.to_param })
-      expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature)
+      expect(json.map { |f| f['feature'] }.sort).to eql %w[account_feature course_feature]
     end
 
     it "respects root_opt_in" do
       t_root_account.feature_flags.create! feature: 'root_opt_in_feature'
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
                               { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_sub_account.to_param })
-      expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature root_opt_in_feature)
+      expect(json.map { |f| f['feature'] }.sort).to eql %w[account_feature course_feature root_opt_in_feature]
     end
 
     describe "hidden" do
       it "shows hidden features on site admin" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                                 { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.id.to_s })
-        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature compact_live_event_payloads)
+        expect(json.map { |f| f['feature'] }).to match_array %w[account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature compact_live_event_payloads]
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
       it "shows hidden features on root accounts to a site admin user" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                                 { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
-        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
+        expect(json.map { |f| f['feature'] }).to match_array %w[account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads]
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
@@ -175,7 +175,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                                 { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to be_nil
-        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
+        expect(json.map { |f| f['feature'] }).to match_array %w[account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads]
       end
 
       it "shows 'hidden' tag to site admin on the feature flag that un-hides a hidden feature" do
@@ -222,13 +222,13 @@ describe "Feature Flags API", type: :request do
                                                          })
       json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features",
                               { controller: 'feature_flags', action: 'index', format: 'json', course_id: t_course.to_param })
-      expect(json.map { |f| f['feature'] }).to eql %w(course_feature)
+      expect(json.map { |f| f['feature'] }).to eql %w[course_feature]
     end
 
     it "operates on a user" do
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features",
                               { controller: 'feature_flags', action: 'index', format: 'json', user_id: t_teacher.to_param })
-      expect(json.map { |f| f['feature'] }).to eql %w(user_feature)
+      expect(json.map { |f| f['feature'] }).to eql %w[user_feature]
     end
   end
 
@@ -243,7 +243,7 @@ describe "Feature Flags API", type: :request do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/enabled",
                               { controller: 'feature_flags', action: 'enabled_features', format: 'json', account_id: t_root_account.to_param })
-      expect(json.sort).to eql %w(account_feature course_feature)
+      expect(json.sort).to eql %w[account_feature course_feature]
     end
   end
 
@@ -409,7 +409,7 @@ describe "Feature Flags API", type: :request do
       enable_cache do
         flag = t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
         # try to trick the controller into inserting (and violating a unique constraint) instead of updating
-        MultiCache.fetch(cache_key) { nil }
+        MultiCache.fetch(cache_key) { nil } # rubocop:disable Style/RedundantFetchBlock it's a cache, not a Hash
         api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature?state=off",
                          { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature', state: 'off' })
         assert_status(200)
@@ -555,9 +555,9 @@ describe "Feature Flags API", type: :request do
     before do
       allow(Feature).to receive(:definitions).and_return({
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                                                                                           custom_transition_proc: ->(_user, _context, from_state, transitions) do
+                                                                                           custom_transition_proc: lambda do |_user, _context, from_state, transitions|
                                                                                                                      transitions['off'] = { 'locked' => true, 'message' => "don't ever turn this off" } if from_state == 'on'
-                                                                                                                     transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.has_key?('on')
+                                                                                                                     transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.key?('on')
                                                                                                                    end),
                                                            'compact_live_event_payloads' => live_event_feature,
                                                            'granular_permissions_manage_courses' => granular_permissions_feature
@@ -606,7 +606,7 @@ describe "Feature Flags API", type: :request do
     before do
       allow(Feature).to receive(:definitions).and_return({
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                                                                                           after_state_change_proc: ->(user, context, from_state, to_state) do
+                                                                                           after_state_change_proc: lambda do |user, context, from_state, to_state|
                                                                                                                       t_state_changes << [user.id, context.id, from_state, to_state]
                                                                                                                     end),
                                                            'compact_live_event_payloads' => live_event_feature,
@@ -615,28 +615,28 @@ describe "Feature Flags API", type: :request do
     end
 
     it "fires when creating a feature flag to enable an allowed feature" do
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
                          { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'allowed', 'on']
     end
 
     it "fires when changing a feature flag's state" do
       t_course.disable_feature! 'custom_feature'
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
                          { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'off', 'on']
     end
 
     it 'fires when deleting a feature flag override (because of a hidden feature or otherwise)' do
       t_course.enable_feature! 'custom_feature'
-      expect {
+      expect do
         api_call_as_user(t_root_admin, :delete, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
                          { controller: 'feature_flags', action: 'delete', format: 'json', course_id: t_course.to_param, feature: 'custom_feature' })
-      }.to change(t_state_changes, :size).by(1)
+      end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'on', 'allowed']
     end
   end

@@ -20,7 +20,7 @@
 
 require 'securerandom'
 
-class EventStream::Record < Struct.new(:attributes)
+EventStream::Record = Struct.new(:attributes) do
   def self.attributes(*attribute_names)
     attribute_names.each do |attribute_name|
       define_method attribute_name do

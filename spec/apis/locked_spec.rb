@@ -27,10 +27,10 @@ shared_examples_for 'a locked api item' do
   end
 
   def verify_locked(*lock_info_extra)
-    prohibited_fields = %w(
+    prohibited_fields = %w[
       canvadoc_session_url
       crocodoc_session_url
-    )
+    ]
 
     json = api_get_json
 

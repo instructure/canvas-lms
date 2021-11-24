@@ -40,7 +40,7 @@ describe Lti::Messages::ResourceLinkRequest do
     end
 
     describe 'custom parameters' do
-      let(:link_for_params) {
+      let(:link_for_params) do
         Lti::ResourceLink.new(
           context_external_tool: tool_override || tool,
           context: course,
@@ -49,7 +49,7 @@ describe Lti::Messages::ResourceLinkRequest do
             no_expansion: "overrides tool param!"
           }
         )
-      }
+      end
       let(:opts) { super().merge(resource_link_for_custom_params: link_for_params) }
 
       context 'when link-level custom params are given in resource_link_for_custom_params' do

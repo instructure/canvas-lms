@@ -31,7 +31,7 @@ describe ContentMigration do
 
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
 
-      attrs = [:title, :body, :editing_roles, :todo_date]
+      attrs = %i[title body editing_roles todo_date]
       expect(page.attributes.slice(*attrs)).to eq page_to.attributes.slice(*attrs)
       expect(page_to.body.strip).to eq "<address><ul></ul></address>"
     end
@@ -56,7 +56,7 @@ describe ContentMigration do
     it "does not escape links to wiki urls" do
       page1 = @copy_from.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
 
-      body = %{<p>Link to module item: <a href="/courses/%s/pages/%s#header">some assignment</a></p>}
+      body = %(<p>Link to module item: <a href="/courses/%s/pages/%s#header">some assignment</a></p>)
       page2 = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, page1.url])
 
       run_course_copy
@@ -75,12 +75,12 @@ describe ContentMigration do
       # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
       @copy_from.wiki.set_front_page_url!('front-page')
       main_page = @copy_from.wiki.front_page
-      main_page.body = %{<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>}
+      main_page.body = %(<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>)
       main_page.save!
-      @copy_from.wiki_pages.create!(:title => "Online: Unit Pages", :body => %{<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>})
+      @copy_from.wiki_pages.create!(:title => "Online: Unit Pages", :body => %(<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>))
       run_course_copy
-      expect(@copy_to.wiki.front_page.body).to eq %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>}
-      expect(@copy_to.wiki_pages.where(url: "online-unit-pages").first!.body).to eq %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>}
+      expect(@copy_to.wiki.front_page.body).to eq %(<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>)
+      expect(@copy_to.wiki_pages.where(url: "online-unit-pages").first!.body).to eq %(<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>)
     end
 
     it "keeps assignment relationship" do

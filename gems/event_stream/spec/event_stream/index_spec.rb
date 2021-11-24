@@ -24,17 +24,13 @@ describe EventStream::Index do
   before do
     @database = double('database')
 
-    def @database.batch;
-      yield;
+    def @database.batch
+      yield
     end
 
-    def @database.update_record(*args)
-      ;
-    end
+    def @database.update_record(*); end
 
-    def @database.update(*args)
-      ;
-    end
+    def @database.update(*); end
 
     def @database.keyspace
       'test_db'
@@ -87,12 +83,12 @@ describe EventStream::Index do
       table = @table
       entry_proc = @entry_proc
 
-      expect {
+      expect do
         EventStream::Index.new(@stream) { self.table table }
-      }.to raise_exception ArgumentError
-      expect {
+      end.to raise_exception ArgumentError
+      expect do
         EventStream::Index.new(@stream) { self.entry_proc entry_proc }
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     context "defaults" do

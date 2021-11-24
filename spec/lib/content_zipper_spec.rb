@@ -31,9 +31,9 @@ describe ContentZipper do
       s3.update_attribute :sortable_name, 'trolololo'
       s4.update_attribute :sortable_name, 'ünicodemân'
       assignment_model(course: @course)
-      [s1, s2, s3, s4].each { |s|
+      [s1, s2, s3, s4].each do |s|
         submission_model user: s, assignment: @assignment, body: "blah"
-      }
+      end
       attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
@@ -50,9 +50,9 @@ describe ContentZipper do
       filename = attachment.reload.full_filename
 
       Zip::File.foreach(filename) do |f|
-        expect {
+        expect do
           expected_file_patterns.delete_if { |expected_pattern| f.name =~ expected_pattern }
-        }.to change { expected_file_patterns.size }.by(-1)
+        end.to change { expected_file_patterns.size }.by(-1)
       end
 
       expect(expected_file_patterns).to be_empty
@@ -134,7 +134,7 @@ describe ContentZipper do
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           expect(f.name).to match(/some9991234guy/)
-          expect(f.get_input_stream.read).to match(%r{This submission was a url})
+          expect(f.get_input_stream.read).to match(/This submission was a url/)
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
       end
@@ -205,12 +205,15 @@ describe ContentZipper do
     it "only includes one submission per group" do
       teacher_in_course active_all: true
       gc = @course.group_categories.create! name: "Homework Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
-      students = 4.times.map { student_in_course(active_all: true); @student }
+      groups = Array.new(2) { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      students = Array.new(4) do
+        student_in_course(active_all: true)
+        @student
+      end
       students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
       a = @course.assignments.create! group_category_id: gc.id,
                                       grade_group_students_individually: false,
-                                      submission_types: %w(text_entry)
+                                      submission_types: %w[text_entry]
       a.submit_homework(students.first, body: "group 1 submission")
       a.submit_homework(students.second, body: "group 2 submission")
 
@@ -223,9 +226,9 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_names = [/group0/, /group1/]
       Zip::File.foreach(attachment.full_filename) do |f|
-        expect {
+        expect do
           expected_file_names.delete_if { |expected_name| f.name =~ expected_name }
-        }.to change { expected_file_names.size }.by(-1)
+        end.to change { expected_file_names.size }.by(-1)
       end
     end
 
@@ -484,9 +487,9 @@ describe ContentZipper do
         user: user,
         workflow_state: "to_be_zipped"
       )
-      expect {
+      expect do
         ContentZipper.new.zip_eportfolio(attachment, eportfolio)
-      }.to_not raise_error
+      end.to_not raise_error
     end
 
     context "with restricted permissions" do

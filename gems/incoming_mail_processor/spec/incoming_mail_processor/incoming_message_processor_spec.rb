@@ -571,7 +571,7 @@ module IncomingMailProcessor
       before do
         allow(IncomingMessageProcessor).to receive(:get_mailbox_class).and_return(timeout_mailbox)
 
-        [:connect, :each_message, :delete_message, :move_message, :disconnect].each do |f|
+        %i[connect each_message delete_message move_message disconnect].each do |f|
           allow_any_instance_of(timeout_mailbox).to receive(f)
         end
       end

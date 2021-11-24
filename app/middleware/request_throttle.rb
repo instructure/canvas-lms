@@ -42,8 +42,8 @@ class RequestThrottle
   end
 
   def call(env)
-    starting_mem = Canvas.sample_memory()
-    starting_cpu = Process.times()
+    starting_mem = Canvas.sample_memory
+    starting_cpu = Process.times
 
     request = ActionDispatch::Request.new(env)
 
@@ -59,15 +59,15 @@ class RequestThrottle
     up_front_cost = bucket.get_up_front_cost_for_path(path)
     pre_judged = (approved?(request) || blocked?(request))
     cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
-      status, headers, response = if !allowed?(request, bucket)
+      status, headers, response = if allowed?(request, bucket)
+                                    @app.call(env)
+                                  else
                                     throttled = true
                                     rate_limit_exceeded
-                                  else
-                                    @app.call(env)
                                   end
 
-      ending_cpu = Process.times()
-      ending_mem = Canvas.sample_memory()
+      ending_cpu = Process.times
+      ending_mem = Canvas.sample_memory
 
       user_cpu = ending_cpu.utime - starting_cpu.utime
       system_cpu = ending_cpu.stime - starting_cpu.stime
@@ -109,12 +109,12 @@ class RequestThrottle
 
   def allowed?(request, bucket)
     if approved?(request)
-      return true
+      true
     elsif blocked?(request)
       # blocking is useful even if throttling is disabled, this is left in intentionally
       Rails.logger.info("blocking request due to blocklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
       InstStatsd::Statsd.increment("request_throttling.blocked")
-      return false
+      false
     else
       if bucket.full?
         if RequestThrottle.enabled?
@@ -125,7 +125,7 @@ class RequestThrottle
           Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
-      return true
+      true
     end
   end
 
@@ -163,7 +163,7 @@ class RequestThrottle
     return unless request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback}
 
     tool_id = $1
-    return unless tool_id =~ Api::ID_REGEX
+    return unless Api::ID_REGEX.match?(tool_id)
 
     # yes, a db lookup, but we're only loading it for these two actions,
     # and only if another identifier couldn't be found
@@ -289,11 +289,11 @@ class RequestThrottle
           hash = RequestThrottle.dynamic_settings['up_front_cost_by_path_regex'] || {}
           hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
-            unless k.is_a?(Regexp) && v.is_a?(Numeric)
-              ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")
-              hash.clear
-              break
-            end
+            next if k.is_a?(Regexp) && v.is_a?(Numeric)
+
+            ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")
+            hash.clear
+            break
           end
           hash
         end
@@ -310,9 +310,9 @@ class RequestThrottle
     def get_up_front_cost_for_path(path)
       # if it matches any of the regexes in the setting, return the specified cost
       self.class.up_front_cost_by_path_regex.each do |regex, cost|
-        return cost if regex =~ path
+        return cost if regex&.match?(path)
       end
-      self.up_front_cost # otherwise use the default
+      up_front_cost # otherwise use the default
     end
 
     # This method does an initial increment by the up_front_cost, loading the
@@ -347,7 +347,7 @@ class RequestThrottle
       end
 
       current_time = current_time.to_f
-      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json.to_a).to_json}")
+      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + as_json.to_a).to_json}")
       redis = self.redis
       count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f

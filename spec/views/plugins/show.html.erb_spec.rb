@@ -27,7 +27,7 @@ describe "plugins/show" do
       settings_partial: "settings_header",
       test_cluster_inherit?: false
     )
-    plugin_setting = PluginSetting.new()
+    plugin_setting = PluginSetting.new
 
     assign(:plugin, plugin)
     assign(:plugin_setting, plugin_setting)

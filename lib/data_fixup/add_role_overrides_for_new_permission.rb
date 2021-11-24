@@ -26,7 +26,7 @@ module DataFixup::AddRoleOverridesForNewPermission
   def self.run(base_permission, new_permission, skip_validation: false, base_role_type: nil)
     unless skip_validation
       [base_permission, new_permission].each do |perm|
-        raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
+        raise "#{perm} is not a valid permission" unless RoleOverride.permissions.key?(perm.to_sym)
       end
     end
 
@@ -41,7 +41,7 @@ module DataFixup::AddRoleOverridesForNewPermission
 
         new_ro = RoleOverride.new
         new_ro.permission = new_permission
-        attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env root_account_id})
+        attrs = ro.attributes.slice(*%w[context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env root_account_id])
         new_ro.assign_attributes(attrs)
         new_ro.save!
       end

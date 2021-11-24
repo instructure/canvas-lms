@@ -40,21 +40,21 @@ module DifferentiatedAssignments
 
       def add_assignments_to_modules
         assignments = DifferentiatedAssignments::Homework::Assignments
-        self.first_module.add_assignment(assignments.assignment_for_section_a)
-        self.first_module.add_assignment(assignments.assignment_for_section_b)
-        self.first_module.add_assignment(assignments.assignment_for_first_student)
+        first_module.add_assignment(assignments.assignment_for_section_a)
+        first_module.add_assignment(assignments.assignment_for_section_b)
+        first_module.add_assignment(assignments.assignment_for_first_student)
 
         quizzes = DifferentiatedAssignments::Homework::Quizzes
-        self.second_module.add_quiz(quizzes.quiz_for_section_a)
-        self.second_module.add_quiz(quizzes.quiz_for_section_b)
-        self.second_module.add_quiz(quizzes.quiz_for_second_and_third_students)
+        second_module.add_quiz(quizzes.quiz_for_section_a)
+        second_module.add_quiz(quizzes.quiz_for_section_b)
+        second_module.add_quiz(quizzes.quiz_for_second_and_third_students)
 
         discussions = DifferentiatedAssignments::Homework::Discussions
-        self.third_module.add_discussion(discussions.discussion_for_section_a)
-        self.third_module.add_discussion(discussions.discussion_for_section_b)
-        self.third_module.add_discussion(discussions.discussion_for_first_student)
+        third_module.add_discussion(discussions.discussion_for_section_a)
+        third_module.add_discussion(discussions.discussion_for_section_b)
+        third_module.add_discussion(discussions.discussion_for_first_student)
 
-        self.fourth_module.add_assignment(assignments.assignment_for_section_c)
+        fourth_module.add_assignment(assignments.assignment_for_section_c)
       end
     end
   end

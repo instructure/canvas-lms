@@ -97,12 +97,12 @@ describe 'taking a quiz' do
           expect(f("#content")).not_to contain_css('#quiz_access_code')
         end
 
-        it 'only asks once for the access code', priority: "1", test_id: 522898 do
+        it 'only asks once for the access code', priority: "1" do
           verify_no_access_code_reprompts_during_oqaat_quiz
         end
 
         context 'when the access code changes during an active quiz session' do
-          it 'doesn\'t prompt for the access code again', priority: "1", test_id: 522902
+          it 'doesn\'t prompt for the access code again', priority: "1"
         end
 
         it 'does not prompt for access code for sidebar question navigation' do
@@ -148,7 +148,7 @@ describe 'taking a quiz' do
           expect(f('#quiz_access_code')).to be_truthy
         end
 
-        it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
+        it 'prompts for access code upon resuming the quiz', priority: "1" do
           skip_if_safari(:alert)
           skip('investigate in CCI-182')
           start_and_exit_quiz do
@@ -158,7 +158,7 @@ describe 'taking a quiz' do
           end
         end
 
-        it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
+        it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1" do
           skip('investigate in CCI-182')
           skip_if_safari(:alert)
           start_and_exit_quiz do

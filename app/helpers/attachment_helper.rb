@@ -42,15 +42,15 @@ module AttachmentHelper
     attrs[:mimetype] = attachment.mimetype
     context_name = url_helper_context_from_object(attachment.context)
     url_helper = "#{context_name}_file_inline_view_url"
-    if self.respond_to?(url_helper)
-      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id, { :verifier => params[:verifier] })
+    if respond_to?(url_helper)
+      attrs[:attachment_view_inline_ping_url] = send(url_helper, attachment.context, attachment.id, { :verifier => params[:verifier] })
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
     end
-    attrs.map { |attr, val|
-      %|data-#{attr}="#{ERB::Util.html_escape(val)}"|
-    }.join(" ").html_safe
+    attrs.map do |attr, val|
+      %(data-#{attr}="#{ERB::Util.html_escape(val)}")
+    end.join(" ").html_safe
   end
 
   def media_preview_attributes(attachment, attrs = {})
@@ -77,9 +77,11 @@ module AttachmentHelper
 
     # up here to preempt files domain redirect
     if attachment.instfs_hosted? && file_location_mode? && !direct
-      url = inline ?
-        authenticated_inline_url(attachment) :
-        authenticated_download_url(attachment)
+      url = if inline
+              authenticated_inline_url(attachment)
+            else
+              authenticated_download_url(attachment)
+            end
       render_file_location(url)
       return
     end
@@ -97,7 +99,7 @@ module AttachmentHelper
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
       render body: body
     elsif must_proxy
-      return render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
+      render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
       redirect_to authenticated_inline_url(attachment)
     else
@@ -117,7 +119,7 @@ module AttachmentHelper
   end
 
   def set_cache_header(attachment, direct)
-    # TODO [RECNVS-73]
+    # TODO: [RECNVS-73]
     # instfs JWTs cannot be shared across users, so we cannot cache them across
     # users. while most browsers will only service one user and caching
     # independent of user would not be detrimental, we cannot guarantee that.
@@ -125,7 +127,7 @@ module AttachmentHelper
     # investigate opportunities to reuse JWTs when the same user requests the
     # same file within a reasonable window of time, so that the URL redirected
     # too can still take advantage of browser caching.
-    unless (attachment.instfs_hosted? && !direct) || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
+    unless (attachment.instfs_hosted? && !direct) || attachment.content_type&.start_with?('text') || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
       # set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
       ttl = direct ? 1.day : attachment.url_ttl

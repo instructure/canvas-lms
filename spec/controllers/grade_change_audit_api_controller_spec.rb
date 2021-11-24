@@ -33,7 +33,7 @@ describe GradeChangeAuditApiController do
       event.fetch("links").fetch("assignment") == assignment.id
     end
   end
-  let(:student_ids) { events_for_assignment.map { |event| event.fetch("links").fetch("student") }.compact }
+  let(:student_ids) { events_for_assignment.filter_map { |event| event.fetch("links").fetch("student") } }
 
   before do
     user_session(admin)
@@ -427,7 +427,7 @@ describe GradeChangeAuditApiController do
       end
 
       before do
-        # FIXME this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
+        # FIXME: this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
         Auditors::GradeChange.record(override_grade_change: @override_grade_change)
       end
 

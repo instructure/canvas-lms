@@ -38,6 +38,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
           allow_student_forum_attachments: true,
           allow_student_discussion_editing: true,
           allow_student_discussion_reporting: true,
+          allow_student_anonymous_discussion_topics: true,
           grading_standard_enabled: false,
           grading_standard_id: null,
           allow_student_organized_groups: true,
@@ -59,7 +60,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     ENV = {
-      student_reporting_enabled: true
+      student_reporting_enabled: true,
+      discussion_anonymity_enabled: true
     }
   })
 
@@ -76,17 +78,6 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     equal(modalOpenSpy.callCount, 1)
   })
 
-  test('should find 4 checked boxes', () => {
-    tree = mount(
-      <DiscussionSettings
-        {...makeProps({
-          permissions: {change_settings: true}
-        })}
-      />
-    )
-    equal(document.querySelectorAll('[checked]').length, 4)
-  })
-
   test('should find 0 checked boxes', () => {
     tree = mount(
       <DiscussionSettings
@@ -96,7 +87,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
             allow_student_discussion_topics: false,
             allow_student_forum_attachments: false,
             allow_student_discussion_editing: false,
-            allow_student_discussion_reporting: false
+            allow_student_discussion_reporting: false,
+            allow_student_anonymous_discussion_topics: false
           }
         })}
       />
@@ -111,14 +103,14 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     equal(checkboxes.length, 1)
   })
 
-  test('should render 5 checkbox if can change settings', () => {
+  test('should render 6 checkbox if can change settings', () => {
     tree = shallow(
       <DiscussionSettings
         {...makeProps({isSettingsModalOpen: true, permissions: {change_settings: true}})}
       />
     )
     const checkboxes = tree.find('Checkbox')
-    equal(checkboxes.length, 5)
+    equal(checkboxes.length, 6)
   })
 
   test('should set state correctly with all true settings', () => {
@@ -128,7 +120,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       />
     )
     tree.setProps({isSavingSettings: false})
-    equal(tree.instance().state.studentSettings.length, 4)
+    equal(tree.instance().state.studentSettings.length, 5)
   })
 
   test('should set state correctly with false props', () => {
@@ -162,7 +154,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       allow_student_discussion_topics: true,
       allow_student_forum_attachments: true,
       allow_student_discussion_editing: true,
-      allow_student_discussion_reporting: true
+      allow_student_discussion_reporting: true,
+      allow_student_anonymous_discussion_topics: true
     }
     const userSettings = {
       markAsRead: false,
@@ -188,7 +181,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       allow_student_discussion_topics: true,
       allow_student_forum_attachments: false,
       allow_student_discussion_editing: true,
-      allow_student_discussion_reporting: false
+      allow_student_discussion_reporting: false,
+      allow_student_anonymous_discussion_topics: false
     }
     const userSettings = {
       markAsRead: false,

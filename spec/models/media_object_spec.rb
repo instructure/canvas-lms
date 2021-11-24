@@ -35,7 +35,7 @@ describe MediaObject do
     end
 
     it "raises an error if someone tries to use find_by_media_id" do
-      expect { MediaObject.find_by_media_id('fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
+      expect { MediaObject.find_by(media_id: 'fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
     end
   end
 
@@ -265,7 +265,7 @@ describe MediaObject do
       expect(mo.title).to eq "Kaltura Title"
     end
 
-    it "ensures retrieve_details adds '/' to media_type " do
+    it "ensures retrieve_details adds '/' to media_type" do
       mo = media_object
       mo.retrieve_details
       expect(mo.media_type).to eql "video/*"

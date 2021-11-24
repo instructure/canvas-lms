@@ -263,7 +263,7 @@ describe Quizzes::QuizzesController do
 
     context 'DIRECT_SHARE_ENABLED' do
       before :once do
-        course_quiz()
+        course_quiz
       end
 
       it "js_env DIRECT_SHARE_ENABLED is true when user can manage" do
@@ -299,7 +299,7 @@ describe Quizzes::QuizzesController do
       end
 
       let_once(:workflow_states) do
-        [:unpublished, :published, :unpublished, :published]
+        %i[unpublished published unpublished published]
       end
 
       let_once(:tool) do
@@ -348,7 +348,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(2)
           expect(
-            controller.js_env[:QUIZZES][:assignment].map { |x| x[:id] }
+            controller.js_env[:QUIZZES][:assignment].pluck(:id)
           ).to contain_exactly(course_quizzes[1].id, course_assignments[3].id)
         end
       end
@@ -834,10 +834,9 @@ describe Quizzes::QuizzesController do
     context 'student_filters' do
       before do
         user_session(@teacher)
-        5.times.map do |i|
+        5.times do |i|
           name = "#{(i + 'a'.ord).chr}_student"
           course_with_student(name: name, course: @course)
-          @student
         end
       end
 
@@ -2752,6 +2751,7 @@ describe Quizzes::QuizzesController do
         expect(controller.js_env[:QUIZZES][:assignment]).to eq []
       end
     end
+
     context 'show' do
       it 'shows the page to students with visibility' do
         user_session(@student1)

@@ -30,7 +30,7 @@ describe "Tutorials" do
       user_session(@teacher)
     end
 
-    it "the tutorial tray appears on the home page", priority: "1", test_id: 3165149 do
+    it "the tutorial tray appears on the home page", priority: "1" do
       get "/courses/#{@course.id}"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Home")
@@ -39,7 +39,7 @@ describe "Tutorials" do
       expect(element).to include_text("The Home Page can display the course participation activity stream")
     end
 
-    it "the tutorial tray appears on the assignments page", priority: "1", test_id: 3165163 do
+    it "the tutorial tray appears on the assignments page", priority: "1" do
       get "/courses/#{@course.id}/assignments"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Assignments")
@@ -48,7 +48,7 @@ describe "Tutorials" do
       expect(element).to include_text("Create assignment groups to organize your assignments")
     end
 
-    it "the tutorial tray appears on the announcements page", priority: "1", test_id: 3165168 do
+    it "the tutorial tray appears on the announcements page", priority: "1" do
       get "/courses/#{@course.id}/announcements"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Announcements")
@@ -57,7 +57,7 @@ describe "Tutorials" do
       expect(element).to include_text("Announcements can include text, multimedia, and files")
     end
 
-    it "the tutorial tray appears on the discussions page", priority: "1", test_id: 3165160 do
+    it "the tutorial tray appears on the discussions page", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Discussions")
@@ -66,7 +66,7 @@ describe "Tutorials" do
       expect(element).to include_text("Focused discussions are best suited")
     end
 
-    it "the tutorial tray appears on the grades page", priority: "1", test_id: 3165169 do
+    it "the tutorial tray appears on the grades page", priority: "1" do
       get "/courses/#{@course.id}/gradebook"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Grades")
@@ -75,7 +75,7 @@ describe "Tutorials" do
       expect(element).to include_text("For simplified grading, use SpeedGrader")
     end
 
-    it "the tutorial tray appears on the users page", priority: "1", test_id: 3165167 do
+    it "the tutorial tray appears on the users page", priority: "1" do
       get "/courses/#{@course.id}/users"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("People")
@@ -83,7 +83,7 @@ describe "Tutorials" do
       expect(element).to include_text("You can also create student groups to house group assignments")
     end
 
-    it "the tutorial tray appears on the pages page", priority: "1", test_id: 3165162 do
+    it "the tutorial tray appears on the pages page", priority: "1" do
       get "/courses/#{@course.id}/pages"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Pages")
@@ -92,7 +92,7 @@ describe "Tutorials" do
       expect(element).to include_text("You can also allow students to contribute to specific pages")
     end
 
-    it "the tutorial tray appears on the files page", priority: "1", test_id: 3165166 do
+    it "the tutorial tray appears on the files page", priority: "1" do
       get "/courses/#{@course.id}/files"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Files")
@@ -101,7 +101,7 @@ describe "Tutorials" do
       expect(element).to include_text("Distribute files to students from your course folder")
     end
 
-    it "the tutorial tray appears on the syllabus page", priority: "1", test_id: 3165150 do
+    it "the tutorial tray appears on the syllabus page", priority: "1" do
       get "/courses/#{@course.id}/assignments/syllabus"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Syllabus")
@@ -110,7 +110,7 @@ describe "Tutorials" do
       expect(element).to include_text("The Syllabus page can also display all assignments")
     end
 
-    it "the tutorial tray appears on the quizzes page", priority: "1", test_id: 3165164 do
+    it "the tutorial tray appears on the quizzes page", priority: "1" do
       get "/courses/#{@course.id}/quizzes"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Quizzes")
@@ -118,7 +118,7 @@ describe "Tutorials" do
       expect(element).to include_text("Use quizzes to challenge student understanding")
     end
 
-    it "the tutorial tray appears on the modules page", priority: "1", test_id: 3165260 do
+    it "the tutorial tray appears on the modules page", priority: "1" do
       get "/courses/#{@course.id}/modules"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Modules")
@@ -127,7 +127,7 @@ describe "Tutorials" do
       expect(element).to include_text("Require prerequisites to be completed before moving")
     end
 
-    it "the tutorial tray appears on the settings page", priority: "1", test_id: 3165165 do
+    it "the tutorial tray appears on the settings page", priority: "1" do
       get "/courses/#{@course.id}/settings#!/configurations"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Settings")
@@ -136,7 +136,7 @@ describe "Tutorials" do
       expect(element).to include_text("You may also be able to adjust the course name")
     end
 
-    it "the tutorial tray appears on the course import page", priority: "1", test_id: 3165153 do
+    it "the tutorial tray appears on the course import page", priority: "1" do
       get "/courses/#{@course.id}/content_migrations"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Import")
@@ -145,7 +145,7 @@ describe "Tutorials" do
       expect(element).to include_text("such as Moodle or QTI")
     end
 
-    it "the 'Don't Show Again' button ends the tutorial", priority: "1", test_id: 3189025 do
+    it "the 'Don't Show Again' button ends the tutorial", priority: "1" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
       wait_for_new_page_load do
@@ -154,7 +154,7 @@ describe "Tutorials" do
       expect(driver).not_to contain_css(".NewUserTutorialTray")
     end
 
-    it "the 'x' button closes the End Course Set-up Tutorial modal", priority: "1", test_id: 3165170 do
+    it "the 'x' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
       fj("button:contains('Close')").click
@@ -162,7 +162,7 @@ describe "Tutorials" do
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end
 
-    it "the 'Cancel' button closes the End Course Set-up Tutorial modal", priority: "1", test_id: 3189026 do
+    it "the 'Cancel' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
       fj("span button:contains('Cancel')").click

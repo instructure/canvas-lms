@@ -71,7 +71,7 @@ module CanvasHttp
       end
 
       def redis_client
-        @redis.respond_to?(:call) ? @redis.call() : @redis || nil
+        @redis.respond_to?(:call) ? @redis.call : @redis || nil
       end
 
       def threshold(domain)

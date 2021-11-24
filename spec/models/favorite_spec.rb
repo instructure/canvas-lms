@@ -19,7 +19,7 @@
 
 describe Favorite do
   it 'populates root account' do
-    student_in_course()
+    student_in_course
     favorite = @user.favorites.create!(context: @course)
     expect(favorite.root_account).to eq @course.root_account
   end

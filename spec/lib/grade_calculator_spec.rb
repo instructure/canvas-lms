@@ -44,9 +44,9 @@ describe GradeCalculator do
         end_date: 10.days.from_now,
         weight: 50
       )
-      expect {
+      expect do
         GradeCalculator.recompute_final_score(@student.id, first_course.id)
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "weighted grading periods: gracefully handles (by skipping) deleted enrollments" do
@@ -59,9 +59,9 @@ describe GradeCalculator do
         weight: 50
       )
       @user.enrollments.first.destroy
-      expect {
+      expect do
         GradeCalculator.recompute_final_score(@user.id, @course.id)
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "weighted grading periods: compute_scores does not raise an error if no grading period score objects exist" do
@@ -89,9 +89,9 @@ describe GradeCalculator do
         end_date: 10.days.from_now
       )
       @user.enrollments.first.destroy
-      expect {
+      expect do
         GradeCalculator.recompute_final_score(@user.id, @course.id, grading_period_id: period.id)
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "deletes irrelevant scores for inactive grading periods" do
@@ -110,9 +110,9 @@ describe GradeCalculator do
       stale_score = Score.find_by(enrollment: @user.enrollments.first, grading_period: period2)
       period2.destroy
       stale_score.reload.undestroy
-      expect {
+      expect do
         GradeCalculator.recompute_final_score(@user.id, @course.id)
-      }.to change { stale_score.reload.workflow_state }.from('active').to('deleted')
+      end.to change { stale_score.reload.workflow_state }.from('active').to('deleted')
     end
 
     it "gracefully handles missing submissions" do
@@ -212,9 +212,9 @@ describe GradeCalculator do
           @stale_score.reload.undestroy
         end
 
-        expect {
+        expect do
           GradeCalculator.recompute_final_score(@user.id, @course.id)
-        }.to change { @stale_score.reload.workflow_state }.from('active').to('deleted')
+        end.to change { @stale_score.reload.workflow_state }.from('active').to('deleted')
       end
 
       it "updates cross-shard scores" do
@@ -1774,9 +1774,9 @@ describe GradeCalculator do
 
     it "updates root_account_id on existing scores if they do not have a root_account_id set" do
       overall_course_score.update_column(:root_account_id, nil)
-      expect {
+      expect do
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
-      }.to change {
+      end.to change {
         overall_course_score.reload.root_account_id
       }.from(nil).to(@course.root_account_id)
     end
@@ -1830,9 +1830,9 @@ describe GradeCalculator do
       it "updates root_account_id on existing scores if they do not have a root_account_id set" do
         score = student_scores.first
         score.update_column(:root_account_id, nil)
-        expect {
+        expect do
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
-        }.to change { score.reload.root_account_id }.from(nil).to(@course.root_account_id)
+        end.to change { score.reload.root_account_id }.from(nil).to(@course.root_account_id)
       end
 
       it "activates previously soft deleted assignment group scores when updating them" do

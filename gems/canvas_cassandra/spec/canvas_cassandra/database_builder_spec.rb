@@ -58,7 +58,7 @@ describe CanvasCassandra::DatabaseBuilder do
 
   describe ".from_config" do
     it "boots a DB instance from config" do
-      allow(CassandraCQL::Database).to receive(:new).and_return(double())
+      allow(CassandraCQL::Database).to receive(:new).and_return(double)
       db = CanvasCassandra::DatabaseBuilder.from_config("foobars")
       expect(@logger_obj.logs[0]).to be_nil
       expect(db).to be_a(CanvasCassandra::Database)

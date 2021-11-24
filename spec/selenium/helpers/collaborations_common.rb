@@ -57,7 +57,7 @@ module CollaborationsCommon
   # execute_script - Boolean flag to override window.confirm (default: false).
   #
   # Returns nothing.
-  def validate_collaborations(urls = %W{/courses/#{@course.id}/collaborations},
+  def validate_collaborations(urls = %W[/courses/#{@course.id}/collaborations],
                               form_visible = true,
                               execute_script = false)
     Array(urls).each do |url|

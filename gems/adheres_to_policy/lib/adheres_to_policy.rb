@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'active_support'
+require "active_support/core_ext/object/blank"
 
 module AdheresToPolicy
   require 'adheres_to_policy/cache'

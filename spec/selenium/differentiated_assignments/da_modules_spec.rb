@@ -86,19 +86,19 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         da_module_setup
       end
 
-      it "does not show inaccessible module items", priority: "1", test_id: 135291 do
+      it "does not show inaccessible module items", priority: "1" do
         create_section_overrides(@section1)
         get "/courses/#{@course.id}/modules"
         expect_module_to_not_have_items(@module)
       end
 
-      it "displays module items with overrides", priority: "1", test_id: 135292 do
+      it "displays module items with overrides", priority: "1" do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end
 
-      it "shows module items with graded submissions", priority: "1", test_id: 135293 do
+      it "shows module items with graded submissions", priority: "1" do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)

@@ -111,7 +111,7 @@ describe BrandableCSS do
   end
 
   [true, false].each do |high_contrast|
-    ['js', 'json', 'css'].each do |type|
+    %w[js json css].each do |type|
       describe "save_default!(#{type})" do
         it "writes the default json representation to the default json file" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
@@ -147,7 +147,7 @@ describe BrandableCSS do
 
   describe 'font_path_cache' do
     it 'creates the cache' do
-      BrandableCSS.font_path_cache()
+      BrandableCSS.font_path_cache
       expect(BrandableCSS.instance_variable_get(:@decorated_font_paths)).not_to be_nil
     end
 

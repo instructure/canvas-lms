@@ -40,11 +40,11 @@ module DataFixup::DeleteExtraPlaceholderSubmissions
         edd = EffectiveDueDates.for_course(course).filter_students_to(batch_student_ids)
         course_assignment_ids.each do |assignment_id|
           deletable_student_ids = batch_student_ids - edd.find_effective_due_dates_for_assignment(assignment_id).keys
-          unless deletable_student_ids.blank?
-            Submission.active
-                      .where(assignment_id: assignment_id, user_id: deletable_student_ids)
-                      .update_all(workflow_state: :deleted)
-          end
+          next if deletable_student_ids.blank?
+
+          Submission.active
+                    .where(assignment_id: assignment_id, user_id: deletable_student_ids)
+                    .update_all(workflow_state: :deleted)
         end
       end
     end

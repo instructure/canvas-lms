@@ -24,11 +24,11 @@ class Alert < ActiveRecord::Base
 
   serialize :recipients
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :criteria
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :criteria, presence: true
   validates_associated :criteria
-  validates_presence_of :recipients
+  validates :recipients, presence: true
 
   before_save :infer_defaults
 
@@ -40,15 +40,15 @@ class Alert < ActiveRecord::Base
     include_student = false
     include_teachers = false
     admin_role_ids = []
-    self.recipients.try(:each) do |recipient|
-      case
-      when recipient == :student
+    recipients.try(:each) do |recipient|
+      case recipient
+      when :student
         include_student = true
-      when recipient == :teachers
+      when :teachers
         include_teachers = true
-      when recipient.is_a?(String)
+      when String
         admin_role_ids << find_role_by_name(recipient).id
-      when recipient.is_a?(Hash)
+      when Hash
         admin_role_ids << recipient[:role_id]
       else
         raise "Unsupported recipient type!"
@@ -66,14 +66,15 @@ class Alert < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.repetition = nil if self.repetition.blank?
+    self.repetition = nil if repetition.blank?
   end
 
   def as_json(**)
-    converted_recipients = self.recipients.to_a.map do |recipient|
-      if recipient.is_a?(String)
+    converted_recipients = recipients.to_a.map do |recipient|
+      case recipient
+      when String
         find_role_by_name(recipient).id
-      elsif recipient.is_a?(Hash)
+      when Hash
         recipient[:role_id]
       else
         ":#{recipient}"
@@ -92,14 +93,14 @@ class Alert < ActiveRecord::Base
       values = values.map do |params|
         if params[:id].present?
           id = params.delete(:id).to_i
-          criterion = self.criteria.to_ary.find { |c| c.id == id }
+          criterion = criteria.to_ary.find { |c| c.id == id }
           criterion.attributes = params
         else
-          criterion = self.criteria.build(params)
+          criterion = criteria.build(params)
         end
         criterion
       end
     end
-    self.criteria.replace(values)
+    criteria.replace(values)
   end
 end

@@ -36,13 +36,13 @@ describe "Gradebook" do
       Gradebook.visit(@course)
     end
 
-    it 'is maintained in editable mode', priority: '1', test_id: 3426618 do
+    it 'is maintained in editable mode', priority: '1' do
       Gradebook::Cells.grading_cell(@students[0], @assignment).click
       title = f("#{Gradebook::Cells.grading_cell_selector(@students[0], @assignment)} title")
       expect(title.attribute(:innerHTML)).to eq 'Complete'
     end
 
-    it 'is maintained on page refresh post grade update', priority: '1', test_id: 3435317 do
+    it 'is maintained on page refresh post grade update', priority: '1' do
       Gradebook::Cells.select_complete_incomplete_grade(@students[0], @assignment, 'Incomplete')
       refresh_page
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq 'Incomplete'

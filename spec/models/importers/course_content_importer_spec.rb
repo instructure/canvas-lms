@@ -23,7 +23,7 @@ require_relative '../../import_helper'
 describe Course do
   describe "import_content" do
     before(:once) do
-      @course = course_factory()
+      @course = course_factory
     end
 
     it "imports a whole json file" do
@@ -75,7 +75,7 @@ describe Course do
 
       # discussion topic tests
       expect(@course.discussion_topics.length).to eq(3)
-      migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
+      migration_ids = %w[1864019689002 1865116155002 4488523052421].sort
       added_migration_ids = @course.discussion_topics.map(&:migration_id).uniq.sort
       expect(added_migration_ids).to eq(migration_ids)
       topic = @course.discussion_topics.where(migration_id: "1864019689002").first
@@ -114,7 +114,7 @@ describe Course do
       @course.reload
       expect(@course.assignments.length).to eq 4
       expect(@course.assignments.map(&:migration_id).sort).to(
-        eq(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
+        eq(%w[1865116155002 1865116014002 4407365899221 4469882339231].sort)
       )
       # assignment with due date
       assignment = @course.assignments.where(migration_id: "1865116014002").first
@@ -535,12 +535,12 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
 
     it "can insert items from one module to an existing module" do
       migration = @course.content_migrations.build
-      @params["copy"].merge!("context_modules" => { "1864019962002" => true })
+      @params["copy"]["context_modules"] = { "1864019962002" => true }
       migration.migration_settings[:migration_ids_to_import] = @params
       migration.migration_settings[:insert_into_module_id] = @module.id
       migration.save!
@@ -559,7 +559,7 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(Assignment ContextModuleSubHeader))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[Assignment ContextModuleSubHeader])
     end
 
     it "respects insert_into_module_type" do
@@ -570,7 +570,7 @@ describe Course do
       migration.migration_settings[:insert_into_module_type] = 'assignment'
       migration.save!
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
   end
 
@@ -627,7 +627,7 @@ describe Course do
 end
 
 def from_file_path(path, course)
-  list = path.split("/").select { |f| !f.empty? }
+  list = path.split("/").reject(&:empty?)
   filename = list.pop
   folder = Folder.assert_path(list.join('/'), course)
   file = folder.file_attachments.build(:display_name => filename, :filename => filename, :content_type => "text/plain")

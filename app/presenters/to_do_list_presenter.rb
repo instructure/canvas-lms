@@ -36,9 +36,9 @@ class ToDoListPresenter
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
-      @needs_reviewing = assessment_requests.map do |ar|
+      @needs_reviewing = assessment_requests.filter_map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
-      end.compact
+      end
 
       # we need a complete list of courses first because we only care about the courses
       # from the assignments involved. not just the contexts handed in.
@@ -46,11 +46,13 @@ class ToDoListPresenter
         @needs_submitting.map(&:context) + @needs_reviewing.map(&:context)).uniq
       course_to_permissions = @user.precalculate_permissions_for_courses(deduped_courses, [:manage_grades])
 
-      @needs_grading = @needs_grading.select { |assignment|
-        course_to_permissions ?
-          course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false) :
+      @needs_grading = @needs_grading.select do |assignment|
+        if course_to_permissions
+          course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false)
+        else
           assignment.context.grants_right?(@user, :manage_grades)
-      }
+        end
+      end
     else
       @needs_grading = []
       @needs_moderation = []
@@ -262,8 +264,7 @@ class ToDoListPresenter
       I18n.t('Ignore %{assignment}', :assignment => @assignment.title)
     end
 
-    def ignore_flash_message
-    end
+    def ignore_flash_message; end
 
     def submission_author_name
       @view.submission_author_name_for(@assessment_request, "#{I18n.t('user')}: ")

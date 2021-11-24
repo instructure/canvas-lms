@@ -253,8 +253,8 @@ describe SubmissionsController do
       expect(assigns[:submission].submission_type).to eql("online_upload")
       expect(assigns[:submission].attachments).not_to be_empty
       expect(assigns[:submission].attachments.length).to eql(2)
-      expect(assigns[:submission].attachments.map { |a| a.display_name }).to be_include("doc.doc")
-      expect(assigns[:submission].attachments.map { |a| a.display_name }).to be_include("txt.txt")
+      expect(assigns[:submission].attachments.map(&:display_name)).to be_include("doc.doc")
+      expect(assigns[:submission].attachments.map(&:display_name)).to be_include("txt.txt")
     end
 
     it "fails but not raise when the submission is invalid" do
@@ -590,7 +590,7 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))
@@ -615,7 +615,7 @@ describe SubmissionsController do
       end
 
       it "gracefully reports a gdrive timeout" do
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))
@@ -630,7 +630,7 @@ describe SubmissionsController do
       end
 
       it "gracefully reports an invalid entry" do
-        mock_user_service = double()
+        mock_user_service = double
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive")
                                                     .and_return(double(first: double(token: "token", secret: "secret")))
@@ -762,7 +762,7 @@ describe SubmissionsController do
         assignment = course.assignments.create!(
           title: "some assignment",
           submission_types: "online_url",
-          due_at: 1.days.ago
+          due_at: 1.day.ago
         )
 
         post 'create', params: {
@@ -1084,12 +1084,12 @@ describe SubmissionsController do
       context 'when there are multiple originality reports' do
         let(:submission2) { assignment.submit_homework(test_student, body: 'hello world') }
         let(:report_url2) { 'http://www.another-test-score.com/' }
-        let(:originality_report2) {
+        let(:originality_report2) do
           OriginalityReport.create!(attachment: nil,
                                     submission: submission2,
                                     originality_score: 0.4,
                                     originality_report_url: report_url2)
-        }
+        end
 
         it 'can use attempt number to find the report url for text entry submissions' do
           originality_report2 # Create immediately

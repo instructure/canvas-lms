@@ -174,16 +174,16 @@ describe "Enrollment::BatchStateUpdater" do
           MicrosoftSync::Group.create!(course: course2)
           MicrosoftSync::Group.create!(course: course3)
 
-          expect {
+          expect do
             Enrollment::BatchStateUpdater.sync_microsoft_group([course2, course3], @course.root_account)
-          }.to change { Delayed::Job.count }.by 2
+          end.to change { Delayed::Job.count }.by 2
         end
       end
     end
   end
 
   it 'accounts for all enrollment callbacks in Enrollment::BatchStateUpdater.destroy_batch' do
-    accounted_for_callbacks = %i(
+    accounted_for_callbacks = %i[
       add_to_favorites_later
       assign_uuid
       audit_groups_for_deleted_enrollments
@@ -214,7 +214,7 @@ describe "Enrollment::BatchStateUpdater" do
       update_assignment_overrides_if_needed
       update_linked_enrollments
       update_user_account_associations_if_necessary
-    )
+    ]
     expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
   end
 end

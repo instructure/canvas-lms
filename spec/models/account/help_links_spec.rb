@@ -34,7 +34,7 @@ describe Account::HelpLinks do
 
     it 'reorders featured links to the front' do
       links = [{ id: 'a', is_featured: false }, { id: 'b', is_featured: false }, { id: 'c', is_featured: true }, { id: 'd', is_featured: false }]
-      expect(subject.instantiate_links(links).pluck(:id)).to eq ['c', 'a', 'b', 'd']
+      expect(subject.instantiate_links(links).pluck(:id)).to eq %w[c a b d]
     end
   end
 
@@ -131,7 +131,7 @@ describe Account::HelpLinks do
     it 'does not return a link for covid resources' do
       Account.site_admin.disable_feature! :featured_help_links
       links = account.help_links
-      link_ids = links.map { |link| link[:id] }
+      link_ids = links.pluck(:id)
       expect(link_ids).not_to include(:covid)
     end
   end

@@ -776,9 +776,9 @@ describe Quizzes::QuizSubmission do
       it "does not update the posted_at date of already-posted submissions" do
         submission.update!(posted_at: 1.day.ago)
 
-        expect {
+        expect do
           save_quiz_submission
-        }.not_to change { submission.reload.posted_at }
+        end.not_to change { submission.reload.posted_at }
       end
     end
 
@@ -1247,7 +1247,7 @@ describe Quizzes::QuizSubmission do
         first_attempt = attempts.first
         expect(first_attempt).to be_a(Quizzes::QuizSubmissionAttempt)
 
-        expect(attempts.last_versions.map { |version| version.number }).to eq [2, 3]
+        expect(attempts.last_versions.map(&:number)).to eq [2, 3]
       end
     end
 
@@ -1355,6 +1355,7 @@ describe Quizzes::QuizSubmission do
         end
       end
     end
+
     describe "#needs_grading" do
       before :once do
         student_in_course
@@ -1985,9 +1986,9 @@ describe Quizzes::QuizSubmission do
 
       it "does not remove the score or kept_score fields" do
         json = { "id" => 1, "kept_score" => 10, "score" => 10 }
-        expect {
+        expect do
           practice_quiz_submission.filter_attributes_for_user(json, student, nil)
-        }.not_to change {
+        end.not_to change {
           json
         }
       end
@@ -2006,9 +2007,9 @@ describe Quizzes::QuizSubmission do
 
       it "keeps the score and kept_score fields when the user can see the grade" do
         json = { "id" => 1, "kept_score" => 10, "score" => 10 }
-        expect {
+        expect do
           quiz_submission.filter_attributes_for_user(json, teacher, nil)
-        }.not_to change {
+        end.not_to change {
           json
         }
       end
@@ -2017,9 +2018,9 @@ describe Quizzes::QuizSubmission do
     context "when the quiz submission is posted to the student" do
       it "always keeps the score and kept_score fields" do
         json = { "id" => 1, "kept_score" => 10, "score" => 10 }
-        expect {
+        expect do
           quiz_submission.filter_attributes_for_user(json, student, nil)
-        }.not_to change {
+        end.not_to change {
           json
         }
       end

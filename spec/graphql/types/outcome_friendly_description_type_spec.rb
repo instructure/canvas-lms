@@ -26,20 +26,20 @@ describe Types::OutcomeFriendlyDescriptionType do
     account_admin_user
   end
 
-  let(:outcome) {
+  let(:outcome) do
     outcome_model
-  }
+  end
 
   let(:description) { "Friendly Description" }
   let(:context) { Account.default }
 
-  let(:outcome_friendly_description) {
+  let(:outcome_friendly_description) do
     OutcomeFriendlyDescription.create!(
       learning_outcome: outcome,
       context: context,
       description: description
     )
-  }
+  end
   let(:graphql_context) { { current_user: @user } }
   let(:outcome_friendly_description_type) { GraphQLTypeTester.new(outcome_friendly_description, graphql_context) }
 

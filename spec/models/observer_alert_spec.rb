@@ -58,7 +58,7 @@ describe ObserverAlert do
 
   describe 'course_grade alerts' do
     before :once do
-      course_with_teacher()
+      course_with_teacher
       observer_alert_threshold_model(course: @course, alert_type: 'course_grade_low', threshold: 50)
       @threshold1 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_high', threshold: 80)
       @student1 = @student
@@ -118,7 +118,7 @@ describe ObserverAlert do
     end
 
     it 'doesnt create an alert for courses the user is not enrolled in' do
-      course_with_teacher()
+      course_with_teacher
       course_with_student(course: @course)
       assignment = assignment_model(context: @course, points_possible: 100)
 
@@ -206,7 +206,7 @@ describe ObserverAlert do
 
   describe 'create_assignment_missing_alerts' do
     before :once do
-      @course = course_factory()
+      @course = course_factory
       @student1 = student_in_course(active_all: true, course: @course).user
       @observer1 = course_with_observer(course: @course, associated_user_id: @student1.id, active_all: true).user
       observer_alert_threshold_model(student: @student1, observer: @observer1, alert_type: 'assignment_missing')
@@ -263,7 +263,7 @@ describe ObserverAlert do
     end
 
     it 'doesnt create an alert if the assignment is not published' do
-      @course = course_factory()
+      @course = course_factory
       @student = student_in_course(active_all: true, course: @course).user
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
       ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: 'assignment_missing')
@@ -315,18 +315,18 @@ describe ObserverAlert do
       end
 
       it "creates an alert for submissions manually marked as missing when the assignment has no due date" do
-        expect {
+        expect do
           ObserverAlert.create_assignment_missing_alerts
-        }.to change {
+        end.to change {
           ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
         }.by(1)
       end
 
       it "does not create an alert for missing submissions if one has already been created" do
         ObserverAlert.create_assignment_missing_alerts
-        expect {
+        expect do
           ObserverAlert.create_assignment_missing_alerts
-        }.not_to change {
+        end.not_to change {
           ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
         }
       end
@@ -339,9 +339,9 @@ describe ObserverAlert do
       ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: 'assignment_missing')
 
       course.assignments.create!(title: 'missing', due_at: 1.hour.ago, submission_types: 'online_text_entry')
-      expect {
+      expect do
         ObserverAlert.create_assignment_missing_alerts
-      }.to change {
+      end.to change {
         ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
       }.by(1)
     end
@@ -353,9 +353,9 @@ describe ObserverAlert do
       ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: 'assignment_missing')
 
       course.assignments.create!(title: 'missing', due_at: 2.days.ago, submission_types: 'online_text_entry')
-      expect {
+      expect do
         ObserverAlert.create_assignment_missing_alerts
-      }.not_to change {
+      end.not_to change {
         ObserverAlert.where(student: student, alert_type: 'assignment_missing').count
       }
     end

@@ -119,7 +119,7 @@ describe Types::LearningOutcomeGroupType do
       user_model
     end
 
-    it "returns " do
+    it "returns" do
       expect(outcome_group_type.resolve("_id")).to be_nil
     end
   end

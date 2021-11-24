@@ -62,7 +62,7 @@ module Lti
       end
 
       it 'creates subscriptions' do
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_successful
@@ -80,7 +80,7 @@ module Lti
 
       it 'renders 401 if Lti::ToolProxy#active_in_context? does not return true' do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
@@ -88,14 +88,14 @@ module Lti
 
       it 'gives error message if Lti::ToolProxy#active_in_context? does not return true' do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
       it 'requires JWT Access token' do
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }
         expect(response).to be_unauthorized
@@ -103,7 +103,7 @@ module Lti
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response.status).to eq 500
@@ -111,7 +111,7 @@ module Lti
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
@@ -121,7 +121,7 @@ module Lti
     describe '#destroy' do
       before do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: delete_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
       end
 
@@ -159,7 +159,7 @@ module Lti
 
     describe '#show' do
       before do
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
       end
 
@@ -198,7 +198,7 @@ module Lti
     describe '#update' do
       before do
         allow(subscription_service).to receive_messages(update_tool_proxy_subscription: ok_response)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
       end
 
@@ -229,7 +229,7 @@ module Lti
 
       it 'renders 401 if Lti::ToolProxy#active_in_context? does not return true' do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
@@ -237,7 +237,7 @@ module Lti
 
       it 'gives error message if Lti::ToolProxy#active_in_context? does not return true' do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
@@ -263,7 +263,7 @@ module Lti
 
     describe '#index' do
       before do
-        tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+        tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
       end
 

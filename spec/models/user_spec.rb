@@ -19,7 +19,7 @@
 #
 
 require 'rotp'
-
+require 'timecop'
 require_relative '../helpers/k5_common'
 
 describe User do
@@ -43,6 +43,27 @@ describe User do
         user
         user.short_name = "chewie"
         expect(user).to be_valid
+      end
+    end
+  end
+
+  describe "notifications" do
+    describe "#daily_notification_time" do
+      it "returns the users 6pm local time" do
+        Time.use_zone('UTC') do
+          @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Central Time (US & Canada)' }
+          # set up user in central time (different than the specific time zones
+          # referenced in set_send_at)
+          @account = Account.create!(:name => 'new acct')
+          @user = user_with_pseudonym(:account => @account)
+          @user.time_zone = @central.name
+          @user.pseudonym.update_attribute(:account, @account)
+          @user.save
+
+          Timecop.freeze(Time.zone.local(2021, 9, 22, 1, 0, 0)) do
+            expect(@user.daily_notification_time).to  eq(@central.now.change(:day => 22, :hour => 18))
+          end
+        end
       end
     end
   end
@@ -261,9 +282,9 @@ describe User do
     end
 
     let(:context_keys) do
-      @contexts.map { |context|
+      @contexts.map do |context|
         StreamItemCache.recent_stream_items_key(@teacher, context.class.base_class.name, context.id)
-      }
+      end
     end
 
     it "creates cache keys for each context" do
@@ -422,9 +443,9 @@ describe User do
 
     context 'when there is a single root account association' do
       it 'updates root_account_ids with the root account' do
-        expect {
+        expect do
           user.update_root_account_ids
-        }.to change {
+        end.to change {
           user.root_account_ids
         }.from([]).to([root_account.global_id])
       end
@@ -435,9 +456,9 @@ describe User do
         before { communication_channel.update(root_account_ids: nil) }
 
         it 'updates root_account_ids on associated communication channels' do
-          expect {
+          expect do
             user.update_root_account_ids
-          }.to change {
+          end.to change {
             user.communication_channels.first.root_account_ids
           }.from([]).to([root_account.id])
         end
@@ -459,9 +480,9 @@ describe User do
       end
 
       it 'updates root_account_ids with all root accounts' do
-        expect {
+        expect do
           user.update_root_account_ids
-        }.to change {
+        end.to change {
           user.root_account_ids&.sort
         }.from([]).to(
           [root_account.id, shard_two_root_account.global_id].sort
@@ -476,7 +497,7 @@ describe User do
       expect(user.user_account_associations).to eq []
       account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
-      sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
+      sort_account_associations = ->(a, b) { a.keys.first <=> b.keys.first }
 
       User.update_account_associations([user], :incremental => true, :precalculated_associations => { account1.id => 0 })
       expect(user.user_account_associations.reload.map { |aa| { aa.account_id => aa.depth } }).to eq [{ account1.id => 0 }]
@@ -785,16 +806,16 @@ describe User do
         observer_enrollment2.save!
 
         @teacher_course = course_factory(:course_name => "English ", :active_course => true)
-        teacher_entollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
-        teacher_entollment.save!
+        teacher_enrollment = @teacher_course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+        teacher_enrollment.save!
 
         @student_course = course_factory(:course_name => "Leadership", :active_course => true)
-        teacher_entollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-        teacher_entollment.save!
+        student_enrollment = @student_course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+        student_enrollment.save!
       end
 
       it "returns observed courses related to the associated_user" do
-        expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student.id)
+        expect(@observer.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student)
         .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
           [@observer_course2.id, 'ObserverEnrollment'],
           [@observer_course.id, 'ObserverEnrollment']
@@ -803,11 +824,38 @@ describe User do
 
       it "returns only own courses if the associated_user is the current user" do
         expect(@observer
-        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer.id)
+        .courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @observer)
         .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
           [@teacher_course.id, 'TeacherEnrollment'],
           [@student_course.id, 'StudentEnrollment']
         ]
+      end
+
+      describe "with cross sharding" do
+        specs_require_sharding
+
+        before(:once) do
+          @shard2.activate do
+            account = Account.create!
+            course_with_teacher(account: account, active_all: true)
+
+            observer_enrollment = @observer_course.enroll_user(@teacher, 'ObserverEnrollment', :enrollment_state => 'active')
+            observer_enrollment.associated_user_id = @student.id
+            observer_enrollment.save!
+          end
+        end
+
+        it "returns the user's courses across shards when they are the observee" do
+          own_courses = @teacher.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @teacher)
+          expect(own_courses.count).to be 1
+          expect(own_courses.first.id).to be @course.id
+        end
+
+        it "returns the observer's courses across shards when observing someone else" do
+          observed_courses = @teacher.courses_with_primary_enrollment(:current_and_invited_courses, nil, :observee_user => @student)
+          expect(observed_courses.count).to be 1
+          expect(observed_courses.first.id).to be @observer_course.id
+        end
       end
     end
 
@@ -1357,9 +1405,9 @@ describe User do
       end
 
       it "optionally shows pending enrollments in unpublished courses" do
-        course_factory()
+        course_factory
         teacher_in_course(:active_all => true)
-        student_in_course()
+        student_in_course
         expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string).map(&:id)).to include @student.id
       end
     end
@@ -1375,7 +1423,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
 
     it "includes configured external tools" do
@@ -1385,7 +1433,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:href]).to eq :user_external_tool_path
       expect(tab[:args]).to eq [@user.id, tool.id]
@@ -1439,7 +1487,7 @@ describe User do
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "does not allow external  urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
+    it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'https://3510111291#sdf.instructure.com/image' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
@@ -1556,12 +1604,12 @@ describe User do
       expect(User.name_parts('John St. Clair')).to eq ['John St.', 'Clair', nil]
       expect(User.name_parts('Jefferson Thomas Cutrer IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Jefferson Thomas Cutrer, IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
-      expect(User.name_parts('Cutrer, Jefferson, IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson, IV')).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts('Cutrer, Jefferson, IV',
-                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
-      expect(User.name_parts('Cutrer, Jefferson IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+                             likely_already_surname_first: true)).to eq %w[Jefferson Cutrer IV]
+      expect(User.name_parts('Cutrer, Jefferson IV')).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts('Cutrer, Jefferson IV',
-                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
+                             likely_already_surname_first: true)).to eq %w[Jefferson Cutrer IV]
       expect(User.name_parts(nil)).to eq [nil, nil, nil]
       expect(User.name_parts('Bob')).to eq ['Bob', nil, nil]
       expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
@@ -2090,9 +2138,9 @@ describe User do
       end
 
       it "doesn't show unpublished assignments" do
-        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.day.from_now)
         assignment.unpublish
-        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.day.from_now)
         assignment2.publish
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2
@@ -2224,12 +2272,13 @@ describe User do
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
 
-    it " should return '0' for an invalid user id" do
+    it "returns '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
       expect(User.avatar_key(0)).to eq "0"
     end
   end
+
   describe "user_id_from_avatar_key" do
     it "returns a valid user id for a valid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0, 10]}")).to eq '1'
@@ -2291,7 +2340,7 @@ describe User do
     end
 
     it "breaks ties with user id" do
-      ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
+      ids = Array.new(5) { User.create!(:name => "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
     end
 
@@ -2713,37 +2762,37 @@ describe User do
     end
 
     describe ":reset_mfa" do
-      let(:account1) {
+      let(:account1) do
         a = Account.default
         a.settings[:admins_can_view_notifications] = true
         a.save!
         a
-      }
+      end
       let(:account2) { Account.create! }
 
-      let(:sally) {
+      let(:sally) do
         account_admin_user(
           user: student_in_course(account: account2).user,
           account: account1
         )
-      }
+      end
 
-      let(:bob) {
+      let(:bob) do
         student_in_course(
           user: student_in_course(account: account2).user,
           course: course_factory(account: account1)
         ).user
-      }
+      end
 
       let(:charlie) { student_in_course(account: account1).user }
 
-      let(:alice) {
+      let(:alice) do
         account_admin_user_with_role_changes(
           account: account1,
           role: custom_account_role('StrongerAdmin', account: account1),
           role_changes: { view_notifications: true }
         )
-      }
+      end
 
       it "grants non-admins :reset_mfa on themselves" do
         pseudonym(charlie, account: account1)
@@ -2803,37 +2852,37 @@ describe User do
     end
 
     describe ":merge" do
-      let(:account1) {
+      let(:account1) do
         a = Account.default
         a.settings[:admins_can_view_notifications] = true
         a.save!
         a
-      }
+      end
       let(:account2) { Account.create! }
 
-      let(:sally) {
+      let(:sally) do
         account_admin_user(
           user: student_in_course(account: account2).user,
           account: account1
         )
-      }
+      end
 
-      let(:bob) {
+      let(:bob) do
         student_in_course(
           user: student_in_course(account: account2).user,
           course: course_factory(account: account1)
         ).user
-      }
+      end
 
       let(:charlie) { student_in_course(account: account2).user }
 
-      let(:alice) {
+      let(:alice) do
         account_admin_user_with_role_changes(
           account: account1,
           role: custom_account_role('StrongerAdmin', account: account1),
           role_changes: { view_notifications: true }
         )
-      }
+      end
 
       it "grants admins :merge on themselves" do
         pseudonym(sally, account: account1)
@@ -2976,7 +3025,7 @@ describe User do
 
       it "checks for associated accounts on shards the user shares with the seeker" do
         # create target user on defualt shard
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -2988,7 +3037,7 @@ describe User do
       end
 
       it 'checks all shards, even if not actually associated' do
-        target = user_factory()
+        target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
@@ -3002,7 +3051,7 @@ describe User do
 
       it 'falls back to user shard for callsite, if no account associations found for target user' do
         account = Account.default
-        target = user_factory()
+        target = user_factory
         seeker = account_admin_user(
           account: account,
           role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id)

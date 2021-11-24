@@ -25,7 +25,7 @@ module Api::V1::AssessmentRequest
 
   def assessment_request_json(assessment_request, user, session, includes = Set.new)
     assignment = assessment_request.asset.assignment
-    json_attributes = %w(id user_id assessor_id asset_id asset_type workflow_state)
+    json_attributes = %w[id user_id assessor_id asset_id asset_type workflow_state]
     if assignment.anonymous_peer_reviews? && !assignment.grants_any_right?(user, session, :grade)
       json_attributes.delete('assessor_id')
     end

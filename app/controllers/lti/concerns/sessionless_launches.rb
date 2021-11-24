@@ -130,7 +130,7 @@ module Lti::Concerns
 
     def course_or_account_launch_link(context, tool, session_token, launch_url)
       context_type = context.class.to_s.downcase
-      self.send(
+      send(
         "#{context_type}_external_tool_url",
         context.id,
         id: tool.id,

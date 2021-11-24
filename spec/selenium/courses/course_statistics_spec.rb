@@ -31,8 +31,14 @@ describe "course statistics" do
 
   it "shows most recent logged in users" do
     pseudonym(@student1) # no login info
-    pseudonym(@student2).tap { |p| p.current_login_at = 1.days.ago; p.save! }
-    pseudonym(@student3).tap { |p| p.current_login_at = 2.days.ago; p.save! }
+    pseudonym(@student2).tap do |p|
+      p.current_login_at = 1.day.ago
+      p.save!
+    end
+    pseudonym(@student3).tap do |p|
+      p.current_login_at = 2.days.ago
+      p.save!
+    end
 
     get "/courses/#{@course.id}/statistics"
     wait_for_ajaximations

@@ -70,7 +70,7 @@ describe "dashboard" do
       expect(todo_sidebar_container).to contain_jqcss("span:contains('Nothing for now')")
     end
 
-    it "can dismiss notification from recent activity feed", priority: "1", test_id: 215577 do
+    it "can dismiss notification from recent activity feed", priority: "1" do
       go_to_recent_activity_view
       recent_activity_show_more_link.click
       recent_activity_close_announcement(@announcement1.title).click
@@ -136,7 +136,7 @@ describe "dashboard" do
       expect(todo_sidebar_container).to contain_jqcss("span:contains('Nothing for now')")
     end
 
-    it "can dismiss notification from recent activity feed", priority: "1", test_id: 215578 do
+    it "can dismiss notification from recent activity feed", priority: "1" do
       recent_activity_show_more_link.click
       recent_activity_close_announcement(@announcement1.title).click
 
@@ -172,7 +172,7 @@ describe "dashboard" do
       user_session(@teacher)
     end
 
-    it "can delete an announcement", priority: "1", test_id: 215579 do
+    it "can delete an announcement", priority: "1" do
       AnnouncementIndex.visit_announcements(@course.id)
       AnnouncementIndex.announcement_options_menu(@announcement1.title).click
       AnnouncementIndex.delete_announcement_option.click

@@ -34,7 +34,7 @@ module Lti
     end
 
     def oauth_authenticated_request?(secret)
-      !!OAuth::Signature.build(request, :consumer_secret => secret).verify()
+      !!OAuth::Signature.build(request, :consumer_secret => secret).verify
     end
 
     def oauth_consumer_key

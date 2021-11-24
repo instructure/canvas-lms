@@ -61,7 +61,7 @@ describe ConversationMessage do
       expect(message.author_short_name_with_shared_contexts(@user)).to eq message.author.short_name
     end
 
-    it "creates appropriate notifications on new message", priority: "1", test_id: 186561 do
+    it "creates appropriate notifications on new message", priority: "1" do
       message = add_message
       expect(message.messages_sent).to be_include("Conversation Message")
       expect(message.messages_sent).not_to be_include("Added To Conversation")
@@ -100,7 +100,7 @@ describe ConversationMessage do
       message_user_ids = message.messages_sent["Conversation Message"].map(&:user_id)
       expect(message_user_ids).not_to include(@teacher.id)
       expect(message_user_ids).to include(@students.first.id)
-      @students[1..-1].each do |student|
+      @students[1..].each do |student|
         expect(message_user_ids).not_to include(student.id)
       end
     end
@@ -303,7 +303,7 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      expect {
+      expect do
         cm.reply_from({
                         :purpose => 'general',
                         :user => @teacher,
@@ -311,11 +311,11 @@ describe ConversationMessage do
                         :html => "body",
                         :text => "body"
                       })
-      }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "replies only to the message author on conversations2 conversations" do
-      users = 3.times.map { course_with_student(course: @course).user }
+      users = Array.new(3) { course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
@@ -328,7 +328,7 @@ describe ConversationMessage do
                              :text => "body"
                            })
       expect(cm3.conversation_message_participants.size).to eq 2
-      expect(cm3.conversation_message_participants.map { |x| x.user_id }.sort).to eq [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [users[1].id, users[2].id].sort
     end
 
     it "marks conversations as read for the replying author" do

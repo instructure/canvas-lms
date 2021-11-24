@@ -28,7 +28,7 @@ class ImmersiveReaderController < ApplicationController
   before_action :require_config
 
   def ir_config
-    @ir_config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['immersive_reader.yml'] || '{}')
+    @ir_config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['immersive_reader.yml'] || '{}')
   end
 
   def require_config

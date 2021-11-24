@@ -47,7 +47,7 @@ module AddressBook
       end
 
       def cached?(user)
-        @entries.has_key?(key(user))
+        @entries.key?(key(user))
       end
 
       def fetch(user)
@@ -68,28 +68,28 @@ module AddressBook
       private
 
       def globalize(role_hash)
-        Hash[*role_hash.map do |id, roles|
+        Hash[*role_hash.flat_map do |id, roles|
           id = Shard.global_id_for(id) if id > 0
           [id, roles]
-        end.flatten(1)]
+        end]
       end
 
       def relativize(role_hash)
-        Hash[*role_hash.map do |id, roles|
+        Hash[*role_hash.flat_map do |id, roles|
           id = Shard.relative_id_for(id, Shard.current, Shard.current) if id > 0
           [id, roles]
-        end.flatten(1)]
+        end]
       end
     end
 
     def known_users(users, options = {})
-      uncached = users.select { |user| !cached?(user) }
+      uncached = users.reject { |user| cached?(user) }
       # flag excluded users as "not known" so we don't recheck them
       # individually in the future
       @cache.null(uncached)
       # implementation is responsible for storing known users into cache
       super(uncached, options)
-      users.map { |user| @cache.fetch(user) }.compact
+      users.filter_map { |user| @cache.fetch(user) }
     end
   end
 end

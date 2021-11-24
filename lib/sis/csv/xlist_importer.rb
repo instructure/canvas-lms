@@ -32,14 +32,13 @@ module SIS
       # possible columns:
       # xlist_course_id, section_id, status
       def process(csv, index = nil, count = nil)
-        count = SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
+        SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             importer.add_crosslist(row['xlist_course_id'], row['section_id'], row['status'])
           rescue ImportError => e
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
-        count
       end
     end
   end

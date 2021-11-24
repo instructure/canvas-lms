@@ -73,7 +73,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
 
   it 'creates a discussion entry' do
     result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey')
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
     entry = @topic.discussion_entries.last
@@ -99,7 +99,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
   it 'replies to an existing discussion entry' do
     parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic)
     result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
     entry = @topic.discussion_entries.last
@@ -112,7 +112,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
     parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
     result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
     entry = @topic.discussion_entries.last
@@ -127,7 +127,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     attachment = attachment_with_context(@student)
     attachment.update!(user: @student)
     result = run_mutation(discussion_topic_id: @topic.id, message: 'howdy', file_id: attachment.id)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
     entry = @topic.discussion_entries.last
@@ -138,7 +138,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
   context 'include reply preview' do
     it 'cannot be a root entry' do
       result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey', include_reply_preview: true)
-      expect(result.dig('errors')).to be nil
+      expect(result['errors']).to be nil
       expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
       entry = @topic.discussion_entries.last
@@ -149,7 +149,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
       root_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic)
       result = run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey', include_reply_preview: true, parent_entry_id: root_entry.id)
 
-      expect(result.dig('errors')).to be nil
+      expect(result['errors']).to be nil
       expect(result.dig('data', 'createDiscussionEntry', 'errors')).to be nil
 
       entry = @topic.discussion_entries.last

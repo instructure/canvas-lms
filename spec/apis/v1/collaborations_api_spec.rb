@@ -139,12 +139,12 @@ describe CollaborationsController, type: :request do
     end
 
     let(:url) { "/api/v1/collaborations/#{@collaboration.to_param}/members.json" }
-    let(:url_options) {
+    let(:url_options) do
       { :controller => 'collaborations',
         :action => 'members',
         :id => @collaboration.to_param,
         :format => 'json' }
-    }
+    end
 
     describe 'a group member' do
       it 'sees group members' do
@@ -159,7 +159,7 @@ describe CollaborationsController, type: :request do
 
       it 'is formatted by collaborator_json' do
         json = api_call(:get, url, url_options)
-        expect(json.first.keys.sort).to eq %w{collaborator_id id name type}
+        expect(json.first.keys.sort).to eq %w[collaborator_id id name type]
       end
 
       it 'includes groups' do

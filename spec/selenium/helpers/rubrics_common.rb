@@ -100,11 +100,11 @@ module RubricsCommon
     rating = ffj(".rubric .criterion:visible .rating")[idx]
     driver.action.move_to(rating).perform
 
-    driver.execute_script <<-JS
-              var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
-              $rating.addClass('add_column add_left');
-              $rating.prev().addClass('add_right');
-              $rating.click();
+    driver.execute_script <<~JS
+      var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
+      $rating.addClass('add_column add_left');
+      $rating.prev().addClass('add_right');
+      $rating.click();
     JS
   end
 

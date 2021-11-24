@@ -188,7 +188,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(psh3).to receive(:destroy_subscription).with('subscription_id3').once
       DataFixup::CreateSubscriptionsForPlagiarismTools.recreate_subscriptions
 
-      expect([tool_proxy.reload.subscription_id, tp2.reload.subscription_id, tp3.reload.subscription_id]).to eq(['id1', 'id2', 'id3'])
+      expect([tool_proxy.reload.subscription_id, tp2.reload.subscription_id, tp3.reload.subscription_id]).to eq(%w[id1 id2 id3])
     end
   end
 end

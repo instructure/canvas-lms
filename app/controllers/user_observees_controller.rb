@@ -126,7 +126,7 @@ class UserObserveesController < ApplicationController
     if params[:access_token]
       verified_token = AccessToken.authenticate(params[:access_token])
       if verified_token.nil?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
         return
       end
       @student = verified_token.user
@@ -134,7 +134,7 @@ class UserObserveesController < ApplicationController
     elsif params[:pairing_code]
       code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
-        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: :unprocessable_entity
         return
       end
       @student = code.user
@@ -145,7 +145,7 @@ class UserObserveesController < ApplicationController
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
         return
       end
 
@@ -261,9 +261,11 @@ class UserObserveesController < ApplicationController
   #
   # @returns User
   def destroy
-    scope = observer == @current_user ?
-      observer.as_observer_observation_links.where(student: student) :
-      observer.as_observer_observation_links.where(student: student).for_root_accounts(@accounts_with_observer_permissions)
+    scope = if observer == @current_user
+              observer.as_observer_observation_links.where(student: student)
+            else
+              observer.as_observer_observation_links.where(student: student).for_root_accounts(@accounts_with_observer_permissions)
+            end
     raise ActiveRecord::RecordNotFound unless scope.exists?
 
     scope.destroy_all
@@ -346,7 +348,7 @@ class UserObserveesController < ApplicationController
   end
 
   def root_account_for_new_link
-    if %w{create update}.include?(action_name)
+    if %w[create update].include?(action_name)
       case params[:root_account_id]
       when "all"
         nil

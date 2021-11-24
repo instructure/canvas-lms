@@ -91,7 +91,7 @@ shared_examples_for "lti services" do
     context 'with site admin developer key' do
       context 'when LTI 1.3 feature is allowed' do
         let(:before_send_request) do
-          -> do
+          lambda do
             developer_key.update!(account: nil)
           end
         end
@@ -114,7 +114,7 @@ shared_examples_for "lti services" do
     context 'with system failure during access token validation' do
       let(:jwt_validator) { instance_double(Canvas::Security::JwtValidator) }
       let(:before_send_request) do
-        -> do
+        lambda do
           allow(Canvas::Security::JwtValidator).to receive(:new).and_return(jwt_validator)
           expect(jwt_validator).to receive(:valid?).and_raise(StandardError)
         end
@@ -174,7 +174,7 @@ shared_examples_for "lti services" do
     end
 
     context 'with missing access token claims' do
-      let(:access_token_jwt_hash) { super().delete_if { |k| %i(sub aud exp iat jti iss).include?(k) } }
+      let(:access_token_jwt_hash) { super().delete_if { |k| %i[sub aud exp iat jti iss].include?(k) } }
 
       it_behaves_like 'mime_type check'
 
@@ -229,7 +229,7 @@ shared_examples_for "lti services" do
 
     context 'with inactive developer key' do
       let(:before_send_request) do
-        -> do
+        lambda do
           developer_key.workflow_state = :inactive
           developer_key.save!
         end

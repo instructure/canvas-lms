@@ -53,7 +53,7 @@ describe "new account user search" do
       visit_users(@account)
     end
 
-    it "brings up user page when clicking name", priority: "1", test_id: 3399648 do
+    it "brings up user page when clicking name", priority: "1" do
       click_user_link(@user.sortable_name)
       expect(f("#content h2")).to include_text @user.name
     end
@@ -63,17 +63,17 @@ describe "new account user search" do
       expect(edit_full_name_input.attribute('value')).to eq(@user.name)
     end
 
-    it "opens the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
+    it "opens the act as page when clicking the masquerade button", priority: "1" do
       click_masquerade_button(@user.name)
       expect(act_as_label).to include_text @user.name
     end
 
-    it "opens the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
+    it "opens the conversation page when clicking the send message button", priority: "1" do
       click_message_button(@user.name)
       expect(message_recipient_input).to include_text @user.name
     end
 
-    it "searches but not find bogus user", priority: "1", test_id: 3399649 do
+    it "searches but not find bogus user", priority: "1" do
       enter_search('jtsdumbthing')
       expect(f('#content h2')).to include_text('No users found')
       expect(results_body).not_to contain_css(results_row)
@@ -194,7 +194,7 @@ describe "new account user search" do
       expect(full_name_input.attribute('value')).to eq('')
     end
 
-    it "is able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
+    it "is able to create users with confirmation disabled", priority: "1" do
       name = 'Confirmation Disabled'
       email = 'someemail@example.com'
       visit_users(@account)

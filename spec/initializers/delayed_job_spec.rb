@@ -27,10 +27,10 @@ describe 'Delayed::Job' do
     it "keeps track of the current shard on child jobs" do
       shard = @shard1 || Shard.default
       shard.activate do
-        Delayed::Batch.serial_batch {
+        Delayed::Batch.serial_batch do
           expect("string".delay(ignore_transaction: true).size).to be true
           expect("string".delay(ignore_transaction: true).gsub(/./, "!")).to be true
-        }
+        end
       end
       job = Delayed::Job.find_available(1).first
       expect(job.current_shard).to eq shard

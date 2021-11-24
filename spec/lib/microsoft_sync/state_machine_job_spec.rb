@@ -68,7 +68,7 @@ module MicrosoftSync
         StateMachineJob::Retry.new(
           error: StandardError.new('foo'),
           delay_amount: 2.seconds,
-          job_state_data: 'retry2',
+          job_state_data: 'retry2'
         )
       when ['retry2', nil]
         StateMachineJob::NextStep.new(:step_second, 'first_data')
@@ -116,8 +116,7 @@ module MicrosoftSync
 
     # Used as a helper to enqueue actual delayed jobs
     def direct_enqueue_run(run_at, step, initial_mem_state)
-      StateMachineJob.instance_method(:delay).bind(self)
-                     .call(sender: self, strand: strand, run_at: run_at)
+      StateMachineJob.instance_method(:delay).bind_call(self, sender: self, strand: strand, run_at: run_at)
                      .run(step, initial_mem_state)
     end
 
@@ -634,9 +633,9 @@ module MicrosoftSync
               { tags: { type: 'microsoft_sync_smj' } },
               :error
             )
-            expect {
+            expect do
               subject.send(:run, :step_initial, nil)
-            }.to raise_error(StateMachineJob::InternalError, /Job step doesn't match state: :step_initial != nil/)
+            end.to raise_error(StateMachineJob::InternalError, /Job step doesn't match state: :step_initial != nil/)
           end
         end
 
@@ -695,7 +694,7 @@ module MicrosoftSync
               it_behaves_like 'restarting when a retrying job has stalled'
             end
 
-            context "when the retrying job's run_at is after 1 day in the past " do
+            context "when the retrying job's run_at is after 1 day in the past" do
               let(:retrying_job_run_at) { (1.day - 1.second).ago }
 
               it 'enqueues a new job' do

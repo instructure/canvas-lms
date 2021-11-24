@@ -22,6 +22,7 @@ analytics_2:
       to ON. For full details, please see the *New Analytics user group* in the Canvas
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
+  beta: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
@@ -44,7 +45,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-  beta: true
 commons_favorites:
   state: hidden
   applies_to: RootAccount
@@ -77,7 +77,6 @@ disable_alert_timeouts:
       Enabling this feature gets rid of the timeout for alert notifications that pop up, giving the
       user as much time as they need to read the notification over and dismiss it when they are finished.
   applies_to: User
-  autoexpand: true
 disable_celebrations:
   type: setting
   state: hidden
@@ -95,7 +94,6 @@ disable_keyboard_shortcuts:
     Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
     will have an improved experience with these shortcuts turned off.
   applies_to: User
-  autoexpand: true
 disable_lti_post_only:
   state: hidden
   display_name: Don't Move LTI Query Params to POST Body
@@ -103,7 +101,6 @@ disable_lti_post_only:
     an LTI launch.
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 embedded_release_notes:
   type: setting
   state: allowed_on
@@ -111,7 +108,6 @@ embedded_release_notes:
   description: Show Instructure-provided release notes filtered by user role in the
     Help Menu. Available to users with admin, teacher (instructor), and observer
     roles. Applicable features for student roles are included in observer notes.
-  pending_enforcement: true
   applies_to: Account
 encrypted_sourcedids:
   type: setting
@@ -130,13 +126,9 @@ epub_export:
 feature_flag_filters:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Feature Flag Filters
-  description: Adds additional information and filtering for feature flags
-  enable_at: Date.new(2021, 9, 18)
-  pending_enforcement: true
-  environments:
-    beta:
-      enable_at: Date.new(2021, 8, 23)
+  display_name: Flags tab updates
+  description: This flag updates the title of the feature flags tab to "Feature Options" and adds
+    a "Feature Preview" pill for feature preview projects.
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin
@@ -185,7 +177,6 @@ high_contrast:
       High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
-  autoexpand: true
 important_dates:
   state: hidden
   display_name: Important Dates
@@ -212,7 +203,6 @@ javascript_csp:
   description: Enable the Security tab on the settings page to adjust CSP settings
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
   environments:
     production:
       state: hidden
@@ -232,7 +222,6 @@ lti2_rereg:
   description: Enable reregistration for LTI 2
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 membership_service_for_lti_tools:
   state: hidden
   display_name: Membership Service Configuration
@@ -265,11 +254,10 @@ new_sis_integrations:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-      Settings. The Post to SIS feature preview has been incorporated into this new
+      Settings. The Post to SIS feature option has been incorporated into this new
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true
-  beta: true
 new_user_tutorial:
   type: setting
   state: allowed
@@ -448,3 +436,8 @@ gradebook_show_first_last_names:
   display_name: Separate columns for first/last names in Gradebook
   description: Show account setting to allow viewing and exporting of student first and last names
     in separate columns in the gradebook.
+open_todos_in_new_tab:
+  applies_to: User
+  state: allowed_on
+  display_name: Open to-do items in a new tab
+  description: When enabled, this setting automatically opens teacher to-do items in a new tab.

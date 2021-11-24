@@ -43,7 +43,7 @@ class MockStaticSite
     @url = url
     @mock_site = mock_site.to_s
 
-    current_location = File.expand_path(File.dirname(__FILE__))
+    current_location = __dir__
     @root_dir_path = "#{current_location}/#{MOCK_SITES_DIRECTORY}/#{mock_site}"
     begin
       root_dir = Dir.entries(root_dir_path)

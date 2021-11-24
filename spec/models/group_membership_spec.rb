@@ -64,8 +64,15 @@ describe GroupMembership do
 
   context "section homogeneity" do
     # can't use 'course' because it is defined in spec_helper, so use 'course1'
-    let_once(:course1) { course_with_teacher(:active_all => true); @course }
-    let_once(:student) { student = user_model; course1.enroll_student(student); student }
+    let_once(:course1) do
+      course_with_teacher(:active_all => true)
+      @course
+    end
+    let_once(:student) do
+      student = user_model
+      course1.enroll_student(student)
+      student
+    end
     let_once(:group_category) { GroupCategory.student_organized_for(course1) }
     let_once(:group) { course1.groups.create(:group_category => group_category) }
     let_once(:group_membership) { group.group_memberships.create(:user => student) }
@@ -82,9 +89,9 @@ describe GroupMembership do
     end
 
     it "passes validation on update" do
-      expect {
+      expect do
         group_membership.save!
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
@@ -96,7 +103,7 @@ describe GroupMembership do
         @group1 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
       end
 
-      it "sends message if the first membership in a student organized group", priority: "1", test_id: 193157 do
+      it "sends message if the first membership in a student organized group", priority: "1" do
         Notification.create(name: 'New Student Organized Group', category: 'TestImmediately')
         communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
@@ -104,7 +111,7 @@ describe GroupMembership do
         expect(group_membership.messages_sent['New Student Organized Group']).not_to be_empty
       end
 
-      it "sends message when a new student is invited to group and auto-joins", priority: "1", test_id: 193155 do
+      it "sends message when a new student is invited to group and auto-joins", priority: "1" do
         Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
         student2 = student_in_course(active_all: true).user
         communication_channel(student2, { username: "test_channel_email_#{student2.id}@test.com", active_cc: true })
@@ -332,7 +339,7 @@ describe GroupMembership do
       @membership.group = @group
       @group.group_category = @group_category
 
-      @assignments = 3.times.map { assignment_model(:course => @course) }
+      @assignments = Array.new(3) { assignment_model(:course => @course) }
       @assignments.last.group_category = nil
       @assignments.last.save!
     end
@@ -399,9 +406,9 @@ describe GroupMembership do
       membership = group.group_memberships.create!(user: user)
       membership.root_account_id = nil
 
-      expect {
+      expect do
         membership.save!
-      }.to change {
+      end.to change {
         membership.root_account_id
       }.from(nil).to(group.root_account_id)
     end
@@ -411,9 +418,9 @@ describe GroupMembership do
 
       expect(membership.group).not_to receive(:root_account_id)
 
-      expect {
+      expect do
         membership.save!
-      }.not_to change {
+      end.not_to change {
         GroupMembership.find(membership.id).root_account_id
       }
     end

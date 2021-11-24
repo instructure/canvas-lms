@@ -44,7 +44,7 @@ class CustomData < ActiveRecord::Base
 
   serialize :data, Hash
 
-  validates_presence_of :user, :namespace
+  validates :user, :namespace, presence: true
 
   def get_data(scope)
     hash_data_from_scope(data_frd, "d/#{scope}")
@@ -52,9 +52,9 @@ class CustomData < ActiveRecord::Base
 
   def lock_and_save
     transaction do
-      self.lock!
+      lock!
       yield
-      self.destroyed? || save
+      destroyed? || save
     end
   end
 
@@ -81,7 +81,7 @@ class CustomData < ActiveRecord::Base
     keys = scope.split('/')
     last = keys.pop
 
-    traverse = ->(hsh, key_idx) do
+    traverse = lambda do |hsh, key_idx|
       return hsh if key_idx == keys.length
 
       k = keys[key_idx]
@@ -106,7 +106,7 @@ class CustomData < ActiveRecord::Base
 
   def delete_hash_data_from_scope(hash, scope)
     keys = scope.split('/')
-    del_frd = ->(hash2) do
+    del_frd = lambda do |hash2|
       k = keys.shift
       if keys.empty?
         raise ArgumentError, 'invalid scope for hash' unless hash2.key?(k)
@@ -122,7 +122,7 @@ class CustomData < ActiveRecord::Base
       end
     end
     ret = del_frd.call(hash)
-    self.destroy if hash.empty?
+    destroy if hash.empty?
     ret
   end
 

@@ -26,7 +26,7 @@ describe "quizzes for a public course" do
   include_context "public course as a logged out user"
   include QuizzesCommon
 
-  it "displays quizzes list", priority: "1", test_id: 270033 do
+  it "displays quizzes list", priority: "1" do
     course_quiz(:active)
     @quiz.update(:title => "hey you should see me")
 

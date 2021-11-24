@@ -51,7 +51,7 @@ module SIS
         { :file_io => File.open(output_path, 'rb'), :row_count => row_count }
       end
 
-      VALID_ENROLLMENT_DROP_STATUS = %w(deleted inactive completed deleted_last_completed).freeze
+      VALID_ENROLLMENT_DROP_STATUS = %w[deleted inactive completed deleted_last_completed].freeze
 
       def generate_csvs(previous_csvs, current_csvs)
         generated = []

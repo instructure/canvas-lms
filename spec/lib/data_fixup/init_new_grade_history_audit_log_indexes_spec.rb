@@ -32,20 +32,20 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
   end
 
   let(:no_grader_required_tables) do
-    %w(
+    %w[
       grade_changes_by_course_assignment
       grade_changes_by_course_assignment_student
       grade_changes_by_course_student
-    ).freeze
+    ].freeze
   end
 
   let(:grader_required_tables) do
-    %w(
+    %w[
       grade_changes_by_course_assignment_grader
       grade_change_by_course_assignment_grader_student
       grade_changes_by_course_grader
       grade_changes_by_course_grader_student
-    ).freeze
+    ].freeze
   end
 
   let(:index_tables) { (no_grader_required_tables + grader_required_tables).freeze }

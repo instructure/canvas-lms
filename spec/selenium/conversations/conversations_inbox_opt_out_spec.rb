@@ -28,12 +28,12 @@ describe "conversations new" do
   end
 
   describe 'conversations inbox opt-out option' do
-    it "is hidden a feature flag", priority: "1", test_id: 206028 do
+    it "is hidden a feature flag", priority: "1" do
       get "/profile/settings"
       expect(f("#content")).not_to contain_css('#disable_inbox')
     end
 
-    it "reveals when the feature flag is set", priority: "1", test_id: 138894 do
+    it "reveals when the feature flag is set", priority: "1" do
       @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
       get "/profile/settings"
       expect(ff('#disable_inbox').count).to eq 1

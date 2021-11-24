@@ -29,7 +29,7 @@ module FullStoryHelper
 
     fsconfig = Canvas::DynamicSettings.find('fullstory', tree: 'config', service: 'canvas')
     rate = fsconfig[:sampling_rate, failsafe: 0.0].to_f
-    sample = rand()
+    sample = rand
     session[:fullstory_enabled] = rate >= 0.0 && rate <= 1.0 && sample < rate
   end
 

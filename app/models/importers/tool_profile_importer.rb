@@ -62,7 +62,7 @@ module Importers
         missing_keys = values.select { |_, v| v.nil? }.keys
 
         if missing_keys.present?
-          fail MissingRequiredToolProfileValuesError, I18n.t("Missing required values: %{missing_values}", missing_values: missing_keys.join(','))
+          raise MissingRequiredToolProfileValuesError, I18n.t("Missing required values: %{missing_values}", missing_values: missing_keys.join(','))
         else
           values
         end

@@ -90,7 +90,7 @@ module Canvas
 
         def url_for(source)
           # remove the leading slash if there is one
-          source = source.sub(/^\//, '')
+          source = source.sub(%r{^/}, '')
           if webpack_request?(source)
             webpack_url_for(source)
           else
@@ -105,7 +105,7 @@ module Canvas
 
           RequestCache.cache("rev-manifest") do
             benchmark("reading rev-manifest") do
-              file = Rails.root.join('public', 'dist', 'rev-manifest.json')
+              file = Rails.root.join('public/dist/rev-manifest.json')
               if file.exist?
                 Rails.logger.debug "reading rev-manifest.json"
                 @gulp_manifest = JSON.parse(file.read).freeze

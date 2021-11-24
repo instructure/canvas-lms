@@ -206,7 +206,7 @@ module BlueprintCourseCommon
 
   # click the Save button and wait for it to complete
   def do_save
-    save_button().click
+    save_button.click
     expect(f('#flashalert_message_holder')).to contain_css('div') # the alert saying the save completed
   end
 

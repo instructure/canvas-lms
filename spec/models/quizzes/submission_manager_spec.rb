@@ -62,9 +62,9 @@ describe Quizzes::SubmissionManager do
         submission = @quiz.quiz_submissions.create!(user: test_user)
 
         s = nil
-        expect {
+        expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        }.to_not change { Quizzes::QuizSubmission.count }
+        end.to_not change { Quizzes::QuizSubmission.count }
 
         expect(s.user).to eq test_user
         expect(s).to eq submission
@@ -77,9 +77,9 @@ describe Quizzes::SubmissionManager do
         submission.update_attribute :workflow_state, 'graded'
         expect_any_instance_of(Quizzes::QuizSubmission).not_to receive(:save!)
         s = nil
-        expect {
+        expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        }.to_not change { Quizzes::QuizSubmission.count }
+        end.to_not change { Quizzes::QuizSubmission.count }
         expect(s).to eq submission
         expect(s.workflow_state).to eq 'graded'
       end
@@ -88,17 +88,17 @@ describe Quizzes::SubmissionManager do
     context 'for a non-existant submissions' do
       it 'creates new submission and set the workflow state' do
         s = nil
-        expect {
+        expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, false, "preview")
-        }.to change { Quizzes::QuizSubmission.count }.by(1)
+        end.to change { Quizzes::QuizSubmission.count }.by(1)
         expect(s.workflow_state).to eq "preview"
       end
 
       it 'defaults workflow state to untaken if not set' do
         s = nil
-        expect {
+        expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        }.to change { Quizzes::QuizSubmission.count }.by(1)
+        end.to change { Quizzes::QuizSubmission.count }.by(1)
         expect(s.workflow_state).to eq "untaken"
       end
     end

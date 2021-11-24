@@ -40,15 +40,15 @@ describe "speed grader - grade display" do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    it "displays the score on the sidebar", priority: "1", test_id: 283993 do
+    it "displays the score on the sidebar", priority: "1" do
       expect(Speedgrader.grade_value).to eq grade.to_int.to_s
     end
 
-    it "displays total number of graded assignments to students", priority: "1", test_id: 283994 do
+    it "displays total number of graded assignments to students", priority: "1" do
       expect(Speedgrader.fraction_graded).to include_text("1/2")
     end
 
-    it "displays average submission grade for total assignment submissions", priority: "1", test_id: 283995 do
+    it "displays average submission grade for total assignment submissions", priority: "1" do
       average = (grade / points * 100).to_int
       expect(Speedgrader.average_grade).to include_text("#{grade.to_int} / #{points.to_int} (#{average}%)")
     end

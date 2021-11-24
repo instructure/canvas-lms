@@ -41,7 +41,7 @@ describe "duplicate discussion" do
           get discussions_topic_page
         end
 
-        it "has duplication option for discussions", priority: "2", test_id: 3353071 do
+        it "has duplication option for discussions", priority: "2" do
           f('.discussions-index-manage-menu').click
           expect(f('#duplicate-discussion-menu-option')).to include_text('Duplicate')
         end

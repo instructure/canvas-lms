@@ -43,11 +43,12 @@ module FilesCommon
     file_name_textbox_el.send_keys(:return)
   end
 
-  def delete(row_selected = 0, delete_using = :cog_icon)
-    if delete_using == :cog_icon
+  def delete_file(row_selected = 0, delete_using = :cog_icon)
+    case delete_using
+    when :cog_icon
       ff('.al-trigger')[row_selected].click
       fln("Delete").click
-    elsif delete_using == :toolbar_menu
+    when :toolbar_menu
       ff('.ef-item-row')[row_selected].click
       f('.btn-delete').click
     end
@@ -55,10 +56,11 @@ module FilesCommon
   end
 
   def move(file_name, row_selected = 0, move_using = :cog_icon, destination = nil)
-    if move_using == :cog_icon
+    case move_using
+    when :cog_icon
       ff('.al-trigger')[row_selected].click
       fln("Move").click
-    elsif move_using == :toolbar_menu
+    when :toolbar_menu
       ff('.ef-item-row')[row_selected].click
       f('.btn-move').click
     end
@@ -94,9 +96,10 @@ module FilesCommon
 
   # This method sets permissions on files/folders
   def set_item_permissions(permission_type = :publish, restricted_access_option = nil, set_permissions_from = :cloud_icon)
-    if set_permissions_from == :cloud_icon
+    case set_permissions_from
+    when :cloud_icon
       f('.btn-link.published-status').click
-    elsif set_permissions_from == :toolbar_menu
+    when :toolbar_menu
       ff('.ef-item-row')[0].click
       f('.btn-restrict').click
     end
@@ -105,19 +108,17 @@ module FilesCommon
       driver.find_elements(:name, 'permissions')[0].click
     elsif permission_type == :unpublish
       driver.find_elements(:name, 'permissions')[1].click
+    elsif restricted_access_option == :available_with_link
+      driver.find_elements(:name, 'permissions')[2].click
     else
-      if restricted_access_option == :available_with_link
-        driver.find_elements(:name, 'permissions')[2].click
-      else
-        driver.find_elements(:name, 'permissions')[3].click
-        ff('.ui-datepicker-trigger.btn')[0].click
-        fln("15").click
-        ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
-        wait_for_ajaximations
-        ff('.ui-datepicker-trigger.btn')[1].click
-        fln("25").click
-        ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar
-      end
+      driver.find_elements(:name, 'permissions')[3].click
+      ff('.ui-datepicker-trigger.btn')[0].click
+      fln("15").click
+      ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
+      wait_for_ajaximations
+      ff('.ui-datepicker-trigger.btn')[1].click
+      fln("25").click
+      ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar
     end
     ff('.btn.btn-primary')[1].click
     wait_for_ajaximations
@@ -144,7 +145,7 @@ module FilesCommon
     link = f(".links a.download_zip_link")
     wait_for_ajaximations
     expect(link).to be_displayed
-    expect(link).to have_attribute('href', %r"/courses/#{@course.id}/folders/\d+/download")
+    expect(link).to have_attribute('href', %r{/courses/#{@course.id}/folders/\d+/download})
   end
 
   def confirm_delete_on_dialog
@@ -187,12 +188,13 @@ module FilesCommon
     fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")').click
     fj('[role=tabpanel] button:contains("unfiled")').click
     fj('[role=tabpanel] button:contains("some test file")').click
-    if insert_into == :quiz
+    case insert_into
+    when :quiz
       fj("[role=tabpanel] button:contains('#{filename}')").click
       f(".save_quiz_button").click
-    elsif insert_into == :discussion
+    when :discussion
       f("#edit_discussion_form_buttons .btn-primary").click
-    elsif insert_into == :wiki_page
+    when :wiki_page
       f('.btn-primary.submit').click
     else
       f('.btn-primary[type=submit]').click

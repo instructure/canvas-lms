@@ -44,7 +44,7 @@ describe FileInContext do
       before do
         @course.usage_rights_required = true
         @course.save!
-        @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files a_file.txt)))
+        @filename = File.expand_path(File.join(File.dirname(__FILE__), %w[.. fixtures files a_file.txt]))
       end
 
       it "creates files in unpublished state" do

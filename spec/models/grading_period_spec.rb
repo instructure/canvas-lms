@@ -800,6 +800,7 @@ describe GradingPeriod do
 
   describe "Soft deletion" do
     subject { grading_period_group.grading_periods }
+
     let(:creation_arguments) { [period_one, period_two] }
     let(:period_one) { { title: 'an title', start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
     let(:period_two) { { title: 'an title', start_date: 2.weeks.from_now(now), end_date: 5.weeks.from_now(now) } }
@@ -869,7 +870,7 @@ describe GradingPeriod do
           title: 'B'
         )
         json = GradingPeriod.json_for(course, nil)
-        expect(json.map { |el| el['title'] }).to eq %w(A B C)
+        expect(json.map { |el| el['title'] }).to eq %w[A B C]
         expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
       end
     end
@@ -882,6 +883,7 @@ describe GradingPeriod do
 
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+
       let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.not_to be_account_group }
@@ -891,6 +893,7 @@ describe GradingPeriod do
   describe '#course_group?' do
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+
       let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.to be_course_group }

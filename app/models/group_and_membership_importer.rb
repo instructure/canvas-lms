@@ -64,7 +64,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     progress.complete
     progress.save!
     self.workflow_state = 'completed'
-    self.save!
+    save!
   end
 
   workflow do
@@ -82,7 +82,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
 
   def fail_import(error)
     self.workflow_state = 'failed'
-    self.save!
+    save!
     progress.message = error
     progress.save!
     progress.fail

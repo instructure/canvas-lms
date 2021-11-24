@@ -28,7 +28,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_params
-    super - open_id_connect_params + [:login_attribute, :jit_provisioning, :hosted_domain].freeze
+    super - open_id_connect_params + %i[login_attribute jit_provisioning hosted_domain].freeze
   end
 
   # Rename db field
@@ -44,13 +44,13 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    [
-      'email',
-      'family_name',
-      'given_name',
-      'locale',
-      'name',
-      'sub',
+    %w[
+      email
+      family_name
+      given_name
+      locale
+      name
+      sub
     ].freeze
   end
 
