@@ -354,9 +354,6 @@ RSpec/ImplicitBlockExpectation:
 RSpec/ImplicitExpect:
   Severity: convention
   AutoCorrect: false
-RSpec/ItBehavesLike:
-  Severity: convention
-  AutoCorrect: false
 RSpec/IteratedExpectation:
   Severity: convention
 RSpec/LeakyConstantDeclaration:

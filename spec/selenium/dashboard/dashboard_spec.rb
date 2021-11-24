@@ -365,7 +365,7 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
-    it_should_behave_like 'load events list'
+    it_behaves_like 'load events list'
 
     context "restricted future courses" do
       before :once do
