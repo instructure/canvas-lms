@@ -26,10 +26,10 @@ module CanvasPartman
     class << self
       def create(base_class)
         unless base_class < Concerns::Partitioned
-          raise ArgumentError, <<~TEXT
+          raise ArgumentError, <<~ERROR
             PartitionManager can only work on models that are Partitioned.
             See CanvasPartman::Concerns::Partitioned.
-          TEXT
+          ERROR
         end
 
         const_get(base_class.partitioning_strategy.to_s.classify).new(base_class)
@@ -67,7 +67,8 @@ module CanvasPartman
     #
     # @param [Integer] number_to_keep
     #   The number of partitions to keep (excluding the current partition)
-    def prune_partitions(_number_to_keep = 6); end
+    def prune_partitions(_number_to_keep = 6)
+    end
 
     # Create a new partition table.
     #
@@ -82,12 +83,14 @@ module CanvasPartman
     def create_partition(value, graceful: false)
       partition_table = generate_name_for_partition(value)
 
-      return if graceful && partition_exists?(partition_table)
+      if graceful == true
+        return if partition_exists?(partition_table)
+      end
 
       constraint_check = generate_check_constraint(value)
 
       with_statement_timeout do
-        execute(<<SQL.squish)
+        execute(<<SQL)
         CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
           LIKE #{base_class.quoted_table_name} INCLUDING ALL,
           CHECK (#{constraint_check})
@@ -139,7 +142,7 @@ SQL
     end
 
     def initialize(base_class)
-      raise NotImplementedError if instance_of?(PartitionManager)
+      raise NotImplementedError if self.class == PartitionManager
 
       @base_class = base_class
     end

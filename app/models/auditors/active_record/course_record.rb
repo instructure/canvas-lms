@@ -47,7 +47,7 @@ module Auditors::ActiveRecord
     end
 
     def event_data
-      @_event_data ||= JSON.parse(data)
+      @_event_data ||= JSON.parse(self.data)
     end
   end
 end

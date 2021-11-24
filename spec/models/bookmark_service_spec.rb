@@ -49,7 +49,7 @@ describe BookmarkService do
         :title => 'some title',
         :url => 'google.com',
         :comments => 'some comments',
-        :tags => %w[some tags]
+        :tags => %w(some tags)
       )
     end
 
@@ -70,21 +70,21 @@ describe BookmarkService do
         :title => 'some title',
         :url => 'google.com',
         :comments => 'some comments',
-        :tags => %w[some tags]
+        :tags => %w(some tags)
       )
     end
 
     it "rescues silently if something happens during the process" do
       allow(@bookmark_service).to receive(:diigo_post_bookmark).and_raise(ArgumentError)
 
-      expect do
+      expect {
         @bookmark_service.post_bookmark(
           :title => 'some title',
           :url => 'google.com',
           :comments => 'some comments',
-          :tags => %w[some tags]
+          :tags => %w(some tags)
         )
-      end.not_to raise_error
+      }.not_to raise_error
     end
   end
 end

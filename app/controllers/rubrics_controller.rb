@@ -145,11 +145,8 @@ class RubricsController < ApplicationController
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
   def update
-    association_params = if params[:rubric_association]
-                           params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :hide_points, :hide_outcome_results, :bookmarked)
-                         else
-                           {}
-                         end
+    association_params = params[:rubric_association] ?
+      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :hide_points, :hide_outcome_results, :bookmarked) : {}
 
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
@@ -181,7 +178,7 @@ class RubricsController < ApplicationController
         @rubric.rubric_id = original_rubric_id
         @rubric.user = @current_user
       end
-      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || @association&.grants_right?(@current_user, session, :update)) # authorized_action(@rubric, @current_user, :update)
+      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) # authorized_action(@rubric, @current_user, :update)
         @association = @rubric.update_with_association(@current_user, params[:rubric], @context, association_params)
         @rubric = @association.rubric if @association
       end

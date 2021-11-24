@@ -482,7 +482,7 @@ module Api
 
       describe '#include_total_scores?' do
         let(:predicate) { course_json.include_total_scores? }
-        let(:course_settings) { {} }
+        let(:course_settings) { Hash.new }
         let(:course) { double(course_settings) }
 
         describe 'when total scores key is set' do
@@ -522,7 +522,7 @@ module Api
 
         it 'tacks on any includes' do
           includes << :some << :other << :keys
-          expect(course_json.allowed_attributes).to eq(CourseJson::BASE_ATTRIBUTES + %i[some other keys])
+          expect(course_json.allowed_attributes).to eq(CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys])
         end
       end
 
@@ -550,7 +550,7 @@ module Api
       end
 
       describe '#clear_unneeded_fields' do
-        let(:hash) { {} }
+        let(:hash) { Hash.new }
 
         describe 'with an optional field' do
           before { hash['enrollments'] = [] }
@@ -597,7 +597,7 @@ module Api
       describe '#initialization' do
         let(:enrollments) { double(:enrollments) }
         let(:hash) { { :a => '1', :b => '2' } }
-        let(:includes) { %w[these three keys] }
+        let(:includes) { ['these', 'three', 'keys'] }
 
         before do
           @json = CourseJson.new(course, user, includes, enrollments) { hash }
@@ -607,31 +607,26 @@ module Api
 
         describe '#course' do
           subject { super().course }
-
           it { is_expected.to eq course }
         end
 
         describe '#user' do
           subject { super().user }
-
           it { is_expected.to eq user }
         end
 
         describe '#includes' do
           subject { super().includes }
-
-          it { is_expected.to eq %i[these three keys] }
+          it { is_expected.to eq [:these, :three, :keys] }
         end
 
         describe '#enrollments' do
           subject { super().enrollments }
-
           it { is_expected.to eq enrollments }
         end
 
         describe '#hash' do
           subject { super().hash }
-
           it { is_expected.to eq hash }
         end
       end
@@ -640,7 +635,7 @@ module Api
         let(:sis_course) { double(grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
         let(:sis_course_json) { CourseJson.new(sis_course, user, includes, []) }
         let(:root_account) { double(grants_right?: @has_right) }
-        let(:hash) { {} }
+        let(:hash) { Hash.new }
 
         before do
           @sis_id = 1357

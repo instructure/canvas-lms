@@ -411,7 +411,7 @@ describe OutcomeResultsController do
       it 'does not display rollups for concluded enrollments when they are not included' do
         StudentEnrollment.find_by(user_id: @student2.id).conclude
         json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
-        expect(json['rollups'].count { |r| r['links']['user'] == @student2.id.to_s }).to eq(0)
+        expect(json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }.count).to eq(0)
       end
 
       it 'displays rollups for a student who has an active and a concluded enrolllment regardless of filter' do
@@ -436,7 +436,7 @@ describe OutcomeResultsController do
       it 'does not display rollups for inactive enrollments when they are not included' do
         StudentEnrollment.find_by(user_id: @student2.id).deactivate
         json = parse_response(get_rollups(exclude: 'inactive_enrollments'))
-        expect(json['rollups'].count { |r| r['links']['user'] == @student2.id.to_s }).to eq(0)
+        expect(json['rollups'].select { |r| r['links']['user'] == @student2.id.to_s }.count).to eq(0)
       end
 
       context 'users with enrollments of different enrollment states' do
@@ -504,7 +504,7 @@ describe OutcomeResultsController do
 
       def expect_score_order(rollups, scores)
         rollup_scores = rollups.map do |r|
-          r['scores'].empty? ? nil : r['scores'][0]['score'].to_i
+          r['scores'].length == 0 ? nil : r['scores'][0]['score'].to_i
         end
         expect(rollup_scores).to eq scores
       end

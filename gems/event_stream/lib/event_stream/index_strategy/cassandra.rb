@@ -27,8 +27,13 @@ module EventStream::IndexStrategy
       @index = index_obj
     end
 
-    delegate :event_stream, to: :index
-    delegate :database, to: :event_stream
+    def event_stream
+      @index.event_stream
+    end
+
+    def database
+      event_stream.database
+    end
 
     def bucket_for_time(time)
       time.to_i - (time.to_i % index.bucket_size)

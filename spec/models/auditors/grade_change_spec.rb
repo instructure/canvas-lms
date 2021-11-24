@@ -30,13 +30,13 @@ describe Auditors::GradeChange do
   before do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
 
-    shard_class = Class.new do
+    shard_class = Class.new {
       define_method(:activate) { |&b| b.call }
-    end
+    }
 
-    EventStream.current_shard_lookup = lambda do
+    EventStream.current_shard_lookup = lambda {
       shard_class.new
-    end
+    }
 
     @account = Account.default
     @sub_account = Account.create!(:parent_account => @account)
@@ -353,9 +353,9 @@ describe Auditors::GradeChange do
     end
 
     it "does not accept both a submission and an override in the same call" do
-      expect do
+      expect {
         Auditors::GradeChange.record(submission: @submission, override_grade_change: override_grade_change)
-      end.to raise_error(ArgumentError)
+      }.to raise_error(ArgumentError)
     end
 
     it "returns submission grade changes in results" do
@@ -375,9 +375,9 @@ describe Auditors::GradeChange do
     end
 
     it "stores override grade changes in the database" do
-      expect do
+      expect {
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
-      end.to change {
+      }.to change {
         Auditors::ActiveRecord::GradeChangeRecord.where(
           context_id: @course.id,
           context_type: "Course"

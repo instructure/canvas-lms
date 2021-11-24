@@ -129,7 +129,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   # @returns Progress
 
   def bulk_update
-    bulk_update_params = params.permit(column_data: %i[user_id column_id content])
+    bulk_update_params = params.permit(column_data: [:user_id, :column_id, :content])
     column_data_as_array = bulk_update_params.to_h[:column_data]
     raise ActionController::BadRequest if column_data_as_array.blank?
 
@@ -148,7 +148,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   end
 
   def allowed_users
-    @context.students_visible_to(@current_user, include: %i[inactive completed])
+    @context.students_visible_to(@current_user, include: %i{inactive completed})
   end
   private :allowed_users
 

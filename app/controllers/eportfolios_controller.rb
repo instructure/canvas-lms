@@ -25,8 +25,8 @@ class EportfoliosController < ApplicationController
   include EportfolioPage
   before_action :require_user, :only => [:index, :user_index]
   before_action :reject_student_view_student
-  before_action :verified_user_check, :only => %i[index user_index create]
-  before_action :get_eportfolio, :except => %i[index user_index create]
+  before_action :verified_user_check, :only => [:index, :user_index, :create]
+  before_action :get_eportfolio, :except => [:index, :user_index, :create]
 
   def index
     user_index
@@ -54,10 +54,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
-          format.html do
+          format.html {
             rce_js_env
             render :new
-          end
+          }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -107,6 +107,7 @@ class EportfoliosController < ApplicationController
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { :title => t('titles.feed', "Eportfolio Atom Feed") })
       end
+      js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
     end
   end
 
@@ -125,10 +126,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
-          format.html do
+          format.html {
             rce_js_env
             render :edit
-          end
+          }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -176,7 +177,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @attachments = @portfolio.attachments.not_deleted
                                .where(display_name: zip_filename,
-                                      workflow_state: %w[to_be_zipped zipping zipped unattached],
+                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'],
                                       user_id: @current_user)
       @attachment = @attachments.order(:created_at).last
       @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)
@@ -186,7 +187,15 @@ class EportfoliosController < ApplicationController
         @attachment = nil
       end
 
-      if @attachment
+      if !@attachment
+        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.file_state = '0'
+        @attachment.user = @current_user
+        @attachment.save!
+        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
+        render :json => @attachment
+      else
         respond_to do |format|
           if @attachment.zipped?
             if @attachment.stored_locally?
@@ -206,14 +215,6 @@ class EportfoliosController < ApplicationController
             format.json { render :json => @attachment }
           end
         end
-      else
-        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
-        @attachment.workflow_state = 'to_be_zipped'
-        @attachment.file_state = '0'
-        @attachment.user = @current_user
-        @attachment.save!
-        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
-        render :json => @attachment
       end
     end
   end
@@ -254,6 +255,6 @@ class EportfoliosController < ApplicationController
 
   def stale_zip_file?
     @attachment.created_at < 1.hour.ago ||
-      @attachment.created_at < (@portfolio.eportfolio_entries.filter_map(&:updated_at).max || @attachment.created_at)
+      @attachment.created_at < (@portfolio.eportfolio_entries.map(&:updated_at).compact.max || @attachment.created_at)
   end
 end

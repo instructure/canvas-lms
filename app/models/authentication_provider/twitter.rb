@@ -33,11 +33,11 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    %w[
-      name
-      screen_name
-      time_zone
-      user_id
+    [
+      'name',
+      'screen_name',
+      'time_zone',
+      'user_id',
     ].freeze
   end
 

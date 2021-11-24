@@ -88,13 +88,13 @@ describe LiveEvents::Client do
                                             "aws_endpoint" => "example.com:6543/"
                                           })
 
-      expect(res).not_to have_key(:endpoint)
+      expect(res.key?(:endpoint)).to eq false
     end
 
     it "loads custom creds" do
-      LiveEvents.aws_credentials = lambda do |settings|
+      LiveEvents.aws_credentials = ->(settings) {
         settings['value_to_return']
-      end
+      }
 
       res = LiveEvents::Client.aws_config({
                                             'custom_aws_credentials' => 'true',
@@ -256,7 +256,7 @@ describe LiveEvents::Client do
       LiveEvents.set_context({ user_id: 123 })
       LiveEvents.clear_context!
 
-      now = Time.now
+      now = Time.now # rubocop:disable Rails/SmartTimeZone
 
       LiveEvents.post_event(
         event_name: 'event',
@@ -285,7 +285,7 @@ describe LiveEvents::Client do
       let(:test_stream_name) { 'custom_stream_name' }
 
       it "uses custom stream client when defined" do
-        now = Time.now
+        now = Time.now # rubocop:disable Rails/SmartTimeZone
 
         LiveEvents.post_event(
           event_name: 'event',

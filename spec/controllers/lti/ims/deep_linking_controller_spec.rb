@@ -397,7 +397,7 @@ module Lti
           end
 
           context 'when placement should create new module' do
-            let(:params) { super().merge({ course_id: course.id, placement: 'module_index_menu_modal' }) }
+            let(:params) { super().merge({ course_id: course.id, placement: 'module_index_menu' }) }
 
             context 'when feature flag is disabled' do
               it 'does not change anything' do
@@ -409,7 +409,7 @@ module Lti
 
             context 'when feature flag is enabled' do
               before :once do
-                course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
+                course.root_account.enable_feature!(:lti_deep_linking_module_index_menu)
               end
 
               it 'creates a new context module' do
@@ -453,7 +453,7 @@ module Lti
 
         context 'when content items that contain line items are received' do
           let(:course) { course_model(account: account) }
-          let(:context_external_tool) do
+          let(:context_external_tool) {
             ContextExternalTool.create!(
               context: course.account,
               url: 'http://tool.url/login',
@@ -463,7 +463,7 @@ module Lti
               developer_key: developer_key,
               settings: { use_1_3: true }
             )
-          end
+          }
 
           let(:params) { super().merge({ course_id: course.id, placement: 'course_assignments_menu' }) }
           let(:launch_url) { 'http://tool.url/launch' }
@@ -556,7 +556,7 @@ module Lti
 
             it 'uses title for assignment title' do
               subject
-              expect(Assignment.last.title).to eq content_items.first[:title]
+              expect(Assignment.last.title).to eq content_items.first.dig(:title)
             end
           end
 

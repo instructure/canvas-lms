@@ -237,7 +237,7 @@
 class ContextModuleItemsApiController < ApplicationController
   before_action :require_context
   before_action :require_user, :only => [:select_mastery_path]
-  before_action :find_student, :only => %i[index show select_mastery_path]
+  before_action :find_student, :only => [:index, :show, :select_mastery_path]
   before_action :disable_escape_html_entities, :only => [:index, :show]
   after_action :enable_escape_html_entities, :only => [:index, :show]
   include Api::V1::ContextModule
@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          render(:status => :bad_request, :json => { :message => "incorrect module item type" })
+          return render(:status => 400, :json => { :message => "incorrect module item type" })
         end
       end
     end
@@ -412,7 +412,7 @@ class ContextModuleItemsApiController < ApplicationController
       elsif @tag
         render :json => @tag.errors, :status => :bad_request
       else
-        render :status => :bad_request, :json => { :message => t(:invalid_content, "Could not find content") }
+        render :status => 400, :json => { :message => t(:invalid_content, "Could not find content") }
       end
     end
   end
@@ -472,7 +472,7 @@ class ContextModuleItemsApiController < ApplicationController
       return render :json => { :message => "missing module item parameter" }, :status => :bad_request unless params[:module_item]
 
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
-      @tag.url = params[:module_item][:external_url] if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:module_item][:external_url]
+      @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
       if (target_module_id = params[:module_item][:module_id]) && target_module_id.to_i != @tag.context_module_id
@@ -492,17 +492,19 @@ class ContextModuleItemsApiController < ApplicationController
         end
       end
 
-      if params[:module_item].key?(:published)
+      if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
           if module_item_publishable?(@tag)
             @tag.publish
           else
             return render json: { message: "item can't be published" }, status: :unprocessable_entity
           end
-        elsif module_item_unpublishable?(@tag)
-          @tag.unpublish
         else
-          return render :json => { :message => "item can't be unpublished" }, :status => :forbidden
+          if module_item_unpublishable?(@tag)
+            @tag.unpublish
+          else
+            return render :json => { :message => "item can't be unpublished" }, :status => :forbidden
+          end
         end
         @tag.save
         @tag.update_asset_workflow_state!
@@ -679,7 +681,7 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_item_read
     if authorized_action(@context, @current_user, :read)
       get_module_item
-      content = @item.content.respond_to?(:locked_for?) ? @item.content : @item
+      content = (@item.content && @item.content.respond_to?(:locked_for?)) ? @item.content : @item
       return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
 
       @item.context_module_action(@current_user, :read)
@@ -723,11 +725,11 @@ class ContextModuleItemsApiController < ApplicationController
           graded: new_tag.graded?,
           content_details: content_details(new_tag, @current_user),
           assignment_id: new_tag.assignment.try(:id),
-          is_duplicate_able: new_tag.duplicate_able?
+          is_duplicate_able: new_tag.duplicate_able?,
         )
         render json: json
       else
-        render :status => :bad_request, :json => { :message => t("Item cannot be duplicated") }
+        render :status => 400, :json => { :message => t("Item cannot be duplicated") }
       end
     end
   end
@@ -753,10 +755,10 @@ class ContextModuleItemsApiController < ApplicationController
       @context.touch
 
       @tag.reload
-      true
+      return true
     else
       @tag.errors.add(:position, t(:invalid_position, "Invalid position"))
-      false
+      return false
     end
   end
   protected :set_position
@@ -791,7 +793,7 @@ class ContextModuleItemsApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      true
+      return true
     end
   end
   protected :find_student

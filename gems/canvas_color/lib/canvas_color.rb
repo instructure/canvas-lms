@@ -234,34 +234,26 @@ module CanvasColor
       val = Color.parse(val)
       return false if val.nil?
 
-      r == val.r && g == val.g && b == val.b && a == val.a
+      return r == val.r && g == val.g && b == val.b && a == val.a
     end
 
     # Setters for individual channels - take 0-255 or '00'-'FF' values
-    def r=(val)
-      @r = from_hex(val)
-    end
+    def r=(val); @r = from_hex(val); end
 
-    def g=(val)
-      @g = from_hex(val)
-    end
+    def g=(val); @g = from_hex(val); end
 
-    def b=(val)
-      @b = from_hex(val)
-    end
+    def b=(val); @b = from_hex(val); end
 
-    def a=(val)
-      @a = from_hex(val)
-    end
+    def a=(val); @a = from_hex(val); end
 
     # Attempt to read in a string and parse it into values
     def self.parse(*args)
       case args.size
 
-      when 0
+      when 0 then
         return nil
 
-      when 1
+      when 1 then
         val = args[0]
 
         # Trivial parse... :-)
@@ -279,9 +271,9 @@ module CanvasColor
 
         str = str[/[0-9A-F]{3,8}/] || ''
         case str.size
-        when 3, 4
+        when 3, 4 then
           r, g, b, a = str.scan(/[0-9A-F]/)
-        when 6, 8
+        when 6, 8 then
           r, g, b, a = str.scan(/[0-9A-F]{2}/)
         else
           return nil
@@ -289,7 +281,7 @@ module CanvasColor
 
         return Color.new(r, g, b, a || 255)
 
-      when 3, 4
+      when 3, 4 then
         return Color.new(*args)
 
       end
@@ -411,7 +403,7 @@ module CanvasColor
     def from_hex(val)
       if val.is_a?(String)
         # Double up if single char form
-        val += val if val.size == 1
+        val = val + val if val.size == 1
         # Convert to integer
         val = val.hex
       end

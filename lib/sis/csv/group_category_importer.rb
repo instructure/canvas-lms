@@ -20,7 +20,7 @@
 
 module SIS
   module CSV
-    # NOTE: these are account-level group categories, not course groups
+    # note these are account-level group categories, not course groups
     class GroupCategoryImporter < CSVBaseImporter
       def self.group_category_csv?(row)
         row.include?('group_category_id') && row.include?('category_name')
@@ -33,7 +33,7 @@ module SIS
       # expected columns
       # group_category_id, account_id, name, status
       def process(csv, index = nil, count = nil)
-        SIS::GroupCategoryImporter.new(@root_account, importer_opts).process do |importer|
+        count = SIS::GroupCategoryImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             importer.add_group_category(row['group_category_id'], row['account_id'],
                                         row['course_id'], row['category_name'], row['status'])
@@ -41,6 +41,7 @@ module SIS
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
+        count
       end
     end
   end

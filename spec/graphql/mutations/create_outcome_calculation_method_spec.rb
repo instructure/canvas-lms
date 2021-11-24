@@ -54,20 +54,20 @@ describe Mutations::CreateOutcomeCalculationMethod do
   end
 
   it "creates an outcome calculation method" do
-    query = <<~GQL
+    query = <<~QUERY
       contextType: "Course"
       contextId: #{@course.id}
       calculationMethod: "highest"
-    GQL
+    QUERY
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
+    expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createOutcomeCalculationMethod', 'errors')).to be_nil
     result = result.dig('data', 'createOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result['_id'])
-    expect(result['contextType']).to eq 'Course'
-    expect(result['contextId']).to eq @course.id.to_s
-    expect(result['calculationMethod']).to eq 'highest'
-    expect(result['calculationInt']).to be_nil
+    record = OutcomeCalculationMethod.find(result.dig('_id'))
+    expect(result.dig('contextType')).to eq 'Course'
+    expect(result.dig('contextId')).to eq @course.id.to_s
+    expect(result.dig('calculationMethod')).to eq 'highest'
+    expect(result.dig('calculationInt')).to be_nil
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
     expect(record.context).to eq @course
@@ -76,15 +76,15 @@ describe Mutations::CreateOutcomeCalculationMethod do
   it "restores previously soft-deleted record" do
     original_record = outcome_calculation_method_model(@course)
     original_record.destroy
-    query = <<~GQL
+    query = <<~QUERY
       contextType: "Course"
       contextId: #{@course.id}
       calculationMethod: "highest"
       calculationInt: null
-    GQL
+    QUERY
     result = execute_with_input(query)
     result = result.dig('data', 'createOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result['_id'])
+    record = OutcomeCalculationMethod.find(result.dig('_id'))
     expect(record.id).to eq original_record.id
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
@@ -92,58 +92,58 @@ describe Mutations::CreateOutcomeCalculationMethod do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'createOutcomeCalculationMethod', 'errors')
+      errors = result.dig('errors') || result.dig('data', 'createOutcomeCalculationMethod', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_calculations permission" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Course"
         contextId: #{@course.id}
         calculationMethod: "highest"
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid context type" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Foobar"
         contextId: 1
         calculationMethod: "highest"
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid context type')
     end
 
     it "invalid context id" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Course"
         contextId: -100
         calculationMethod: "highest"
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'context not found')
     end
 
     it "invalid calculation method" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Course"
         contextId: #{@course.id}
         calculationMethod: "foobaz"
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'calculation_method must be one of')
     end
 
     it "invalid calculation int" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Course"
         contextId: #{@course.id}
         calculationMethod: "highest"
         calculationInt: 100
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid calculation_int for this calculation_method')
     end
@@ -163,17 +163,17 @@ describe Mutations::CreateOutcomeCalculationMethod do
           m.call(*args)
         end
       end
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Course"
         contextId: #{@course.id}
         calculationMethod: "highest"
         calculationInt: null
-      GQL
+      QUERY
       result = execute_with_input(query)
-      expect(result['errors']).to be_nil
+      expect(result.dig('errors')).to be_nil
       expect(result.dig('data', 'createOutcomeCalculationMethod', 'errors')).to be_nil
       result = result.dig('data', 'createOutcomeCalculationMethod', 'outcomeCalculationMethod')
-      record = OutcomeCalculationMethod.find(result['_id'])
+      record = OutcomeCalculationMethod.find(result.dig('_id'))
       expect(record.id).to eq original_record.id
     end
   end

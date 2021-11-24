@@ -28,67 +28,67 @@ module BrandableCSS
   MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'
 
   VARIABLE_HUMAN_NAMES = {
-    "ic-brand-primary" => -> { I18n.t("Primary Brand Color") },
-    "ic-brand-font-color-dark" => -> { I18n.t("Main Text Color") },
-    "ic-link-color" => -> { I18n.t("Link Color") },
-    "ic-brand-button--primary-bgd" => -> { I18n.t("Primary Button") },
-    "ic-brand-button--primary-text" => -> { I18n.t("Primary Button Text") },
-    "ic-brand-button--secondary-bgd" => -> { I18n.t("Secondary Button") },
-    "ic-brand-button--secondary-text" => -> { I18n.t("Secondary Button Text") },
-    "ic-brand-global-nav-bgd" => -> { I18n.t("Nav Background") },
-    "ic-brand-global-nav-ic-icon-svg-fill" => -> { I18n.t("Nav Icon") },
-    "ic-brand-global-nav-ic-icon-svg-fill--active" => -> { I18n.t("Nav Icon Active") },
-    "ic-brand-global-nav-menu-item__text-color" => -> { I18n.t("Nav Text") },
-    "ic-brand-global-nav-menu-item__text-color--active" => -> { I18n.t("Nav Text Active") },
-    "ic-brand-global-nav-avatar-border" => -> { I18n.t("Nav Avatar Border") },
-    "ic-brand-global-nav-menu-item__badge-bgd" => -> { I18n.t("Nav Badge") },
-    "ic-brand-global-nav-menu-item__badge-text" => -> { I18n.t("Nav Badge Text") },
-    "ic-brand-global-nav-logo-bgd" => -> { I18n.t("Nav Logo Background") },
-    "ic-brand-header-image" => -> { I18n.t("Nav Logo") },
-    "ic-brand-mobile-global-nav-logo" => -> { I18n.t("Responsive Global Nav Logo") },
-    "ic-brand-watermark" => -> { I18n.t("Watermark") },
-    "ic-brand-watermark-opacity" => -> { I18n.t("Watermark Opacity") },
-    "ic-brand-favicon" => -> { I18n.t("Favicon") },
-    "ic-brand-apple-touch-icon" => -> { I18n.t("Mobile Homescreen Icon") },
-    "ic-brand-msapplication-tile-color" => -> { I18n.t("Windows Tile Color") },
-    "ic-brand-msapplication-tile-square" => -> { I18n.t("Windows Tile: Square") },
-    "ic-brand-msapplication-tile-wide" => -> { I18n.t("Windows Tile: Wide") },
-    "ic-brand-right-sidebar-logo" => -> { I18n.t("Right Sidebar Logo") },
-    "ic-brand-Login-body-bgd-color" => -> { I18n.t("Background Color") },
-    "ic-brand-Login-body-bgd-image" => -> { I18n.t("Background Image") },
-    "ic-brand-Login-body-bgd-shadow-color" => -> { I18n.t("Body Shadow") },
-    "ic-brand-Login-logo" => -> { I18n.t("Login Logo") },
-    "ic-brand-Login-Content-bgd-color" => -> { I18n.t("Top Box Background") },
-    "ic-brand-Login-Content-border-color" => -> { I18n.t("Top Box Border") },
-    "ic-brand-Login-Content-inner-bgd" => -> { I18n.t("Inner Box Background") },
-    "ic-brand-Login-Content-inner-border" => -> { I18n.t("Inner Box Border") },
-    "ic-brand-Login-Content-inner-body-bgd" => -> { I18n.t("Form Background") },
-    "ic-brand-Login-Content-inner-body-border" => -> { I18n.t("Form Border") },
-    "ic-brand-Login-Content-label-text-color" => -> { I18n.t("Login Label") },
-    "ic-brand-Login-Content-password-text-color" => -> { I18n.t("Login Link Color") },
-    "ic-brand-Login-footer-link-color" => -> { I18n.t("Login Footer Link") },
-    "ic-brand-Login-footer-link-color-hover" => -> { I18n.t("Login Footer Link Hover") },
-    "ic-brand-Login-instructure-logo" => -> { I18n.t("Login Instructure Logo") }
+    "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
+    "ic-brand-font-color-dark" => lambda { I18n.t("Main Text Color") },
+    "ic-link-color" => lambda { I18n.t("Link Color") },
+    "ic-brand-button--primary-bgd" => lambda { I18n.t("Primary Button") },
+    "ic-brand-button--primary-text" => lambda { I18n.t("Primary Button Text") },
+    "ic-brand-button--secondary-bgd" => lambda { I18n.t("Secondary Button") },
+    "ic-brand-button--secondary-text" => lambda { I18n.t("Secondary Button Text") },
+    "ic-brand-global-nav-bgd" => lambda { I18n.t("Nav Background") },
+    "ic-brand-global-nav-ic-icon-svg-fill" => lambda { I18n.t("Nav Icon") },
+    "ic-brand-global-nav-ic-icon-svg-fill--active" => lambda { I18n.t("Nav Icon Active") },
+    "ic-brand-global-nav-menu-item__text-color" => lambda { I18n.t("Nav Text") },
+    "ic-brand-global-nav-menu-item__text-color--active" => lambda { I18n.t("Nav Text Active") },
+    "ic-brand-global-nav-avatar-border" => lambda { I18n.t("Nav Avatar Border") },
+    "ic-brand-global-nav-menu-item__badge-bgd" => lambda { I18n.t("Nav Badge") },
+    "ic-brand-global-nav-menu-item__badge-text" => lambda { I18n.t("Nav Badge Text") },
+    "ic-brand-global-nav-logo-bgd" => lambda { I18n.t("Nav Logo Background") },
+    "ic-brand-header-image" => lambda { I18n.t("Nav Logo") },
+    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Responsive Global Nav Logo") },
+    "ic-brand-watermark" => lambda { I18n.t("Watermark") },
+    "ic-brand-watermark-opacity" => lambda { I18n.t("Watermark Opacity") },
+    "ic-brand-favicon" => lambda { I18n.t("Favicon") },
+    "ic-brand-apple-touch-icon" => lambda { I18n.t("Mobile Homescreen Icon") },
+    "ic-brand-msapplication-tile-color" => lambda { I18n.t("Windows Tile Color") },
+    "ic-brand-msapplication-tile-square" => lambda { I18n.t("Windows Tile: Square") },
+    "ic-brand-msapplication-tile-wide" => lambda { I18n.t("Windows Tile: Wide") },
+    "ic-brand-right-sidebar-logo" => lambda { I18n.t("Right Sidebar Logo") },
+    "ic-brand-Login-body-bgd-color" => lambda { I18n.t("Background Color") },
+    "ic-brand-Login-body-bgd-image" => lambda { I18n.t("Background Image") },
+    "ic-brand-Login-body-bgd-shadow-color" => lambda { I18n.t("Body Shadow") },
+    "ic-brand-Login-logo" => lambda { I18n.t("Login Logo") },
+    "ic-brand-Login-Content-bgd-color" => lambda { I18n.t("Top Box Background") },
+    "ic-brand-Login-Content-border-color" => lambda { I18n.t("Top Box Border") },
+    "ic-brand-Login-Content-inner-bgd" => lambda { I18n.t("Inner Box Background") },
+    "ic-brand-Login-Content-inner-border" => lambda { I18n.t("Inner Box Border") },
+    "ic-brand-Login-Content-inner-body-bgd" => lambda { I18n.t("Form Background") },
+    "ic-brand-Login-Content-inner-body-border" => lambda { I18n.t("Form Border") },
+    "ic-brand-Login-Content-label-text-color" => lambda { I18n.t("Login Label") },
+    "ic-brand-Login-Content-password-text-color" => lambda { I18n.t("Login Link Color") },
+    "ic-brand-Login-footer-link-color" => lambda { I18n.t("Login Footer Link") },
+    "ic-brand-Login-footer-link-color-hover" => lambda { I18n.t("Login Footer Link Hover") },
+    "ic-brand-Login-instructure-logo" => lambda { I18n.t("Login Instructure Logo") }
   }.freeze
 
   GROUP_NAMES = {
-    "global_branding" => -> { I18n.t("Global Branding") },
-    "global_navigation" => -> { I18n.t("Global Navigation") },
-    "watermarks" => -> { I18n.t("Watermarks & Other Images") },
-    "login" => -> { I18n.t("Login Screen") }
+    "global_branding" => lambda { I18n.t("Global Branding") },
+    "global_navigation" => lambda { I18n.t("Global Navigation") },
+    "watermarks" => lambda { I18n.t("Watermarks & Other Images") },
+    "login" => lambda { I18n.t("Login Screen") }
   }.freeze
 
   HELPER_TEXTS = {
-    "ic-brand-header-image" => -> { I18n.t("Accepted formats: svg, png, jpg, gif") },
-    "ic-brand-mobile-global-nav-logo" => -> { I18n.t("Appears at the top of the global navigation tray that opens on mobile sized screens. display height: 48px. Accepted formats: svg, png, jpg, gif") },
-    "ic-brand-watermark" => -> { I18n.t("This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg") },
-    "ic-brand-watermark-opacity" => -> { I18n.t("Specify the transparency of the watermark background image.") },
-    "ic-brand-favicon" => -> { I18n.t("You can use a single 16x16, 32x32, 48x48 ico file.") },
-    "ic-brand-apple-touch-icon" => -> { I18n.t("The shortcut icon for iOS/Android devices. 180x180 png") },
-    "ic-brand-msapplication-tile-square" => -> { I18n.t("558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)") },
-    "ic-brand-msapplication-tile-wide" => -> { I18n.t("558x270 png, jpg, gif") },
-    "ic-brand-right-sidebar-logo" => -> { I18n.t("A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif") },
-    "ic-brand-Login-body-bgd-shadow-color" => -> { I18n.t("accepted formats: hex, rgba, rgb, hsl") }
+    "ic-brand-header-image" => lambda { I18n.t("Accepted formats: svg, png, jpg, gif") },
+    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Appears at the top of the global navigation tray that opens on mobile sized screens. display height: 48px. Accepted formats: svg, png, jpg, gif") },
+    "ic-brand-watermark" => lambda { I18n.t("This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg") },
+    "ic-brand-watermark-opacity" => lambda { I18n.t("Specify the transparency of the watermark background image.") },
+    "ic-brand-favicon" => lambda { I18n.t("You can use a single 16x16, 32x32, 48x48 ico file.") },
+    "ic-brand-apple-touch-icon" => lambda { I18n.t("The shortcut icon for iOS/Android devices. 180x180 png") },
+    "ic-brand-msapplication-tile-square" => lambda { I18n.t("558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)") },
+    "ic-brand-msapplication-tile-wide" => lambda { I18n.t("558x270 png, jpg, gif") },
+    "ic-brand-right-sidebar-logo" => lambda { I18n.t("A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif") },
+    "ic-brand-Login-body-bgd-shadow-color" => lambda { I18n.t("accepted formats: hex, rgba, rgb, hsl") }
   }.freeze
 
   class << self
@@ -99,11 +99,11 @@ module BrandableCSS
     end
 
     def variables_map_with_image_urls
-      @variables_map_with_image_urls ||= variables_map.transform_values do |config|
+      @variables_map_with_image_urls ||= variables_map.each_with_object({}) do |(key, config), memo|
         if config['type'] == 'image'
-          config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
+          memo[key] = config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
         else
-          config
+          memo[key] = config
         end
       end.freeze
     end
@@ -140,7 +140,7 @@ module BrandableCSS
     def skip_migration_check?
       # our canvas_rspec build doesn't even run `yarn install` or `gulp rev` so since
       # they are not expecting all the frontend assets to work, this check isn't useful
-      Rails.env.test? && !Rails.root.join('public/dist/rev-manifest.json').exist?
+      Rails.env.test? && !Rails.root.join('public', 'dist', 'rev-manifest.json').exist?
     end
 
     def default_variables_md5
@@ -167,17 +167,17 @@ module BrandableCSS
       return handle_urls(explicit_value, config, css_urls) if explicit_value
 
       default = config['default']
-      if default&.starts_with?('$')
+      if default && default.starts_with?('$')
         if css_urls
-          return "var(--#{default[1..]})"
+          return "var(--#{default[1..-1]})"
         else
-          return brand_variable_value(default[1..], active_brand_config, config_map, css_urls)
+          return brand_variable_value(default[1..-1], active_brand_config, config_map, css_urls)
         end
       end
 
       # while in our sass, we want `url(/images/foo.png)`,
       # the Rails Asset Helpers expect us to not have the '/images/', eg: <%= image_tag('foo.png') %>
-      default = default.sub(%r{^/images/}, '') if config['type'] == 'image'
+      default = default.sub(/^\/images\//, '') if config['type'] == 'image'
       handle_urls(default, config, css_urls)
     end
 
@@ -257,7 +257,7 @@ module BrandableCSS
 
     def save_default_files!
       [true, false].each do |high_contrast|
-        %w[js css json].each { |type| save_default!(type, high_contrast) }
+        ['js', 'css', 'json'].each { |type| save_default!(type, high_contrast) }
       end
     end
 
@@ -295,8 +295,8 @@ module BrandableCSS
 
       file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
       if file.exist?
-        @combined_checksums = JSON.parse(file.read).transform_values do |v|
-          v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
+        @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
+          memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
         raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
@@ -346,14 +346,12 @@ module BrandableCSS
       file = APP_ROOT.join(CONFIG.dig('paths', 'rev_manifest'))
 
       # in reality, if the rev-manifest.json file is missing you won't get this far, but let's be careful anyway
-      if file.exist?
-        return(
-          @decorated_font_paths =
-            JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
-              memo["/#{k}"] = "/dist/#{v}" if /^fonts.*woff2/.match?(k)
-            end.freeze
-        )
-      end
+      return(
+        @decorated_font_paths =
+          JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
+            memo["/#{k}"] = "/dist/#{v}" if k =~ /^fonts.*woff2/
+          end.freeze
+      ) if file.exist?
 
       # the file does not exist in production, we have a problem
       if defined?(Rails) && Rails.env.production?
@@ -370,28 +368,28 @@ module BrandableCSS
     end
 
     def all_fingerprints_for(bundle_path)
-      variants.index_with do |variant|
-        cache_for(bundle_path, variant)
+      variants.each_with_object({}) do |variant, object|
+        object[variant] = cache_for(bundle_path, variant)
       end
     end
   end
 
   class BrandConfigWithOutCompileAssets < RuntimeError
     def initialize
-      super <<~TEXT
+      super <<~END
 
         It looks like you are running a migration before running `rake canvas:compile_assets`
         compile_assets needs to complete before running db:migrate if brand_configs have not run
 
         run `rake canvas:compile_assets` and then try migrations again.
 
-      TEXT
+      END
     end
   end
 
   class DefaultMD5NotUpToDateError < RuntimeError
     def initialize
-      super <<~TEXT
+      super <<~END
 
         Something has changed about the default variables or images used in the Theme Editor.
         If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json
@@ -416,7 +414,7 @@ module BrandableCSS
            db/migrate/#{BrandableCSS.migration_version + 1}_#{MIGRATION_NAME.underscore}_postdeploy.rb
 
         FYI, current variables are: #{BrandableCSS.things_that_go_into_defaults_md5}
-      TEXT
+      END
     end
   end
 end

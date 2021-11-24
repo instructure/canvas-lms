@@ -24,16 +24,16 @@ def appendix
   controllers = options[:controllers]
 
   if options[:all_resources]
-    controllers = options[:resources].flatten.select do |o|
+    controllers = options[:resources].flatten.select { |o|
       o.is_a?(YARD::CodeObjects::NamespaceObject)
-    end
+    }
   end
 
-  return unless controllers.is_a?(Array)
+  return unless controllers && controllers.is_a?(Array)
 
-  @appendixes = controllers.collect do |c|
-    c.children.select { |o| o.type == :appendix }
-  end.flatten
+  @appendixes = controllers.collect { |c|
+    c.children.select { |o| :appendix == o.type }
+  }.flatten
 
   super
 end

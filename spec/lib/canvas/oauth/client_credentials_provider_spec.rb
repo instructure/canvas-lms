@@ -24,9 +24,9 @@ module Canvas::OAuth
     let(:dev_key) { DeveloperKey.create! }
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
-    before do
+    before {
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    end
+    }
 
     describe 'generate_token' do
       subject { provider.generate_token }
@@ -34,7 +34,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i[access_token token_type expires_in scope].each do |key|
+        %i(access_token token_type expires_in scope).each do |key|
           expect(subject).to have_key key
         end
       end
@@ -87,9 +87,9 @@ module Canvas::OAuth
     let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
     let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
-    before do
+    before {
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    end
+    }
 
     describe 'using public jwk url' do
       subject { provider.valid? }
@@ -169,7 +169,7 @@ module Canvas::OAuth
       it { is_expected.to be_a Hash }
 
       it 'has the correct expected keys' do
-        %i[access_token token_type expires_in scope].each do |key|
+        %i(access_token token_type expires_in scope).each do |key|
           expect(subject).to have_key key
         end
       end
@@ -297,20 +297,18 @@ module Canvas::OAuth
     let(:dev_key) { DeveloperKey.create! client_credentials_audience: "external" }
     let(:provider) { described_class.new dev_key.id, 'example.com' }
 
-    before do
+    before {
       allow(Rails.application.routes).to receive(:default_url_options).and_return({ :host => 'example.com' })
-    end
+    }
 
     context 'with valid client_id' do
       describe '#error_message' do
         subject { provider.error_message }
-
         it { is_expected.to be_empty }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
-
         it { is_expected.to be true }
       end
 
@@ -320,7 +318,7 @@ module Canvas::OAuth
         it { is_expected.to be_a Hash }
 
         it 'has the correct expected keys' do
-          %i[access_token token_type expires_in scope].each do |key|
+          %i(access_token token_type expires_in scope).each do |key|
             expect(subject).to have_key key
           end
         end
@@ -332,13 +330,11 @@ module Canvas::OAuth
 
       describe '#error_message' do
         subject { provider.error_message }
-
         it { is_expected.to eq("Unknown client_id") }
       end
 
       describe '#valid?' do
         subject { provider.valid? }
-
         it { is_expected.to be false }
       end
     end

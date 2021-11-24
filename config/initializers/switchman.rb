@@ -61,13 +61,13 @@ Rails.application.config.after_initialize do
       end
 
       def encrypt_settings
-        s = settings.dup
+        s = self.settings.dup
         if (encryption_key = s.delete(:encryption_key))
           secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
           s[:encryption_key_enc] = secret
           s[:encryption_key_salt] = salt
         end
-        if s != settings
+        if s != self.settings
           self.settings = s
         end
         s
@@ -102,7 +102,7 @@ Rails.application.config.after_initialize do
       end
     end
 
-    scope :in_region, lambda { |region|
+    scope :in_region, ->(region) do
       next in_current_region if region.nil?
 
       dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
@@ -128,21 +128,21 @@ Rails.application.config.after_initialize do
           where.not(database_server_id: dbs_not_in_this_region)
         end
       end
-    }
+    end
 
-    scope :in_current_region, lambda {
+    scope :in_current_region, -> do
       # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
       # either way there's only one shard, and we always want to see it
       return [default] unless default.is_a?(Switchman::Shard)
       return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
 
       in_region(ApplicationController.region)
-    }
+    end
   end
 
   Switchman::DatabaseServer.class_eval do
     def self.regions
-      @regions ||= all.filter_map { |db| db.config[:region] }.uniq.sort
+      @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
     end
 
     def in_region?(region)
@@ -168,7 +168,7 @@ Rails.application.config.after_initialize do
         (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end
 
-      next_day = maintenance_days.find(&:future?)
+      next_day = maintenance_days.find { |d| d.future? }
       # Time offsets are strange
       start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
@@ -203,7 +203,7 @@ Rails.application.config.after_initialize do
       return klass.send(method, *args) if DatabaseServer.all.all? { |db| !db.config[:region] }
 
       regions = Set.new
-      unless run_current_region_asynchronously
+      if !run_current_region_asynchronously
         klass.send(method, *args)
         regions << Shard.current.database_server.config[:region]
       end

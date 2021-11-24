@@ -266,8 +266,8 @@ class RubricsApiController < ApplicationController
   before_action :require_context
   before_action :validate_args
 
-  VALID_ASSESSMENT_SCOPES = %w[assessments graded_assessments peer_assessments].freeze
-  VALID_ASSOCIATION_SCOPES = %w[associations assignment_associations course_associations account_associations].freeze
+  VALID_ASSESSMENT_SCOPES = %w(assessments graded_assessments peer_assessments).freeze
+  VALID_ASSOCIATION_SCOPES = %w(associations assignment_associations course_associations account_associations).freeze
 
   VALID_INCLUDE_PARAMS = (VALID_ASSESSMENT_SCOPES + VALID_ASSOCIATION_SCOPES).freeze
 
@@ -295,15 +295,15 @@ class RubricsApiController < ApplicationController
     rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
     return render json: { message: "Rubric not found" }, status: :not_found unless rubric.present? && !rubric.deleted?
 
-    if @context.errors.present?
-      render json: @context.errors, status: :bad_request
-    else
+    if !@context.errors.present?
       assessments = rubric_assessments(rubric)
       associations = rubric_associations(rubric)
       render json: rubric_json(rubric, @current_user, session,
                                assessments: assessments,
                                associations: associations,
                                style: params[:style])
+    else
+      render json: @context.errors, status: :bad_request
     end
   end
 

@@ -808,7 +808,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
-          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: :bad_request
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
         end
 
         scope = scope.where(id: params[:assignment_ids])
@@ -817,11 +817,11 @@ class AssignmentsApiController < ApplicationController
       when 'name'
         scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
       when 'due_at'
-        scope = if @context.grants_right?(user, :read_as_admin)
-                  scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
-                else
-                  scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
-                end
+        if @context.grants_right?(user, :read_as_admin)
+          scope = scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        else
+          scope = scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        end
       end
 
       assignments = if params[:assignment_group_id].present?
@@ -834,7 +834,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
-        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: :bad_request
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: 400
       end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
@@ -846,7 +846,7 @@ class AssignmentsApiController < ApplicationController
       override_dates = value_to_boolean(override_param)
       if override_dates || include_all_dates || include_override_objects
         ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
-        assignments.select { |a| a.assignment_overrides.empty? }
+        assignments.select { |a| a.assignment_overrides.size == 0 }
                    .each { |a| a.has_no_overrides = true }
 
         if AssignmentOverrideApplicator.should_preload_override_students?(assignments, user, "assignments_api")
@@ -877,16 +877,11 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
-      mc_status = setup_master_course_restrictions(assignments, context)
-
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        needs_grading_course_proxy = if @context.grants_right?(user, session, :manage_grades)
-                                       Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user)
-                                     else
-                                       nil
-                                     end
+        needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
+          Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
 
         assignment_json(assignment, user, session,
                         submission: submission, override_dates: override_dates,
@@ -899,8 +894,7 @@ class AssignmentsApiController < ApplicationController
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
                         include_can_edit: include_params.include?('can_edit'),
-                        include_score_statistics: include_params.include?('score_statistics'),
-                        master_course_status: mc_status)
+                        include_score_statistics: include_params.include?('score_statistics'))
       end
     end
   end
@@ -1396,7 +1390,7 @@ class AssignmentsApiController < ApplicationController
   def bulk_update
     return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
 
-    data = params.permit(:_json => [:id, :all_dates => %i[id base due_at unlock_at lock_at]]).to_h[:_json]
+    data = params.permit(:_json => [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]).to_h[:_json]
     return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
 
@@ -1439,18 +1433,19 @@ class AssignmentsApiController < ApplicationController
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
     @context.errors.add('bucket', err_msg, :att_name => 'bucket')
-    render :json => @context.errors, :status => :bad_request
+    return render :json => @context.errors, :status => :bad_request
   end
 
   def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
 
     @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
-    # teacher, ta
-    return if @context.grants_right?(@current_user, :view_all_grades) && @context.students_visible_to(@current_user).include?(@user)
-
+    if @context.grants_right?(@current_user, :view_all_grades)
+      # teacher, ta
+      return if @context.students_visible_to(@current_user).include?(@user)
+    end
     # self, observer
-    authorized_action(@user, @current_user, %i[read_as_parent read])
+    authorized_action(@user, @current_user, %i(read_as_parent read))
   end
 
   def needs_grading_permission?

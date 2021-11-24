@@ -26,7 +26,7 @@ class AbstractCourse < ActiveRecord::Base
   belongs_to :enrollment_term
   has_many :courses
 
-  validates :account_id, :root_account_id, :enrollment_term_id, :workflow_state, presence: true
+  validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
 
   workflow do
     state :active

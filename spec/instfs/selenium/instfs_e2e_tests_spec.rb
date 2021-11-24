@@ -84,12 +84,12 @@ describe "instfs file uploads" do
 
   def compare_md5s(image_element_src, original_file_path)
     downloaded_data = download_file(image_element_src)
-    if downloaded_data == false
-      false
-    else
+    if downloaded_data != false
       temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
-      temp_md5 == original_md5
+      return temp_md5 == original_md5
+    else
+      return false
     end
   end
 
@@ -128,17 +128,17 @@ describe "instfs file uploads" do
   end
 
   def check_file_link(file_link)
-    downloaded_data = URI.parse(file_link).open
-    !downloaded_data.empty?
+    downloaded_data = open(file_link)
+    downloaded_data.size > 0
   end
 
   def download_file(file_link)
     # if a file is less than 10K, it will return a StringIO, not a file object.
     # in that case get the string from the StringIO
-    downloaded_data = URI.parse(file_link).open
-    if downloaded_data.instance_of?(StringIO)
+    downloaded_data = open(file_link)
+    if downloaded_data.class == StringIO
       downloaded_data = downloaded_data.string
-    elsif !downloaded_data.empty?
+    elsif downloaded_data.size > 0
       downloaded_data = File.read(downloaded_data)
     else
       return false
@@ -165,7 +165,7 @@ describe "instfs file uploads" do
       enable_instfs
     end
 
-    it "uploads a file to instfs on the files page", priority: "1" do
+    it "uploads a file to instfs on the files page", priority: "1", test_id: 3399288 do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/files"
       wait_for_ajaximations
@@ -176,7 +176,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "displays a thumbnail from instfs", priority: "1" do
+    it "displays a thumbnail from instfs", priority: "1", test_id: 3399295 do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
@@ -185,11 +185,11 @@ describe "instfs file uploads" do
       thumbnail_link = f(".media-object")["style"]
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
       file_link = get_file_link_from_bg_image(thumbnail_link)
-      downloaded_file = URI.parse(file_link).open
+      downloaded_file = open(file_link)
       expect(downloaded_file.size).to be > 0
     end
 
-    it "downloads an instfs file with instfs disabled", priority: "1" do
+    it "downloads an instfs file with instfs disabled", priority: "1", test_id: 3399305 do
       file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
       get "/files"
@@ -203,7 +203,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "uploads a file to instfs with content exports", priority: "1" do
+    it "uploads a file to instfs with content exports", priority: "1", test_id: 3399292 do
       get "/courses/#{@course.id}/content_exports"
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
@@ -226,7 +226,7 @@ describe "instfs file uploads" do
       @ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_upload" })
     end
 
-    it 'allows the teacher to see the uploaded file on speedgrader', priority: "1" do
+    it 'allows the teacher to see the uploaded file on speedgrader', priority: "1", test_id: 3399286 do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
@@ -240,7 +240,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "allows Rich Content Editor to access InstFS files", priority: "1" do
+    it "allows Rich Content Editor to access InstFS files", priority: "1", test_id: 3399287 do
       course_folder = Folder.root_folders(@course).first
       filename = "test_image.jpg"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
@@ -256,7 +256,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "uploads course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1" do
+    it "uploads course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1", test_id: 3455114 do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/courses/#{@course.id}/settings"
       wait_for_ajaximations
@@ -268,7 +268,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'allows the teacher to see the uploaded file on submissions page', priority: "1" do
+    it 'allows the teacher to see the uploaded file on submissions page', priority: "1", test_id: 3399291 do
       filename = "test_image.jpg"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
@@ -288,7 +288,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "displays an attached instfs file in a discussion for the student", priority: "1" do
+    it "displays an attached instfs file in a discussion for the student", priority: "1", test_id: 3455116 do
       filename = "files/instructure.png"
       file_path = File.join(RSpec.configuration.fixture_path, filename)
       discussion = @course.discussion_topics.create!(user: @teacher, title: 'cool stuff', message: 'cool message')
@@ -314,7 +314,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'uploads submission discussion files to instfs', priority: "1" do
+    it 'uploads submission discussion files to instfs', priority: "1", test_id: 3399302 do
       ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_text_entry" })
       ass.submit_homework(@student, submission_type: 'online_text_entry', body: "so cool")
       user_logged_in(:user => @student)
@@ -338,7 +338,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'allows the teacher to see the uploaded file on a quiz submission', priority: "1" do
+    it 'allows the teacher to see the uploaded file on a quiz submission', priority: "1", test_id: 3399299 do
       file_path = File.join(RSpec.configuration.fixture_path, "files/instructure.png")
       quiz = @course.quizzes.create
       quiz.workflow_state = "available"
@@ -374,7 +374,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(file_link, file_path)
     end
 
-    it 'displays instfs images on course modules', priority: "1" do
+    it 'displays instfs images on course modules', priority: "1", test_id: 3455117 do
       file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       get "/courses/#{@course.id}/modules"
       wait_for_ajaximations
@@ -404,7 +404,7 @@ describe "instfs file uploads" do
       enable_instfs
     end
 
-    it "uploads avatar images to instfs", priority: "1" do
+    it "uploads avatar images to instfs", priority: "1", test_id: 3455115 do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       Account.default.enable_service(:avatars)
       Account.default.save!
@@ -420,7 +420,7 @@ describe "instfs file uploads" do
       file_link = get_file_link_from_bg_image(image_link)
       thumbnail_link = get_link_redirect_path(file_link)
       expect(thumbnail_link).to include(InstFS.app_host + "/thumbnails")
-      downloaded_file = URI.parse(file_link).open
+      downloaded_file = open(file_link)
       expect(downloaded_file.size).to be > 0
     end
   end

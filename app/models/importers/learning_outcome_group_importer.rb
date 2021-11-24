@@ -36,7 +36,7 @@ module Importers
           item ||= LearningOutcomeGroup.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
           item ||= LearningOutcomeGroup.new
         else
-          migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), :title => hash[:title]))
+          migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
           return
         end
       else
@@ -44,14 +44,10 @@ module Importers
         root_outcome_group = context.root_outcome_group
         parent_group = hash[:parent_group] || root_outcome_group
 
-        if hash[:migration_id]
-          item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s)
-                                       .where(migration_id: hash[:migration_id]).first
-        end
-        if hash[:vendor_guid].present?
-          item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
-                                                context: context, learning_outcome_group: parent_group)
-        end
+        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s)
+                                     .where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+        item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
+                                              context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
         # Don't migrate if we already have a folder with the same name inside the parent_group
         item ||= LearningOutcomeGroup.active.where(
           context: context,
@@ -86,9 +82,11 @@ module Importers
       # model validation fails that requires a title.  Since "ENG" is
       # always from the UK, we can safely set the title here to avoid
       # the breakage and make imports of UK standards work again
-      if !item.title && item.vendor_guid == "ENG"
-        item.title = "United Kingdom"
-        item.description = "United Kingdom Authority"
+      unless item.title
+        if item.vendor_guid == "ENG"
+          item.title = "United Kingdom"
+          item.description = "United Kingdom Authority"
+        end
       end
 
       item.save!
@@ -112,19 +110,21 @@ module Importers
     end
 
     def self.process_children(hash, item, migration, skip_import = false)
-      hash[:outcomes]&.each do |child|
-        if child[:type] == 'learning_outcome_group'
-          child[:parent_group] = item
-          Importers::LearningOutcomeGroupImporter.import_from_migration(
-            child,
-            migration,
-            nil,
-            skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
-          )
-        else
-          child[:learning_outcome_group] = item
-          if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
-            Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+      if hash[:outcomes]
+        hash[:outcomes].each do |child|
+          if child[:type] == 'learning_outcome_group'
+            child[:parent_group] = item
+            Importers::LearningOutcomeGroupImporter.import_from_migration(
+              child,
+              migration,
+              nil,
+              skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+            )
+          else
+            child[:learning_outcome_group] = item
+            if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+              Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            end
           end
         end
       end

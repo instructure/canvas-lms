@@ -72,10 +72,7 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].upcase
       end
       # compare everything else without the ids
-      hash[:answers].each do |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      end
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq RespondusExpected::MATCHING
     end
@@ -90,10 +87,7 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].upcase
       end
       # compare everything else without the ids
-      hash[:answers].each do |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      end
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq RespondusExpected::MATCHING
     end
@@ -134,7 +128,7 @@ if Qti.migration_executable
         :neutral_comments => "The answer was \"2\". Or \"two\". Or I would even take \"abs(2)\"",
         :question_type => "short_answer_question",
         :question_text => "The absolute value of (-2) is __________"
-      }.freeze
+      }
 
     ESSAY =
       {
@@ -147,7 +141,7 @@ if Qti.migration_executable
         :neutral_comments => "You should have typed something coherent and meaningful into the essay box.",
         :question_type => "essay_question",
         :question_text => "Please type your essay question answer in the box below."
-      }.freeze
+      }
 
     MATCHING =
       {
@@ -169,7 +163,7 @@ if Qti.migration_executable
         :neutral_comments => "This should have been fairly straightforward, if you know the alphabet at all.",
         :question_type => "matching_question",
         :question_text => "Match each lowercase letter with its capitalized letter"
-      }.freeze
+      }
     MULTIPLE_ANSWER2 =
       { :correct_comments => "",
         :question_name => "Multiple Response -- Right less Wrong",
@@ -196,7 +190,7 @@ if Qti.migration_executable
         :neutral_comments =>
                       "\"Alabaster\" and \"architecture\" both start with an \"A\".",
         :question_type => "multiple_answers_question",
-        :question_text => "Select all the words that start with an \"A\"." }.freeze
+        :question_text => "Select all the words that start with an \"A\"." }
     MULTIPLE_ANSWER =
       { :correct_comments => "",
         :question_name => "Multiple Response Question - All or Nothing",
@@ -224,7 +218,7 @@ if Qti.migration_executable
         :neutral_comments =>
                       "the words \"fox\" and \"clocks\" rhyme with \"box\". I know, that was a tricky one because \"clocks\" doesn't end in \"ox\" like \"box\" and \"fox\" do.",
         :question_type => "multiple_answers_question",
-        :question_text => "Select all answers that rhyme with \"box\"." }.freeze
+        :question_text => "Select all answers that rhyme with \"box\"." }
     MULTIPLE_CHOICE =
       {       :correct_comments => '',
               :incorrect_comments => '',
@@ -254,7 +248,7 @@ if Qti.migration_executable
               :neutral_comments_html =>
                       "Well, the correct answer should have been \"C\".  If you didn't put that, you're <b>wrong</b>.",
               :question_type => "multiple_choice_question",
-              :question_text => "Please select the answer \"C\"" }.freeze
+              :question_text => "Please select the answer \"C\"" }
 
     TRUE_FALSE =
       {
@@ -277,7 +271,7 @@ if Qti.migration_executable
         :question_name => "True False Question",
         :points_possible => 1,
         :migration_id => "QUE_1015"
-      }.freeze
+      }
     ALGORITHM_QUESTION =
       { :correct_comments => "",
         :points_possible => 1,
@@ -290,7 +284,7 @@ if Qti.migration_executable
                        { :migration_id => "QUE_1067_A5", :text => "Answer E", :weight => 0 }],
         :migration_id => "QUE_1061",
         :question_type => "multiple_choice_question",
-        :incorrect_comments => "" }.freeze
+        :incorrect_comments => "" }
     ASSESSMENT =
       { :points_possible => "237.0",
         :migration_id => "neutral",
@@ -313,6 +307,6 @@ if Qti.migration_executable
                        { :migration_id => "QUE_1051", :question_type => "question_reference" },
                        { :migration_id => "QUE_1061", :question_type => "question_reference" }],
         :title => "neutral",
-        :quiz_name => "neutral" }.freeze
+        :quiz_name => "neutral" }
   end
 end

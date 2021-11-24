@@ -302,7 +302,9 @@ class OutcomesApiController < ApplicationController
   # @returns [OutcomeAlignment]
 
   def outcome_alignments
-    if params[:student_id]
+    if !params[:student_id]
+      render json: { message: "student_id is required" }, status: :bad_request
+    else
       course = Course.find(params[:course_id])
       can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       student_id = params[:student_id].to_i
@@ -314,7 +316,7 @@ class OutcomesApiController < ApplicationController
         .select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types")
         .joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'")
         .joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'")
-        .where.not(assignments: { workflow_state: assignment_states })
+        .where('assignments.workflow_state NOT IN (?)', assignment_states)
         .to_sql).to_a
       alignments.each { |a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}" }
 
@@ -324,10 +326,10 @@ class OutcomesApiController < ApplicationController
                 .select(:title, :id, :assignment_id).preload(:quiz_questions)
                 .joins(assignment: :submissions)
                 .where(context: course)
-                .where(submissions: { user_id: student_id })
+                .where("submissions.user_id = ?", student_id)
                 .where("submissions.workflow_state <> 'deleted'")
       quiz_alignments = quizzes.map do |quiz|
-        bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq
+        bank_ids = quiz.quiz_questions.map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.compact.uniq
         outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
         outcome_ids.map do |id|
           {
@@ -357,8 +359,6 @@ class OutcomesApiController < ApplicationController
       alignments.concat(quiz_alignments, magic_marker_alignments)
 
       render :json => alignments
-    else
-      render json: { message: "student_id is required" }, status: :bad_request
     end
   rescue ActiveRecord::RecordNotFound => e
     render json: { message: e.message }, status: :not_found

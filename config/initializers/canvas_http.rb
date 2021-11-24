@@ -20,19 +20,19 @@
 CanvasHttp.open_timeout = -> { Setting.get('http_open_timeout', 5).to_f }
 CanvasHttp.read_timeout = -> { Setting.get('http_read_timeout', 30).to_f }
 CanvasHttp.logger = -> { Rails.logger }
-CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.0.0.1/8').split(",").presence }
+CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.0.0.1/8').split(/,/).presence }
 
 module CanvasHttpInitializer
   def self.configure_circuit_breaker!
     # need some place to store circuit breaker information so we don't
     # have to have each process store it's own circuit breaker
     # state
-    CanvasHttp::CircuitBreaker.redis = lambda do
+    CanvasHttp::CircuitBreaker.redis = lambda {
       return MultiCache.cache.redis if MultiCache.cache.respond_to?(:redis)
       return Canvas.redis if Canvas.redis_enabled?
 
       nil
-    end
+    }
 
     # how many failures for a domain trips the circuit breaker
     CanvasHttp::CircuitBreaker.threshold = lambda do |domain|

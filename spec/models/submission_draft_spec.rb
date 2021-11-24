@@ -73,39 +73,39 @@ RSpec.describe SubmissionDraft do
 
   describe 'validation' do
     it 'submission cannot be nil' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: nil, submission_attempt: @submission.attempt)
-      end.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'submission_attempt cannot be nil' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: @submission, submission_attempt: nil)
-      end.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'cannot have duplicate drafts for the same submission and attempt' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt)
-      end.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'submission_attempt can be one attempt ahead of the current submissions' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt + 1)
-      end.not_to raise_error
+      }.not_to raise_error
     end
 
     it 'submission_attempt cannot be more then one attempt ahead of the current submissions' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt + 2)
-      end.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'cannot have a media_object_it that does not correspond to a media object' do
-      expect do
+      expect {
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt, media_object_id: 'oogyboogy')
-      end.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 

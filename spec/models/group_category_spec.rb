@@ -189,7 +189,7 @@ describe GroupCategory do
   it "can pass through selfsignup info given (enabled, restricted)" do
     @category = GroupCategory.new
     @category.name = "foo"
-    @category.context = course_factory
+    @category.context = course_factory()
     @category.self_signup = 'enabled'
     expect(@category.self_signup?).to be_truthy
     expect(@category.unrestricted_self_signup?).to be_truthy
@@ -288,9 +288,9 @@ describe GroupCategory do
       potential_members = @course.users_not_in_groups(groups)
       memberships = category.distribute_members_among_groups(potential_members, groups)
       student_ids = [student3.id, student4.id, student5.id, student6.id]
-      expect(memberships.map(&:user_id).sort).to eq student_ids.sort
+      expect(memberships.map { |m| m.user_id }.sort).to eq student_ids.sort
 
-      grouped_memberships = memberships.group_by(&:group_id)
+      grouped_memberships = memberships.group_by { |m| m.group_id }
       expect(grouped_memberships[group1.id].size).to eq 1
       expect(grouped_memberships[group2.id].size).to eq 3
     end
@@ -381,7 +381,7 @@ describe GroupCategory do
 
       # student1 shouldn't get assigned, already being in a group
       memberships = @category.assign_unassigned_members
-      expect(memberships.map(&:user)).not_to include(student1)
+      expect(memberships.map { |m| m.user }).not_to include(student1)
     end
 
     it "otherwises assign ungrouped users to groups in the @category" do
@@ -393,7 +393,7 @@ describe GroupCategory do
 
       # student2 should get assigned, not being in a group
       memberships = @category.assign_unassigned_members
-      expect(memberships.map(&:user)).to include(student2)
+      expect(memberships.map { |m| m.user }).to include(student2)
     end
 
     it "handles unequal group sizes" do
@@ -467,7 +467,7 @@ describe GroupCategory do
 
     it "calculates correctly for a clean split" do
       # 10 "users"
-      allow(@category).to receive(:unassigned_users) { %w[u u u u u u u u u u] }
+      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership
@@ -477,7 +477,7 @@ describe GroupCategory do
 
     it "rounds up for an uneven split" do
       # 11 "users"
-      allow(@category).to receive(:unassigned_users) { %w[u u u u u u u u u u u] }
+      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership
@@ -675,9 +675,9 @@ describe GroupCategory do
   end
 
   it 'requires a group category to belong to an account or course' do
-    expect do
+    expect {
       GroupCategory.create!(name: 'Test') # don't provide an account or course; should fail
-    end.to raise_error(ActiveRecord::RecordInvalid)
+    }.to raise_error(ActiveRecord::RecordInvalid)
 
     gc = GroupCategory.create(name: 'Test')
     expect(gc.errors.full_messages).to include('Context Must have an account or course ID')
@@ -685,9 +685,9 @@ describe GroupCategory do
   end
 
   it 'makes sure sis_batch_id is valid' do
-    expect do
+    expect {
       GroupCategory.create!(name: 'Test', account: account, sis_batch_id: 1)
-    end.to raise_error(ActiveRecord::InvalidForeignKey)
+    }.to raise_error(ActiveRecord::InvalidForeignKey)
 
     sis_batch = SisBatch.create!(account: account)
     gc = GroupCategory.create!(name: 'Test2', account: account, sis_batch: sis_batch)
@@ -697,9 +697,9 @@ describe GroupCategory do
   it 'makes sure sis_source_id is unique per root_account' do
     GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
 
-    expect do
+    expect {
       GroupCategory.create!(name: 'Test2', account: account, sis_source_id: '1')
-    end.to raise_error(ActiveRecord::RecordInvalid)
+    }.to raise_error(ActiveRecord::RecordInvalid)
 
     new_account = Account.create
     gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)
@@ -727,7 +727,7 @@ def assert_random_group_assignment(category, course, initial_spread, result_spre
   end
 
   # set up course users
-  user_count = result_spread.sum + expected_leftover_count
+  user_count = result_spread.inject(:+) + expected_leftover_count
   course_users = create_users_in_course(course, user_count, return_type: :record)
 
   # set up initial spread

@@ -28,14 +28,12 @@ describe 'RequestThrottle' do
   let(:request_header_token) { request_user_2.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session.options' => { id: 'sess1' } }) }
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
-  let(:inner_app) { ->(_env) { response } }
+  let(:inner_app) { lambda { |_env| response } }
   let(:throttler) { RequestThrottle.new(inner_app) }
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   # not a let so that actual and expected aren't the same object that get modified together
-  def response
-    [200, { 'Content-Type' => 'text/plain' }, ['Hello']]
-  end
+  def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
 
   after { RequestThrottle.reload! }
 
@@ -47,19 +45,19 @@ describe 'RequestThrottle' do
 
   describe "#client_identifier" do
     def req(hash)
-      ActionDispatch::Request.new(hash).tap(&:fullpath)
+      ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
     end
 
     it "uses access token" do
-      expect(throttler.client_identifier(req(request_header_token))).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
+      expect(throttler.client_identifier(req request_header_token)).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
     it "uses user id" do
-      expect(throttler.client_identifier(req(request_user_2))).to eq "user:2"
+      expect(throttler.client_identifier(req request_user_2)).to eq "user:2"
     end
 
     it "uses session id" do
-      expect(throttler.client_identifier(req(request_logged_out))).to eq 'session:sess1'
+      expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
     end
 
     it "falls back to ip" do
@@ -394,11 +392,11 @@ describe 'RequestThrottle' do
         it "still decrements when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
-            expect do
+            expect {
               @bucket.reserve_capacity(20) do
                 raise "oh noes"
               end
-            end.to raise_error(RuntimeError)
+            }.to raise_error(RuntimeError)
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
           end
         end
@@ -433,7 +431,7 @@ describe 'RequestThrottle' do
 
         it "uses regexes to predict up front costs by path if set" do
           hash = {
-            %r{\A/files/\d+/download} => 1,
+            /\A\/files\/\d+\/download/ => 1,
             "equation_images\/" => 2
           }
           expect(RequestThrottle).to receive(:dynamic_settings).and_return({ 'up_front_cost_by_path_regex' => hash })

@@ -33,7 +33,8 @@ describe "links", priority: "2" do
 
     def find_link(link_css)
       link_section = f('#section-tabs')
-      link_section.find_element(:css, link_css)
+      link_element = link_section.find_element(:css, link_css)
+      link_element
     end
 
     it "navigates user to home page after home link is clicked" do
@@ -117,10 +118,10 @@ describe "links", priority: "2" do
       end
 
       it "navigates user to user settings page after settings link is clicked" do
-        expect_new_page_load do
+        expect_new_page_load {
           f('#global_nav_profile_link').click
           fj('[aria-label="Profile tray"] a:contains("Settings")').click
-        end
+        }
         expect(f("a.edit_settings_link")).to be_displayed
       end
     end

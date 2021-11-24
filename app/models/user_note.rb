@@ -24,9 +24,9 @@ class UserNote < ActiveRecord::Base
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
 
-  validates :user_id, :created_by_id, :workflow_state, presence: true
-  validates :note, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates_presence_of :user_id, :created_by_id, :workflow_state
+  validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   after_save :update_last_user_note
 
   sanitize_field :note, CanvasSanitize::SANITIZE
@@ -40,7 +40,7 @@ class UserNote < ActiveRecord::Base
   scope :desc_by_date, -> { order('created_at DESC') }
 
   set_policy do
-    given { |user| creator == user }
+    given { |user| self.creator == user }
     can :delete and can :read
 
     given { |user| self.user.grants_right?(user, :delete_user_notes) }
@@ -58,18 +58,18 @@ class UserNote < ActiveRecord::Base
   end
 
   def formatted_note(truncate = nil)
-    extend TextHelper
-    res = note
-    res = truncate_html(note, :max_length => truncate, :words => true) if truncate
+    self.extend TextHelper
+    res = self.note
+    res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
     res
   end
 
   def creator_name
-    creator ? creator.name : nil
+    self.creator ? self.creator.name : nil
   end
 
   def update_last_user_note
-    user.update_last_user_note
-    user.save
+    self.user.update_last_user_note
+    self.user.save
   end
 end

@@ -113,7 +113,7 @@ describe UserMerge do
       user1.reload
       user2.reload
 
-      %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
+      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
         expect(user1[attr]).to eq user2[attr]
       end
     end
@@ -309,7 +309,7 @@ describe UserMerge do
                                                                                                            ['i@instructure.com', 'retired'],
                                                                                                            ['o@instructure.com', 'retired']
                                                                                                          ])
-      %w[B@instructure.com F@instructure.com H@instructure.com].each do |path|
+      %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
         expect(CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }).to be_nil
       end
     end

@@ -131,7 +131,7 @@ module Workflow
       workflow_methods = const_get(:WorkflowMethods, false)
       self.workflow_spec ||= Specification.new
       self.workflow_spec.add(&specification)
-      self.workflow_spec.states.each_value do |state|
+      self.workflow_spec.states.values.each do |state|
         state_name = state.name
         workflow_methods.module_eval do
           define_method "#{state_name}?" do
@@ -139,7 +139,7 @@ module Workflow
           end
         end
 
-        state.events.each_value do |event|
+        state.events.values.each do |event|
           event_name = event.name
           workflow_methods.module_eval do
             define_method "#{event_name}!".to_sym do |*args|
@@ -191,15 +191,16 @@ module Workflow
 
     def process_event!(name, *args)
       event = current_state.events[name.to_sym]
-      raise NoTransitionAllowed, "There is no event #{name.to_sym} defined for the #{current_state} state" if event.nil?
-
+      raise NoTransitionAllowed.new(
+        "There is no event #{name.to_sym} defined for the #{current_state} state"
+      ) if event.nil?
       @halted_because = nil
       @halted = false
       @raise_exception_on_halt = false
       return_value = run_action(event.action, *args) || run_action_callback("do_#{event.name}", *args)
       if @halted
         if @raise_exception_on_halt
-          raise TransitionHalted, @halted_because
+          raise TransitionHalted.new(@halted_because)
         else
           false
         end
@@ -243,7 +244,7 @@ module Workflow
     end
 
     def run_action_callback(action_name, *args)
-      send action_name.to_sym, *args if respond_to?(action_name.to_sym)
+      self.send action_name.to_sym, *args if self.respond_to?(action_name.to_sym)
     end
 
     def run_on_entry(state, prior_state, triggering_event, *args)
@@ -251,7 +252,7 @@ module Workflow
     end
 
     def run_on_exit(state, new_state, triggering_event, *args)
-      instance_exec(new_state.name, triggering_event, *args, &state.on_exit) if state&.on_exit
+      instance_exec(new_state.name, triggering_event, *args, &state.on_exit) if state and state.on_exit
     end
 
     # load_workflow_state and persist_workflow_state

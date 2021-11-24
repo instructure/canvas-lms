@@ -29,7 +29,7 @@ describe Lti::ToolProxyNameBookmarker do
 
   it_behaves_like 'a bookmarker for models with names', order: true do
     let(:model_factory_proc) do
-      ->(account, model_name) { create_tool_proxy(context: account, name: model_name) }
+      lambda { |account, model_name| create_tool_proxy(context: account, name: model_name) }
     end
 
     let(:model_base_scope) { Lti::ToolProxy }

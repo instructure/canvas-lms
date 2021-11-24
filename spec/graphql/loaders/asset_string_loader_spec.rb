@@ -37,26 +37,26 @@ describe Loaders::AssetStringLoader do
   end
 
   it "batch loads" do
-    expect do
+    expect {
       GraphQL::Batch.batch do
-        Loaders::AssetStringLoader.load(@course1.asset_string).then do |course|
+        Loaders::AssetStringLoader.load(@course1.asset_string).then { |course|
           expect(course).to eq @course1
-        end
-        Loaders::AssetStringLoader.load(@course2.asset_string).then do |course|
+        }
+        Loaders::AssetStringLoader.load(@course2.asset_string).then { |course|
           expect(course).to eq @course2
-        end
-        Loaders::AssetStringLoader.load(@assignment.asset_string).then do |assignment|
+        }
+        Loaders::AssetStringLoader.load(@assignment.asset_string).then { |assignment|
           expect(assignment).to eq @assignment
-        end
+        }
       end
-    end.to change { @query_count }.by(2)
+    }.to change { @query_count }.by(2)
   end
 
   it "fulfills with nil if target is not found" do
     GraphQL::Batch.batch do
-      Loaders::AssetStringLoader.load("random_1").then do |target|
+      Loaders::AssetStringLoader.load("random_1").then { |target|
         expect(target).to eq nil
-      end
+      }
     end
   end
 end

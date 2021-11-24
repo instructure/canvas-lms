@@ -86,17 +86,17 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
       end
 
-      specify do
-        wont_send_when do
+      specify {
+        wont_send_when {
           allow(submission).to receive(:group_broadcast_submission).and_return true
-        end
-      end
+        }
+      }
 
-      specify do
-        wont_send_when do
+      specify {
+        wont_send_when {
           allow(course).to receive(:available?).and_return false
-        end
-      end
+        }
+      }
 
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }

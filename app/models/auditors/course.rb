@@ -62,7 +62,7 @@ class Auditors::Course
     end
 
     def event_source
-      attributes['event_source']&.to_sym
+      attributes['event_source'].to_sym if attributes['event_source']
     end
 
     def user
@@ -106,7 +106,9 @@ class Auditors::Course
       attributes['data'] = @event_data.to_json
     end
 
-    delegate :account, to: :course
+    def account
+      course.account
+    end
   end
 
   Stream = Audits.stream do
@@ -120,16 +122,16 @@ class Auditors::Course
 
     add_index :course do
       table :courses_by_course
-      entry_proc ->(record) { record.course }
-      key_proc ->(course) { course.global_id }
-      ar_scope_proc ->(course) { course_ar_type.where(course_id: course.id) }
+      entry_proc lambda { |record| record.course }
+      key_proc lambda { |course| course.global_id }
+      ar_scope_proc lambda { |course| course_ar_type.where(course_id: course.id) }
     end
 
     add_index :account do
       table :courses_by_account
-      entry_proc ->(record) { record.account }
-      key_proc ->(account) { account.global_id }
-      ar_scope_proc ->(account) { course_ar_type.where(account_id: account.id) }
+      entry_proc lambda { |record| record.account }
+      key_proc lambda { |account| account.global_id }
+      ar_scope_proc lambda { |account| course_ar_type.where(account_id: account.id) }
     end
   end
 
@@ -141,71 +143,71 @@ class Auditors::Course
   def self.record_created(course, user, changes, opts = {})
     return unless course && changes
 
-    changes = remove_empty_changes(changes)
+    changes = self.remove_empty_changes(changes)
     return if changes.empty?
 
-    record(course, user, "created", changes, opts)
+    self.record(course, user, "created", changes, opts)
   end
 
   def self.record_updated(course, user, changes, opts = {})
     return unless course && changes
 
-    changes = remove_empty_changes(changes)
+    changes = self.remove_empty_changes(changes)
     return if changes.empty?
 
-    record(course, user, 'updated', changes, opts)
+    self.record(course, user, 'updated', changes, opts)
   end
 
   def self.record_concluded(course, user, opts = {})
     return unless course
 
-    record(course, user, 'concluded', {}, opts)
+    self.record(course, user, 'concluded', {}, opts)
   end
 
   def self.record_unconcluded(course, user, opts = {})
     return unless course
 
-    record(course, user, 'unconcluded', {}, opts)
+    self.record(course, user, 'unconcluded', {}, opts)
   end
 
   def self.record_deleted(course, user, opts = {})
     return unless course
 
-    record(course, user, 'deleted', {}, opts)
+    self.record(course, user, 'deleted', {}, opts)
   end
 
   def self.record_restored(course, user, opts = {})
     return unless course
 
-    record(course, user, 'restored', {}, opts)
+    self.record(course, user, 'restored', {}, opts)
   end
 
   def self.record_published(course, user, opts = {})
     return unless course
 
-    record(course, user, 'published', {}, opts)
+    self.record(course, user, 'published', {}, opts)
   end
 
   def self.record_claimed(course, user, opts = {})
     return unless course
 
-    record(course, user, 'claimed', {}, opts)
+    self.record(course, user, 'claimed', {}, opts)
   end
 
   def self.record_copied(course, copy, user, opts = {})
     return unless course && copy
 
-    copied_from = record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
-    copied_to = record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
-    [copied_from, copied_to]
+    copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
+    copied_to = self.record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
+    return copied_from, copied_to
   end
 
   def self.record_reset(course, new_course, user, opts = {})
     return unless course && new_course
 
-    reset_from = record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
-    reset_to = record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
-    [reset_from, reset_to]
+    reset_from = self.record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
+    reset_to = self.record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
+    return reset_from, reset_to
   end
 
   def self.record(course, user, event_type, data = {}, opts = {})

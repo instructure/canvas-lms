@@ -28,7 +28,7 @@ describe EventStream::AttrConfig do
       def initialize(opts = {})
         # assumes the class has had attr_config :field declared. but that
         # declaration will happen during specs since it varies
-        field(opts[:field]) if opts.key?(:field)
+        field(opts[:field]) if opts.has_key?(:field)
         attr_config_validate
       end
     end
@@ -46,9 +46,9 @@ describe EventStream::AttrConfig do
     it "errors on accessor with > 1 args" do
       @class.attr_config :field, :default => nil
       obj = @class.new
-      expect do
+      expect {
         obj.field(1, 2)
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
 
     it "allows defaults" do
@@ -92,9 +92,9 @@ describe EventStream::AttrConfig do
       obj.field(nil)
       expect(obj.field).to be_nil
 
-      expect do
+      expect {
         obj.field('value')
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
 
     it "errors when Proc does not return the expected type" do
@@ -103,9 +103,9 @@ describe EventStream::AttrConfig do
       value = -> { [] }
       obj.field(value)
 
-      expect do
+      expect {
         obj.field
-      end.to raise_exception NoMethodError
+      }.to raise_exception NoMethodError
     end
 
     it "skips cast with unknown type" do
@@ -135,9 +135,9 @@ describe EventStream::AttrConfig do
       value = double('value')
       @class.attr_config :field
       @class.new(:field => value)
-      expect do
+      expect {
         @class.new
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
 
     it "runs the value when its a Proc" do
@@ -151,9 +151,9 @@ describe EventStream::AttrConfig do
       @class.attr_config :field
       value = -> {}
       obj = @class.new(:field => value)
-      expect do
+      expect {
         obj.field
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
   end
 end

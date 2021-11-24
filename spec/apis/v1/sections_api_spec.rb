@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 
 describe SectionsController, type: :request do
   describe '#index' do
-    let(:user_api_fields) { %w[id name sortable_name short_name created_at] }
+    let(:user_api_fields) { %w(id name sortable_name short_name created_at) }
 
     before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
@@ -130,7 +130,7 @@ describe SectionsController, type: :request do
                       { :include => ['students'] })
 
       expect(json.first["name"]).to eq @course.default_section.name
-      expect(json.first.key?("students")).to be_falsey
+      expect(json.first.keys.include?("students")).to be_falsey
     end
 
     it "returns all sections if :all are specified" do

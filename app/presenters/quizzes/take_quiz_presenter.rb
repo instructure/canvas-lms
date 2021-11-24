@@ -115,7 +115,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def question_answered?(question)
-    answers.key?(question[:id])
+    answers.has_key?(question[:id])
   end
 
   def question_index(question)
@@ -187,7 +187,7 @@ class Quizzes::TakeQuizPresenter
   private
 
   def first_unread_question
-    question_ids = all_questions.pluck(:id)
+    question_ids = all_questions.map { |question| question[:id] }
     first_unread = question_ids.detect do |question_id|
       !submission_data[:"_question_#{question_id}_read"]
     end
@@ -195,7 +195,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def form_action_params(session, user)
-    url_params = { :user_id => user&.id }
+    url_params = { :user_id => user && user.id }
     if session['lockdown_browser_popup']
       url_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params)
     end
@@ -229,7 +229,7 @@ class Quizzes::TakeQuizPresenter
 
     answers.reject! do |_, status_entries|
       # an answer must not be falsy/empty
-      status_entries.any? { |status| dataset[status].blank? } ||
+      status_entries.any? { |status| !dataset[status].present? } ||
         # all zeroes for an answer is a no-answer
         status_entries.all? { |status| dataset[status] == '0' }
     end

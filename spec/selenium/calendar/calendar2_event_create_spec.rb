@@ -27,7 +27,7 @@ describe "calendar2" do
   include K5Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -97,7 +97,7 @@ describe "calendar2" do
 
         # verify it shows up right when set from the datepicker
         f('#calendar_event_date + .ui-datepicker-trigger').click
-        fj('.ui-datepicker-current-day a:contains(2)').click
+        fj('.ui-datepicker-current-day a:contains(2)').click()
         expect(f('.ui-dialog #calendar_event_date').attribute(:value)).to eq('ven 2 Mars 2018')
         expect(fj('.date_field_container:has(#calendar_event_date) .datetime_suggest').text).to eq 'ven. 2 Mar 2018'
 
@@ -105,7 +105,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.start_at).to eq Time.utc(2018, 3, 2)
       end
 
-      it "goes to calendar event modal when a syllabus link is clicked", priority: "1" do
+      it "goes to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
         event_title = "Test Event"
         make_event(title: event_title, context: @course)
 
@@ -130,7 +130,7 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
-      it "creates an event that is recurring", priority: "1" do
+      it "creates an event that is recurring", priority: "1", test_id: 223510 do
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
@@ -250,12 +250,12 @@ describe "calendar2" do
         @student_to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "Student to do")
       end
 
-      it "shows student to-do events in the calendar", priority: "1" do
+      it "shows student to-do events in the calendar", priority: "1", test_id: 3357313 do
         get "/calendar2"
         expect(f('.fc-content .fc-title')).to include_text(@student_to_do.title)
       end
 
-      it "shows the correct date and context for student to-do item in calendar", priority: "1" do
+      it "shows the correct date and context for student to-do item in calendar", priority: "1", test_id: 3357315 do
         get "/calendar2"
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
@@ -272,12 +272,12 @@ describe "calendar2" do
                                                         course_id: @course.id)
       end
 
-      it "shows course to do events in the calendar", priority: "1" do
+      it "shows course to do events in the calendar", priority: "1", test_id: 3357314 do
         get "/calendar2"
         expect(f('.fc-content .fc-title')).to include_text(@course_to_do.title)
       end
 
-      it "shows the correct date and context for courseto-do item in calendar", priority: "1" do
+      it "shows the correct date and context for courseto-do item in calendar", priority: "1", test_id: 3357316 do
         get "/calendar2"
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
@@ -326,13 +326,13 @@ describe "calendar2" do
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
       end
 
-      it "edits the event in calendar", priority: "1" do
+      it "edits the event in calendar", priority: "1", test_id: 3415211 do
         get "/calendar2"
         f('.fc-content .fc-title').click
         f('.edit_event_link').click
         replace_content(f('input[name=title]'), 'new to-do edited')
         datetime = @todo_date
-        datetime = if datetime.to_date.mday == '15'
+        datetime = if datetime.to_date().mday() == '15'
                      datetime.change({ day: 20 })
                    else
                      datetime.change({ day: 15 })

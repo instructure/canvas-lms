@@ -52,11 +52,11 @@ module Lti
     end
 
     def self.expansion_keys
-      expansions.keys.map { |c| c.to_s[1..] }
+      self.expansions.keys.map { |c| c.to_s[1..-1] }
     end
 
     def self.default_name_expansions
-      expansions.values.select { |v| v.default_name.present? }.map(&:name)
+      self.expansions.values.select { |v| v.default_name.present? }.map(&:name)
     end
 
     def self.find_expansion(key)
@@ -64,20 +64,20 @@ module Lti
 
       if (md = key.to_s.match(PARAMETERS_REGEX))
         real_key = md[1] + "<>"
-        if (expansion = expansions[real_key.to_sym])
+        if (expansion = self.expansions[real_key.to_sym])
           [expansion, md[2]]
         end
       else
-        expansions[key.to_sym]
+        self.expansions[key.to_sym]
       end
     end
 
     CONTROLLER_GUARD = -> { !!@controller }
     COURSE_GUARD = -> { @context.is_a? Course }
-    TERM_START_DATE_GUARD = lambda do
+    TERM_START_DATE_GUARD = -> {
       @context.is_a?(Course) && @context.enrollment_term &&
         @context.enrollment_term.start_at
-    end
+    }
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
@@ -88,8 +88,8 @@ module Lti
     ASSIGNMENT_GUARD = -> { @assignment }
     FILE_UPLOAD_GUARD = -> { !!@assignment && @assignment.submission_types.split(',').include?('online_upload') }
     COLLABORATION_GUARD = -> { @collaboration }
-    MEDIA_OBJECT_GUARD = -> { @attachment&.media_object }
-    USAGE_RIGHTS_GUARD = -> { @attachment&.usage_rights }
+    MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object }
+    USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights }
     MEDIA_OBJECT_ID_GUARD = -> { @attachment && (@attachment.media_object || @attachment.media_entry_id) }
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
@@ -121,7 +121,7 @@ module Lti
     def [](key)
       k = (key[0] == '$' && key) || "$#{key}"
       expansion, args = self.class.find_expansion(k)
-      expansion&.expand(self, *args)
+      expansion.expand(self, *args) if expansion
     end
 
     def expand_variables!(var_hash)
@@ -163,7 +163,7 @@ module Lti
     #    All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
     #   ```
     register_expansion 'com.instructure.User.observees', [],
-                       lambda {
+                       -> do
                          observed_users = ObserverEnrollment.observed_students(@context, @current_user)
                                                             .keys
                          if @tool.use_1_3?
@@ -171,7 +171,7 @@ module Lti
                          else
                            observed_users.map { |u| Lti::Asset.opaque_identifier_for(u) }.join(',')
                          end
-                       },
+                       end,
                        COURSE_GUARD,
                        default_name: 'com_instructure_user_observees'
 
@@ -194,10 +194,10 @@ module Lti
     #   "A123,B456,..."
     #   ```
     register_expansion 'com.instructure.Observee.sisIds', [],
-                       lambda {
+                       -> do
                          observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
                          observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(',')
-                       },
+                       end,
                        COURSE_GUARD,
                        default_name: 'com_instructure_observee_sis_ids'
 
@@ -254,7 +254,7 @@ module Lti
     #   "9ae4170c-6b64-444d-9246-0b7dedd5f560"
     #   ```
     register_expansion 'com.instructure.Assignment.lti.id', [],
-                       lambda {
+                       -> do
                          if @assignment
                            @assignment.lti_context_id
                          elsif @originality_report
@@ -262,7 +262,7 @@ module Lti
                          elsif @secure_params.present?
                            Lti::Security.decoded_lti_assignment_id(@secure_params)
                          end
-                       },
+                       end,
                        LTI_ASSIGN_ID,
                        default_name: 'com_instructure_assignment_lti_id'
 
@@ -273,7 +273,7 @@ module Lti
     #   "Example Description"
     #   ```
     register_expansion 'com.instructure.Assignment.description', [],
-                       lambda {
+                       -> do
                          if @assignment
                            @assignment.lti_safe_description
                          elsif @originality_report
@@ -281,7 +281,7 @@ module Lti
                          elsif @secure_params.present?
                            Lti::Security.decoded_lti_assignment_description(@secure_params)
                          end
-                       },
+                       end,
                        LTI_ASSIGN_DESCRIPTION,
                        default_name: 'com_instructure_assignment_description'
 
@@ -308,9 +308,9 @@ module Lti
     #   23
     #   ```
     register_expansion 'com.instructure.OriginalityReport.id', [],
-                       lambda {
+                       -> do
                          @originality_report.id
-                       },
+                       end,
                        ORIGINALITY_REPORT_GUARD,
                        default_name: 'com_instructure_originality_report_id'
 
@@ -504,7 +504,7 @@ module Lti
     #   "http://example.url/path"
     #   ```
     register_expansion 'Canvas.externalTool.url', [],
-                       lambda {
+                       -> {
                          @controller.named_context_url(@tool.context, :api_v1_context_external_tools_update_url,
                                                        @tool.id, include_host: true)
                        },
@@ -547,7 +547,7 @@ module Lti
     #   "http://example.url/path.css"
     #   ```
     register_expansion 'Canvas.css.common', [],
-                       lambda {
+                       -> {
                          URI.parse(@request.url)
                             .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s
                        },
@@ -977,7 +977,7 @@ module Lti
     #   "1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,..."
     #   ```
     register_expansion 'Canvas.group.contextIds', [],
-                       lambda {
+                       -> {
                          @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
                            Lti::Asset.opaque_identifier_for(g)
                          end.join(',')
@@ -1199,7 +1199,7 @@ module Lti
     #   1234
     #   ```
     register_expansion 'Canvas.module.id', [],
-                       lambda {
+                       -> {
                          @content_tag.context_module_id
                        },
                        CONTENT_TAG_GUARD
@@ -1211,7 +1211,7 @@ module Lti
     #   1234
     #   ```
     register_expansion 'Canvas.moduleItem.id', [],
-                       lambda {
+                       -> {
                          @content_tag.id
                        },
                        CONTENT_TAG_GUARD
@@ -1420,11 +1420,11 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
     #   ```
     register_expansion 'vnd.Canvas.OriginalityReport.url', [],
-                       lambda {
+                       -> do
                          OriginalityReportsApiController::SERVICE_DEFINITIONS.find do |s|
                            s[:id] == 'vnd.Canvas.OriginalityReport'
                          end[:endpoint]
-                       },
+                       end,
                        default_name: 'vnd_canvas_originality_report_url'
 
     # The submission LTI2 service endpoint
@@ -1434,11 +1434,11 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}"
     #   ```
     register_expansion 'vnd.Canvas.submission.url', [],
-                       lambda {
+                       -> do
                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                            s[:id] == 'vnd.Canvas.submission'
                          end[:endpoint]
-                       },
+                       end,
                        default_name: 'vnd_canvas_submission_url'
 
     # The submission history LTI2 service endpoint
@@ -1448,11 +1448,11 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}/history"
     #   ```
     register_expansion 'vnd.Canvas.submission.history.url', [],
-                       lambda {
+                       -> do
                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
                            s[:id] == 'vnd.Canvas.submission.history'
                          end[:endpoint]
-                       },
+                       end,
                        default_name: 'vnd_canvas_submission_history_url'
 
     register_expansion 'Canvas.file.media.id', [],
@@ -1501,7 +1501,7 @@ module Lti
     #   "assignment,discussion_topic,page,quiz,module"
     #   ```
     register_expansion 'com.instructure.Course.accept_canvas_resource_types', [],
-                       lambda {
+                       -> {
                          val = @request.parameters['com_instructure_course_accept_canvas_resource_types']
                          val.is_a?(Array) ? val.join(",") : val
                        }
@@ -1548,7 +1548,7 @@ module Lti
     #   [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
     #   ```
     register_expansion 'com.instructure.Course.available_canvas_resources', [],
-                       lambda {
+                       -> {
                          val = @request.parameters['com_instructure_course_available_canvas_resources']
                          val = val.values if val.is_a?(Hash)
                          if val&.count == 1 && (course_id = val.first["course_id"])
@@ -1585,7 +1585,7 @@ module Lti
     end
 
     def lti_1_3?
-      @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
+      @tool && @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
     end
   end
 end

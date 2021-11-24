@@ -164,10 +164,10 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_course
     begin
       course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => e
+    rescue ActiveRecord::RecordNotFound => not_found
       return render_unauthorized_action unless admin_authorized?
 
-      raise e
+      raise not_found
     end
 
     return render_unauthorized_action unless course_authorized?(course)
@@ -252,7 +252,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def query
-    unless Auditors.read_from_postgres?
+    unless Auditors::read_from_postgres?
       return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
     end
 
@@ -274,13 +274,10 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     conditions = {}
-    if course
-      conditions[:context_id] = course.id
-      conditions[:context_type] = 'Course'
-    end
-    conditions[:student_id] = student.id if student
-    conditions[:grader_id] = grader.id if grader
-    conditions[:assignment_id] = assignment.id if assignment
+    conditions.merge!(context_id: course.id, context_type: 'Course') if course
+    conditions.merge!(student_id: student.id) if student
+    conditions.merge!(grader_id: grader.id) if grader
+    conditions.merge!(assignment_id: assignment.id) if assignment
     if conditions.empty?
       return render json: { message: "Must specify at least one query condition" }, status: :bad_request
     end
@@ -289,15 +286,15 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, api_v1_audit_grade_change_url, course: course, remove_anonymous: params[:student_id].present?)
   end
 
-  # TODO: remove Cassandra cruft and make Gradebook History use the admin search above
+  # TODO remove Cassandra cruft and make Gradebook History use the admin search above
   # once OSS users have been given the opportunity to migrate to Postgres auditors
   def for_course_and_other_parameters
     begin
       course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => e
+    rescue ActiveRecord::RecordNotFound => not_found
       return render_unauthorized_action unless admin_authorized?
 
-      raise e
+      raise not_found
     end
 
     return render_unauthorized_action unless course_authorized?(course)
@@ -386,7 +383,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def anonymous_and_muted(events)
-    assignment_ids = events.filter_map { |event| event["attributes"].fetch("assignment_id") }
+    assignment_ids = events.map { |event| event["attributes"].fetch("assignment_id") }.compact
     assignments = api_find_all(Assignment, assignment_ids)
     assignments_anonymous_and_muted = {}
 

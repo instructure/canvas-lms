@@ -25,8 +25,8 @@ module Lti
 
     attr_readonly :created_at
 
-    belongs_to :resource_handler, class_name: "Lti::ResourceHandler"
-    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
+    belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
+    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy', foreign_key: :tool_proxy_id
 
     has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
     has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'").preload(context_module: :content_tags) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
@@ -34,9 +34,9 @@ module Lti
     serialize :capabilities
     serialize :parameters
 
-    validates :message_type, :resource_handler, :launch_path, presence: true
+    validates_presence_of :message_type, :resource_handler, :launch_path
 
-    scope :by_message_types, ->(*message_types) { where(message_type: message_types) }
+    scope :by_message_types, lambda { |*message_types| where(message_type: message_types) }
 
     scope :for_context, lambda { |context|
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)

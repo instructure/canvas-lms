@@ -30,7 +30,7 @@ describe ExternalToolsController do
   end
 
   describe "POST 'create'" do
-    let(:post_body) do
+    let(:post_body) {
       'external_tool%5Bname%5D=IMS+Cert+Tool&external_tool%5Bprivacy_level%5D=name_only'\
         '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
         '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
@@ -40,7 +40,7 @@ describe ExternalToolsController do
         '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
         'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
         'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
-    end
+    }
 
     it 'accepts form data' do
       user_session(@teacher)
@@ -66,7 +66,7 @@ describe ExternalToolsController do
   end
 
   describe "PUT 'update'" do
-    let(:post_body) do
+    let(:post_body) {
       'external_tool%5Bname%5D=IMS+Cert+Tool&external_tool%5Bprivacy_level%5D=name_only'\
         '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
         '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
@@ -76,7 +76,7 @@ describe ExternalToolsController do
         '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
         'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
         'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
-    end
+    }
 
     it "does not update tool if user lacks update_manually" do
       user_session(@student)
@@ -179,7 +179,7 @@ describe ExternalToolsController do
         allow_any_instance_of(AppCenter::AppApi).to receive(:fetch_app_center_response).and_return(app_center_response)
         allow_any_instance_of(CC::Importer::BLTIConverter).to receive(:fetch).and_return(config_response)
 
-        configxml = Rails.root.join('spec/fixtures/lti/config.youtube.xml').read
+        configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
         stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
         stub_request(:get, "https://www.edu-apps.org/tool_i_should_not_have_access_to.xml").to_return(status: 404)
       end

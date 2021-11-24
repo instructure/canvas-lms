@@ -48,10 +48,10 @@ module CanvasSecurity
       include_context "JWT setup"
 
       let(:translate_token) do
-        lambda do |jwt|
+        ->(jwt) {
           decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
           return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
-        end
+        }
       end
 
       it "has secrets accessors" do
@@ -167,7 +167,7 @@ module CanvasSecurity
           it "doesn't include the masq key if there is no real user" do
             jwt = ServicesJwt.for_user(host, user, real_user: nil)
             decrypted_token_body = translate_token.call(jwt)
-            expect(decrypted_token_body.key?(:masq_sub)).to eq(false)
+            expect(decrypted_token_body.keys.include?(:masq_sub)).to eq(false)
           end
 
           it "includes workflows if given" do

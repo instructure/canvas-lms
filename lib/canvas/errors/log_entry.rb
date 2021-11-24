@@ -33,7 +33,7 @@ module Canvas
       # on a condition and write a message if a surprising
       # thing happens
       def self.write(exception, data, level = :error)
-        msg = new(exception, data).message
+        msg = self.new(exception, data).message
         Rails.logger.send(level, msg)
       end
 
@@ -67,8 +67,8 @@ module Canvas
         entry << "\n#{e.class}"
         begin
           entry << " (#{e.message}):" if e.respond_to?(:message)
-        rescue => e
-          entry << "\n***[WARNING]: Unable to extract error message due to #{e}"
+        rescue StandardError => new_err
+          entry << "\n***[WARNING]: Unable to extract error message due to #{new_err}"
         end
         entry << "\n"
         entry << e.annoted_source_code.to_s if e.respond_to?(:annoted_source_code)

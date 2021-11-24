@@ -25,14 +25,14 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#export_completed?' do
     let(:course) { course_model }
-    let(:tool) do
+    let(:tool) {
       course.context_external_tools.create!({
                                               name: 'a',
                                               domain: 'lti.example.com',
                                               consumer_key: '12345',
                                               shared_secret: 'sekret',
                                             })
-    end
+    }
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:status_url) { 'https://lti.example.com/export/42/status' }
 
@@ -62,14 +62,14 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#retrieve_export' do
     let(:course) { course_model }
-    let(:tool) do
+    let(:tool) {
       course.context_external_tools.create!({
                                               name: 'a',
                                               domain: 'lti.example.com',
                                               consumer_key: '12345',
                                               shared_secret: 'sekret',
                                             })
-    end
+    }
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:fetch_url) { 'https://lti.example.com/export/42' }
 
@@ -230,7 +230,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     context 'for a partial export' do
       before do
         @options[:selective] = true
-        @exports = @options[:exported_assets] = %w[assignment_42 learning_outcome_84 announcement_21]
+        @exports = @options[:exported_assets] = ['assignment_42', 'learning_outcome_84', 'announcement_21']
         @migrator.start!
       end
 

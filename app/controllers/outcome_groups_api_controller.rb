@@ -155,11 +155,9 @@ class OutcomeGroupsApiController < ApplicationController
   def redirect
     return unless can_read_outcomes
 
-    @outcome_group = if @context
-                       @context.root_outcome_group
-                     else
-                       LearningOutcomeGroup.global_root_outcome_group
-                     end
+    @outcome_group = @context ?
+      @context.root_outcome_group :
+      LearningOutcomeGroup.global_root_outcome_group
     redirect_to polymorphic_path [:api_v1, @context || :global, :outcome_group], :id => @outcome_group.id
   end
 
@@ -385,7 +383,7 @@ class OutcomeGroupsApiController < ApplicationController
       else
         @context.account.account_chain.dup
       end
-    account_chain.map! do |a|
+    account_chain.map! { |a|
       {
         :id => a.root_outcome_group.id,
         :title => a.name,
@@ -395,7 +393,7 @@ class OutcomeGroupsApiController < ApplicationController
         :subgroups_url => polymorphic_path([:api_v1, a, :outcome_group_subgroups], :id => a.root_outcome_group.id),
         :outcomes_url => polymorphic_path([:api_v1, a, :outcome_group_outcomes], :id => a.root_outcome_group.id)
       }
-    end
+    }
     path = polymorphic_path [:api_v1, @context, :account_chain]
     account_chain = Api.paginate(account_chain, self, path)
 
@@ -570,8 +568,8 @@ class OutcomeGroupsApiController < ApplicationController
     begin
       @outcome_link.destroy
       render :json => outcome_link_json(@outcome_link, @current_user, session)
-    rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
-      render :json => { 'message' => e.message }, :status => :bad_request
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
+      render :json => { 'message' => error.message }, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request
     end

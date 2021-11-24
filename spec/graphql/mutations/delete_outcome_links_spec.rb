@@ -41,9 +41,9 @@ describe Mutations::DeleteOutcomeLinks do
   end
 
   def variables(args = {})
-    <<~YAML
+    <<~VARS
       ids: #{args[:ids] || [@outcome_link1.id]}
-    YAML
+    VARS
   end
 
   def execute_with_input(input, user_executing: @admin)
@@ -88,7 +88,7 @@ describe Mutations::DeleteOutcomeLinks do
 
   context 'Error' do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'deleteOutcomeLinks', 'errors')
+      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeLinks', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end

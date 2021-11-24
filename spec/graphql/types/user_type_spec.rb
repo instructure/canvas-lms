@@ -339,14 +339,14 @@ describe Types::UserType do
 
   context "groups" do
     before(:once) do
-      @user_group_ids = (1..5).map do
+      @user_group_ids = (1..5).map {
         group_with_user({ user: @student, active_all: true }).group_id.to_s
-      end
-      @deleted_user_group_ids = (1..3).map do
+      }
+      @deleted_user_group_ids = (1..3).map {
         group = group_with_user({ user: @student, active_all: true })
         group.destroy
         group.group_id.to_s
-      end
+      }
     end
 
     it "fetches the groups associated with a user" do
@@ -501,7 +501,7 @@ describe Types::UserType do
     end
 
     it 'returns known users' do
-      known_users = @student.address_book.search_users.paginate(per_page: 4)
+      known_users = @student.address_book.search_users().paginate(per_page: 4)
       result = type.resolve('recipients { usersConnection { nodes { _id } } }')
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
@@ -512,7 +512,7 @@ describe Types::UserType do
     end
 
     it 'searches users' do
-      known_users = @student.address_book.search_users.paginate(per_page: 3)
+      known_users = @student.address_book.search_users().paginate(per_page: 3)
       User.find(known_users.first.id).update!(name: 'Matthew Lemon')
       result = type.resolve('recipients(search: "lemon") { usersConnection { nodes { _id } } }')
       expect(result[0]).to eq(known_users.first.id.to_s)
@@ -744,7 +744,7 @@ describe Types::UserType do
       ).to eq ["TeacherEnrollment"]
     end
 
-    it "returns all roles if no role types are specified" do
+    it "returns all roles if no role types are specified " do
       expect(
         teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
       ).to include("TaEnrollment", "TeacherEnrollment")

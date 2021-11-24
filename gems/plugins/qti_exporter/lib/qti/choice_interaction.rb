@@ -46,7 +46,7 @@ module Qti
     private
 
     def is_either_or
-      @migration_type =~ %r{either/or}i
+      @migration_type =~ /either\/or/i
     end
 
     def process_true_false_question
@@ -73,7 +73,7 @@ module Qti
       if is_either_or
         @question[:answers].each do |a|
           split = a[:text].split(/_|\./)
-          a[:text] = /true/i.match?(split[2]) ? split[0] : split[1]
+          a[:text] = split[2] =~ /true/i ? split[0] : split[1]
         end
       end
     end
@@ -81,7 +81,7 @@ module Qti
     def set_question_type
       correct_answers = 0
       @question[:answers].each do |ans|
-        correct_answers += 1 if ans[:weight] && ans[:weight] > 0
+        correct_answers += 1 if ans[:weight] and ans[:weight] > 0
       end
 
       # If the question is worth zero points its correct answer's weight might
@@ -89,11 +89,11 @@ module Qti
       # instead of added to. So set that answer to correct in that case.
       if correct_answers == 0 && @use_set_var_set_as_correct
         @question[:answers].each do |ans|
-          next unless ans[:zero_weight_set_not_summed]
-
-          ans.delete :zero_weight_set_not_summed
-          ans[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
-          correct_answers += 1
+          if ans[:zero_weight_set_not_summed]
+            ans.delete :zero_weight_set_not_summed
+            ans[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
+            correct_answers += 1
+          end
         end
       end
 
@@ -123,25 +123,25 @@ module Qti
               answer[:text] = choice.text.strip
             else
               sanitized = sanitize_html!(choice.at_css('div[class=html]') ? Nokogiri::HTML5.fragment(choice.text) : choice, true)
-              if sanitized.present? && sanitized != CGI.escapeHTML(answer[:text])
+              if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
                 answer[:html] = sanitized
               end
             end
           end
 
           if answer[:text] == ""
-            answer[:text] = if /true|false/i.match?(answer[:migration_id])
-                              clear_html(answer[:migration_id])
-                            else
-                              DEFAULT_ANSWER_TEXT
-                            end
+            if answer[:migration_id] =~ /true|false/i
+              answer[:text] = clear_html(answer[:migration_id])
+            else
+              answer[:text] = DEFAULT_ANSWER_TEXT
+            end
           end
           if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question' && choice['identifier'] =~ /true|false/i
             answer[:text] = choice['identifier']
           end
 
           @question[:answers] << answer
-          if ci['responseIdentifier'] && @question[:question_type] == 'multiple_dropdowns_question'
+          if ci['responseIdentifier'] and @question[:question_type] == 'multiple_dropdowns_question'
             answer[:blank_id] = ci['responseIdentifier']
             answers_hash["#{answer[:blank_id]}_#{answer[:migration_id]}"] = answer
           else
@@ -178,8 +178,8 @@ module Qti
         elsif @doc.at_css('instructureField[name="bb_question_type"][value="Multiple Answer"]') &&
               @doc.at_css('responseIf > and > match')
           process_blackboard_9_multiple_answers(answers_hash)
-        elsif cond.at_css('match variable[identifier=RESP_MC]') || cond.at_css('match variable[identifier=response]')
-          migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip
+        elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
+          migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
           migration_id = migration_id.sub('.', '_') if is_either_or
           answer = answers_hash[migration_id] || answers_hash.values.detect { |a| a[:text] == migration_id }
           answer[:weight] = get_response_weight(cond)
@@ -197,7 +197,7 @@ module Qti
           @question[:question_type] = "true_false_question"
         elsif cond.at_css('responseIf and > member')
           cond.css('responseIf > and > member').each do |m|
-            migration_id = m.at_css('baseValue[baseType=identifier]').text.strip
+            migration_id = m.at_css('baseValue[baseType=identifier]').text.strip()
             answer = answers_hash[migration_id]
             answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
             answer[:feedback_id] ||= get_feedback_id(cond)
@@ -207,26 +207,28 @@ module Qti
             migration_id = r_if.at_css('match baseValue[baseType=identifier]')
             migration_id ||= r_if.at_css('member baseValue[baseType=identifier]')
             if migration_id
-              migration_id = migration_id.text.strip
+              migration_id = migration_id.text.strip()
 
               answer = answers_hash[migration_id]
-              answer ||= answers_hash.values.detect { |a| a[:text]&.casecmp?(migration_id) }
+              answer ||= answers_hash.values.detect { |a| a[:text] && a[:text].downcase == migration_id.downcase }
 
               if answer
                 answer[:weight] = get_response_weight(r_if)
                 answer[:feedback_id] ||= get_feedback_id(r_if)
 
                 # flag whether this answer was set or added to
-                if @use_set_var_set_as_correct && (answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]'))
-                  answer[:zero_weight_set_not_summed] = true
+                if @use_set_var_set_as_correct
+                  if answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+                    answer[:zero_weight_set_not_summed] = true
+                  end
                 end
               end
             end
-            next if @question[:points_possible]
-
-            que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
-            if que_scores.any?
-              @question[:points_possible] = que_scores.map { |q| q.text.to_i }.max
+            unless @question[:points_possible]
+              que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+              if que_scores.any?
+                @question[:points_possible] = que_scores.map { |q| q.text.to_i }.max
+              end
             end
           end
           @question[:feedback_id] = get_feedback_id(cond)
@@ -260,17 +262,16 @@ module Qti
 
     def get_base_value(node)
       weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-      case node['baseType']
-      when "float" # base_value = node.at_css('baseValue[baseType=float]')
-        if node.text =~ /score\.max/i || node.text.to_f > 0
+      if node['baseType'] == "float" # base_value = node.at_css('baseValue[baseType=float]')
+        if node.text =~ /score\.max/i or node.text.to_f > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      when "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
+      elsif node['baseType'] == "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
         if node.text.to_i > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      when "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
-        if node.text.casecmp?("true")
+      elsif node['baseType'] == "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
+        if node.text.downcase == "true"
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
       else
@@ -283,8 +284,8 @@ module Qti
     # BB9 does these questions a little differently, so we will special-case them
     def process_blackboard_9_multiple_answers(answers_hash)
       and_node = @doc.at_css('responseIf > and')
-      matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip }
-      not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip }
+      matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+      not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
       get_real_blackboard_match_ids(answers_hash, matches, not_matches).each do |migration_id|
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(and_node.parent)

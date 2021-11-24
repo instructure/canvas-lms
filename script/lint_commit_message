@@ -24,12 +24,12 @@ def comment(severity, line, message, link_to_guidelines: false)
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
     payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message }
     `gergich comment #{Shellwords.escape(payload.to_json)}`
-    warn "line #{line}: [#{severity}]: #{message}"
+    $stderr.puts "line #{line}: [#{severity}]: #{message}"
   elsif line
-    warn $lines[line - 1]
-    warn "  ^: [#{severity}]: #{message}"
+    $stderr.puts $lines[line - 1]
+    $stderr.puts "  ^: [#{severity}]: #{message}"
   else
-    warn "[#{severity}]: #{message}"
+    $stderr.puts "[#{severity}]: #{message}"
   end
 end
 
@@ -98,7 +98,7 @@ long_lines = lines.each_with_index.select do |line, _i|
   line.size > BODY_IDEAL_LINE_LENGTH
 end
 
-unless long_lines.empty?
+if long_lines.size > 0
   comment "warn", long_lines.first[1] + 3,
           "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
           (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),

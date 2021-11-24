@@ -27,8 +27,8 @@ describe DataFixup::ClearOldCommunicationChannelRootAccountIds do
     CommunicationChannel.create!(user: u1, path: 'a@b.com')
     CommunicationChannel.create!(user: u2, path: 'a@b.com')
     CommunicationChannel.create!(user: u3, path: 'a@b.com')
-    expect do
+    expect {
       described_class.run
-    end.to change { CommunicationChannel.pluck(:root_account_ids).uniq }.from([[], [a.id]]).to([nil])
+    }.to change { CommunicationChannel.pluck(:root_account_ids).uniq }.from([[], [a.id]]).to([nil])
   end
 end

@@ -82,9 +82,11 @@ class ReleaseNotesController < ApplicationController
       }
     end
 
-    if !(@current_user.nil? || transformed_notes.empty?) && (transformed_notes.first[:date] > last_seen_release_note)
-      @current_user.last_seen_release_note = transformed_notes.first[:date]
-      @current_user.save!
+    unless @current_user.nil? || transformed_notes.empty?
+      if transformed_notes.first[:date] > last_seen_release_note
+        @current_user.last_seen_release_note = transformed_notes.first[:date]
+        @current_user.save!
+      end
     end
 
     render json: transformed_notes
@@ -146,7 +148,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def upsert_params
-    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.index_with { %w[title description url] }, show_ats: allowed_envs).to_h
+    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.map { |l| [l, ['title', 'description', 'url']] }.to_h, show_ats: allowed_envs).to_h
   end
 
   def allowed_langs
@@ -167,8 +169,8 @@ class ReleaseNotesController < ApplicationController
 
   # For specs only
   def clear_ivars
-    instance_variables.each do |ivar|
-      instance_variable_set(ivar, nil)
+    self.instance_variables.each do |ivar|
+      self.instance_variable_set(ivar, nil)
     end
   end
 end

@@ -67,7 +67,7 @@ describe AvatarHelper do
       end
 
       it "sets the href to the given url" do
-        expect(avatar(user, url: "/test_url")).to match(%r{href="/test_url"})
+        expect(avatar(user, url: "/test_url")).to match(/href="\/test_url"/)
       end
 
       it "links to the context user's page when given a context_code" do
@@ -96,10 +96,7 @@ describe AvatarHelper do
 
     describe ".avatar_url_for_user" do
       before(:once) do
-        Account.default.tap do |a|
-          a.enable_service(:avatars)
-          a.save!
-        end
+        Account.default.tap { |a| a.enable_service(:avatars); a.save! }
       end
 
       it "returns a fallback avatar if the user doesn't have one" do

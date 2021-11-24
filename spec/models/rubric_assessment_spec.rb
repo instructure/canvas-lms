@@ -419,7 +419,8 @@ describe RubricAssessment do
         expect(assessment.artifact.score).to be 3.0
       end
 
-      it "allows points to exceed max points possible if Allow Outcome Extra Credit feature is enabled" do
+      it "should allow points to exceed max points possible " +
+         "if Allow Outcome Extra Credit feature is enabled" do
         @course.enable_feature!(:outcome_extra_credit)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({
@@ -692,7 +693,7 @@ describe RubricAssessment do
     end
 
     describe "#considered_anonymous?" do
-      let_once(:assessment) do
+      let_once(:assessment) {
         RubricAssessment.create!({
                                    artifact: @assignment.find_or_create_submission(@student),
                                    assessment_type: 'peer_review',
@@ -700,7 +701,7 @@ describe RubricAssessment do
                                    rubric: @rubric,
                                    user: @student
                                  })
-      end
+      }
 
       it "does not blow up without a rubric_association" do
         expect { assessment.considered_anonymous? }.not_to raise_error

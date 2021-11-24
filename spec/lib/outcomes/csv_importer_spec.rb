@@ -145,8 +145,8 @@ describe Outcomes::CSVImporter do
 
       criteria = by_guid['c'].rubric_criterion
       ratings = criteria[:ratings].sort_by { |r| r[:points] }
-      expect(ratings.pluck(:points)).to eq([1, 2, 3])
-      expect(ratings.pluck(:description)).to eq(%w[Good Better Betterest])
+      expect(ratings.map { |r| r[:points] }).to eq([1, 2, 3])
+      expect(ratings.map { |r| r[:description] }).to eq(['Good', 'Better', 'Betterest'])
 
       expect(by_guid['d'].rubric_criterion[:ratings].length).to eq(2)
       expect(by_guid['e'].rubric_criterion[:ratings].length).to eq(2)
@@ -295,7 +295,7 @@ describe Outcomes::CSVImporter do
 
     it 'when invalid headers are present' do
       expect_import_failure(
-        [%w[vendor_guid title object_type spanish_inquisition parent_guids ratings]],
+        [['vendor_guid', 'title', 'object_type', 'spanish_inquisition', 'parent_guids', 'ratings']],
         'Invalid fields: ["spanish_inquisition"]'
       )
     end
@@ -446,7 +446,7 @@ describe Outcomes::CSVImporter do
           group_row(
             vendor_guid: 'a',
             calculation_method: 'n_mastery',
-            calculation_int: '5'
+            calculation_int: '5',
           ) + ['1', 'Sad Trombone'],
         ],
         [[2, 'Invalid fields for a group: ["calculation_method", "calculation_int", "ratings"]']]

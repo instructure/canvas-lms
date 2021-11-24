@@ -42,4 +42,7 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
         &.clear_downstream_caches(:role_overrides)
     end
   end
+
+  def down
+  end
 end

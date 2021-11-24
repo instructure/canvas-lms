@@ -24,6 +24,6 @@ module Lti
 
     belongs_to :context, polymorphic: [:course, :account]
 
-    validates :tool_proxy, :context, presence: true
+    validates_presence_of :tool_proxy, :context
   end
 end

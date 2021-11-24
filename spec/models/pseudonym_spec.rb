@@ -435,37 +435,37 @@ describe Pseudonym do
   end
 
   describe "permissions" do
-    let(:account1) do
+    let(:account1) {
       a = Account.default
       a.settings[:admins_can_view_notifications] = true
       a.save!
       a
-    end
+    }
     let(:account2) { Account.create! }
 
-    let(:sally) do
+    let(:sally) {
       account_admin_user(
         user: student_in_course(account: account2).user,
         account: account1
       )
-    end
+    }
 
-    let(:bob) do
+    let(:bob) {
       student_in_course(
         user: student_in_course(account: account2).user,
         course: course_factory(account: account1)
       ).user
-    end
+    }
 
     let(:charlie) { student_in_course(account: account2).user }
 
-    let(:alice) do
+    let(:alice) {
       account_admin_user_with_role_changes(
         account: account1,
         role: custom_account_role('StrongerAdmin', account: account1),
         role_changes: { view_notifications: true }
       )
-    end
+    }
 
     describe ":create" do
       it "grants admins :create for themselves on the account" do

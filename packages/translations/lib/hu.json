@@ -455,9 +455,6 @@
     "feedback_6dcc1991": {
         "message": "Visszajelzés"
     },
-    "file_name_8fd421ff": {
-        "message": "Fájlnév"
-    },
     "file_url_c12b64be": {
         "message": "Fájl URL"
     },
@@ -832,9 +829,6 @@
     },
     "people_b4ebb13c": {
         "message": "Résztvevők"
-    },
-    "percentage_34ab7c2c": {
-        "message": "Százalék"
     },
     "points_bceb5005": {
         "message": "pontszám"

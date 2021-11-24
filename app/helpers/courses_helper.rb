@@ -37,11 +37,8 @@ module CoursesHelper
 
     # because this happens in a sidebar, the context may be wrong. check and fix
     # it if that's the case.
-    context = if context.instance_of?(recent_event.class) && context.id == recent_event.context_id
-                context
-              else
-                recent_event.context
-              end
+    context = context.class == recent_event.class && context.id == recent_event.context_id ?
+      context : recent_event.context
 
     icon_data = [nil] + event_type
 
@@ -52,22 +49,22 @@ module CoursesHelper
       else
         icon_data = [t('#courses.recent_event.not_submitted', 'not submitted')] + event_type
       end
-      icon_data[0] = nil unless recent_event.expects_submission?
+      icon_data[0] = nil if !recent_event.expects_submission?
     elsif !student_only && can_do(context, current_user, :manage_grades)
       # no submissions
-      icon_data = if !recent_event.has_submitted_submissions?
-                    [t('#courses.recent_event.no_submissions', 'no submissions')] + event_type
-                  # all received submissions graded (but not all turned in)
-                  elsif recent_event.submitted_count < context.students.size &&
-                        !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
-                    [t('#courses.recent_event.no_new_submissions', 'no new submissions')] + event_type
-                  # all submissions turned in and graded
-                  elsif !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
-                    [t('#courses.recent_event.all_graded', 'all graded')] + event_type
-                  # assignments need grading
-                  else
-                    [t('#courses.recent_event.needs_grading', 'needs grading')] + event_type
-                  end
+      if !recent_event.has_submitted_submissions?
+        icon_data = [t('#courses.recent_event.no_submissions', 'no submissions')] + event_type
+      # all received submissions graded (but not all turned in)
+      elsif recent_event.submitted_count < context.students.size &&
+            !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
+        icon_data = [t('#courses.recent_event.no_new_submissions', 'no new submissions')] + event_type
+      # all submissions turned in and graded
+      elsif !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
+        icon_data = [t('#courses.recent_event.all_graded', 'all graded')] + event_type
+      # assignments need grading
+      else
+        icon_data = [t('#courses.recent_event.needs_grading', 'needs grading')] + event_type
+      end
     end
 
     icon_data
@@ -76,13 +73,15 @@ module CoursesHelper
   def recent_event_url(recent_event)
     context = recent_event.context
     if recent_event.is_a?(Assignment)
-      context_url(context, :context_assignment_url, :id => recent_event.id)
+      url = context_url(context, :context_assignment_url, :id => recent_event.id)
     else
-      calendar_url_for(nil, {
-                         :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
-                         :anchor => "calendar_event_" + recent_event.id.to_s
-                       })
+      url = calendar_url_for(nil, {
+                               :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
+                               :anchor => "calendar_event_" + recent_event.id.to_s
+                             })
     end
+
+    url
   end
 
   # Public: Display the given user count, or "None" if it's 0.
@@ -109,10 +108,10 @@ module CoursesHelper
   end
 
   def readable_grade(submission)
-    if submission.grade &&
+    if submission.grade and
        submission.workflow_state == 'graded'
-      if submission.grading_type == 'points' &&
-         submission.assignment &&
+      if submission.grading_type == 'points' and
+         submission.assignment and
          submission.assignment.respond_to?(:points_possible)
         score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
       else
@@ -133,7 +132,7 @@ module CoursesHelper
     end
 
     type = enrollment.type.remove(/Enrollment/).downcase
-    type = "student" if %w[studentview observer].include?(type)
+    type = "student" if %w/studentview observer/.include?(type)
 
     type
   end

@@ -35,7 +35,7 @@ describe GraphQLController do
   context "graphiql" do
     it "requires a user" do
       get :graphiql
-      expect(response.location).to match(%r{/login$})
+      expect(response.location).to match(/\/login$/)
     end
 
     it "works in production for normal users" do

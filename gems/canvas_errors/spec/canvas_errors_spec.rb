@@ -68,9 +68,7 @@ describe CanvasErrors do
       fake_job_class = Class.new do
         def perform; end
 
-        def tag
-          "#perform"
-        end
+        def tag; "#perform"; end
       end
       job = fake_job_class.new
       allow(Delayed::Worker).to receive(:current_job).and_return(job)
@@ -99,12 +97,12 @@ describe CanvasErrors do
   end
 
   it "passes through extra information if available wrapped in extra" do
-    CanvasErrors.capture(double, { detail1: 'blah' })
+    CanvasErrors.capture(double(), { detail1: 'blah' })
     expect(@error_harness.details[:extra][:detail1]).to eq('blah')
   end
 
   it 'captures output from each callback according to their registry tag' do
-    outputs = CanvasErrors.capture(double)
+    outputs = CanvasErrors.capture(double())
     expect(outputs[:test_thing]).to eq("ERROR_BLOCK_RESPONSE")
   end
 end

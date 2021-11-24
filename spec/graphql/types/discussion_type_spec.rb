@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 RSpec.shared_examples "DiscussionType" do
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
-  let(:permissions) do
+  let(:permissions) {
     [
       {
         value: 'attach',
@@ -79,23 +79,23 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'speedGrader',
-        allowed: lambda do |user|
+        allowed: ->(user) {
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
             return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
           else
             return permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
-        end
+        }
       },
       {
         value: 'peerReview',
-        allowed: lambda do |user|
+        allowed: ->(user) {
           discussion.assignment_id &&
             discussion.assignment.published? &&
             discussion.assignment.has_peer_reviews? &&
             discussion.assignment.grants_right?(user, :grade)
-        end
+        }
       },
       {
         value: 'showRubric',
@@ -103,35 +103,35 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'addRubric',
-        allowed: lambda do |user|
+        allowed: ->(user) {
           !discussion.assignment_id.nil? &&
             discussion.assignment.rubric.nil? &&
             discussion.assignment.grants_right?(user, :update)
-        end
+        }
       },
       {
         value: 'openForComments',
-        allowed: lambda do |user|
+        allowed: ->(user) {
           !discussion.comments_disabled? &&
             discussion.locked &&
             discussion.grants_right?(user, :moderate_forum)
-        end
+        }
       },
       {
         value: 'closeForComments',
-        allowed: lambda do |user|
+        allowed: ->(user) {
           discussion.can_lock? &&
             !discussion.comments_disabled? &&
             !discussion.locked &&
             discussion.grants_right?(user, :moderate_forum)
-        end
+        }
       },
       {
         value: 'copyAndSendTo',
         allowed: ->(user) { discussion.context.grants_right?(user, :read_as_admin) }
       }
     ]
-  end
+  }
 
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
@@ -384,6 +384,17 @@ describe Types::DiscussionType do
       it 'finds lists the user' do
         expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.users.map(&:id).map(&:to_s))
       end
+    end
+
+    it "locked_for_user is set correctly" do
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return({ unlock_at: 'a sample date' })
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(false)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
     end
 
     it "available_for_user is set correctly" do

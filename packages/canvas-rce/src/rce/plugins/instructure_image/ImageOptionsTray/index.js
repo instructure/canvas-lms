@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 
-import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, MIN_PERCENTAGE, scaleToSize} from '../ImageEmbedOptions'
+import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, scaleToSize} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
 import {useDimensionsState} from '../../shared/DimensionsInput'
 import ImageOptionsForm from '../../shared/ImageOptionsForm'
@@ -50,8 +50,7 @@ export default function ImageOptionsTray(props) {
 
   const dimensionsState = useDimensionsState(imageOptions, {
     minHeight: MIN_HEIGHT,
-    minWidth: MIN_WIDTH,
-    minPercentage: MIN_PERCENTAGE
+    minWidth: MIN_WIDTH
   })
 
   function handleUrlChange(newUrl) {
@@ -89,13 +88,8 @@ export default function ImageOptionsTray(props) {
     let appliedHeight = imageHeight
     let appliedWidth = imageWidth
     if (imageSize === CUSTOM) {
-      if (dimensionsState.usePercentageUnits) {
-        appliedHeight = `${dimensionsState.percentage}%`
-        appliedWidth = `${dimensionsState.percentage}%`
-      } else {
-        appliedHeight = dimensionsState.height
-        appliedWidth = dimensionsState.width
-      }
+      appliedHeight = dimensionsState.height
+      appliedWidth = dimensionsState.width
     }
 
     onSave({

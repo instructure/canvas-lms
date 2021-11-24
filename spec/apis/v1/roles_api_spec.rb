@@ -48,7 +48,7 @@ describe "Roles API", type: :request do
       json = api_call(:post, "/api/v1/accounts/#{account.id}/roles",
                       { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => account.id.to_s },
                       parameters)
-      @role = Role.find_by(id: json["id"])
+      @role = Role.find_by_id(json["id"])
       json
     end
 
@@ -120,7 +120,7 @@ describe "Roles API", type: :request do
 
         it "lists inactive roles" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive] })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive) })
           expect(json.size).to eq 1
           expect(json[0]['role']).to eq 'inactive_role'
         end
@@ -134,7 +134,7 @@ describe "Roles API", type: :request do
 
         it "accepts multiple states" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive&state[]=active",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive active] })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive active) })
           expect(json.size).to eq 7
           expect(json.map { |role| role['role'] }).to be_include 'inactive_role'
         end
@@ -199,7 +199,7 @@ describe "Roles API", type: :request do
                                            'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' } } })
       @account.reload
 
-      role = Role.find_by(id: json['id'])
+      role = Role.find_by_id(json['id'])
       overrides = @account.role_overrides.where(:role_id => role.id).index_by(&:permission)
       expect(overrides['read_forum'].enabled).to be_truthy
       expect(overrides['read_forum'].locked).to be_falsey
@@ -214,7 +214,7 @@ describe "Roles API", type: :request do
       before :once do
         @role = custom_teacher_role(@role_name, :account => @account)
         course1 = Course.create!(:name => "blah", :account => @account)
-        user1 = user_factory
+        user1 = user_factory()
 
         enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment', :role => @role)
         enrollment1.invite
@@ -435,7 +435,7 @@ describe "Roles API", type: :request do
                           restricted_permission => { :explicit => '1', :enabled => '1' }
                         } })
 
-      @role = Role.find_by(id: json["id"])
+      @role = Role.find_by_id(json["id"])
 
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1 # not 2
       override = @account.role_overrides.where(:permission => restricted_permission, :role_id => @role.id).first
@@ -450,21 +450,21 @@ describe "Roles API", type: :request do
         @account.root_account.disable_feature!(:granular_permissions_manage_users)
         @account.root_account.disable_feature!(:granular_permissions_manage_courses)
         @account.root_account.disable_feature!(:granular_permissions_manage_groups)
-        @expected_permissions = %w[
-          become_user change_course_state create_collaborations
-          create_conferences manage_account_memberships
-          manage_account_settings manage_admin_users manage_alerts
-          manage_assignments manage_calendar manage_content
-          manage_courses manage_files_add manage_files_edit manage_files_delete
-          manage_grades manage_groups manage_interaction_alerts manage_outcomes
-          manage_role_overrides manage_sections_add manage_sections_edit
-          manage_sections_delete manage_sis manage_students manage_user_logins
-          manage_wiki_create manage_wiki_delete manage_wiki_update
-          moderate_forum post_to_forum
-          read_course_content read_course_list read_forum
-          read_question_banks read_reports read_roster
-          read_sis send_messages view_all_grades view_group_pages
-          view_statistics
+        @expected_permissions = [
+          "become_user", "change_course_state", "create_collaborations",
+          "create_conferences", "manage_account_memberships",
+          "manage_account_settings", "manage_admin_users", "manage_alerts",
+          "manage_assignments", "manage_calendar", "manage_content",
+          "manage_courses", "manage_files_add", "manage_files_edit", "manage_files_delete",
+          "manage_grades", "manage_groups", "manage_interaction_alerts", "manage_outcomes",
+          "manage_role_overrides", "manage_sections_add", "manage_sections_edit",
+          "manage_sections_delete", "manage_sis", "manage_students", "manage_user_logins",
+          "manage_wiki_create", "manage_wiki_delete", "manage_wiki_update",
+          "moderate_forum", "post_to_forum",
+          "read_course_content", "read_course_list", "read_forum",
+          "read_question_banks", "read_reports", "read_roster",
+          "read_sis", "send_messages", "view_all_grades", "view_group_pages",
+          "view_statistics"
         ]
       end
 
@@ -496,18 +496,18 @@ describe "Roles API", type: :request do
 
         # no longer have manage_admin_users or manage_students, instead we have the new ones
         expected_perms = @expected_permissions - ["manage_admin_users", "manage_students"]
-        expected_perms += %w[
-          allow_course_admin_actions
-          add_teacher_to_course
-          add_ta_to_course
-          add_designer_to_course
-          add_student_to_course
-          add_observer_to_course
-          remove_teacher_from_course
-          remove_ta_from_course
-          remove_designer_from_course
-          remove_student_from_course
-          remove_observer_from_course
+        expected_perms += [
+          "allow_course_admin_actions",
+          "add_teacher_to_course",
+          "add_ta_to_course",
+          "add_designer_to_course",
+          "add_student_to_course",
+          "add_observer_to_course",
+          "remove_teacher_from_course",
+          "remove_ta_from_course",
+          "remove_designer_from_course",
+          "remove_student_from_course",
+          "remove_observer_from_course"
         ]
 
         json = api_call_with_settings
@@ -535,12 +535,12 @@ describe "Roles API", type: :request do
       it "returns the expected json format with granular manage courses permission on" do
         @account.root_account.enable_feature!(:granular_permissions_manage_courses)
         expected_perms = @expected_permissions - ["manage_courses", "change_course_state"]
-        expected_perms += %w[
-          manage_courses_add
-          manage_courses_admin
-          manage_courses_publish
-          manage_courses_conclude
-          manage_courses_delete
+        expected_perms += [
+          "manage_courses_add",
+          "manage_courses_admin",
+          "manage_courses_publish",
+          "manage_courses_conclude",
+          "manage_courses_delete"
         ]
 
         json = api_call_with_settings
@@ -568,10 +568,10 @@ describe "Roles API", type: :request do
       it "returns the expected json format with granular manage groups permission on" do
         @account.root_account.enable_feature!(:granular_permissions_manage_groups)
         expected_perms = @expected_permissions - ["manage_groups"]
-        expected_perms += %w[
-          manage_groups_add
-          manage_groups_manage
-          manage_groups_delete
+        expected_perms += [
+          "manage_groups_add",
+          "manage_groups_manage",
+          "manage_groups_delete"
         ]
 
         json = api_call_with_settings
@@ -712,7 +712,7 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
                         { :role => role_name, :base_role_type => 'StudentEnrollment' })
 
-        role = Role.find_by(id: json["id"])
+        role = Role.find_by_id(json["id"])
         @path = "/api/v1/accounts/#{@account.id}/roles/#{role.id}"
         @path_options[:id] = role.id
         @permissions[:permissions][:read_question_banks][:enabled] = 1

@@ -25,7 +25,7 @@ module GoogleDrive
       @entry = google_drive_entry
       @document_id = @entry['id']
       @preferred_extensions = preferred_extensions
-      parent = @entry['parents'].empty? ? nil : @entry['parents'][0]
+      parent = @entry['parents'].length > 0 ? @entry['parents'][0] : nil
       @folder = (parent.nil? || parent['isRoot'] ? nil : parent['id'])
     end
 
@@ -85,7 +85,7 @@ module GoogleDrive
 
         current_url = @entry['exportLinks'][mime_type]
         current_extension = /([a-z]+)$/.match(current_url).to_s
-        has_preferred_extension = preferred_extensions&.include?(current_extension)
+        has_preferred_extension = preferred_extensions && preferred_extensions.include?(current_extension)
 
         # our extension is in the preferred list or we have no preferences
         [current_url, current_extension] if has_preferred_extension || !preferred_extensions
@@ -103,7 +103,7 @@ module GoogleDrive
     def preferred_mime_types
       # Order is important
       # we return the first matching mime type
-      %w[
+      %w{
         application/vnd.openxmlformats-officedocument.wordprocessingml.document
         application/vnd.oasis.opendocument.text
         application/vnd.openxmlformats-officedocument.presentationml.presentation
@@ -111,7 +111,7 @@ module GoogleDrive
         application/x-vnd.oasis.opendocument.spreadsheet
         application/pdf
         application/zip
-      ]
+      }
     end
   end
 end

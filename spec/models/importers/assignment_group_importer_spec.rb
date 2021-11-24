@@ -22,26 +22,26 @@ require_relative '../../import_helper'
 
 describe "Importing Assignment Groups" do
   SYSTEMS.each do |system|
-    next unless import_data_exists? system, 'assignment_group'
+    if import_data_exists? system, 'assignment_group'
+      it "imports from #{system}" do
+        data = get_import_data(system, 'assignment_group')
+        context = get_import_context(system)
+        migration = context.content_migrations.create!
 
-    it "imports from #{system}" do
-      data = get_import_data(system, 'assignment_group')
-      context = get_import_context(system)
-      migration = context.content_migrations.create!
+        data[:assignment_groups_to_import] = {}
+        expect {
+          expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
+        }.to change(AssignmentGroup, :count).by(0)
 
-      data[:assignment_groups_to_import] = {}
-      expect do
-        expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
-      end.to change(AssignmentGroup, :count).by(0)
+        data[:assignment_groups_to_import][data[:migration_id]] = true
+        expect {
+          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+        }.to change(AssignmentGroup, :count).by(1)
+        g = AssignmentGroup.where(migration_id: data[:migration_id]).first
 
-      data[:assignment_groups_to_import][data[:migration_id]] = true
-      expect do
-        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-      end.to change(AssignmentGroup, :count).by(1)
-      g = AssignmentGroup.where(migration_id: data[:migration_id]).first
-
-      expect(g.name).to eq data[:title]
+        expect(g.name).to eq data[:title]
+      end
     end
   end
 
@@ -71,13 +71,13 @@ describe "Importing Assignment Groups" do
     data = get_import_data('bb8', 'assignment_group')
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
-    expect do
+    expect {
       Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-    end.to change(AssignmentGroup, :count).by(1)
+    }.to change(AssignmentGroup, :count).by(1)
 
-    expect do
+    expect {
       ass = Importers::AssignmentImporter.import_from_migration(get_import_data('bb8', 'assignment'), context, migration)
       expect(ass.assignment_group.name).to eq data[:title]
-    end.to change(AssignmentGroup, :count).by(0)
+    }.to change(AssignmentGroup, :count).by(0)
   end
 end

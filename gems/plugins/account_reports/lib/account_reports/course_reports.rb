@@ -31,8 +31,8 @@ module AccountReports
 
     def default_courses
       root_account.all_courses
-                  .select(%i[id sis_source_id name course_code start_at
-                             conclude_at restrict_enrollments_to_course_dates])
+                  .select([:id, :sis_source_id, :name, :course_code, :start_at,
+                           :conclude_at, :restrict_enrollments_to_course_dates])
     end
 
     def recently_deleted
@@ -121,7 +121,7 @@ module AccountReports
       end
     end
 
-    def unused_courses
+    def unused_courses()
       courses = root_account.all_courses.active
                             .select("courses.id, courses.name, courses.course_code,
                 courses.sis_source_id, courses.created_at,

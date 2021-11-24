@@ -21,11 +21,11 @@
 module QuizMathDataFixup
   def fixup_quiz_questions_with_bad_math(quiz_or_bank, check_date: nil, question_bank: false)
     changed = false
-    questions = if question_bank
-                  quiz_or_bank.assessment_questions
-                else
-                  quiz_or_bank.quiz_questions
-                end
+    if question_bank
+      questions = quiz_or_bank.assessment_questions
+    else
+      questions = quiz_or_bank.quiz_questions
+    end
     questions = questions.where('updated_at>?', check_date) if check_date
     questions.find_each do |quiz_question|
       old_data = quiz_question.question_data.to_hash
@@ -70,12 +70,12 @@ module QuizMathDataFixup
       %i[html comments_html].each do |key|
         # if there's html, the text field is used as the title attribute/tooltip
         # clear it out if we updated the html because it's probably hosed.
-        next unless answer[key].present?
+        if answer[key].present?
+          answer[key] = fixup_html(answer[key])
 
-        answer[key] = fixup_html(answer[key])
-
-        text_key = key.to_s.sub(/html/, 'text')
-        answer[text_key] = '' if answer[text_key].present?
+          text_key = key.to_s.sub(/html/, 'text')
+          answer[text_key] = '' if answer[text_key].present?
+        end
       end
       data[:answers][index] = answer
     end
@@ -115,12 +115,12 @@ module QuizMathDataFixup
       mjnodes =
         html.search('[class^="MathJax"]')
 
-      unless mjnodes.empty?
+      if mjnodes.length > 0
         n = mjnodes.filter('[data-mathml]')[0]
         mml = n.attribute('data-mathml') if n
         mjnodes.each(&:remove)
       end
-      if !latex.content.empty?
+      if latex.content.length > 0
         if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/ && latex.content !~ /[\\+-^=<>]|{.+}/
           # the content is not delimineted latex,
           # and doesn't even _look like_ latex
@@ -149,7 +149,7 @@ module QuizMathDataFixup
     html.search('[id^="MathJax"]').each(&:remove)
     html.search('span.hidden-readable').each(&:remove)
 
-    return html_str if html.content.empty? && html.search('img.equation_image').empty?
+    return html_str if html.content.length == 0 && html.search('img.equation_image').length == 0
 
     html.to_s
   end

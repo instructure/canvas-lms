@@ -38,9 +38,9 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
       end
 
       it "leaves the feature flag in its current state" do
-        expect do
+        expect {
           DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
-        end.not_to change {
+        }.not_to change {
           @flag.reload.state
         }
       end
@@ -54,9 +54,9 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
       end
 
       it "leaves the feature flag as disabled" do
-        expect do
+        expect {
           DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
-        end.not_to change {
+        }.not_to change {
           @flag.reload.state
         }
       end
@@ -70,9 +70,9 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
       end
 
       it "changes the feature flag to enabled" do
-        expect do
+        expect {
           DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
-        end.to change {
+        }.to change {
           @flag.reload.state
         }.from(Feature::STATE_DEFAULT_ON).to(Feature::STATE_ON)
       end
@@ -86,9 +86,9 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
       end
 
       it "leaves the feature flag as disabled" do
-        expect do
+        expect {
           DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
-        end.not_to change {
+        }.not_to change {
           @flag.reload.state
         }
       end
@@ -102,9 +102,9 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
       end
 
       it "leaves the feature flag as enabled" do
-        expect do
+        expect {
           DataFixup::ChangeImmersiveReaderAllowedOnToOn.run
-        end.not_to change {
+        }.not_to change {
           @flag.reload.state
         }
       end

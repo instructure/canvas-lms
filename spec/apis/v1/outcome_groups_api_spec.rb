@@ -90,7 +90,7 @@ describe "Outcome Groups API", type: :request do
     assignment = assignment_model(context: context)
     rubric = add_or_get_rubric(outcome)
     user ||= user_factory(active_all: true)
-    context.enroll_student(user) unless context.student_enrollments.where(user_id: user.id).exists?
+    context.enroll_student(user) unless context.student_enrollments.exists?(user_id: user.id)
     a = rubric.associate_with(assignment, context, :purpose => 'grading')
     assignment.reload
     submission = assignment.grade_student(user, grade: "10", grader: @teacher).first
@@ -156,7 +156,7 @@ describe "Outcome Groups API", type: :request do
                      :action => 'redirect',
                      :format => 'json')
         assert_status(302)
-        expect(response.location).to eq polymorphic_url(%i[api_v1 global outcome_group], :id => root.id)
+        expect(response.location).to eq polymorphic_url([:api_v1, :global, :outcome_group], :id => root.id)
       end
 
       it "creates the root global group if necessary" do
@@ -264,7 +264,7 @@ describe "Outcome Groups API", type: :request do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @links = Array.new(3) { create_outcome }
+      @links = 3.times.map { create_outcome }
     end
 
     it "returns active links" do
@@ -346,7 +346,7 @@ describe "Outcome Groups API", type: :request do
 
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
-        lambda do |outcome, can_edit|
+        ->(outcome, can_edit) do
           expect(outcome).to include({
                                        "id" => @outcome.id,
                                        "vendor_guid" => @outcome.vendor_guid,
@@ -362,7 +362,7 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_edit, can_unlink|
+        ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
           expect(outcome_link).to include({
                                             "context_type" => context.class.to_s,
                                             "context_id" => context.id,
@@ -550,11 +550,11 @@ describe "Outcome Groups API", type: :request do
                              "id" => group.id,
                              "title" => group.title,
                              "vendor_guid" => group.vendor_guid,
-                             "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => group.id),
+                             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
                              "can_edit" => true,
-                             "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => group.id),
-                             "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => group.id),
-                             "import_url" => polymorphic_path(%i[api_v1 global outcome_group_import], :id => group.id),
+                             "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
+                             "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
+                             "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
                              "context_id" => nil,
                              "context_type" => nil,
                              "description" => group.description
@@ -579,18 +579,18 @@ describe "Outcome Groups API", type: :request do
                              "id" => group.id,
                              "title" => group.title,
                              "vendor_guid" => group.vendor_guid,
-                             "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => group.id),
+                             "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => group.id),
                              "can_edit" => true,
-                             "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => group.id),
-                             "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => group.id),
-                             "import_url" => polymorphic_path(%i[api_v1 global outcome_group_import], :id => group.id),
+                             "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => group.id),
+                             "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => group.id),
+                             "import_url" => polymorphic_path([:api_v1, :global, :outcome_group_import], :id => group.id),
                              "parent_outcome_group" => {
                                "id" => parent_group.id,
                                "title" => parent_group.title,
                                "vendor_guid" => parent_group.vendor_guid,
-                               "url" => polymorphic_path(%i[api_v1 global outcome_group], :id => parent_group.id),
-                               "subgroups_url" => polymorphic_path(%i[api_v1 global outcome_group_subgroups], :id => parent_group.id),
-                               "outcomes_url" => polymorphic_path(%i[api_v1 global outcome_group_outcomes], :id => parent_group.id),
+                               "url" => polymorphic_path([:api_v1, :global, :outcome_group], :id => parent_group.id),
+                               "subgroups_url" => polymorphic_path([:api_v1, :global, :outcome_group_subgroups], :id => parent_group.id),
+                               "outcomes_url" => polymorphic_path([:api_v1, :global, :outcome_group_outcomes], :id => parent_group.id),
                                "can_edit" => true
                              },
                              "context_id" => nil,
@@ -749,7 +749,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "fails (400) if the update is invalid" do
-      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
+      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    { :controller => 'outcome_groups_api',
                      :action => 'update',
@@ -977,7 +977,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders links by outcome title" do
-      @links = %w[B A C].map { |title| create_outcome(:title => title) }
+      @links = ["B", "A", "C"].map { |title| create_outcome(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       :controller => 'outcome_groups_api',
                       :action => 'outcomes',
@@ -1016,7 +1016,7 @@ describe "Outcome Groups API", type: :request do
 
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
-        lambda do |outcome|
+        ->(outcome) do
           expect(outcome).to include({
                                        "id" => @outcome.id,
                                        "vendor_guid" => @outcome.vendor_guid,
@@ -1032,7 +1032,7 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_unlink|
+        ->(outcome_link, context, group, assessed, can_unlink) do
           expect(outcome_link).to include({
                                             "context_type" => context.class.to_s,
                                             "context_id" => context.id,
@@ -1348,7 +1348,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "fails (400) if the new outcome is invalid" do
-      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
+      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                    { :controller => 'outcome_groups_api',
                      :action => 'link',
@@ -1557,11 +1557,11 @@ describe "Outcome Groups API", type: :request do
       end
 
       context "should fail (400) to create a new outcome with an illegal calculation_int" do
-        methods = %w[
-          decaying_average
-          n_mastery
-          highest
-          latest
+        methods = [
+          'decaying_average',
+          'n_mastery',
+          'highest',
+          'latest'
         ]
 
         methods.each do |method|
@@ -1771,7 +1771,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders subgroups by title" do
-      @subgroups = %w[B A C].map { |title| create_subgroup(:title => title) }
+      @subgroups = ["B", "A", "C"].map { |title| create_subgroup(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       :controller => 'outcome_groups_api',
                       :action => 'subgroups',

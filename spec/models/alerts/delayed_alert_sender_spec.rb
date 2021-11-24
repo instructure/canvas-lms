@@ -329,9 +329,9 @@ module Alerts
       alert.save!
       @course.start_at = Time.zone.now - 30.days
 
-      expect do
+      expect {
         DelayedAlertSender.evaluate_for_course(@course, nil)
-      end.to change(DelayedMessage, :count).by(1)
+      }.to change(DelayedMessage, :count).by(1)
     end
   end
 end

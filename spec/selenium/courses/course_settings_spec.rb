@@ -205,7 +205,7 @@ describe "course settings" do
       wait.until do
         el = f('.self_enrollment_message')
         el.present? &&
-          !el.text.nil? &&
+          el.text != nil &&
           el.text != ""
       end
       message = f('.self_enrollment_message')
@@ -348,7 +348,7 @@ describe "course settings" do
       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
     end
 
-    it "disables from Course Navigation tab", priority: "1" do
+    it "disables from Course Navigation tab", priority: "1", test_id: 112172 do
       get "/courses/#{@course.id}/settings#tab-navigation"
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click
@@ -416,7 +416,7 @@ describe "course settings" do
       expect(ff('#sections > .section')[0]).to include_text(edit_text)
     end
 
-    # TODO: reimplement per CNVS-29605, but make sure we're testing at the right level
+    # TODO reimplement per CNVS-29605, but make sure we're testing at the right level
     it "should move a nav item to disabled"
   end
 
@@ -532,12 +532,12 @@ describe "course settings" do
 
       bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
       bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
-      html = <<~HTML
-        <a href="#{bad_url}">Bad absolute link</a>
-        <img src="#{bad_url2}">Bad file link</a>
-        <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
-        <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
-      HTML
+      html = %{
+      <a href="#{bad_url}">Bad absolute link</a>
+      <img src="#{bad_url2}">Bad file link</a>
+      <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
+      <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
+    }
 
       @course.syllabus_body = html
       @course.save!
@@ -596,13 +596,13 @@ describe "course settings" do
       unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
       deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
 
-      @course.syllabus_body = <<~HTML
+      @course.syllabus_body = %{
         <a href='#{active_link}'>link</a>
         <a href='#{unpublished_link}'>unpublished link</a>
         <a href='#{deleted_link}'>deleted link</a>
-      HTML
+      }
       @course.save!
-      page = @course.wiki_pages.create!(:title => "wikiii", :body => %(<a href='#{unpublished_link}'>unpublished link</a>))
+      page = @course.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>unpublished link</a>})
 
       get "/courses/#{@course.id}/link_validator"
       wait_for_ajaximations

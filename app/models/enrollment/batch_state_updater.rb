@@ -52,11 +52,8 @@ class Enrollment::BatchStateUpdater
       # cache some data before the destroy that is needed after the destroy
       @invited_user_ids = Enrollment.where(id: batch, workflow_state: 'invited').distinct.pluck(:user_id)
       @students = Enrollment.of_student_type.where(id: batch).preload({ user: :linked_observers }, :root_account).to_a
-      @students.each do |e|
-        e.workflow_state = 'deleted'
-        e.readonly!
-      end
-      @user_course_tuples = Enrollment.where(id: batch).active.select(%i[user_id course_id]).distinct.to_a
+      @students.each { |e| e.workflow_state = 'deleted'; e.readonly! }
+      @user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
       @user_ids = Enrollment.where(id: batch).order(:user_id).distinct.pluck(:user_id)
       @courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
       @root_account = @courses.first.root_account
@@ -158,7 +155,7 @@ class Enrollment::BatchStateUpdater
   def self.touch_all_graders_if_needed(students)
     courses_to_touch_admins = students.map(&:course_id).uniq
     admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
-                                 type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment])
+                                 type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'])
                           .active.distinct.order(:user_id).pluck(:user_id)
     User.clear_cache_keys(admin_ids, :todo_list)
   end

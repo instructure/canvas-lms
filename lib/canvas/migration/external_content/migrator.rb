@@ -25,10 +25,10 @@ module Canvas::Migration::ExternalContent
       end
 
       def register_service(key, service)
-        raise "service with the key #{key} is already registered" if registered_services[key] && registered_services[key] != service
+        raise "service with the key #{key} is already registered" if self.registered_services[key] && self.registered_services[key] != service
 
         Canvas::Migration::ExternalContent::ServiceInterface.validate_service!(service)
-        registered_services[key] = service
+        self.registered_services[key] = service
       end
 
       # tells the services to begin exporting
@@ -36,15 +36,15 @@ module Canvas::Migration::ExternalContent
       def begin_exports(course, opts = {})
         pending_exports = {}
         pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
-        registered_services.each do |key, service|
-          next unless service.applies_to_course?(course)
-
-          begin
-            if (export = service.begin_export(course, opts))
-              pending_exports[key] = export
+        self.registered_services.each do |key, service|
+          if service.applies_to_course?(course)
+            begin
+              if (export = service.begin_export(course, opts))
+                pending_exports[key] = export
+              end
+            rescue => e
+              Canvas::Errors.capture_exception(:external_content_migration, e)
             end
-          rescue => e
-            Canvas::Errors.capture_exception(:external_content_migration, e)
           end
         end
         pending_exports
@@ -102,7 +102,7 @@ module Canvas::Migration::ExternalContent
         if pending_export.respond_to?(:export_completed?)
           pending_export.export_completed?
         else
-          registered_services[key].export_completed?(pending_export)
+          self.registered_services[key].export_completed?(pending_export)
         end
       end
 
@@ -110,7 +110,7 @@ module Canvas::Migration::ExternalContent
         if pending_export.respond_to?(:retrieve_export)
           pending_export.retrieve_export
         else
-          registered_services[key].retrieve_export(pending_export)
+          self.registered_services[key].retrieve_export(pending_export)
         end
       end
 
@@ -121,24 +121,24 @@ module Canvas::Migration::ExternalContent
         pending_imports = {}
         imported_content.each do |key, content|
           service = import_service_for(key)
-          next unless service
-
-          begin
-            if (import = service.send_imported_content(migration.context, migration, content))
-              pending_imports[key] = import
+          if service
+            begin
+              if (import = service.send_imported_content(migration.context, migration, content))
+                pending_imports[key] = import
+              end
+            rescue => e
+              Canvas::Errors.capture_exception(:external_content_migration, e)
             end
-          rescue => e
-            Canvas::Errors.capture_exception(:external_content_migration, e)
           end
         end
         ensure_imports_completed(pending_imports)
       end
 
       private def import_service_for(key)
-        if Lti::ContentMigrationService::KEY_REGEX.match?(key)
+        if Lti::ContentMigrationService::KEY_REGEX =~ key
           Lti::ContentMigrationService.importer_for(key)
         else
-          registered_services[key]
+          self.registered_services[key]
         end
       end
 
@@ -149,7 +149,7 @@ module Canvas::Migration::ExternalContent
           if import_data.respond_to?(:import_completed?)
             import_data.import_completed?
           else
-            registered_services[key].import_completed?(import_data)
+            self.registered_services[key].import_completed?(import_data)
           end
         end
       end

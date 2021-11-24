@@ -33,13 +33,13 @@ describe AppointmentGroupsController, type: :request do
     @user = @me
   end
 
-  expected_fields = %w[
-    appointments_count context_codes created_at description
-    end_at html_url id location_address location_name
-    max_appointments_per_participant min_appointments_per_participant
-    participant_type participant_visibility
-    participants_per_appointment requiring_action start_at
-    sub_context_codes title updated_at url workflow_state
+  expected_fields = [
+    'appointments_count', 'context_codes', 'created_at', 'description',
+    'end_at', 'html_url', 'id', 'location_address', 'location_name',
+    'max_appointments_per_participant', 'min_appointments_per_participant',
+    'participant_type', 'participant_visibility',
+    'participants_per_appointment', 'requiring_action', 'start_at',
+    'sub_context_codes', 'title', 'updated_at', 'url', 'workflow_state'
   ]
 
   it 'returns manageable appointment groups' do
@@ -507,12 +507,12 @@ describe AppointmentGroupsController, type: :request do
   end
 
   types = {
-    'users' => proc do
+    'users' => proc {
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
       @ag.appointments.first.reserve_for @student1, @me
-    end,
-    'groups' => proc do
+    },
+    'groups' => proc {
       cat = @course.group_categories.create(name: "foo")
       @ag = AppointmentGroup.create!(:title => "yay", :sub_context_codes => [cat.asset_string], :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
       @ag.publish!
@@ -521,7 +521,7 @@ describe AppointmentGroupsController, type: :request do
       @ag.appointments.first.reserve_for group1, @me
       group2 = cat.groups.create(:context => @course)
       group2.users << @student2
-    end
+    }
   }
   types.each do |type, block|
     context "#{type.singularize}-level appointment groups" do

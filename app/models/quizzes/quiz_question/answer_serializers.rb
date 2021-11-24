@@ -32,11 +32,9 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # @throw NameError if no serializer was found for the given question
     def serializer_for(question)
-      question_type = if question.respond_to?(:data)
-                        question.data[:question_type]
-                      else
-                        question[:question_type]
-                      end
+      question_type = question.respond_to?(:data) ?
+        question.data[:question_type] :
+        question[:question_type]
 
       klass = question_type.gsub(/_question$/, '').demodulize.camelize
 

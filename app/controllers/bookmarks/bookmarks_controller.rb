@@ -48,7 +48,7 @@
 #     }
 class Bookmarks::BookmarksController < ApplicationController
   before_action :require_user
-  before_action :find_bookmark, :only => %i[show update destroy]
+  before_action :find_bookmark, :only => [:show, :update, :destroy]
 
   # @API List bookmarks
   # Returns the paginated list of bookmarks.
@@ -162,7 +162,7 @@ class Bookmarks::BookmarksController < ApplicationController
 
   def find_bookmark
     unless (@bookmark = Bookmarks::Bookmark.where(id: params[:id], user_id: user_id).first)
-      head :not_found
+      head 404
     end
   end
 

@@ -127,19 +127,19 @@ module Turnitin
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
         settings[:s_view_report] = determine_student_visibility(settings[:originality_report_visibility])
 
-        %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
+        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end
         exclude_value = settings[:exclude_value].to_i
-        settings[:exclude_type] = '0' unless %w[0 1 2].include?(settings[:exclude_type])
+        settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
-                                   when '0' then ''
-                                   when '1' then [exclude_value, 1].max.to_s
-                                   when '2' then (0..100).cover?(exclude_value) ? exclude_value.to_s : '0'
+                                   when '0'; ''
+                                   when '1'; [exclude_value, 1].max.to_s
+                                   when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
                                    end
       end
       settings
@@ -194,7 +194,7 @@ module Turnitin
       if submission.submission_type == 'online_upload'
         attachments = submission.attachments.select { |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
-          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open, :ptype => '2' }.merge!(opts))
+          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
         responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))
@@ -276,9 +276,9 @@ module Turnitin
     def request_md5(params)
       keys_used = []
       str = ""
-      keys = %i[aid assign assignid cid cpw ctl diagnostic dis dtdue dtstart dtpost encrypt fcmd fid gmtime newassign newupw oid pfn pln ptl ptype said tem uem ufn uid uln upw utp]
+      keys = [:aid, :assign, :assignid, :cid, :cpw, :ctl, :diagnostic, :dis, :dtdue, :dtstart, :dtpost, :encrypt, :fcmd, :fid, :gmtime, :newassign, :newupw, :oid, :pfn, :pln, :ptl, :ptype, :said, :tem, :uem, :ufn, :uid, :uln, :upw, :utp]
       keys.each do |key|
-        keys_used << key if params[key].present?
+        keys_used << key if params[key] && !params[key].empty?
         str += (params[key] || "")
       end
       str += @shared_secret
@@ -288,14 +288,14 @@ module Turnitin
     def escape_params(params)
       escaped_params = {}
       params.each do |key, value|
-        escaped_params[key] = if value.is_a?(String)
-                                CGI.escape(value).gsub("+", "%20")
-                              # turnitin uses %20 to encode spaces (instead of +)
-                              else
-                                value
-                              end
+        if value.is_a?(String)
+          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
+          # turnitin uses %20 to encode spaces (instead of +)
+        else
+          escaped_params[key] = value
+        end
       end
-      escaped_params
+      return escaped_params
     end
 
     def prepare_params(command, fcmd, args)
@@ -336,7 +336,7 @@ module Turnitin
 
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
-      params
+      return params
     end
 
     def sendRequest(command, fcmd, args)
@@ -350,7 +350,7 @@ module Turnitin
         query, headers = mp.prepare_query(params)
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
-        http_response = http.start do |con|
+        http_response = http.start { |con|
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
@@ -359,7 +359,7 @@ module Turnitin
             Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
             Rails.logger.error(params.to_json)
           end
-        end
+        }
       else
         requestParams = ""
         params.each do |key, value|
@@ -372,9 +372,9 @@ module Turnitin
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          http_response = http.start do |conn|
+          http_response = http.start { |conn|
             conn.get("#{@endpoint}?#{requestParams}")
-          end
+          }
         end
       end
 

@@ -7,7 +7,7 @@
         ordinals: lambda do |_key, options|
           number = options[:number]
           case number
-          when 1 then '‑ին'
+          when 1; '‑ին'
           else; '‑րդ'
           end
         end,

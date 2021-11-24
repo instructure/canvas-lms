@@ -74,9 +74,9 @@ describe RubricAssociationsController do
       end
 
       it 'records a rubric_created event for the assignment' do
-        expect do
+        expect {
           post('create', params: request_params)
-        end.to change {
+        }.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
         }.by(1)
       end
@@ -107,9 +107,9 @@ describe RubricAssociationsController do
         end
 
         it "duplicates the associated rubric" do
-          expect do
+          expect {
             post 'create', params: { course_id: @course2.id, rubric_association: { rubric_id: @rubric.id } }
-          end.to change {
+          }.to change {
             Rubric.count
           }.by(1)
           expect(assigns[:rubric].context).to eq @course2
@@ -129,7 +129,7 @@ describe RubricAssociationsController do
               expect(outcome_criterion[:ratings].length).to eq 2
               expect(outcome_criterion[:points]).to eq 10
               expect(outcome_criterion[:mastery_points]).to eq 10
-              expect(outcome_criterion[:ratings].pluck(:description)).to eq ["best", "worst"]
+              expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ["best", "worst"]
             end
           end
 
@@ -155,9 +155,9 @@ describe RubricAssociationsController do
         end
 
         it "does not duplicate the rubric" do
-          expect do
+          expect {
             post 'create', params: { course_id: @course.id, rubric_association: { rubric_id: @rubric.id } }
-          end.to change {
+          }.to change {
             Rubric.count
           }.by(0)
           expect(assigns[:rubric]).to eq @rubric
@@ -244,9 +244,9 @@ describe RubricAssociationsController do
       end
 
       it 'records a rubric_updated event for the assignment' do
-        expect do
+        expect {
           put('update', params: request_params)
-        end.to change {
+        }.to change {
           AnonymousOrModerationEvent.where(
             event_type: 'rubric_updated',
             assignment: assignment
@@ -352,9 +352,9 @@ describe RubricAssociationsController do
       end
 
       it 'creates an AnonymousOrModerationEvent capturing the deletion' do
-        expect do
+        expect {
           delete('destroy', params: { course_id: course.id, id: rubric_association.id })
-        end.to change {
+        }.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_deleted', assignment: assignment, user: teacher).count
         }.by(1)
       end

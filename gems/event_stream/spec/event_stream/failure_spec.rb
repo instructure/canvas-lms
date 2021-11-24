@@ -41,9 +41,9 @@ describe EventStream::Failure do
     end
 
     it "creates a new db record" do
-      expect do
+      expect {
         EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      end.to change(EventStream::Failure, :count)
+      }.to change(EventStream::Failure, :count)
     end
 
     it "saves the failed operation type" do

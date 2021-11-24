@@ -26,12 +26,10 @@ class CassandraAddAccountIndexForCourses < ActiveRecord::Migration[5.2]
   end
 
   def self.up
-    unless cassandra_column_exists?('courses', 'account_id')
-      cassandra.execute <<~SQL.squish
-        ALTER TABLE courses
-        ADD account_id bigint;
-      SQL
-    end
+    cassandra.execute %{
+      ALTER TABLE courses
+      ADD account_id bigint;
+    } unless cassandra_column_exists?('courses', 'account_id')
 
     return if cassandra_table_exists?('courses_by_account')
 
@@ -41,24 +39,21 @@ class CassandraAddAccountIndexForCourses < ActiveRecord::Migration[5.2]
                            "WITH compression_parameters:sstable_compression='DeflateCompressor'"
                          end
 
-    cassandra.execute <<~SQL.squish
+    cassandra.execute %{
       CREATE TABLE courses_by_account (
         key text,
         ordered_id text,
         id text,
         PRIMARY KEY (key, ordered_id)
-      ) #{compression_params}
-    SQL
+      ) #{compression_params}}
   end
 
   def self.down
-    if cassandra_column_exists?('courses', 'account_id')
-      cassandra.execute <<~SQL.squish
-        ALTER TABLE courses
-        DROP account_id;
-      SQL
-    end
+    cassandra.execute %{
+      ALTER TABLE courses
+      DROP account_id;
+    } if cassandra_column_exists?('courses', 'account_id')
 
-    cassandra.execute %(DROP TABLE courses_by_account) if cassandra_table_exists?('courses_by_account')
+    cassandra.execute %{DROP TABLE courses_by_account} if cassandra_table_exists?('courses_by_account')
   end
 end

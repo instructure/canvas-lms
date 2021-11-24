@@ -44,7 +44,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers do
     end
 
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers }
-    let(:question_params) { {} }
+    let(:question_params) { Hash.new }
 
     include_examples "All answer parsers"
   end

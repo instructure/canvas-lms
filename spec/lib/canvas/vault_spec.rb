@@ -28,20 +28,20 @@ module Canvas
     let(:token_path) { '/path/to/token' }
     let(:addr) { 'http://vault:8200' }
     let(:addr_path) { '/path/to/addr' }
-    let(:static_config) do
+    let(:static_config) {
       {
         token: token,
         addr: addr,
         kv_mount: 'app-canvas'
       }
-    end
-    let(:path_config) do
+    }
+    let(:path_config) {
       {
         token_path: token_path,
         addr_path: addr_path,
         kv_mount: 'app-canvas'
       }
-    end
+    }
     let(:local_config) { { token: 'file', addr: 'file' } }
 
     before do
@@ -85,9 +85,9 @@ module Canvas
                     foo: 'bar'
                   },
                   lease_duration: 3600,
-                }.to_json, headers: { "content-type": 'application/json' })
+                }.to_json, headers: { 'content-type': 'application/json' })
         stub_request(:get, "#{addr}/v1/bad/test/path")
-          .to_return(status: 404, headers: { "content-type": 'application/json' })
+          .to_return(status: 404, headers: { 'content-type': 'application/json' })
       end
 
       it 'Caches the read' do
@@ -171,7 +171,7 @@ module Canvas
                        .to_return(status: 200, body: {
                          data: credential_data,
                          lease_duration: lease_duration,
-                       }.to_json, headers: { "content-type": 'application/json' })
+                       }.to_json, headers: { 'content-type': 'application/json' })
         end
 
         it "will queue if the lock is taken and there is no value in the cache" do
@@ -183,7 +183,7 @@ module Canvas
             Thread.new { t3_val = described_class.read(credential_path) },
             Thread.new { t4_val = described_class.read(credential_path) }
           ]
-          threads.each(&:join)
+          threads.each { |t| t.join }
           expect(t1_val).to eq(credential_data)
           expect(t2_val).to eq(credential_data)
           expect(t3_val).to eq(credential_data)

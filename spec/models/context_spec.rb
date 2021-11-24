@@ -313,13 +313,13 @@ describe Context do
             c.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
           end
         end
-        expected = lambda do
+        expected = -> {
           [
             { name: 'c1', rubrics: 1, context_code: course1.asset_string },
             { name: 'c2', rubrics: 1, context_code: course2.asset_string },
             { name: 'c3', rubrics: 1, context_code: course3.asset_string }
           ]
-        end
+        }
         expect(course1.rubric_contexts(user)).to match_array(expected.call)
         @shard1.activate do
           expect(course2.rubric_contexts(user)).to match_array(expected.call)
@@ -351,15 +351,15 @@ describe Context do
     end
 
     it "raises an ArgumentError if you pass (only_check: [])" do
-      expect do
+      expect {
         course.active_record_types(only_check: [])
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
 
     it "raises an ArgumentError if you pass bogus values as only_check" do
-      expect do
+      expect {
         course.active_record_types(only_check: [:bogus_type, :other_bogus_tab])
-      end.to raise_exception ArgumentError
+      }.to raise_exception ArgumentError
     end
   end
 

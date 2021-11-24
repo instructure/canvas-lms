@@ -51,9 +51,9 @@ describe Quizzes::QuizQuestion::RawFields do
 
       fields = Quizzes::QuizQuestion::RawFields.new(answer_comment: long_data)
 
-      expect do
+      expect {
         fields.fetch_with_enforced_length(:answer_comment)
-      end.to raise_error(Quizzes::QuizQuestion::RawFields::FieldTooLongError)
+      }.to raise_error(Quizzes::QuizQuestion::RawFields::FieldTooLongError)
     end
   end
 end

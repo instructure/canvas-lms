@@ -23,9 +23,9 @@ describe CanvasPartman::Concerns::Partitioned do
 
     describe 'creating records' do
       it 'fails if the target partition does not exist' do
-        expect do
+        expect {
           Animal.create!
-        end.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
+        }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
       end
 
       it 'creates multiple records in the proper partition tables' do
@@ -57,12 +57,12 @@ describe CanvasPartman::Concerns::Partitioned do
           subject.create_partition(Time.new(2014, 12))
           subject.create_partition(Time.new(2015, 1))
 
-          expect do
+          expect {
             # this would be at new years of 2015 in UTC: 1/1/2015 00:00:00
             Animal.create({
                             created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
                           })
-          end.not_to raise_error
+          }.not_to raise_error
         end
       end
 
@@ -179,14 +179,13 @@ describe CanvasPartman::Concerns::Partitioned do
 
   context :by_id do
     subject { CanvasPartman::PartitionManager.create(Trail) }
-
     let(:zoo) { Zoo.create! }
 
     describe 'creating records' do
       it 'fails if the target partition does not exist' do
-        expect do
+        expect {
           Trail.create!(zoo: zoo)
-        end.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
+        }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
       end
 
       it 'creates records in the proper partition table' do

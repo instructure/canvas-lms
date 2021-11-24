@@ -75,21 +75,21 @@ describe 'RCE next tests', ignore_js_errors: true do
 
     def create_wiki_page_with_content(page_title)
       @root_folder = Folder.root_folders(@course).first
-      content = <<~HTML
-        <p>
-          <table style="border-collapse: collapse; width: 100%;" border="1">
-            <tbody>
-            <tr>
-            <td style="width: 50%;">cell 1</td>
-            <td style="width: 50%;">cell 2</td>
-            </tr>
-            </tbody>
-          </table>
-        </p><p>
-          <a class="instructure_file_link" title="Link"
-          href="/files/719/download"
-          target="_blank" rel="noopener noreferrer">a.html</a>
-        </p>
+      content = <<-HTML
+      <p>
+        <table style="border-collapse: collapse; width: 100%;" border="1">
+          <tbody>
+          <tr>
+          <td style="width: 50%;">cell 1</td>
+          <td style="width: 50%;">cell 2</td>
+          </tr>
+          </tbody>
+        </table>
+      </p><p>
+        <a class="instructure_file_link" title="Link"
+        href="/files/719/download"
+        target="_blank" rel="noopener noreferrer">a.html</a>
+      </p>
       HTML
       @course.wiki_pages.create!(title: page_title, body: content)
     end
@@ -965,9 +965,9 @@ describe 'RCE next tests', ignore_js_errors: true do
         switch_to_editor_view
 
         expect(
-          wait_for_no_such_element(method: nil, timeout: 5) do
+          wait_for_no_such_element(method: nil, timeout: 5) {
             fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
-          end
+          }
         ).to be_truthy
       end
 
@@ -982,9 +982,9 @@ describe 'RCE next tests', ignore_js_errors: true do
         switch_to_editor_view
 
         expect(
-          wait_for_no_such_element(method: nil, timeout: 5) do
+          wait_for_no_such_element(method: nil, timeout: 5) {
             fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
-          end
+          }
         ).to be_truthy
       end
 
@@ -1411,7 +1411,6 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(f('body')).to contain_css(menubar_menu_item_css('User Documents'))
       end
     end
-
     describe 'Insert content toolbar button default actions' do
       it 'does the right thing when clicking the toolbar button' do
         double('CanvasKaltura::ClientV3')

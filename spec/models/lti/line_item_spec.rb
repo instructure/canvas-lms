@@ -89,7 +89,6 @@ RSpec.describe Lti::LineItem, type: :model do
 
   it_behaves_like "soft deletion" do
     subject { Lti::LineItem }
-
     let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
   end
 
@@ -102,27 +101,27 @@ RSpec.describe Lti::LineItem, type: :model do
       line_item_one = line_item_model(assignment: assignment, coupled: false)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
+      expect {
         line_item_one.destroy!
-      end.to change(assignment, :workflow_state).from('published').to('deleted')
+      }.to change(assignment, :workflow_state).from('published').to('deleted')
     end
 
     it "doesn't destroy the assignment if the line item is not the first line item" do
       line_item_one = line_item_model(assignment: assignment)
       line_item_two = line_item_model(assignment: assignment, coupled: false)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
+      expect {
         line_item_two.destroy!
-      end.not_to change(assignment, :workflow_state)
+      }.not_to change(assignment, :workflow_state)
     end
 
     it "doesn't destroy the assignment if the line item is coupled" do
       line_item_one = line_item_model(assignment: assignment, coupled: true)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect do
+      expect {
         line_item_one.destroy!
-      end.not_to change(assignment, :workflow_state)
+      }.not_to change(assignment, :workflow_state)
     end
   end
 end

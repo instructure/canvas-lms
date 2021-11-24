@@ -37,10 +37,11 @@ module I18nExtraction; end
 module I18nExtraction::Extensions
   module TranslateCall
     def validate_default
-      if @default.is_a?(String) && %r{<[a-z][a-z0-9]*[> /]}i.match?(@default)
-        raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
+      if @default.is_a?(String)
+        if @default =~ /<[a-z][a-z0-9]*[> \/]/i
+          raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
+        end
       end
-
       super
     end
 
@@ -57,7 +58,7 @@ module I18nExtraction::Extensions
   end
 
   module RubyExtractor
-    LABEL_CALLS = %i[label blabel label_tag _label_symbol_translation before_label].freeze
+    LABEL_CALLS = [:label, :blabel, :label_tag, :_label_symbol_translation, :before_label].freeze
     CANVAS_TRANSLATE_CALLS = [:mt, :ot].freeze
     ALL_CALLS = (I18nliner::Extractors::RubyExtractor::TRANSLATE_CALLS +
       LABEL_CALLS + CANVAS_TRANSLATE_CALLS +
@@ -144,7 +145,7 @@ module I18nExtraction::Extensions
       default = nil
       key = args.shift
       # these can have an optional explicit key arg
-      if %i[label blabel label_tag].include?(method) && (args[0].is_a?(Symbol) || args[0].is_a?(String))
+      if [:label, :blabel, :label_tag].include?(method) && (args[0].is_a?(Symbol) || args[0].is_a?(String))
         key = args.shift
       end
 
@@ -155,7 +156,7 @@ module I18nExtraction::Extensions
       end
 
       if key && default
-        key = "labels.#{key}" unless I18nliner::Scope::ABSOLUTE_KEY.match?(key)
+        key = "labels.#{key}" unless key =~ I18nliner::Scope::ABSOLUTE_KEY
         process_translate_call(nil, :t, [key, default])
       end
     end
@@ -173,11 +174,11 @@ module I18nExtraction::Extensions
 
     def scope_for(filename)
       scope = case filename
-              when %r{app/controllers/}
-                scope = filename.gsub(%r{.*app/controllers/|_controller\.rb}, '').gsub(%r{/_?}, '.')
+              when /app\/controllers\//
+                scope = filename.gsub(/.*app\/controllers\/|_controller\.rb/, '').gsub(/\/_?/, '.')
                 scope == 'application.' ? '' : scope
-              when %r{app/models/}
-                scope = filename.gsub(%r{.*app/models/|\.rb}, '')
+              when /app\/models\//
+                scope = filename.gsub(/.*app\/models\/|\.rb/, '')
                 STI_SUPERCLASSES.include?(scope) ? '' : scope
               end
       I18nliner::Scope.new scope
@@ -188,11 +189,11 @@ module I18nExtraction::Extensions
     def scope_for(filename)
       remove_whitespace = true
       scope = case filename
-              when %r{app/messages/}
+              when /app\/messages\//
                 remove_whitespace = false unless filename.include?('html')
-                filename.gsub(%r{.*app/|\.erb}, '').gsub(%r{/_?}, '.')
-              when %r{app/views/}
-                filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, '').gsub(%r{/_?}, '.')
+                filename.gsub(/.*app\/|\.erb/, '').gsub(/\/_?/, '.')
+              when /app\/views\//
+                filename.gsub(/.*app\/views\/|\.(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
               end
       I18nliner::Scope.new scope, remove_whitespace: remove_whitespace
     end

@@ -35,13 +35,13 @@ class ContextController < ApplicationController
   # views.
   def object_snippet
     if HostUrl.has_file_host? && !HostUrl.is_file_host?(request.host_with_port)
-      return head :bad_request
+      return head 400
     end
 
     @snippet = params[:object_data] || ""
 
     unless Canvas::Security.verify_hmac_sha1(params[:s], @snippet)
-      return head :bad_request
+      return head 400
     end
 
     # http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx
@@ -65,13 +65,12 @@ class ContextController < ApplicationController
 
     log_asset_access(["roster", @context], 'roster', 'other')
 
-    case @context
-    when Course
+    if @context.is_a?(Course)
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
       if @context.concluded?
-        sections = @context.course_sections.active.select(%i[id course_id name end_at restrict_enrollments_to_section_dates]).preload(:course)
-        concluded_sections = sections.select(&:concluded?).map { |s| "section_#{s.id}" }
+        sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
+        concluded_sections = sections.select { |s| s.concluded? }.map { |s| "section_#{s.id}" }
       else
         sections = @context.course_sections.active.select([:id, :name])
         concluded_sections = []
@@ -129,12 +128,12 @@ class ContextController < ApplicationController
       if @context.grants_right?(@current_user, session, :read_as_admin)
         set_student_context_cards_js_env
       end
-    when Group
-      @users = if @context.grants_right?(@current_user, :read_as_admin)
-                 @context.participating_users.distinct.order_by_sortable_name
-               else
-                 @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
-               end
+    elsif @context.is_a?(Group)
+      if @context.grants_right?(@current_user, :read_as_admin)
+        @users = @context.participating_users.distinct.order_by_sortable_name
+      else
+        @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
+      end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
@@ -146,11 +145,9 @@ class ContextController < ApplicationController
   end
 
   def prior_users
-    manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-                      :allow_course_admin_actions
-                    else
-                      :manage_admin_users
-                    end
+    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
+      :allow_course_admin_actions :
+      :manage_admin_users
     if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
       @prior_users = @context.prior_users
                              .by_top_enrollment.merge(Enrollment.not_fake)
@@ -171,20 +168,18 @@ class ContextController < ApplicationController
       @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
-      @users.each_with_index do |u, i|
-        @users_hash[u.id] = u
-        @users_order_hash[u.id] = i
-      end
+      @users.each_with_index { |u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
       @current_user.user_services.select { |s| feature_and_service_enabled?(s.service) }.each { |s| @current_user_services[s.service] = s }
       @services = UserService.for_user(@users.except(:select, :order)).sort_by { |s| @users_order_hash[s.user_id] || CanvasSort::Last }
-      @services = @services.select do |service|
+      @services = @services.select { |service|
         feature_and_service_enabled?(service.service.to_sym)
-      end
-      @services_hash = @services.to_a.each_with_object({}) do |item, hash|
+      }
+      @services_hash = @services.to_a.inject({}) do |hash, item|
         mapped = item.service
         hash[mapped] ||= []
         hash[mapped] << item
+        hash
       end
     end
   end
@@ -203,7 +198,7 @@ class ContextController < ApplicationController
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-            render :json => @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
+            render :json => @accesses.map { |a| a.as_json(methods: [:readable_name, :asset_class_name, :icon]) }
           end
         end
       end
@@ -212,11 +207,10 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
+      raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
 
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
-      case @context
-      when Course
+      if @context.is_a?(Course)
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
         scope = @context.enrollments_visible_to(@current_user, :include_concluded => is_admin).where(user_id: user_id)
         scope = scope.active_or_pending unless is_admin
@@ -233,17 +227,16 @@ class ContextController < ApplicationController
 
           log_asset_access(@membership, "roster", "roster")
         end
-      when Group
+      elsif @context.is_a?(Group)
         @membership = @context.group_memberships.active.where(user_id: user_id).first
         @enrollments = []
       end
 
       @user = @membership.user rescue nil
-      unless @user
-        case @context
-        when Course
+      if !@user
+        if @context.is_a?(Course)
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
-        when Group
+        elsif @context.is_a?(Group)
           flash[:error] = t('no_user.group', "That user does not exist or is not currently a member of this group")
         end
         redirect_to named_context_url(@context, :context_users_url)
@@ -283,7 +276,7 @@ class ContextController < ApplicationController
         end
         @messages += DiscussionEntry.active.where(:discussion_topic_id => @topics, :user_id => @user).to_a
 
-        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by(&:created_at).reverse
+        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by { |e| e.created_at }.reverse
       end
 
       add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
@@ -295,9 +288,9 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = %i[all_discussion_topics assignment_groups assignments
-                      collaborations context_modules enrollments groups
-                      quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
+  WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
+                    :collaborations, :context_modules, :enrollments, :groups,
+                    :quizzes, :rubrics, :wiki_pages, :rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
@@ -329,10 +322,11 @@ class ContextController < ApplicationController
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
       type = 'all_group_category' if type == 'group_category'
-      if %w[all_group_category group].include?(type) && !@context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
-        return render_unauthorized_action
+      if %w[all_group_category group].include?(type)
+        unless @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+          return render_unauthorized_action
+        end
       end
-
       type = type.pluralize
       type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
       unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
@@ -347,12 +341,12 @@ class ContextController < ApplicationController
 
   def add_enrollment_permissions(context)
     if context.root_account.feature_enabled?(:granular_permissions_manage_users)
-      %i[
-        add_teacher_to_course
-        add_ta_to_course
-        add_designer_to_course
-        add_student_to_course
-        add_observer_to_course
+      [
+        :add_teacher_to_course,
+        :add_ta_to_course,
+        :add_designer_to_course,
+        :add_student_to_course,
+        :add_observer_to_course,
       ]
     else
       [
