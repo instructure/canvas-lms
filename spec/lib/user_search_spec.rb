@@ -88,7 +88,6 @@ describe UserSearch do
 
         describe 'filtering by role' do
           subject { names }
-
           describe 'to a single role' do
             let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student').to_a }
 
@@ -266,7 +265,7 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
-          it 'matches unconfirmed channels', priority: 1 do
+          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
             communication_channel(user, { username: 'unconfirmed@example.com' })
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end
@@ -444,7 +443,7 @@ describe UserSearch do
     it 'raises an error if there is a bad enrollment type' do
       course = Course.create!
       student = User.create!
-      bad_scope = -> { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
+      bad_scope = lambda { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
       expect(bad_scope).to raise_error(ArgumentError, 'Invalid Enrollment Type')
     end
 

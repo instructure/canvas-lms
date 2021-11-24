@@ -111,7 +111,7 @@ class OutcomeImportsApiController < ApplicationController
   end
 
   rescue_from InvalidContentType do
-    render :json => { :error => t('Invalid content type, UTF-8 required') }, :status => :bad_request
+    render :json => { :error => t('Invalid content type, UTF-8 required') }, :status => 400
   end
 
   # @API Import Outcomes
@@ -167,11 +167,12 @@ class OutcomeImportsApiController < ApplicationController
       params[:import_type] ||= 'instructure_csv'
       raise "invalid import type parameter" unless OutcomeImport.valid_import_type?(params[:import_type])
 
-      file_obj = if params.key?(:attachment)
-                   params[:attachment]
-                 else
-                   body_file
-                 end
+      file_obj = nil
+      if params.key?(:attachment)
+        file_obj = params[:attachment]
+      else
+        file_obj = body_file
+      end
 
       import = OutcomeImport.create_with_attachment(
         @context, params[:import_type], file_obj, @current_user, params[:learning_outcome_group_id]
@@ -195,7 +196,7 @@ class OutcomeImportsApiController < ApplicationController
   #
   # @returns OutcomeImport
   def show
-    if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
+    if authorized_action(@context, @current_user, %i(import_outcomes manage_outcomes))
       begin
         @import = if params[:id] == 'latest'
                     @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
@@ -214,7 +215,6 @@ class OutcomeImportsApiController < ApplicationController
   def body_file
     file_obj = request.body
 
-    # rubocop:disable Style/TrivialAccessors not a Class
     file_obj.instance_exec do
       def set_file_attributes(filename, content_type)
         @original_filename = filename
@@ -229,7 +229,6 @@ class OutcomeImportsApiController < ApplicationController
         @original_filename
       end
     end
-    # rubocop:enable Style/TrivialAccessors
 
     if params[:extension]
       file_obj.set_file_attributes("outcome_import.#{params[:extension]}",

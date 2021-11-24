@@ -127,14 +127,14 @@ module Importers
 
     def missing_relative_file_url(rel_path)
       # the rel_path should already be escaped
-      File.join(URI.escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
+      File.join(URI::escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
     end
 
     def find_file_in_context(rel_path)
       mig_id = nil
       # This is for backward-compatibility: canvas attachment filenames are escaped
       # with '+' for spaces and older exports have files with that instead of %20
-      alt_rel_path = rel_path.tr('+', ' ')
+      alt_rel_path = rel_path.gsub('+', ' ')
       if @migration.attachment_path_id_lookup
         mig_id ||= @migration.attachment_path_id_lookup[rel_path]
         mig_id ||= @migration.attachment_path_id_lookup[alt_rel_path]
@@ -163,7 +163,7 @@ module Importers
       rel_path_parts = Pathname.new(rel_path).each_filename.to_a
 
       # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"
-      while new_url.nil? && !rel_path_parts.empty?
+      while new_url.nil? && rel_path_parts.length > 0
         sub_path = File.join(rel_path_parts)
         if (file = find_file_in_context(sub_path))
           new_url = "#{context_path}/files/#{file.id}"
@@ -181,7 +181,11 @@ module Importers
               new_action += "/#{$1}"
             end
           end
-          new_url += new_action.presence || "/preview"
+          if new_action.present?
+            new_url += new_action
+          else
+            new_url += "/preview"
+          end
           new_url += "?#{qs.join("&")}" if qs.present?
         end
         rel_path_parts.shift
@@ -197,7 +201,7 @@ module Importers
 
     def resolve_media_comment_data(node, rel_path)
       if (file = find_file_in_context(rel_path[/^[^?]+/])) # strip query string for this search
-        media_id = (file.media_object&.media_id || file.media_entry_id)
+        media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
         if media_id && media_id != 'maybe'
           if node.name == 'iframe'
             node['data-media-id'] = media_id
@@ -210,14 +214,14 @@ module Importers
       end
 
       if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
-        "/media_objects/#{$1}"
+        return "/media_objects/#{$1}"
       elsif node['data-media-id'].present?
-        media_iframe_url(node['data-media-id'], node['data-media-type'])
+        return media_iframe_url(node['data-media-id'], node['data-media-type'])
       else
         node.delete('class')
         node.delete('id')
         node.delete('style')
-        nil
+        return nil
       end
     end
   end

@@ -77,7 +77,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       let :service_action do
-        ->(*_) { subject.create quiz }
+        lambda { |*_| subject.create quiz }
       end
 
       include_examples 'Takeable Quiz Services'
@@ -182,7 +182,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       let :service_action do
-        ->(*_) { subject.complete qs, qs.attempt }
+        lambda { |*_| subject.complete qs, qs.attempt }
       end
 
       include_examples 'Takeable Quiz Services'
@@ -240,7 +240,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       let :service_action do
-        ->(*_) { subject.update_question({}, qs, qs.attempt) }
+        lambda { |*_| subject.update_question({}, qs, qs.attempt) }
       end
 
       include_examples 'Takeable Quiz Services'

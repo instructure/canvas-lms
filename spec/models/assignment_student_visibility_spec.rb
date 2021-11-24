@@ -62,7 +62,7 @@ describe "differentiated_assignments" do
   def student_in_course_with_adhoc_override(assignment, opts = {})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course)
-    ao = AssignmentOverride.new
+    ao = AssignmentOverride.new()
     ao.assignment = assignment
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
@@ -108,12 +108,12 @@ describe "differentiated_assignments" do
     @group_bar = @course.groups.create!(:name => 'bar group')
   end
 
-  def create_override_for_assignment(assignment)
-    ao = AssignmentOverride.new
+  def create_override_for_assignment(assignment, &block)
+    ao = AssignmentOverride.new()
     ao.assignment = assignment
     ao.title = "Lorem"
     ao.workflow_state = "active"
-    yield(ao)
+    block.call(ao)
     ao.save!
     assignment.reload
   end
@@ -167,11 +167,11 @@ describe "differentiated_assignments" do
     end
 
     it "doesnt allow new records" do
-      expect do
+      expect {
         AssignmentStudentVisibility.create!(user_id: @user.id,
                                             assignment_id: @assignment_id,
                                             course_id: @course.id)
-      end.to raise_error(ActiveRecord::ReadOnlyRecord)
+      }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow deletion" do
@@ -333,7 +333,6 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
-
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
 
@@ -373,7 +372,6 @@ describe "differentiated_assignments" do
             expect(visible_assignment_ids.count).to eq 1
           end
         end
-
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
 
@@ -381,7 +379,6 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
-
         context "user in section with override and one without override" do
           before do
             enroller_user_in_both_sections
@@ -392,7 +389,6 @@ describe "differentiated_assignments" do
           end
         end
       end
-
       context "assignment with false only_visible_to_overrides" do
         before do
           assignment_with_false_only_visible_to_overrides
@@ -409,7 +405,6 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
         end
-
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
 
@@ -417,7 +412,6 @@ describe "differentiated_assignments" do
             ensure_user_sees_assignment
           end
         end
-
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
 
@@ -425,7 +419,6 @@ describe "differentiated_assignments" do
             ensure_user_sees_assignment
           end
         end
-
         context "user in section with override and one without override" do
           before do
             enroller_user_in_both_sections

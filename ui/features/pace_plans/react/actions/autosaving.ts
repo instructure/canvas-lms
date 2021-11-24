@@ -60,14 +60,14 @@ const updatePacePlan = (
         dispatch(uiActions.hideLoadingOverlay())
       }
       dispatch(uiActions.autoSaveCompleted()) // Update the UI state
-      dispatch(uiActions.clearCategoryError('autosaving'))
+      dispatch(uiActions.setErrorMessage(''))
     })
     .catch(error => {
       if (shouldBlock) {
         dispatch(uiActions.hideLoadingOverlay())
       }
       dispatch(uiActions.autoSaveCompleted())
-      dispatch(uiActions.setCategoryError('autosaving', error?.toString()))
+      dispatch(uiActions.setErrorMessage('There was an error saving your changes'))
       console.error(error) // eslint-disable-line no-console
     })
 }

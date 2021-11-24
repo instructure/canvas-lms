@@ -28,9 +28,9 @@ module Types
     field :comments, String, null: true
     field :comments_html, String, null: true
 
-    field :criterion, RubricCriterionType, <<~MD, null: true
+    field :criterion, RubricCriterionType, <<~DESC, null: true
       The rubric criteria that this assessment is for
-    MD
+    DESC
     def criterion
       Loaders::IDLoader.for(Rubric).load(object[:rubric_id]).then do |rubric|
         rubric.criteria.find { |c| c[:id] == object[:criterion_id] }

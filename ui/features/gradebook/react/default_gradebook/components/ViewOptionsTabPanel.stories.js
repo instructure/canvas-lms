@@ -53,11 +53,6 @@ export default {
       allowed: true,
       checked: true,
       onChange: () => {}
-    },
-    showSeparateFirstLastNames: {
-      allowed: true,
-      checked: false,
-      onChange: () => {}
     }
   }
 }

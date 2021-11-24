@@ -34,22 +34,15 @@ describe 'content_link_error' do
 
   let(:asset) { @assignment }
   let(:notification_name) { :content_link_error }
+  include_examples "a message"
 
-  context "with a quiz" do
-    let(:asset) { @quiz }
+  let(:asset) { @quiz }
+  include_examples "a message"
 
-    include_examples "a message"
-  end
+  let(:asset) { @dt }
+  include_examples "a message"
 
-  context "with a discussion topic" do
-    let(:asset) { @dt }
+  let(:asset) { @page }
 
-    include_examples "a message"
-  end
-
-  context "with a wiki page" do
-    let(:asset) { @page }
-
-    include_examples "a message"
-  end
+  include_examples "a message"
 end

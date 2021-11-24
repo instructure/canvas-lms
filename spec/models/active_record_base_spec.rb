@@ -44,7 +44,9 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
+        start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }
+      ]
     end
 
     it "justs do the last 20 days by default" do
@@ -59,7 +61,9 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
+        start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }
+      ]
     end
   end
 
@@ -213,10 +217,10 @@ describe ActiveRecord::Base do
 
   it "has a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
-    expect do
+    expect {
       User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by('id', 'name')}"
       User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by('id', 'name')}"
-    end.not_to raise_error
+    }.not_to raise_error
   end
 
   context "unique_constraint_retry" do
@@ -236,14 +240,13 @@ describe ActiveRecord::Base do
     it "runs twice if it gets a RecordNotUnique" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      # we don't catch the error the second time
-expect do
+      expect {
         User.unique_constraint_retry do
           tries += 1
           User.create!
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the second time
       expect(Submission.count).to eql 1
       expect(tries).to eql 2
       expect(User.count).to eql @orig_user_count
@@ -252,13 +255,12 @@ expect do
     it "runs additional times if specified" do
       Submission.create!(:user => @user, :assignment => @assignment)
       tries = 0
-      # we don't catch the error the last time
-expect do
+      expect {
         User.unique_constraint_retry(2) do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      }.to raise_error(ActiveRecord::RecordNotUnique) # we don't catch the error the last time
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
@@ -281,23 +283,23 @@ expect do
 
     it "does not eat other ActiveRecord::StatementInvalid exceptions" do
       tries = 0
-      expect do
-        User.unique_constraint_retry do
+      expect {
+        User.unique_constraint_retry {
           tries += 1
           User.connection.execute "this is not valid sql"
-        end
-      end.to raise_error(ActiveRecord::StatementInvalid)
+        }
+      }.to raise_error(ActiveRecord::StatementInvalid)
       expect(tries).to eql 1
     end
 
     it "does not eat any other exceptions" do
       tries = 0
-      expect do
-        User.unique_constraint_retry do
+      expect {
+        User.unique_constraint_retry {
           tries += 1
           raise "oh crap"
-        end
-      end.to raise_error("oh crap")
+        }
+      }.to raise_error("oh crap")
       expect(tries).to eql 1
     end
   end
@@ -388,8 +390,8 @@ expect do
 
   context "distinct_values" do
     before :once do
-      User.create
-      User.create
+      User.create()
+      User.create()
       User.create(:locale => "en")
       User.create(:locale => "en")
       User.create(:locale => "es")
@@ -407,7 +409,7 @@ expect do
   context "find_ids_in_batches" do
     it "returns ids from the table in batches of specified size" do
       ids = []
-      5.times { ids << User.create!.id }
+      5.times { ids << User.create!().id }
       batches = []
       User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
         batches << found_ids
@@ -419,7 +421,7 @@ expect do
   describe "find_ids_in_ranges" do
     before :once do
       @ids = []
-      10.times { @ids << User.create!.id }
+      10.times { @ids << User.create!().id }
     end
 
     it "returns ids from the table in ranges" do
@@ -472,9 +474,9 @@ expect do
     end
 
     it "fails with dot in nested column name" do
-      expect do
+      expect {
         User.where(:name => { "users.id" => @user }).first
-      end.to raise_error(TypeError)
+      }.to raise_error(TypeError)
     end
 
     it "does not fail with a dot in column name only" do
@@ -564,7 +566,7 @@ expect do
     it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
       u1 = User.create!(name: 'a')
       u2 = User.create!(name: 'a')
-      User.from(<<~SQL.squish)
+      User.from(<<-SQL)
         (WITH duplicates AS (
           SELECT users.*,
               ROW_NUMBER() OVER(PARTITION BY users.name
@@ -884,13 +886,13 @@ end
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   # create a private pool, with the same config as the regular pool, but ensure
   # max_runtime is set
-  let(:spec) do
+  let(:spec) {
     ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
       'spec',
       ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
       'postgresql_connection'
     )
-  end
+  }
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
 
   it "doesn't evict a normal cycle" do
@@ -902,23 +904,23 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections on checkout" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
     conn2 = pool.connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     expect(conn1.runtime).to eq 0
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
 
     expect(conn1.runtime).to eq 60
     pool.checkin(conn1)
@@ -927,12 +929,12 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections if you call flush" do
-    allow(Process).to receive(:clock_gettime).and_return(0)
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Process).to receive(:clock_gettime).and_return(60)
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
 
     pool.flush
 

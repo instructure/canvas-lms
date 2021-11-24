@@ -40,9 +40,9 @@ class DelayedMessage < ActiveRecord::Base
     ]
   belongs_to :communication_channel
 
-  validates :summary, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :link, length: { maximum: maximum_text_length, allow_blank: true }
-  validates :communication_channel_id, :workflow_state, presence: true
+  validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :link, maximum: maximum_text_length, allow_nil: true, allow_blank: true
+  validates_presence_of :communication_channel_id, :workflow_state
 
   before_save :set_send_at
 
@@ -71,7 +71,7 @@ class DelayedMessage < ActiveRecord::Base
     end
   }
 
-  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
   include Workflow
 
@@ -101,16 +101,17 @@ class DelayedMessage < ActiveRecord::Base
     end
     delayed_messages = uniqs.values
     delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
-    first = delayed_messages.detect do |m|
-      m.communication_channel&.active? &&
+    first = delayed_messages.detect { |m|
+      m.communication_channel &&
+        m.communication_channel.active? &&
         !m.communication_channel.bouncing?
-    end
+    }
     to = first.communication_channel rescue nil
     return nil unless to
     return nil if delayed_messages.empty?
 
     user = to.user rescue nil
-    context = delayed_messages.select(&:context).compact.first.try(:context)
+    context = delayed_messages.select { |m| m.context }.compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
@@ -143,19 +144,19 @@ class DelayedMessage < ActiveRecord::Base
 
   def set_send_at
     # no cc yet = wait
-    return unless communication_channel&.user
-    return if send_at
+    return unless self.communication_channel and self.communication_channel.user
+    return if self.send_at
 
     # I got tired of trying to figure out time zones in my head, and I realized
     # if we do it this way, Rails will take care of it all for us!
-    if frequency == 'weekly'
-      target = communication_channel.user.weekly_notification_time
+    if self.frequency == 'weekly'
+      target = self.communication_channel.user.weekly_notification_time
     else
       # Find the appropriate timezone. For weekly notifications, always use
       # Eastern. For other notifications, try and user the user's time zone,
       # defaulting to mountain. (Should be impossible to not find mountain, but
       # default to system time if necessary.)
-      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
+      time_zone = self.communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
       target = time_zone.now.change(:hour => 18)
       target += 1.day if target < time_zone.now
     end

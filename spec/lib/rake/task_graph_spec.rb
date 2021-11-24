@@ -44,7 +44,7 @@ describe Rake::TaskGraph do
     subject.task 'a'
     subject.task 'b' => ['a']
     subject.task 'c' => []
-    subject.task 'd' => %w[a b c]
+    subject.task 'd' => ['a', 'b', 'c']
 
     expect(subject.batches).to eq(subject.batches)
   end
@@ -77,23 +77,23 @@ describe Rake::TaskGraph do
   end
 
   it 'whines on self-deps' do
-    expect do
+    expect {
       described_class.draw { task 'a' => ['a'] }
-    end.to raise_error(/has a self or circular dependency/)
+    }.to raise_error(/has a self or circular dependency/)
   end
 
   it 'whines on circular deps' do
-    expect do
+    expect {
       described_class.draw do
         task 'a' => ['b']
         task 'b' => ['a']
       end
-    end.to raise_error(/has a self or circular dependency/)
+    }.to raise_error(/has a self or circular dependency/)
   end
 
   it 'whines if a dependency is undefined' do
-    expect do
+    expect {
       described_class.draw { task 'a' => ['b'] }
-    end.to raise_error(/but were not defined/)
+    }.to raise_error(/but were not defined/)
   end
 end

@@ -78,10 +78,7 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each do |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      end
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq AngelPropExpected::MATCHING
     end
@@ -96,10 +93,7 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything without the ids
-      hash[:answers].each do |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      end
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq AngelPropExpected::ORDER
     end
@@ -141,7 +135,7 @@ if Qti.migration_executable
         :question_name => "Question for main question bank.",
         :points_possible => 1,
         :correct_comments => ""
-      }.freeze
+      }
 
     MULTIPLE_CHOICE =
       {
@@ -166,7 +160,7 @@ if Qti.migration_executable
         :question_name => "Multiple choice question title",
         :points_possible => 1,
         :correct_comments => ""
-      }.freeze
+      }
 
     ESSAY =
       {
@@ -178,7 +172,7 @@ if Qti.migration_executable
         :question_name => "Essay question title here",
         :points_possible => 1,
         :correct_comments => ""
-      }.freeze
+      }
 
     LIKERT =
       {
@@ -195,7 +189,7 @@ if Qti.migration_executable
         :correct_comments => "",
         :migration_id => nil,
         :question_text => "<div>How good <em>is</em> Instructure</div>"
-      }.freeze
+      }
 
     MULTIPLE_ANSWER =
       {
@@ -212,7 +206,7 @@ if Qti.migration_executable
         :correct_comments => "ok ok",
         :migration_id => nil,
         :question_text => "<div>go!</div>"
-      }.freeze
+      }
 
     SHORT_ANSWER =
       { :answers => [{ :text => "cat", :weight => 100 }],
@@ -222,7 +216,7 @@ if Qti.migration_executable
         :migration_id => nil,
         :points_possible => 1,
         :question_type => "short_answer_question",
-        :question_text => "<div>What is your answer</div>" }.freeze
+        :question_text => "<div>What is your answer</div>" }
 
     SHORT_ANSWER_AS_ESSAY =
       {
@@ -234,7 +228,7 @@ if Qti.migration_executable
         :question_name => "",
         :points_possible => 1,
         :correct_comments => ""
-      }.freeze
+      }
 
     MATCHING =
       {
@@ -247,7 +241,7 @@ if Qti.migration_executable
         :question_type => "matching_question",
         :question_text => "<div>matching question</div>",
         :matches => [{ :text => "1" }, { :text => "2" }, { :text => "3" }]
-      }.freeze
+      }
 
     ORDER =
       { :answers =>
@@ -261,7 +255,7 @@ if Qti.migration_executable
         :points_possible => 1,
         :question_type => "matching_question",
         :question_text => "<div>Order these</div>",
-        :matches => [{ :text => "1" }, { :text => "2" }, { :text => "3" }] }.freeze
+        :matches => [{ :text => "1" }, { :text => "2" }, { :text => "3" }] }
 
     FILE_RESPONSE =
       {
@@ -273,7 +267,7 @@ if Qti.migration_executable
         :points_possible => 1,
         :question_type => "file_upload_question",
         :question_text => "<div>This is an offline item. I don't know what to do.</div>",
-      }.freeze
+      }
 
     FIB =
       {
@@ -290,6 +284,6 @@ if Qti.migration_executable
         :points_possible => 1,
         :question_text => "<div>The [l1] brown [l2] jumped over the lazy [l3] .</div> [l4]  [l5] ",
         :question_type => "fill_in_multiple_blanks_question"
-      }.freeze
+      }
   end
 end

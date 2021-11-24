@@ -25,7 +25,7 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -49,7 +49,7 @@ describe "calendar2" do
         account.save!
       end
 
-      it "creates a new event via plus button", priority: "1" do
+      it "creates a new event via plus button", priority: "1", test_id: 250293 do
         load_agenda_view
 
         # Clicks plus button, saves event, and verifies a row has been added
@@ -65,7 +65,7 @@ describe "calendar2" do
         expect(fj('.agenda-wrapper:visible')).to be_present
       end
 
-      it "sets the header in the format 'Oct 11, 2013'", priority: "1" do
+      it "sets the header in the format 'Oct 11, 2013'", priority: "1", test_id: 28546 do
         start_date = Time.zone.now.beginning_of_day + 12.hours
         @course.calendar_events.create!(title: "ohai",
                                         start_at: start_date, end_at: start_date + 1.hour)
@@ -138,7 +138,7 @@ describe "calendar2" do
         expect(agenda_view_header).not_to include_text('Invalid')
       end
 
-      it "allows deleting events", priority: "1" do
+      it "allows deleting events", priority: "1", test_id: 138857 do
         tomorrow = 3.days.from_now
         make_event(start: tomorrow)
 
@@ -152,7 +152,7 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
       end
 
-      it "allows deleting assignments", priority: "1" do
+      it "allows deleting assignments", priority: "1", test_id: 138858 do
         title = "Maniac Mansion"
         @assignment = @course.assignments.create!(name: title, due_at: 3.days.from_now)
 
@@ -192,7 +192,7 @@ describe "calendar2" do
         expect(fj('.event-details:visible time')).to include_text('11:59')
       end
 
-      it "has a working today button", priority: "1" do
+      it "has a working today button", priority: "1", test_id: 28550 do
         load_month_view
         # Go to a future calendar date to test going back
         change_calendar
@@ -210,7 +210,7 @@ describe "calendar2" do
         expect(agenda_view_header.text).to include(date)
       end
 
-      it "shows the location when clicking on a calendar event", priority: "1" do
+      it "shows the location when clicking on a calendar event", priority: "1", test_id: 138890 do
         location_name = "brighton"
         location_address = "cottonwood"
         make_event(location_name: location_name, location_address: location_address)
@@ -224,7 +224,7 @@ describe "calendar2" do
         expect(f('.event-details-content')).to include_text(location_address)
       end
 
-      it "brings up a calendar date picker when clicking on the agenda range", priority: "1" do
+      it "brings up a calendar date picker when clicking on the agenda range", priority: "1", test_id: 140223 do
         load_agenda_view
 
         # Click on the agenda header
@@ -236,21 +236,21 @@ describe "calendar2" do
         expect(f('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
-      it "show quizes on agenda view", priority: "1" do
+      it "show quizes on agenda view", priority: "1", test_id: 138850 do
         create_quiz
 
         load_agenda_view
         expect(agenda_item).to include_text('Test Quiz')
       end
 
-      it "shows assignment due dates for different sections", priority: "1" do
+      it "shows assignment due dates for different sections", priority: "1", test_id: 138848 do
         assignment = @course.assignments.create!(name: 'Test Title', due_at: 1.day.from_now)
 
         # Create Sections and Differentiated Assignment
         s1 = @course.course_sections.create!(name: 'Section1')
         s2 = @course.course_sections.create!(name: 'Section2')
         s1_date = rand(2...9).day.from_now
-        s2_date = s1_date + 1.day
+        s2_date = s1_date + 1.days
         @override = create_section_override_for_assignment(assignment, course_section: s1, due_at: s1_date)
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 
@@ -273,7 +273,7 @@ describe "calendar2" do
           create_graded_discussion
         end
 
-        it "allows deleting a graded discussion", priority: "1" do
+        it "allows deleting a graded discussion", priority: "1", test_id: 138859 do
           load_agenda_view
           expect(agenda_item_title).to include_text('Graded Discussion')
 
@@ -284,7 +284,7 @@ describe "calendar2" do
           expect(f("#content")).not_to contain_css('.agenda-event__item-container')
         end
 
-        it "allows editing via modal", priority: "1" do
+        it "allows editing via modal", priority: "1", test_id: 138855 do
           test_date = 2.days.from_now
           test_name = 'Test Title'
           load_agenda_view
@@ -306,7 +306,7 @@ describe "calendar2" do
           expect(f('.agenda-date')).to include_text(date_string(test_date, :short_with_weekday))
         end
 
-        it "allows editing via More Options", priority: "1" do
+        it "allows editing via More Options", priority: "1", test_id: 420724 do
           skip('final load_agenda_view is fragile, needs analysis')
           test_date = 2.days.from_now.change(hours: 13, min: 59, sec: 0, usec: 0)
           test_title = 'Test Title'
@@ -356,7 +356,7 @@ describe "calendar2" do
       course_with_student_logged_in
     end
 
-    it "student can not delete events created by a teacher", priority: "1" do
+    it "student can not delete events created by a teacher", priority: "1", test_id: 138856 do
       # create an event as the teacher
       @course.calendar_events.create!(title: "Monkey Island", start_at: Time.zone.now.advance(days: 4))
 

@@ -32,15 +32,15 @@ module CanvasDynamoDB
     end
 
     def request_items(tables)
-      tables.transform_values { |v| { keys: v } }
+      Hash[tables.map { |k, v| [k, { keys: v }] }]
     end
 
     def execute
       @result ||= begin
         result = {}
-        execute_raw.each do |resp|
+        execute_raw.each { |resp|
           merge_result(resp.responses, result)
-        end
+        }
         result
       end
     end

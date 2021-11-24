@@ -38,7 +38,6 @@ if Qti.migration_executable
         expect(hash[:question_text]).to eq "<div>Rhode Island is neither a road nor an island. Discuss. </div>"
       end
     end
-
     describe "multiple choice text" do
       it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('multiple_choice')
@@ -66,7 +65,6 @@ if Qti.migration_executable
         ]
       end
     end
-
     describe "multiple answer text" do
       it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('multiple_answer')
@@ -94,7 +92,6 @@ if Qti.migration_executable
         ]
       end
     end
-
     describe "matching text" do
       it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('matching')
@@ -119,7 +116,7 @@ if Qti.migration_executable
           { :html => nil, :text => "left 3" },
           { :html => nil, :text => "left 4" }
         ]
-        expect(hash[:matches].pluck(:text)).to eq ["right 1", "rïght 2", "right 3", "right 4"]
+        expect(hash[:matches].collect { |m| m[:text] }).to eq ["right 1", "rïght 2", "right 3", "right 4"]
       end
     end
   end

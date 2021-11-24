@@ -973,14 +973,14 @@ describe EnrollmentsApiController, type: :request do
           course0 = @course
 
           course_with_student user: @student, enrollment_state: 'invited', active_course: true
-          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invited active])
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w(invited active))
           expect(json.map { |e| e['course_id'] }).to match_array [course0.id, @course.id]
 
           @course.start_at = 1.month.ago
           @course.conclude_at = 1.week.ago
           @course.restrict_enrollments_to_course_dates = true
           @course.save!
-          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invited active])
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w(invited active))
           expect(json.map { |e| e['course_id'] }).to match_array [course0.id]
         end
 
@@ -1033,9 +1033,9 @@ describe EnrollmentsApiController, type: :request do
           let(:observer) { User.create! }
 
           student_grade = lambda do |json|
-            student_json = json.find do |e|
+            student_json = json.find { |e|
               e["type"] == "StudentEnrollment"
-            end
+            }
             if student_json
               student_json["grades"]["final_score"]
             end
@@ -1275,7 +1275,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_section_id] = 'SIS123'
             json = api_call(:get, @path, @params)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
+            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             expect(json_user_ids).to match_array(section_user_ids)
           end
@@ -1285,7 +1285,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
+            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(section_user_ids)
           end
 
@@ -1306,7 +1306,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map(&:user_id)
+            course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
           end
 
@@ -1315,7 +1315,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map(&:user_id)
+            course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
           end
 
@@ -1434,7 +1434,7 @@ describe EnrollmentsApiController, type: :request do
 
         # with a state[] filter
         json = api_call(:get, "#{@user_path}?state[]=active",
-                        @user_params.merge(:state => %w[active]))
+                        @user_params.merge(:state => %w{active}))
         expect(json.map { |e| e['id'] }).to include enrollment.id
       end
 
@@ -1523,7 +1523,7 @@ describe EnrollmentsApiController, type: :request do
 
             it "accepts an array of enrollment roles" do
               json = api_call(:get, "#{@user_path}?role[]=StudentEnrollment&role[]=CustomStudent",
-                              @user_params.merge(:role => %w[StudentEnrollment CustomStudent]))
+                              @user_params.merge(:role => %w{StudentEnrollment CustomStudent}))
               expect(json.map { |e| e['course_id'].to_i }.sort).to eq [@original_course.id, @course.id].sort
             end
           end
@@ -1576,7 +1576,7 @@ describe EnrollmentsApiController, type: :request do
 
           it "accepts an array of enrollment roles" do
             json = api_call(:get, "#{@path}?role[]=StudentEnrollment&role[]=CustomStudent",
-                            @params.merge(:role => %w[StudentEnrollment CustomStudent]))
+                            @params.merge(:role => %w{StudentEnrollment CustomStudent}))
             expect(json.map { |e| e['user_id'].to_i }.sort).to eq [@original_student.id, @student.id].sort
           end
         end
@@ -1591,7 +1591,7 @@ describe EnrollmentsApiController, type: :request do
 
         @user = current_user
         json = api_call(:get, @path, @params)
-        enrollments = %w[observer student ta teacher].inject([]) do |res, type|
+        enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res + @course.send("#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
         end
         expect(json).to match_array(enrollments.map do |e|
@@ -1621,28 +1621,22 @@ describe EnrollmentsApiController, type: :request do
             }
           }
           # should display the user's own grades
-          if e.student? && e.user_id == @user.id
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user),
-              'final_score' => nil,
-              'current_score' => nil,
-              'final_grade' => nil,
-              'current_grade' => nil,
-            }
-          end
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+            'final_score' => nil,
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
+          } if e.student? && e.user_id == @user.id
           # should not display grades for other users.
-          if e.student? && e.user_id != @user.id
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user)
-            }
-          end
-          if e.user == @user
-            h.merge!(
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
-            )
-          end
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user)
+          } if e.student? && e.user_id != @user.id
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
 
           h
         end)
@@ -1682,7 +1676,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "filters by enrollment workflow_state" do
         @teacher.enrollments.first.update_attribute(:workflow_state, 'completed')
-        json = api_call(:get, "#{@path}?state[]=completed", @params.merge(:state => %w[completed]))
+        json = api_call(:get, "#{@path}?state[]=completed", @params.merge(:state => %w{completed}))
         expect(json.count).to be > 0
         json.each { |e| expect(e['enrollment_state']).to eql 'completed' }
       end
@@ -1874,7 +1868,7 @@ describe EnrollmentsApiController, type: :request do
         @course.save
 
         json = api_call(:get, @user_path, @user_params)
-        expect(json[0]['grades'].keys).to eql %w[html_url]
+        expect(json[0]['grades'].keys).to eql %w{html_url}
       end
 
       it "does not show enrollments for courses that aren't published" do
@@ -1889,7 +1883,7 @@ describe EnrollmentsApiController, type: :request do
 
         # Request w/ a state[] filter.
         json = api_call(:get, @user_path,
-                        @user_params.merge(:state => %w[active], :type => %w[StudentEnrollment]))
+                        @user_params.merge(:state => %w{active}, :type => %w{StudentEnrollment}))
         expect(json.map { |e| e['id'] }).not_to include enrollment.id
       end
 
@@ -1900,7 +1894,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment.update_attribute(:workflow_state, 'active')
 
         json = api_call(:get, @user_path,
-                        @user_params.merge(:state => %w[current_and_future], :type => %w[StudentEnrollment]))
+                        @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
         expect(json.map { |e| e['id'] }).to include enrollment.id
       end
 
@@ -1912,7 +1906,7 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.enrollment_state.state).to eq "pending_active"
 
         json = api_call(:get, @user_path,
-                        @user_params.merge(:state => %w[current_and_future], :type => %w[StudentEnrollment]))
+                        @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
         expect(json.map { |e| e['id'] }).to include enrollment.id
       end
 
@@ -1923,7 +1917,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment.update_attribute(:workflow_state, 'completed')
 
         json = api_call(:get, @user_path,
-                        @user_params.merge(:state => %w[active completed]))
+                        @user_params.merge(:state => %w{active completed}))
         expect(json.map { |e| e['id'].to_i }.sort).to eq @user.enrollments.map(&:id).sort
       end
 
@@ -1945,7 +1939,7 @@ describe EnrollmentsApiController, type: :request do
       it "does not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|
-          %w[sis_user_id login_id].each { |key| expect(res['user']).not_to include(key) }
+          %w{sis_user_id login_id}.each { |key| expect(res['user']).not_to include(key) }
         end
       end
     end
@@ -1957,7 +1951,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "includes users' sis and login ids" do
         json = api_call(:get, @path, @params)
-        enrollments = %w[observer student ta teacher].inject([]) do |res, type|
+        enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res + @course.send("#{type}_enrollments").preload(:user)
         end
         enrollments = enrollments.sort_by { |e| [e.type, e.user.sortable_name] }
@@ -1970,8 +1964,10 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.user.created_at.iso8601,
             'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
           }
-          user_json['sis_user_id'] = e.user.pseudonym.sis_user_id
-          user_json['integration_id'] = e.user.pseudonym.integration_id
+          user_json.merge!({
+                             'sis_user_id' => e.user.pseudonym.sis_user_id,
+                             'integration_id' => e.user.pseudonym.integration_id,
+                           })
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2000,19 +1996,17 @@ describe EnrollmentsApiController, type: :request do
             'sis_user_id' => nil,
             'section_integration_id' => nil
           }
-          if e.student?
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user),
-              'final_score' => nil,
-              'current_score' => nil,
-              'final_grade' => nil,
-              'current_grade' => nil,
-              "unposted_current_score" => nil,
-              "unposted_current_grade" => nil,
-              "unposted_final_score" => nil,
-              "unposted_final_grade" => nil
-            }
-          end
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+            'final_score' => nil,
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
+            "unposted_current_score" => nil,
+            "unposted_current_grade" => nil,
+            "unposted_final_score" => nil,
+            "unposted_final_grade" => nil
+          } if e.student?
           h
         end)
       end
@@ -2294,9 +2288,9 @@ describe EnrollmentsApiController, type: :request do
       shared_examples_for 'numeric pagination' do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
-          enrollments = %w[observer student ta teacher].inject([]) do |res, type|
+          enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
             res + @course.send("#{type}_enrollments").preload(:user)
-          end.map do |e|
+          }.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
               'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2322,22 +2316,18 @@ describe EnrollmentsApiController, type: :request do
               'start_at' => nil,
               'end_at' => nil,
             }
-            if e.student?
-              h['grades'] = {
-                'html_url' => course_student_grades_url(@course, e.user),
-                'final_score' => nil,
-                'current_score' => nil,
-                'final_grade' => nil,
-                'current_grade' => nil,
-              }
-            end
-            if e.user == @user
-              h.merge!(
-                'last_activity_at' => nil,
-                'last_attended_at' => nil,
-                'total_activity_time' => 0
-              )
-            end
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+            } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
 
@@ -2361,9 +2351,9 @@ describe EnrollmentsApiController, type: :request do
       shared_examples_for 'bookmarked pagination' do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
-          enrollments = %w[observer student ta teacher].inject([]) do |res, type|
+          enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
             res + @course.send("#{type}_enrollments").preload(:user)
-          end.map do |e|
+          }.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
               'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2389,22 +2379,18 @@ describe EnrollmentsApiController, type: :request do
               'start_at' => nil,
               'end_at' => nil,
             }
-            if e.student?
-              h['grades'] = {
-                'html_url' => course_student_grades_url(@course, e.user),
-                'final_score' => nil,
-                'current_score' => nil,
-                'final_grade' => nil,
-                'current_grade' => nil,
-              }
-            end
-            if e.user == @user
-              h.merge!(
-                'last_activity_at' => nil,
-                'last_attended_at' => nil,
-                'total_activity_time' => 0
-              )
-            end
+            h['grades'] = {
+              'html_url' => course_student_grades_url(@course, e.user),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+            } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
           link_header = response.headers['Link'].split(',')
@@ -2592,8 +2578,7 @@ describe EnrollmentsApiController, type: :request do
           enrollment = @teacher.enrollments.first
 
           @path.sub!(@enrollment.id.to_s, enrollment.id.to_s)
-          @params[:id] = enrollment.id.to_param
-          @params[:task] = 'delete'
+          @params.merge!(:id => enrollment.id.to_param, :task => 'delete')
 
           raw_api_call(:delete, "#{@path}?task=delete", @params)
 
@@ -2715,7 +2700,7 @@ describe EnrollmentsApiController, type: :request do
 
     describe "filters" do
       it "properly filters by a single enrollment type" do
-        json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w[StudentEnrollment]))
+        json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w{StudentEnrollment}))
         expect(json).to eql(@course.student_enrollments.map do |e|
           {
             'root_account_id' => e.root_account_id,
@@ -2762,10 +2747,10 @@ describe EnrollmentsApiController, type: :request do
         @course.enroll_user(@new_user, 'TaEnrollment', :enrollment_state => 'active')
         @course.enroll_user(@new_user, 'ObserverEnrollment', :enrollment_state => 'active')
         @user = request_user
-        json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w[StudentEnrollment TeacherEnrollment]))
+        json = api_call(:get, "#{@path}?type[]=StudentEnrollment&type[]=TeacherEnrollment", @params.merge(:type => %w{StudentEnrollment TeacherEnrollment}))
         enrollments = (@course.student_enrollments + @course.teacher_enrollments).sort_by { |e| [e.type, e.user.sortable_name] }
 
-        expect(json).to eq(enrollments.map do |e|
+        expect(json).to eq(enrollments.map { |e|
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2791,31 +2776,27 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.user.created_at.iso8601
             }
           }
-          if e.student?
-            h['grades'] = {
-              'html_url' => course_student_grades_url(@course, e.user),
-              'final_score' => nil,
-              'current_score' => nil,
-              'final_grade' => nil,
-              'current_grade' => nil,
-            }
-          end
-          if e.user == @user
-            h.merge!(
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
-            )
-          end
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+            'final_score' => nil,
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
+          } if e.student?
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
           h
-        end)
+        })
       end
 
       it "returns an empty array when no user enrollments match a filter" do
         site_admin_user(:active_all => true)
 
         json = api_call(:get, "#{@user_path}?type[]=TeacherEnrollment",
-                        @user_params.merge(:type => %w[TeacherEnrollment]))
+                        @user_params.merge(:type => %w{TeacherEnrollment}))
 
         expect(json).to be_empty
       end

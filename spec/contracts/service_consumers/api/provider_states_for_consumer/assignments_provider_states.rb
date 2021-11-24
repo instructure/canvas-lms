@@ -83,7 +83,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         mcourse = Pact::Canvas.base_state.mobile_courses[1]
         mstudent = Pact::Canvas.base_state.mobile_student
         mteacher = Pact::Canvas.base_state.mobile_teacher
-        test_submission_types = %w[online_text_entry online_upload online_url]
+        test_submission_types = ['online_text_entry', 'online_upload', 'online_url']
         # Create a category/group...
         cat = mcourse.group_categories.create!(name: "The Cool Kids")
         g = cat.groups.create(:context => mcourse)
@@ -105,8 +105,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           # Submit an online_upload for course 2, and an online_text_entry for course 3
           submission_type = test_submission_types[i]
           submission =
-            case submission_type
-            when 'online_upload'
+            if submission_type == 'online_upload'
               assignment.submit_homework(
                 mstudent, {
                   submission_type: 'online_upload',
@@ -115,7 +114,7 @@ PactConfig::Consumers::ALL.each do |consumer|
                   ]
                 }
               )
-            when 'online_url'
+            elsif submission_type == 'online_url'
               assignment.submit_homework(mstudent, { submission_type: "online_url", url: "someurl" })
             else
               # assume online_text_entry by default
@@ -126,7 +125,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           # Add a submission comment to the submission
           submission.submission_comments.create!(
             author: mstudent,
-            comment: "a comment"
+            comment: "a comment",
             # this had no effect at all
             # attachments: [
             #   attachment_model(filename: 'comment_attachment.txt', context: mstudent, content_type: 'text/html')
@@ -154,7 +153,7 @@ PactConfig::Consumers::ALL.each do |consumer|
             :context_id => mcourse.id,
             :context_type => "Course",
             :points_possible => 10,
-            :public => true
+            :public => true,
           )
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was

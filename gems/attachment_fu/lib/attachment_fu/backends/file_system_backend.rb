@@ -61,7 +61,7 @@ module AttachmentFu # :nodoc:
       # Gets the public path to the file
       # The optional thumbnail argument will output the thumbnail's filename.
       def public_filename(thumbnail = nil)
-        full_filename(thumbnail).gsub(/^#{Regexp.escape(base_path)}/, '')
+        full_filename(thumbnail).gsub %r(^#{Regexp.escape(base_path)}), ''
       end
 
       def authenticated_s3_url(*args)
@@ -74,15 +74,17 @@ module AttachmentFu # :nodoc:
 
       def filename=(value)
         value = sanitize_filename(value)
-        if !new_record? && !(filename.nil? || @old_filename)
-          @old_filename = full_filename
+        if self.new_record?
+          write_attribute :filename, value
+        else
+          @old_filename = full_filename unless filename.nil? || @old_filename
+          write_attribute :filename, value
         end
-        write_attribute :filename, value
       end
 
       def sanitize_filename(filename)
-        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
-          filename = root_attachment.filename
+        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
+          filename = self.root_attachment.filename
         else
           filename = Attachment.truncate_filename(filename, 255)
           filename.gsub!(%r{/| }, '_')
@@ -90,9 +92,7 @@ module AttachmentFu # :nodoc:
         filename
       end
 
-      def bucket_name
-        "no-bucket"
-      end
+      def bucket_name; "no-bucket"; end
 
       # Creates a temp file from the currently saved file.
       def create_temp_file
@@ -129,7 +129,7 @@ module AttachmentFu # :nodoc:
           # TODO: This overwrites the file if it exists, maybe have an allow_overwrite option?
           FileUtils.mkdir_p(File.dirname(full_filename))
           FileUtils.cp(temp_path, full_filename)
-          File.chmod(attachment_options[:chmod] || 0o644, full_filename)
+          File.chmod(attachment_options[:chmod] || 0644, full_filename)
         end
         @old_filename = nil
         true

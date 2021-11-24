@@ -59,9 +59,9 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
       data[question_id] = nil
       answer = Quizzes::QuizQuestion::FileUploadAnswer.new(question_id, points_possible, data)
       ids = nil
-      expect do
+      expect {
         ids = answer.attachment_ids
-      end.to_not raise_error
+      }.to_not raise_error
       expect(ids).to be_nil
     end
   end

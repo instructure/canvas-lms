@@ -33,8 +33,7 @@ const STUDENT_SETTINGS = [
   'allow_student_forum_attachments',
   'allow_student_discussion_editing',
   'allow_student_discussion_topics',
-  'allow_student_discussion_reporting',
-  'allow_student_anonymous_discussion_topics'
+  'allow_student_discussion_reporting'
 ]
 
 export default class DiscussionSettings extends Component {
@@ -120,17 +119,6 @@ export default class DiscussionSettings extends Component {
               label={I18n.t('Create discussion topics')}
               value="allow_student_discussion_topics"
             />
-            {ENV.discussion_anonymity_enabled && (
-              <Checkbox
-                id="allow_student_anonymous_discussion_topics"
-                disabled={
-                  this.props.isSavingSettings ||
-                  !this.state.studentSettings.includes('allow_student_discussion_topics')
-                }
-                label={I18n.t('Create anonymous discussion topics')}
-                value="allow_student_anonymous_discussion_topics"
-              />
-            )}
             <Checkbox
               id="allow_student_discussion_editing"
               disabled={this.props.isSavingSettings}

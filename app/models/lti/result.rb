@@ -89,7 +89,7 @@ class Lti::Result < ApplicationRecord
   # Updates score for submission safely (does not allow maximum score to be null, but
   # if it's not already set, it will set it to assignment's points_possible)
   def self.update_score_for_submission(submission, score)
-    update_query = <<~SQL.squish
+    update_query = <<~SQL
       UPDATE #{Lti::Result.quoted_table_name} SET
         result_score = #{connection.quote(score)},
         result_maximum = COALESCE(
@@ -110,6 +110,6 @@ class Lti::Result < ApplicationRecord
   private
 
   def set_root_account
-    self.root_account_id ||= submission&.root_account_id || line_item&.root_account_id
+    self.root_account_id ||= self.submission&.root_account_id || self.line_item&.root_account_id
   end
 end

@@ -54,9 +54,9 @@ describe "/gradebooks/speed_grader" do
   end
 
   it "renders without error" do
-    expect do
+    expect {
       render template: 'gradebooks/speed_grader', locals: locals
-    end.not_to raise_error
+    }.not_to raise_error
   end
 
   it "includes a mount pount for submission comments" do

@@ -22,11 +22,11 @@ class OutcomeCalculationMethod < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
 
-  CALCULATION_METHODS = %w[
-    decaying_average
-    n_mastery
-    highest
-    latest
+  CALCULATION_METHODS = [
+    'decaying_average',
+    'n_mastery',
+    'highest',
+    'latest'
   ].freeze
 
   VALID_CALCULATION_INTS = {
@@ -46,19 +46,19 @@ class OutcomeCalculationMethod < ApplicationRecord
     message: "calculation_method must be one of #{CALCULATION_METHODS}"
   }
   validates :calculation_int, inclusion: {
-    in: lambda do |model|
+    in: ->(model) {
       VALID_CALCULATION_INTS[model.calculation_method].presence || [nil] # if valid ints == [], value must be nil
-    end,
-    if: lambda do |model|
+    },
+    if: ->(model) {
       CALCULATION_METHODS.include?(model.calculation_method)
-    end,
+    },
     message: "invalid calculation_int for this calculation_method"
   }
 
   after_save :clear_cached_methods
 
   def as_json(options = {})
-    super(options.reverse_merge(include_root: false, only: %i[id calculation_method calculation_int context_type context_id]))
+    super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
   end
 
   def self.find_or_create_default!(context)

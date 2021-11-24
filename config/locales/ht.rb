@@ -7,7 +7,7 @@
         ordinals: lambda do |_key, options|
           number = options[:number]
           case number
-          when 1 then 'ye'
+          when 1; 'ye'
           else; 'yèm'
           end
         end,

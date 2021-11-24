@@ -245,8 +245,8 @@ module MicrosoftSync
           raise InternalError, 'A job is waiting to be retried; use run_later() to enqueue another'
         end
 
-        delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
-          .run(nil, initial_mem_state)
+        self.delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
+            .run(nil, initial_mem_state)
       end
     end
 
@@ -321,8 +321,8 @@ module MicrosoftSync
         return
       end
 
-      delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
-        .run(step, initial_mem_state)
+      self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
+          .run(step, initial_mem_state)
     end
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
@@ -350,7 +350,7 @@ module MicrosoftSync
       return unless update_state_record_to_retrying(
         step: delayed_next_step.step,
         data: delayed_next_step.job_state_data,
-        retries_by_step: job_state_record.reload.job_state&.dig(:retries_by_step)
+        retries_by_step: job_state_record.reload.job_state&.dig(:retries_by_step),
       )
 
       run_with_delay(
@@ -398,7 +398,7 @@ module MicrosoftSync
         data: retry_object.job_state_data,
         retries_by_step: retries_by_step.merge(retry_step.to_s => retries + 1),
         # for debugging only:
-        retried_on_error: "#{retry_object.error.class}: #{retry_object.error.message}"
+        retried_on_error: "#{retry_object.error.class}: #{retry_object.error.message}",
       )
 
       delay_amount = retry_object.delay_amount

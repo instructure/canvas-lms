@@ -24,7 +24,7 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_reader :password
 
-  validates :user_id, :service, :service_user_id, :workflow_state, presence: true
+  validates_presence_of :user_id, :service, :service_user_id, :workflow_state
 
   before_save :infer_defaults
   after_save :assert_relations
@@ -32,30 +32,30 @@ class UserService < ActiveRecord::Base
   after_save :clear_cache_key
 
   def should_have_communication_channel?
-    [CommunicationChannel::TYPE_TWITTER].include?(service) && user
+    [CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
   end
 
   def assert_relations
     if should_have_communication_channel?
-      cc = user.communication_channels.where(path_type: service).first_or_initialize
+      cc = self.user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
       cc.workflow_state = 'active'
-      cc.path = "#{service_user_id}@#{service}.com"
+      cc.path = "#{self.service_user_id}@#{service}.com"
       cc.save!
     end
-    if user_id && service
-      UserService.where(:user_id => user_id, :service => service).where("id<>?", self).delete_all
+    if self.user_id && self.service
+      UserService.where(:user_id => self.user_id, :service => self.service).where("id<>?", self).delete_all
     end
     true
   end
 
   def clear_cache_key
-    user.clear_cache_key(:user_services)
+    self.user.clear_cache_key(:user_services)
   end
 
   def assert_communication_channel
     # why is twitter getting special treatment?
-    touch if should_have_communication_channel? && !user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
+    self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
 
   def infer_defaults
@@ -71,10 +71,10 @@ class UserService < ActiveRecord::Base
     state :failed
   end
 
-  scope :of_type, ->(type) { where(:type => type.to_s) }
+  scope :of_type, lambda { |type| where(:type => type.to_s) }
 
   scope :to_be_polled, -> { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, lambda { |user| where(:user_id => user) }
   scope :for_service, lambda { |service|
     service = service.service if service.is_a?(UserService)
     where(:service => service.to_s)
@@ -82,7 +82,7 @@ class UserService < ActiveRecord::Base
   scope :visible, -> { where("visible") }
 
   def service_name
-    service.titleize rescue ""
+    self.service.titleize rescue ""
   end
 
   def password=(password)
@@ -90,9 +90,9 @@ class UserService < ActiveRecord::Base
   end
 
   def decrypted_password
-    return nil unless password_salt && crypted_password
+    return nil unless self.password_salt && self.crypted_password
 
-    Canvas::Security.decrypt_password(crypted_password, password_salt, 'instructure_user_service')
+    Canvas::Security.decrypt_password(self.crypted_password, self.password_salt, 'instructure_user_service')
   end
 
   def self.register(opts = {})
@@ -228,19 +228,16 @@ class UserService < ActiveRecord::Base
   end
 
   def self.service_type(type)
-    case type
-    when 'google_docs', 'google_drive'
+    if type == 'google_docs' || type == 'google_drive'
       'DocumentService'
-    when 'delicious', 'diigo'
+    elsif type == 'delicious' || type == 'diigo'
       'BookmarkService'
     else
       'UserService'
     end
   end
 
-  def self.serialization_excludes
-    %i[crypted_password password_salt token secret]
-  end
+  def self.serialization_excludes; [:crypted_password, :password_salt, :token, :secret]; end
 
   def self.associated_shards(_service, _service_user_id)
     [Shard.default]

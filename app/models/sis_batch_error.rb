@@ -31,6 +31,6 @@ class SisBatchError < ActiveRecord::Base
   end
 
   def description
-    (file || "") + " - " + (message || "")
+    (self.file || "") + " - " + (self.message || "")
   end
 end

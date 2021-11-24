@@ -182,16 +182,16 @@ describe AnonymousOrModerationEvent do
     end
 
     it "does not include AnonymousOrModerationEvents not related to assignment" do
-      expect do
+      expect {
         course.assignments.create!(name: "another assignment", anonymous_grading: true, updating_user: teacher)
-      end.not_to change { events.count }
+      }.not_to change { events.count }
     end
 
     it "does not include AnonymousOrModerationEvents not related to submission" do
       second_student = course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user
-      expect do
+      expect {
         assignment.submit_homework(second_student, body: "please give bad grade")
-      end.not_to change { events.count }
+      }.not_to change { events.count }
     end
   end
 end

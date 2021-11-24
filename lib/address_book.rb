@@ -24,7 +24,7 @@ require_relative 'address_book/messageable_user'
 # see AddressBook::Base for primary documentation of the interface
 module AddressBook
   STRATEGIES = {
-    'messageable_user' => { implementation: AddressBook::MessageableUser, label: -> { I18n.t('MessageableUser library') } }.freeze,
+    'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda { I18n.t('MessageableUser library') } }.freeze,
   }.freeze
   DEFAULT_STRATEGY = 'messageable_user'
 
@@ -38,7 +38,7 @@ module AddressBook
   end
 
   def self.implementation
-    STRATEGIES[strategy][:implementation]
+    return STRATEGIES[strategy][:implementation]
   end
 
   # instantiates an address book for the sender
@@ -50,7 +50,7 @@ module AddressBook
   def self.partition_recipients(recipients)
     users = ::MessageableUser.individual_recipients(recipients)
     contexts = ::MessageableUser.context_recipients(recipients)
-    [users, contexts]
+    return users, contexts
   end
 
   # filters the list of users to only those that are "available" (but not
@@ -64,7 +64,7 @@ module AddressBook
   def self.decompose_context(context_code)
     context_code &&
       context_code =~ ::MessageableUser::Calculator::CONTEXT_RECIPIENT &&
-      Regexp.last_match.to_a[1..]
+      Regexp.last_match.to_a[1..-1]
   end
 
   def self.valid_context?(context_code)

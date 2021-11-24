@@ -30,9 +30,9 @@ describe MediaSourceFetcher do
   describe '#fetch_preferred_source_url' do
     context 'when file extension and media_type are provided' do
       it 'raises an error' do
-        expect do
+        expect {
           fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4', media_type: 'audio')
-        end.to raise_error(ArgumentError, /file_extension and media_type should not both be present/)
+        }.to raise_error(ArgumentError, /file_extension and media_type should not both be present/)
       end
     end
 

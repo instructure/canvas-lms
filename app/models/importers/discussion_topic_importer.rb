@@ -37,7 +37,7 @@ module Importers
         event[:type] = 'announcement'
 
         begin
-          import_from_migration(event, migration.context, migration)
+          self.import_from_migration(event, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
@@ -47,11 +47,9 @@ module Importers
     def self.process_discussion_topics_migration(discussion_topics, migration)
       topic_entries_to_import = migration.to_import('topic_entries')
       discussion_topics.each do |topic|
-        if topic['group_id']
-          context = Group.where(context_id: migration.context.id,
-                                context_type: migration.context.class.to_s,
-                                migration_id: topic['group_id']).first
-        end
+        context = Group.where(context_id: migration.context.id,
+                              context_type: migration.context.class.to_s,
+                              migration_id: topic['group_id']).first if topic['group_id']
         context ||= migration.context
         next unless context && can_import_topic?(topic, migration)
 
@@ -69,7 +67,7 @@ module Importers
     end
 
     def self.import_from_migration(hash, context, migration, item = nil)
-      importer = new(hash, context, migration, item)
+      importer = self.new(hash, context, migration, item)
       importer.run
     end
 
@@ -87,7 +85,7 @@ module Importers
 
       topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id)
                              .where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
-      topic ||= if /announcement/i.match?(options[:type])
+      topic ||= if options[:type] =~ /announcement/i
                   context.announcements.temp_record
                 else
                   context.discussion_topics.temp_record
@@ -99,9 +97,9 @@ module Importers
     def run
       return unless options.importable?
 
-      %i[migration_id title discussion_type position pinned
-         require_initial_post allow_rating only_graders_can_rate
-         sort_by_rating].each do |attr|
+      [:migration_id, :title, :discussion_type, :position, :pinned,
+       :require_initial_post, :allow_rating, :only_graders_can_rate,
+       :sort_by_rating].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
 
         item.send("#{attr}=", options[attr])
@@ -109,11 +107,11 @@ module Importers
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
-      item.message = if options.message
-                       migration.convert_html(options.message, type, options[:migration_id], :message)
-                     else
-                       I18n.t('#discussion_topic.empty_message', 'No message')
-                     end
+      if options.message
+        item.message = migration.convert_html(options.message, type, options[:migration_id], :message)
+      else
+        item.message = I18n.t('#discussion_topic.empty_message', 'No message')
+      end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       if options[:assignment]
@@ -197,7 +195,7 @@ module Importers
     class DiscussionTopicOptions
       attr_reader :options
 
-      BOOLEAN_KEYS = %i[pinned require_initial_post locked].freeze
+      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked]
 
       def initialize(options = {})
         @options = options.with_indifferent_access

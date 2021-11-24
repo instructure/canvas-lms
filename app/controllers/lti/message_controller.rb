@@ -52,17 +52,19 @@ module Lti
     end
 
     def reregistration
-      if authorized_action(@context, @current_user, :update) && (tp = ToolProxy.find(params['tool_proxy_id']))
-        mh = tp.reregistration_message_handler
-        return not_found unless mh.present?
+      if authorized_action(@context, @current_user, :update)
+        if (tp = ToolProxy.find(params['tool_proxy_id']))
+          mh = tp.reregistration_message_handler
+          return not_found unless mh.present?
 
-        message = reregistration_message(mh, tp)
-        @lti_launch = Launch.new
-        @lti_launch.resource_url = message.launch_url
-        @lti_launch.link_text = mh.resource_handler.name
-        @lti_launch.launch_type = message.launch_presentation_document_target
-        @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
-        render Lti::AppUtil.display_template('borderless') and return
+          message = reregistration_message(mh, tp)
+          @lti_launch = Launch.new
+          @lti_launch.resource_url = message.launch_url
+          @lti_launch.link_text = mh.resource_handler.name
+          @lti_launch.launch_type = message.launch_presentation_document_target
+          @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
+          render Lti::AppUtil.display_template('borderless') and return
+        end
       end
       not_found
     end
@@ -161,7 +163,7 @@ module Lti
 
       not_found
     rescue InvalidDomain => e
-      render json: { errors: { invalid_launch_url: { message: e.message } } }, status: :bad_request
+      return render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
     end
 
     def lti2_basic_launch(message_handler, lti_link = nil)
@@ -243,7 +245,7 @@ module Lti
       end
       account_ids = @context.account_chain.map(&:id)
       bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.index_by(&:context_id)
+      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end
@@ -258,8 +260,8 @@ module Lti
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
-      params = %w[LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url]
-      if parameters && (parameters.filter_map { |p| p['variable'] } & params).any?
+      params = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
+      if parameters && (parameters.map { |p| p['variable'] }.compact & params).any?
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,

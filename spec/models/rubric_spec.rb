@@ -108,7 +108,7 @@ describe Rubric do
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq %w[best new worst]
+            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'new', 'worst']
             expect(rubric_criterion.ratings.map(&:points)).to eq [10, 5, 0]
           end
 
@@ -443,9 +443,9 @@ describe Rubric do
         end
 
         it 'records a rubric_updated event for the assignment' do
-          expect do
+          expect {
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          end.to change {
+          }.to change {
             AnonymousOrModerationEvent.where(event_type: 'rubric_updated').count
           }.by(1)
         end
@@ -475,9 +475,9 @@ describe Rubric do
         let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
         it 'records a rubric_created event for the assignment' do
-          expect do
+          expect {
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          end.to change {
+          }.to change {
             AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
           }.by(1)
         end
@@ -619,7 +619,7 @@ describe Rubric do
           title: "my rubric"
         )
 
-        expect(rubric.criteria.pluck(:description)).to eq %w[ddddd bbbbb aaaaa ccccc]
+        expect(rubric.criteria.pluck(:description)).to eq ["ddddd", "bbbbb", "aaaaa", "ccccc"]
       end
 
       it "sorts ratings within each criterion by the number of points in descending order" do
@@ -638,7 +638,7 @@ describe Rubric do
         )
 
         criterion = rubric.criteria.first
-        expect(criterion[:ratings].pluck(:description)).to eq %w[good ok bad]
+        expect(criterion[:ratings].pluck(:description)).to eq ["good", "ok", "bad"]
       end
 
       it "sorts ratings with the same number of points by description" do

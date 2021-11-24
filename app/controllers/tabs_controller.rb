@@ -137,15 +137,13 @@ class TabsController < ApplicationController
     tabs = context_tabs(@context, @current_user)
     tab = (tabs.find { |t| t.with_indifferent_access[:css_class] == css_class }).with_indifferent_access
     tab_config = @context.tab_configuration
-    if tab_config.blank? || tab_config.count != tabs.count
-      tab_config = tabs.map do |t|
-        {
-          'id' => t.with_indifferent_access['id'],
-          'hidden' => t.with_indifferent_access['hidden'],
-          'position' => t.with_indifferent_access['position']
-        }
-      end
-    end
+    tab_config = tabs.map do |t|
+      {
+        'id' => t.with_indifferent_access['id'],
+        'hidden' => t.with_indifferent_access['hidden'],
+        'position' => t.with_indifferent_access['position']
+      }
+    end if tab_config.blank? || tab_config.count != tabs.count
     if [@context.class::TAB_HOME, @context.class::TAB_SETTINGS].include?(tab[:id])
       render json: { error: t(:tab_unmanagable_error, "%{css_class} is not manageable", css_class: css_class) }, status: :bad_request
     elsif new_pos && (new_pos <= 1 || new_pos >= tab_config.count + 1)
@@ -154,7 +152,7 @@ class TabsController < ApplicationController
       pos = tab_config.index { |t| t['id'] == tab['id'] }
       if pos.nil?
         pos = (tab['position'] || tab_config.size) - 1
-        tab_config.insert(pos, tab.with_indifferent_access.slice(*%w[id hidden position]))
+        tab_config.insert(pos, tab.with_indifferent_access.slice(*%w{id hidden position}))
       end
 
       if value_to_boolean(params['hidden'])

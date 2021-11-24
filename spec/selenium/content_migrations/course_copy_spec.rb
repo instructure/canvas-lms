@@ -50,7 +50,7 @@ describe "course copy" do
     expect(@new_course.wiki_pages.count).to eq 1
   end
 
-  # TODO: reimplement per CNVS-29604, but make sure we're testing at the right level
+  # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
   it "should copy the course with different settings"
 
   it "sets the course name and code correctly" do
@@ -135,6 +135,7 @@ describe "course copy" do
   end
 
   it "is not able to submit invalid course dates" do
+    skip("LS-2782 -- dates not registering even after tab out")
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -165,7 +166,7 @@ describe "course copy" do
 
     # this test requires jobs to run in the middle of it and course_copys
     # need to check a lot of things, a longer timeout is reasonable.
-    it "shifts the dates a week later", priority: "2", custom_timeout: 30 do
+    it "shifts the dates a week later", priority: "2", test_id: 2953906, custom_timeout: 30 do
       event = @course.calendar_events.create! title: 'Monday Event', start_at: @date_to_use
 
       get "/courses/#{@course.id}/copy"

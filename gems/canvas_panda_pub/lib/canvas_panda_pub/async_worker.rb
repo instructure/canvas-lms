@@ -31,7 +31,7 @@ module CanvasPandaPub
       @logger = CanvasPandaPub.logger
       @interval = CanvasPandaPub.process_interval
 
-      start! if start_thread
+      self.start! if start_thread
     end
 
     def push(tag, p)
@@ -53,7 +53,7 @@ module CanvasPandaPub
     end
 
     def start!
-      @thread = Thread.new { run_thread }
+      @thread = Thread.new { self.run_thread }
     end
 
     def run_thread

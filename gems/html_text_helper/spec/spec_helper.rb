@@ -25,7 +25,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 begin
-  require '../../spec/coverage_tool'
+  require '../../spec/coverage_tool.rb'
   CoverageTool.start('html-text-helper-spec-gem')
 rescue LoadError => e
   puts "Error: #{e} "

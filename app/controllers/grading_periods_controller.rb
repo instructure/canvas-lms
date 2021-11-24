@@ -181,7 +181,7 @@ class GradingPeriodsController < ApplicationController
   def grading_period(inherit: true)
     @grading_period ||= begin
       grading_period = GradingPeriod.for(@context, inherit: inherit).find_by(id: params[:id])
-      raise ActionController::RoutingError, 'Not Found' if grading_period.blank?
+      fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
 
       grading_period
     end
@@ -272,11 +272,11 @@ class GradingPeriodsController < ApplicationController
 
   def find_or_build_periods(periods_params, grading_period_group)
     periods_params.map do |period_params|
-      period = if period_params[:id].present?
-                 grading_period_group.grading_periods.active.find(period_params[:id])
-               else
-                 grading_period_group.grading_periods.build
-               end
+      if period_params[:id].present?
+        period = grading_period_group.grading_periods.active.find(period_params[:id])
+      else
+        period = grading_period_group.grading_periods.build
+      end
       period.assign_attributes(period_params.permit(:weight, :start_date, :end_date, :close_date, :title))
       period
     end

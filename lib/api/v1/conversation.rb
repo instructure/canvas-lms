@@ -57,7 +57,7 @@ module Api::V1::Conversation
     # Changing to account context means users can reply to admins, even if the admin messages from a
     # course they aren't enrolled in
     result[:context_code] =
-      if conversation.conversation.context_type.eql?("Course") && AccountUser.where(user_id: current_user.id).exists?
+      if conversation.conversation.context_type.eql?("Course") && AccountUser.exists?(user_id: current_user.id)
         "account_#{@domain_root_account.id}"
       else
         conversation.conversation.context_code
@@ -146,8 +146,8 @@ module Api::V1::Conversation
     result = api_json batch,
                       current_user,
                       session,
-                      :only => %w[id workflow_state],
-                      :methods => %w[completion recipient_count]
+                      :only => %w{id workflow_state},
+                      :methods => %w{completion recipient_count}
     result[:message] = conversation_message_json(batch.root_conversation_message, current_user, session)
     result[:tags] = batch.local_tags
     result

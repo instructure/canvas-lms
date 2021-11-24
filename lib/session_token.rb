@@ -34,7 +34,7 @@ class SessionToken
     result = JSONToken.decode(serialized_token) rescue nil
     return nil unless
       result.is_a?(Hash) &&
-      result.keys.sort == %w[created_at current_user_id pseudonym_id signature used_remember_me_token] &&
+      result.keys.sort == ['created_at', 'current_user_id', 'pseudonym_id', 'signature', 'used_remember_me_token'] &&
       result['created_at'].is_a?(Integer) &&
       result['pseudonym_id'].is_a?(Integer) &&
       (result['current_user_id'].nil? || result['current_user_id'].is_a?(Integer)) &&
@@ -48,7 +48,7 @@ class SessionToken
                 used_remember_me_token: result['used_remember_me_token'])
     token.created_at = Time.at(result['created_at'])
     token.signature = result['signature']
-    token
+    return token
   end
 
   VALIDITY_PERIOD = 30

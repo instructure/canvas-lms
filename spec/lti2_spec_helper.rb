@@ -204,7 +204,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
           "action" => ["GET"],
           "@type" => "RestServiceProfile" },
         { "service" => "vnd.Canvas.OriginalityReport",
-          "action" => %w[GET POST PUT],
+          "action" => ["GET", "POST", "PUT"],
           "@type" => "RestServiceProfile" }
       ]
     }

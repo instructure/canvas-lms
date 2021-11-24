@@ -95,9 +95,9 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
   end
 
   def point_biserials
-    @answers.map do |answer|
+    @answers.map { |answer|
       point_biserial_for(answer)
-    end
+    }
   end
 
   def ratio_for(answer)

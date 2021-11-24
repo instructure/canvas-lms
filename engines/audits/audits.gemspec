@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "lib/audits/version"
+$:.push File.expand_path("lib", __dir__)
+
+# Maintain your gem's version:
+require "audits/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|

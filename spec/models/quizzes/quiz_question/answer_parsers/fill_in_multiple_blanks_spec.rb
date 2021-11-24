@@ -46,7 +46,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::FillInMultipleBlanks do
       ]
     end
 
-    let(:question_params) { {} }
+    let(:question_params) { Hash.new }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::FillInMultipleBlanks }
 
     include_examples "All answer parsers"

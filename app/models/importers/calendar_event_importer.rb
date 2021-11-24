@@ -25,14 +25,14 @@ module Importers
     self.item_class = CalendarEvent
 
     def self.process_migration(data, migration)
-      events = data['calendar_events'] || []
+      events = data['calendar_events'] ? data['calendar_events'] : []
       events.each do |event|
-        next unless migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
-
-        begin
-          import_from_migration(event, migration.context, migration)
-        rescue
-          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
+        if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
+          begin
+            import_from_migration(event, migration.context, migration)
+          rescue
+            migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
+          end
         end
       end
     end
@@ -71,7 +71,7 @@ module Importers
     # no idea what 'area' or 'media_collection' attachment types are, so we're ignoring them
     def self.import_migration_attachment_suffix(hash, context)
       suffix_method_name = "#{hash[:attachment_type]}_attachment_description"
-      suffix = send(suffix_method_name, hash, context) if respond_to?(suffix_method_name)
+      suffix = self.send(suffix_method_name, hash, context) if self.respond_to?(suffix_method_name)
       suffix || ""
     end
 

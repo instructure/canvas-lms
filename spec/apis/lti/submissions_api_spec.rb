@@ -51,10 +51,7 @@ module Lti
       a
     end
 
-    let(:student) do
-      course_with_student(active_all: true, course: course)
-      @user
-    end
+    let(:student) { course_with_student(active_all: true, course: course); @user }
 
     let(:aud) { host }
 
@@ -217,13 +214,13 @@ module Lti
 
       it "sends back versioned attachments" do
         attachments = [attachment_model(filename: "submission-a.doc", :context => student)]
-        Timecop.freeze(10.seconds.ago) do
+        Timecop.freeze(10.second.ago) do
           assignment.submit_homework(student, submission_type: 'online_upload',
                                               attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", :context => student)
-        Timecop.freeze(5.seconds.ago) do
+        Timecop.freeze(5.second.ago) do
           assignment.submit_homework student, attachments: [attachments[1]]
         end
 

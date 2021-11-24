@@ -33,7 +33,7 @@ module RootAccountResolver
   def resolves_root_account(through:)
     resolver = case through
                when Symbol
-                 lambda do |instance|
+                 ->(instance) do
                    source = instance.send(through)
 
                    case source
@@ -46,7 +46,7 @@ module RootAccountResolver
                when Proc
                  through
                else
-                 raise ArgumentError, "Expected resolver to be a Symbol or a Proc, got #{through}"
+                 raise ArgumentError.new("Expected resolver to be a Symbol or a Proc, got #{through}")
                end
 
     belongs_to :root_account, class_name: 'Account'

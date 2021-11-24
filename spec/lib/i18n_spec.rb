@@ -57,9 +57,9 @@ describe I18n do
     end
 
     it "raises an error if the the en interpolation is broken" do
-      expect do
+      expect {
         I18n.t(:__interpolation_test, "Hello %{world}", { foo: "bar" })
-      end.to raise_error(I18n::MissingInterpolationArgument)
+      }.to raise_error(I18n::MissingInterpolationArgument)
     end
 
     it "formats count numbers" do

@@ -28,7 +28,7 @@ module CC::Importer::Standard
       conversion_dir = @package_root.item_path("temp_qti_conversions")
 
       resources_by_type("imsqti").each do |res|
-        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
+        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         full_path = path ? get_full_path(path) : nil
         id = res[:migration_id]
 
@@ -41,17 +41,17 @@ module CC::Importer::Standard
           File.open(full_path, 'w') { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
         end
 
-        next unless File.exist?(full_path)
-
-        qti_converted_dir = File.join(conversion_dir, id)
-        next unless run_qti_converter(full_path, qti_converted_dir, id)
-
-        # get quizzes/questions
-        if (q_list = convert_questions(qti_converted_dir, id))
-          questions += q_list
-        end
-        if (quiz = convert_assessment(qti_converted_dir, id))
-          quizzes << quiz
+        if File.exist?(full_path)
+          qti_converted_dir = File.join(conversion_dir, id)
+          if run_qti_converter(full_path, qti_converted_dir, id)
+            # get quizzes/questions
+            if (q_list = convert_questions(qti_converted_dir, id))
+              questions += q_list
+            end
+            if (quiz = convert_assessment(qti_converted_dir, id))
+              quizzes << quiz
+            end
+          end
         end
       end
 
@@ -84,8 +84,8 @@ module CC::Importer::Standard
           question[:question_text] = replace_urls(question[:question_text], resource_id) if question[:question_text]
           question[:answers].each do |ans|
             ans.each_pair do |key, val|
-              if key.to_s.end_with?("html") && ans[key]
-                ans[key] = replace_urls(val, resource_id)
+              if key.to_s.end_with? "html"
+                ans[key] = replace_urls(val, resource_id) if ans[key]
               end
             end
           end

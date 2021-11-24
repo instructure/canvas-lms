@@ -73,16 +73,13 @@ describe StreamItem do
   describe "destroy_stream_items_using_setting" do
     it "has a default ttl" do
       StreamItem.create!(asset_type: 'Message', data: { notification_id: nil })
-      si2 = StreamItem.create! do |si|
-        si.asset_type = 'Message'
-        si.data = { notification_id: nil }
-      end
+      si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
       StreamItem.where(:id => si2).update_all(:updated_at => 1.year.ago)
       # stub this out so that the vacuum is skipped (can't run in specs in a transaction)
       allow(Shard.current.database_server).to receive(:unguard)
-      expect do
+      expect {
         StreamItem.destroy_stream_items_using_setting
-      end.to change(StreamItem, :count).by(-1)
+      }.to change(StreamItem, :count).by(-1)
     end
   end
 
@@ -128,16 +125,14 @@ describe StreamItem do
 
       dt = @course.discussion_topics.create!(:title => 'title')
       enable_cache do
-        expect(@user2).to receive(:recent_stream_items).once.and_call_original
         items = @user2.cached_recent_stream_items
         items2 = @shard1.activate { @user2.cached_recent_stream_items }
         expect(items).to eq [dt.stream_item]
-        expect(items).to eq items2
+        expect(items).to be === items2 # same object, because same cache key
 
         item = @user2.visible_stream_item_instances.last
         item.update_attribute(:hidden, true)
 
-        expect(@user2).to receive(:recent_stream_items).once.and_call_original
         # after dismissing an item, the old items should no longer be cached
         items = @user2.cached_recent_stream_items
         items2 = @shard1.activate { @user2.cached_recent_stream_items }

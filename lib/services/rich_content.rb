@@ -32,8 +32,8 @@ module Services
             # TODO: remove this once we teach the rcs to consume the asymmetric ones
             symmetric: true
           )
-        rescue Canvas::Security::InvalidJwtKey => e
-          Canvas::Errors.capture_exception(:jwt, e)
+        rescue Canvas::Security::InvalidJwtKey => exception
+          Canvas::Errors.capture_exception(:jwt, exception)
           env_hash[:JWT] = "InvalidJwtKey"
         end
       end

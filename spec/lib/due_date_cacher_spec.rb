@@ -252,7 +252,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      @instance = double
+      @instance = double()
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
@@ -265,7 +265,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      @instance = double
+      @instance = double()
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "what:up:dog", max_attempts: 10)
@@ -308,35 +308,35 @@ describe DueDateCacher do
     let(:instance) { instance_double("DueDateCacher", recompute: nil) }
 
     it "accepts a User" do
-      expect do
+      expect {
         DueDateCacher.with_executing_user(student) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      end.not_to raise_error
+      }.not_to raise_error
     end
 
     it "accepts a user ID" do
-      expect do
+      expect {
         DueDateCacher.with_executing_user(student) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      end.not_to raise_error
+      }.not_to raise_error
     end
 
     it "accepts a nil value" do
-      expect do
+      expect {
         DueDateCacher.with_executing_user(nil) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      end.not_to raise_error
+      }.not_to raise_error
     end
 
     it "raises an error if no argument is given" do
-      expect do
+      expect {
         DueDateCacher.with_executing_user do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      end.to raise_error(ArgumentError)
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -1060,9 +1060,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect do
+          expect {
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          end.to change {
+          }.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1089,9 +1089,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect do
+          expect {
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          end.to change {
+          }.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1118,9 +1118,9 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect do
+          expect {
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          end.to change {
+          }.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
@@ -1145,9 +1145,9 @@ describe DueDateCacher do
           )
         end
 
-        expect do
+        expect {
           DueDateCacher.recompute(assignment, executing_user: teacher)
-        end.not_to change {
+        }.not_to change {
           AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
         }
       end
@@ -1159,9 +1159,9 @@ describe DueDateCacher do
         assignment = course.assignments.create!(title: 'zzz', anonymous_grading: true)
       end
 
-      expect do
+      expect {
         DueDateCacher.recompute(assignment)
-      end.not_to change {
+      }.not_to change {
         AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
       }
     end

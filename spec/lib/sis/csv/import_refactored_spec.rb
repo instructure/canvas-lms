@@ -156,14 +156,14 @@ describe SIS::CSV::ImportRefactored do
       ",U008,student,S008S,deleted,",
       ",U009,student,S005S,deleted,"
     )
-    expect do
+    expect {
       process_csv_data_cleanly(
         "group_id,name,account_id,status",
         "G001,Group 1,,available",
         "G002,Group 2,,deleted",
         "G003,Group 3,,closed"
       )
-    end.not_to raise_error
+    }.not_to raise_error
   end
 
   it 'supports sis stickiness overriding' do
@@ -334,11 +334,11 @@ describe SIS::CSV::ImportRefactored do
   end
 
   it "does not invalidly break up UTF-8 characters" do
-    expect do
+    expect {
       process_csv_data_cleanly(
         File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/utf8.csv"))
       )
-    end.not_to raise_error
+    }.not_to raise_error
   end
 
   it "ignores BOM chars" do
@@ -428,10 +428,8 @@ describe SIS::CSV::ImportRefactored do
           tf
         end
       end
-      csv_string = <<~CSV
-        term_id,name,status
-        "T001","Winter13",active
-      CSV
+      csv_string = "term_id,name,status\n" +
+                   "\"T001\",\"Winter13\",active"
       fake_attachment = flakey_attachment_cls.new(csv_string)
       root_account = account_model
       user = user_model

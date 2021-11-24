@@ -21,7 +21,5 @@
 class OAuthRequest < ActiveRecord::Base
   belongs_to :user
 
-  def self.serialization_excludes
-    [:secret, :user_secret]
-  end
+  def self.serialization_excludes; [:secret, :user_secret]; end
 end

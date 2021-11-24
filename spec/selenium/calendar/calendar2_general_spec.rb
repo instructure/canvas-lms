@@ -25,7 +25,7 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -64,7 +64,7 @@ describe "calendar2" do
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
       ]
-      student1, student2 = Array.new(2) do
+      student1, student2 = 2.times.map do
         student_in_course :course => @course, :active_all => true
         @student
       end
@@ -125,7 +125,7 @@ describe "calendar2" do
       expect(assignment2.assignment_group).to eq group2
     end
 
-    it "editing an existing assignment should preserve more options link", priority: "1" do
+    it "editing an existing assignment should preserve more options link", priority: "1", test_id: 138854 do
       assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
       get "/calendar2"
       f('.fc-event').click
@@ -163,7 +163,7 @@ describe "calendar2" do
       expect(f('.undated_event_title')).to include_text("undate me")
     end
 
-    context "event editing", priority: "1" do
+    context "event editing", priority: "1", test_id: 138853 do
       it "allows editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
@@ -216,7 +216,7 @@ describe "calendar2" do
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         @course.assignments.create!(
           title: 'test assignment',
-          due_at: event_start
+          due_at: event_start,
         )
         get "/calendar2"
         f('.fc-event').click
@@ -278,7 +278,7 @@ describe "calendar2" do
       expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
     end
 
-    it "only considers active enrollments for upcoming events list", priority: "2" do
+    it "only considers active enrollments for upcoming events list", priority: "2", test_id: 854796 do
       make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
       get "/"
       expect(f('.coming_up').text).to include('Test Event')
@@ -289,7 +289,7 @@ describe "calendar2" do
       expect(f('.coming_up')).to include_text('Nothing for the next week')
     end
 
-    it "graded discussion appears on all calendars", priority: "1" do
+    it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do
       skip('LS-1257 - 7/29/2020')
 
       create_graded_discussion
@@ -298,7 +298,7 @@ describe "calendar2" do
       assert_views(@gd.title, @assignment.due_at)
     end
 
-    it "event appears on all calendars", priority: "1" do
+    it "event appears on all calendars", priority: "1", test_id: 138846 do
       skip('LS-1257 - 7/29/2020')
 
       title = 'loom'
@@ -308,7 +308,7 @@ describe "calendar2" do
       assert_views(title, due_time)
     end
 
-    it "assignment appears on all calendars", priority: "1" do
+    it "assignment appears on all calendars", priority: "1", test_id: 238862 do
       skip('LS-1257 - 7/29/2020')
 
       title = 'Zak McKracken'
@@ -318,7 +318,7 @@ describe "calendar2" do
       assert_views(title, due_time)
     end
 
-    it "quiz appears on all calendars", priority: "1" do
+    it "quiz appears on all calendars", priority: "1", test_id: 238863 do
       skip('LS-1257 - 7/29/2020')
 
       create_quiz

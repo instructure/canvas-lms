@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper"
+require_relative "../../spec_helper.rb"
 require_dependency "discussion_topic/scoped_to_sections"
 
 describe DiscussionTopic::ScopedToSections do
@@ -42,17 +42,17 @@ describe DiscussionTopic::ScopedToSections do
       let(:consumer) { double }
 
       it 'fails' do
-        expect do
+        expect {
           described_class.for(consumer, context, user, scope)
-        end.to raise_error "Invalid consumer #{consumer.class}"
+        }.to raise_error "Invalid consumer #{consumer.class}"
       end
     end
   end
 
   describe '#scope' do
-    let_once(:announcement) do
+    let_once(:announcement) {
       context.announcements.create!(:user => @teacher, message: 'hello')
-    end
+    }
     let_once(:scope) { context.active_announcements }
 
     context 'with an instructor' do

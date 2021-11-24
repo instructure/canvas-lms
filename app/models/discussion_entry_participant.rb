@@ -26,36 +26,36 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  validates :discussion_entry_id, :user_id, :workflow_state, presence: true
+  validates_presence_of :discussion_entry_id, :user_id, :workflow_state
   validate :prevent_creates
 
-  validates :report_type, inclusion: { in: %w[inappropriate offensive other],
+  validates :report_type, inclusion: { in: %w(inappropriate offensive other),
                                        message: "%{value} is not valid" }
 
   def prevent_creates
-    if new_record?
+    if self.new_record?
       # e.g. DiscussionEntryParticipant.upsert_for_entries(entry, user, new_state: 'read')
-      errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
+      self.errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
     end
   end
 
   def self.read_entry_ids(entry_ids, user)
-    where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
-      .pluck(:discussion_entry_id)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
+        .pluck(:discussion_entry_id)
   end
 
   def self.forced_read_state_entry_ids(entry_ids, user)
-    where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
-      .pluck(:discussion_entry_id)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
+        .pluck(:discussion_entry_id)
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
-    ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
+    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
+    Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
-    entry_participant = new(discussion_entry: entry, user: user)
+    entry_participant = self.new(discussion_entry: entry, user: user)
     error_message = "Null value in column '#{column}' violates not-null constraint"
     entry_participant.errors.add(column, error_message)
     entry_participant
@@ -81,7 +81,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
-      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state]
+      insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
       update_columns = []
       update_values = []
 
@@ -98,7 +98,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       end
 
       unless report_type.nil?
-        unless %w[inappropriate offensive other].include? report_type
+        unless %w(inappropriate offensive other).include? report_type
           raise(ArgumentError)
         end
 
@@ -190,12 +190,12 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   scope :read, -> { where(:workflow_state => 'read') }
-  scope :existing_participants, lambda { |user, entry_id|
+  scope :existing_participants, ->(user, entry_id) {
     select([:id, :discussion_entry_id])
       .where(user_id: user, discussion_entry_id: entry_id)
   }
 
   def set_root_account_id
-    self.root_account_id = discussion_entry.root_account_id
+    self.root_account_id = self.discussion_entry.root_account_id
   end
 end

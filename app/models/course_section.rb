@@ -32,20 +32,20 @@ class CourseSection < ActiveRecord::Base
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :instructor_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment']) }, class_name: 'Enrollment'
-  has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: 'Enrollment'
+  has_many :admin_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']) }, class_name: 'Enrollment'
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   has_many :calendar_events, :as => :context, :inverse_of => :context
   has_many :assignment_overrides, :as => :set, :dependent => :destroy
-  has_many :discussion_topic_section_visibilities, lambda {
+  has_many :discussion_topic_section_visibilities, -> {
     where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
   }, dependent: :destroy
   has_many :discussion_topics, :through => :discussion_topic_section_visibilities
 
   before_validation :infer_defaults, :verify_unique_sis_source_id, :verify_unique_integration_id
-  validates :course_id, :root_account_id, :workflow_state, presence: true
-  validates :sis_source_id, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false }
-  validates :name, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
+  validates_presence_of :course_id, :root_account_id, :workflow_state
+  validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
   validate :validate_section_dates
 
   has_many :sis_post_grades_statuses
@@ -58,11 +58,13 @@ class CourseSection < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
-  delegate :account, to: :course
+  def account
+    course.account
+  end
 
   def validate_section_dates
     if start_at.present? && end_at.present? && end_at < start_at
-      errors.add(:end_at, t("End date cannot be before start date"))
+      self.errors.add(:end_at, t("End date cannot be before start date"))
       false
     else
       true
@@ -70,7 +72,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def maybe_touch_all_enrollments
-    touch_all_enrollments if start_at_changed? || end_at_changed? || restrict_enrollments_to_section_dates_changed? || course_id_changed?
+    self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?
   end
 
   def delete_enrollments_later_if_deleted
@@ -79,7 +81,7 @@ class CourseSection < ActiveRecord::Base
 
   def delete_enrollments_if_deleted
     if workflow_state == 'deleted'
-      enrollments.where.not(workflow_state: 'deleted').find_in_batches do |batch|
+      self.enrollments.where.not(workflow_state: 'deleted').find_in_batches do |batch|
         Enrollment::BatchStateUpdater.destroy_batch(batch)
       end
     end
@@ -121,21 +123,23 @@ class CourseSection < ActiveRecord::Base
     ps
   end
 
-  delegate :available?, to: :course
+  def available?
+    course.available?
+  end
 
   def concluded?
     now = Time.now
-    if end_at && restrict_enrollments_to_section_dates
-      end_at < now
+    if self.end_at && self.restrict_enrollments_to_section_dates
+      self.end_at < now
     else
-      course.concluded?
+      self.course.concluded?
     end
   end
 
   def touch_all_enrollments
     return if new_record?
 
-    enrollments.touch_all
+    self.enrollments.touch_all
     User.where(id: all_enrollments.select(:user_id)).touch_all
   end
 
@@ -145,110 +149,110 @@ class CourseSection < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      course.grants_right?(user, session, :manage_sections_add)
+      self.course.grants_right?(user, session, :manage_sections_add)
     end
     can :read and can :create
 
     given do |user, session|
-      course.grants_right?(user, session, :manage_sections_edit)
+      self.course.grants_right?(user, session, :manage_sections_edit)
     end
     can :read and can :update
 
     given do |user, session|
-      course.grants_right?(user, session, :manage_sections_delete)
+      self.course.grants_right?(user, session, :manage_sections_delete)
     end
     can :read and can :delete
 
     given do |user, session|
-      manage_perm = if root_account.feature_enabled? :granular_permissions_manage_users
+      manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
                       :allow_course_admin_actions
                     else
                       :manage_admin_users
                     end
-      course.grants_any_right?(user, session, :manage_students, manage_perm)
+      self.course.grants_any_right?(user, session, :manage_students, manage_perm)
     end
     can :read
 
-    given { |user| course.account_membership_allows(user, :read_roster) }
+    given { |user| self.course.account_membership_allows(user, :read_roster) }
     can :read
 
-    given { |user, session| course.grants_right?(user, session, :manage_calendar) }
+    given { |user, session| self.course.grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
-    given do |user, session|
+    given { |user, session|
       user &&
-        course.sections_visible_to(user).where(:id => self).exists? &&
-        course.grants_right?(user, session, :read_roster)
-    end
+        self.course.sections_visible_to(user).where(:id => self).exists? &&
+        self.course.grants_right?(user, session, :read_roster)
+    }
     can :read
 
-    given { |user, session| course.grants_right?(user, session, :manage_grades) }
+    given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
     can :manage_grades
 
-    given { |user, session| course.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.course.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
   end
 
   def update_account_associations_if_changed
-    if (saved_change_to_course_id? || saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
-      Course.delay_if_production(n_strand: ["update_account_associations", root_account_id])
-            .update_account_associations([course_id, course_id_before_last_save, nonxlist_course_id, nonxlist_course_id_before_last_save].compact.uniq)
+    if (self.saved_change_to_course_id? || self.saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
+      Course.delay_if_production(n_strand: ["update_account_associations", self.root_account_id])
+            .update_account_associations([self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
 
   def update_account_associations
-    Course.update_account_associations([course_id, nonxlist_course_id].compact)
+    Course.update_account_associations([self.course_id, self.nonxlist_course_id].compact)
   end
 
   def verify_unique_sis_source_id
-    return true unless sis_source_id
+    return true unless self.sis_source_id
     return true if !root_account_id_changed? && !sis_source_id_changed?
 
-    scope = root_account.course_sections.where(sis_source_id: sis_source_id)
-    scope = scope.where("id<>?", self) unless new_record?
+    scope = root_account.course_sections.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => sis_source_id))
+    self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     throw :abort
   end
 
   def verify_unique_integration_id
-    return true unless integration_id
+    return true unless self.integration_id
     return true if !root_account_id_changed? && !integration_id_changed?
 
-    scope = root_account.course_sections.where(integration_id: integration_id)
-    scope = scope.where("id<>?", self) unless new_record?
+    scope = root_account.course_sections.where(integration_id: self.integration_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
     return true unless scope.exists?
 
-    errors.add(:integration_id, t('integration_id_taken', "INTEGRATRION ID \"%{integration_id}\" is already in use", :integration_id => integration_id))
+    self.errors.add(:integration_id, t('integration_id_taken', "INTEGRATRION ID \"%{integration_id}\" is already in use", :integration_id => self.integration_id))
     throw :abort
   end
 
   alias_method :parent_event_context, :course
 
   def section_code
-    name
+    self.name
   end
 
   def infer_defaults
-    self.root_account_id ||= (course.root_account_id rescue nil) || Account.default.id
-    raise "Course required" unless course
+    self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
+    raise "Course required" unless self.course
 
-    self.root_account_id = course.root_account_id || Account.default.id
+    self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
     #   and I don't know which one is best, or which one to show.
     # Here's the current plan:
     # - otherwise, just use name
     # - use the method display_name to consolidate this logic
-    self.name ||= course.name if default_section
-    self.name ||= "#{course.name} #{Time.zone.today}"
+    self.name ||= self.course.name if self.default_section
+    self.name ||= "#{self.course.name} #{Time.zone.today}"
   end
 
   def defined_by_sis?
-    !!sis_source_id
+    !!self.sis_source_id
   end
 
   # NOTE: Don't assume the section_name contains the course name
@@ -262,20 +266,20 @@ class CourseSection < ActiveRecord::Base
   end
 
   def move_to_course(course, **opts)
-    return self if course_id == course.id
+    return self if self.course_id == course.id
 
     old_course = self.course
     self.course = course
     self.root_account_id = course.root_account_id
 
     all_attrs = { course_id: course.id }
-    if root_account_id_changed?
+    if self.root_account_id_changed?
       all_attrs[:root_account_id] = self.root_account_id
     end
 
     CourseSection.unique_constraint_retry do
-      self.default_section = (course.course_sections.active.empty?)
-      save!
+      self.default_section = (course.course_sections.active.size == 0)
+      self.save!
     end
 
     old_course.course_sections.reset
@@ -283,12 +287,12 @@ class CourseSection < ActiveRecord::Base
     assignment_overrides.active.destroy_all
     discussion_topic_section_visibilities.active.destroy_all
 
-    enrollment_data = all_enrollments.pluck(:id, :user_id)
+    enrollment_data = self.all_enrollments.pluck(:id, :user_id)
     enrollment_ids = enrollment_data.map(&:first)
     user_ids = enrollment_data.map(&:last).uniq
 
     if enrollment_ids.any?
-      all_enrollments.update_all all_attrs
+      self.all_enrollments.update_all all_attrs
       Enrollment.delay_if_production.batch_add_to_favorites(enrollment_ids)
     end
 
@@ -297,11 +301,11 @@ class CourseSection < ActiveRecord::Base
     end
 
     User.clear_cache_keys(user_ids, :enrollments)
-    EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
+    EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
                    .invalidate_states_for_course_or_section(self, invalidate_access: true)
     User.delay_if_production.update_account_associations(user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
-    if old_course.id != course_id && old_course.id != nonxlist_course_id && !Course.skip_updating_account_associations?
-      old_course.delay_if_production.update_account_associations
+    if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
+      old_course.delay_if_production.update_account_associations unless Course.skip_updating_account_associations?
     end
 
     DueDateCacher.recompute_users_for_course(
@@ -318,44 +322,44 @@ class CourseSection < ActiveRecord::Base
   end
 
   def ensure_enrollments_in_correct_section
-    enrollments.where.not(:course_id => course_id).each { |e| e.update_attribute(:course_id, course_id) }
+    self.enrollments.where.not(:course_id => self.course_id).each { |e| e.update_attribute(:course_id, self.course_id) }
   end
 
   def crosslist_to_course(course, **opts)
-    return self if course_id == course.id
+    return self if self.course_id == course.id
 
-    self.nonxlist_course_id ||= course_id
-    move_to_course(course, **opts)
+    self.nonxlist_course_id ||= self.course_id
+    self.move_to_course(course, **opts)
   end
 
   def uncrosslist(**opts)
     return unless self.nonxlist_course_id
 
-    if nonxlist_course.workflow_state == "deleted"
-      nonxlist_course.workflow_state = "claimed"
-      nonxlist_course.save!
+    if self.nonxlist_course.workflow_state == "deleted"
+      self.nonxlist_course.workflow_state = "claimed"
+      self.nonxlist_course.save!
     end
     nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
-    move_to_course(nonxlist_course, **opts)
+    self.move_to_course(nonxlist_course, **opts)
   end
 
   def crosslisted?
-    !!self.nonxlist_course_id
+    return !!self.nonxlist_course_id
   end
 
   def destroy_course_if_no_more_sections
-    if deleted? && course.course_sections.active.empty?
-      course.destroy
+    if self.deleted? && self.course.course_sections.active.empty?
+      self.course.destroy
     end
   end
 
   def deletable?
-    !enrollments.where.not(:workflow_state => 'rejected').not_fake.exists?
+    !self.enrollments.where.not(:workflow_state => 'rejected').not_fake.exists?
   end
 
   def enroll_user(user, type, state = 'invited')
-    course.enroll_user(user, type, :enrollment_state => state, :section => self)
+    self.course.enroll_user(user, type, :enrollment_state => state, :section => self)
   end
 
   workflow do
@@ -366,9 +370,9 @@ class CourseSection < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    enrollments.not_fake.each(&:destroy)
-    assignment_overrides.each(&:destroy)
-    discussion_topic_section_visibilities&.each(&:destroy)
+    self.enrollments.not_fake.each(&:destroy)
+    self.assignment_overrides.each(&:destroy)
+    self.discussion_topic_section_visibilities&.each(&:destroy)
     save!
   end
 
@@ -395,15 +399,15 @@ class CourseSection < ActiveRecord::Base
 
   scope :active, -> { where("course_sections.workflow_state<>'deleted'") }
 
-  scope :sis_sections, ->(account, *source_ids) { where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
+  scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 
   def common_to_users?(users)
-    users.all? { |user| student_enrollments.active.for_user(user).exists? }
+    users.all? { |user| self.student_enrollments.active.for_user(user).exists? }
   end
 
   def update_enrollment_states_if_necessary
-    if saved_change_to_restrict_enrollments_to_section_dates? || (restrict_enrollments_to_section_dates? && (saved_changes.keys & %w[start_at end_at]).any?)
-      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
+    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
+      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
                      .invalidate_states_for_course_or_section(self)
     end
   end

@@ -313,24 +313,24 @@ describe Eportfolio do
         end
 
         it "does not mark as spam when the title matches no keywords" do
-          expect do
+          expect {
             eportfolio.update!(name: "my great and notbad page")
-          end.not_to change { spam_status }
+          }.not_to change { spam_status }
         end
 
         it "does not mark as spam if a spam_status already exists" do
           eportfolio.update!(spam_status: "marked_as_safe")
 
-          expect do
+          expect {
             eportfolio.update!(name: "actually a bad page")
-          end.not_to change { spam_status }
+          }.not_to change { spam_status }
         end
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        expect do
+        expect {
           eportfolio.update!(name: "actually a bad page")
-        end.not_to change { spam_status }
+        }.not_to change { spam_status }
       end
     end
   end

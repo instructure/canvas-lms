@@ -110,29 +110,29 @@ describe BroadcastPolicy::InstanceMethods do
 
     it "hides existing changed_attributes" do
       harness.with_changed_attributes_from(prior_version) do
-        expect(harness.changed_attributes).not_to have_key(:score)
+        expect(harness.changed_attributes.key?(:score)).to be false
       end
     end
 
     it "applies changed attributes from it" do
       harness.with_changed_attributes_from(prior_version) do
-        expect(harness.changed_attributes).to have_key(:workflow_state)
+        expect(harness.changed_attributes.key?(:workflow_state)).to be true
         expect(harness.changed_attributes["workflow_state"]).to eq "created"
       end
     end
 
     it "doesn't apply unchanged attributes from it" do
       harness.with_changed_attributes_from(prior_version) do
-        expect(harness.changed_attributes).not_to have_key(:id)
+        expect(harness.changed_attributes.key?(:id)).to be false
       end
     end
 
     it "restores the original changed_attributes no matter what" do
-      expect do
+      expect {
         harness.with_changed_attributes_from(prior_version) do
           raise "yolo"
         end
-      end.to raise_error(/yolo/)
+      }.to raise_error(/yolo/)
       expect(harness.changed_attributes).to equal og_changed_attributes
     end
   end

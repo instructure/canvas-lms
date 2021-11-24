@@ -189,7 +189,7 @@ module Autoextend::ClassMethods
   end
 end
 
-# NOTE: Autoextend can't detect a module being defined,
+# Note: Autoextend can't detect a module being defined,
 # only when it gets included into a class.
 module Autoextend::ModuleMethods
   def prepended(klass)
@@ -214,7 +214,7 @@ module Autoextend::ActiveSupport
         constant = Object.const_get(constant_name, false)
         next unless constant.is_a?(Module)
 
-        Autoextend.const_added(constant, source: :"ActiveSupport::Dependencies", recursive: true)
+        Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies', recursive: true)
       end
     end
 

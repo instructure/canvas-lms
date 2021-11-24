@@ -20,7 +20,7 @@
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     ctx = LiveEvents.get_context || {}
-    payload.compact! if ctx[:compact_live_events]&.present?
+    payload.compact! if ctx.dig(:compact_live_events)&.present?
 
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
@@ -245,17 +245,19 @@ module Canvas::LiveEvents
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
-    if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
-      context: assignment.course,
-      vendor_code: actl.tool_vendor_code,
-      product_code: actl.tool_product_code,
-      resource_type_code: actl.tool_resource_type_code
-    ).first)
-      event[:associated_integration_id] = tool_proxy.guid
-      # TEMPORARY: to switch over from the old format to guid,
-      # send both formats until all subscriptions have been changed
-      old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
-      event[:associated_integration_ids] = [tool_proxy.guid, old_format]
+    if actl
+      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
+        context: assignment.course,
+        vendor_code: actl.tool_vendor_code,
+        product_code: actl.tool_product_code,
+        resource_type_code: actl.tool_resource_type_code
+      ).first)
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
+      end
     end
     event
   end
@@ -353,17 +355,19 @@ module Canvas::LiveEvents
       workflow_state: submission.workflow_state,
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
-    if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
-      context: submission.course,
-      vendor_code: actl.tool_vendor_code,
-      product_code: actl.tool_product_code,
-      resource_type_code: actl.tool_resource_type_code
-    ).first)
-      event[:associated_integration_id] = tool_proxy.guid
-      # TEMPORARY: to switch over from the old format to guid,
-      # send both formats until all subscriptions have been changed
-      old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
-      event[:associated_integration_ids] = [tool_proxy.guid, old_format]
+    if actl
+      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
+        context: submission.course,
+        vendor_code: actl.tool_vendor_code,
+        product_code: actl.tool_product_code,
+        resource_type_code: actl.tool_resource_type_code
+      ).first)
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
+      end
     end
     event
   end
@@ -627,12 +631,7 @@ module Canvas::LiveEvents
   end
 
   def self.quiz_export_complete(content_export)
-    # when importing content export packages, migration_ids are obtained
-    # from content_migrations, a content_migration and content_export can share
-    # the same ID.
-    # The "content-export-" prefix prevents from saving the same migration_id on
-    # records that belong to different migrations
-    payload = (content_export.settings[:quizzes2] || {}).merge({ content_export_id: "content-export-#{content_export.global_id}" })
+    payload = content_export.settings[:quizzes2]
     post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 
@@ -970,14 +969,5 @@ module Canvas::LiveEvents
       learning_outcome_id: description.learning_outcome_id,
       root_account_id: description.root_account_id
     }
-  end
-
-  def self.heartbeat
-    data = {
-      environment: Canvas.environment,
-      region_code: Canvas.region_code || 'not_configured',
-      region: Canvas.region || 'not_configured'
-    }
-    post_event_stringified('heartbeat', data)
   end
 end

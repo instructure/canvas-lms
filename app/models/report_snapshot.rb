@@ -31,34 +31,34 @@ class ReportSnapshot < ActiveRecord::Base
     items = []
     now = Time.now.utc.to_i
     report['monthly'].each do |month|
-      next unless month[key]
+      if month[key]
+        stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
+        next if stamp > now
 
-      stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
-      next if stamp > now
-
-      items << [stamp.to_i * 1000, month[key]]
+        items << [stamp.to_i * 1000, month[key]]
+      end
     end
     report['weekly'].each do |week|
-      next unless week[key]
+      if week[key]
+        stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
+        next if stamp > now
 
-      stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
-      next if stamp > now
-
-      items << [stamp * 1000, week[key]]
+        items << [stamp * 1000, week[key]]
+      end
     end
     items.sort_by(&:first).uniq(&:first)
   end
 
   def report_value_over_time(*args)
     if args.length == 1
-      ReportSnapshot.report_value_over_time(data, args.first)
+      ReportSnapshot.report_value_over_time(self.data, args.first)
     else
-      ReportSnapshot.report_value_over_time(data[args.first], args.last)
+      ReportSnapshot.report_value_over_time(self.data[args.first], args.last)
     end
   end
 
   def data
-    unless @data
+    if !@data
       @data = JSON.parse(read_attribute(:data) || '{}')
       @data['generated_at'] = Time.at(@data['generated_at'].to_i / 1000) if @data['generated_at']
     end
@@ -81,8 +81,8 @@ class ReportSnapshot < ActiveRecord::Base
   scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
 
   def push_to_instructure_if_collection_enabled
-    return if report_type != REPORT_TO_SEND
-    return if account != Account.default
+    return if self.report_type != REPORT_TO_SEND
+    return if self.account != Account.default
 
     collection_type = Setting.get("usage_statistics_collection", "opt_out")
     return if collection_type == "opt_out"
@@ -92,7 +92,7 @@ class ReportSnapshot < ActiveRecord::Base
     data = {
       "collection_type" => collection_type,
       "installation_uuid" => Canvas.installation_uuid,
-      "report_type" => report_type,
+      "report_type" => self.report_type,
       "data" => read_attribute(:data),
       "rails_env" => Rails.env
     }

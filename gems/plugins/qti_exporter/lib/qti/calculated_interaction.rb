@@ -45,10 +45,10 @@ module Qti
       get_calculated_property('partial_credit_tolerance')
       @question[:partial_credit_tolerance] = @question[:partial_credit_tolerance].to_f if @question[:partial_credit_tolerance]
 
-      get_variables
-      get_answer_sets
-      get_feedback
-      get_formulas
+      get_variables()
+      get_answer_sets()
+      get_feedback()
+      get_formulas()
 
       if !@question[:answer_tolerance] &&
          (tolerance = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_tolerance]', 'value'))
@@ -69,8 +69,8 @@ module Qti
 
     def get_calculated_property(prop_name, is_true_false = false)
       @question[:"#{prop_name}"] = @doc.at_css("calculated #{prop_name}").text if @doc.at_css("calculated #{prop_name}")
-      if is_true_false && @question[:"#{prop_name}"]
-        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true'
+      if is_true_false and @question[:"#{prop_name}"]
+        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true' ? true : false
       end
     end
 
@@ -118,9 +118,9 @@ module Qti
       @question[:variables].each do |v|
         v_name = v[:name]
         # substitute {var} for [var]
-        @question[:question_text]&.gsub!("{#{v_name}}", "[#{v_name}]")
+        @question[:question_text].gsub!("{#{v_name}}", "[#{v_name}]") if @question[:question_text]
         # substitute {var} for var
-        @question[:imported_formula]&.gsub!("{#{v_name}}", v_name.to_s)
+        @question[:imported_formula].gsub!("{#{v_name}}", v_name.to_s) if @question[:imported_formula]
       end
       if @question[:imported_formula]
         method_substitutions = { "sqr" => "sqrt", "Factorial" => "fact", "exp" => "e" }
@@ -132,7 +132,7 @@ module Qti
         # is this secretly a simple numeric question in disguise
         var = @question[:variables].first
         if (var[:min] == var[:max]) && (@question[:imported_formula] == var[:name]) # yup the formula for the answer is "x" and there's only one possible value
-          %i[variables formulas imported_formula formula_decimal_places answer_tolerance].each { |k| @question.delete(k) }
+          [:variables, :formulas, :imported_formula, :formula_decimal_places, :answer_tolerance].each { |k| @question.delete(k) }
           @question[:question_type] = 'numerical_question'
           @question[:answers] = [
             { :weight => 100, :id => unique_local_id, :text => 'answer_text',

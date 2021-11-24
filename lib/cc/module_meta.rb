@@ -60,12 +60,12 @@ module CC
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
             m_node.position cm.position
-            m_node.unlock_at CCHelper.ims_datetime(cm.unlock_at) if cm.unlock_at
+            m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
 
-            if cm.prerequisites.present?
+            if cm.prerequisites && !cm.prerequisites.empty?
               m_node.prerequisites do |pre_reqs|
                 cm.prerequisites.each do |pre_req|
                   pre_reqs.prerequisite(:type => pre_req[:type]) do |pr|
@@ -94,7 +94,7 @@ module CC
                     if ct.content && ct.content.context != @course
                       item_node.global_identifierref ct.content.id
                     end
-                    if ct.associated_asset.instance_of?(Lti::ResourceLink)
+                    if ct.associated_asset.class == Lti::ResourceLink
                       item_node.lti_resource_link_lookup_uuid ct.associated_asset.lookup_uuid
                     end
                   end
@@ -106,7 +106,7 @@ module CC
               end
             end
 
-            if cm.completion_requirements.present?
+            if cm.completion_requirements && !cm.completion_requirements.empty?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
                   crs_node.completionRequirement(:type => c_req[:type]) do |cr_node|
@@ -119,7 +119,7 @@ module CC
           end
         end
       end
-      meta_file&.close
+      meta_file.close if meta_file
       rel_path
     end
   end

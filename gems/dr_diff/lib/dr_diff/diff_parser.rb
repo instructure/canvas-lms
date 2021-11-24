@@ -56,12 +56,12 @@ module DrDiff
           parsed[key][:context] << range
           cur_line_number = range.first
         end
-        next unless code_line?(line)
-
-        if touched?(line)
-          parsed[key][:change] << cur_line_number
+        if code_line?(line)
+          if touched?(line)
+            parsed[key][:change] << cur_line_number
+          end
+          cur_line_number += 1 unless line_gone?(line)
         end
-        cur_line_number += 1 unless line_gone?(line)
       end
       parsed
     end
@@ -73,9 +73,9 @@ module DrDiff
     def code_line?(line)
       return false if file_line?(line)
       return false if line_range?(line)
-      return false if %r{^--- a/.*\.}.match?(line)
-      return false if /^index .*\d\d\d$/.match?(line)
-      return false if /^diff --git/.match?(line)
+      return false if line =~ /^--- a\/.*\./
+      return false if line =~ /^index .*\d\d\d$/
+      return false if line =~ /^diff --git/
 
       true
     end
@@ -85,7 +85,7 @@ module DrDiff
     end
 
     def file_line?(line)
-      line =~ %r{^\+\+\+ b/}
+      line =~ /^\+\+\+ b\//
     rescue ArgumentError => e
       puts("UNABLE TO DIGEST THIS LINE: |#{line}|")
       puts(e)
@@ -97,7 +97,7 @@ module DrDiff
     end
 
     def path_from_file_line(line)
-      line.split(/\s/).last.gsub(%r{^b/}, "")
+      line.split(/\s/).last.gsub(/^b\//, "")
     end
 
     def range_from_file_line(line)

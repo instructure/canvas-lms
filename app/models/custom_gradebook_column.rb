@@ -47,18 +47,16 @@ class CustomGradebookColumn < ActiveRecord::Base
   scope :not_deleted, -> { where("workflow_state != 'deleted'") }
 
   set_policy do
-    given do |user, session|
+    given { |user, session|
       course.grants_any_right?(user, session, :view_all_grades, :manage_grades)
-    end
+    }
     can :read, :manage
   end
 
   def hidden=(hidden)
-    self.workflow_state = if Canvas::Plugin.value_to_boolean(hidden)
-                            "hidden"
-                          else
+    self.workflow_state = Canvas::Plugin::value_to_boolean(hidden) ?
+                            "hidden" :
                             "active"
-                          end
   end
 
   alias_method :destroy_permanently!, :destroy

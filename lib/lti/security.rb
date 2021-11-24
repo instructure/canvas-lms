@@ -54,11 +54,11 @@ module Lti
     def self.generate_params_deprecated(params, url, key, secret)
       uri = URI.parse(url.strip)
 
-      host = if uri.port == uri.default_port
-               uri.host
-             else
-               "#{uri.host}:#{uri.port}"
-             end
+      if uri.port == uri.default_port
+        host = uri.host
+      else
+        host = "#{uri.host}:#{uri.port}"
+      end
 
       consumer = OAuth::Consumer.new(key, secret, {
                                        :site => "#{uri.scheme}://#{host}",
@@ -81,12 +81,12 @@ module Lti
       # want to revert the escapage and return the hash of post parameters ready
       # for embedding in a html view
       hash = {}
-      request.body.split("&").each do |param|
-        key, val = param.split("=").map { |v| CGI.unescape(v) }
+      request.body.split(/&/).each do |param|
+        key, val = param.split(/=/).map { |v| CGI.unescape(v) }
         hash[key] = val
       end
 
-      # NOTE: this base string has duplicate oauth parameters in it when logged,
+      # note that this base string has duplicate oauth parameters in it when logged,
       # though these parameters don't affect signature generation and oauth launches (I hope?)
       Lti::Logging.lti_1_launch_generated(request.oauth_helper.signature_base_string)
 

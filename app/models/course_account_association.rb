@@ -24,16 +24,16 @@ class CourseAccountAssociation < ActiveRecord::Base
   belongs_to :account
   has_many :account_users, :foreign_key => 'account_id', :primary_key => 'account_id'
 
-  validates :course_id, :account_id, :depth, presence: true
+  validates_presence_of :course_id, :account_id, :depth
 
   before_create :set_root_account_id
 
   def set_root_account_id
     self.root_account_id ||=
       if account.root_account?
-        account.id
+        self.account.id
       else
-        account&.root_account_id
+        self.account&.root_account_id
       end
   end
 end

@@ -26,10 +26,10 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
   before :once do
     course_with_teacher active_all: true
-    s1, s2 = Array.new(2) do |i|
+    s1, s2 = 2.times.map { |i|
       @course.course_sections.create! name: "section #{i}"
-    end
-    @student1, @student2 = Array.new(2) { user_factory(active_all: true) }
+    }
+    @student1, @student2 = 2.times.map { user_factory(active_all: true) }
     s1.enroll_user @student1, 'StudentEnrollment', 'active'
     s2.enroll_user @student2, 'StudentEnrollment', 'active'
 
@@ -46,12 +46,12 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
   describe 'index' do
     before :once do
-      [@student1, @student2].each_with_index do |s, i|
-        @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap do |d|
+      [@student1, @student2].each_with_index { |s, i|
+        @col.custom_gradebook_column_data.build(content: "Blah #{i}").tap { |d|
           d.user_id = s.id
           d.save!
-        end
-      end
+        }
+      }
     end
 
     it 'checks permissions' do
@@ -191,20 +191,20 @@ describe CustomGradebookColumnDataApiController, type: :request do
     it 'works' do
       json = nil
 
-      check = lambda do |content|
+      check = lambda { |content|
         expect(response).to be_successful
         expect(json["content"]).to eq content
         expect(@col.custom_gradebook_column_data.where(user_id: @student1.id)
         .first.reload.content).to eq content
-      end
+      }
 
       # create
       json = update(@student1, "blarg")
-      check.call("blarg")
+      check.("blarg")
 
       # update
       json = update(@student1, "shmarg")
-      check.call("shmarg")
+      check.("shmarg")
     end
   end
 

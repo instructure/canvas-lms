@@ -104,11 +104,11 @@ class EpubExportsController < ApplicationController
        @domain_root_account.enable_offline_web_export?
       respond_to do |format|
         format.html do
-          render status: :not_found, template: 'shared/errors/404_message'
+          render status: 404, template: 'shared/errors/404_message'
         end
-        format.json { render status: :not_found }
+        format.json { render status: 404 }
       end
-      false
+      return false
     end
   end
 

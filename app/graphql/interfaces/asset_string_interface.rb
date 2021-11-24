@@ -22,5 +22,7 @@ module Interfaces::AssetStringInterface
   graphql_name "AssetString"
 
   field :asset_string, String, null: true
-  delegate :asset_string, to: :object
+  def asset_string
+    object.asset_string
+  end
 end

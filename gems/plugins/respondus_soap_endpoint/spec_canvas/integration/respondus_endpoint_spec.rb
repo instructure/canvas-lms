@@ -72,10 +72,10 @@ describe "Respondus SOAP API", type: :request do
   it "identifies the server without user credentials" do
     soap_response = soap_request('IdentifyServer', '', '', '')
     expect(soap_response.first).to eq "Success"
-    expect(soap_response.last).to eq %(
+    expect(soap_response.last).to eq %{
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS)
+Implemented for: Canvas LMS}
   end
 
   it "authenticates an existing user" do
@@ -231,7 +231,7 @@ Implemented for: Canvas LMS)
     expect(pair.value).to eq @question_bank.to_param
 
     # clear boxin
-    data = Marshal.load(Base64.decode64(context.split('--').first)) # rubocop:disable Security/MarshalLoad
+    data = Marshal.load(Base64.decode64(context.split('--').first))
     expect(data['selection_state']).to eq [@course.to_param]
   end
 
@@ -248,7 +248,7 @@ Implemented for: Canvas LMS)
     mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
       self.workflow_state = 'imported'
-      migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
+      self.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
     end
     allow(ContentMigration).to receive(:new).and_return(mock_migration)
     allow(ContentMigration).to receive(:find).with(mock_migration.id).and_return(mock_migration)

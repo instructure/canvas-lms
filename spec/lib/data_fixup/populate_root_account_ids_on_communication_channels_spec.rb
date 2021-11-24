@@ -28,9 +28,9 @@ describe DataFixup::PopulateRootAccountIdsOnCommunicationChannels do
         cc = CommunicationChannel.create!(user: user_record, path: 'canvas@instructure.com')
         cc.update_columns(root_account_ids: nil)
 
-        expect do
+        expect {
           DataFixup::PopulateRootAccountIdOnModels.run
-        end.to change { cc.reload.root_account_ids }.from(nil).to(ra_ids)
+        }.to change { cc.reload.root_account_ids }.from(nil).to(ra_ids)
       end
     end
   end

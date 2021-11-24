@@ -21,13 +21,13 @@
 class UsageRights < ActiveRecord::Base
   include ContentLicenses
 
-  USE_JUSTIFICATIONS = %w[own_copyright public_domain used_by_permission fair_use creative_commons].freeze
+  USE_JUSTIFICATIONS = %w(own_copyright public_domain used_by_permission fair_use creative_commons).freeze
 
-  belongs_to :context, polymorphic: %i[course group user]
+  belongs_to :context, polymorphic: [:course, :group, :user]
 
   before_validation :infer_license
-  validates :use_justification, inclusion: { in: USE_JUSTIFICATIONS }
-  validates :license, inclusion: { in: licenses.keys, allow_nil: true }
+  validates_inclusion_of :use_justification, in: USE_JUSTIFICATIONS
+  validates_inclusion_of :license, in: licenses.keys, allow_nil: true
 
   def infer_license
     if license.blank?

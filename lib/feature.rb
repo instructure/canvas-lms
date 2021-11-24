@@ -19,17 +19,17 @@
 #
 
 class Feature
-  ATTRS = %i[feature display_name description applies_to state
-             root_opt_in enable_at beta type pending_enforcement
-             release_notes_url custom_transition_proc visible_on
-             after_state_change_proc autoexpand touch_context].freeze
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state,
+           :root_opt_in, :enable_at, :beta, :type, :pending_enforcement,
+           :release_notes_url, :custom_transition_proc, :visible_on,
+           :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader(*ATTRS)
 
   def initialize(opts = {})
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
-      next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
+      next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
 
       instance_variable_set "@#{key}", val
     end
@@ -76,7 +76,7 @@ class Feature
   end
 
   def self.production_environment?
-    environment == :production
+    self.environment == :production
   end
 
   # Register one or more features.  Must be done during application initialization.
@@ -86,16 +86,16 @@ class Feature
   #   automatic_essay_grading: {
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
   #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
-  #     applies_to: 'Course',     # or 'RootAccount' or 'Account' or 'User'
-  #     state: 'allowed',         # or 'on', 'hidden', or 'disabled'
-  #                               # - 'hidden' means the feature must be set by a site admin before it will be visible
-  #                               #   (in that context and below) to other users
-  #                               # - 'disabled' means the feature will not appear in the feature list and
-  #                               #   cannot be turned on. It is intended for use in environment state overrides.
-  #     root_opt_in: false,       # if true, 'allowed' features in source or site admin
-  #                               # will be inherited in "off" state by root accounts
-  #     enable_at: "2014-01-01",  # estimated release date shown in UI
-  #     beta: false,              # 'beta' tag shown in UI
+  #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
+  #     state: 'allowed',     # or 'on', 'hidden', or 'disabled'
+  #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
+  #                           #   (in that context and below) to other users
+  #                           # - 'disabled' means the feature will not appear in the feature list and
+  #                           #   cannot be turned on. It is intended for use in environment state overrides.
+  #     root_opt_in: false,   # if true, 'allowed' features in source or site admin
+  #                           # will be inherited in "off" state by root accounts
+  #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
+  #     beta: false,          # 'beta' tag shown in UI
   #     release_notes_url: 'http://example.com/',
   #
   #     # features that are pending_enforcement are nearing completion and will be finalized at a future date
@@ -132,9 +132,9 @@ class Feature
   STATE_DISABLED = 'disabled'
 
   VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
-  VALID_APPLIES_TO = %w[Course Account RootAccount User SiteAdmin].freeze
-  VALID_ENVS = %i[development ci beta test production].freeze
-  VALID_TYPES = %w[feature_option setting].freeze
+  VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
+  VALID_ENVS = %i(development ci beta test production).freeze
+  VALID_TYPES = %w(feature_option setting).freeze
 
   DISABLED_FEATURE = Feature.new.freeze
 
@@ -144,11 +144,11 @@ class Feature
       apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      @features[feature] = if attrs[:state] == STATE_DISABLED
-                             DISABLED_FEATURE
-                           else
-                             Feature.new({ feature: feature }.merge(attrs))
-                           end
+      if attrs[:state] == STATE_DISABLED
+        @features[feature] = DISABLED_FEATURE
+      else
+        @features[feature] = Feature.new({ feature: feature }.merge(attrs))
+      end
     end
   end
 
@@ -171,7 +171,7 @@ class Feature
     if environments
       raise "invalid environment tag for feature #{feature_name}: must be one of #{VALID_ENVS}" unless (environments.keys - VALID_ENVS).empty?
 
-      env = environment
+      env = self.environment
       if environments.key?(env)
         feature_hash.merge!(environments[env])
       end
@@ -208,16 +208,15 @@ class Feature
 
   def self.applicable_features(object, type: nil)
     applicable_types = []
-    case object
-    when Account
+    if object.is_a?(Account)
       applicable_types << 'Account'
       applicable_types << 'Course'
       applicable_types << 'RootAccount' if object.root_account?
       applicable_types << 'User' if object.site_admin?
       applicable_types << 'SiteAdmin' if object.site_admin?
-    when Course
+    elsif object.is_a?(Course)
       applicable_types << 'Course'
-    when User
+    elsif object.is_a?(User)
       applicable_types << 'User'
     end
     definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }
@@ -226,9 +225,10 @@ class Feature
   def default_transitions(context, orig_state)
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
-    (valid_states - [orig_state]).index_with do |state|
-      { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
+    (valid_states - [orig_state]).inject({}) do |transitions, state|
+      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
         context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
+      transitions
     end
   end
 
@@ -248,7 +248,7 @@ class Feature
   end
 
   def self.remove_obsolete_flags
-    valid_features = definitions.keys
+    valid_features = self.definitions.keys
     cutoff = Setting.get('obsolete_feature_flag_cutoff_days', 60).to_i.days.ago
     delete_scope = FeatureFlag.where('updated_at<?', cutoff).where.not(feature: valid_features)
     delete_scope.in_batches.delete_all

@@ -23,13 +23,13 @@ describe DiscussionTopicPresenter do
   let(:user)       { user_model }
   let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let(:course)     { course_model }
-  let(:assignment) do
+  let(:assignment) {
     Assignment.new(:title => 'Test Topic',
                    :due_at => Time.now,
                    :lock_at => Time.now + 1.week,
                    :unlock_at => Time.now - 1.week,
                    :submission_types => 'discussion_topic')
-  end
+  }
 
   before do
     allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for)
@@ -102,7 +102,8 @@ describe DiscussionTopicPresenter do
   end
 
   describe "#comments_disabled?" do
-    it "only returns true when topic is assignment, its context is a course, and the course settings lock all announcements" do
+    it "only returns true when topic is assignment, its context is a course, " +
+       "and the course settings lock all announcements" do
       course_factory
       @course.lock_all_announcements = true
       @course.save!
@@ -121,13 +122,15 @@ describe DiscussionTopicPresenter do
   end
 
   describe "#large_roster?" do
-    it "returns true when context responds to large_roster and context has a large roster" do
+    it "returns true when context responds to large_roster and context " +
+       "has a large roster" do
       topic.context = Course.new(:name => "Canvas")
       topic.context.large_roster = true
       expect(presenter.large_roster?).to eq true
     end
 
-    it "returns false when context responds to large roster and context doesn't have a large roster" do
+    it "returns false when context responds to large roster and context " +
+       "doesn't have a large roster" do
       topic.context = Course.new(:name => "Canvas")
       topic.context.large_roster = false
       expect(presenter.large_roster?).to eq false

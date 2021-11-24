@@ -55,7 +55,7 @@ module Api
         when 'default'
           @domain_root_account.default_enrollment_term
         when 'current'
-          unless current_term
+          if !current_term
             current_terms = @domain_root_account
                             .enrollment_terms
                             .active
@@ -129,7 +129,7 @@ module Api
                       'sis_integration_id' => 'integration_id',
                       'lti_context_id' => 'lti_context_id',
                       'uuid' => 'uuid' }.freeze,
-        :is_not_scoped_to_account => %w[id lti_context_id uuid].freeze,
+        :is_not_scoped_to_account => ['id', 'lti_context_id', 'uuid'].freeze,
         :scope => 'root_account_id' }.freeze,
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id',
@@ -157,9 +157,9 @@ module Api
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
-  MAX_ID_RANGE = (-MAX_ID...MAX_ID).freeze
-  ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/.freeze
-  UUID_REGEX = /\Auuid:(\w{40,})\z/.freeze
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
+  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -167,16 +167,15 @@ module Api
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
-    case id
-    when /\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z/
+    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    when /\A(lti_[\w_]+|sis_[\w_]+):(.+)\z/
+    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    when ID_REGEX
-      return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
-    when UUID_REGEX
+    elsif id =~ ID_REGEX
+      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
+    elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
@@ -189,7 +188,7 @@ module Api
       sis_id = column[:transform].call(sis_id)
       column = column[:column]
     end
-    [column, sis_id]
+    return column, sis_id
   end
 
   def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
@@ -204,16 +203,16 @@ module Api
       columns[column] ||= []
       columns[column] << sis_id
     end
-    columns.each_key { |key| columns[key].uniq! }
-    columns
+    columns.keys.each { |key| columns[key].uniq! }
+    return columns
   end
 
   # remove things that don't look like valid database IDs
   # return in integer format if possible
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
-    ids.map { |id| id.to_s.strip }.grep(ID_REGEX).map do |id|
-      /\A\d+\z/.match?(id) ? id.to_i : id
+    ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
+      id =~ /\A\d+\z/ ? id.to_i : id
     end
   end
 
@@ -260,7 +259,7 @@ module Api
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
 
           ids = columns[column]
-          if ids.any?(Array)
+          if ids.any? { |id| id.is_a?(Array) }
             ids_hash = {}
             ids.each do |id|
               id = Array(id)
@@ -329,7 +328,7 @@ module Api
     collection = paginate_collection!(collection, controller, pagination_args)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') unless links.empty?
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
     if response_args[:enhanced_return]
       { hash: hash, collection: collection }
     else
@@ -351,8 +350,8 @@ module Api
     meta = jsonapi_meta(collection, controller, base_url)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') unless links.empty?
-    [collection, meta]
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    return collection, meta
   end
 
   def self.jsonapi_meta(collection, controller, base_url)
@@ -418,9 +417,9 @@ module Api
     }
   end
 
-  PAGINATION_PARAMS = %i[current next prev first last].freeze
-  LINK_PRIORITY = %i[next last prev current first].freeze
-  EXCLUDE_IN_PAGINATION_LINKS = %w[page per_page access_token api_key].freeze
+  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
+  LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)
@@ -445,13 +444,13 @@ module Api
     max_link_headers_size = Setting.get('pagination_max_link_headers_size', '6144').to_i
     link_headers_size = 0
     LINK_PRIORITY.each_with_object({}) do |param, obj|
-      next unless opts[param].present?
+      if opts[param].present?
+        link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
+        return obj if link_headers_size + link.size > max_link_headers_size
 
-      link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
-      return obj if link_headers_size + link.size > max_link_headers_size
-
-      link_headers_size += link.size
-      obj[param] = link
+        link_headers_size += link.size
+        obj[param] = link
+      end
     end
   end
 
@@ -466,7 +465,7 @@ module Api
 
   def self.parse_pagination_links(link_header)
     link_header.split(",").map do |link|
-      url, rel = link.match(/^<([^>]+)>; rel="([^"]+)"/).captures
+      url, rel = link.match(%r{^<([^>]+)>; rel="([^"]+)"}).captures
       uri = URI.parse(url)
       raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
 
@@ -545,10 +544,10 @@ module Api
     # use the host of the request if available;
     # use a placeholder host for pre-generated content, which we will replace with the request host when available;
     # otherwise let HostUrl figure out what host is appropriate
-    if respond_to?(:request)
+    if self.respond_to?(:request)
       host, protocol = get_host_and_protocol_from_request
       target_shard = Shard.current
-    elsif respond_to?(:use_placeholder_host?) && use_placeholder_host?
+    elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
       host = PLACEHOLDER_HOST
       protocol = PLACEHOLDER_PROTOCOL
     else
@@ -589,7 +588,7 @@ module Api
   # and adds context (e.g. /courses/:id/) if it is missing
   # exception: it leaves user-context file links alone
   def process_incoming_html_content(html)
-    host, port = [request.host, request.port] if respond_to?(:request)
+    host, port = [request.host, request.port] if self.respond_to?(:request)
     Html::Content.process_incoming(html, host: host, port: port)
   end
 
@@ -618,10 +617,10 @@ module Api
                     (?<minute>[0-5][0-9]):
                     (?<second>60|[0-5][0-9])
                     (?<fraction>\.[0-9]+)?
-                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x.freeze
+                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x
 
   # regex for valid dates
-  DATE_REGEX = %r{^\d{4}[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$}.freeze
+  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/
 
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'
@@ -663,13 +662,13 @@ module Api
     placeholder = "PLACEHOLDER"
 
     placeholders = args.each_with_index.map do |arg, index|
-      arg&.match?(format) ? "#{placeholder}#{index}" : arg
+      arg =~ format ? "#{placeholder}#{index}" : arg
     end
 
     url = send(method, *placeholders)
 
     args.each_with_index do |arg, index|
-      url.sub!("#{placeholder}#{index}", arg) if arg&.match?(format)
+      url.sub!("#{placeholder}#{index}", arg) if arg =~ format
     end
 
     url

@@ -59,7 +59,7 @@ class ObjectView < HashView
   end
 
   def clean_json_parts
-    clean_json_text_parts.map { |text| JSON.parse(text) }
+    clean_json_text_parts.map { |text| JSON::parse(text) }
   end
 
   def parts
@@ -77,6 +77,6 @@ class ObjectView < HashView
   end
 
   def self.strip_comments(str)
-    str.gsub(%r{//[^\n"]+$}, '')
+    str.gsub(%r(//[^\n"]+$), '')
   end
 end

@@ -61,9 +61,9 @@ class ControllerView < HashView
   def raw_methods
     @controller.children.select do |method|
       method.tags.find do |tag|
-        tag.tag_name.casecmp?("api")
-      end && method.tags.none? do |tag|
-        tag.tag_name.casecmp?("internal")
+        tag.tag_name.downcase == "api"
+      end && !method.tags.any? do |tag|
+        tag.tag_name.downcase == "internal"
       end
     end
   end
@@ -77,7 +77,7 @@ class ControllerView < HashView
   def to_hash
     {
       "name" => name,
-      "methods" => methods.map(&:to_hash),
+      "methods" => methods.map { |m| m.to_hash },
     }
   end
 end

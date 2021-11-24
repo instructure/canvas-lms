@@ -19,7 +19,7 @@
 #
 
 require "spec_helper"
-require "db/migrate/20210830223331_clear_sms_overrides"
+require "db/migrate/20210830223331_clear_sms_overrides.rb"
 
 describe ClearSmsOverrides do
   let(:migration) { described_class.new }
@@ -27,9 +27,9 @@ describe ClearSmsOverrides do
   it "clears the global setting" do
     Setting.set('allowed_sms_notification_categories', 'foobar')
 
-    expect do
+    expect {
       migration.change
-    end.to change {
+    }.to change {
       Setting.get('allowed_sms_notification_categories', nil)
     }.from('foobar').to(nil)
   end

@@ -90,21 +90,21 @@ describe "CanvasUnzip" do
     end
 
     it "raises an error if the file limit is exceeded" do
-      expect do
+      expect {
         limits = CanvasUnzip::Limits.new(CanvasUnzip::DEFAULT_BYTE_LIMIT, 2)
         Dir.mktmpdir do |tmpdir|
           CanvasUnzip.extract_archive(fixture_filename("test.zip"), tmpdir, limits: limits)
         end
-      end.to raise_error(CanvasUnzip::FileLimitExceeded)
+      }.to raise_error(CanvasUnzip::FileLimitExceeded)
     end
 
     it "raises an error if the byte limit is exceeded" do
-      expect do
+      expect {
         limits = CanvasUnzip::Limits.new(10, 100)
         Dir.mktmpdir do |tmpdir|
           CanvasUnzip.extract_archive(fixture_filename("test.zip"), tmpdir, limits: limits)
         end
-      end.to raise_error(CanvasUnzip::SizeLimitExceeded)
+      }.to raise_error(CanvasUnzip::SizeLimitExceeded)
     end
   end
 

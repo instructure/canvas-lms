@@ -31,7 +31,7 @@ class AssessmentRequest < ActiveRecord::Base
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
   belongs_to :rubric_assessment
-  validates :user_id, :asset_id, :asset_type, :workflow_state, presence: true
+  validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
 
   before_save :infer_uuid
   after_save :delete_ignores
@@ -56,27 +56,32 @@ class AssessmentRequest < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
-    p.to { assessor }
-    p.whenever do
-      should_send_reminder? && active_rubric_association?
-    end
+    p.to { self.assessor }
+    p.whenever { |record|
+      record.assigned? && @send_reminder && active_rubric_association?
+    }
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
-    p.to { assessor }
-    p.whenever do
-      should_send_reminder? && !active_rubric_association?
-    end
+    p.to { self.assessor }
+    p.whenever { |record|
+      send_notification = record.assigned? && @send_reminder && !active_rubric_association?
+      # Do not send notifications if the context is an unpublished course
+      # or if the asset is a submission and the assignment is unpublished
+      send_notification = false if self.context.is_a?(Course) && !self.context.workflow_state.in?(['available', 'completed'])
+      send_notification = false if self.asset.is_a?(Submission) && self.asset.assignment.workflow_state != "published"
+      send_notification
+    }
     p.data { course_broadcast_data }
   end
 
   scope :incomplete, -> { where(:workflow_state => 'assigned') }
   scope :complete, -> { where(:workflow_state => 'completed') }
-  scope :for_assessee, ->(user_id) { where(:user_id => user_id) }
-  scope :for_assessor, ->(assessor_id) { where(:assessor_id => assessor_id) }
-  scope :for_asset, ->(asset_id) { where(:asset_id => asset_id) }
-  scope :for_assignment, ->(assignment_id) { eager_load(:submission).where(:submissions => { :assignment_id => assignment_id }) }
-  scope :for_courses, ->(courses) { eager_load(:submission).where(:submissions => { :course_id => courses }) }
+  scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
+  scope :for_assessor, lambda { |assessor_id| where(:assessor_id => assessor_id) }
+  scope :for_asset, lambda { |asset_id| where(:asset_id => asset_id) }
+  scope :for_assignment, lambda { |assignment_id| eager_load(:submission).where(:submissions => { :assignment_id => assignment_id }) }
+  scope :for_courses, lambda { |courses| eager_load(:submission).where(:submissions => { :course_id => courses }) }
 
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",
@@ -85,38 +90,28 @@ class AssessmentRequest < ActiveRecord::Base
   }
 
   set_policy do
-    given do |user, session|
-      can_read_assessment_user_name?(user, session)
-    end
+    given { |user, session|
+      self.can_read_assessment_user_name?(user, session)
+    }
     can :read_assessment_user
   end
 
   def can_read_assessment_user_name?(user, session)
-    !considered_anonymous? ||
-      user_id == user.id ||
-      submission.assignment.context.grants_right?(user, session, :view_all_grades)
+    !self.considered_anonymous? ||
+      self.user_id == user.id ||
+      self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
   end
 
   def considered_anonymous?
-    submission.assignment.anonymous_peer_reviews?
+    self.submission.assignment.anonymous_peer_reviews?
   end
 
   def send_reminder!
     @send_reminder = true
     self.updated_at = Time.now
-    save!
+    self.save!
   ensure
     @send_reminder = nil
-  end
-
-  def should_send_reminder?
-    # Do not send notifications if the context is an unpublished course
-    return false if context.is_a?(Course) && !context.published?
-
-    # or if the asset is a submission and the assignment is unpublished
-    return false if asset.is_a?(Submission) && asset.assignment.workflow_state != "published"
-
-    @send_reminder && assigned?
   end
 
   def context
@@ -124,7 +119,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def assessor_name
-    rubric_assessment.assessor_name rescue ((assessor.name rescue nil) || t("#unknown", "Unknown"))
+    self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))
   end
 
   def incomplete?
@@ -132,10 +127,10 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    assessor
+    self.assessor
   end
   on_update_send_to_streams do
-    assessor
+    self.assessor
   end
 
   workflow do
@@ -148,29 +143,27 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def asset_title
-    (asset.assignment.title rescue asset.title) rescue t("#unknown", "Unknown")
+    (self.asset.assignment.title rescue self.asset.title) rescue t("#unknown", "Unknown")
   end
 
   def comment_added
-    self.workflow_state = "completed" unless active_rubric_association? && rubric_association.rubric
+    self.workflow_state = "completed" unless active_rubric_association? && self.rubric_association.rubric
   end
 
   def asset_user_name
-    asset.user.name rescue t("#unknown", "Unknown")
+    self.asset.user.name rescue t("#unknown", "Unknown")
   end
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'
-      override = PlannerOverride.find_by(plannable_id: id, plannable_type: 'AssessmentRequest', user: assessor)
+      override = PlannerOverride.find_by(plannable_id: self.id, plannable_type: 'AssessmentRequest', user: assessor)
       override.update(marked_complete: true) if override.present?
     end
   end
 
   def active_rubric_association?
-    !!rubric_association&.active?
+    !!self.rubric_association&.active?
   end
 end

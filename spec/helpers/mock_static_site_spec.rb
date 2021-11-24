@@ -25,15 +25,15 @@ describe "a mock static site" do
   end
 
   it "throws exception if static site directory doesn't exist" do
-    expect do
+    expect {
       MockStaticSite.new('asdf.test', 'non_existant_location')
-    end.to raise_error(NonexistentMockSiteError)
+    }.to raise_error(NonexistentMockSiteError)
   end
 
   it "creates a MockStaticSite if the directory does exist" do
-    expect do
+    expect {
       MockStaticSite.new('asdf.test', 'sample_site')
-    end.not_to raise_error
+    }.not_to raise_error
   end
 
   context "when created" do

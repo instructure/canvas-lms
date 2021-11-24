@@ -137,16 +137,8 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align', tags: { type: @rubric.class.name })
-      expect(InstStatsd::Statsd).to have_received(:increment).with('feature_flag_check', any_args).at_least(:once)
-    end
-
-    it "adding outcomes to an AssessmentQuestionBank should increment datadog counter" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      @question_bank = AssessmentQuestionBank.create(:context => @course)
-      @outcome.align(@question_bank, @course, mastery_score: 0.5)
-      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align', tags: { type: @question_bank.class.name })
-      expect(InstStatsd::Statsd).to have_received(:increment).with('feature_flag_check', any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome.align')
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "allows learning outcome rows in the rubric" do
@@ -578,9 +570,9 @@ describe LearningOutcome do
                                      })
       @outcome.alignments << @alignment
 
-      expect do
+      expect {
         @outcome.remove_alignment(@alignment.id, @outcome.context)
-      end.to change {
+      }.to change {
         @outcome.alignments.count
       }.from(1).to(0)
     end
@@ -609,9 +601,9 @@ describe LearningOutcome do
       expect(@outcome).to respond_to(:rubric_criterion)
       expect(@outcome.data).not_to be_nil
       expect(@outcome.rubric_criterion).to eq(@outcome.data[:rubric_criterion])
-      expect do
+      expect {
         @outcome.rubric_criterion = @outcome.rubric_criterion.merge(mpoints)
-      end.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
+      }.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
     end
 
     it "updates aligned rubrics after save" do
@@ -644,11 +636,11 @@ describe LearningOutcome do
       @outcome.save!
 
       rubric.reload
-      expect(rubric.data.first[:ratings].pluck(:description)).to match_array([
-                                                                               "Exceeds Expectations",
-                                                                               "Meets Expectations",
-                                                                               "Does Not Meet Expectations"
-                                                                             ])
+      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to match_array([
+                                                                                       "Exceeds Expectations",
+                                                                                       "Meets Expectations",
+                                                                                       "Does Not Meet Expectations"
+                                                                                     ])
     end
   end
 
@@ -679,11 +671,11 @@ describe LearningOutcome do
 
     context "illegal calculation ints" do
       context "per method" do
-        calc_method = %w[
-          decaying_average
-          n_mastery
-          highest
-          latest
+        calc_method = [
+          'decaying_average',
+          'n_mastery',
+          'highest',
+          'latest'
         ]
 
         calc_method.each do |method|
@@ -1026,14 +1018,8 @@ describe LearningOutcome do
       )
     end
 
-    let(:c1) do
-      course_with_teacher
-      @course
-    end
-    let(:c2) do
-      course_with_teacher
-      @course
-    end
+    let(:c1) { course_with_teacher; @course }
+    let(:c2) { course_with_teacher; @course }
 
     let(:add_student) do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }
@@ -1042,7 +1028,7 @@ describe LearningOutcome do
     let(:account) { -> { Account.all.find { |a| !a.site_admin? && a.root_account? } } }
 
     let(:create_rubric) do
-      lambda do |outcome|
+      ->(outcome) do
         rubric = Rubric.create!(:context => outcome.context)
         rubric.data = [{
           :points => 3,
@@ -1070,7 +1056,7 @@ describe LearningOutcome do
     end
 
     let(:find_rubric) do
-      lambda do |outcome|
+      ->(outcome) do
         # This is horribly inefficient, but there's not a good
         # way to query by learning outcome id because it's stored
         # in a serialized field :facepalm:.  When we do our outcomes
@@ -1088,7 +1074,7 @@ describe LearningOutcome do
     end
 
     let(:assess_with) do
-      lambda do |outcome, context|
+      ->(outcome, context) do
         assignment = assignment_model(context: context)
         rubric = add_or_get_rubric(outcome)
         user = user_factory(active_all: true)

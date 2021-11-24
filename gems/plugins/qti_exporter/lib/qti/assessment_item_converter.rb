@@ -28,12 +28,12 @@ module Qti
     DEFAULT_CORRECT_WEIGHT = 100
     DEFAULT_INCORRECT_WEIGHT = 0
     DEFAULT_POINTS_POSSIBLE = 1
-    UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence'].freeze
+    UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence']
 
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
     def initialize(opts)
-      @log = Canvas::Migration.logger
+      @log = Canvas::Migration::logger
       reset_local_ids
       @manifest_node = opts[:manifest_node]
       @migration_type = opts[:interaction_type]
@@ -42,7 +42,7 @@ module Qti
       @opts = opts
       if (@path_map = opts[:file_path_map])
         @sorted_paths = opts[:sorted_file_paths]
-        @sorted_paths ||= @path_map.keys.sort_by(&:length)
+        @sorted_paths ||= @path_map.keys.sort_by { |v| v.length }
       end
 
       if @manifest_node
@@ -74,14 +74,14 @@ module Qti
     end
 
     def create_xml_doc
-      @doc = if @manifest_node
-               Nokogiri::XML(File.open(@href))
-             else
-               Nokogiri::XML(@qti_data)
-             end
+      if @manifest_node
+        @doc = Nokogiri::XML(File.open(@href))
+      else
+        @doc = Nokogiri::XML(@qti_data)
+      end
     end
 
-    EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"].freeze
+    EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"]
 
     def create_instructure_question
       begin
@@ -89,7 +89,7 @@ module Qti
         @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
         # The colons are replaced with dashes in the conversion from QTI 1.2
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-        @question[:migration_id] = @question[:migration_id].tr(':', '-').gsub('identifier=', '') if @question[:migration_id]
+        @question[:migration_id] = @question[:migration_id].gsub(/:/, '-').gsub('identifier=', '') if @question[:migration_id]
 
         if @flavor == Qti::Flavors::D2L
           # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
@@ -109,28 +109,28 @@ module Qti
 
         selectors = ['itemBody > div', 'itemBody > p']
         type = @opts[:custom_type] || @migration_type || @type
-        unless %w[fill_in_multiple_blanks_question canvas_matching matching_question
-                  multiple_dropdowns_question respondus_matching].include?(type)
+        unless ['fill_in_multiple_blanks_question', 'canvas_matching', 'matching_question',
+                'multiple_dropdowns_question', 'respondus_matching'].include?(type)
           selectors << 'itemBody choiceInteraction > prompt'
           selectors << 'itemBody > extendedTextInteraction > prompt'
         end
 
         text_nodes = @doc.css(selectors.join(','))
-        text_nodes = text_nodes.reject do |node|
+        text_nodes = text_nodes.reject { |node|
           node.inner_html.strip.empty? ||
             EXCLUDED_QUESTION_TEXT_CLASSES.any? { |c| c.casecmp(node['class'].to_s) == 0 } ||
             node.at_css('choiceInteraction') || node.at_css('associateInteraction')
-        end
+        }
 
-        if !text_nodes.empty?
+        if text_nodes.length > 0
           @question[:question_text] = ''
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0
-            @question[:question_text] += if node['class'] == 'html'
-                                           sanitize_html_string(node.text)
-                                         else
-                                           sanitize_html!(node)
-                                         end
+            if node['class'] == 'html'
+              @question[:question_text] += sanitize_html_string(node.text)
+            else
+              @question[:question_text] += sanitize_html!(node)
+            end
           end
         elsif @doc.at_css('itemBody associateInteraction prompt')
           @question[:question_text] = "" # apparently they deliberately had a blank question?
@@ -145,13 +145,13 @@ module Qti
           end
         end
 
-        if @migration_type && UNSUPPORTED_TYPES.member?(@migration_type)
+        if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
           @question[:question_type] = @migration_type
           @question[:unsupported] = true
-        elsif !%w[text_only_question file_upload_question].include?(@migration_type)
-          parse_question_data
+        elsif !%w(text_only_question file_upload_question).include?(@migration_type)
+          self.parse_question_data
         else
-          get_feedback if @migration_type == 'file_upload_question'
+          self.get_feedback if @migration_type == 'file_upload_question'
           @question[:question_type] ||= @migration_type
         end
       rescue => e
@@ -164,6 +164,15 @@ module Qti
       @question[:points_possible] ||= AssessmentItemConverter::DEFAULT_POINTS_POSSIBLE
       @question
     end
+
+    QUESTION_TYPE_MAPPING = {
+      /matching/i => 'matching_question',
+      /text\s?information/i => 'text_only_question',
+      /image/i => 'text_only_question',
+      'trueFalse' => 'true_false_question',
+      /true\/false/i => 'true_false_question',
+      'multiple_dropdowns' => 'multiple_dropdowns_question'
+    }
 
     def parse_instructure_metadata
       if (meta = @doc.at_css('instructureMetadata'))
@@ -212,13 +221,10 @@ module Qti
             @question[:question_type] = 'multiple_dropdowns_question'
           end
         elsif (type = get_node_att(meta, 'instructureField[name=question_type]', 'value'))
-          @migration_type = case type
-                            when /matching/i then 'matching_question'
-                            when /text\s?information/i, /image/i then 'text_only_question'
-                            when 'trueFalse', %r{true/false}i then 'true_false_question'
-                            when 'multiple_dropdowns' then 'multiple_dropdowns_question'
-                            else type
-                            end
+          @migration_type = type
+          QUESTION_TYPE_MAPPING.each do |k, v|
+            @migration_type = v if k === @migration_type
+          end
           if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
             @question[:question_type] = @migration_type
           end
@@ -233,7 +239,7 @@ module Qti
              else
                response_identifier.to_s.sub(/response_/i, "").to_i
              end
-        id == 0 ? unique_local_id : id
+        id != 0 ? id : unique_local_id
       else
         unique_local_id
       end
@@ -256,15 +262,15 @@ module Qti
     def get_feedback
       @doc.search('modalFeedback').each do |f|
         id = f['identifier']
-        if /wrong|incorrect|(_IC$)/i.match?(id)
+        if id =~ /wrong|incorrect|(_IC$)/i
           extract_feedback!(@question, :incorrect_comments, f)
-        elsif /correct|(_C$)/i.match?(id)
+        elsif id =~ /correct|(_C$)/i
           if f.at_css('div.solution')
             @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
           else
             extract_feedback!(@question, :correct_comments, f)
           end
-        elsif /solution/i.match?(id)
+        elsif id =~ /solution/i
           @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
         elsif (@flavor == Qti::Flavors::D2L && f.text.present?) || id =~ /general_|_all/i
           extract_feedback!(@question, :neutral_comments, f)
@@ -284,7 +290,7 @@ module Qti
       end
     end
 
-    KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1'].freeze
+    KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1']
     def has_known_meta_class(node)
       return false unless node.attributes['class']
 
@@ -379,7 +385,7 @@ module Qti
       # clear extra entries
       @question.delete :feedback_id
       answers.each do |answer|
-        if feedback_hash.key? answer[:feedback_id]
+        if feedback_hash.has_key? answer[:feedback_id]
           extract_feedback!(answer, :comments, feedback_hash[answer[:feedback_id]])
         end
         answer.delete :feedback_id
@@ -390,14 +396,16 @@ module Qti
     def get_feedback_id(cond)
       id = nil
 
-      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')) &&
-         feedback.at_css('variable[identifier=FEEDBACK]') &&
-         (feedback = feedback.at_css('baseValue[baseType=identifier]'))
-        id = feedback.text.strip
+      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]'))
+        if feedback.at_css('variable[identifier=FEEDBACK]')
+          if (feedback = feedback.at_css('baseValue[baseType=identifier]'))
+            id = feedback.text.strip
+          end
+        end
       end
       # Sometimes individual answers are assigned general feedback, don't return
       # the identifier if that's the case
-      /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i.match?(id) ? nil : id
+      id =~ /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
     end
   end
 end

@@ -23,12 +23,12 @@ describe Loaders::IDLoader do
     course_with_student(active_all: true)
     GraphQL::Batch.batch do
       course_loader = Loaders::IDLoader.for(Course)
-      course_loader.load(@course.id).then do |course|
+      course_loader.load(@course.id).then { |course|
         expect(course).to eq @course
-      end
-      course_loader.load(-1).then do |course|
+      }
+      course_loader.load(-1).then { |course|
         expect(course).to be_nil
-      end
+      }
     end
   end
 
@@ -40,38 +40,38 @@ describe Loaders::IDLoader do
       @shard_a_course = @course
       @shard_a_student = @student
 
-      @shard1.activate do
+      @shard1.activate {
         shard_b_account = Account.create! name: "shard b  account"
         course_with_student(active_all: true, account: shard_b_account)
         @shard_b_course = @course
         @shard_b_student = @student
-      end
+      }
     end
 
     it "works across multiple shards" do
       GraphQL::Batch.batch do
         course_loader = Loaders::IDLoader.for(Course)
-        course_loader.load(@shard_a_course.id).then do |course|
+        course_loader.load(@shard_a_course.id).then { |course|
           expect(course).to eq @shard_a_course
-        end
-        course_loader.load(@shard_a_course.global_id).then do |course|
+        }
+        course_loader.load(@shard_a_course.global_id).then { |course|
           expect(course).to eq @shard_a_course
-        end
-        course_loader.load(@shard_b_course.global_id).then do |course|
+        }
+        course_loader.load(@shard_b_course.global_id).then { |course|
           expect(course).to eq @shard_b_course
-        end
+        }
       end
     end
 
     it "doesn't get cross-shard data when scoped" do
       GraphQL::Batch.batch do
         student_loader = Loaders::IDLoader.for(@shard_a_course.students)
-        student_loader.load(@shard_a_student.id).then do |student|
+        student_loader.load(@shard_a_student.id).then { |student|
           expect(student).to eq @shard_a_student
-        end
-        student_loader.load(@shard_b_student.global_id).then do |student|
+        }
+        student_loader.load(@shard_b_student.global_id).then { |student|
           expect(student).to be_nil
-        end
+        }
       end
     end
   end

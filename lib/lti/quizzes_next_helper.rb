@@ -33,7 +33,7 @@ module Lti
 
       current_user_enrollment = context.enrollments.where(user: current_user)
       current_user_enrollment
-        .where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+        .where(type: ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'])
         .active_by_date.union(current_user_enrollment.of_admin_type).none?
     end
 

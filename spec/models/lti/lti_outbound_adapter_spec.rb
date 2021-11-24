@@ -28,37 +28,37 @@ describe Lti::LtiOutboundAdapter do
   let(:resource_type) { :lti_launch_type }
   let(:tool_url) { 'http://www.tool.com/launch/url?firstname=rory' }
 
-  let(:tool) do
+  let(:tool) {
     ContextExternalTool.new.tap do |tool|
       allow(tool).to receive(:id).and_return('tool_id')
       tool.url = tool_url
     end
-  end
+  }
 
   let(:user) { User.create! }
 
-  let(:context) do
+  let(:context) {
     Course.new.tap do |course|
       allow(course).to receive(:id).and_return('course_id')
       course.root_account = account
       course.account = account
     end
-  end
+  }
 
-  let(:assignment) do
+  let(:assignment) {
     Assignment.new.tap do |assignment|
       allow(assignment).to receive(:id).and_return('assignment_id')
     end
-  end
+  }
 
   let(:subject) { adapter }
   let(:adapter) { Lti::LtiOutboundAdapter.new(tool, user, context) }
   let(:lti_consumer_instance) { LtiOutbound::LTIConsumerInstance.new }
-  let(:lti_context) do
+  let(:lti_context) {
     LtiOutbound::LTIContext.new.tap do |lti_context|
       lti_context.consumer_instance = lti_consumer_instance
     end
-  end
+  }
   let(:lti_user) { LtiOutbound::LTIUser.new }
   let(:lti_tool) { LtiOutbound::LTITool.new }
   let(:lti_assignment) { LtiOutbound::LTIAssignment.new }
@@ -232,7 +232,7 @@ describe Lti::LtiOutboundAdapter do
       expect(payload['firstname']).to be_nil
     end
 
-    it "does not copy query params to the post body if post_only is set and oauth_compliant tool setting is enabled" do
+    it "does not copy query params to the post body if post_only is set and  oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
       tool.settings = { oauth_compliant: true, post_only: true }
       adapter.prepare_tool_launch(return_url, variable_expander)
@@ -302,9 +302,9 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect do
+      expect {
         adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      end.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
+      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
     end
   end
 
@@ -320,9 +320,9 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
-      expect do
+      expect {
         adapter.generate_post_payload_for_homework_submission(assignment)
-      end.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling prepare_tool_launch')
+      }.to raise_error(RuntimeError, 'Called generate_post_payload_for_homework_submission before calling prepare_tool_launch')
     end
   end
 

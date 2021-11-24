@@ -77,7 +77,7 @@ module SIS
       end
 
       def any_left_to_process?
-        !@batched_users.empty?
+        return @batched_users.size > 0
       end
 
       def infer_user_name(user_row, prior_name = nil)
@@ -177,38 +177,40 @@ module SIS
             unless user.stuck_sis_fields.include?(:sortable_name)
               user.sortable_name = infer_sortable_name(user_row, user.sortable_name)
             end
-            if !user.stuck_sis_fields.include?(:short_name) && user_row.short_name.present?
-              user.short_name = user_row.short_name
-            end
-          elsif login_only
-            if user_row.root_account_id.present?
-              root_account = root_account_from_id(user_row.root_account_id, user_row)
-              next unless root_account
-            else
-              root_account = @root_account
-            end
-            pseudo = existing_login(user_row, root_account)
-            if pseudo.nil?
-              message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
-              message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            else
-              user = pseudo.user
-              pseudo = Pseudonym.new
+            unless user.stuck_sis_fields.include?(:short_name)
+              user.short_name = user_row.short_name if user_row.short_name.present?
             end
           else
-            user = nil
-            pseudo = Pseudonym.new
-            user = other_user(user_row, pseudo) if user_row.integration_id.present?
-            unless user
-              user = User.new
-              user.name = infer_user_name(user_row)
-              user.sortable_name = infer_sortable_name(user_row)
-              user.short_name = user_row.short_name if user_row.short_name.present?
+            if login_only
+              if user_row.root_account_id.present?
+                root_account = root_account_from_id(user_row.root_account_id, user_row)
+                next unless root_account
+              else
+                root_account = @root_account
+              end
+              pseudo = existing_login(user_row, root_account)
+              if pseudo.nil?
+                message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
+                message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              else
+                user = pseudo.user
+                pseudo = Pseudonym.new
+              end
+            else
+              user = nil
+              pseudo = Pseudonym.new
+              user = other_user(user_row, pseudo) if user_row.integration_id.present?
+              unless user
+                user = User.new
+                user.name = infer_user_name(user_row)
+                user.sortable_name = infer_sortable_name(user_row)
+                user.short_name = user_row.short_name if user_row.short_name.present?
+              end
             end
           end
 
@@ -273,12 +275,12 @@ module SIS
 
           # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
           # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-          if user_row.password.present? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
+          if !user_row.password.blank? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
             pseudo.password = user_row.password
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true
           end
-          pseudo.sis_ssha = user_row.ssha_password unless user_row.ssha_password.blank?
+          pseudo.sis_ssha = user_row.ssha_password if !user_row.ssha_password.blank?
           pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
           user_touched = false
 
@@ -288,7 +290,7 @@ module SIS
             User.transaction(:requires_new => true) do
               if user.changed?
                 user_touched = true
-                if !user.save && !user.errors.empty?
+                if !user.save && user.errors.size > 0
                   message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
@@ -301,7 +303,7 @@ module SIS
                 if pseudo.save_without_broadcasting
                   p_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: pseudo)
                   @roll_back_data << p_data if p_data
-                elsif !pseudo.errors.empty?
+                elsif pseudo.errors.size > 0
                   message = generate_user_warning(pseudo.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
                 end
@@ -501,11 +503,12 @@ module SIS
       private
 
       def generate_user_warning(message, user_id, login_id)
-        generate_readable_error_message(
+        user_message = generate_readable_error_message(
           message: message,
           user_id: user_id,
           login_id: login_id
         )
+        user_message
       end
 
       ERRORS_TO_REASONS = {
@@ -516,8 +519,9 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        "Could not save the user with user_id: '#{options[:user_id]}'." \
-          " #{reason}"
+        result = "Could not save the user with user_id: '#{options[:user_id]}'." +
+                 " #{reason}"
+        result
       end
     end
   end

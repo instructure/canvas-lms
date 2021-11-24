@@ -25,9 +25,9 @@ describe CanvasQuizStatistics::Analyzers::Essay do
   subject { described_class.new(question_data) }
 
   it 'does not blow up when no responses are provided' do
-    expect do
+    expect {
       expect(subject.run([])).to be_present
-    end.to_not raise_error
+    }.to_not raise_error
   end
 
   it_behaves_like 'essay [:responses]'
@@ -156,7 +156,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
                                { points: nil, user_id: 5 }
                              ])
 
-        expect(output[:point_distribution].pluck(:score)).to eq([nil, 1, 3])
+        expect(output[:point_distribution].map { |v| v[:score] }).to eq([nil, 1, 3])
       end
     end
   end

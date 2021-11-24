@@ -116,7 +116,8 @@ describe Quizzes::TakeQuizPresenter do
       expect(presenter.previous_question_viewable?).to eq false
     end
 
-    it "returns true if there is a previous question and quiz allows user to go back" do
+    it "returns true if there is a previous question and quiz allows " +
+       "user to go back" do
       expect(presenter).to receive(:previous_question).and_return true
       expect(presenter).to receive(:cant_go_back?).and_return false
       expect(presenter.previous_question_viewable?).to eq true
@@ -326,9 +327,9 @@ describe Quizzes::TakeQuizPresenter do
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
 
-      expect(p.answers).to have_key(question1[:id])
-      expect(p.answers).to have_key(question2[:id])
-      expect(p.answers).not_to have_key(question3[:id])
+      expect(p.answers.has_key?(question1[:id])).to be_truthy
+      expect(p.answers.has_key?(question2[:id])).to be_truthy
+      expect(p.answers.has_key?(question3[:id])).to be_falsey
     end
 
     it 'rejects zeroes for an answer' do
@@ -337,7 +338,7 @@ describe Quizzes::TakeQuizPresenter do
                                                                 })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
-      expect(p.answers).not_to have_key(question1[:id])
+      expect(p.answers.has_key?(question1[:id])).to be_falsey
     end
   end
 end

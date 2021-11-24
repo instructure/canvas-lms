@@ -201,7 +201,7 @@ describe Conversation do
         end
         @shard2.activate do
           users << user_factory(:name => 'e')
-          conversation.add_participants(users.first, users[-2..])
+          conversation.add_participants(users.first, users[-2..-1])
           expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard2
@@ -445,7 +445,7 @@ describe Conversation do
       end
     end
 
-    it "broadcasts conversation created", priority: "1" do
+    it "broadcasts conversation created", priority: "1", test_id: 193163 do
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
       [sender].each do |user|
@@ -455,7 +455,7 @@ describe Conversation do
       end
 
       recipients = create_users(5, return_type: :record)
-      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true)
+      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true);
 
       # check that our sender recieved a conversation created notification
       expect(conversation.messages_sent).to include("Conversation Created")
@@ -497,7 +497,7 @@ describe Conversation do
     end
 
     it "sets last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
-      expected_times = [Time.now.utc - 1.hour, Time.now.utc].map { |t| Time.at(t.to_i).utc }
+      expected_times = [Time.now.utc - 1.hours, Time.now.utc].map { |t| Time.at(t.to_i).utc }
 
       convo = nil
       Timecop.freeze(expected_times.first) do
@@ -936,7 +936,7 @@ describe Conversation do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
-        [@old_course, old_course2].each(&:complete!)
+        [@old_course, old_course2].each { |c| c.complete! }
 
         teacher_course = course_factory
         teacher_course.offer!

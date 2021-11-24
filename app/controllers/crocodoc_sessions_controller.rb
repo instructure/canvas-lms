@@ -29,11 +29,9 @@ class CrocodocSessionsController < ApplicationController
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.crocodoc_available?
-      annotations = if params[:annotations]
-                      value_to_boolean(params[:annotations])
-                    else
-                      true
-                    end
+      annotations = params[:annotations] ?
+        value_to_boolean(params[:annotations]) :
+        true
 
       crocodoc = attachment.crocodoc_document
       url = crocodoc.session_url(:user => @current_user,

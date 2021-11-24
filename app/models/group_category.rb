@@ -97,7 +97,7 @@ class GroupCategory < ActiveRecord::Base
 
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
-  scope :other_than, ->(cat) { where("group_categories.id<>?", cat.id || 0) }
+  scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
   class << self
     def protected_name_for_context?(name, context)
@@ -150,7 +150,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     def role_category_for_context(role, context)
-      return unless context && protected_role_for_context?(role, context)
+      return unless context and protected_role_for_context?(role, context)
 
       category = context.group_categories.where(role: role).first ||
                  context.group_categories.build(name: name_for_role(role),
@@ -162,15 +162,15 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def communities?
-    role == 'communities'
+    self.role == 'communities'
   end
 
   def student_organized?
-    role == 'student_organized'
+    self.role == 'student_organized'
   end
 
   def protected?
-    role.present? && role != 'imported'
+    self.role.present? && self.role != 'imported'
   end
 
   # Group categories generally restrict students to only be in one group per
@@ -178,7 +178,7 @@ class GroupCategory < ActiveRecord::Base
   # communities as one big group category, and then relax that membership
   # restriction.
   def allows_multiple_memberships?
-    student_organized? || communities?
+    self.student_organized? || self.communities?
   end
 
   # this is preferred over setting self_signup directly. know that if you set
@@ -187,19 +187,19 @@ class GroupCategory < ActiveRecord::Base
   def configure_self_signup(enabled, restricted)
     args = { enable_self_signup: enabled, restrict_self_signup: restricted }
     self.self_signup = GroupCategories::Params.new(args).self_signup
-    save!
+    self.save!
   end
 
   def self_signup?
-    self_signup.present?
+    self.self_signup.present?
   end
 
   def unrestricted_self_signup?
-    self_signup.present? && self_signup != 'restricted'
+    self.self_signup.present? && self.self_signup != 'restricted'
   end
 
   def restricted_self_signup?
-    self_signup.present? && self_signup == 'restricted'
+    self.self_signup.present? && self.self_signup == 'restricted'
   end
 
   def has_heterogenous_group?
@@ -207,9 +207,9 @@ class GroupCategory < ActiveRecord::Base
     # condition would may any group in the category say has_common_section?
     # false, and force us true. so we special case it, and get the short
     # circuit as a bonus.
-    return false unless context.is_a?(Course)
+    return false unless self.context && self.context.is_a?(Course)
 
-    groups.any? { |group| !group.has_common_section? }
+    self.groups.any? { |group| !group.has_common_section? }
   end
 
   def group_for(user)
@@ -232,13 +232,13 @@ class GroupCategory < ActiveRecord::Base
     # double checked groups.destroy_all does the right thing. :)
     groups.destroy_all
     self.deleted_at = Time.now.utc
-    save
+    self.save
   end
 
   def restore
-    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: 'available', deleted_at: nil)
+    self.groups.where(deleted_at: [self.deleted_at - 10.minutes..self.deleted_at]).update_all(workflow_state: 'available', deleted_at: nil)
     self.deleted_at = nil
-    save!
+    self.save!
   end
 
   # We can't reassign existing group members, groups can have different maximum limits, and we want
@@ -286,7 +286,7 @@ class GroupCategory < ActiveRecord::Base
       remaining_member_count -= allocate_members_into_watermark(
         remaining_member_count,
         next_watermark,
-        water_allocation
+        water_allocation,
       )
     end
     water_allocation
@@ -383,10 +383,10 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def finish_group_member_assignment
-    return unless reload.groups.any?
+    return unless self.reload.groups.any?
 
-    if auto_leader
-      groups.each do |group|
+    if self.auto_leader
+      self.groups.each do |group|
         GroupLeadership.new(group).auto_assign!(auto_leader)
       end
     end
@@ -400,21 +400,18 @@ class GroupCategory < ActiveRecord::Base
   def distribute_members_among_groups_by_section
     # trying to make this work for new group sets is hard enough - i'm not even going to bother with ones with existing stuff
     if GroupMembership.active.where(:group_id => groups.active).exists?
-      errors.add(:group_by_section, t("Groups must be empty to assign by section"))
-      return
+      self.errors.add(:group_by_section, t("Groups must be empty to assign by section")); return
     end
     if groups.active.where.not(:max_membership => nil).exists?
-      errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section"))
-      return
+      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section")); return
     end
 
     group_count = groups.active.count
-    section_count = context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id)
+    section_count = self.context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id)
     return unless group_count > 0 && section_count > 0
 
     if group_count < section_count
-      errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section"))
-      return
+      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section")); return
     end
 
     GroupBySectionCalculator.new(self).distribute_members
@@ -422,11 +419,9 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def create_group_count=(num)
-    @create_group_count = if num && num > 0
-                            [num, Setting.get('max_groups_in_new_category', '200').to_i].min
-                          else
-                            nil
-                          end
+    @create_group_count = num && num > 0 ?
+      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
+      nil
   end
 
   def create_group_member_count=(num)
@@ -435,8 +430,8 @@ class GroupCategory < ActiveRecord::Base
 
   def set_root_account_id
     # context might be nil since this runs before validations.
-    if context&.root_account
-      root_account_id = context.root_account.id
+    if self.context&.root_account
+      root_account_id = self.context.root_account.id
       self.root_account_id = root_account_id
     end
   end
@@ -450,10 +445,10 @@ class GroupCategory < ActiveRecord::Base
 
     if split_type
       InstStatsd::Statsd.increment('groups.auto_create',
-                                   tags: { split_type: split_type, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
+                                   tags: { split_type: split_type, root_account_id: self.root_account&.global_id, root_account_name: self.root_account&.name })
     end
 
-    by_section = @group_by_section && context.is_a?(Course)
+    by_section = @group_by_section && self.context.is_a?(Course)
     calculate_group_count_by_membership(by_section: by_section) if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
@@ -464,7 +459,7 @@ class GroupCategory < ActiveRecord::Base
 
   def create_groups(num)
     group_name = name
-    # TODO: i18n
+    # TODO i18n
     group_name = group_name.singularize if I18n.locale == :en
     num.times do |idx|
       groups.create(name: "#{group_name} #{idx + 1}", :context => context)
@@ -476,7 +471,7 @@ class GroupCategory < ActiveRecord::Base
                             counts = User.joins(:not_ended_enrollments)
                                          .where(enrollments: { course_id: context, type: 'StudentEnrollment' })
                                          .distinct('user_id').group('course_section_id').count
-                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.sum(&:ceil)
+                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.map(&:ceil).sum
                           else
                             (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
                           end
@@ -493,8 +488,8 @@ class GroupCategory < ActiveRecord::Base
           distribute_members_among_groups_by_section
           finish_group_member_assignment
           if current_progress
-            if errors.any?
-              current_progress.message = errors.full_messages
+            if self.errors.any?
+              current_progress.message = self.errors.full_messages
               current_progress.fail
             else
               complete_progress
@@ -521,7 +516,7 @@ class GroupCategory < ActiveRecord::Base
     groups.preload(:group_memberships).find_each do |group|
       new_group = group.dup
       new_group.group_category = new_group_category
-      %i[sis_batch_id sis_source_id uuid wiki_id].each do |attr|
+      [:sis_batch_id, :sis_source_id, :uuid, :wiki_id].each do |attr|
         new_group[attr] = nil
       end
       new_group.save!
@@ -541,14 +536,14 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def discussion_topics
-    shard.activate do
-      DiscussionTopic.where(context_type: context_type, context_id: context_id, group_category_id: self)
+    self.shard.activate do
+      DiscussionTopic.where(context_type: self.context_type, context_id: self.context_id, group_category_id: self)
     end
   end
 
   def submission_ids_by_user_id(user_ids = nil)
-    shard.activate do
-      assignments = Assignment.active.where(:context_type => context_type, :context_id => context_id, :group_category_id => id)
+    self.shard.activate do
+      assignments = Assignment.active.where(:context_type => self.context_type, :context_id => self.context_id, :group_category_id => self.id)
       submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted')
       submissions = submissions.where(:user_id => user_ids) if user_ids
       rows = submissions.pluck(:id, :user_id)
@@ -645,7 +640,7 @@ class GroupCategory < ActiveRecord::Base
           # more likely will we have some extra groups now because of remainder students from our first pass
           # so at least one section will have to have some smaller groups now
           # best thing to do now is to find the group that can take the hit the easiest
-          leftover_sec_id = group_counts.max_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.first
+          leftover_sec_id = group_counts.sort_by { |k, count| [-1 * (extra_groups[k] || 0), (user_counts[k].to_f / (count + 1)), k] }.last.first
           group_counts[leftover_sec_id] += 1
           extra_groups[leftover_sec_id] ||= 0
           extra_groups[leftover_sec_id] += 1
@@ -662,7 +657,7 @@ class GroupCategory < ActiveRecord::Base
         end
         @group_distributions[section_id] = dist
       end
-      if @group_distributions.values.sum(&:count) != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
+      if @group_distributions.values.map(&:count).sum != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
         raise "user/group count mismatch" # we should make sure this works before going any further
       end
 

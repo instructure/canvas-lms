@@ -33,7 +33,7 @@ Delayed::Backend::Base.class_eval do
   end
 
   def to_log_format
-    logged_attributes = %i[tag strand priority attempts created_at max_attempts source account_id]
+    logged_attributes = [:tag, :strand, :priority, :attempts, :created_at, :max_attempts, :source, :account_id]
     log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
     log_hash[:shard_id] = current_shard&.id
     log_hash[:jobs_cluster] = "NONE"
@@ -109,7 +109,7 @@ end
 module DelayedJobConfig
   class << self
     def config
-      @config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['delayed_jobs.yml'] || '{}')
+      @config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['delayed_jobs.yml'] || '{}')
     end
 
     def strands_to_send_to_statsd
@@ -145,16 +145,16 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   old_root_account = Attachment.current_root_account
   Attachment.current_root_account = job.account
 
-  starting_mem = Canvas.sample_memory
-  starting_cpu = Process.times
+  starting_mem = Canvas.sample_memory()
+  starting_cpu = Process.times()
 
   begin
     RequestCache.enable do
       block.call(worker, job)
     end
   ensure
-    ending_cpu = Process.times
-    ending_mem = Canvas.sample_memory
+    ending_cpu = Process.times()
+    ending_mem = Canvas.sample_memory()
     user_cpu = ending_cpu.utime - starting_cpu.utime
     system_cpu = ending_cpu.stime - starting_cpu.stime
 

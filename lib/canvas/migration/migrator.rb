@@ -21,7 +21,7 @@
 module Canvas::Migration
   class Migrator
     include MigratorHelper
-    SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }.freeze
+    SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
 
     attr_accessor :course, :extra_settings, :total_error_count, :package_root
     attr_reader :base_export_dir, :manifest, :import_objects, :settings
@@ -111,7 +111,7 @@ module Canvas::Migration
         resource[:type] = r_node['type']
         resource[:href] = r_node['href']
         if resource[:href]
-          resource[:href] = resource[:href].tr('\\', '/')
+          resource[:href] = resource[:href].gsub('\\', '/')
         else
           # it could be embedded in the manifest
           @resource_nodes_for_flat_manifest[id] = r_node
@@ -122,7 +122,7 @@ module Canvas::Migration
         resource[:intended_use] = r_node['intendeduse']
         resource[:files] = []
         r_node.css('file').each do |file_node|
-          resource[:files] << { :href => file_node[:href].tr('\\', '/') }
+          resource[:files] << { :href => file_node[:href].gsub('\\', '/') }
         end
         resource[:dependencies] = []
         r_node.css('dependency').each do |d_node|

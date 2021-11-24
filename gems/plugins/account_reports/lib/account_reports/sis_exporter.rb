@@ -25,9 +25,9 @@ module AccountReports
     include ReportHelper
     include Pronouns
 
-    SIS_CSV_REPORTS = %w[users accounts terms courses sections
-                         enrollments groups group_membership
-                         group_categories xlist user_observers admins].freeze
+    SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
+                       "enrollments", "groups", "group_membership",
+                       "group_categories", "xlist", "user_observers", "admins"].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -51,17 +51,16 @@ module AccountReports
                        :files => files
                      ))
 
-      case @reports.length
-      when 0
-        send_report
-      when 1
-        csv = send(@reports.first)
+      if @reports.length == 0
+        send_report()
+      elsif @reports.length == 1
+        csv = self.send(@reports.first)
         send_report(csv)
       else
         csvs = {}
 
         @reports.each do |report_name|
-          csvs[report_name] = send(report_name)
+          csvs[report_name] = self.send(report_name)
         end
         send_report(csvs)
         csvs
@@ -88,9 +87,9 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[user_id integration_id authentication_provider_id
-                     login_id password first_name last_name full_name
-                     sortable_name short_name email status]
+        headers = ['user_id', 'integration_id', 'authentication_provider_id',
+                   'login_id', 'password', 'first_name', 'last_name', 'full_name',
+                   'sortable_name', 'short_name', 'email', 'status']
         headers << 'pronouns' if should_add_pronouns?
       else # provisioning_report
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
@@ -183,7 +182,7 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[account_id parent_account_id name status]
+        headers = ['account_id', 'parent_account_id', 'name', 'status']
       else
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
@@ -235,7 +234,7 @@ module AccountReports
     def terms
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[term_id name status start_date end_date]
+        headers = ['term_id', 'name', 'status', 'start_date', 'end_date']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
@@ -269,10 +268,11 @@ module AccountReports
       terms = terms.where.not(enrollment_terms: { sis_batch_id: nil }) if @created_by_sis
 
       if @include_deleted
-        terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
       else
-        terms.where("workflow_state<>'deleted'")
+        terms = terms.where("workflow_state<>'deleted'")
       end
+      terms
     end
 
     def courses
@@ -287,9 +287,9 @@ module AccountReports
         courses.find_in_batches do |batch|
           blueprint_map = {}
           root_account.shard.activate do
-            sub_data = MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id).to_h
-            template_data = MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
-            course_sis_data = Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id).to_h if template_data.present?
+            sub_data = Hash[MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id)]
+            template_data = Hash[MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id)] if sub_data.present?
+            course_sis_data = Hash[Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id)] if template_data.present?
             if course_sis_data.present?
               sub_data.each do |child_course_id, template_id|
                 sis_id = course_sis_data[template_data[template_id]]
@@ -309,9 +309,9 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[course_id integration_id short_name long_name
-                     account_id term_id status start_date end_date course_format
-                     blueprint_course_id]
+        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
+                   'blueprint_course_id']
       else
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
         headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
@@ -364,15 +364,15 @@ module AccountReports
       row << c.enrollment_term_id unless @sis_format
       row << c.enrollment_term.try(:sis_source_id)
       # for sis import format 'claimed', 'created', and 'available' are all considered active
-      row << if @sis_format
-               if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-                 c.workflow_state
-               else
-                 'active'
-               end
-             else
-               course_state_sub[c.workflow_state]
-             end
+      if @sis_format
+        if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+          row << c.workflow_state
+        else
+          row << 'active'
+        end
+      else
+        row << course_state_sub[c.workflow_state]
+      end
       if c.restrict_enrollments_to_course_dates
         row << default_timezone_format(c.start_at)
         row << default_timezone_format(c.conclude_at)
@@ -402,8 +402,8 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[section_id course_id integration_id name status
-                     start_date end_date]
+        headers = ['section_id', 'course_id', 'integration_id', 'name', 'status',
+                   'start_date', 'end_date']
       else
         headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
         headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
@@ -494,8 +494,8 @@ module AccountReports
         # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
         enrol.preload(:root_account, :sis_pseudonym, :role).find_in_batches(strategy: :id) do |batch|
-          users = batch.filter_map { |e| User.new(id: e.user_id) }
-          users += batch.filter_map { |e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil? }
+          users = batch.map { |e| User.new(id: e.user_id) }.compact
+          users += batch.map { |e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil? }.compact
           users.uniq!
           users_by_id = users.index_by(&:id)
           pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
@@ -527,7 +527,7 @@ module AccountReports
       row << e.course_section_sis_id
       row << e.enroll_state
       row << e.associated_user_id unless @sis_format
-      unless e.associated_user_id.nil?
+      if !e.associated_user_id.nil?
         p2 = loaded_pseudonym(pseudonyms,
                               users_by_id[e.associated_user_id],
                               include_deleted: @include_deleted)
@@ -587,8 +587,8 @@ module AccountReports
     def enrollment_headers(include_other_roots)
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[course_id user_id role role_id section_id
-                     status associated_user_id limit_section_privileges]
+        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id',
+                   'status', 'associated_user_id', 'limit_section_privileges']
         headers << 'root_account' if include_other_roots
       else
         headers = []
@@ -615,7 +615,7 @@ module AccountReports
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[group_id group_category_id account_id course_id name status]
+        headers = ['group_id', 'group_category_id', 'account_id', 'course_id', 'name', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -688,7 +688,7 @@ module AccountReports
     def group_categories
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[group_category_id account_id course_id category_name status]
+        headers = ['group_category_id', 'account_id', 'course_id', 'category_name', 'status']
       else
         headers = []
         headers << I18n.t('canvas_group_category_id')
@@ -704,22 +704,22 @@ module AccountReports
       end
 
       root_account.shard.activate do
-        group_categories = if account == root_account
-                             root_account.all_group_categories
+        if account != root_account
+          group_categories = GroupCategory
+                             .joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+                   AND group_categories.context_type = 'Course'")
+                             .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
+                   AND group_categories.context_type = 'Account'")
+                             .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
+                                    account,
+                                    CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
+        else
+          group_categories = root_account.all_group_categories
                                          .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
                      AND group_categories.context_type = 'Account'
                    LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                      AND group_categories.context_type = 'Course'")
-                           else
-                             GroupCategory
-                               .joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
-                   AND group_categories.context_type = 'Course'")
-                               .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
-                   AND group_categories.context_type = 'Account'")
-                               .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
-                                      account,
-                                      CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
-                           end
+        end
         group_categories = group_category_query_options(group_categories)
 
         generate_and_run_report headers do |csv|
@@ -756,7 +756,7 @@ module AccountReports
     def group_membership
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[group_id user_id status]
+        headers = ['group_id', 'user_id', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -791,7 +791,7 @@ module AccountReports
 
       generate_and_run_report headers do |csv|
         gm.find_in_batches do |batch|
-          users = batch.filter_map { |au| User.new(id: au.user_id) }.uniq
+          users = batch.map { |au| User.new(id: au.user_id) }.compact.uniq
           users_by_id = users.index_by(&:id)
           sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
@@ -831,7 +831,7 @@ module AccountReports
     def xlist
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[xlist_course_id section_id status]
+        headers = ['xlist_course_id', 'section_id', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_xlist_course_id', 'canvas_xlist_course_id')
@@ -848,7 +848,7 @@ module AccountReports
                 nxc.sis_source_id AS nxc_sis_id")
                        .joins("INNER JOIN #{Course.quoted_table_name} ON course_sections.course_id = courses.id
                INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id")
-                       .where.not(course_sections: { nonxlist_course_id: nil })
+                       .where("course_sections.nonxlist_course_id IS NOT NULL")
 
       xl = xlist_query_options(xl)
       generate_and_run_report headers do |csv|
@@ -889,7 +889,7 @@ module AccountReports
     def user_observers
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[observer_id student_id status]
+        headers = ['observer_id', 'student_id', 'status']
       else
         headers = []
         headers << I18n.t('canvas_observer_id')
@@ -942,7 +942,7 @@ module AccountReports
       include_other_roots = root_account.trust_exists?
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[user_id account_id role_id role status]
+        headers = ['user_id', 'account_id', 'role_id', 'role', 'status']
         headers << 'root_account' if include_other_roots
       else
         headers = []
@@ -973,7 +973,7 @@ module AccountReports
         admins = admin_query_options(admins)
         generate_and_run_report headers do |csv|
           admins.find_in_batches do |batch|
-            users = batch.filter_map { |au| User.new(id: au.user_id) }.uniq
+            users = batch.map { |au| User.new(id: au.user_id) }.compact.uniq
             users_by_id = users.index_by(&:id)
             sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 

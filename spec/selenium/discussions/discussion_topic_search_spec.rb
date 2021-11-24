@@ -70,10 +70,14 @@ describe "Discussion Topic Search" do
       student = student_in_course(course: @course, name: 'Jeff', active_all: true).user
       user_session(student)
 
-      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      # visit a fast loading page first to set localstorage
+      get "/courses/#{@course.id}/discussion_topics"
       # rubocop:disable Specs/NoExecuteScript
-      driver.execute_script("ENV.per_page = 1")
+      driver.execute_script("window.localStorage.setItem('DISCUSSION_PER_PAGE', 1)")
       # rubocop:enable Specs/NoExecuteScript
+
+      # load the intended page
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for_ajaximations
       expect(fj("span:contains('foo 2')")).to be_present

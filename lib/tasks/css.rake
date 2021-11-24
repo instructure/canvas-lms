@@ -8,8 +8,8 @@ namespace :css do
       python_version = `#{Pygments::Popen.new.find_python_binary} --version 2>&1` rescue nil
       python_version ||= '???'
 
-      unless /^Python 2/.match?(python_version.strip)
-        next warn <<~TEXT
+      unless python_version.strip =~ /^Python 2/
+        next warn <<~MESSAGE
           Generating the CSS styleguide requires Python 2, but you have #{python_version}.
 
           If you already have a Python 2 installation, make sure it is available
@@ -19,13 +19,13 @@ namespace :css do
 
               PYGMENTS_RB_PYTHON=custom-python-interpreter
 
-        TEXT
+        MESSAGE
       end
     end
 
     puts "--> creating styleguide"
     system('bin/dress_code config/styleguide.yml')
-    raise "error running dress_code" unless $?.success?
+    fail "error running dress_code" unless $?.success?
   end
 
   task :compile do
@@ -46,7 +46,7 @@ namespace :css do
       end
       BrandableCSS.save_default_files!
       system('yarn run build:css')
-      raise "error running brandable_css" unless $?.success?
+      fail "error running brandable_css" unless $?.success?
     end
     puts "--> Finished: 'css:compile' in #{time}"
   end

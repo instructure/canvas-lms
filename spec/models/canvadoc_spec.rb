@@ -35,7 +35,7 @@ describe 'Canvadoc' do
                                                                           "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
-    @doc = @attachment.create_canvadoc
+    @doc = @attachment.create_canvadoc()
   end
 
   def disable_canvadocs
@@ -70,9 +70,9 @@ describe 'Canvadoc' do
 
     it "doesn't upload when canvadocs isn't configured" do
       disable_canvadocs
-      expect do
+      expect {
         @doc.upload
-      end.to raise_error("Canvadocs isn't enabled")
+      }.to raise_error("Canvadocs isn't enabled")
     end
 
     it "ignores annotatable if unavailable" do

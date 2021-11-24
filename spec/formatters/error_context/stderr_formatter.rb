@@ -43,7 +43,7 @@ module ErrorContext
 
       if output.any?
         output.unshift RerunArgument.for(summary.example)
-        warn output.join("\n")
+        $stderr.puts output.join("\n")
       end
     end
   end

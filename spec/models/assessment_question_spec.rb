@@ -95,29 +95,29 @@ describe AssessmentQuestion do
 
   it "translates links to be readable w/ verifier" do
     @attachments = {}
-    attachment_tag = lambda do |key|
+    attachment_tag = lambda { |key|
       @attachments[key] ||= []
       a = @course.attachments.build(:filename => "foo-#{key}.gif")
       a.content_type = 'image/gif'
       a.save!
       @attachments[key] << a
       "<img src=\"/courses/#{@course.id}/files/#{a.id}/download\">"
-    end
+    }
     data = {
       :name => 'test question',
       :question_type => 'multiple_choice_question',
-      :question_text => "which ones are like this one? #{attachment_tag.call([:question_text])} what about: #{attachment_tag.call([:question_text])}",
-      :correct_comments => "yay! #{attachment_tag.call([:correct_comments])}",
-      :incorrect_comments => "boo! #{attachment_tag.call([:incorrect_comments])}",
-      :neutral_comments => "meh. #{attachment_tag.call([:neutral_comments])}",
-      :text_after_answers => "oh btw #{attachment_tag.call([:text_after_answers])}",
+      :question_text => "which ones are like this one? #{attachment_tag.call("[:question_text]")} what about: #{attachment_tag.call("[:question_text]")}",
+      :correct_comments => "yay! #{attachment_tag.call("[:correct_comments]")}",
+      :incorrect_comments => "boo! #{attachment_tag.call("[:incorrect_comments]")}",
+      :neutral_comments => "meh. #{attachment_tag.call("[:neutral_comments]")}",
+      :text_after_answers => "oh btw #{attachment_tag.call("[:text_after_answers]")}",
       :answers => [
         { :weight => 1, :text => "A",
-          :html => "A #{attachment_tag.call([:answers, 0, :html])}",
-          :comments_html => "yeppers #{attachment_tag.call([:answers, 0, :comments_html])}" },
+          :html => "A #{attachment_tag.call("[:answers][0][:html]")}",
+          :comments_html => "yeppers #{attachment_tag.call("[:answers][0][:comments_html]")}" },
         { :weight => 1, :text => "B",
-          :html => "B #{attachment_tag.call([:answers, 1, :html])}",
-          :comments_html => "yeppers #{attachment_tag.call([:answers, 1, :comments_html])}" }
+          :html => "B #{attachment_tag.call("[:answers][1][:html]")}",
+          :comments_html => "yeppers #{attachment_tag.call("[:answers][1][:comments_html]")}" }
       ]
     }
 
@@ -125,10 +125,10 @@ describe AssessmentQuestion do
 
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachment_clones = @attachments.transform_values { |ary| ary.map { |a| @question.attachments.where(root_attachment_id: a).first } }
+    @attachment_clones = Hash[@attachments.map { |k, ary| [k, ary.map { |a| @question.attachments.where(root_attachment_id: a).first }] }]
 
     @attachment_clones.each do |key, ary|
-      string = @question.question_data.dig(*key)
+      string = eval "@question.question_data#{key}"
       matches = string.scan %r{/assessment_questions/\d+/files/\d+/download\?verifier=\w+}
       expect(matches.length).to eq ary.length
       matches.each_with_index do |match, index|
@@ -232,7 +232,7 @@ describe AssessmentQuestion do
       # consistent ordering is good for preventing deadlocks
       questions = []
       3.times { questions << assessment_question.create_quiz_question(quiz.id) }
-      smallest_id_question = questions.min_by(&:id)
+      smallest_id_question = questions.sort_by(&:id).first
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.id).to eq(smallest_id_question.id)
     end

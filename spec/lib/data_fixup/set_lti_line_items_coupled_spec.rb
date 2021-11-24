@@ -20,7 +20,7 @@
 require_relative '../../lti2_spec_helper'
 
 describe DataFixup::SetLtiLineItemsCoupled do
-  let(:tool) do
+  let(:tool) {
     ContextExternalTool.create!(
       context: course,
       consumer_key: 'key',
@@ -31,7 +31,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
       settings: { use_1_3: true },
       workflow_state: 'public'
     )
-  end
+  }
 
   let(:course) { course_factory }
 

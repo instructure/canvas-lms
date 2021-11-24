@@ -63,11 +63,11 @@ module Canvas
         begin
           result = dynamodb.create_table(params)
           Rails.logger.debug('Created table. Status: ' + result.table_description.table_status)
-          true
-        rescue Aws::DynamoDB::Errors::ServiceError => e
+          return true
+        rescue Aws::DynamoDB::Errors::ServiceError => error
           Rails.logger.debug('Unable to create table:')
-          Rails.logger.debug(e.message)
-          false
+          Rails.logger.debug(error.message)
+          return false
         end
       end
     end

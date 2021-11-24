@@ -22,7 +22,6 @@ import {scaleForHeight, scaleForWidth} from '../shared/DimensionUtils'
 export const MIN_HEIGHT = 10
 export const MIN_WIDTH = 10
 export const MIN_WIDTH_VIDEO = 320
-export const MIN_PERCENTAGE = 10
 
 export const SMALL = 'small'
 export const MEDIUM = 'medium'
@@ -58,28 +57,16 @@ function imageSizeFromKnownOptions(imageOptions) {
   return sizeByMaximumDimension[largestDimension] || CUSTOM
 }
 
-function getPercentageUnitsFromAttributes($element) {
-  const getAttribute = attribute =>
-    $element.hasAttribute(attribute) ? $element.getAttribute(attribute) : $element[attribute]
-  const widthValue = getAttribute('width')
-  const heightValue = getAttribute('height')
-  const value = [widthValue, heightValue].find(v => /\d+(?:\.\d+)?%/.test(v))
-  return value ? Math.round(Number.parseInt(value, 10)) : null
-}
-
 export function fromImageEmbed($element) {
   const altText = $element.getAttribute('alt')
-  const percentageUnits = getPercentageUnitsFromAttributes($element)
 
   const imageOptions = {
-    appliedWidth: parsedOrNull($element, 'width'),
-    appliedHeight: parsedOrNull($element, 'height'),
-    naturalWidth: $element.naturalWidth,
-    naturalHeight: $element.naturalHeight,
-    appliedPercentage: percentageUnits || 100,
-    usePercentageUnits: !!percentageUnits,
     altText: altText || '',
+    appliedHeight: parsedOrNull($element, 'height'),
+    appliedWidth: parsedOrNull($element, 'width'),
     isDecorativeImage: altText !== null && altText.replace(/\s/g, '') === '',
+    naturalHeight: $element.naturalHeight,
+    naturalWidth: $element.naturalWidth,
     url: $element.src
   }
 

@@ -30,7 +30,7 @@ module Lti::IMS::AccessTokenHelper
     raise Lti::OAuth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
   rescue Lti::OAuth2::InvalidTokenError
     raise
-  rescue => e
+  rescue StandardError => e
     raise Lti::OAuth2::InvalidTokenError, e
   end
 
@@ -47,7 +47,7 @@ module Lti::IMS::AccessTokenHelper
   def oauth2_request?
     pattern = /^Bearer /
     header = request.headers["Authorization"]
-    header&.match?(pattern)
+    header && header.match?(pattern)
   end
 
   def tool_proxy
@@ -58,10 +58,10 @@ module Lti::IMS::AccessTokenHelper
     ims_tp = ::IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
     service_names = [*lti2_service_name]
     service = ims_tp.security_contract.tool_services.find(
-      lambda do
+      -> {
         raise Lti::OAuth2::InvalidTokenError,
               "The ToolProxy security contract doesn't include #{service_names.join(', or ')}"
-      end
+      }
     ) do |s|
       service_names.include? s.service.split(':').last.split('#').last
     end

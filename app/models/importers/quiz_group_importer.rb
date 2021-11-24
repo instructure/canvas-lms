@@ -39,10 +39,9 @@ module Importers
           bank_context = nil
 
           unless migration.cross_institution?
-            case hash[:question_bank_context]
-            when /account_(\d*)/
+            if hash[:question_bank_context] =~ /account_(\d*)/
               bank_context = Account.where(id: $1).first
-            when /course_(\d*)/
+            elsif hash[:question_bank_context] =~ /course_(\d*)/
               bank_context = Course.where(id: $1).first
             end
 
@@ -61,8 +60,10 @@ module Importers
           else
             migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
           end
-        elsif (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
-          item.assessment_question_bank_id = bank.id
+        else
+          if (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
+            item.assessment_question_bank_id = bank.id
+          end
         end
       end
       item.save!

@@ -36,7 +36,7 @@ module Types
       argument :context_type, NotificationPreferencesContextType, required: false
     end
     def notification_policies(context_type: nil)
-      NotificationPolicy.find_all_for(object, context_type: context_type)
+      NotificationPolicy.find_all_for(self.object, context_type: context_type)
     end
 
     field :notification_policy_overrides, [NotificationPolicyType], null: true do
@@ -45,7 +45,7 @@ module Types
       argument :context_type, NotificationPreferencesContextType, required: true
     end
     def notification_policy_overrides(account_id: nil, course_id: nil, context_type: nil)
-      overrides_for = lambda do |context|
+      overrides_for = ->(context) do
         NotificationPolicyOverride.find_all_for(current_user, [context], channel: object)
       end
 
