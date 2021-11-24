@@ -301,12 +301,12 @@ describe DiscussionTopicsController do
     end
 
     it "redirects full_anonymity discussions to index when react_discussions_post is turned off" do
+      anon_topic = @course.discussion_topics.build(title: "some topic", anonymous_state: "full_anonymity")
       user_session(@teacher)
-      course_topic
-      @topic.anonymous_state = "full_anonymity"
-      @topic.save!
+      anon_topic.save
+      anon_topic.reload
       Account.site_admin.disable_feature! :react_discussions_post
-      get('show', params: { course_id: @course.id, id: @topic.id })
+      get("show", params: { course_id: @course.id, id: anon_topic.id })
       expect(flash[:info]).to match(/Redesign feature flag turned on/)
       expect(response).to be_redirect
       expect(response.location).to eq course_discussion_topics_url @course
