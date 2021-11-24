@@ -17,68 +17,60 @@
  */
 
 import I18n from 'i18n!external_content.success'
-import React from 'react'
+import React, {useEffect, useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 
-export class RetrievingContent extends React.Component {
-  static messageType = 'LtiDeepLinkingResponse'
+export const RetrievingContent = ({environment, parentWindow}) => {
+  const messageType = 'LtiDeepLinkingResponse'
 
-  componentDidMount() {
-    const parentWindow = this.parentWindow()
+  const sendMessage = useCallback(() => {
     parentWindow.postMessage(
       {
-        messageType: RetrievingContent.messageType,
-        content_items: ENV.content_items,
-        msg: ENV.message,
-        log: ENV.log,
-        errormsg: ENV.error_message,
-        errorlog: ENV.error_log,
-        ltiEndpoint: ENV.lti_endpoint,
-        reloadpage: ENV.reload_page
+        messageType,
+        content_items: environment.content_items,
+        msg: environment.message,
+        log: environment.log,
+        errormsg: environment.error_message,
+        errorlog: environment.error_log,
+        ltiEndpoint: environment.lti_endpoint,
+        reloadpage: environment.reload_page
       },
-      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
     )
-  }
+  }, [environment, parentWindow])
 
-  render() {
-    const message = I18n.t('Retrieving Content')
-    return (
-      <div>
-        <Flex justifyItems="center" margin="x-large 0 large 0">
-          <Flex.Item>
-            <Spinner renderTitle={message} size="large" />
-          </Flex.Item>
-        </Flex>
-        <Flex justifyItems="center" margin="0 0 large">
-          <Flex.Item>
-            <Text size="x-large" fontStyle="italic">
-              {message}
-            </Text>
-          </Flex.Item>
-        </Flex>
-      </div>
-    )
-  }
+  useEffect(() => {
+    sendMessage()
+  }, [sendMessage])
 
-  parentWindow() {
-    // respect windows created using window.open() as well as windows in iframes
-    if (window.opener) {
-      return window.opener
-    }
-
-    let parentWindow = window.parent
-    while (parentWindow && parentWindow.parent !== window.parent) {
-      parentWindow = parentWindow.parent
-    }
-    return parentWindow
-  }
+  const message = I18n.t('Retrieving Content')
+  return (
+    <div>
+      <Flex justifyItems="center" margin="x-large 0 large 0">
+        <Flex.Item>
+          <Spinner renderTitle={message} size="large" />
+        </Flex.Item>
+      </Flex>
+      <Flex justifyItems="center" margin="0 0 large">
+        <Flex.Item>
+          <Text size="x-large" fontStyle="italic">
+            {message}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    </div>
+  )
 }
 
 export default class DeepLinkingResponse {
   static mount() {
-    ReactDOM.render(<RetrievingContent />, document.getElementById('deepLinkingContent'))
+    const parentWindow = window.opener || window.top
+    ReactDOM.render(
+      <RetrievingContent environment={window.ENV} parentWindow={parentWindow} />,
+      document.getElementById('deepLinkingContent')
+    )
   }
 }
