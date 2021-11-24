@@ -22,6 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {RetrievingContent} from '../DeepLinkingResponse'
 
 let wrapper = 'empty wrapper'
+const windowMock = {}
 const env = {
   content_items: [{type: 'link'}],
   message: 'message',
@@ -32,37 +33,28 @@ const env = {
   lti_endpoint: 'https://www.test.com/retrieve',
   close_dialog: false
 }
-let oldEnv = {}
+
+const render = () => mount(<RetrievingContent environment={env} parentWindow={windowMock} />)
 
 beforeEach(() => {
-  oldEnv = window.ENV
-  window.ENV = env
+  windowMock.postMessage = jest.fn()
 })
 
 afterEach(() => {
   wrapper.unmount()
-  window.ENV = oldEnv
 })
 
 it('renders an informative message', () => {
-  wrapper = mount(<RetrievingContent />)
+  wrapper = render()
   expect(wrapper.find(Text).html()).toContain('Retrieving Content')
 })
 
 describe('post message', () => {
-  const oldPostMessage = window.postMessage
-  const postMessageDouble = jest.fn()
-
   beforeEach(() => {
-    window.postMessage = postMessageDouble
-    wrapper = mount(<RetrievingContent />)
+    wrapper = render()
   })
 
-  afterEach(() => {
-    window.postMessage = oldPostMessage
-  })
-
-  const messageData = () => postMessageDouble.mock.calls[0][0]
+  const messageData = () => windowMock.postMessage.mock.calls[0][0]
 
   it('sends the correct message type', () => {
     expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
