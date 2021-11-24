@@ -53,9 +53,9 @@ describe "course people" do
 
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
       wait_for_ajaximations
-      elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
+      elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map do |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
-      }
+      end
       wait_for_ajaximations
       element = elements.detect { |e| e.last == text }
       expect(element).not_to be_nil

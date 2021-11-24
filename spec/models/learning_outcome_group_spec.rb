@@ -24,7 +24,7 @@ describe LearningOutcomeGroup do
     @root = @course.root_outcome_group
   end
 
-  def long_text(max = 65535)
+  def long_text(max = 65_535)
     text = +''
     (0...max + 1).each do |num|
       text.concat(num.to_s)
@@ -320,7 +320,7 @@ describe LearningOutcomeGroup do
   context "sync_source_group" do
     def assert_tree_exists(groups, db_parent_group)
       group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
-      expect(group_titles.sort).to eql(groups.map { |g| g[:title] }.sort)
+      expect(group_titles.sort).to eql(groups.pluck(:title).sort)
 
       groups.each do |group|
         outcome_titles = group[:outcomes] || []

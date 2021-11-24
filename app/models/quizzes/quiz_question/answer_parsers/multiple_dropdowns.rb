@@ -45,14 +45,13 @@ module Quizzes::QuizQuestion::AnswerParsers
       question.answers = @answers
 
       variables.each do |variable, found_correct|
-        if !found_correct
-          question.answers.each_with_index do |answer, idx|
-            if answer[:blank_id] == variable && !found_correct
-              question.answers[idx][:weight] = 100
-              found_correct = true
-            end
-          end
+        next if found_correct
 
+        question.answers.each_with_index do |answer, idx|
+          if answer[:blank_id] == variable && !found_correct
+            question.answers[idx][:weight] = 100
+            found_correct = true
+          end
         end
       end
 

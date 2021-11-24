@@ -176,7 +176,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     it 'returns an empty list' do
       json = api_index
-      expect(json.has_key?('quiz_submission_questions')).to be_truthy
+      expect(json).to have_key('quiz_submission_questions')
       expect(json['quiz_submission_questions'].size).to eq 0
     end
 
@@ -241,11 +241,6 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       assert_status(401)
     end
 
-    it "allows teacher access even if quiz is OQAAT" do
-      api_index({}, { raw: true })
-      assert_status(200)
-    end
-
     it "denies access to another student" do
       student_in_course
       api_index({}, { raw: true })
@@ -272,7 +267,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     it 'grants access to its student' do
       skip
       json = api_show
-      expect(json.has_key?('quiz_submission_questions')).to be_truthy
+      expect(json).to have_key('quiz_submission_questions')
       expect(json['quiz_submission_questions'].length).to eq 1
     end
 
@@ -287,7 +282,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       it 'includes the quiz question id' do
         skip
         json = api_show
-        expect(json.has_key?('quiz_submission_questions')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
         expect(json['quiz_submission_questions'][0]['id']).to eq(
           @question.id
         )
@@ -296,8 +291,8 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       it 'includes the flagged status' do
         skip
         json = api_show
-        expect(json.has_key?('quiz_submission_questions')).to be_truthy
-        expect(json['quiz_submission_questions'][0].has_key?('flagged')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
+        expect(json['quiz_submission_questions'][0]).to have_key('flagged')
         expect(json['quiz_submission_questions'][0]['flagged']).to be_falsey
       end
     end
@@ -309,10 +304,10 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
                           :include => %w[quiz_question]
                         })
 
-        expect(json.has_key?('quiz_submission_questions')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
         expect(json['quiz_submission_questions'].size).to eq 1
 
-        expect(json.has_key?('quiz_questions')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
         expect(json['quiz_questions'].size).to eq 1
         expect(json['quiz_questions'][0]['id']).to eq(
           json['quiz_submission_questions'][0]['id']
@@ -398,7 +393,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         @quiz_submission = @quiz.generate_submission(@teacher)
 
         json = api_answer
-        expect(json.has_key?('quiz_submission_questions')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
         expect(json['quiz_submission_questions'].length).to eq 0
       end
 
@@ -408,7 +403,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         @quiz_submission = @quiz.generate_submission(@student)
 
         json = api_answer
-        expect(json.has_key?('quiz_submission_questions')).to be_truthy
+        expect(json).to have_key('quiz_submission_questions')
         expect(json['quiz_submission_questions'].length).to eq 0
       end
     end
@@ -439,7 +434,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
                             }]
                           })
 
-        expect(json['quiz_submission_questions'][0]["answers"].map(&:keys).uniq.include? "weight").to be_falsey
+        expect(json['quiz_submission_questions'][0]["answers"].map(&:keys).uniq.include?("weight")).to be_falsey
         expect(json['quiz_submission_questions'][1]["answers"]).to equal(nil)
       end
 

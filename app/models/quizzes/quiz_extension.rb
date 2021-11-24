@@ -45,7 +45,7 @@ class Quizzes::QuizExtension
       ext_params.map do |params|
         student    = students.find(params[:user_id])
         submission = sub_manager.find_or_create_submission(student, nil, 'settings_only')
-        extension  = self.new(submission, params)
+        extension  = new(submission, params)
         yield extension if block_given? # use yielded block to check permissions
         extensions << extension
       end
@@ -63,11 +63,11 @@ class Quizzes::QuizExtension
 
     if ext_params[:extra_time]
       # limit to a week
-      quiz_submission.extra_time = [ext_params[:extra_time].to_i.abs, 10080].min
+      quiz_submission.extra_time = [ext_params[:extra_time].to_i.abs, 10_080].min
     end
 
     # false is a valid value, so explicitly check nil
-    if !ext_params[:manually_unlocked].nil?
+    unless ext_params[:manually_unlocked].nil?
       unlocked = [1, "1", true, "true"].include?(ext_params[:manually_unlocked])
       quiz_submission.manually_unlocked = unlocked
     end

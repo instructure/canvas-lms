@@ -24,6 +24,7 @@ RSpec.describe LatePolicySerializer do
   subject(:json) do
     LatePolicySerializer.new(late_policy, controller: instance_double('FakeController')).as_json
   end
+
   let(:late_policy) { LatePolicy.new(course_id: course) }
   let(:course) { Course.create! }
 

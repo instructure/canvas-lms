@@ -56,9 +56,9 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 
   before_action :require_user, :require_quiz_submission, :export_scopes
-  before_action :require_question, only: [:show, :flag, :unflag, :formatted_answer]
-  before_action :prepare_service, only: [:answer, :flag, :unflag]
-  before_action :validate_ldb_status!, only: [:answer, :flag, :unflag]
+  before_action :require_question, only: %i[show flag unflag formatted_answer]
+  before_action :prepare_service, only: %i[answer flag unflag]
+  before_action :validate_ldb_status!, only: %i[answer flag unflag]
 
   # @API Get all quiz submission questions.
   #
@@ -137,12 +137,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
 
-    answers = params.to_unsafe_h.fetch(:quiz_questions, []).reduce({}) do |hsh, p|
+    answers = params.to_unsafe_h.fetch(:quiz_questions, []).each_with_object({}) do |p, hsh|
       if p[:id].present?
         hsh[p[:id].to_i] = p[:answer] || []
       end
-
-      hsh
     end
 
     quiz_questions = @quiz.quiz_questions.where(id: answers.keys)
@@ -286,10 +284,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #
   # [Transient:CNVS-10071]
   def validate_ldb_status!(quiz = @quiz)
-    if quiz.require_lockdown_browser?
-      unless ldb_plugin.authorized?(self)
-        reject! 'this quiz requires the lockdown browser', 403
-      end
+    if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
+      reject! 'this quiz requires the lockdown browser', 403
     end
   end
 

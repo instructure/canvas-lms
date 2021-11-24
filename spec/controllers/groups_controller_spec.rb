@@ -409,7 +409,7 @@ describe GroupsController do
     it "fails when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
       @course.group_categories.create(:name => 'some category')
-      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11235 } }
+      post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11_235 } }
       expect(response).not_to be_successful
     end
 
@@ -496,7 +496,7 @@ describe GroupsController do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
-      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => 11235 } }
+      put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :group_category_id => 11_235 } }
       expect(response).not_to be_successful
     end
 
@@ -605,7 +605,7 @@ describe GroupsController do
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u1, u2, u3].map { |u| u.id }.sort
+        .to eq [u1, u2, u3].map(&:id).sort
     end
 
     it "includes only users not in a group in the category otherwise" do
@@ -632,14 +632,14 @@ describe GroupsController do
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u2, u3].map { |u| u.id }.sort
+        .to eq [u2, u3].map(&:id).sort
 
       get 'unassigned_members', params: { :course_id => @course.id, :category_id => group2.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u1, u3].map { |u| u.id }.sort
+        .to eq [u1, u3].map(&:id).sort
 
       get 'unassigned_members', params: { :course_id => @course.id, :category_id => group3.group_category.id }
       expect(response).to be_successful
@@ -713,7 +713,7 @@ describe GroupsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "includes an author for each entry" do

@@ -388,8 +388,8 @@ describe "Outcomes API", type: :request do
                 :format => 'json'
               )
               json = controller.outcome_json(@outcome, @account_user.user, session)
-              ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
-                expect(json.key?(key)).to be false
+              %w[points_possible mastery_points ratings calculation_method calculation_int].each do |key|
+                expect(json).not_to have_key(key)
               end
             end
           end
@@ -434,7 +434,7 @@ describe "Outcomes API", type: :request do
       end
 
       it "fails (400) if the outcome is invalid" do
-        too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
+        too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
         raw_api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                      { :controller => 'outcomes_api',
                        :action => 'update',
@@ -599,7 +599,7 @@ describe "Outcomes API", type: :request do
 
           method_to_int.each do |method, int|
             it "does not allow updating the calculation_int to an illegal value for the calculation_method '#{method}'" do
-              expect {
+              expect do
                 api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                          { :controller => 'outcomes_api',
                            :action => 'update',
@@ -611,9 +611,9 @@ describe "Outcomes API", type: :request do
                            :calculation_method => method,
                            :calculation_int => int[:good] })
                 @outcome.reload
-              }.to change { @outcome.calculation_int }.to(int[:good])
+              end.to change { @outcome.calculation_int }.to(int[:good])
 
-              expect {
+              expect do
                 api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                          { :controller => 'outcomes_api',
                            :action => 'update',
@@ -627,7 +627,7 @@ describe "Outcomes API", type: :request do
                          {},
                          { :expected_status => 400 })
                 @outcome.reload
-              }.to_not change { @outcome.calculation_int }
+              end.to_not change { @outcome.calculation_int }
 
               expect(@outcome.calculation_method).to eql(method)
             end
@@ -913,8 +913,8 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
-        expect(json.map { |j| j['assessment_id'] }.compact.sort).to eq([@live_assessment.id].sort)
+        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.filter_map { |j| j['assessment_id'] }.sort).to eq([@live_assessment.id].sort)
       end
 
       it "allows teacher to return aligned assignments for a student" do
@@ -925,7 +925,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "allows observer to return aligned assignments for a student" do
@@ -936,7 +936,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "does not return outcomes aligned to quizzes in other courses" do
@@ -965,7 +965,7 @@ describe "Outcomes API", type: :request do
                         :course_id => @course.id.to_s,
                         :student_id => @student.id.to_s,
                         :format => 'json')
-        expect(json.map { |j| j["assignment_id"] }.compact.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "requires a student_id to be present" do
@@ -991,7 +991,7 @@ describe "Outcomes API", type: :request do
           end
 
           let(:update_outcome_api) do
-            ->(attrs) do
+            lambda do |attrs|
               api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
                        { :controller => 'outcomes_api',
                          :action => 'update',

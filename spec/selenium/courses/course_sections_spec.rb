@@ -133,7 +133,7 @@ describe "course sections" do
       @account = Account.default
     end
 
-    it "course section page should display student name in tray", priority: "1", test_id: 3022068 do
+    it "course section page should display student name in tray", priority: "1" do
       add_enrollment("active", @section)
       get("/courses/#{@course.id}/sections/#{@section.id}")
       f("a[data-student_id='#{@student.id}']").click

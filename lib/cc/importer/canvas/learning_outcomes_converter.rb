@@ -31,9 +31,10 @@ module CC::Importer::Canvas
       return list unless node
 
       node.children.each do |child|
-        if child.name == 'learningOutcome'
+        case child.name
+        when 'learningOutcome'
           list << process_learning_outcome(child)
-        elsif child.name == 'learningOutcomeGroup'
+        when 'learningOutcomeGroup'
           list << process_outcome_group(child)
         end
       end

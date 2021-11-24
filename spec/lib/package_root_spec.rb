@@ -37,9 +37,9 @@ describe PackageRoot do
   end
 
   it "refuses to follow .. paths above the package root" do
-    expect {
+    expect do
       subject.item_path('course_settings', '..', '..', 'assessments.json')
-    }.to raise_error(ArgumentError)
+    end.to raise_error(ArgumentError)
   end
 
   it "makes relative paths" do

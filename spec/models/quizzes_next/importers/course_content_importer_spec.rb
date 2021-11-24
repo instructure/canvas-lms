@@ -25,7 +25,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
   end
 
   context '.import_content' do
-    let(:course) { course_factory() }
+    let(:course) { course_factory }
     let(:migration) { ContentMigration.create!(:context => course) }
     let!(:quiz01) do
       Quizzes::Quiz.create(

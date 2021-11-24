@@ -46,7 +46,7 @@ describe AddressBook::Empty do
   describe "common_groups" do
     it "returns an empty hash" do
       other_user = user_model
-      expect(@address_book.common_courses(other_user)).to eql({})
+      expect(@address_book.common_groups(other_user)).to eql({})
     end
   end
 

@@ -2,9 +2,9 @@
 
 desc 'Removes the schema line in fixtures, models, and specs.'
 task :remove_schema_signature do
-  models = Dir.glob(File.join(File.dirname(__FILE__), %w(.. .. app models)) + "/*.rb")
-  specs = Dir.glob(File.join(File.dirname(__FILE__), %w(.. .. spec models)) + "/*.rb")
-  fixtures = Dir.glob(File.join(File.dirname(__FILE__), %w(.. .. spec fixtures)) + "/*.yml")
+  models = Dir.glob(File.join(File.dirname(__FILE__), %w[.. .. app models]) + "/*.rb")
+  specs = Dir.glob(File.join(File.dirname(__FILE__), %w[.. .. spec models]) + "/*.rb")
+  fixtures = Dir.glob(File.join(File.dirname(__FILE__), %w[.. .. spec fixtures]) + "/*.yml")
   files = models | specs | fixtures
   files.each { |file| remove_signature(file) }
 end

@@ -34,7 +34,7 @@ describe AuthenticationProvider::PluginSettings do
     end
   end
 
-  let(:plugin) { double() }
+  let(:plugin) { double }
 
   before do
     allow(Canvas::Plugin).to receive(:find).with(:custom_plugin).and_return(plugin)
@@ -61,7 +61,7 @@ describe AuthenticationProvider::PluginSettings do
     context 'without plugin config' do
       it 'returns plugin params' do
         allow(plugin).to receive(:enabled?).and_return(false)
-        expect(klass.recognized_params).to eq [:auth_host, :noninherited_method, :mfa_required]
+        expect(klass.recognized_params).to eq %i[auth_host noninherited_method mfa_required]
       end
     end
   end

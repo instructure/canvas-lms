@@ -21,8 +21,9 @@ require_relative 'turnitin_spec_helper'
 require 'turnitin_api'
 module Turnitin
   describe TiiClient do
-    include_context "shared_tii_lti"
     subject { described_class.new(lti_student, lti_assignment, tool, {}) }
+
+    include_context "shared_tii_lti"
 
     describe ".new" do
       it 'set the user_id to the opaque identifier' do

@@ -137,7 +137,7 @@ describe "context modules" do
       test_relock
     end
 
-    it "validates module lock date picker format", priority: "2", test_id: 132519 do
+    it "validates module lock date picker format", priority: "2" do
       unlock_date = format_time_for_view(Time.zone.today + 2.days)
       @course.context_modules.create!(name: "name", unlock_at: unlock_date)
       get "/courses/#{@course.id}/modules"
@@ -265,7 +265,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
       end
 
-      it "shows all items are completed radio button", priority: "1", test_id: 248023 do
+      it "shows all items are completed radio button", priority: "1" do
         f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
         hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
         f('.add-item .add_completion_criterion_link').click
@@ -273,7 +273,7 @@ describe "context modules" do
         expect(f('.ic-Radio .ic-Label').text).to eq('Students must complete all of these requirements')
       end
 
-      it "shows complete one of these items radio button", priority: "1", test_id: 250294 do
+      it "shows complete one of these items radio button", priority: "1" do
         f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
         hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
         f('.add-item .add_completion_criterion_link').click
@@ -281,7 +281,7 @@ describe "context modules" do
         expect(ff('.ic-Radio .ic-Label')[1].text).to eq('Student must complete one of these requirements')
       end
 
-      it "does not show the radio buttons for module with no items", priority: "1", test_id: 3028275 do
+      it "does not show the radio buttons for module with no items", priority: "1" do
         f("#context_module_#{@mod[1].id} .ig-header-admin .al-trigger").click
         hover_and_click("#context_module_#{@mod[1].id} .edit_module_link")
         expect(f('.ic-Radio .ic-Label').text).not_to include('Students must complete all of these requirements')

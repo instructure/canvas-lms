@@ -118,7 +118,7 @@ describe "google analytics" do
       expect_dimensions_to_include(
         admin: '00',
         enrollments: '100',
-        masquerading: '1',
+        masquerading: '1'
       )
     end
 

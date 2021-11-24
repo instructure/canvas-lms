@@ -22,14 +22,14 @@ require_relative '../../../lti_1_3_spec_helper'
 describe Lti::IMS::AuthenticationController do
   include Lti::RedisMessageClient
 
-  let(:developer_key) {
+  let(:developer_key) do
     key = DeveloperKey.create!(
       redirect_uris: redirect_uris,
       account: context.root_account
     )
     enable_developer_key_account_binding!(key)
     key
-  }
+  end
   let(:redirect_uris) { ['https://redirect.tool.com'] }
   let(:user) { user_model }
   let(:redirect_domain) { 'redirect.instructure.com' }
@@ -173,11 +173,11 @@ describe Lti::IMS::AuthenticationController do
     end
 
     context 'when there is a cached LTI 1.3 launch' do
-      include_context 'lti_1_3_spec_helper'
-
       subject do
         get :authorize, params: params
       end
+
+      include_context 'lti_1_3_spec_helper'
 
       let(:id_token) do
         token = assigns.dig(:id_token, :id_token)

@@ -20,14 +20,14 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
-  let(:question_data) { QuestionHelpers.fixture('fill_in_multiple_blanks_question') }
-
   subject { described_class.new(question_data) }
 
+  let(:question_data) { QuestionHelpers.fixture('fill_in_multiple_blanks_question') }
+
   it 'does not blow up when no responses are provided' do
-    expect {
+    expect do
       subject.run([])
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   describe '[:answer_sets]' do

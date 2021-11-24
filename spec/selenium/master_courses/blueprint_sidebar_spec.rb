@@ -190,7 +190,7 @@ describe "master courses sidebar" do
       expect(f('body')).not_to contain_css('[aria-label="Associations"]')
     end
 
-    it "limits notification message to 140 characters", priority: "2", test_id: 3186725 do
+    it "limits notification message to 140 characters", priority: "2" do
       msg = '1234567890123456789012345678901234567890123456789012345678901234567890'
       open_blueprint_sidebar
       send_notification_checkbox.click
@@ -230,7 +230,7 @@ describe "master courses sidebar" do
     end
 
     context "before sync" do
-      it "shows sync button and options before sync", priority: "2", test_id: 3186721 do
+      it "shows sync button and options before sync", priority: "2" do
         open_blueprint_sidebar
         bcs_content = bcs_content_panel
         expect(bcs_content).to include_text("Unsynced Changes")
@@ -240,7 +240,7 @@ describe "master courses sidebar" do
         expect(bcs_content).to contain_css('.bcs__migration-sync__button')
       end
 
-      it "shows sync options in modal", priority: "2", test_id: 3186721 do
+      it "shows sync options in modal", priority: "2" do
         open_blueprint_sidebar
         unsynced_changes_link.click
         bcs_content = bcs_content_panel
@@ -262,7 +262,7 @@ describe "master courses sidebar" do
         run_jobs
       end
 
-      it "removes sync button after sync", priority: "2", test_id: 3186726 do
+      it "removes sync button after sync", priority: "2" do
         refresh_page
         open_blueprint_sidebar
         test_var = false
@@ -275,7 +275,7 @@ describe "master courses sidebar" do
         expect(bcs_content_panel).not_to contain_css('button#mcUnsyncedChangesBtn')
       end
 
-      it "removes notification options after sync", priority: "2", test_id: 3256295 do
+      it "removes notification options after sync", priority: "2" do
         refresh_page
         open_blueprint_sidebar
         test_var = false
@@ -294,7 +294,7 @@ describe "master courses sidebar" do
       end
     end
 
-    it "closes modal after sync", priority: "2", test_id: 3186727 do
+    it "closes modal after sync", priority: "2" do
       open_blueprint_sidebar
       unsynced_changes_link.click
       sync_modal_send_notification_checkbox.click

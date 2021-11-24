@@ -162,18 +162,7 @@ describe OAuth2ProviderController do
                       response_type: 'code',
                       scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
-      end
-
-      it 'accepts the deprecated name of scopes for scope param' do
-        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
-        get :auth,
-            params: { client_id: key.id,
-                      redirect_uri: 'https://example.com',
-                      response_type: 'code',
-                      scope: '/auth/userinfo' }
-        expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       it 'does not reuse userinfo tokens for other scopes' do
@@ -192,11 +181,11 @@ describe OAuth2ProviderController do
                              response_type: 'code',
                              scope: '/auth/userinfo' }
         expect(response).to be_redirect
-        expect(response.location).to match(/https:\/\/example.com/)
+        expect(response.location).to match(%r{https://example.com})
       end
 
       context 'when "prompt=none"' do
-        let(:params) {
+        let(:params) do
           {
             client_id: key.id,
             redirect_uri: 'https://example.com',
@@ -204,13 +193,13 @@ describe OAuth2ProviderController do
             scope: '/auth/userinfo',
             prompt: 'none'
           }
-        }
+        end
 
         it 'redirects to the redirect uri if the user already has remember-me token' do
           @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects to the redirect uri if the developer key is trusted' do
@@ -218,13 +207,13 @@ describe OAuth2ProviderController do
           key.save!
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects with "interaction_required" if the current session cannot be used without a prompt' do
           get :auth, params: params
           expect(response).to be_redirect
-          expect(response.location).to match(/https:\/\/example.com/)
+          expect(response.location).to match(%r{https://example.com})
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params['error']).to eq 'interaction_required'
         end
@@ -389,25 +378,25 @@ describe OAuth2ProviderController do
             expect(subject).to redirect_to('https://example.com?error=invalid_client&error_description=unknown+client')
           end
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is missing' do
           let(:client_id) { nil }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is not found' do
           let(:client_id) { 0 }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
 
         context 'key is not an integer' do
           let(:client_id) { 'a' }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
       end
 
@@ -417,7 +406,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(302)
+            expect(subject).to have_http_status(:found)
           end
         end
 
@@ -426,7 +415,7 @@ describe OAuth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(302)
+            expect(subject).to have_http_status(:found)
           end
         end
       end
@@ -435,7 +424,7 @@ describe OAuth2ProviderController do
         let(:before_post) { success_setup }
         let(:overrides) { success_params }
 
-        it { is_expected.to have_http_status(200) }
+        it { is_expected.to have_http_status(:ok) }
 
         it 'outputs the token json if everything checks out' do
           json = JSON.parse(response.body)
@@ -446,7 +435,7 @@ describe OAuth2ProviderController do
         context 'with global_id as client_id' do
           let(:client_id) { key.global_id }
 
-          it { is_expected.to have_http_status(200) }
+          it { is_expected.to have_http_status(:ok) }
         end
       end
 
@@ -462,7 +451,7 @@ describe OAuth2ProviderController do
         context 'missing grant_type' do
           let(:grant_type) { nil }
 
-          it { is_expected.to have_http_status(302) }
+          it { is_expected.to have_http_status(:found) }
         end
       end
     end
@@ -474,8 +463,8 @@ describe OAuth2ProviderController do
       let(:redis) do
         redis = double('Redis')
         allow(redis).to receive(:get)
-        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
-        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
+        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
         redis
       end
 
@@ -486,7 +475,7 @@ describe OAuth2ProviderController do
         let(:success_setup) do
           expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
         end
-        let(:success_token_keys) { %w(access_token refresh_token user expires_in token_type) }
+        let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type] }
       end
 
       it 'renders a 302 if a code is not provided for an authorization_code grant' do
@@ -510,7 +499,7 @@ describe OAuth2ProviderController do
         post :token, params: base_params.merge(code: valid_code)
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
+        expect(json.keys.sort).to match_array %w[access_token refresh_token user expires_in token_type]
         expect(json.dig('user', 'effective_locale')).to eq 'zh-Hant'
       end
 
@@ -535,7 +524,7 @@ describe OAuth2ProviderController do
 
       it_behaves_like 'common oauth2 token checks' do
         let(:success_params) { { refresh_token: refresh_token } }
-        let(:success_token_keys) { %w(access_token user expires_in token_type) }
+        let(:success_token_keys) { %w[access_token user expires_in token_type] }
       end
 
       it 'does not generate a new access_token with an invalid refresh_token' do
@@ -603,7 +592,7 @@ describe OAuth2ProviderController do
       it_behaves_like 'common oauth2 token checks' do
         let(:success_params) { client_credentials_params }
         let(:overrides) { client_credentials_params }
-        let(:success_token_keys) { %w(access_token token_type expires_in scope) }
+        let(:success_token_keys) { %w[access_token token_type expires_in scope] }
       end
 
       describe 'additional client_credentials checks' do
@@ -624,7 +613,7 @@ describe OAuth2ProviderController do
         context 'with aud as an array' do
           let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host'), 'doesnotexist'] }
 
-          it { is_expected.to have_http_status 200 }
+          it { is_expected.to have_http_status :ok }
         end
 
         context 'with a port in the aud' do
@@ -632,13 +621,13 @@ describe OAuth2ProviderController do
 
           before { request.host = 'test.host:3000' }
 
-          it { is_expected.to have_http_status 200 }
+          it { is_expected.to have_http_status :ok }
         end
 
         context 'with bad exp' do
           let(:exp) { 1.minute.ago.to_i }
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
         end
 
         context 'with iat in the future by a small amount' do
@@ -647,7 +636,7 @@ describe OAuth2ProviderController do
 
           it 'returns an access token' do
             Timecop.freeze(future_iat_time - 5.seconds) do
-              expect(subject).to have_http_status 200
+              expect(subject).to have_http_status :ok
             end
           end
         end
@@ -655,12 +644,12 @@ describe OAuth2ProviderController do
         context 'with bad iat' do
           let(:iat) { 1.minute.from_now.to_i }
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
 
           context 'with iat too far in future' do
             let(:iat) { 6.minutes.from_now.to_i }
 
-            it { is_expected.to have_http_status 302 }
+            it { is_expected.to have_http_status :found }
           end
         end
 
@@ -672,7 +661,7 @@ describe OAuth2ProviderController do
             other_key.save!
           end
 
-          it { is_expected.to have_http_status 302 }
+          it { is_expected.to have_http_status :found }
         end
 
         context 'with missing assertion' do
@@ -682,7 +671,7 @@ describe OAuth2ProviderController do
 
             it "returns 302 when #{assertion} missing" do
               jwt.delete assertion.to_sym
-              expected = assertion != 'sub' ? request_url + assertion : client_url
+              expected = assertion == 'sub' ? client_url : request_url + assertion
               expect(subject).to redirect_to(expected)
             end
           end
@@ -691,12 +680,12 @@ describe OAuth2ProviderController do
         context 'with same token' do
           it 'returns 200' do
             enable_cache do
-              expect(subject).to have_http_status 200
+              expect(subject).to have_http_status :ok
               Setting.set('oauth.allowed_timestamp_future_skew', 0.seconds)
 
               parameters = { grant_type: 'client_credentials' }.merge(client_credentials_params)
               post :token, params: parameters
-              expect(response).to have_http_status 200
+              expect(response).to have_http_status :ok
             end
           end
         end
@@ -712,7 +701,7 @@ describe OAuth2ProviderController do
           end
 
           it 'rejects by default' do
-            is_expected.to redirect_to('https://example.com?error=invalid_request&error_description=assertion+method+not+supported+for+this+grant_type')
+            expect(subject).to redirect_to('https://example.com?error=invalid_request&error_description=assertion+method+not+supported+for+this+grant_type')
           end
 
           context "with external audience key" do
@@ -721,7 +710,7 @@ describe OAuth2ProviderController do
               key.save!
             end
 
-            it { is_expected.to have_http_status 200 }
+            it { is_expected.to have_http_status :ok }
           end
         end
       end

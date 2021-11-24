@@ -48,10 +48,10 @@ module CanvasSecurity
       include_context "JWT setup"
 
       let(:translate_token) do
-        ->(jwt) {
+        lambda do |jwt|
           decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
           return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
-        }
+        end
       end
 
       it "has secrets accessors" do
@@ -111,7 +111,7 @@ module CanvasSecurity
         it "expires in an hour" do
           Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
             jwt = ServicesJwt.new(jwt_string, false)
-            expect(jwt.expires_at).to eq(1363169520)
+            expect(jwt.expires_at).to eq(1_363_169_520)
           end
         end
 
@@ -167,7 +167,7 @@ module CanvasSecurity
           it "doesn't include the masq key if there is no real user" do
             jwt = ServicesJwt.for_user(host, user, real_user: nil)
             decrypted_token_body = translate_token.call(jwt)
-            expect(decrypted_token_body.keys.include?(:masq_sub)).to eq(false)
+            expect(decrypted_token_body.key?(:masq_sub)).to eq(false)
           end
 
           it "includes workflows if given" do

@@ -21,18 +21,6 @@ require_relative 'support/answer_serializers_specs'
 require_relative 'support/id_answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
-  include_examples 'Answer Serializers'
-
-  let :factory_options do
-    {
-      answer_parser_compatibility: true
-    }
-  end
-
-  let :input do
-    ['9761']
-  end
-
   let :output do
     {
       "question_5_answer_9761" => "1",
@@ -46,6 +34,16 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
       "question_5_answer_7381" => "0"
     }.with_indifferent_access
   end
+  let :input do
+    ['9761']
+  end
+  let :factory_options do
+    {
+      answer_parser_compatibility: true
+    }
+  end
+
+  include_examples 'Answer Serializers'
 
   # for auto specs
   def format(value)

@@ -26,7 +26,7 @@ describe "root account basic settings" do
   let(:reports_url) { "/accounts/#{account.id}/reports_tab" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
 
-  include_examples "settings basic tests", :root_account
+  include_examples "settings basic tests"
 
   it "is able to disable enable_gravatar" do
     account_admin_user(:active_all => true)
@@ -148,20 +148,20 @@ describe "root account basic settings" do
   it "has date pickers for reports tab" do
     course_with_admin_logged_in
     get account_settings_url
-    f('#tab-reports-link').click()
+    f('#tab-reports-link').click
     wait_for_ajax_requests
-    f('#configure_zero_activity_csv').click()
+    f('#configure_zero_activity_csv').click
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
   it "handles linking directly to reports tab" do
     course_with_admin_logged_in
     get account_settings_url + "#tab-reports"
-    f('#configure_zero_activity_csv').click()
+    f('#configure_zero_activity_csv').click
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
-  it "changes the default user quota", priority: "1", test_id: 250002 do
+  it "changes the default user quota", priority: "1" do
     course_with_admin_logged_in
     group_model(context: @course)
     get account_settings_url
@@ -181,7 +181,7 @@ describe "root account basic settings" do
 
     # ensure the account was updated properly
     account.reload
-    expect(account.default_user_storage_quota).to eq user_quota * 1048576
+    expect(account.default_user_storage_quota).to eq user_quota * 1_048_576
 
     # ensure the new value is reflected after a refresh
     get account_settings_url
@@ -200,7 +200,7 @@ describe "root account basic settings" do
     account.reload
     expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
 
-    filter = ff('.ip_filter').detect { |fil| fil.displayed? }
+    filter = ff('.ip_filter').detect(&:displayed?)
     filter.find_element(:css, '.delete_filter_link').click
 
     expect_new_page_load { submit_form("#account_settings") }

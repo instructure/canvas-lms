@@ -41,21 +41,21 @@ class GradingPeriod < ActiveRecord::Base
   after_save :recompute_scores, if: :dates_or_weight_or_workflow_state_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
-  scope :current, -> do
+  scope :current, lambda {
     now = Time.zone.now.change(sec: 0)
     where(
       "date_trunc('minute', grading_periods.end_date) >= ? AND date_trunc('minute', grading_periods.start_date) < ?",
       now,
       now
     )
-  end
+  }
 
   scope :closed, -> { where("grading_periods.close_date < ?", Time.zone.now) }
   scope :open, -> { where("grading_periods.close_date IS NULL OR grading_periods.close_date >= ?", Time.zone.now) }
 
-  scope :grading_periods_by, ->(context_with_ids) do
+  scope :grading_periods_by, lambda { |context_with_ids|
     joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)
-  end
+  }
 
   set_policy do
     %i[read create update delete].each do |permission|
@@ -68,7 +68,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def self.date_in_closed_grading_period?(course:, date:, periods: nil)
-    period = self.for_date_in_course(date: date, course: course, periods: periods)
+    period = for_date_in_course(date: date, course: course, periods: periods)
     period.present? && period.closed?
   end
 
@@ -76,7 +76,7 @@ class GradingPeriod < ActiveRecord::Base
     periods ||= self.for(course)
 
     if date.nil?
-      return periods.sort_by(&:end_date).last
+      periods.max_by(&:end_date)
     else
       periods.detect { |p| p.in_date_range?(date) }
     end
@@ -156,7 +156,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def self.json_for(context, user)
     periods = self.for(context).sort_by(&:start_date)
-    self.periods_json(periods, user)
+    periods_json(periods, user)
   end
 
   def self.periods_json(periods, user)
@@ -167,9 +167,9 @@ class GradingPeriod < ActiveRecord::Base
 
   def as_json_with_user_permissions(user)
     as_json(
-      only: [:id, :title, :start_date, :end_date, :close_date, :weight],
+      only: %i[id title start_date end_date close_date weight],
       permissions: { user: user },
-      methods: [:is_last, :is_closed],
+      methods: [:is_last, :is_closed]
     ).fetch(:grading_period)
   end
 
@@ -227,14 +227,14 @@ class GradingPeriod < ActiveRecord::Base
     @_skip_not_overlapping_validator
   end
 
-  scope :overlaps, ->(from, to) do
+  scope :overlaps, lambda { |from, to|
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
     where(
       "((date_trunc('minute', end_date) > ?) and (date_trunc('minute', start_date) < ?))",
       from&.change(sec: 0),
       to&.change(sec: 0)
     )
-  end
+  }
 
   def not_overlapping
     if overlapping?
@@ -255,7 +255,7 @@ class GradingPeriod < ActiveRecord::Base
     if new_record?
       grading_periods
     else
-      grading_periods.where("id <> ?", id)
+      grading_periods.where.not(id: id)
     end
   end
 

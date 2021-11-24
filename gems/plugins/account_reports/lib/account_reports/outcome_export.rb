@@ -29,8 +29,8 @@ module AccountReports
       include_deleted_objects
     end
 
-    NO_SCORE_HEADERS = %w(vendor_guid object_type title description display_name parent_guids workflow_state).freeze
-    OUTCOME_EXPORT_SCALAR_HEADERS = %w(vendor_guid object_type title description display_name calculation_method calculation_int parent_guids workflow_state mastery_points).freeze
+    NO_SCORE_HEADERS = %w[vendor_guid object_type title description display_name parent_guids workflow_state].freeze
+    OUTCOME_EXPORT_SCALAR_HEADERS = %w[vendor_guid object_type title description display_name calculation_method calculation_int parent_guids workflow_state mastery_points].freeze
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ['ratings']).freeze
 
     def outcome_export
@@ -58,7 +58,7 @@ module AccountReports
     end
 
     def outcome_group_scope
-      LearningOutcomeGroup.connection.execute(<<~SQL)
+      LearningOutcomeGroup.connection.execute(<<~SQL.squish)
         WITH RECURSIVE outcome_tree AS (
           SELECT
             root_group.id,
@@ -113,7 +113,7 @@ module AccountReports
     end
 
     def outcome_scope
-      simple_outcome_scope.joins(<<~SQL)
+      simple_outcome_scope.joins(<<~SQL.squish)
         JOIN #{LearningOutcomeGroup.quoted_table_name} learning_outcome_groups
         ON learning_outcome_groups.id = content_tags.associated_asset_id
       SQL
@@ -121,7 +121,7 @@ module AccountReports
                           .order('learning_outcomes.id')
                           .group('learning_outcomes.id')
                           .group('content_tags.content_id')
-                          .select(<<~SQL)
+                          .select(<<~SQL.squish)
                             content_tags.content_id,
                             learning_outcomes.*,
                             #{vendor_guid_field('learning_outcomes', prefix: 'canvas_outcome')} AS vendor_guid,

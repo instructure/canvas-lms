@@ -83,17 +83,17 @@ module CanvasSecurity
 
   def self.config
     @config ||= begin
-      path = Rails.root + 'config/security.yml'
-      raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
+      path = Rails.root.join('config/security.yml')
+      raise('config/security.yml missing, see security.yml.example') unless path.file?
 
-      YAML.safe_load(ERB.new(File.read(path)).result, aliases: true)[Rails.env]
+      YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
     end
   end
 
   def self.encrypt_data(data)
     nonce = SecureRandom.bytes(12)
     encryptor = OpenSSL::Cipher.new('aes-256-gcm').encrypt
-    encryptor.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    encryptor.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     encryptor.iv = nonce
     encryptor.auth_data = 'Canvas-v1.0.0'
     encrypted_data = encryptor.update(data) + encryptor.final
@@ -103,7 +103,7 @@ module CanvasSecurity
 
   def self.decrypt_data(data, nonce, tag)
     decipher = OpenSSL::Cipher.new('aes-256-gcm').decrypt
-    decipher.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    decipher.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     decipher.iv = nonce
     decipher.auth_tag = tag
     decipher.auth_data = 'Canvas-v1.0.0'
@@ -342,16 +342,15 @@ module CanvasSecurity
         end
       end
 
-      if body[:exp].present? && !ignore_expiration
-        if timestamp_as_integer(body[:exp]) < verification_time.to_i
-          raise CanvasSecurity::TokenExpired
-        end
+      if body[:exp].present? &&
+         !ignore_expiration &&
+         timestamp_as_integer(body[:exp]) < verification_time.to_i
+        raise CanvasSecurity::TokenExpired
       end
 
-      if body[:nbf].present?
-        if timestamp_as_integer(body[:nbf]) > verification_time.to_i
-          raise CanvasSecurity::InvalidToken
-        end
+      if body[:nbf].present? &&
+         timestamp_as_integer(body[:nbf]) > verification_time.to_i
+        raise CanvasSecurity::InvalidToken
       end
     end
 

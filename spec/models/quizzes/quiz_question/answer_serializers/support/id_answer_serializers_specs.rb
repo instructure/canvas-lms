@@ -19,7 +19,7 @@
 
 shared_examples_for 'Id Answer Serializers' do
   it '[auto] should reject an unknown answer ID' do
-    input = 12321
+    input = 12_321
     input = format(input) if respond_to?(:format)
 
     rc = subject.serialize(input)

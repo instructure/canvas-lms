@@ -165,7 +165,7 @@ class Quizzes::QuizSubmissionService
       reject! 'you are not allowed to update scores for this quiz submission', 403
     end
 
-    if !attempt
+    unless attempt
       reject! 'invalid attempt', 400
     end
 
@@ -304,9 +304,10 @@ class Quizzes::QuizSubmissionService
 
     unless can_take.eligible?
       reason = can_take.declined_reason_renders
-      if reason == :access_code
+      case reason
+      when :access_code
         reject! 'invalid access code', 403
-      elsif reason == :invalid_ip
+      when :invalid_ip
         reject! 'IP address denied', 403
       end
       reject! 'quiz is locked', 400

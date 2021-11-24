@@ -18,9 +18,12 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import GradebookHeaderMenu from 'ui/features/screenreader_gradebook/jquery/GradebookHeaderMenu.js'
+import GradebookHeaderMenu from 'ui/features/screenreader_gradebook/jquery/GradebookHeaderMenu'
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog.coffee'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import MessageStudentsWithObserversDialog from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
   setup() {
@@ -34,13 +37,13 @@ QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
   }
 })
 
-test('calls @hideMenuActionsWithUnmetDependencies when isAdmin', function() {
+test('calls @hideMenuActionsWithUnmetDependencies when isAdmin', function () {
   fakeENV.setup({current_user_roles: ['admin']})
   this.menuPopupOpenHandler()
   ok(this.hideMenuActionsWithUnmetDependencies.called)
 })
 
-test('calls @hideMenuActionsWithUnmetDependencies when not isAdmin', function() {
+test('calls @hideMenuActionsWithUnmetDependencies when not isAdmin', function () {
   fakeENV.setup({current_user_roles: []})
   this.menuPopupOpenHandler()
   ok(this.hideMenuActionsWithUnmetDependencies.called)
@@ -95,54 +98,54 @@ QUnit.module('GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies', {
   }
 })
 
-test('hides 0 menu items given optimal conditions', function() {
+test('hides 0 menu items given optimal conditions', function () {
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   equal(this.visibleMenuItems(this.menu).length, 7)
 })
 
-test('hides the showAssignmentDetails menu item when @allSubmissionsLoaded is false', function() {
+test('hides the showAssignmentDetails menu item when @allSubmissionsLoaded is false', function () {
   this.allSubmissionsLoaded = false
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('showAssignmentDetails'))
 })
 
-test('hides the messageStudentsWho menu item when @allSubmissionsLoaded is false', function() {
+test('hides the messageStudentsWho menu item when @allSubmissionsLoaded is false', function () {
   this.allSubmissionsLoaded = false
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('messageStudentsWho'))
 })
 
-test('hides the setDefaultGrade menu item when @allSubmissionsLoaded is false', function() {
+test('hides the setDefaultGrade menu item when @allSubmissionsLoaded is false', function () {
   this.allSubmissionsLoaded = false
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('setDefaultGrade'))
 })
 
-test('hides the curveGrades menu item when @allSubmissionsLoaded is false', function() {
+test('hides the curveGrades menu item when @allSubmissionsLoaded is false', function () {
   this.allSubmissionsLoaded = false
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('curveGrades'))
 })
 
-test('hides the curveGrades menu item when @assignment.grading_type is pass_fail', function() {
+test('hides the curveGrades menu item when @assignment.grading_type is pass_fail', function () {
   this.assignment.grading_type = 'pass_fail'
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('curveGrades'))
 })
 
-test('hides the curveGrades menu item when @assignment.points_possible is empty', function() {
+test('hides the curveGrades menu item when @assignment.points_possible is empty', function () {
   delete this.assignment.points_possible
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('curveGrades'))
 })
 
-test('hides the curveGrades menu item when @assignment.points_possible is 0', function() {
+test('hides the curveGrades menu item when @assignment.points_possible is 0', function () {
   this.assignment.points_possible = 0
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('curveGrades'))
 })
 
-test('does not hide the downloadSubmissions menu item when @assignment.submission_types is online_text_entry or online_url', function() {
+test('does not hide the downloadSubmissions menu item when @assignment.submission_types is online_text_entry or online_url', function () {
   ;['online_text_entry', 'online_url'].forEach(submission_type => {
     this.assignment.submission_types = 'online_text_entry'
     this.hideMenuActionsWithUnmetDependencies(this.menu)
@@ -150,19 +153,19 @@ test('does not hide the downloadSubmissions menu item when @assignment.submissio
   })
 })
 
-test('hides the downloadSubmissions menu item when @assignment.submission_types is not one of online_upload, online_text_entry or online_url', function() {
+test('hides the downloadSubmissions menu item when @assignment.submission_types is not one of online_upload, online_text_entry or online_url', function () {
   this.assignment.submission_types = 'go-ravens'
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('downloadSubmissions'))
 })
 
-test('hides the reuploadSubmissions menu item when gradebook is editable', function() {
+test('hides the reuploadSubmissions menu item when gradebook is editable', function () {
   this.gradebook.options.gradebook_is_editable = false
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('reuploadSubmissions'))
 })
 
-test('hides the reuploadSubmissions menu item when @assignment.submission_downloads is 0', function() {
+test('hides the reuploadSubmissions menu item when @assignment.submission_downloads is 0', function () {
   this.assignment.submissions_downloads = 0
   this.hideMenuActionsWithUnmetDependencies(this.menu)
   notOk(this.visibleMenuItemNames(this.menu).includes('reuploadSubmissions'))
@@ -199,24 +202,24 @@ QUnit.module('GradebookHeaderMenu#disableUnavailableMenuActions', {
   }
 })
 
-test('disables 0 menu items when given a menu but @assignment does not exist', function() {
+test('disables 0 menu items when given a menu but @assignment does not exist', function () {
   this.disableUnavailableMenuActions(this.menu)
   equal(this.disabledMenuItems(this.menu).length, 0)
 })
 
-test('disables 0 menu items when given a menu and @assignment which does not have inClosedGradingPeriod set', function() {
+test('disables 0 menu items when given a menu and @assignment which does not have inClosedGradingPeriod set', function () {
   this.assignment = {}
   this.disableUnavailableMenuActions(this.menu)
   equal(this.disabledMenuItems(this.menu).length, 0)
 })
 
-test('disables 0 menu items when given a menu and @assignment which has inClosedGradingPeriod set', function() {
+test('disables 0 menu items when given a menu and @assignment which has inClosedGradingPeriod set', function () {
   this.assignment = {inClosedGradingPeriod: false}
   this.disableUnavailableMenuActions(this.menu)
   equal(this.disabledMenuItems(this.menu).length, 0)
 })
 
-test('given an assignment in closed grading period, disable curveGrades and setDefaultGrade menu items', function() {
+test('given an assignment in closed grading period, disable curveGrades and setDefaultGrade menu items', function () {
   this.assignment = {inClosedGradingPeriod: true}
   this.disableUnavailableMenuActions(this.menu)
   const disabledMenuItems = this.disabledMenuItems(this.menu)
@@ -227,14 +230,14 @@ test('given an assignment in closed grading period, disable curveGrades and setD
   ok(disabledMenuItems[1].getAttribute('aria-disabled'))
 })
 
-test('does not disable "Curve Grades" when isAdmin', function() {
+test('does not disable "Curve Grades" when isAdmin', function () {
   ENV.current_user_roles = ['admin']
   this.assignment = {inClosedGradingPeriod: true}
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(this.menu.find('[data-action="curveGrades"]')[0].getAttribute('aria-disabled'), null)
 })
 
-test('does not disable "Set Default Grade" when isAdmin', function() {
+test('does not disable "Set Default Grade" when isAdmin', function () {
   ENV.current_user_roles = ['admin']
   this.assignment = {inClosedGradingPeriod: true}
   this.disableUnavailableMenuActions(this.menu)
@@ -244,7 +247,7 @@ test('does not disable "Set Default Grade" when isAdmin', function() {
   )
 })
 
-test('disables "Unmute Assignment" when the assignment is moderated and grades have not been published', function() {
+test('disables "Unmute Assignment" when the assignment is moderated and grades have not been published', function () {
   this.assignment = {
     moderated_grading: true,
     grades_published: false,
@@ -258,7 +261,7 @@ test('disables "Unmute Assignment" when the assignment is moderated and grades h
   )
 })
 
-test('does not disable "Unmute Assignment" when grades are published', function() {
+test('does not disable "Unmute Assignment" when grades are published', function () {
   this.assignment = {
     moderated_grading: true,
     grades_published: true,
@@ -269,7 +272,7 @@ test('does not disable "Unmute Assignment" when grades are published', function(
   strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), null)
 })
 
-test('does not disable "Mute Assignment" when the assignment can be muted', function() {
+test('does not disable "Mute Assignment" when the assignment can be muted', function () {
   this.assignment = {
     moderated_grading: true,
     grades_published: false,
@@ -296,24 +299,24 @@ QUnit.module('GradebookHeaderMenu#setDefaultGrade', {
   }
 })
 
-test('calls the SetDefaultGradeDialog when isAdmin is true and assignment has no due date in a closed grading period', function() {
+test('calls the SetDefaultGradeDialog when isAdmin is true and assignment has no due date in a closed grading period', function () {
   this.setDefaultGrade(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls the SetDefaultGradeDialog when isAdmin is true and assignment does have a due date in a closed grading period', function() {
+test('calls the SetDefaultGradeDialog when isAdmin is true and assignment does have a due date in a closed grading period', function () {
   this.options.assignment.inClosedGradingPeriod = true
   this.setDefaultGrade(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls the SetDefaultGradeDialog when isAdmin is false and assignment has no due date in a closed grading period', function() {
+test('calls the SetDefaultGradeDialog when isAdmin is false and assignment has no due date in a closed grading period', function () {
   ENV.current_user_roles = []
   this.setDefaultGrade(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls the flashError when isAdmin is false and assignment does have a due date in a closed grading period', function() {
+test('calls the flashError when isAdmin is false and assignment does have a due date in a closed grading period', function () {
   ENV.current_user_roles = []
   this.options.assignment.inClosedGradingPeriod = true
   this.setDefaultGrade(this.options)
@@ -337,27 +340,140 @@ QUnit.module('GradebookHeaderMenu#curveGrades', {
   }
 })
 
-test('calls the CurveGradesDialog when isAdmin is true and assignment has no due date in a closed grading period', function() {
+test('calls the CurveGradesDialog when isAdmin is true and assignment has no due date in a closed grading period', function () {
   this.curveGrades(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls the CurveGradesDialog when isAdmin is true and assignment does have a due date in a closed grading period', function() {
+test('calls the CurveGradesDialog when isAdmin is true and assignment does have a due date in a closed grading period', function () {
   this.options.assignment.inClosedGradingPeriod = true
   this.curveGrades(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls the CurveGradesDialog when isAdmin is false and assignment has no due date in a closed grading period', function() {
+test('calls the CurveGradesDialog when isAdmin is false and assignment has no due date in a closed grading period', function () {
   ENV.current_user_roles = []
   this.curveGrades(this.options)
   ok(this.dialogStub.called)
 })
 
-test('calls flashError when isAdmin is false and assignment does have a due date in a closed grading period', function() {
+test('calls flashError when isAdmin is false and assignment does have a due date in a closed grading period', function () {
   ENV.current_user_roles = []
   this.options.assignment.inClosedGradingPeriod = true
   this.curveGrades(this.options)
   notOk(this.dialogStub.called)
   ok($.flashError.called)
+})
+
+QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
+  QUnit.module('when opts.show_message_students_with_observers_dialog is true', function (hooks) {
+    let createElementStub
+    let mountPoint
+    let params
+    let renderStub
+
+    hooks.beforeEach(() => {
+      createElementStub = sandbox.stub(React, 'createElement')
+      renderStub = sandbox.stub(ReactDOM, 'render')
+
+      mountPoint = document.createElement('span')
+      mountPoint.dataset.component = 'MessageStudentsWithObserversModal'
+      document.body.append(mountPoint)
+
+      params = {
+        assignment: {
+          id: '1',
+          name: 'some assignment'
+        },
+        show_message_students_with_observers_dialog: true,
+        students: [
+          {
+            assignment_1: {
+              score: 1
+            },
+            id: '100',
+            name: 'Adam Jones',
+            sortable_name: 'Jones, Adam'
+          },
+          {
+            assignment_1: {
+              score: 2
+            },
+            id: '101',
+            name: 'Betty Ford',
+            sortable_name: 'Ford, Betty'
+          },
+          {
+            assignment_1: {
+              score: 3
+            },
+            id: '102',
+            name: 'Charlie Xi',
+            sortable_name: 'Xi, Charlie'
+          },
+          {
+            assignment_1: {
+              score: 4
+            },
+            id: '103',
+            name: 'Dana Smith',
+            sortable_name: 'Smith, Dana'
+          }
+        ]
+      }
+    })
+
+    hooks.afterEach(() => {
+      renderStub.restore()
+      createElementStub.restore()
+
+      mountPoint.remove()
+    })
+
+    test('creates the modal', function () {
+      GradebookHeaderMenu.prototype.messageStudentsWho(params)
+      strictEqual(createElementStub.callCount, 1)
+      strictEqual(createElementStub.firstCall.args[0], MessageStudentsWithObserversDialog)
+
+      const [, elementProps] = createElementStub.firstCall.args
+      deepEqual(elementProps.assignment, {id: '1', name: 'some assignment'})
+      deepEqual(elementProps.students, [
+        {
+          id: '100',
+          name: 'Adam Jones',
+          score: 1,
+          sortableName: 'Jones, Adam',
+          submitted_at: undefined
+        },
+        {
+          id: '101',
+          name: 'Betty Ford',
+          score: 2,
+          sortableName: 'Ford, Betty',
+          submitted_at: undefined
+        },
+        {
+          id: '102',
+          name: 'Charlie Xi',
+          score: 3,
+          sortableName: 'Xi, Charlie',
+          submitted_at: undefined
+        },
+        {
+          id: '103',
+          name: 'Dana Smith',
+          score: 4,
+          sortableName: 'Smith, Dana',
+          submitted_at: undefined
+        }
+      ])
+    })
+
+    test('renders the modal at the supplied mount point', function () {
+      GradebookHeaderMenu.prototype.messageStudentsWho(params)
+      strictEqual(renderStub.callCount, 1)
+      strictEqual(renderStub.firstCall.args[0], createElementStub.firstCall.returnValue)
+      strictEqual(renderStub.firstCall.args[1], mountPoint)
+    })
+  })
 })

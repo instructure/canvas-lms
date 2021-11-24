@@ -39,7 +39,7 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
 
       folder = cm.context.folders.find(cm.migration_settings[:folder_id])
 
-      update_callback = lambda { |pct|
+      update_callback = lambda do |pct|
         percent_complete = pct * 100
 
         scaled = percent_complete
@@ -52,7 +52,7 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
         if scaled - cm.progress >= 1
           cm.update_import_progress(percent_complete)
         end
-      }
+      end
 
       UnzipAttachment.process(
         :context => cm.context,

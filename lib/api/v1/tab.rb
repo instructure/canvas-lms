@@ -24,9 +24,9 @@ module Api::V1::Tab
   include NewQuizzesFeaturesHelper
 
   def tabs_available_json(context, user, session, _includes = [], precalculated_permissions: nil)
-    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map { |tab|
+    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map do |tab|
       tab_json(tab.with_indifferent_access, context, user, session)
-    }
+    end
     json.sort! { |x, y| x['position'] <=> y['position'] }
   end
 

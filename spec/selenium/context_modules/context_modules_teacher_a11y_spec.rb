@@ -58,7 +58,7 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "creates a new module using enter key", priority: "2", test_id: 126705 do
+    it "creates a new module using enter key", priority: "2" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
@@ -93,9 +93,13 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       mod1 = f("#context_module_#{modules[1].id}")
       f(".ig-header-admin .al-trigger", mod1).click
-      f('.edit_module_link', mod1).click; wait_for_ajaximations
+      f('.edit_module_link', mod1).click
+      wait_for_ajaximations
       add_button = f(".add_prerequisite_link")
-      2.times { add_button.click; wait_for_animations }
+      2.times do
+        add_button.click
+        wait_for_animations
+      end
       links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
       expect(links.size).to eq 2
       links[1].click

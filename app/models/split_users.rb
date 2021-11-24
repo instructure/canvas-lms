@@ -133,7 +133,7 @@ class SplitUsers
                        favorite: :user_id,
                        ignore: :user_id,
                        user_past_lti_id: :user_id,
-                       'Polling::Poll': :user_id }.freeze
+                       "Polling::Poll": :user_id }.freeze
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
@@ -231,7 +231,7 @@ class SplitUsers
       next unless target_cc&.user_id == source_user.id
 
       conflict_cc = restored_user.communication_channels.detect do |c|
-        c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
+        c.path.casecmp?(target_cc.path) && c.path_type == target_cc.path_type
       end
       if conflict_cc
         # we need to resolve before we can un-merge
@@ -250,8 +250,10 @@ class SplitUsers
     max_position = restored_user.communication_channels.last&.position&.+(1) || 0
     scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: restored_user).pluck(:context_id))
     # passing the array to update_all so we can get postgres to add the position for us.
-    scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
-                      restored_user.id, max_position, restored_user.root_account_ids]) unless scope.empty?
+    unless scope.empty?
+      scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
+                        restored_user.id, max_position, restored_user.root_account_ids])
+    end
 
     cc_records.where.not(previous_workflow_state: 'non existent').each do |cr|
       CommunicationChannel.where(id: cr.context_id).update_all(workflow_state: cr.previous_workflow_state)
@@ -305,7 +307,7 @@ class SplitUsers
   end
 
   def restore_source_user
-    [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+    %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
       avatar_item = merge_data.items.where.not(user_id: source_user).where(item_type: attr).take&.item
       # we only move avatar items if there were no avatar on the source_user,
       # so now we only restore it if they match what was on the from_user.
@@ -363,7 +365,7 @@ class SplitUsers
 
   def handle_submissions(records)
     [[:submissions, 'fk_rails_8d85741475'],
-     [:'quizzes/quiz_submissions', 'fk_rails_04850db4b4']].each do |table, foreign_key|
+     [:"quizzes/quiz_submissions", 'fk_rails_04850db4b4']].each do |table, foreign_key|
       model = table.to_s.classify.constantize
 
       ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
@@ -396,8 +398,8 @@ class SplitUsers
       c = r.context
       next unless c && c.class.columns_hash.key?('workflow_state')
 
-      c.workflow_state = r.previous_workflow_state unless c.class == Attachment
-      c.file_state = r.previous_workflow_state if c.class == Attachment
+      c.workflow_state = r.previous_workflow_state unless c.instance_of?(Attachment)
+      c.file_state = r.previous_workflow_state if c.instance_of?(Attachment)
       c.save! if c.changed? && c.valid?
     end
   end

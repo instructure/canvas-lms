@@ -32,9 +32,9 @@ describe "RequestContext::Session" do
     end
     Rails.application = app_class.new
     env = { 'rack.session.options' => { id: 'abc' } }
-    RequestContext::Session.new(->(_env) {
+    RequestContext::Session.new(lambda do |_env|
       [200, {}, []]
-    }).call(env)
+    end).call(env)
     expect(env['action_dispatch.cookies']['log_session_id']).to eq 'abc'
   end
 end

@@ -38,8 +38,10 @@ module SubmittablesGradingPeriodProtection
   def grading_periods_allow_submittable_update?(submittable, submittable_params, flash_message: false)
     return true unless submittable.graded?
 
-    submittable.only_visible_to_overrides =
-      submittable_params[:only_visible_to_overrides] if submittable_params.key?(:only_visible_to_overrides)
+    if submittable_params.key?(:only_visible_to_overrides)
+      submittable.only_visible_to_overrides =
+        submittable_params[:only_visible_to_overrides]
+    end
     submittable.due_at = submittable_params[:due_at] if submittable_params.key?(:due_at)
     return true unless submittable.only_visible_to_overrides_changed? || due_at_changed?(submittable)
     return true unless constrained_by_grading_periods?
@@ -126,7 +128,7 @@ module SubmittablesGradingPeriodProtection
   end
 
   def can_update_overrides?(submittable, overrides, flash_message: false)
-    changed_overrides = overrides.select { |override| override.due_at_was.to_i != override.due_at.to_i }
+    changed_overrides = overrides.reject { |override| override.due_at_was.to_i == override.due_at.to_i }
     return true if changed_overrides.empty?
 
     if changed_overrides.any? { |override| date_in_closed_grading_period?(override.due_at_was) }

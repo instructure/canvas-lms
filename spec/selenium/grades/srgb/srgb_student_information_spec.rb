@@ -42,7 +42,7 @@ describe 'Screenreader Gradebook Student Information' do
       srgb_page.visit(test_course.id)
     end
 
-    it 'allows comments in Notes field', priority: "2", test_id: 615709 do
+    it 'allows comments in Notes field', priority: "2" do
       skip_if_chrome('fails in chrome - due to replace content')
       srgb_page.select_student(student)
       srgb_page.show_notes_option.click
@@ -52,7 +52,7 @@ describe 'Screenreader Gradebook Student Information' do
       expect(srgb_page.notes_field).to have_value('Good job!')
     end
 
-    it "displays student's grades", priority: "2", test_id: 615710 do
+    it "displays student's grades", priority: "2" do
       srgb_page.select_student(student)
       expect(srgb_page.final_grade.text).to eq("30% (3 / 10 points)")
       expect(srgb_page.assign_subtotal_grade.text).to eq("30% (3 / 10)")
@@ -67,14 +67,14 @@ describe 'Screenreader Gradebook Student Information' do
         srgb_page.visit(test_course.id)
       end
 
-      it "with only a student selected", priority: "2", test_id: 615711 do
+      it "with only a student selected", priority: "2" do
         srgb_page.select_student(student)
 
         expect(f('span.text-error > i.icon-warning')).to be_displayed
         expect(f('#student_information > div.row-fluid')).to include_text('Score does not include assignments from the group')
       end
 
-      it "with only an assignment is selected", priority: "2", test_id: 615691 do
+      it "with only an assignment is selected", priority: "2" do
         srgb_page.select_assignment(assignment_5)
 
         expect(f('a > i.icon-warning')).to be_displayed

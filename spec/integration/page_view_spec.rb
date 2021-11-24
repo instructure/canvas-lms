@@ -75,7 +75,7 @@ describe "page views" do
     it "sets the canvas meta header on interaction_seconds update" do
       course_with_teacher_logged_in(:active_all => 1)
       page_view = PageView.new
-      page_view.request_id = rand(10000000).to_s
+      page_view.request_id = rand(10_000_000).to_s
       page_view.user = @user
       page_view.save
 

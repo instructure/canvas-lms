@@ -67,7 +67,7 @@ describe MicrosoftSync::PartialSyncChange do
     end
 
     it 'returns no results if array is empty' do
-      expect(described_class.with_values_in(%[id course_id], []).to_a).to be_empty
+      expect(described_class.with_values_in(%(id course_id), []).to_a).to be_empty
     end
   end
 
@@ -164,9 +164,9 @@ describe MicrosoftSync::PartialSyncChange do
     end
 
     it "doesn't delete records for different courses" do
-      expect {
+      expect do
         described_class.delete_all_replicated_to_secondary_for_course(courses[0].id)
-      }.to_not change { described_class.where(course_id: courses[1].id).count }.from(4)
+      end.to_not change { described_class.where(course_id: courses[1].id).count }.from(4)
     end
   end
 end

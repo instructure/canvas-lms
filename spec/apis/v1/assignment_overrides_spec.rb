@@ -170,11 +170,6 @@ describe AssignmentOverridesController, type: :request do
       assert_status(404)
     end
 
-    it "excludes due_at/all_day/all_day_date/lock_at/unlock_at when not overridden" do
-      json = api_show_override(@course, @assignment, @override)
-      validate_override_json(@override, json)
-    end
-
     it "includes unlock_at when overridden" do
       @override.override_unlock_at(4.days.ago)
       @override.save!
@@ -1112,12 +1107,12 @@ describe AssignmentOverridesController, type: :request do
   context 'batch operations' do
     before :once do
       course_with_teacher(:active_all => true)
-      @a, @b = 2.times.map { assignment_model(:course => @course) }
-      @a1, @a2 = 2.times.map do
+      @a, @b = Array.new(2) { assignment_model(:course => @course) }
+      @a1, @a2 = Array.new(2) do
         student_in_course
         create_adhoc_override_for_assignment(@a, @student)
       end
-      @b1, @b2, @b3 = 3.times.map do
+      @b1, @b2, @b3 = Array.new(3) do
         create_section_override_for_assignment(@b, course_section: @course.course_sections.create!)
       end
       @user = @teacher

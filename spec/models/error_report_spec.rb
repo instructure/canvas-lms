@@ -76,7 +76,7 @@ describe ErrorReport do
     ErrorReport.create! { |r| r.category = 'george' }
     expect(ErrorReport.categories).to eq ['bob', 'george']
     ErrorReport.create! { |r| r.category = 'fred' }
-    expect(ErrorReport.categories).to eq ['bob', 'fred', 'george']
+    expect(ErrorReport.categories).to eq %w[bob fred george]
   end
 
   it "filters the url when it is assigned" do
@@ -120,7 +120,7 @@ describe ErrorReport do
 
   it "truncates absurdly long messages" do
     report = described_class.new
-    long_message = (0...100000).map { 'a' }.join
+    long_message = (0...100_000).map { 'a' }.join
     report.assign_data(message: long_message)
     expect(report.message.length).to eq long_message.length
     report.save!

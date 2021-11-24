@@ -91,12 +91,12 @@ describe Api::V1::QuizQuestion do
   end
 
   describe 'as a student' do
+    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
+
     let(:answers) { [] }
     let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
     let(:user) { User.new }
     let(:session) { nil }
-
-    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
 
     describe 'text_only_questions' do
       let(:question_data) { { "answers" => answers, "question_type" => "text_only_questions" } }
@@ -110,7 +110,6 @@ describe Api::V1::QuizQuestion do
       it { is_expected.not_to include("correct_comments_html") }
       it { is_expected.not_to include("incorrect_comments_html") }
       it { is_expected.not_to include("neutral_comments_html") }
-      it { is_expected.not_to include("answers") }
       it { is_expected.to include("variables") }
       it { is_expected.to include("answer_tolerance") }
       it { is_expected.to include("formula_decimal_places") }

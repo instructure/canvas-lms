@@ -23,9 +23,15 @@ require_relative '../api_spec_helper'
 describe UserObserveesController, type: :request do
   let_once(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }
   let_once(:student)            { student_pseudonym.user }
-  let_once(:student_pseudonym)  { user_with_pseudonym(name: 'Child Smith', active_all: true); @pseudonym }
+  let_once(:student_pseudonym)  do
+    user_with_pseudonym(name: 'Child Smith', active_all: true)
+    @pseudonym
+  end
   let_once(:student2)           { student2_pseudonym.user }
-  let_once(:student2_pseudonym) { user_with_pseudonym(name: 'Another Smith', active_all: true); @pseudonym }
+  let_once(:student2_pseudonym) do
+    user_with_pseudonym(name: 'Another Smith', active_all: true)
+    @pseudonym
+  end
   let_once(:allowed_admin) do
     a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: true })
     pseudonym(a)
@@ -47,7 +53,10 @@ describe UserObserveesController, type: :request do
   let_once(:external_account)           { account_model(name: 'External Account') }
   let_once(:external_parent)            { user_with_pseudonym(name: 'Parent External', active_all: true, account: external_account) }
   let_once(:external_student)           { external_student_pseudonym.user }
-  let_once(:external_student_pseudonym) { user_with_pseudonym(name: 'Child External', active_all: true, account: external_account); @pseudonym }
+  let_once(:external_student_pseudonym) do
+    user_with_pseudonym(name: 'Child External', active_all: true, account: external_account)
+    @pseudonym
+  end
   let_once(:external_allowed_admin) do
     a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: true })
     pseudonym(a, account: external_account)
@@ -87,18 +96,17 @@ describe UserObserveesController, type: :request do
     end
 
     if opts[:avatars]
-      params.merge!(include: ["avatar_url"])
+      params[:include] = ["avatar_url"]
     end
-    json = api_call_as_user(
+    api_call_as_user(
       opts[:api_user] || allowed_admin,
       :get,
       "/api/v1/users/#{params[:user_id]}/observees#{page}",
       params.merge(action: 'index'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
-    json
   end
 
   def observers_call(opts = {})
@@ -110,16 +118,15 @@ describe UserObserveesController, type: :request do
 
   def raw_observers_call(opts = {})
     params[:user_id] = opts[:user_id] || student.id
-    json = api_call_as_user(
+    api_call_as_user(
       opts[:api_user] || allowed_admin,
       :get,
       "/api/v1/users/#{params[:user_id]}/observers",
       params.merge(action: 'observers'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
-    json
   end
 
   def create_call(data, opts = {})
@@ -132,7 +139,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'create'),
       data,
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -150,7 +157,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'show'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -168,7 +175,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'show_observer'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -186,7 +193,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'update'),
       opts.slice(:root_account_id),
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 
@@ -203,7 +210,7 @@ describe UserObserveesController, type: :request do
       params.merge(action: 'destroy'),
       {},
       {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default }
     )
     return nil if opts[:expected_status]
 

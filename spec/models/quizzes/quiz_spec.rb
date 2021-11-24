@@ -266,7 +266,7 @@ describe Quizzes::Quiz do
     end
   end
 
-  it_should_behave_like 'Canvas::DraftStateValidations'
+  it_behaves_like 'Canvas::DraftStateValidations'
 
   it "infers the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,
@@ -531,8 +531,8 @@ describe Quizzes::Quiz do
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
     q.quiz_questions.create!(:quiz_group => g)
     q.quiz_questions.create!(:quiz_group => g)
-    q.quiz_questions.create!()
-    q.quiz_questions.create!()
+    q.quiz_questions.create!
+    q.quiz_questions.create!
     q.quiz_questions.create!(:question_data => { :question_type => "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
@@ -727,18 +727,18 @@ describe Quizzes::Quiz do
 
     it "destroys results if the quiz_type becomes practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
-      expect {
+      expect do
         @quiz.save!
-      }.to change { LearningOutcomeResult.active.count }.by(-1)
+      end.to change { LearningOutcomeResult.active.count }.by(-1)
     end
 
     it "restores results if the quiz_type changes from practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
       @quiz.save!
       @quiz.quiz_type = "assignment"
-      expect {
+      expect do
         @quiz.save!
-      }.to change { LearningOutcomeResult.active.count }.by(1)
+      end.to change { LearningOutcomeResult.active.count }.by(1)
     end
   end
 
@@ -1025,7 +1025,7 @@ describe Quizzes::Quiz do
     it "creates a submission" do
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 4
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       # one of the bank questions should be duplicated, since the group
       # pick count is 3 and the bank only has 2 questions:
       expect(texts.uniq.count).to eq(3)
@@ -1051,7 +1051,7 @@ describe Quizzes::Quiz do
 
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 3
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       expect(texts.member?('gq1')).to be_truthy
       expect(texts.member?('gq2')).to be_truthy
       expect(texts.member?('qq1')).to be_truthy
@@ -1068,7 +1068,7 @@ describe Quizzes::Quiz do
 
     # nothing should be restricted
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+    [q, q1, q2].product(%i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?])
                .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # register a plugin
@@ -1078,7 +1078,7 @@ describe Quizzes::Quiz do
 
     # nothing should change yet
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+    [q, q1, q2].product(%i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?])
                .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # now actually enable the plugin
@@ -1088,13 +1088,13 @@ describe Quizzes::Quiz do
 
     # now the restrictions should take effect
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_truthy
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q.send(s)).to be_falsey }
     [:require_lockdown_browser, :require_lockdown_browser?]
       .each { |s| expect(q1.send(s)).to be_truthy }
-    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q1.send(s)).to be_falsey }
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+    %i[require_lockdown_browser require_lockdown_browser? require_lockdown_browser_for_results require_lockdown_browser_for_results? require_lockdown_browser_monitor require_lockdown_browser_monitor?]
       .each { |s| expect(q2.send(s)).to be_truthy }
   end
 
@@ -1321,7 +1321,7 @@ describe Quizzes::Quiz do
   context "custom validations" do
     context "changinging quiz points" do
       it "does not allow quiz points higher than allowable by postgres" do
-        q = Quizzes::Quiz.new(:points_possible => 2000000001)
+        q = Quizzes::Quiz.new(:points_possible => 2_000_000_001)
         expect(q.valid?).to eq false
         expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
@@ -1422,7 +1422,7 @@ describe Quizzes::Quiz do
                                                        { "question_type" => "foo" },
                                                        { "entry_type" => "quiz_group", "questions" => [{ "question_type" => "bar" }, { "question_type" => "baz" }] }
                                                      ])
-      expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
+      expect(@quiz.question_types).to eq(%w[foo bar baz])
     end
   end
 
@@ -1675,11 +1675,11 @@ describe Quizzes::Quiz do
   end
 
   describe "#restrict_answers_for_concluded_course?" do
+    subject { quiz.restrict_answers_for_concluded_course? }
+
     let(:account) { Account.default }
     let(:course) { Course.create!(root_account: account) }
     let(:quiz) { course.quizzes.create! }
-
-    subject { quiz.restrict_answers_for_concluded_course? }
 
     before do
       account.settings[:restrict_quiz_questions] = restrict_quiz_settings
@@ -1721,6 +1721,8 @@ describe Quizzes::Quiz do
           it { is_expected.to be(true) }
 
           context 'student in a section with extended time' do
+            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
+
             let(:section_end_at) { 10.minutes.from_now }
             let(:section_start_at) { 10.minutes.ago }
             let(:section) do
@@ -1731,8 +1733,6 @@ describe Quizzes::Quiz do
               )
             end
             let(:student) { student_in_section(section) }
-
-            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
 
             it { is_expected.to be(false) }
           end
@@ -1954,7 +1954,7 @@ describe Quizzes::Quiz do
   describe "#grants_right?" do
     before(:once) do
       quiz_model(course: @course)
-      @admin = account_admin_user()
+      @admin = account_admin_user
       teacher_in_course(:course => @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
@@ -2193,12 +2193,12 @@ describe Quizzes::Quiz do
   end
 
   describe '#locked_for?' do
+    subject { quiz.locked_for?(subject_user, opts) }
+
     let(:quiz) { @course.quizzes.create! }
     let(:student) { student_in_course(course: @course, active_enrollment: true).user }
     let(:subject_user) { student }
     let(:opts) { {} }
-
-    subject { quiz.locked_for?(subject_user, opts) }
 
     before do
       @course.offer!
@@ -2403,11 +2403,7 @@ describe Quizzes::Quiz do
         end
 
         context 'without students' do
-          it 'shows the quiz if there is an override' do
-            expect(@quiz.visible_to_user?(@observer)).to be_truthy
-          end
-
-          it 'shows the quiz even if there is no override' do
+          it 'shows the quiz' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
         end

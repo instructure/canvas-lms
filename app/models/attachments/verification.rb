@@ -92,7 +92,7 @@ class Attachments::Verification
       return nil
     end
 
-    return body
+    body
   end
 
   # Decodes a verifier and checks the user of the verifier has permission to access

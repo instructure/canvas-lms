@@ -99,12 +99,12 @@ module Lti::IMS::NamesAndRolesMatchers
   def expected_base_membership(user, opts)
     {
       'status' => 'Active',
-      'name' => (user.name if %w(public name_only).include?(privacy(opts))),
+      'name' => (user.name if %w[public name_only].include?(privacy(opts))),
       'picture' => (user.avatar_url if privacy(opts) == 'public'),
-      'given_name' => (user.first_name if %w(public name_only).include?(privacy(opts))),
-      'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
-      'email' => (user.email if %w(public email_only).include?(privacy(opts))),
-      'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
+      'given_name' => (user.first_name if %w[public name_only].include?(privacy(opts))),
+      'family_name' => (user.last_name if %w[public name_only].include?(privacy(opts))),
+      'email' => (user.email if %w[public email_only].include?(privacy(opts))),
+      'lis_person_sourcedid' => (expected_sourced_id(user) if %w[public name_only].include?(privacy(opts))),
       'user_id' => expected_lti_id(Lti::IMS::Providers::MembershipsProvider.unwrap(user)),
       'lti11_legacy_user_id' => Lti::Asset.opaque_identifier_for(user)
     }.compact

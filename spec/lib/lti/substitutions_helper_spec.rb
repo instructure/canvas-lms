@@ -26,16 +26,16 @@ module Lti
 
     specs_require_sharding
 
-    let(:course) {
+    let(:course) do
       Course.new.tap do |c|
         c.root_account = root_account
         c.account = account
       end
-    }
+    end
     let(:root_account) { Account.create! }
-    let(:account) {
+    let(:account) do
       Account.create!(root_account: root_account)
-    }
+    end
     let(:user) { User.create! }
 
     def set_up_persistance!
@@ -107,7 +107,7 @@ module Lti
     describe '#all_roles' do
       it 'converts multiple roles' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles
         expect(roles).to include LtiOutbound::LTIRoles::System::USER
         expect(roles).to include LtiOutbound::LTIRoles::Institution::STUDENT
@@ -127,7 +127,7 @@ module Lti
 
       it 'converts multiple roles for lis 2' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles('lis2')
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
@@ -156,7 +156,7 @@ module Lti
 
       it 'converts multiple roles for lti 1.3' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
-        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        allow(user).to receive(:roles).and_return(%w[user student teacher admin])
         roles = subject.all_roles('lti1_3')
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
         expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
@@ -224,6 +224,7 @@ module Lti
 
     describe '#account_enrollments' do
       subject { SubstitutionsHelper.new(account, root_account, user) }
+
       it 'returns enrollments in an account for a user' do
         set_up_persistance!
         enrollment = account.account_users.create!(:user => user)
@@ -482,7 +483,7 @@ module Lti
       end
 
       it "returns previous lti context_ids" do
-        expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
+        expect(subject.previous_lti_context_ids.split(",")).to match_array %w[abc def]
       end
     end
 
@@ -663,12 +664,6 @@ module Lti
       end
 
       describe "#email" do
-        it "returns the users email" do
-          expect(substitution_helper.email).to eq user.email
-        end
-
-        let(:sis_email) { 'sis@example.com' }
-
         let(:sis_pseudonym) do
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
@@ -679,6 +674,11 @@ module Lti
           pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           pseudonym
+        end
+        let(:sis_email) { 'sis@example.com' }
+
+        it "returns the users email" do
+          expect(substitution_helper.email).to eq user.email
         end
 
         it "returns the sis email if it's an LTI2 tool" do

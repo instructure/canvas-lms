@@ -18,6 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::QuizStatisticsSerializer do
+  subject do
+    Quizzes::QuizStatisticsSerializer.new(statistics, {
+                                            controller: controller,
+                                            scope: user,
+                                            session: session
+                                          })
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -67,14 +75,6 @@ describe Quizzes::QuizStatisticsSerializer do
     end
   end
 
-  subject do
-    Quizzes::QuizStatisticsSerializer.new(statistics, {
-                                            controller: controller,
-                                            scope: user,
-                                            session: session
-                                          })
-  end
-
   before do
     @json = subject.as_json[:quiz_statistics].stringify_keys
   end
@@ -92,7 +92,7 @@ describe Quizzes::QuizStatisticsSerializer do
     oldest = 5.days.ago
 
     allow(statistics.student_analysis).to receive_messages(created_at: oldest)
-    allow(statistics.item_analysis).to receive_messages(created_at: oldest + 1.days)
+    allow(statistics.item_analysis).to receive_messages(created_at: oldest + 1.day)
 
     @json = subject.as_json[:quiz_statistics].stringify_keys
     expect(@json['generated_at']).to eq oldest

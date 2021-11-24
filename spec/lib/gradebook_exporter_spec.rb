@@ -209,13 +209,13 @@ describe GradebookExporter do
     end
 
     describe "default output with blank course" do
+      subject(:csv) { exporter.to_csv }
+
       before(:once) do
         @course.custom_gradebook_columns.create! title: "Custom Column 1"
         @course.custom_gradebook_columns.create! title: "Custom Column 2"
         @course.custom_gradebook_columns.create!({ title: "Custom Column 3", workflow_state: "hidden" })
       end
-
-      subject(:csv) { exporter.to_csv }
 
       let(:expected_headers) do
         [
@@ -273,7 +273,7 @@ describe GradebookExporter do
         end
       end
 
-      context "when Final Grade Override is not enabled" do
+      context "when Final Grade Override is not enabled on the course" do
         before(:once) do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
@@ -290,7 +290,7 @@ describe GradebookExporter do
         end
       end
 
-      context "when Final Grade Override is not enabled" do
+      context "when Final Grade Override is not enabled as a feature" do
         it "excludes the Override Score headers" do
           actual_headers = CSV.parse(csv, headers: true).headers
           expect(actual_headers).not_to include("Override Grade")
@@ -531,7 +531,7 @@ describe GradebookExporter do
                                                        title: "past",
                                                        points_possible: 10
 
-        @current_assignment = @course.assignments.create! due_at: 1.weeks.from_now,
+        @current_assignment = @course.assignments.create! due_at: 1.week.from_now,
                                                           title: "current",
                                                           points_possible: 10
 

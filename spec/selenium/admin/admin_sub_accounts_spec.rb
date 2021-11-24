@@ -67,11 +67,11 @@ describe "admin sub accounts" do
 
   it "deletes a sub account" do
     sub_account = create_sub_account_and_go
-    expect {
+    expect do
       click_account_action_link(sub_account.id, '.delete_account_link')
       driver.switch_to.alert.accept
       wait_for_ajaximations
-    }.to change(Account.default.sub_accounts, :count).by(-1)
+    end.to change(Account.default.sub_accounts, :count).by(-1)
     check_element_has_focus f("#account_#{Account.default.id} > .header .name")
     expect(f('.sub_accounts')).not_to contain_css('.sub_account')
   end

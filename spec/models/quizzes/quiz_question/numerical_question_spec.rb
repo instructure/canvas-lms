@@ -51,7 +51,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it 'works for inputs of type Float' do
-      expect(question.i18n_decimal(123456e-2)).to eq BigDecimal('1234.56')
+      expect(question.i18n_decimal(123_456e-2)).to eq BigDecimal('1234.56')
     end
   end
 
@@ -61,14 +61,6 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
 
     context "handles '' values without error" do
       it 'handles "answer[:exact]"' do
-        answer_data = {
-          numerical_answer_type: "exact_answer"
-        }
-        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
-      end
-
-      it 'handles "answer[:margin]"' do
         answer_data = {
           numerical_answer_type: "exact_answer"
         }

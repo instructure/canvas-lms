@@ -56,7 +56,7 @@ describe Mutations::CreateGroupInSet do
   end
 
   it "fails gracefully for invalid group sets" do
-    invalid_group_set_id = 111111111111111111
+    invalid_group_set_id = 111_111_111_111_111_111
     result = CanvasSchema.execute(mutation_str(group_set_id: invalid_group_set_id), context: { current_user: @student })
     expect(result["errors"]).not_to be_nil
     expect(result.dig(*%w[data createGroupInSet])).to be_nil

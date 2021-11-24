@@ -57,7 +57,7 @@ describe "Gradebook - post grades to SIS" do
   describe "Plugin" do
     before(:once) { export_plugin_setting.update(disabled: false) }
 
-    it "is not visible by default", priority: "1", test_id: 244958 do
+    it "is not visible by default", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.open_action_menu
 
@@ -76,7 +76,7 @@ describe "Gradebook - post grades to SIS" do
     end
 
     it 'does not show assignment errors when clicking the post grades button if all ' \
-       'assignments have due dates for each section', priority: '1', test_id: 3036003 do
+       'assignments have due dates for each section', priority: '1' do
       mock_feature_flag(:post_grades, true)
 
       @course.update!(sis_source_id: 'xyz')
@@ -102,7 +102,7 @@ describe "Gradebook - post grades to SIS" do
       export_plugin_setting.update(disabled: false)
     end
 
-    it "is not visible by default", priority: "1", test_id: 244958 do
+    it "is not visible by default", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.select_sync
 
@@ -121,7 +121,7 @@ describe "Gradebook - post grades to SIS" do
     end
 
     it 'does not show assignment errors when clicking the post grades button if all ' \
-       'assignments have due dates for each section', priority: '1', test_id: 3036003 do
+       'assignments have due dates for each section', priority: '1' do
       mock_feature_flag(:post_grades, true)
 
       @course.update!(sis_source_id: 'xyz')
@@ -161,7 +161,7 @@ describe "Gradebook - post grades to SIS" do
     let!(:tool) { create_post_grades_tool }
     let(:tool_name) { "post_grades_lti_#{tool.id}" }
 
-    it "shows when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
+    it "shows when a post_grades lti tool is installed", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.open_action_menu
 
@@ -189,7 +189,7 @@ describe "Gradebook - post grades to SIS" do
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
 
-    it "does not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
+    it "does not hide post grades lti button when section selected", priority: "1" do
       create_post_grades_tool
 
       Gradebook.visit(@course)
@@ -228,7 +228,7 @@ describe "Gradebook - post grades to SIS" do
     let!(:tool) { create_post_grades_tool }
     let(:tool_name) { "post_grades_lti_#{tool.id}" }
 
-    it "shows when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
+    it "shows when a post_grades lti tool is installed", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.select_sync
 
@@ -256,7 +256,7 @@ describe "Gradebook - post grades to SIS" do
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
 
-    it "does not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
+    it "does not hide post grades lti button when section selected", priority: "1" do
       create_post_grades_tool
 
       Gradebook.visit(@course)

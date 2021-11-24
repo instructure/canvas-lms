@@ -33,7 +33,10 @@ describe "speed grader submissions" do
   end
 
   context "as a teacher" do
-    it "displays submission of first student and then second student", priority: "1", test_id: 283276 do
+    let(:student_3) { @course.enroll_student(unenrolled_user, enrollment_state: :active) }
+    let(:unenrolled_user) { create_users(1, return_type: :record)[0] }
+
+    it "displays submission of first student and then second student", priority: "1" do
       student_submission
 
       # create initial data for second student
@@ -49,14 +52,14 @@ describe "speed grader submissions" do
       expect(f('#assignment_url')).to include_text(@assignment.title)
 
       # check for assignment text in speed grader iframe
-      check_first_student = -> do
+      check_first_student = lambda do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student.name)
         in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission.body)
         end
       end
 
-      check_second_student = -> do
+      check_second_student = lambda do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student_2.name)
         in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission_2.body)
@@ -76,14 +79,14 @@ describe "speed grader submissions" do
       end
     end
 
-    it "does not error if there are no submissions", priority: "2", test_id: 283277 do
+    it "does not error if there are no submissions", priority: "2" do
       student_in_course
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajax_requests
       expect(driver.execute_script("return INST.errorCount")).to eq 0
     end
 
-    it "has a submission_history after a submitting a comment", priority: "1", test_id: 283278 do
+    it "has a submission_history after a submitting a comment", priority: "1" do
       # a student without a submission
       @student_2 = User.create!(name: 'student 2')
       @student_2.register
@@ -99,7 +102,7 @@ describe "speed grader submissions" do
       expect(f('#comments > .comment')).to be_displayed
     end
 
-    it "displays submission late notice message", priority: "1", test_id: 283279 do
+    it "displays submission late notice message", priority: "1" do
       @assignment.due_at = Time.zone.now - 2.days
       @assignment.save!
       student_submission
@@ -109,7 +112,7 @@ describe "speed grader submissions" do
       expect(f('#submission_details')).to contain_css('.submission-late-pill')
     end
 
-    it "does not display a late message if an assignment has been overridden", priority: "1", test_id: 283280 do
+    it "does not display a late message if an assignment has been overridden", priority: "1" do
       @assignment.update_attribute(:due_at, Time.now - 2.days)
       override = @assignment.assignment_overrides.build
       override.due_at = Time.now + 2.days
@@ -123,7 +126,7 @@ describe "speed grader submissions" do
       expect(f('#submission_details')).not_to contain_css('.submission-late-pill')
     end
 
-    it "displays no submission message if student does not make a submission", priority: "1", test_id: 283499 do
+    it "displays no submission message if student does not make a submission", priority: "1" do
       @student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
       @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
 
@@ -132,11 +135,7 @@ describe "speed grader submissions" do
       expect(f('#this_student_does_not_have_a_submission')).to be_displayed
     end
 
-    let(:unenrolled_user) { create_users(1, return_type: :record)[0] }
-
-    let(:student_3) { @course.enroll_student(unenrolled_user, enrollment_state: :active) }
-
-    it "handles versions correctly", priority: "2", test_id: 283500 do
+    it "handles versions correctly", priority: "2" do
       submission1 = student_submission(username: "student1@example.com", body: 'first student, first version')
       submission2 = student_submission(username: "student2@example.com", body: 'second student')
       student_3
@@ -200,7 +199,7 @@ describe "speed grader submissions" do
       end
       expect(f('#submission_not_newest_notice')).to be_displayed
 
-      f(%Q{#students_selectmenu option[value="#{submission2.user.id}"]}).click
+      f(%(#students_selectmenu option[value="#{submission2.user.id}"])).click
 
       in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations
@@ -209,7 +208,7 @@ describe "speed grader submissions" do
       expect(f('#submission_not_newest_notice')).not_to be_displayed
     end
 
-    it "leaves the full rubric open when switching submissions", priority: "1", test_id: 283501 do
+    it "leaves the full rubric open when switching submissions", priority: "1" do
       student_submission(username: "student1@example.com")
       student_submission(username: "student2@example.com")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -219,8 +218,8 @@ describe "speed grader submissions" do
       wait_for_ajaximations
       rubric = f('#rubric_full')
       expect(rubric).to be_displayed
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Rockin'" }[0].click
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Rockin'" }.click
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
       expect(f("span[data-selenium='rubric_total']")).to include_text('8')
       f('#rubric_full .save_rubric_button').click
       wait_for_ajaximations
@@ -244,10 +243,9 @@ describe "speed grader submissions" do
       expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "5")
     end
 
-    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
-                                                                                                test_id: 283502
+    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1"
 
-    it "displays image submission in browser", priority: "1", test_id: 283503 do
+    it "displays image submission in browser", priority: "1" do
       filename, fullpath, _data = get_file("graded.png")
       create_and_enroll_students(1)
       @assignment.submission_types = 'online_upload'
@@ -304,7 +302,7 @@ describe "speed grader submissions" do
         @assignment.save!
       end
 
-      it "displays a pending icon if submission status is pending", priority: "1", test_id: 283504 do
+      it "displays a pending icon if submission status is pending", priority: "1" do
         student_submission
         set_turnitin_asset(@submission, { status: 'pending' })
 
@@ -318,7 +316,7 @@ describe "speed grader submissions" do
         expect(f('#grade_container .turnitin_info')).not_to be_nil
       end
 
-      it "displays a score if submission has a similarity score", priority: "1", test_id: 283505 do
+      it "displays a score if submission has a similarity score", priority: "1" do
         student_submission
         set_turnitin_asset(@submission, { similarity_score: 96, state: 'failure', status: 'scored' })
 
@@ -328,7 +326,7 @@ describe "speed grader submissions" do
         expect(f('#grade_container .turnitin_similarity_score')).to include_text "96%"
       end
 
-      it "displays an error icon if submission status is error", priority: "2", test_id: 283506 do
+      it "displays an error icon if submission status is error", priority: "2" do
         student_submission
         set_turnitin_asset(@submission, { status: 'error' })
 
@@ -343,15 +341,15 @@ describe "speed grader submissions" do
         expect(f('#grade_container .turnitin_resubmit_button')).not_to be_nil
       end
 
-      it "shows turnitin score for attached files", priority: "1", test_id: 283507 do
+      it "shows turnitin score for attached files", priority: "1" do
         @user = user_with_pseudonym({ active_user: true, username: 'student@example.com', password: 'qwertyuiop' })
         attachment1 = @user.attachments.new filename: "homework1.doc"
         attachment1.content_type = "application/msword"
-        attachment1.size = 10093
+        attachment1.size = 10_093
         attachment1.save!
         attachment2 = @user.attachments.new filename: "homework2.doc"
         attachment2.content_type = "application/msword"
-        attachment2.size = 10093
+        attachment2.size = 10_093
         attachment2.save!
 
         create_enrollments @course, [@user]
@@ -366,7 +364,7 @@ describe "speed grader submissions" do
         expect(f('#submission_files_list .submission_pending')).not_to be_nil
       end
 
-      it "successfully schedules resubmit when button is clicked", priority: "1", test_id: 283508 do
+      it "successfully schedules resubmit when button is clicked", priority: "1" do
         account = @assignment.context.account
         account.update(turnitin_account_id: 'test_account',
                        turnitin_shared_secret: 'skeret',
@@ -382,7 +380,7 @@ describe "speed grader submissions" do
         wait_for_ajaximations
         expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click }
         wait_for_ajaximations
-        expect(Delayed::Job.find_by_tag('Submission#submit_to_turnitin')).not_to be_nil
+        expect(Delayed::Job.find_by(tag: 'Submission#submit_to_turnitin')).not_to be_nil
         expect(f('#grade_container .submission_pending')).not_to be_nil
       end
     end

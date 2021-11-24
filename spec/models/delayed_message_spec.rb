@@ -293,7 +293,7 @@ describe DelayedMessage do
         expected_windows = []
         actual_windows = []
 
-        DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times.map do |i|
+        DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times do |i|
           @dm.communication_channel.user.pseudonym.account_id = i
           @dm.send_at = nil
           @dm.send(:set_send_at)
@@ -316,7 +316,7 @@ describe DelayedMessage do
         actual_diffs = []
         windows = []
 
-        DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times.map do |i|
+        DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times do |i|
           @dm.communication_channel.user.id = i
           @dm.send_at = nil
           @dm.send(:set_send_at)

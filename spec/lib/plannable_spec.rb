@@ -38,7 +38,7 @@ describe Plannable do
     end
 
     it "returns the assignment's override if the associated object does not have an override" do
-      assignment = assignment_model()
+      assignment = assignment_model
       assignment_override = assignment.planner_overrides.create!(user: @student)
       assignment.submission_types = "discussion_topic"
       assignment.save!
@@ -46,7 +46,7 @@ describe Plannable do
     end
 
     it "prefers the associated object's override if both have an override" do
-      assignment = assignment_model()
+      assignment = assignment_model
       assignment.planner_overrides.create!(user: @student)
       assignment.submission_types = "discussion_topic"
       assignment.save!

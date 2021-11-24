@@ -29,7 +29,7 @@ describe 'quizzes accessibility' do
     @last_quiz = start_quiz_question
   end
 
-  it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
+  it 'renders all answer arrows accessible to a screen reader', priority: "2" do
     skip('started failing around Mar 20, 2016 - need investigation')
     skip_if_chrome('Can not get to student view in Chrome')
     # -------------------------------------------------------------------------

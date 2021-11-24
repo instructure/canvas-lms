@@ -185,7 +185,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         it "has only the allowed question output fields" do
           question_fields = Api::V1::QuizQuestion::API_ALLOWED_QUESTION_OUTPUT_FIELDS[:only].map(&:to_sym) + Api::V1::QuizQuestion::API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.map(&:to_sym)
           expect(question_fields).to include(:correct_comments_html)
-          @json.keys.each { |key| expect(question_fields.to_s).to include(key.to_s) }
+          @json.each_key { |key| expect(question_fields.to_s).to include(key.to_s) }
         end
 
         it "has the question data fields" do
@@ -274,7 +274,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
       end
 
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show) ' do
+      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 

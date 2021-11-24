@@ -45,7 +45,7 @@ describe SpeedGrader::Assignment do
         @course.assignments.create!(
           group_category_id: category.id,
           grade_group_students_individually: false,
-          submission_types: %w(text_entry)
+          submission_types: %w[text_entry]
         )
       end
       let(:homework_params) do
@@ -114,56 +114,56 @@ describe SpeedGrader::Assignment do
 
         before do
           json = SpeedGrader::Assignment.new(assignment, teacher).json
-          student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
+          student_a_submission = json.fetch(:submissions).find { |s| s[:user_id] == first_student.id.to_s }
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
             comment.slice(:author_id, :comment)
           end
         end
 
         it do
-          is_expected.to include({ "author_id" => first_student.id.to_s, "comment" => homework_params.fetch(:comment) })
+          expect(subject).to include({ "author_id" => first_student.id.to_s, "comment" => homework_params.fetch(:comment) })
         end
 
         it do
-          is_expected.to include({
-                                   "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_two_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.to include({
-                                   "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_three_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.to include({
-                                   "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
-                                   "comment" => comment_six_to_group_params.fetch(:comment)
-                                 })
-        end
-
-        it do
-          is_expected.not_to include({
-                                       "author_id" => comment_four_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_four_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_two_to_group_params.fetch(:comment)
                                      })
         end
 
         it do
-          is_expected.not_to include({
-                                       "author_id" => comment_five_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_five_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_three_to_group_params.fetch(:comment)
                                      })
         end
 
         it do
-          is_expected.not_to include({
-                                       "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
-                                       "comment" => comment_seven_private_params.fetch(:comment)
+          expect(subject).to include({
+                                       "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
+                                       "comment" => comment_six_to_group_params.fetch(:comment)
                                      })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_four_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_four_private_params.fetch(:comment)
+                                         })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_five_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_five_private_params.fetch(:comment)
+                                         })
+        end
+
+        it do
+          expect(subject).not_to include({
+                                           "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
+                                           "comment" => comment_seven_private_params.fetch(:comment)
+                                         })
         end
       end
     end
@@ -263,10 +263,10 @@ describe SpeedGrader::Assignment do
     it "includes only students and sections with overrides for differentiated assignments" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
-      expect(json[:context][:students].map { |s| s[:id] }).not_to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).not_to include(@section2.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
+      expect(json[:context][:students].pluck(:id)).not_to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).not_to include(@section2.id.to_s)
     end
 
     it "sorts student view students last" do
@@ -280,10 +280,10 @@ describe SpeedGrader::Assignment do
       @assignment.save!
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section2.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section2.id.to_s)
     end
   end
 
@@ -633,7 +633,7 @@ describe SpeedGrader::Assignment do
                                              })
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-            students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
             StringifyIds.recursively_stringify_ids(students)
             expect(json_students).to match_array(students)
           end
@@ -651,7 +651,7 @@ describe SpeedGrader::Assignment do
           it 'returns only students that belong to the first group' do
             json = SpeedGrader::Assignment.new(@assignment, @teacher).json
             json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-            group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
             StringifyIds.recursively_stringify_ids(group_students)
             expect(json_students).to match_array(group_students)
           end
@@ -665,7 +665,7 @@ describe SpeedGrader::Assignment do
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
               group_students = group.users.where.not(id: first_student)
-                                    .as_json(include_root: false, only: [:id, :name, :sortable_name])
+                                    .as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -680,7 +680,7 @@ describe SpeedGrader::Assignment do
                                                })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-              group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              group_students = group.users.as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(group_students)
               expect(json_students).to match_array(group_students)
             end
@@ -697,7 +697,7 @@ describe SpeedGrader::Assignment do
 
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map { |s| s.except(:rubric_assessments) }
-              course_students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              course_students = @course.students.as_json(include_root: false, only: %i[id name sortable_name])
               StringifyIds.recursively_stringify_ids(course_students)
               expect(json_students).to match_array(course_students)
             end
@@ -711,7 +711,7 @@ describe SpeedGrader::Assignment do
         @assignment = @course.assignments.create!(
           group_category_id: @group_category.id,
           grade_group_students_individually: false,
-          submission_types: %w(text_entry)
+          submission_types: %w[text_entry]
         )
       end
 
@@ -921,9 +921,7 @@ describe SpeedGrader::Assignment do
       assignment = quiz.assignment
       assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      expect(json[:submissions]).to be_all do |s|
-        s.key? 'submission_history'
-      end
+      expect(json[:submissions]).to all(have_key('submission_history'))
     end
 
     context "with quiz_submissions" do
@@ -1030,12 +1028,12 @@ describe SpeedGrader::Assignment do
       let(:submission) { Submission.find_or_initialize_by(assignment: @assignment, user: @student) }
 
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00
           https://abcdef.com/uuurrrlll01
           https://abcdef.com/uuurrrlll02
           https://abcdef.com/uuurrrlll03
-        )
+        ]
       end
 
       let(:url_grades) do
@@ -1284,11 +1282,11 @@ describe SpeedGrader::Assignment do
       end
 
       it "excludes provisional grade submission comments from other graders" do
-        expect(comment_ids).not_to include(ta_comment.id.to_s)
+        expect(comment_ids).not_to include(ta_provisional_comment.id.to_s)
       end
 
       it "excludes provisional grade submission comments from the final grader" do
-        expect(comment_ids).not_to include(final_grader_comment.id.to_s)
+        expect(comment_ids).not_to include(final_grader_provisional_comment.id.to_s)
       end
     end
   end
@@ -1935,7 +1933,7 @@ describe SpeedGrader::Assignment do
 
       it "adds anonymous ids to student enrollments" do
         anonymous_ids = json['context']['enrollments'].map { |enrollment| enrollment['anonymous_id'] }
-        expect(anonymous_ids.uniq).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids.uniq).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids from student enrollments" do
@@ -1948,7 +1946,7 @@ describe SpeedGrader::Assignment do
 
       it "adds anonymous ids to students" do
         anonymous_ids = json['context']['students'].map { |student| student['anonymous_id'] }
-        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids from submissions" do
@@ -1957,7 +1955,7 @@ describe SpeedGrader::Assignment do
 
       it "includes anonymous ids on submissions" do
         anonymous_ids = json['submissions'].map { |submission| submission['anonymous_id'] }
-        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+        expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
       it "excludes user ids on rubrics" do

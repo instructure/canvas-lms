@@ -130,7 +130,7 @@ module Lti
 
       it 'returns an external tool definition' do
         tool = new_valid_external_tool(account)
-        placements = %w(assignment_selection link_selection resource_selection)
+        placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -183,7 +183,7 @@ module Lti
 
       it 'returns resource_selection tools' do
         tool = new_valid_external_tool(account, true)
-        placements = %w(assignment_selection link_selection resource_selection)
+        placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -225,7 +225,7 @@ module Lti
         ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
         new_valid_external_tool(account)
 
-        placements = %w(assignment_selection link_selection resource_selection)
+        placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
         definitions = described_class.launch_definitions(tools_collection, placements)
@@ -247,7 +247,7 @@ module Lti
           end
           3.times { |_| new_valid_external_tool(account) }
 
-          placements = %w(assignment_selection link_selection resource_selection)
+          placements = %w[assignment_selection link_selection resource_selection]
           collection = described_class.bookmarked_collection(account, placements)
           per_page = 3
           page1 = collection.paginate(per_page: per_page)

@@ -20,9 +20,9 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::MultipleChoice do
-  let(:question_data) { QuestionHelpers.fixture('multiple_choice_question') }
-
   subject { described_class.new(question_data) }
+
+  let(:question_data) { QuestionHelpers.fixture('multiple_choice_question') }
 
   it 'does not blow up when no responses are provided' do
     expect { expect(subject.run([])).to be_present }.to_not raise_error
@@ -51,12 +51,12 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
   describe '[:answers][]' do
     describe '[:id]' do
       it 'stringifies ids' do
-        expect(subject.run([])[:answers].map { |a| a[:id] }.sort).to eq(%w[
-                                                                          3023
-                                                                          5646
-                                                                          7907
-                                                                          8899
-                                                                        ])
+        expect(subject.run([])[:answers].pluck(:id).sort).to eq(%w[
+                                                                  3023
+                                                                  5646
+                                                                  7907
+                                                                  8899
+                                                                ])
       end
     end
 

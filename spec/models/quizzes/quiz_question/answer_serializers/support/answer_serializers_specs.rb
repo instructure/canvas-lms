@@ -30,6 +30,9 @@ shared_examples_for 'Answer Serializers' do
   #     answer_parser_compatibility: true
   #   }
   # end
+  # An AnswerSerializer for the QuizQuestion being tested.
+  subject { described_class.new qq }
+
   let(:qq) do
     question_type = self.class.described_class.question_type
 
@@ -37,9 +40,11 @@ shared_examples_for 'Answer Serializers' do
     options = respond_to?(:factory_options) ? factory_options : {}
 
     # can't test for #arity directly since it might be an optional parameter
-    data = factory.parameters.include?([:opt, :options]) ?
-      factory.call(options) :
-      factory.call
+    data = if factory.parameters.include?([:opt, :options])
+             factory.call(options)
+           else
+             factory.call
+           end
 
     # we'll manually assign an ID of 5 so that we won't have to use variables
     # like "#{question_id}" all over the place, a readability thing that's all
@@ -57,9 +62,6 @@ shared_examples_for 'Answer Serializers' do
 
     qq
   end
-
-  # An AnswerSerializer for the QuizQuestion being tested.
-  subject { described_class.new qq }
 
   context 'serialization' do
     before do

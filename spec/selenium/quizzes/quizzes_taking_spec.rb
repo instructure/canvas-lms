@@ -62,7 +62,6 @@ describe 'quiz taking' do
   it 'allows to take the quiz as long as there are attempts left',
      :xbrowser,
      priority: '1',
-     test_id: 140_606,
      custom_timeout: 30 do
     @quiz.allowed_attempts = 2
     @quiz.save!
@@ -82,8 +81,7 @@ describe 'quiz taking' do
   end
 
   it 'shows a prompt when attempting to submit with unanswered questions',
-     priority: '1',
-     test_id: 140_608 do
+     priority: '1' do
     skip_if_safari(:alert)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f('#take_quiz_link').click }
@@ -102,9 +100,9 @@ describe 'quiz taking' do
     expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
   end
 
-  it 'should not restrict whitelisted ip addresses', priority: '1', test_id: 338_082
+  it 'should not restrict whitelisted ip addresses', priority: '1'
 
-  it 'accounts for question group settings', priority: '1', test_id: 140_591 do
+  it 'accounts for question group settings', priority: '1' do
     skip_if_chrome('research')
     quiz = quiz_model
     bank = AssessmentQuestionBank.create!(context: @course)

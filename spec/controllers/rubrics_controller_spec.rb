@@ -214,9 +214,9 @@ describe RubricsController do
       end
 
       it 'records a rubric_created event for the assignment' do
-        expect {
+        expect do
           post('create', params: request_params)
-        }.to change {
+        end.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
         }.by(1)
       end
@@ -702,9 +702,9 @@ describe RubricsController do
       end
 
       it 'creates an AnonymousOrModerationEvent capturing the deletion' do
-        expect {
+        expect do
           delete('destroy', params: { course_id: course.id, id: rubric.id })
-        }.to change {
+        end.to change {
           AnonymousOrModerationEvent.where(event_type: 'rubric_deleted', assignment: assignment, user: teacher).count
         }.by(1)
       end

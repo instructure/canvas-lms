@@ -54,6 +54,6 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id = self.discussion_topic.root_account_id
+    self.root_account_id = discussion_topic.root_account_id
   end
 end

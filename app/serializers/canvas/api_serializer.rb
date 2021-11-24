@@ -100,7 +100,7 @@ module Canvas
       @sideloads = options.fetch(:includes, []).map(&:to_s)
       @serializer_options = options.fetch(:serializer_options, {})
       unless controller
-        raise ArgumentError.new("You must pass a controller to APISerializer!")
+        raise ArgumentError, "You must pass a controller to APISerializer!"
       end
     end
 
@@ -166,7 +166,7 @@ module Canvas
       object = send(association.name)
       options = { controller: @controller, scope: scope }
       association.build_serializer(object, options).tap do |serializer|
-        if association.options.has_key?(:wrap_in_array)
+        if association.options.key?(:wrap_in_array)
           serializer.instance_variable_set('@wrap_in_array',
                                            association.options[:wrap_in_array])
         end

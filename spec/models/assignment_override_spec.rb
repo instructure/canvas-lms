@@ -168,7 +168,7 @@ describe AssignmentOverride do
 
   describe "active scope" do
     before :once do
-      @overrides = 5.times.map { assignment_override_model }
+      @overrides = Array.new(5) { assignment_override_model }
     end
 
     it "includes active overrides" do
@@ -490,7 +490,7 @@ describe AssignmentOverride do
 
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
       @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hours
       expect(@override.all_day).to eq false
     end
 
@@ -560,9 +560,9 @@ describe AssignmentOverride do
   end
 
   describe '#availability_expired?' do
-    let(:override) { assignment_override_model }
-
     subject { override.availability_expired? }
+
+    let(:override) { assignment_override_model }
 
     context 'without an overridden lock_at' do
       before do
@@ -958,14 +958,14 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.visible_enrollments_for' do
+  describe '.visible_enrollments_for basic cases' do
+    subject(:visible_enrollments) do
+      AssignmentOverride.visible_enrollments_for(@overrides, @student)
+    end
+
     before do
       @override = assignment_override_model
       @overrides = [@override]
-    end
-
-    subject(:visible_enrollments) do
-      AssignmentOverride.visible_enrollments_for(@overrides, @student)
     end
 
     it 'returns empty if provided an empty collection' do
@@ -980,16 +980,16 @@ describe AssignmentOverride do
   end
 
   describe '.visible_enrollments_for' do
+    subject(:visible_enrollments) do
+      AssignmentOverride.visible_enrollments_for([override], @student)
+    end
+
     before do
       @options = {}
     end
 
     let(:override) do
       assignment_override_model(@options)
-    end
-
-    subject(:visible_enrollments) do
-      AssignmentOverride.visible_enrollments_for([override], @student)
     end
 
     context 'when associated with an assignment' do

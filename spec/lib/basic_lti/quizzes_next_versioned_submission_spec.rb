@@ -19,6 +19,8 @@
 #
 
 describe BasicLTI::QuizzesNextVersionedSubmission do
+  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
   before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
@@ -27,8 +29,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
     @course.enroll_student(@user)
   end
-
-  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
   let(:tool) do
     @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret', tool_id: "Quizzes 2")
@@ -57,7 +57,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   end
 
   def request_xml(source_id, launch_url, grade)
-    Nokogiri::XML.parse %{
+    Nokogiri::XML.parse <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -85,7 +85,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   describe "#grade_history" do
@@ -138,12 +138,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     context "with multiple versions for each url" do
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00?p1=9&p2=1
           https://abcdef.com/uuurrrlll01?p1=10&p2=2
           https://abcdef.com/uuurrrlll02?p1=11&p2=3
           https://abcdef.com/uuurrrlll03?p1=12&p2=4
-        )
+        ]
       end
 
       let(:url_grades) do
@@ -221,11 +221,11 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
               [submission[:url], submission[:score], submission[:grade]]
             end
           ).to eq(
-            url_grades.map do |x|
+            url_grades.filter_map do |x|
               next if x[:url].blank?
 
               [x[:url], assignment.points_possible * x[:grade], (assignment.points_possible * x[:grade]).to_s]
-            end.compact
+            end
           )
         end
       end
@@ -265,11 +265,11 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   end
 
   describe "#commit_history" do
+    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
     before do
       allow(Submission).to receive(:find_or_initialize_by).and_return(submission)
     end
-
-    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
     let(:submission) do
       assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
@@ -425,9 +425,9 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
       it "does not update the submission's posted_at date when it is already posted" do
         submission.update!(posted_at: 1.day.ago)
-        expect {
+        expect do
           subject.commit_history('url', '77', -1)
-        }.not_to change { submission.reload.posted_at }
+        end.not_to change { submission.reload.posted_at }
       end
     end
   end

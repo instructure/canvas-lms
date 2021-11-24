@@ -23,7 +23,4 @@ class FixOverwrittenFileModuleItems < ActiveRecord::Migration[4.2]
   def up
     DataFixup::FixOverwrittenFileModuleItems.delay_if_production(priority: Delayed::LOW_PRIORITY).run
   end
-
-  def down
-  end
 end

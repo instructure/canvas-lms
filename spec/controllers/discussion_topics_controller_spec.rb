@@ -130,7 +130,7 @@ describe DiscussionTopicsController do
         term = @course.account.enrollment_terms.create!(
           :name => 'mew',
           :start_at => 6.months.ago(now),
-          :end_at => 1.months.ago(now)
+          :end_at => 1.month.ago(now)
         )
         @course.enrollment_term = term
         @course.update!(start_at: 5.months.ago(now), conclude_at: 2.months.ago(now))
@@ -258,6 +258,17 @@ describe DiscussionTopicsController do
       get 'index', params: { group_id: group.id }
       expect(response).to be_successful
       expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+    end
+
+    it "sets discussions reporting and anonymity when their flags are enabled" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_anonymity
+
+      user_session(@teacher)
+      get 'index', params: { course_id: @course.id }
+      expect(assigns[:js_env][:student_reporting_enabled]).to be(true)
+      expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
     end
   end
 
@@ -630,7 +641,7 @@ describe DiscussionTopicsController do
 
     it "marks as read when topic is in the future as teacher" do
       course_topic(:skip_set_user => true)
-      teacher2 = @course.shard.activate { user_factory() }
+      teacher2 = @course.shard.activate { user_factory }
       teacher2enrollment = @course.enroll_user(teacher2, "TeacherEnrollment")
       teacher2.save!
       teacher2enrollment.course = @course # set the reverse association
@@ -987,9 +998,21 @@ describe DiscussionTopicsController do
       get 'new', params: { :course_id => @course.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
-  end
 
-  describe "GET 'new'" do
+    it "js_env allow_student_anonymous_discussion_topics defaults to false" do
+      user_session(@teacher)
+      get 'new', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+    end
+
+    it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
+      user_session(@teacher)
+      @course.allow_student_anonymous_discussion_topics = true
+      @course.save!
+      get 'new', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
+    end
+
     it "creates a default assignment group if none exist" do
       user_session(@teacher)
       get :new, params: { course_id: @course.id }
@@ -1121,6 +1144,20 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    it "js_env allow_student_anonymous_discussion_topics defaults to false" do
+      user_session(@teacher)
+      get :edit, params: { :course_id => @course.id, :id => @topic.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+    end
+
+    it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
+      user_session(@teacher)
+      @course.allow_student_anonymous_discussion_topics = true
+      @course.save!
+      get :edit, params: { :course_id => @course.id, :id => @topic.id }
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
+    end
+
     context 'conditional-release' do
       before do
         user_session(@teacher)
@@ -1154,14 +1191,14 @@ describe DiscussionTopicsController do
       shared_examples_for 'no usage rights returned' do
         it 'does not return usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be false
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).not_to have_key('usage_rights')
         end
       end
 
       shared_examples_for 'usage rights returned' do
         it 'returns usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be true
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).to have_key('usage_rights')
         end
       end
 
@@ -1284,7 +1321,7 @@ describe DiscussionTopicsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "does not include entries in an anonymous feed" do
@@ -1427,7 +1464,7 @@ describe DiscussionTopicsController do
         post 'create',
              params: topic_params(@course, { is_announcement: true, specific_sections: @section3.id.to_s }),
              :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq old_count
       end
 
@@ -1466,7 +1503,7 @@ describe DiscussionTopicsController do
         @group = @course.groups.create!(:group_category => @group_category)
         post 'create',
              params: group_topic_params(@group, { specific_sections: @section1.id.to_s }), :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1482,7 +1519,7 @@ describe DiscussionTopicsController do
           group_category_id: @group_category.id,
         }
         post('create', params: topic_params(@course, param_overrides), format: :json)
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1492,7 +1529,7 @@ describe DiscussionTopicsController do
                      .merge(assignment_params(@course))
         expect(DiscussionTopic.count).to eq 0
         post('create', params: obj_params, format: :json)
-        expect(response).to have_http_status 422
+        expect(response).to have_http_status :unprocessable_entity
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1501,7 +1538,7 @@ describe DiscussionTopicsController do
         # This teacher does not have permissino for section 3 and 4
         sections = [@section1.id, @section2.id, @section3.id, @section4.id].join(",")
         post 'create', params: topic_params(@course, { specific_sections: sections }), :format => :json
-        expect(response).to have_http_status 400
+        expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -1579,7 +1616,7 @@ describe DiscussionTopicsController do
       expect(topic).to be_published
       expect(topic.assignment).to be_published
       expect(@student.email_channel.messages).to be_empty
-      expect(@student.recent_stream_items.map { |item| item.data }).not_to include topic
+      expect(@student.recent_stream_items.map(&:data)).not_to include topic
     end
 
     it 'does dispatch new topic notification when not hidden' do
@@ -1745,7 +1782,7 @@ describe DiscussionTopicsController do
             specific_sections: section2.id,
             title: 'Updated Topic',
           })
-      expect(response).to have_http_status 422
+      expect(response).to have_http_status :unprocessable_entity
       expect(DiscussionTopic.count).to eq 2
       expect(DiscussionTopicSectionVisibility.count).to eq 0
     end
@@ -1765,7 +1802,7 @@ describe DiscussionTopicsController do
             specific_sections: section1.id,
             title: 'Updated Topic',
           })
-      expect(response).to have_http_status 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "Allows an admin to update a section-specific discussion" do
@@ -1780,7 +1817,7 @@ describe DiscussionTopicsController do
             specific_sections: section.id,
             title: "foobers"
           })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
     end
 
     it "triggers module progression recalculation if needed after changing sections" do
@@ -1828,7 +1865,7 @@ describe DiscussionTopicsController do
             assignment: { set_assignment: "0" },
             specific_sections: section1.id
           })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       topic.reload
       expect(topic.assignment).to be_nil
     end
@@ -1838,7 +1875,7 @@ describe DiscussionTopicsController do
                               title: 'Updated Topic',
                               lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
                               locked: false })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(@topic.reload).not_to be_locked
       expect(@topic.lock_at).not_to be_nil
     end
@@ -1851,7 +1888,7 @@ describe DiscussionTopicsController do
                               title: 'Updated Topic',
                               locked: false,
                               delayed_post_at: nil })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq 'Updated Topic'
       expect(assigns[:topic].locked).to eq false
       expect(assigns[:topic].delayed_post_at).to be_nil
@@ -1863,12 +1900,12 @@ describe DiscussionTopicsController do
       @topic.delayed_post_at = nil
       @topic.locked = false
       @topic.save!
-      delayed_post_time = Time.new(2018, 04, 15)
+      delayed_post_time = Time.new(2018, 4, 15)
       put('update', params: { course_id: @course.id, topic_id: @topic.id,
                               title: 'Updated Topic',
                               locked: true,
                               delayed_post_at: delayed_post_time.to_s })
-      expect(response).to have_http_status 200
+      expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq 'Updated Topic'
       expect(assigns[:topic].locked).to eq true
       expect(assigns[:topic].delayed_post_at.year).to eq 2018
@@ -2011,7 +2048,7 @@ describe DiscussionTopicsController do
       @course.announcements.create!(message: 'asdf')
       course_topic
 
-      topics = 3.times.map { course_topic(pinned: true) }
+      topics = Array.new(3) { course_topic(pinned: true) }
       expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', params: { :course_id => @course.id, :order => "#{t2.id},#{t1.id}" }, :format => 'json'

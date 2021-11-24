@@ -23,7 +23,7 @@ require 'aws-sdk-sqs'
 class BounceNotificationProcessor
   attr_reader :config
 
-  POLL_PARAMS = %i{idle_timeout wait_time_seconds visibility_timeout}.freeze
+  POLL_PARAMS = %i[idle_timeout wait_time_seconds visibility_timeout].freeze
   DEFAULT_CONFIG = {
     bounce_queue_name: 'canvas_notifications_bounces',
     idle_timeout: 10
@@ -34,14 +34,14 @@ class BounceNotificationProcessor
   end
 
   def self.enabled?
-    !!self.config
+    !!config
   end
 
   def self.process
-    bounce = self.new
+    bounce = new
     key = 'bounce_processors_for_region_' + bounce.config[:region].to_s
     num_of_jobs = Setting.get(key, '0').to_i
-    num_of_jobs.times { self.new.delay(priority: Delayed::LOW_PRIORITY).process }
+    num_of_jobs.times { new.delay(priority: Delayed::LOW_PRIORITY).process }
     bounce.process
   end
 

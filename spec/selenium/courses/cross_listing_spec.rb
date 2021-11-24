@@ -55,7 +55,7 @@ describe "cross-listing" do
     expect(submit_btn).not_to have_class('disabled')
     submit_form(form)
     wait_for_ajaximations
-    keep_trying_until { driver.current_url.match(/courses\/#{@course2.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{@course2.id}}) }
 
     # verify teacher doesn't have de-crosslist privileges
     get "/courses/#{@course2.id}/sections/#{@section.id}"
@@ -68,7 +68,7 @@ describe "cross-listing" do
     expect(f('#uncrosslist_form')).to be_displayed
     submit_form('#uncrosslist_form')
     wait_for_ajaximations
-    keep_trying_until { expect(driver.current_url).to match(/courses\/#{@course1.id}/) }
+    keep_trying_until { expect(driver.current_url).to match(%r{courses/#{@course1.id}}) }
   end
 
   it "does not allow cross-listing an invalid section" do
@@ -115,7 +115,7 @@ describe "cross-listing" do
     # expect(form.find_element(:css, ".submit_button")).to have_attribute(:disabled, 'false')
 
     submit_form(form)
-    keep_trying_until { driver.current_url.match(/courses\/#{other_course.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{other_course.id}}) }
 
     # yay, so, now the teacher is not enrolled in the first course (the section
     # they were enrolled in got moved). they don't have the rights to
@@ -129,6 +129,6 @@ describe "cross-listing" do
     f(".uncrosslist_link").click
     expect(f("#uncrosslist_form")).to be_displayed
     submit_form("#uncrosslist_form")
-    keep_trying_until { driver.current_url.match(/courses\/#{course.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{course.id}}) }
   end
 end

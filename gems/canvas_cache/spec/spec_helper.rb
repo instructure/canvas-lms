@@ -50,7 +50,7 @@ CanvasCache.settings_store = MemorySettings.new
 
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
 RSpec.shared_context "caching_helpers", :shared_context => :metadata do
   # provide a way to temporarily replace the rails
@@ -104,8 +104,8 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
         @captured_message_stack = []
       end
 
-      def add(_severity, message = nil, progname = nil, &block)
-        message = (message || (block && block.call) || progname).to_s
+      def add(_severity, message = nil, progname = nil)
+        message = (message || (block_given? && yield) || progname).to_s
         @captured_message_stack << message
       end
     end
@@ -113,7 +113,7 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
     lgr = collector_class.new
     Rails.logger = lgr
     yield
-    return lgr.captured_message_stack
+    lgr.captured_message_stack
   ensure
     Rails.logger = prev_logger
   end

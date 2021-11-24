@@ -19,12 +19,12 @@
 #
 
 describe Canvas::Plugins::Validators::AdobeConnectValidator do
-  let(:plugin_setting) { double }
-
   subject { Canvas::Plugins::Validators::AdobeConnectValidator }
 
+  let(:plugin_setting) { double }
+
   it 'allows an empty hash' do
-    expect(subject.validate({}, plugin_setting)).to eql Hash.new
+    expect(subject.validate({}, plugin_setting)).to eql({})
   end
 
   it 'errors on missing keys' do

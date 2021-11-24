@@ -190,7 +190,7 @@ describe WebConference do
     end
 
     it "rejects ridiculously long conferences" do
-      conference.duration = 100000000000000
+      conference.duration = 100_000_000_000_000
       expect(conference).not_to be_valid
     end
 
@@ -251,7 +251,7 @@ describe WebConference do
       student_in_course(user: @student, active_all: true)
     end
 
-    it "sends invitation notifications", priority: "1", test_id: 193154 do
+    it "sends invitation notifications", priority: "1" do
       conference = WimbaConference.create!(
         :title => "my conference",
         :user => @teacher,

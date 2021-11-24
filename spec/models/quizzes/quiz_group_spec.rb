@@ -37,7 +37,7 @@ describe Quizzes::QuizGroup do
   end
 
   describe "#actual_pick_count" do
-    context "with a question bank" do
+    context "with a small question bank" do
       it "returns the correct pick count if there aren't enough questions" do
         course_factory
         quiz = @course.quizzes.create!(:title => "some quiz")
@@ -108,7 +108,7 @@ describe Quizzes::QuizGroup do
 
   describe ".update_all_positions!" do
     def group_positions(quiz)
-      quiz.quiz_groups.sort_by { |g| g.position }.map { |g| g.id }
+      quiz.quiz_groups.sort_by(&:position).map(&:id)
     end
 
     before :once do

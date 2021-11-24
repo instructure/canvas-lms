@@ -65,9 +65,9 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
-      expect {
+      expect do
         course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
-      }.to change(Delayed::Job, :count).by(1)
+      end.to change(Delayed::Job, :count).by(1)
     end
 
     it "unlocks the attachment when the job runs" do

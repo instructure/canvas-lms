@@ -56,9 +56,9 @@ describe ResponseFieldView do
     end
 
     it 'raises on missing description' do
-      expect {
+      expect do
         view.parse_line('foo')
-      }.to raise_error(ArgumentError, /Expected a description to be present, but it was not provided./)
+      end.to raise_error(ArgumentError, /Expected a description to be present, but it was not provided./)
     end
   end
 
@@ -157,9 +157,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('NOTICE ', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+          end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
         end
 
         it 'is invalid when the NOTICE date is omitted' do
@@ -168,9 +168,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('2018-01-02 ', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date .+ for key `NOTICE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the text "NOTICE" and the NOTICE date are omitted' do
@@ -179,9 +179,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('NOTICE 2018-01-02 ', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
+          end.to raise_error(ArgumentError, /Expected argument `NOTICE`/)
         end
 
         it 'is invalid when the NOTICE date is not in YYYY-MM-DD format' do
@@ -190,9 +190,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('2018-01-02', '01-02-2018'),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date `01-02-2018` for key `NOTICE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the text "EFFECTIVE" is omitted' do
@@ -201,9 +201,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('EFFECTIVE ', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+          end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
         end
 
         it 'is invalid when the EFFECTIVE date is omitted' do
@@ -212,9 +212,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('2018-04-30', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
+          end.to raise_error(ArgumentError, /Expected a value to be present for argument `EFFECTIVE`, but it was blank./)
         end
 
         it 'is invalid when the text "EFFECTIVE" and the EFFECTIVE date are omitted' do
@@ -223,9 +223,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub(' EFFECTIVE 2018-04-30', ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
+          end.to raise_error(ArgumentError, /Expected argument `EFFECTIVE`/)
         end
 
         it 'is invalid when the EFFECTIVE date is not in YYYY-MM-DD format' do
@@ -234,9 +234,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('2018-04-30', '04-30-2018'),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
+          end.to raise_error(ArgumentError, /Expected date `04-30-2018` for key `EFFECTIVE` to be in ISO 8601 format/)
         end
 
         it 'is invalid when the EFFECTIVE date is < 90 days after the NOTICE date' do
@@ -245,9 +245,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub('2018-04-30', '2018-02-26'),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected >= 90 days between the `NOTICE` \(2018-01-02\) and `EFFECTIVE` \(2018-02-26\) dates/
           )
@@ -259,9 +259,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub("\nA description \non multiple lines.", ''),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
           )
@@ -273,9 +273,9 @@ describe ResponseFieldView do
             text: deprecated_tag.text.gsub("\nA description \non multiple lines.", ' A description.'),
             types: ['String']
           )
-          expect {
+          expect do
             ResponseFieldView.new(tag)
-          }.to raise_error(
+          end.to raise_error(
             ArgumentError,
             /Expected two lines: a tag declaration line with deprecation arguments, and a description line/
           )

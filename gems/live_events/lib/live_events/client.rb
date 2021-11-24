@@ -32,14 +32,14 @@ module LiveEvents
     def self.config
       res = LiveEvents.settings
       if res['stub_kinesis']
-        return true if !Rails.env.production?
+        return res.dup unless Rails.env.production?
 
         LiveEvents.logger&.warn(
           "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
         )
       end
-      return nil unless res && !res['kinesis_stream_name'].blank? &&
-                        (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
+      return nil unless res && res['kinesis_stream_name'].present? &&
+                        (res['aws_region'].present? || res['aws_endpoint'].present?)
 
       unless (defined?(Rails) && Rails.env.production?) ||
              res['custom_aws_credentials'] ||
@@ -125,7 +125,7 @@ module LiveEvents
 
       # We don't care too much about the partition key, but it seems safe to
       # let it be the user_id when that's available.
-      partition_key ||= (ctx["user_id"] && ctx["user_id"].try(:to_s)) || rand(1000).to_s
+      partition_key ||= ctx["user_id"]&.try(:to_s) || rand(1000).to_s
 
       pusher = @worker || LiveEvents.worker
 

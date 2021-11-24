@@ -20,7 +20,7 @@
 
 describe 'Canvadoc' do
   def stub_upload
-    expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"
+    expectation = receive(:upload).and_return "id" => 123_456, "status" => "pending"
     allow_any_instance_of(Canvadocs::API).to expectation
     expectation
   end
@@ -35,7 +35,7 @@ describe 'Canvadoc' do
                                                                           "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
-    @doc = @attachment.create_canvadoc()
+    @doc = @attachment.create_canvadoc
   end
 
   def disable_canvadocs
@@ -63,16 +63,16 @@ describe 'Canvadoc' do
     end
 
     it "doesn't upload again" do
-      @doc.update_attribute :document_id, 999999
+      @doc.update_attribute :document_id, 999_999
       @doc.upload
       expect(@doc.document_id.to_s).to eq "999999"  # not 123456
     end
 
     it "doesn't upload when canvadocs isn't configured" do
       disable_canvadocs
-      expect {
+      expect do
         @doc.upload
-      }.to raise_error("Canvadocs isn't enabled")
+      end.to raise_error("Canvadocs isn't enabled")
     end
 
     it "ignores annotatable if unavailable" do

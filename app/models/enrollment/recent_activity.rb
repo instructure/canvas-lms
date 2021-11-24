@@ -29,7 +29,7 @@ class Enrollment
     end
 
     def record_for_access(response)
-      return if response.response_code.to_s =~ /^((4|5)\d{2})$/
+      return if /^((4|5)\d{2})$/.match?(response.response_code.to_s)
 
       if context.is_a?(Course) && enrollment
         record!

@@ -20,7 +20,7 @@
 describe "Migration package importers" do
   context "Detecting content package type" do
     def get_settings(name)
-      if !name.ends_with?('xml')
+      unless name.ends_with?('xml')
         name += '.zip'
       end
       path = File.dirname(__FILE__) + "/../../fixtures/migration/package_identifier/#{name}"
@@ -58,7 +58,7 @@ describe "Migration package importers" do
     supported.each_pair do |key, val|
       it "finds converter for #{key}" do
         settings = get_settings(val.first)
-        expect(Canvas::Migration::Worker::get_converter(settings)).to eq val.last
+        expect(Canvas::Migration::Worker.get_converter(settings)).to eq val.last
       end
     end
 
@@ -73,9 +73,9 @@ describe "Migration package importers" do
     it "raises a traceable error for invalid packages" do
       settings = get_settings('invalid')
       archive = Canvas::Migration::Archive.new(settings)
-      expect {
+      expect do
         Canvas::Migration::PackageIdentifier.new(archive).identify_package
-      }.to raise_error(Canvas::Migration::Error, "Error identifying package type: unknown mime type text/plain for archive invalid.zip")
+      end.to raise_error(Canvas::Migration::Error, "Error identifying package type: unknown mime type text/plain for archive invalid.zip")
     end
   end
 

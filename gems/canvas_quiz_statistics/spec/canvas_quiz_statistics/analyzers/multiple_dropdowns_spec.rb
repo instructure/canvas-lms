@@ -20,9 +20,9 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
-  let(:question_data) { QuestionHelpers.fixture('multiple_dropdowns_question') }
-
   subject { described_class.new(question_data) }
+
+  let(:question_data) { QuestionHelpers.fixture('multiple_dropdowns_question') }
 
   it 'does not blow up when no responses are provided' do
     expect { subject.run([]) }.to_not raise_error

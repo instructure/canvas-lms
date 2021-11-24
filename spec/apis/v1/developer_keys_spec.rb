@@ -246,7 +246,7 @@ describe DeveloperKeysController, type: :request do
 
   def destroy_call
     admin_session
-    key = DeveloperKey.create!()
+    key = DeveloperKey.create!
     api_call(:delete, "/api/v1/developer_keys/#{key.id}.json", {
                controller: 'developer_keys',
                action: 'destroy',
@@ -264,7 +264,7 @@ describe DeveloperKeysController, type: :request do
 
   def confirm_valid_key_in_json(json, key)
     json.map! do |hash|
-      hash.keep_if { |k, _| ['id', 'icon_url', 'name'].include?(k) }
+      hash.keep_if { |k, _| %w[id icon_url name].include?(k) }
     end
 
     expect(json.include?(key_to_hash(key))).to be true

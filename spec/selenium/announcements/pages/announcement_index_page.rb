@@ -26,9 +26,9 @@ class AnnouncementIndex
 
     def visit_announcements(course_id)
       get "/courses/#{course_id}/announcements"
-      wait_for(method: nil, timeout: 1) {
+      wait_for(method: nil, timeout: 1) do
         fj("title:contains('Loading Announcements')", announcements_main_content)
-      }
+      end
     end
 
     def visit_groups_index(group)

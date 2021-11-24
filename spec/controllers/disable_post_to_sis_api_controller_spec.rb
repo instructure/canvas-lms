@@ -82,7 +82,7 @@ describe DisablePostToSisApiController do
 
         it 'responds with 400 when grading period does not exist' do
           put 'disable_post_to_sis', params: { course_id: course.id,
-                                               grading_period_id: 789465789 }
+                                               grading_period_id: 789_465_789 }
 
           parsed_json = json_parse(response.body)
           expect(response.code).to eq "400"

@@ -20,22 +20,22 @@
 require 'spec_helper'
 
 describe Twitter::Messenger do
-  let(:message) { double() }
-  let(:twitter_service) {
+  let(:message) { double }
+  let(:twitter_service) do
     double({
              token: "twitter_token",
              secret: "twitter_secret",
              service_user_name: "twitter_name",
              service_user_id: "twitter_id"
            })
-  }
+  end
   let(:id) { "ABC123" }
   let(:messenger) { Twitter::Messenger.new(message, twitter_service, 'host', id) }
 
   describe '#deliver' do
     let(:user) { double(:user_services) }
     let(:message) { double(:body => 'body', :url => 'url', :user => user, :id => 0, :main_link => '') }
-    let(:connection_mock) { double() }
+    let(:connection_mock) { double }
 
     context "with a twitter service" do
       before do
@@ -59,13 +59,13 @@ describe Twitter::Messenger do
   end
 
   describe '#url' do
-    let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
-
     subject { messenger.url }
+
+    let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
 
     it { is_expected.to match(/host/) }
     it { is_expected.to match(/#{id}$/) }
-    it { is_expected.to match(/^http:\/\//) }
+    it { is_expected.to match(%r{^http://}) }
   end
 
   describe '#body' do

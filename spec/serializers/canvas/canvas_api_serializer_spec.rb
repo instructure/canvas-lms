@@ -30,7 +30,7 @@ describe Canvas::APISerializer do
     expect(serializer.user).to eq serializer.current_user
   end
 
-  [:stringify_json_ids?, :accepts_jsonapi?, :session, :context].each do |method|
+  %i[stringify_json_ids? accepts_jsonapi? session context].each do |method|
     it "delegates #{method} to controller" do
       expect(controller.send(method)).to eq serializer.send(method)
     end
@@ -93,7 +93,7 @@ describe Canvas::APISerializer do
         has_one :bar, embed: :ids
       end
       object = Foo.new(1, 'Bob')
-      expect(object).to receive(:bar).and_return double()
+      expect(object).to receive(:bar).and_return double
       url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer).to receive(:bar_url).and_return(url)
@@ -118,6 +118,13 @@ describe Canvas::APISerializer do
     end
 
     context 'embedding objects in root' do
+      subject do
+        FooSerializer.new(object, {
+                            controller: controller,
+                            root: nil
+                          })
+      end
+
       before do
         Bar = Struct.new(:id, :name) do
           def read_attribute_for_serialization(attr)
@@ -146,13 +153,6 @@ describe Canvas::APISerializer do
                                           accepts_jsonapi: true,
                                           stringify_json_ids: true
                                         })
-      end
-
-      subject do
-        FooSerializer.new(object, {
-                            controller: controller,
-                            root: nil
-                          })
       end
 
       it "uses objects for embed: :object, embed_in_root: true" do

@@ -55,7 +55,7 @@ describe AuthenticationMethods::InstAccessToken do
     end
 
     it "chooses the local user when a local and shadow user share the same UUID" do
-      user_model(id: (10_000_000_000_000 + (rand * 10000000).to_i), uuid: 'a-shared-uuid-between-users')
+      user_model(id: (10_000_000_000_000 + (rand * 10_000_000).to_i), uuid: 'a-shared-uuid-between-users')
       account = Account.default
       user_with_pseudonym(:active_all => true)
       @user.uuid = 'a-shared-uuid-between-users'

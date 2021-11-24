@@ -60,7 +60,7 @@ describe "master courses - add and remove course associations" do
     user_session(@admin)
   end
 
-  it "adds associated courses", priority: "1", test_id: "3078972" do
+  it "adds associated courses", priority: "1" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
@@ -96,7 +96,7 @@ describe "master courses - add and remove course associations" do
     expect(minions[1].attribute('id')).to eq(course1_id)
   end
 
-  it "removes an associated course", priority: "1", test_id: "3077488" do
+  it "removes an associated course", priority: "1" do
     @minion0 = @template.add_child_course!(@course0).child_course
     @minion1 = @template.add_child_course!(@course1).child_course
 
@@ -130,7 +130,7 @@ describe "master courses - add and remove course associations" do
     expect(f("#course_#{@course0.id}", table)).to be_displayed
   end
 
-  it "adds and remove a to-be-added course", priority: "1", test_id: "3077487" do
+  it "adds and remove a to-be-added course", priority: "1" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
@@ -143,7 +143,7 @@ describe "master courses - add and remove course associations" do
     f('label', courses[0]).click # click the checkbox
     f('label', courses[1]).click
 
-    expect(to_be_added().length).to eq(2)
+    expect(to_be_added.length).to eq(2)
     tobetable = to_be_added_table
     expect(f("##{course0_id}", tobetable)).to be_displayed
     expect(f("##{course1_id}", tobetable)).to be_displayed
@@ -157,7 +157,7 @@ describe "master courses - add and remove course associations" do
     the_x = f('button', remove_me)
     the_x.click
 
-    expect(to_be_added().length).to eq(1)
+    expect(to_be_added.length).to eq(1)
     expect(f("##{leave_me_id}", to_be_added_table)).to be_displayed
     expect(f("##{remove_me_id}", available_courses_table)).to be_displayed
   end

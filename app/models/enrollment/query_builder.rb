@@ -139,11 +139,11 @@ class Enrollment
                          "enrollments.workflow_state IN ('invited','creation_pending')"
                        end
                      end
-                   when :deleted;          "enrollments.workflow_state = 'deleted'"
-                   when :rejected;         "enrollments.workflow_state = 'rejected'"
-                   when :completed;        "enrollments.workflow_state = 'completed'"
-                   when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
-                   when :inactive;         "enrollments.workflow_state = 'inactive'"
+                   when :deleted then          "enrollments.workflow_state = 'deleted'"
+                   when :rejected then         "enrollments.workflow_state = 'rejected'"
+                   when :completed then        "enrollments.workflow_state = 'completed'"
+                   when :creation_pending then "enrollments.workflow_state = 'creation_pending'"
+                   when :inactive then         "enrollments.workflow_state = 'inactive'"
                    end
 
       if conditions && @options[:course_workflow_state] && @options[:enforce_course_workflow_state]

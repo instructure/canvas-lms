@@ -43,9 +43,8 @@ module CanvasKaltura
   end
 
   def self.with_timeout_protector(options = {}, &block)
-    @timeout_protector_proc ||= Proc.new do
-      block.call
-    end
+    return yield unless @timeout_protector_proc
+
     @timeout_protector_proc.call(options, &block)
   end
 

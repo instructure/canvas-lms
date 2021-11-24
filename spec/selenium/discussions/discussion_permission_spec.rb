@@ -51,12 +51,12 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "disallows discussion title view", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "806797", teacher: "806798", ta: "806799", observer: "806800", designer: "806801") do
+      it "disallows discussion title view", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_page
         expect(find(unauthorized_message)).to be_displayed
       end
 
-      it "does not show course page discusions link", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "806802", teacher: "806803", ta: "806804", observer: "806805", designer: "806806") do
+      it "does not show course page discusions link", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get course_page
         expect(f(course_navigation_items)).not_to contain_link(discussions_link)
       end
@@ -92,7 +92,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "disallows discussion detail view", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "806807", ta: "807074", observer: "807075", designer: "807076") do
+      it "disallows discussion detail view", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(find(unauthorized_message)).to be_displayed
       end
@@ -123,7 +123,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view, not edit or post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807077", ta: "807078", observer: "807079", designer: "807080") do
+      it "allows discussion view, not edit or post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
@@ -156,7 +156,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view and post, not edit", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807081", teacher: "807082", ta: "807083", observer: "807084", designer: "807085") do
+      it "allows discussion view and post, not edit", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
@@ -194,7 +194,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view and edit, not post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807352", ta: "807354", observer: "807355", designer: "807356") do
+      it "allows discussion view and edit, not post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
@@ -227,7 +227,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view, edit, and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807357", teacher: "807358", ta: "807359", observer: "807360", designer: "807361") do
+      it "allows discussion view, edit, and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
@@ -278,7 +278,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "does not allow user to view discussion title", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807362", teacher: "807363", ta: "807364", observer: "807365", designer: "807366") do
+      it "does not allow user to view discussion title", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_page
         expect(find(unauthorized_message)).to be_displayed
       end
@@ -314,7 +314,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "does not allow user to view discussion details", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807633", ta: "807634", observer: "807635", designer: "807636") do
+      it "does not allow user to view discussion details", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(find(unauthorized_message)).to be_displayed
       end
@@ -345,7 +345,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows viewing discussions, not edit or post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807637", ta: "807638", observer: "807639", designer: "807640") do
+      it "allows viewing discussions, not edit or post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
@@ -378,7 +378,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view and post, not edit", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807641", ta: "807642", observer: "807643", designer: "807910") do
+      it "allows discussion view and post, not edit", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
@@ -411,7 +411,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view and edit, not post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807911", ta: "807912", observer: "807913", designer: "8079114") do
+      it "allows discussion view and edit, not post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
@@ -444,14 +444,14 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows discussion view, edit and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807915", teacher: "807916", ta: "807917", observer: "807918", designer: "807919") do
+      it "allows discussion view, edit and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_edit_button)).to be_displayed
       end
 
-      it "shows the discusions link on the course page", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807920", teacher: "807921", ta: "807922", observer: "807923", designer: "807924") do
+      it "shows the discusions link on the course page", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get course_page
         expect(find(discussion_link)).to be_displayed
       end
@@ -487,7 +487,7 @@ describe "discussion permissions" do
         user_session(context_user)
       end
 
-      it "allows own discussion view, edit, and post with permissions off", priority: "1", test_id: "807925" do
+      it "allows own discussion view, edit, and post with permissions off", priority: "1" do
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed

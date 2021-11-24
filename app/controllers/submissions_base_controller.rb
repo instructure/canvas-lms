@@ -74,7 +74,7 @@ class SubmissionsBaseController < ApplicationController
 
         render :json => @submission.as_json(
           Submission.json_serialization_full_parameters(
-            except: %i(quiz_submission submission_history)
+            except: %i[quiz_submission submission_history]
           ).merge({
                     except: submission_json_exclusions,
                     permissions: {
@@ -209,7 +209,7 @@ class SubmissionsBaseController < ApplicationController
           message: 'Assignment is locked for student.',
           error_code: 'ASSIGNMENT_LOCKED'
         }
-      }, status: 422
+      }, status: :unprocessable_entity
     else
       @submission.update!(redo_request: true)
       head :no_content

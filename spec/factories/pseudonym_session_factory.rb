@@ -19,7 +19,7 @@
 
 module Factories
   def user_session(user, pseudonym = nil)
-    if caller.grep(/onceler\/recorder.*record!/).present?
+    if caller.grep(%r{onceler/recorder.*record!}).present?
       raise "don't stub sessions in a `before(:once)` block; do it in a `before(:each)` so the stubbing works for all examples and not just the first one"
     end
 
@@ -34,14 +34,14 @@ module Factories
         :sis_user_id => 'U001',
         :shard => Shard.default,
         :works_for_account? => true,
-        :suspended? => false,
+        :suspended? => false
       )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
       allow(pseudonym).to receive(:unique_id).and_return('unique_id')
-      allow(pseudonym).to receive(:global_id).and_return(10000000000001)
+      allow(pseudonym).to receive(:global_id).and_return(10_000_000_000_001)
     end
 
     session = double('PseudonymSession',

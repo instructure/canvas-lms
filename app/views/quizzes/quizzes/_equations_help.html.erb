@@ -24,7 +24,7 @@
       <li><a href="#functions"><%= t('links.functions', "Functions") %></a></li>
     </ul>
     <div id="intro">
-      <% concat(t(:equation_intro, <<-TEXT,
+      <% concat(t(:equation_intro, <<~TEXT,
 Calculated questions are based on a set of one or more formulas computed 
 in order.  You can define intermediate variables in these formulas, but the
 numerical result of the last formula is what is used to generate the
@@ -54,7 +54,7 @@ TEXT
     </div>
     <div id="variables">
 
-      <% concat(t(:equation_variables2, <<-TEXT,
+      <% concat(t(:equation_variables2, <<~TEXT,
 You can also define variables in your question text using brackets 
 ("What is [a] + [b]?").  For every variable, you'll see an "Example Value"
 based on the variable settings.  This allows you to check your math and
@@ -80,7 +80,7 @@ TEXT
       <% })) %>
     </div>
     <div id="functions">
-      <% concat(t(:equation_functions, <<-TEXT,
+      <% concat(t(:equation_functions, <<~TEXT,
 In addition to variables, there are also a collection of helper functions
 you can use to generate useful values.  For example:
 

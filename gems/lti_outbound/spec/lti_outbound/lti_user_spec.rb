@@ -21,6 +21,10 @@
 require 'spec_helper'
 
 describe LtiOutbound::LTIUser do
+  let(:observer_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').last }
+  let(:learner_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER }
+  let(:teacher_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR }
+
   it_behaves_like 'an LTI context'
 
   it_behaves_like 'it has a proc attribute setter and getter for', :avatar_url
@@ -32,10 +36,6 @@ describe LtiOutbound::LTIUser do
   it_behaves_like 'it has a proc attribute setter and getter for', :concluded_roles
   it_behaves_like 'it has a proc attribute setter and getter for', :currently_active_in_course
   it_behaves_like 'it has a proc attribute setter and getter for', :current_observee_ids
-
-  let(:teacher_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR }
-  let(:learner_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER }
-  let(:observer_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').last }
 
   describe '#current_role_types' do
     it 'provides a string representation of current roles' do

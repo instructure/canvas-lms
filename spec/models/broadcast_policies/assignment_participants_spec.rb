@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe BroadcastPolicies::AssignmentParticipants do
+  subject do
+    BroadcastPolicies::AssignmentParticipants.new(@assignment, @excluded_ids)
+  end
+
   before :once do
     course_with_student(active_all: true)
     assignment_model course: @course
     @excluded_ids = nil
-  end
-
-  subject do
-    BroadcastPolicies::AssignmentParticipants.new(@assignment, @excluded_ids)
   end
 
   describe '#to' do

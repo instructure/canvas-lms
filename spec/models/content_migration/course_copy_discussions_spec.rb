@@ -38,7 +38,7 @@ describe ContentMigration do
       expect(@copy_to.discussion_topics.count).to eq 1
       new_topic = @copy_to.discussion_topics.first
 
-      attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
+      attrs = %w[title message discussion_type type pinned position require_initial_post]
       expect(new_topic.attributes.slice(*attrs)).to eq topic.attributes.slice(*attrs)
 
       expect(new_topic.locked).to_not eq true # don't lock copied discussions

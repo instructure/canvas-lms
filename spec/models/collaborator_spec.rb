@@ -30,7 +30,7 @@ describe Collaborator do
   end
 
   context 'broadcast policy' do
-    it 'notifies collaborating users', priority: "1", test_id: 193152 do
+    it 'notifies collaborating users', priority: "1" do
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user, :enrollment_state => 'active')
       NotificationPolicy.create(:notification => @notification,

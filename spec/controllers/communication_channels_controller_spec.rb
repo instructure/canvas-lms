@@ -523,7 +523,7 @@ describe CommunicationChannelsController do
         expect(@not_logged_user).to be_deleted
         @logged_user.reload
         expect(@logged_user.communication_channels.map(&:path).sort).to eq ['jt@instructure.com', 'jt+1@instructure.com'].sort
-        expect(@logged_user.communication_channels.all? { |cc| cc.active? }).to be_truthy
+        expect(@logged_user.communication_channels.all?(&:active?)).to be_truthy
       end
 
       it "does not allow merging with someone that's observed through a UserObserver relationship" do
@@ -818,7 +818,7 @@ describe CommunicationChannelsController do
       user_session(@user)
       session[:become_user_id] = u.id
       post 'reset_bounce_count', params: { :user_id => u.id, :id => cc1.id }
-      expect(response).to have_http_status(401)
+      expect(response).to have_http_status(:unauthorized)
       cc1.reload
       expect(cc1.bounce_count).to eq(3)
     end
@@ -1006,7 +1006,7 @@ describe CommunicationChannelsController do
 
           user_with_pseudonym
 
-          ccs = (CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1).times.map do |n|
+          ccs = Array.new(CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1) do |n|
             @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
               cc.workflow_state = 'active'
               cc.bounce_count = 1
@@ -1025,7 +1025,7 @@ describe CommunicationChannelsController do
           user_with_pseudonym
           user_session(@user)
           get 'bouncing_channel_report', params: { account_id: Account.default.id }
-          expect(response).to have_http_status(401)
+          expect(response).to have_http_status(:unauthorized)
         end
       end
     end
@@ -1119,7 +1119,7 @@ describe CommunicationChannelsController do
 
           user_with_pseudonym
 
-          ccs = (CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1).times.map do |n|
+          ccs = Array.new(CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit + 1) do |n|
             @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
               cc.workflow_state = 'active'
               cc.bounce_count = 1
@@ -1151,7 +1151,7 @@ describe CommunicationChannelsController do
 
           post 'bulk_reset_bounce_counts', params: { account_id: Account.default.id }
 
-          expect(response).to have_http_status(401)
+          expect(response).to have_http_status(:unauthorized)
           expect(c.reload.bounce_count).to eq(1)
         end
       end
@@ -1235,14 +1235,14 @@ describe CommunicationChannelsController do
         context "GET 'unconfirmed_channel_report'" do
           it "doesn't work" do
             get 'unconfirmed_channel_report', params: { account_id: Account.default.id }
-            expect(response).to have_http_status(401)
+            expect(response).to have_http_status(:unauthorized)
           end
         end
 
         context "POST 'bulk_confirm'" do
           it "doesn't work" do
             post 'bulk_confirm', params: { account_id: Account.default.id }
-            expect(response).to have_http_status(401)
+            expect(response).to have_http_status(:unauthorized)
           end
         end
       end

@@ -55,7 +55,7 @@ describe "course settings/blueprint" do
       user_session @admin
     end
 
-    it "enables blueprint course and set default restrictions", priority: "1", test_id: 3166299 do
+    it "enables blueprint course and set default restrictions", priority: "1" do
       get "/courses/#{@course.id}/settings"
       f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations

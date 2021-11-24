@@ -46,7 +46,7 @@
 class FavoritesController < ApplicationController
   before_action :require_user
   before_action :check_defaults, :only => [:remove_favorite_course]
-  after_action :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
+  after_action :touch_user, :only => %i[add_favorite_course remove_favorite_course reset_course_favorites]
 
   include Api::V1::Favorite
   include Api::V1::Course
@@ -70,7 +70,7 @@ class FavoritesController < ApplicationController
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
     opts = {}
-    opts[:observee_user] = params[:observed_user].to_i if params.key?(:observed_user)
+    opts[:observee_user] = User.find_by(id: params[:observed_user].to_i) || @current_user if params.key?(:observed_user)
 
     courses = @current_user.menu_courses(nil, opts)
     if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])

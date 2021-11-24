@@ -32,7 +32,7 @@ module CanvasQuizStatistics
     def self.deep_symbolize_keys(input)
       return input unless input.is_a?(Hash)
 
-      input.inject({}) do |result, (key, value)|
+      input.each_with_object({}) do |(key, value), result|
         new_key = key.is_a?(String) ? key.to_sym : key
         new_value = case value
                     when Hash then deep_symbolize_keys(value)
@@ -41,7 +41,6 @@ module CanvasQuizStatistics
                     end
 
         result[new_key] = new_value
-        result
       end
     end
 

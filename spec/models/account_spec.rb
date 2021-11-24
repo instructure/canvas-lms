@@ -376,17 +376,17 @@ describe Account do
 
     context "fast list" do
       it "lists associated courses" do
-        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq [
-          "C001", "C005", "C006", "C007", "C008", "C009",
+        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
+          C001 C005 C006 C007 C008 C009
 
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S",
+          C001S C005S C006S C007S C008S C009S
         ].sort
       end
 
       it "lists associated courses by term" do
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
+        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005 C006 C007 C008 C009 C005S C006S C007S C008S C009S].sort
       end
 
       it "counting cross-listed courses only if requested" do
@@ -411,13 +411,13 @@ describe Account do
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.fast_all_courses({ :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C005", "C007", "C001S", "C005S", "C007S"].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.fast_all_courses({ :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C001 C005 C007 C001S C005S C007S].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
         expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C005", "C007", "C005S", "C007S"].sort
+        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C005 C007 C005S C007S].sort
       end
 
       it "orders list by specified parameter" do
@@ -429,19 +429,19 @@ describe Account do
 
     context "name searching" do
       it "lists associated courses" do
-        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq [
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S"
+        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq %w[
+          C001S C005S C006S C007S C008S C009S
         ]
       end
 
       it "lists associated courses by term" do
         expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001S"]
         expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005S", "C006S", "C007S", "C008S", "C009S"]
+        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005S C006S C007S C008S C009S]
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.courses_name_like("search", { :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001S", "C005S", "C007S"] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.courses_name_like("search", { :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq %w[C001S C005S C007S] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
@@ -577,7 +577,7 @@ describe Account do
 
       describe "services_exposed_to_ui_hash" do
         it "returns services defined in a plugin" do
-          expect(Account.services_exposed_to_ui_hash().keys).to be_include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash.keys).to be_include(:myplugin)
           expect(Account.services_exposed_to_ui_hash(:setting).keys).to be_include(:myplugin)
         end
       end
@@ -744,7 +744,7 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = [:read, :read_as_admin, :manage, :update, :delete, :read_outcomes, :read_terms]
+    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     conditional_access += [:view_bounced_emails] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
@@ -804,7 +804,10 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
-      account.tap { |a| a.settings[:mfa_settings] = :optional; a.save! }
+      account.tap do |a|
+        a.settings[:mfa_settings] = :optional
+        a.save!
+      end
       v[:account] = Account.find(account.id)
     end
     AdheresToPolicy::Cache.clear
@@ -856,6 +859,38 @@ describe Account do
 
       @shard1.activate do
         expect(@course.grants_right?(@user, :read_sis)).to eq true
+      end
+    end
+
+    it "returns sub account ids recursively when another shard is active" do
+      a = Account.default
+      subs = []
+      sub = Account.create!(name: 'sub', parent_account: a)
+      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
+      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
+      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+      @shard1.activate do
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
+      end
+    end
+
+    it "properly returns site admin permissions regardless of active shard" do
+      enable_cache do
+        user_factory
+        site_admin = Account.site_admin
+        site_admin.account_users.create!(user: @user)
+
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+
+        user_factory
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
       end
     end
   end
@@ -934,22 +969,6 @@ describe Account do
     subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
     expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
-  end
-
-  context "sharding" do
-    specs_require_sharding
-    it "returns sub account ids recursively when another shard is active" do
-      a = Account.default
-      subs = []
-      sub = Account.create!(name: 'sub', parent_account: a)
-      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
-      @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
-        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
-      end
-    end
   end
 
   it "returns the correct user count" do
@@ -1055,11 +1074,14 @@ describe Account do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'; @user1.save
-      @user2.sortable_name = 'bob'; @user2.save
-      @user3.sortable_name = 'richard'; @user3.save
+      @user1.sortable_name = 'jonny'
+      @user1.save
+      @user2.sortable_name = 'bob'
+      @user2.save
+      @user3.sortable_name = 'richard'
+      @user3.save
       users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
+      expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 
@@ -1071,28 +1093,28 @@ describe Account do
     it "includes 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(:account => Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
       account_admin_user(:account => account)
       tabs = account.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = @account.root_account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include external tools if not configured for account navigation" do
@@ -1101,7 +1123,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq false
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
 
     it "includes active external tools if configured on the account" do
@@ -1124,7 +1146,7 @@ describe Account do
       tools.each { |t| expect(t.has_placement?(:account_navigation)).to eq true }
 
       tabs = @account.tabs_available
-      tab_ids = tabs.map { |t| t[:id] }
+      tab_ids = tabs.pluck(:id)
       expect(tab_ids).to be_include(tool1.asset_string)
       expect(tab_ids).not_to be_include(tool2.asset_string)
       tab = tabs.detect { |t| t[:id] == tool1.asset_string }
@@ -1139,7 +1161,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1153,11 +1175,11 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.map { |t| t[:id] }).to_not be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
 
       admin = account_admin_user(:account => @account)
       tabs = @account.tabs_available(admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     end
 
     it "uses localized labels" do
@@ -1199,7 +1221,7 @@ describe Account do
     it 'uses :manage_assignments to determine question bank tab visibility' do
       account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_QUESTION_BANKS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
     end
 
     describe "'ePortfolio Moderation' tab" do
@@ -1262,29 +1284,6 @@ describe Account do
       user_factory
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
-    end
-  end
-
-  context "sharding" do
-    specs_require_sharding
-
-    it "properly returns site admin permissions regardless of active shard" do
-      enable_cache do
-        user_factory
-        site_admin = Account.site_admin
-        site_admin.account_users.create!(user: @user)
-
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-
-        user_factory
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-      end
     end
   end
 
@@ -1940,7 +1939,7 @@ describe Account do
     specs_require_sharding
 
     describe ".find_cached" do
-      let(:nonsense_id) { 987654321 }
+      let(:nonsense_id) { 987_654_321 }
 
       it "works relative to a different shard" do
         @shard1.activate do
@@ -2094,7 +2093,7 @@ describe Account do
       end
 
       def cached_account_users
-        [:@account_users_cache, :@account_chain_ids, :@account_chain].each do |iv|
+        %i[@account_users_cache @account_chain_ids @account_chain].each do |iv|
           @account.instance_variable_set(iv, nil)
         end
         @account.cached_account_users_for(@user)
@@ -2435,7 +2434,7 @@ describe Account do
 
     let!(:account) { account_model(settings: before_settings).tap(&:save!) }
     let(:calls) { [] }
-    let(:notifier) { lambda { |*args| calls << args } }
+    let(:notifier) { ->(*args) { calls << args } }
 
     before do
       @old_notifier = CanvasErrors.send(:registry)[:sentry_notification]

@@ -107,9 +107,9 @@ class Auditors::FeatureFlag
 
     add_index :feature_flag do
       table :feature_flag_changes_by_feature_flag
-      entry_proc lambda { |record| record.feature_flag }
-      key_proc lambda { |feature_flag| feature_flag.global_id }
-      ar_scope_proc lambda { |feature_flag| auth_ar_type.where(feature_flag_id: feature_flag.id) }
+      entry_proc ->(record) { record.feature_flag }
+      key_proc ->(feature_flag) { feature_flag.global_id }
+      ar_scope_proc ->(feature_flag) { auth_ar_type.where(feature_flag_id: feature_flag.id) }
     end
   end
 

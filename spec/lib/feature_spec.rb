@@ -91,23 +91,23 @@ describe Feature do
 
   describe "applicable_features" do
     it "works for Site Admin" do
-      expect(Feature.applicable_features(t_site_admin).map(&:feature).sort).to eql %w(A C RA SA U)
+      expect(Feature.applicable_features(t_site_admin).map(&:feature).sort).to eql %w[A C RA SA U]
     end
 
     it "works for RootAccounts" do
-      expect(Feature.applicable_features(t_root_account).map(&:feature).sort).to eql %w(A C RA)
+      expect(Feature.applicable_features(t_root_account).map(&:feature).sort).to eql %w[A C RA]
     end
 
     it "works for Accounts" do
-      expect(Feature.applicable_features(t_sub_account).map(&:feature).sort).to eql %w(A C)
+      expect(Feature.applicable_features(t_sub_account).map(&:feature).sort).to eql %w[A C]
     end
 
     it "works for Courses" do
-      expect(Feature.applicable_features(t_course).map(&:feature)).to eql %w(C)
+      expect(Feature.applicable_features(t_course).map(&:feature)).to eql %w[C]
     end
 
     it "works for Users" do
-      expect(Feature.applicable_features(t_user).map(&:feature)).to eql %w(U)
+      expect(Feature.applicable_features(t_user).map(&:feature)).to eql %w[U]
     end
   end
 
@@ -193,8 +193,8 @@ describe Feature do
       t_root_account.feature_flags.create!(feature: 'RA', state: 'on')
 
       Feature.remove_obsolete_flags
-      expect(t_root_account.feature_flags.where(feature: %w(RA nonexist nonexist-old)).pluck(:feature))
-        .to match_array(%w(RA nonexist))
+      expect(t_root_account.feature_flags.where(feature: %w[RA nonexist nonexist-old]).pluck(:feature))
+        .to match_array(%w[RA nonexist])
     end
   end
 end
@@ -222,6 +222,10 @@ describe "Feature.register" do
 
   let(:t_dev_feature_hash) do
     t_feature_hash.merge(environments: { production: { state: 'disabled' } })
+  end
+
+  let(:t_hidden_in_prod_feature_hash) do
+    t_feature_hash.merge(environments: { production: { state: 'hidden' } })
   end
 
   it "registers a feature" do
@@ -257,10 +261,6 @@ describe "Feature.register" do
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions['dev_feature']).to eq Feature::DISABLED_FEATURE
     end
-  end
-
-  let(:t_hidden_in_prod_feature_hash) do
-    t_feature_hash.merge(environments: { production: { state: 'hidden' } })
   end
 
   describe 'hidden_in_prod' do

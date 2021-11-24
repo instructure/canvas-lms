@@ -21,24 +21,24 @@
 require_relative '../../common'
 
 describe 'Course Grading Periods' do
-  include_examples 'in-process server selenium tests'
-
-  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:period_helper) { Factories::GradingPeriodHelper.new }
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+
+  include_examples 'in-process server selenium tests'
 
   context 'with grading periods' do
     before do
       course_with_teacher_logged_in
     end
 
-    it 'shows grading periods created at the course-level', priority: "1", test_id: 239998 do
+    it 'shows grading periods created at the course-level', priority: "1" do
       @course_grading_period = period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
       period_title = f("#period_title_#{@course_grading_period.id}")
       expect(period_title).to have_value(@course_grading_period.title)
     end
 
-    it 'allows grading periods to be deleted', priority: "1", test_id: 202320 do
+    it 'allows grading periods to be deleted', priority: "1" do
       grading_period_selector = '.grading-period'
       group = group_helper.legacy_create_for_course(@course)
       period_helper.create_with_weeks_for_group(group, 5, 3)
@@ -51,7 +51,7 @@ describe 'Course Grading Periods' do
       expect(ff(grading_period_selector).length).to be 1
     end
 
-    it 'allows updating grading periods', priority: "1", test_id: 202317 do
+    it 'allows updating grading periods', priority: "1" do
       period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
       expect(f("#update-button")).to be_present
@@ -63,11 +63,11 @@ end
 # the way this works will change soon (MGP version 3), so it makes more sense to wait for these
 # changes before refactoring these tests
 describe 'Course Grading Periods Inheritance' do
-  include_examples 'in-process server selenium tests'
-
-  let(:title) { 'hi' }
-  let(:start_date) { format_date_for_view(3.months.from_now) }
   let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
+  let(:start_date) { format_date_for_view(3.months.from_now) }
+  let(:title) { 'hi' }
+
+  include_examples 'in-process server selenium tests'
 
   before do
     course_with_admin_logged_in
@@ -78,7 +78,7 @@ describe 'Course Grading Periods Inheritance' do
     @account_teacher = @teacher
   end
 
-  it 'reads course grading periods', priority: "1", test_id: 202318 do
+  it 'reads course grading periods', priority: "1" do
     user_session @account_teacher
     course_grading_period = Factories::GradingPeriodHelper.new.create_with_group_for_course(@course)
     get "/courses/#{@account_course.id}/grading_standards"

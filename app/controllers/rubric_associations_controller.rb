@@ -79,8 +79,11 @@ class RubricAssociationsController < ApplicationController
   #
   # @returns RubricAssociation
   def update
-    association_params = params[:rubric_association] ?
-      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id) : {}
+    association_params = if params[:rubric_association]
+                           params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id)
+                         else
+                           {}
+                         end
 
     @association = @context.rubric_associations.find(params[:id]) rescue nil
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
@@ -113,7 +116,7 @@ class RubricAssociationsController < ApplicationController
       :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => { :user => @current_user,
                                                                                                   :session => session }),
       :rubric_association => @association.as_json(:include_root => false,
-                                                  :include => %i{rubric_assessments assessment_requests},
+                                                  :include => %i[rubric_assessments assessment_requests],
                                                   :permissions => { :user => @current_user, :session => session })
     }
     render :json => json_res
@@ -146,7 +149,7 @@ class RubricAssociationsController < ApplicationController
   def can_manage_rubrics_or_association_object?(association, association_object)
     return true if association ||
                    @context.grants_right?(@current_user, session, :manage_rubrics) ||
-                   (association_object && association_object.grants_right?(@current_user, session, :update))
+                   association_object&.grants_right?(@current_user, session, :update)
 
     render_unauthorized_action
     false

@@ -23,6 +23,7 @@ module CC
     include ExternalFeeds
     include AssignmentGroups
     include GradingStandards
+    include LatePolicy
     include LearningOutcomes
     include Rubrics
     include Events
@@ -34,7 +35,7 @@ module CC
 
       @canvas_resource_dir = File.join(@export_dir, CCHelper::COURSE_SETTINGS_DIR)
       canvas_export_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::CANVAS_EXPORT_FLAG)
-      FileUtils::mkdir_p @canvas_resource_dir
+      FileUtils.mkdir_p @canvas_resource_dir
 
       resources = []
       resources << run_and_set_progress(:create_course_settings, nil, I18n.t('course_exports.errors.course_settings', "Failed to export course settings"), migration_id) if export_symbol?(:all_course_settings)
@@ -47,6 +48,7 @@ module CC
       resources << run_and_set_progress(:create_learning_outcomes, nil, I18n.t('course_exports.errors.learning_outcomes', "Failed to export learning outcomes"))
       resources << run_and_set_progress(:files_meta_path, nil, I18n.t('course_exports.errors.file_meta', "Failed to export file meta data"))
       resources << run_and_set_progress(:create_events, 25, I18n.t('course_exports.errors.events', "Failed to export calendar events"))
+      resources << run_and_set_progress(:add_late_policy, nil, I18n.t('course_exports.errors.late_policy', "Failed to export late policy"))
 
       if export_media_objects?
         File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), '') # just in case an error happens later
@@ -92,10 +94,10 @@ module CC
       canvas_export_file = File.open(path, 'w')
 
       # Fun panda joke!
-      canvas_export_file << <<~JOKE
+      canvas_export_file << <<~TEXT
         Q: What did the panda say when he was forced out of his natural habitat?
         A: This is un-BEAR-able
-      JOKE
+      TEXT
       canvas_export_file.close
     end
 
@@ -181,7 +183,7 @@ module CC
           c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
         end
       end
-      course_file.close if course_file
+      course_file&.close
       rel_path
     end
   end

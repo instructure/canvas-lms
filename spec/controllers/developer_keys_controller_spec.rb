@@ -199,8 +199,8 @@ describe DeveloperKeysController do
 
       describe 'scopes' do
         let(:valid_scopes) do
-          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+          %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
         end
         let(:invalid_scopes) { ['url:POST/banana', 'url:POST/invalid/scope'] }
         let(:root_account) { account_model }
@@ -254,8 +254,8 @@ describe DeveloperKeysController do
 
       describe 'scopes' do
         let(:valid_scopes) do
-          %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+          %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+             url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
         end
         let(:invalid_scopes) { ['url:POST|/api/v1/banana', 'not_a_scope'] }
         let(:root_account) { account_model }
@@ -334,12 +334,6 @@ describe DeveloperKeysController do
         expect(response).to be_not_found
       end
 
-      it 'does not inherit site admin keys if feature flag is off' do
-        site_admin_key.update!(visible: true)
-        get 'index', params: { account_id: test_domain_root_account.id }, format: :json
-        expect(expected_id).to eq root_account_key.global_id
-      end
-
       it 'does not include non-visible keys from site admin' do
         get 'index', params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
@@ -409,13 +403,6 @@ describe DeveloperKeysController do
     end
 
     it "An account admin shouldn't be able to access site admin dev keys" do
-      user_session(test_domain_root_account_admin)
-      get 'index', params: { account_id: Account.site_admin.id }
-      expect(response).to be_redirect
-      expect(flash[:error]).to eq "You don't have permission to access that page"
-    end
-
-    it "An account admin shouldn't be able to access site admin dev keys explicitly" do
       user_session(test_domain_root_account_admin)
       get 'index', params: { account_id: Account.site_admin.id }
       expect(response).to be_redirect

@@ -30,12 +30,12 @@ describe Loaders::EntryParticipantLoader do
       discussion_entry_participant_loader = Loaders::EntryParticipantLoader.for(
         current_user: @teacher
       )
-      discussion_entry_participant_loader.load(@entry).then { |discussion_entry_participants|
+      discussion_entry_participant_loader.load(@entry).then do |discussion_entry_participants|
         expect(discussion_entry_participants['rating']).to match @entry.discussion_entry_participants.first.rating
         expect(discussion_entry_participants['forced_read_state']).to match @entry.discussion_entry_participants.first.forced_read_state
         expect(discussion_entry_participants['read']).to match @entry.discussion_entry_participants.first.workflow_state == 'read'
         expect(discussion_entry_participants['report_type']).to match @entry.discussion_entry_participants.first.report_type
-      }
+      end
     end
   end
 end

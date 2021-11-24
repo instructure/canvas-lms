@@ -18,6 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe ProgressSerializer do
+  subject do
+    ProgressSerializer.new(progress, {
+                             controller: controller,
+                             scope: User.new
+                           })
+  end
+
   let(:context) { Account.default }
 
   let :progress do
@@ -43,20 +50,13 @@ describe ProgressSerializer do
     end
   end
 
-  subject do
-    ProgressSerializer.new(progress, {
-                             controller: controller,
-                             scope: User.new
-                           })
-  end
-
   let :json do
     @json ||= subject.as_json[:progress].stringify_keys
   end
 
-  [
-    :context_type, :user_id, :tag, :completion, :workflow_state, :created_at,
-    :updated_at, :message
+  %i[
+    context_type user_id tag completion workflow_state created_at
+    updated_at message
   ].map(&:to_s).each do |key|
     it "serializes #{key}" do
       expect(json[key]).to eq progress.send(key)

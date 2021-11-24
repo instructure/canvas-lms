@@ -19,7 +19,7 @@
 #
 
 module ContentNotices
-  NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show]
+  NOTICE_ATTRIBUTES = %i[tag text variant link_text link_target should_show].freeze
 
   class ContentNotice
     attr_accessor(*NOTICE_ATTRIBUTES)
@@ -54,7 +54,7 @@ module ContentNotices
   end
 
   def cn_cache_key(tag)
-    ["content_notice_present", tag, self.asset_string].cache_key
+    ["content_notice_present", tag, asset_string].cache_key
   end
 
   # add a notice to this context. if the notice with the given tag is already active for the context,

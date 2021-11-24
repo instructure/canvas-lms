@@ -26,12 +26,12 @@ class UserAccountAssociation < ActiveRecord::Base
 
   after_commit :update_user_root_account_ids
 
-  validates_presence_of :user_id, :account_id
+  validates :user_id, :account_id, presence: true
 
   resolves_root_account through: :account
 
   scope :for_root_accounts, -> { where('root_account_id = account_id') }
-  scope :for_user_id, lambda { |user_id| where('user_id =?', user_id) }
+  scope :for_user_id, ->(user_id) { where('user_id =?', user_id) }
 
   def for_root_account?
     account_id == root_account_id

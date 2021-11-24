@@ -26,7 +26,4 @@ class CreateLtiLinksForLegacyLtiToolSettings < ActiveRecord::Migration[5.0]
       .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups')
       .run
   end
-
-  def down
-  end
 end

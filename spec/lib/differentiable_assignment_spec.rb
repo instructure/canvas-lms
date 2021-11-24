@@ -30,6 +30,7 @@ shared_examples_for "a differentiable_object" do
         expect(differentiable.differentiated_assignments_applies?).to be_truthy
       end
     end
+
     context "only_visible_to_overrides is false" do
       it "returns false" do
         differentiable.update_attribute "only_visible_to_overrides", false
@@ -52,6 +53,7 @@ shared_examples_for "a differentiable_object" do
         expect(differentiable.visible_to_user?(@user)).to be_falsey
       end
     end
+
     context "observer" do
       before do
         @course_section = @course.course_sections.create
@@ -119,6 +121,7 @@ shared_examples_for "a differentiable_object" do
         end
       end
     end
+
     context "teacher" do
       it "is visible" do
         teacher_in_course(active_all: true, course: @course)
@@ -129,7 +132,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "filter" do
     def call_filter
-      block = lambda { |_collection, _users| return :filtered }
+      block = ->(_collection, _users) { return :filtered }
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "filters for students" do
@@ -156,6 +159,7 @@ shared_examples_for "a differentiable_object" do
         expect(call_filter).to eq :filtered
       end
     end
+
     it "does not filter for the teacher" do
       teacher_in_course(:course => @course)
       expect(call_filter).to eq :not_filtered
@@ -177,15 +181,15 @@ shared_examples_for "a differentiable_object" do
 end
 
 describe Assignment do
-  include_examples "a differentiable_object"
-
-  let(:differentiable) { assignment_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
   let(:differentiable_view) { AssignmentStudentVisibility }
+  let(:differentiable) { assignment_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+
+  include_examples "a differentiable_object"
 end
 
 describe Quizzes::Quiz do
-  include_examples "a differentiable_object"
-
-  let(:differentiable) { quiz_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
   let(:differentiable_view) { Quizzes::QuizStudentVisibility }
+  let(:differentiable) { quiz_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+
+  include_examples "a differentiable_object"
 end

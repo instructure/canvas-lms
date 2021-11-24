@@ -212,9 +212,9 @@ describe 'CommunicationChannels API', type: :request do
       before { @user = @someone }
 
       it 'is able to create its own channels' do
-        expect {
+        expect do
           api_call(:post, @path, @path_options, @post_params)
-        }.to change(CommunicationChannel, :count).by(1)
+        end.to change(CommunicationChannel, :count).by(1)
       end
 
       it 'is not able to create channels for others' do
@@ -226,7 +226,7 @@ describe 'CommunicationChannels API', type: :request do
 
       context 'not configured push' do
         it 'complains about sns not being configured' do
-          @post_params.merge!(communication_channel: { token: 'registration_token', type: 'push' })
+          @post_params[:communication_channel] = { token: 'registration_token', type: 'push' }
           raw_api_call(:post, @path, @path_options, @post_params)
 
           expect(response.code).to eql '400'
@@ -236,7 +236,7 @@ describe 'CommunicationChannels API', type: :request do
       context 'push' do
         before { @post_params.merge!(communication_channel: { token: +'registration_token', type: 'push' }) }
 
-        let(:client) { double() }
+        let(:client) { double }
         let(:dk) do
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'

@@ -22,20 +22,20 @@ describe UserPreferenceValue do
   let(:regular_key) { :custom_colors }
   let(:subbed_key) { :course_nicknames }
 
-  let(:sample_preferences) {
+  let(:sample_preferences) do
     { regular_key => [:arbitrary_data], subbed_key => { :a => 1, :b => [:other_stuff] } }
-  }
+  end
 
-  let(:preexisting_user) {
+  let(:preexisting_user) do
     User.create!(:preferences => sample_preferences)
-  }
+  end
 
-  let(:migrated_user) {
+  let(:migrated_user) do
     u = User.create!(:preferences => sample_preferences)
     u.migrate_preferences_if_needed
     u.save!
     u
-  }
+  end
 
   it "creates a new row when setting a new value" do
     u = User.create!
@@ -128,7 +128,7 @@ describe UserPreferenceValue do
     let(:column1) { course1.custom_gradebook_columns.create!(:title => "1") }
     let(:column2) { course2.custom_gradebook_columns.create!(:title => "2") }
 
-    let(:old_format) {
+    let(:old_format) do
       {
         "student" => "100",
         "assignment_#{assignment1.id}" => "10",
@@ -138,7 +138,7 @@ describe UserPreferenceValue do
         "custom_col_#{column1.id}" => "50",
         "custom_col_#{column2.id}" => "60"
       }
-    }
+    end
 
     it "splits the old gradebook column size preference by course" do
       u = User.create!

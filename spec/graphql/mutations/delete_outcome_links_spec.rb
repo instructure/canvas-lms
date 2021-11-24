@@ -41,9 +41,9 @@ describe Mutations::DeleteOutcomeLinks do
   end
 
   def variables(args = {})
-    <<~VARS
+    <<~YAML
       ids: #{args[:ids] || [@outcome_link1.id]}
-    VARS
+    YAML
   end
 
   def execute_with_input(input, user_executing: @admin)
@@ -88,7 +88,7 @@ describe Mutations::DeleteOutcomeLinks do
 
   context 'Error' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeLinks', 'errors')
+      errors = result['errors'] || result.dig('data', 'deleteOutcomeLinks', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(message)
     end
@@ -126,7 +126,7 @@ describe Mutations::DeleteOutcomeLinks do
     end
 
     it 'fails to delete outcome link if link id is invalid' do
-      result = execute_with_input(variables({ ids: [123456789] }))
+      result = execute_with_input(variables({ ids: [123_456_789] }))
       data = result.dig('data', 'deleteOutcomeLinks', 'deletedOutcomeLinkIds')
       expect_error(result, 'Could not find outcome link')
       expect(data).to be_empty

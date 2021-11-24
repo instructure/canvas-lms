@@ -138,9 +138,9 @@ describe GradingPeriodGroup do
     context "when given a course" do
       it "is expected to fail" do
         course = account.courses.create!
-        expect {
+        expect do
           GradingPeriodGroup.for(course)
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
     end
   end
@@ -246,9 +246,10 @@ describe GradingPeriodGroup do
   end
 
   it_behaves_like "soft deletion" do
+    subject { course.grading_period_groups }
+
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { { title: "A title" } }
-    subject { course.grading_period_groups }
   end
 
   describe "deletion" do
@@ -278,7 +279,7 @@ describe GradingPeriodGroup do
   end
 
   describe "permissions" do
-    let(:permissions) { [:read, :create, :update, :delete] }
+    let(:permissions) { %i[read create update delete] }
 
     context "course belonging to root account" do
       before :once do
@@ -324,7 +325,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read but NOT create, update, not delete root-account " \
-           "grading period groups", priority: "1", test_id: 2528644 do
+           "grading period groups", priority: "1" do
           expect(@root_account_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: true,
@@ -348,7 +349,7 @@ describe GradingPeriodGroup do
 
       context "teacher" do
         it "can read but NOT create, update, nor delete root-account " \
-           "grading period groups", priority: "1", test_id: 2528645 do
+           "grading period groups", priority: "1" do
           expect(@root_account_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,

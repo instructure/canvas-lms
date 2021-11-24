@@ -78,7 +78,7 @@ describe Lti::AccountExternalToolsController do
 
     context 'when an invalid account ID is given' do
       let(:params_overrides) do
-        { account_id: 991234 }
+        { account_id: 991_234 }
       end
 
       it 'returns a 401' do

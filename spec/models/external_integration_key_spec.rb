@@ -31,7 +31,7 @@ describe ExternalIntegrationKey do
   let!(:external_integration_key) do
     account.external_integration_keys.create!(
       key_type: key_type,
-      key_value: '42',
+      key_value: '42'
     )
   end
 
@@ -118,9 +118,9 @@ describe ExternalIntegrationKey do
     account = Account.new
     eik = account.external_integration_keys.build(key_type: key_type)
 
-    expect {
+    expect do
       eik.key_value = '42'
-    }.to change {
+    end.to change {
       account.valid?
     }.from(false).to(true)
   end

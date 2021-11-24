@@ -24,6 +24,10 @@ module Api
   module Html
     describe TrackTag do
       describe '#to_node' do
+        subject(:node) do
+          track_tag.to_node(url_helper)
+        end
+
         let(:url_helper) do
           double({
                    show_media_tracks_url: 'media/track/vtt'
@@ -45,10 +49,6 @@ module Api
             Nokogiri::XML::DocumentFragment.parse('<div></div>'),
             Nokogiri::XML::Node
           )
-        end
-
-        subject(:node) do
-          track_tag.to_node(url_helper)
         end
 
         specify { expect(node['kind']).to eq 'subtitles' }

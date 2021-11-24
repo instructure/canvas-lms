@@ -53,12 +53,12 @@ module Lti
       allow(m).to receive(:use_1_3?).and_return(false)
       m
     end
-    let(:available_canvas_resources) {
+    let(:available_canvas_resources) do
       [
         { id: '1', name: 'item 1' },
         { id: '2', name: 'item 2' }
       ]
-    }
+    end
 
     let(:controller) do
       request_mock = double('request')
@@ -225,7 +225,7 @@ module Lti
 
     describe '#self.expansion_keys' do
       let(:expected_keys) do
-        VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }
+        VariableExpander.expansions.keys.map { |c| c.to_s[1..] }
       end
 
       it 'includes all expansion keys' do
@@ -244,8 +244,8 @@ module Lti
     end
 
     describe '#enabled_capability_params' do
-      let(:enabled_capability) {
-        %w(TestCapability.Foo
+      let(:enabled_capability) do
+        %w[TestCapability.Foo
            ToolConsumerInstance.guid
            CourseSection.sourcedId
            Membership.role
@@ -259,8 +259,8 @@ module Lti
            User.image
            Message.documentTarget
            Message.locale
-           Context.id)
-      }
+           Context.id]
+      end
 
       it 'does not use expansions that do not have default names' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> { 'test' })
@@ -662,10 +662,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.account.id' do
-        allow(account).to receive(:id).and_return(12345)
+        allow(account).to receive(:id).and_return(12_345)
         exp_hash = { test: '$Canvas.account.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 12345
+        expect(exp_hash[:test]).to eq 12_345
       end
 
       it 'has substitution for $Canvas.account.name' do
@@ -683,10 +683,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.rootAccount.id' do
-        allow(root_account).to receive(:id).and_return(54321)
+        allow(root_account).to receive(:id).and_return(54_321)
         exp_hash = { test: '$Canvas.rootAccount.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 54321
+        expect(exp_hash[:test]).to eq 54_321
       end
 
       it 'has substitution for $Canvas.rootAccount.sisSourceId' do
@@ -697,10 +697,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.id' do
-        allow(root_account).to receive(:id).and_return(54321)
+        allow(root_account).to receive(:id).and_return(54_321)
         exp_hash = { test: '$Canvas.root_account.id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 54321
+        expect(exp_hash[:test]).to eq 54_321
       end
 
       it 'has substitution for $Canvas.root_account.uuid' do
@@ -718,10 +718,10 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.global_id' do
-        allow(root_account).to receive(:global_id).and_return(10054321)
+        allow(root_account).to receive(:global_id).and_return(10_054_321)
         exp_hash = { test: '$Canvas.root_account.global_id' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 10054321
+        expect(exp_hash[:test]).to eq 10_054_321
       end
 
       it 'has substitution for $Canvas.shard.id' do
@@ -1301,7 +1301,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.startAt' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term && term.start_at
+          unless term&.start_at
             expect(exp_hash[:test]).to eq '$Canvas.term.startAt'
           end
         end
@@ -1330,7 +1330,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.name' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term && term.name
+          unless term&.name
             expect(exp_hash[:test]).to eq '$Canvas.term.name'
           end
         end
@@ -1420,7 +1420,7 @@ module Lti
         end
       end
 
-      context 'context is a course with an assignment' do
+      context 'context is a course with an assignment and a user' do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
 
         it 'has substitution for $Canvas.assignment.id' do
@@ -1736,7 +1736,7 @@ module Lti
 
         it 'has substitution for $vnd.instructure.User.current_uuid' do
           allow(user).to receive(:uuid).and_return('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
-          exp_hash = { test: '$vnd.instructure.User.uuid' }
+          exp_hash = { test: '$vnd.instructure.User.current_uuid' }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
         end

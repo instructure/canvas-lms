@@ -30,12 +30,12 @@ describe "eportfolios" do
     course_with_student_logged_in
   end
 
-  it "creates an eportfolio", priority: "1", test_id: 220018 do
+  it "creates an eportfolio", priority: "1" do
     create_eportfolio
     validate_eportfolio
   end
 
-  it "creates an eportfolio that is public", priority: "2", test_id: 114348 do
+  it "creates an eportfolio that is public", priority: "2" do
     create_eportfolio
     validate_eportfolio(true)
   end
@@ -45,20 +45,20 @@ describe "eportfolios" do
       eportfolio_model({ :user => @user, :name => "student content" })
     end
 
-    it "starts the download of ePortfolio contents", priority: "1", test_id: 115980 do
+    it "starts the download of ePortfolio contents", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
       expect(f("#export_progress")).to be_displayed
     end
 
-    it "displays the eportfolio wizard", priority: "1", test_id: 220019 do
+    it "displays the eportfolio wizard", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".wizard_popup_link").click
       wait_for_animations
       expect(f("#wizard_box")).to be_displayed
     end
 
-    it "displays and hide eportfolio wizard", priority: "2", test_id: 220020 do
+    it "displays and hide eportfolio wizard", priority: "2" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".wizard_popup_link").click
       wait_for_animations
@@ -68,7 +68,7 @@ describe "eportfolios" do
       expect(f("#wizard_box")).not_to be_displayed
     end
 
-    it "adds a new page", priority: "1", test_id: 115979 do
+    it "adds a new page", priority: "1" do
       page_title = 'I made this page.'
       get "/eportfolios/#{@eportfolio.id}"
       add_eportfolio_page(page_title)
@@ -79,7 +79,7 @@ describe "eportfolios" do
       expect(f('#content h2')).to include_text(page_title)
     end
 
-    it "deletes a page", priority: "1", test_id: 3011032 do
+    it "deletes a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
       # add a few pages
       add_eportfolio_page("page #1")
@@ -96,7 +96,7 @@ describe "eportfolios" do
       expect(last_page).not_to contain_jqcss('.remove_page_link:visible')
     end
 
-    it "reorders a page", priority: "1", test_id: 3011033 do
+    it "reorders a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
 
       # add 3 pages
@@ -111,13 +111,13 @@ describe "eportfolios" do
       expect(pages.last.text).to eq page.text
     end
 
-    it "adds a section", priority: "1", test_id: 3011034 do
+    it "adds a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
       add_eportfolio_section("test section name")
       expect(sections.last).to include_text("test section name")
     end
 
-    it "deletes a section", priority: "1", test_id: 3011035 do
+    it "deletes a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
 
       # add a section
@@ -135,7 +135,7 @@ describe "eportfolios" do
       expect(last_section).not_to contain_jqcss('.remove_section_link:visible')
     end
 
-    it "reorders a section", priority: "1", test_id: 3011036 do
+    it "reorders a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
 
       # add a 3 sections
@@ -150,7 +150,7 @@ describe "eportfolios" do
       expect(sections.last.text).to eq section.text
     end
 
-    it "edits ePortfolio settings", priority: "2", test_id: 220021 do
+    it "edits ePortfolio settings", priority: "2" do
       get "/eportfolios/#{@eportfolio.id}"
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name1"
@@ -190,7 +190,7 @@ describe "eportfolios" do
       expect(ff('#category_select option').map(&:text)).not_to include("New Section")
     end
 
-    it "deletes the ePortfolio", priority: "2", test_id: 114350 do
+    it "deletes the ePortfolio", priority: "2" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click

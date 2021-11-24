@@ -34,9 +34,9 @@ import {
   MOCK_GROUPS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
-import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
+import {MOCK_OBSERVER_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import sinon from 'sinon'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/react/ObserverOptions'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 
 const currentUser = {
   id: '1',

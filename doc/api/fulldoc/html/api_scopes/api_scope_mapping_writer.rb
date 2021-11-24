@@ -24,7 +24,7 @@ class ApiScopeMappingWriter
     @resources = resources
     dir = File.dirname(__FILE__)
     @template = File.read(File.join(dir, '/scope_mapper_template.erb'))
-    @output_file = Rails.root.join("lib", "api_scope_mapper.rb")
+    @output_file = Rails.root.join("lib/api_scope_mapper.rb")
     @resource_lookup = {}
   end
 

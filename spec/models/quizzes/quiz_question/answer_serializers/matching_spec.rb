@@ -20,8 +20,17 @@
 require_relative 'support/answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
-  include_examples 'Answer Serializers'
-
+  let :factory_options do
+    {
+      answer_parser_compatibility: true
+    }
+  end
+  let :output do
+    {
+      "question_5_answer_7396" => "6061",
+      "question_5_answer_4224" => "3855"
+    }.with_indifferent_access
+  end
   let :input do
     [
       { answer_id: '7396', match_id: '6061' },
@@ -29,18 +38,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     ].map(&:with_indifferent_access)
   end
 
-  let :output do
-    {
-      "question_5_answer_7396" => "6061",
-      "question_5_answer_4224" => "3855"
-    }.with_indifferent_access
-  end
-
-  let :factory_options do
-    {
-      answer_parser_compatibility: true
-    }
-  end
+  include_examples 'Answer Serializers'
 
   describe '#deserialize (full)' do
     it 'includes all answer/match pairs' do
@@ -102,7 +100,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     it 'rejects an unknown match' do
       rc = subject.serialize([{
                                answer_id: 7396,
-                               match_id: 123456
+                               match_id: 123_456
                              }])
 
       expect(rc.error).not_to be_nil

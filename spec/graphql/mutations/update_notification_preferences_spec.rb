@@ -82,28 +82,32 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     user_id: nil
   )
     <<~GQL
-      #{"notificationPreferencesEnabled(
-        contextType: #{context_type},
-        #{"courseId: #{course_id}" if course_id}
-        #{"accountId: #{account_id}" if account_id}
-      )" if context_type && (course_id || account_id)}
+      #{if context_type && (course_id || account_id)
+          "notificationPreferencesEnabled(
+          contextType: #{context_type},
+          #{"courseId: #{course_id}" if course_id}
+          #{"accountId: #{account_id}" if account_id}
+      )"
+        end}
       notificationPreferences {
         sendScoresInEmails#{"(courseId: #{course_id})" if course_id}
         sendObservedNamesInNotifications
         readPrivacyNoticeDate
         channels {
-          #{"notificationPolicyOverrides(
-            contextType: #{context_type},
-            #{"courseId: #{course_id}" if course_id}
-            #{"accountId: #{account_id}" if account_id}
+          #{if context_type && (course_id || account_id)
+              "notificationPolicyOverrides(
+              contextType: #{context_type},
+              #{"courseId: #{course_id}" if course_id}
+              #{"accountId: #{account_id}" if account_id}
           ) {
-            frequency
-            notification {
-              category
-              categoryDisplayName
-              name
-            }
-          }" if context_type && (course_id || account_id)}
+              frequency
+              notification {
+                category
+                categoryDisplayName
+                name
+              }
+          }"
+            end}
           notificationPolicies#{"(contextType: #{context_type})" if context_type} {
             frequency
             notification {
@@ -355,7 +359,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     it 'errors when given an account_id for an account that does not exist' do
       result = run_mutation(
         context_type: 'Account',
-        account_id: 987654321,
+        account_id: 987_654_321,
         enabled: false
       )
       expect(result.dig(:errors, 0, :message)).to eq 'not found'
@@ -364,7 +368,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     it 'errors when given a course_id for a course that does not exist' do
       result = run_mutation(
         context_type: 'Course',
-        course_id: 987654321,
+        course_id: 987_654_321,
         enabled: false
       )
       expect(result.dig(:errors, 0, :message)).to eq 'not found'

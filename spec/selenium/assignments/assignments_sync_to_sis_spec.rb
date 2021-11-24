@@ -31,7 +31,7 @@ describe "assignments sync to sis" do
   include CustomScreenActions
   include CustomSeleniumActions
 
-  # note: due date testing can be found in assignments_overrides_spec
+  # NOTE: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
     before(:once) do
@@ -287,30 +287,6 @@ describe "assignments sync to sis" do
       end
 
       describe 'when due dates for quizzes' do
-        let(:assignment_id) { @assignment.assignment.id }
-        let(:type) { @course.quizzes }
-        let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
-        let(:params) { { title: assignment_name, assignment_group: assignment_group } }
-
-        it 'when there are no overrides' do
-          create_assignment(set_date)
-          validate
-        end
-
-        it 'when there are overrides and no base' do
-          create_assignment
-          override_create("A", set_date)
-          validate
-        end
-
-        it 'when there is a base and overrides' do
-          create_assignment(expected_date)
-          override_create("A", set_date)
-          validate
-        end
-      end
-
-      describe 'when no due dates for quizzes' do
         let(:assignment_id) { @assignment.assignment.id }
         let(:type) { @course.quizzes }
         let(:assignment_group) { @course.assignment_groups.create!(name: "default") }

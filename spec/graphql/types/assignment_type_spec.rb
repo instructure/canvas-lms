@@ -30,7 +30,7 @@ describe Types::AssignmentType do
     course.assignments.create(title: "some assignment",
                               submission_types: ["online_text_entry"],
                               workflow_state: "published",
-                              allowed_extensions: ["doc", "xlt", "foo"])
+                              allowed_extensions: %w[doc xlt foo])
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
@@ -69,7 +69,10 @@ describe Types::AssignmentType do
   end
 
   context "sis field" do
-    let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
+    let_once(:sis_assignment) do
+      assignment.update!(sis_source_id: "sisAssignment")
+      assignment
+    end
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -185,7 +188,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
     end
 
     it "includes description when lock settings allow" do
@@ -365,17 +368,17 @@ describe Types::AssignmentType do
 
   describe 'groupSubmissionConnection' do
     before(:once) do
-      course_with_teacher()
+      course_with_teacher
       assignment_model(group_category: 'GROUPS!')
       @group_category.create_groups(2)
-      2.times {
-        student_in_course()
+      2.times do
+        student_in_course
         @group_category.groups.first.add_user(@user)
-      }
-      2.times {
-        student_in_course()
+      end
+      2.times do
+        student_in_course
         @group_category.groups.last.add_user(@user)
-      }
+      end
       @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')
       @assignment.submit_homework(@group_category.groups.last.users.first, body: 'Submit!')
 
@@ -442,7 +445,7 @@ describe Types::AssignmentType do
         }
       }
     GQL
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'assignment')).to be_nil
   end
 
@@ -605,11 +608,11 @@ describe Types::AssignmentType do
         assignment_type.resolve("lockInfo { isLocked }")
       ).to eq false
 
-      %i[lockAt unlockAt canView].each { |field|
+      %i[lockAt unlockAt canView].each do |field|
         expect(
           assignment_type.resolve("lockInfo { #{field} }")
         ).to eq nil
-      }
+      end
     end
 
     it "works when lock_info is a hash" do

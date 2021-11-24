@@ -37,7 +37,7 @@ describe "quizzes log auditing" do
     end
 
     context 'attempt numbers' do
-      it "lists the attempt number for a single attempt", priority: "2", test_id: 605103 do
+      it "lists the attempt number for a single attempt", priority: "2" do
         @students = student_in_course(course: @course, name: 'student', active_all: true).user
         quiz = seed_quiz_with_submission
         sub = quiz.quiz_submissions.first
@@ -60,12 +60,12 @@ describe "quizzes log auditing" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@sub.id}/log"
         end
 
-        it "lists the attempt number for multiple attempts", priority: "2", test_id: 605106 do
+        it "lists the attempt number for multiple attempts", priority: "2" do
           expect(ff('.ic-AttemptController__Attempt')[0]).to include_text('1')
           expect(ff('.ic-AttemptController__Attempt')[1]).to include_text('2')
         end
 
-        it 'toggles between attempts when clicking on the attempt', priority: "2", test_id: 605107 do
+        it 'toggles between attempts when clicking on the attempt', priority: "2" do
           ff('.ic-AttemptController__Attempt')[0].click
           expect(driver.current_url).to include('attempt=1')
           ff('.ic-AttemptController__Attempt')[1].click
@@ -100,7 +100,7 @@ describe "quizzes log auditing" do
         wait_for_ajaximations
       end
 
-      it 'shows that a session had started and that it is has been read', priority: "2", test_id: 605108 do
+      it 'shows that a session had started and that it is has been read', priority: "2" do
         skip_if_safari(:alert)
         resize_screen_to_small
         scroll_page_to_bottom # the question viewed event is triggered by page scroll
@@ -115,7 +115,7 @@ describe "quizzes log auditing" do
         expect(f('#ic-EventStream')).to include_text('Viewed (and possibly read)')
       end
 
-      it 'shows that a question had been answered', priority: "2", test_id: 605109 do
+      it 'shows that a question had been answered', priority: "2" do
         answer_questions_and_submit(@quiz, 1)
 
         sub = @quiz.quiz_submissions.where(:user_id => @student).first
@@ -125,7 +125,7 @@ describe "quizzes log auditing" do
         expect(f('#ic-EventStream')).to include_text('Answered question')
       end
 
-      it 'takes you to a question when you click on the question number', priority: "2", test_id: 605111 do
+      it 'takes you to a question when you click on the question number', priority: "2" do
         answer_questions_and_submit(@quiz, 1)
         sub = @quiz.quiz_submissions.where(:user_id => @student).first
         user_session(@teacher)

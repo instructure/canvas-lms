@@ -51,6 +51,14 @@ shared_examples_for 'QuizReportSerializer Associations' do
 end
 
 describe Quizzes::QuizReportSerializer do
+  subject do
+    Quizzes::QuizReportSerializer.new(statistics, {
+                                        controller: controller,
+                                        scope: user,
+                                        session: session
+                                      })
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1
@@ -77,14 +85,6 @@ describe Quizzes::QuizReportSerializer do
       allow(controller).to receive(:session).and_return session
       allow(controller).to receive(:context).and_return context
     end
-  end
-
-  subject do
-    Quizzes::QuizReportSerializer.new(statistics, {
-                                        controller: controller,
-                                        scope: user,
-                                        session: session
-                                      })
   end
 
   let :json do

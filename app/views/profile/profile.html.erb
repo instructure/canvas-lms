@@ -257,7 +257,7 @@
 <% unless (@domain_root_account && @domain_root_account.service_enabled?(:none)) %>
 <a name="registered_web_services"></a>
 <h2><%= t('headers.web_services', "Web Services") %></h2>
-<p><%= t(:web_services, <<-TEXT)
+<p><%= t(:web_services, <<~TEXT)
 Canvas can make your life a lot easier by tying itself in with the web tools
 you already use.  Click any of the services in "Other Services" to see what we mean.
 TEXT
@@ -317,7 +317,7 @@ TEXT
           <div>
             <%= image_tag "google_docs.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.google_drive_access', "Google Drive Access") %></div>
-            <%= t(:google_drive_description, <<-TEXT)
+            <%= t(:google_drive_description, <<~TEXT)
                 Once you authorize us to see your Google Drive you'll be able to submit your assignments
                             directly from Google Drive, and create and share documents with members of your classes.
                 TEXT
@@ -336,7 +336,7 @@ TEXT
           <div>
             <%= image_tag "skype.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.share_skype_id', "Share your Skype ID") %></div>
-            <%= t(:skype_description, <<-TEXT)
+            <%= t(:skype_description, <<~TEXT)
             Skype offers free online voice and video calls.  Lots of students use
             Skype as a free, easy way to communicate.  If you register your Skype Name
             and enable visibility, then other students can easily find your contact
@@ -368,7 +368,7 @@ TEXT
           <div>
             <%= image_tag "twitter.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.twitter_access', "Twitter Access") %></div>
-            <%= mt(:twitter_description, <<-TEXT)
+            <%= mt(:twitter_description, <<~TEXT)
 Twitter is a service for posting and subscribing to short messages.
 If you have a Twitter account, you can register it here.  Then if you allow
 fellow course/group members to see your registered services, they can
@@ -392,7 +392,7 @@ TEXT
           <div>
             <%= image_tag "delicious.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.delicious_login', "Delicious Login") %></div>
-            <%= t(:delicious_description, <<-TEXT)
+            <%= t(:delicious_description, <<~TEXT)
             Delicious is a tool that lets you store and share your bookmarks with others.
             Canvas's rich content editor will let you search your Delicious tags
             to easily link from within Canvas to other resources you find useful.
@@ -426,7 +426,7 @@ TEXT
           <div>
             <%= image_tag "diigo.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
             <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.diigo_login', "Diigo Login") %></div>
-            <%= t(:diigo_description, <<-TEXT)
+            <%= t(:diigo_description, <<~TEXT)
             Diigo is a social bookmarking tool tailored specifically to research and
             education.
             Canvas's rich content editor will let you search your Diigo tags
@@ -463,7 +463,7 @@ TEXT
 <h2><%= before_label(:'headers.approved_integrations', "Approved Integrations") %></h2>
 <div style="margin-<%= direction('left') %>: 20px;">
   <% if AccessToken.visible_tokens(@user.access_tokens).empty? %>
-    <div id="no_approved_integrations"><%= t(:no_approved_integrations, <<-TEXT)
+    <div id="no_approved_integrations"><%= t(:no_approved_integrations, <<~TEXT)
       Third-party applications can request permission to access
       the Canvas site on your behalf.  As you begin authorizing
       applications you will see them listed here.
@@ -471,7 +471,7 @@ TEXT
     %></div>
   <% end %>
   <div id="access_tokens_holder" style="<%= hidden if AccessToken.visible_tokens(@user.access_tokens).empty? %>">
-    <%= t(:approved_integrations, <<-TEXT)
+    <%= t(:approved_integrations, <<~TEXT)
     These are the third-party applications you have authorized
     to access the Canvas site on your behalf:
     TEXT
@@ -498,7 +498,7 @@ TEXT
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
-    <p><%= t(<<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
+    <p><%= t(<<~TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
       on your behalf.  You can also generate access tokens and *use the Canvas
       Open API* to come up with your own integrations.
@@ -513,7 +513,7 @@ TEXT
           <th scope="row"><%= before_label(:token, "Token") %></th>
           <td>
             <div class="visible_token">&nbsp;</div>
-            <div class="full_token_warning"><%= mt(:full_token_warning, <<-TEXT)
+            <div class="full_token_warning"><%= mt(:full_token_warning, <<~TEXT)
 **Copy this token down now**. Once you leave this page you won't be able to
 retrieve the full token anymore, you'll have to regenerate it to get a new
 value.
@@ -550,7 +550,7 @@ TEXT
   </div>
   <div id="add_access_token_dialog" style="display: none;" title="<%= t('titles.new_access_token', "New Access Token") %>">
     <h2><%= t('headers.generate_access_token', "Generate an Access Token") %></h2>
-    <%= mt(:generate_access_token_description, <<-TEXT, :documentation_url => 'https://canvas.instructure.com/doc/api/index.html')
+    <%= mt(:generate_access_token_description, <<~TEXT, :documentation_url => 'https://canvas.instructure.com/doc/api/index.html')
 Access tokens are what allow third-party applications to access Canvas
 resources on your behalf. These tokens are normally created automatically for
 applications as needed, but if [you're developing a new or limited
@@ -594,7 +594,7 @@ TEXT
   </div>
 </div>
 
-<h2 aria-hidden=true><%= t('Feature Settings') %></h2>
+<h2 aria-hidden=true><%= t('Feature Options') %></h2>
 <div class="feature-flag-wrapper">
   <!-- this is populated by FeatureFlagAdminView -->
 </div>
@@ -620,7 +620,7 @@ TEXT
 <% else %>
   <% js_bundle :confirm_email %>
   <p class="alert alert-info">
-    <%= t <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+    <%= t <<~TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
       Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
       If you don't see it, *click to re-send the email*, and make sure to check your spam box.
     TEXT

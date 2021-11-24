@@ -19,12 +19,12 @@
 #
 
 describe SIS::CSV::DiffGenerator do
+  subject { described_class.new(@account, @batch) }
+
   before :once do
     account_model
     @batch = @account.sis_batches.create
   end
-
-  subject { described_class.new(@account, @batch) }
 
   def csv(name, data)
     @files ||= []
@@ -65,7 +65,7 @@ describe SIS::CSV::DiffGenerator do
                                                                       ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users.csv"
-      expect(warning.message).to match(%r{diffing against more than one})
+      expect(warning.message).to match(/diffing against more than one/)
     end
 
     it 'skips diffing if current has more than one file of type' do
@@ -82,7 +82,7 @@ describe SIS::CSV::DiffGenerator do
                                                                       ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users1.csv"
-      expect(warning.message).to match(%r{diffing against more than one})
+      expect(warning.message).to match(/diffing against more than one/)
     end
 
     it 'generates multiple diffs for different file types' do

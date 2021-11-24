@@ -68,7 +68,7 @@ class Quizzes::QuizSubmissionHistory
     attempts = quiz_submission_attempts(quiz_submission).map do |num, versions|
       Quizzes::QuizSubmissionAttempt.new(:number => num, :versions => versions)
     end
-    attempts.sort_by { |a| a.number }
+    attempts.sort_by(&:number)
   end
 
   def quiz_submission_attempts(quiz_submission)

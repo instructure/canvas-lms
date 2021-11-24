@@ -84,7 +84,7 @@ module Services
 
       it "processes push notification message type" do
         expect(@queue).to receive(:send_message).once
-        sns_client = double()
+        sns_client = double
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: 'token')

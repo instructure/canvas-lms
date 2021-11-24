@@ -42,13 +42,13 @@ describe Quizzes::QuizUserMessager do
     end
 
     it "can send to either submitted or unsubmitted students" do
-      expect {
+      expect do
         send_message('submitted')
-      }.to change { recipient_messages('submitted') }.by 1
+      end.to change { recipient_messages('submitted') }.by 1
 
-      expect {
+      expect do
         send_message('unsubmitted')
-      }.to change { recipient_messages('unsubmitted') }.by 1
+      end.to change { recipient_messages('unsubmitted') }.by 1
     end
   end
 end

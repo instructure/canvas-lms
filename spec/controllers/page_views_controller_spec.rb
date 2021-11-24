@@ -25,9 +25,9 @@ require 'csv'
 describe PageViewsController do
   # Factory-like thing for page views.
   def page_view(user, url, options = {})
-    options.reverse_merge!(:request_id => 'req' + rand(100000000).to_s,
+    options.reverse_merge!(:request_id => 'req' + rand(100_000_000).to_s,
                            :user_agent => 'Firefox/12.0')
-    options.merge!(:url => url)
+    options[:url] = url
 
     user_req = options.delete(:user_request)
     req_id = options.delete(:request_id)

@@ -85,14 +85,14 @@ describe "profile" do
     expect(@pseudonym.reload).to be_valid_password('newpassword')
   end
 
-  it "rejects passwords longer than 255 characters", priority: "2", test_id: 840136 do
+  it "rejects passwords longer than 255 characters", priority: "2" do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(128))
     errorboxes = ff('.error_text')
     expect(errorboxes.any? { |errorbox| errorbox.text.include?("Can't exceed 255 characters") }).to be_truthy
   end
 
-  it "rejects passwords shorter than 8 characters", priority: "2", test_id: 1055503 do
+  it "rejects passwords shorter than 8 characters", priority: "2" do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(2))
     errorboxes = ff('.error_text')
@@ -266,13 +266,13 @@ describe "profile" do
       expect(f(selector).selected?).to be_truthy
     end
 
-    it "generates a new access token without an expiration", priority: "2", test_id: 588918 do
+    it "generates a new access token without an expiration", priority: "2" do
       get "/profile/settings"
       generate_access_token('testing', true)
       expect(fj('.access_token:visible .expires')).to include_text('never')
     end
 
-    it "generates a new access token with an expiration", priority: "2", test_id: 588919 do
+    it "generates a new access token with an expiration", priority: "2" do
       Timecop.freeze do
         get "/profile/settings"
         generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
@@ -281,7 +281,7 @@ describe "profile" do
       expect(fj('.access_token:visible .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
 
-    it "regenerates a new access token", priority: "2", test_id: 588920 do
+    it "regenerates a new access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token
@@ -310,7 +310,7 @@ describe "profile" do
       expect(f('#token_details_dialog')).to be_displayed
     end
 
-    it "deletes an access token", priority: "2", test_id: 588921 do
+    it "deletes an access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token('testing', true)
@@ -354,7 +354,7 @@ describe "profile" do
       local_storage!
     end
 
-    it "saves admin profile pics setting", priority: "1", test_id: 68933 do
+    it "saves admin profile pics setting", priority: "1" do
       site_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
       f('#account_services_avatars').click

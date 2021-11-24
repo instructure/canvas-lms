@@ -40,7 +40,7 @@ class AccountReport < ActiveRecord::Base
 
   def add_report_runner(batch)
     @runners ||= []
-    runners << self.account_report_runners.new(batch_items: batch, created_at: Time.zone.now, updated_at: Time.zone.now)
+    runners << account_report_runners.new(batch_items: batch, created_at: Time.zone.now, updated_at: Time.zone.now)
   end
 
   def write_report_runners
@@ -75,7 +75,7 @@ class AccountReport < ActiveRecord::Base
     # There is a FK between rows and runners, so delete rows first
     cleanup = AccountReportRow.where("created_at<?", 28.days.ago).limit(10_000)
     until cleanup.delete_all < 10_000; end
-    self.delete_old_runners
+    delete_old_runners
   end
 
   def self.delete_old_runners
@@ -92,20 +92,18 @@ class AccountReport < ActiveRecord::Base
   end
 
   def delete_account_report_rows
-    cleanup = self.account_report_rows.limit(10_000)
+    cleanup = account_report_rows.limit(10_000)
     until cleanup.delete_all < 10_000; end
   end
 
   def context
-    self.account
+    account
   end
 
-  def root_account
-    self.account.root_account
-  end
+  delegate :root_account, to: :account
 
   def in_progress?
-    self.created? || self.running?
+    created? || running?
   end
 
   def run_report(type = nil)
@@ -126,15 +124,15 @@ class AccountReport < ActiveRecord::Base
 
   def mark_as_errored
     self.workflow_state = :error
-    self.save!
+    save!
   end
 
   def has_parameter?(key)
-    self.parameters.is_a?(Hash) && self.parameters[key].presence
+    parameters.is_a?(Hash) && parameters[key].presence
   end
 
   def value_for_param(key)
-    self.parameters.is_a?(Hash) && self.parameters[key].presence
+    parameters.is_a?(Hash) && parameters[key].presence
   end
 
   def self.available_reports

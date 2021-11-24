@@ -51,7 +51,7 @@ module CC::Exporter::Epub::Converters
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      [:due_at, :lock_at, :unlock_at].each do |date_type|
+      %i[due_at lock_at unlock_at].each do |date_type|
         val = get_node_val(meta_doc, date_type)
         assignment[date_type] = val unless val.nil?
       end

@@ -120,7 +120,7 @@ module Lti
         id: ORIGINALITY_REPORT_SERVICE,
         endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
         format: ['application/json'].freeze,
-        action: ['POST', 'PUT', 'GET'].freeze
+        action: %w[POST PUT GET].freeze
       }.freeze
     ].freeze
 
@@ -279,21 +279,21 @@ module Lti
     end
 
     def create_attributes
-      (update_attributes + [:file_id]).freeze
+      (update_attributes + [:file_id]).freeze # rubocop:disable Rails/ActiveRecordAliases not ActiveRecord::Base#update_attributes
     end
 
     def update_attributes
-      [
-        :error_message,
-        :originality_report_file_id,
-        :originality_report_url,
-        :originality_score,
-        :workflow_state
+      %i[
+        error_message
+        originality_report_file_id
+        originality_report_url
+        originality_score
+        workflow_state
       ].freeze
     end
 
     def lti_link_attributes
-      [tool_setting: %i(resource_url resource_type_code)].freeze
+      [tool_setting: %i[resource_url resource_type_code]].freeze
     end
 
     def assignment
@@ -338,7 +338,7 @@ module Lti
 
     def update_report_params
       @_update_report_params ||= begin
-        report_attributes = params.require(:originality_report).permit(update_attributes)
+        report_attributes = params.require(:originality_report).permit(update_attributes) # rubocop:disable Rails/ActiveRecordAliases not ActiveRecord::Base#update_attributes
         report_attributes[:lti_link_attributes] = lti_link_params
         report_attributes
       end
@@ -393,7 +393,7 @@ module Lti
       raise ActiveRecord::RecordNotFound if submission.blank?
 
       @report = OriginalityReport.find_by(id: params[:id])
-      # Note: we could end up looking up by file_id, attachment: nil or attempt
+      # NOTE: we could end up looking up by file_id, attachment: nil or attempt
       # even in the `update` or `show` endpoints, if they give us a bogus report id :/
       @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?

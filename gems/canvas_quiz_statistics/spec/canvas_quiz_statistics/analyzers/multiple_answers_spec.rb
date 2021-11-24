@@ -20,9 +20,9 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::MultipleAnswers do
-  let(:question_data) { QuestionHelpers.fixture('multiple_answers_question') }
-
   subject { described_class.new(question_data) }
+
+  let(:question_data) { QuestionHelpers.fixture('multiple_answers_question') }
 
   it 'does not blow up when no responses are provided' do
     expect { expect(subject.run([])).to be_present }.to_not raise_error
@@ -55,9 +55,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleAnswers do
       expect(answer).to be_present
       expect(answer[:responses]).to eq(1)
     end
-  end
 
-  describe '[:answers][]' do
     describe '[:responses]' do
       it 'counts students who picked this answer' do
         stats = subject.run([{ answer_5514: '1' }])

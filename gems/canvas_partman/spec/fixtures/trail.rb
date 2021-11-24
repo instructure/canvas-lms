@@ -28,7 +28,7 @@ class CanvasPartmanTest::Trail < ActiveRecord::Base
   belongs_to :zoo, class_name: 'CanvasPartmanTest::Zoo'
 
   def self.create_schema
-    self.drop_schema
+    drop_schema
 
     CanvasPartmanTest::SchemaHelper.create_table :partman_trails do |t|
       t.string :name

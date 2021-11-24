@@ -39,7 +39,7 @@ describe 'taking a quiz one question at a time' do
         begin_quiz
       end
 
-      it 'allows going back to previous questions', priority: "1", test_id: 140611 do
+      it 'allows going back to previous questions', priority: "1" do
         answer_the_question_correctly
         click_next_button
 
@@ -47,19 +47,19 @@ describe 'taking a quiz one question at a time' do
         it_should_be_on_first_question
       end
 
-      it 'allows saving answers to each question', priority: "1", test_id: 209369 do
+      it 'allows saving answers to each question', priority: "1" do
         answers_flow
       end
 
-      it 'displays one question at a time', priority: "1", test_id: 140610 do
+      it 'displays one question at a time', priority: "1" do
         back_and_forth_flow
       end
 
-      it 'has sidebar navigation', priority: "1", test_id: 140610 do
+      it 'has sidebar navigation', priority: "1" do
         it_should_have_sidebar_navigation
       end
 
-      it 'warns upon submitting unanswered questions', priority: "1", test_id: 209371 do
+      it 'warns upon submitting unanswered questions', priority: "1" do
         skip_if_safari(:alert)
         submit_unfinished_quiz('You have 2 unanswered questions')
       end
@@ -71,18 +71,18 @@ describe 'taking a quiz one question at a time' do
         take_the_quiz
       end
 
-      it 'prevents going back to previous questions', priority: "1", test_id: 140612 do
+      it 'prevents going back to previous questions', priority: "1" do
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
         check_if_cant_go_back
       end
 
-      it 'allows saving answers to each question', priority: "1", test_id: 209364 do
+      it 'allows saving answers to each question', priority: "1" do
         accept_cant_go_back_warning
         answers_flow
       end
 
-      it 'prevents cheating', priority: "1", test_id: 209365 do
+      it 'prevents cheating', priority: "1" do
         skip_if_safari(:alert)
         accept_cant_go_back_warning
 
@@ -92,20 +92,20 @@ describe 'taking a quiz one question at a time' do
         it_should_be_on_second_question
       end
 
-      it 'warns upon submitting a quiz when not on the last question', priority: "1", test_id: 209366 do
+      it 'warns upon submitting a quiz when not on the last question', priority: "1" do
         skip_if_safari(:alert)
         accept_cant_go_back_warning
         answer_the_question_correctly
         submit_unfinished_quiz('There is still 1 question you haven\'t seen')
       end
 
-      it 'warns upon moving on without answering a question', priority: "1", test_id: 209367 do
+      it 'warns upon moving on without answering a question', priority: "1" do
         skip_if_safari(:alert)
         accept_cant_go_back_warning
         click_next_button_and_accept_warning
       end
 
-      it 'warns upon resuming', priority: "1", test_id: 209368 do
+      it 'warns upon resuming', priority: "1" do
         accept_cant_go_back_warning
         navigate_away_and_resume_quiz
         it_should_show_cant_go_back_warning
@@ -124,15 +124,15 @@ describe 'taking a quiz one question at a time' do
         preview_the_quiz
       end
 
-      it 'saves answers to questions', priority: "1", test_id: 209372 do
+      it 'saves answers to questions', priority: "1" do
         answers_flow
       end
 
-      it 'displays one question at a time', priority: "1", test_id: 209373 do
+      it 'displays one question at a time', priority: "1" do
         back_and_forth_flow
       end
 
-      it 'has sidebar navigation', priority: "1", test_id: 209373 do
+      it 'has sidebar navigation', priority: "1" do
         it_should_have_sidebar_navigation
       end
     end
@@ -143,14 +143,14 @@ describe 'taking a quiz one question at a time' do
         preview_the_quiz
       end
 
-      it 'prevents going back to previous questions', priority: "1", test_id: 209374 do
+      it 'prevents going back to previous questions', priority: "1" do
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
 
         check_if_cant_go_back
       end
 
-      it 'saves answers to questions', priority: "1", test_id: 209375 do
+      it 'saves answers to questions', priority: "1" do
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
 

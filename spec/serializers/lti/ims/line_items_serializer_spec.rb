@@ -20,7 +20,7 @@
 RSpec.describe Lti::IMS::LineItemsSerializer do
   let(:resource_link) { resource_link_model(overrides: { resource_link_uuid: assignment.lti_context_id }) }
   let_once(:course) { course_model }
-  let(:tool) {
+  let(:tool) do
     ContextExternalTool.create!(
       context: course,
       consumer_key: 'key',
@@ -31,7 +31,7 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
       settings: { use_1_3: true },
       workflow_state: 'public'
     )
-  }
+  end
   let(:assignment) do
     opts = {
       course: course,

@@ -57,6 +57,7 @@ end
 
 describe "Api::V1::Assignment" do
   subject(:api) { AssignmentApiHarness.new }
+
   let(:assignment) { assignment_model }
 
   describe "#assignment_json" do
@@ -82,7 +83,7 @@ describe "Api::V1::Assignment" do
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
                                  { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
+      expect(json).to have_key('planner_override')
       expect(json['planner_override']['id']).to eq po.id
     end
 
@@ -95,7 +96,7 @@ describe "Api::V1::Assignment" do
 
     it "returns nil for planner override when flag is passed and there is no override" do
       json = api.assignment_json(assignment, user, session, { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
+      expect(json).to have_key('planner_override')
       expect(json['planner_override']).to be_nil
     end
 
@@ -161,7 +162,7 @@ describe "Api::V1::Assignment" do
       overrides = assignment.assignment_overrides
       json = api.assignment_json(assignment, user, session, { overrides: overrides })
       expect(json).to be_a(Hash)
-      expect(json["overrides"].first.keys.sort).to eq ["assignment_id", "id", "title", "student_ids"].sort
+      expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids].sort
     end
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
@@ -288,7 +289,7 @@ describe "Api::V1::Assignment" do
 
         it 'serializes require_lockdown_browser to be true' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_truthy
         end
       end
@@ -305,7 +306,7 @@ describe "Api::V1::Assignment" do
 
         it 'serializes require_lockdown_browser to be false' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_falsy
         end
       end
@@ -313,7 +314,7 @@ describe "Api::V1::Assignment" do
       context 'when N.Q respondus setting is off (default)' do
         it 'serializes require_lockdown_browser to be false' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_falsy
         end
       end
@@ -357,7 +358,7 @@ describe "Api::V1::Assignment" do
       end
 
       it "is valid when user is an account admin" do
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
     end
 
@@ -368,7 +369,7 @@ describe "Api::V1::Assignment" do
 
       it "is valid when not in a closed grading period" do
         expect(assignment).to receive(:in_closed_grading_period?).and_return(false)
-        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+        expect(subject).to be_assignment_editable_fields_valid(assignment, user)
       end
 
       context "in a closed grading period" do

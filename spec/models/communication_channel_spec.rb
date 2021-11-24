@@ -225,13 +225,16 @@ describe CommunicationChannel do
 
   it "only allows email, or sms as path types" do
     communication_channel_model
-    @cc.path_type = 'email'; @cc.save
+    @cc.path_type = 'email'
+    @cc.save
     expect(@cc.path_type).to eql('email')
 
-    @cc.path_type = 'sms'; @cc.save
+    @cc.path_type = 'sms'
+    @cc.save
     expect(@cc.path_type).to eql('sms')
 
-    @cc.path_type = 'not valid'; @cc.save
+    @cc.path_type = 'not valid'
+    @cc.save
     expect(@cc.path_type).to eql('email')
   end
 
@@ -443,7 +446,7 @@ describe CommunicationChannel do
         @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
         @cc2 = communication_channel_model(path: 'bouncy@example.edu')
 
-        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
+        %w[bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu].each do |path|
           CommunicationChannel.bounce_for_path(
             path: path,
             timestamp: nil,
@@ -554,14 +557,14 @@ describe CommunicationChannel do
             suppression_bounce: false
           )
         end
-        expect { bounce_action.call() }.to change {
+        expect { bounce_action.call }.to change {
           cc.reload.last_transient_bounce_at
         }
-        expect { bounce_action.call() }.to not_change {
+        expect { bounce_action.call }.to not_change {
           cc.reload.last_transient_bounce_at
         }
         Timecop.travel(3.hours) do
-          expect { bounce_action.call() }.to change {
+          expect { bounce_action.call }.to change {
             cc.reload.last_transient_bounce_at
           }
         end
@@ -573,7 +576,7 @@ describe CommunicationChannel do
         # action that would need to happen for the bounce_for_path method. If it
         # does not need to happen, add it to the list below. If it does, handle
         # that, then add it to the list here.
-        accounted_for_callbacks = %i(
+        accounted_for_callbacks = %i[
           after_save_collection_association
           assert_path_type
           autosave_associated_records_for_pseudonym
@@ -584,7 +587,7 @@ describe CommunicationChannel do
           consider_building_pseudonym
           set_confirmation_code
           set_root_account_ids
-        )
+        ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end
 
@@ -699,7 +702,7 @@ describe CommunicationChannel do
             @cc3 = communication_channel_model(path: 'BOUNCY@example.edu')
           end
 
-          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
+          %w[bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu].each do |path|
             CommunicationChannel.bounce_for_path(
               path: path,
               timestamp: nil,
@@ -735,7 +738,7 @@ describe CommunicationChannel do
     it "sends directly via SMS if configured" do
       expect(cc.e164_path).to eq '+18015555555'
       allow(InstStatsd::Statsd).to receive(:increment)
-      account = double()
+      account = double
       allow(account).to receive(:feature_enabled?).and_return(true)
       allow(account).to receive(:global_id).and_return('totes_an_ID')
       expect(Services::NotificationService).to receive(:process).with(
@@ -772,12 +775,12 @@ describe CommunicationChannel do
   end
 
   describe '#user_can_have_more_channels?' do
+    subject { CommunicationChannel.user_can_have_more_channels?(@user, @domain_root_account) }
+
     before do
       @domain_root_account = Account.default
       @user = User.create!
     end
-
-    subject { CommunicationChannel.user_can_have_more_channels?(@user, @domain_root_account) }
 
     it 'returns true if :max_communication_channels settings is not set' do
       expect(subject).to be_truthy

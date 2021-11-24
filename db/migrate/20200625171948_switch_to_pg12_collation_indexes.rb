@@ -22,7 +22,7 @@ class SwitchToPg12CollationIndexes < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def self.runnable?
-    connection.postgresql_version >= 120000
+    connection.postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
   end
 
   def up

@@ -35,10 +35,8 @@ module Lti
         display_type = 'default'
       end
 
-      if display_override
-        if TOOL_DISPLAY_TEMPLATES.include?(display_override)
-          display_type = display_override
-        end
+      if display_override && TOOL_DISPLAY_TEMPLATES.include?(display_override)
+        display_type = display_override
       end
 
       TOOL_DISPLAY_TEMPLATES[display_type].dup

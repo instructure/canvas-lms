@@ -89,7 +89,7 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def self.copy_to_group_submissions!(report_id:, user_id:)
-    report = self.find(report_id)
+    report = find(report_id)
     report.copy_to_group_submissions!
   rescue ActiveRecord::RecordNotFound => e
     user = User.where(id: user_id).first
@@ -109,7 +109,7 @@ class OriginalityReport < ActiveRecord::Base
 
     group_submissions = assignment.submissions.where.not(id: submission.id).where(group: submission.group)
     group_submissions.find_each do |s|
-      copy_of_report = self.dup
+      copy_of_report = dup
       copy_of_report.submission_time = nil
 
       # We don't want a single submission to have
@@ -139,9 +139,9 @@ class OriginalityReport < ActiveRecord::Base
 
   def infer_workflow_state
     self.workflow_state = 'error' if error_message.present?
-    return if self.workflow_state == 'error'
+    return if workflow_state == 'error'
 
-    self.workflow_state = self.originality_score.present? ? 'scored' : 'pending'
+    self.workflow_state = originality_score.present? ? 'scored' : 'pending'
   end
 
   def set_root_account

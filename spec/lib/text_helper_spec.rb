@@ -42,7 +42,7 @@ describe TextHelper do
 
     it "is formatted properly" do
       time = Time.zone.now
-      time += 1.minutes if time.min == 0
+      time += 1.minute if time.min == 0
       expect(th.time_string(time)).to eq I18n.l(time, :format => :tiny)
     end
 
@@ -143,6 +143,7 @@ describe TextHelper do
         expect(th.markdown_escape(escaped)).to eq expected
       end
     end
+
     context "i18n" do
       it "automatically escapes Strings" do
         expect(th.mt(:foo, "We **do not** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))
@@ -177,11 +178,11 @@ describe TextHelper do
       end
 
       it "allows wrapper with markdown" do
-        expect(th.mt(:foo, %{Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.
+        expect(th.mt(:foo, %(Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.
 
 Commodo in ham, *short ribs %{name} pastrami* sausage elit sunt dolore eiusmod ut ea proident ribeye.
 
-Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis **eu short loin pancetta**.},
+Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis **eu short loin pancetta**.),
                      :name => '<b>test</b>'.html_safe,
                      :wrapper => {
                        '*' => '<span>\1</span>',

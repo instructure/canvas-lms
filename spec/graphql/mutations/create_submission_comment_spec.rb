@@ -102,7 +102,7 @@ describe Mutations::CreateSubmissionComment do
 
   describe 'submission_id argument' do
     it 'is gracefully handled when the submission is not found' do
-      result = run_mutation(submission_id: 12345)
+      result = run_mutation(submission_id: 12_345)
       expect(result[:errors].length).to eq 1
       expect(result[:errors][0][:message]).to eq 'not found'
     end

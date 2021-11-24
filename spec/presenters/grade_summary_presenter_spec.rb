@@ -312,9 +312,9 @@ describe GradeSummaryPresenter do
     end
 
     it "doesn't return submissions for deleted assignments" do
-      a1, a2 = 2.times.map {
+      a1, a2 = Array.new(2) do
         @course.assignments.create! points_possible: 10
-      }
+      end
       a1.grade_student @student, grade: 10, grader: @teacher
       a2.grade_student @student, grade: 10, grader: @teacher
 
@@ -411,6 +411,7 @@ describe GradeSummaryPresenter do
       expect(I18n).to receive(:t).with('Name')
       expect(I18n).to receive(:t).with('Assignment Group')
       expect(I18n).to receive(:t).with('Module')
+      allow(I18n).to receive(:t).with(any_args)
 
       presenter.sort_options
     end

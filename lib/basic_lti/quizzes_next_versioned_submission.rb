@@ -20,11 +20,11 @@
 
 module BasicLTI
   class QuizzesNextVersionedSubmission
-    JSON_FIELDS = [
-      :id, :grade, :score, :submitted_at, :assignment_id,
-      :user_id, :submission_type, :workflow_state, :updated_at,
-      :grade_matches_current_submission, :graded_at, :turnitin_data,
-      :excused, :points_deducted, :grading_period_id, :late, :missing, :url
+    JSON_FIELDS = %i[
+      id grade score submitted_at assignment_id
+      user_id submission_type workflow_state updated_at
+      grade_matches_current_submission graded_at turnitin_data
+      excused points_deducted grading_period_id late missing url
     ].freeze
 
     def initialize(assignment, user, prioritize_non_tool_grade: false)
@@ -187,7 +187,7 @@ module BasicLTI
 
           matches.captures.first.to_i # ordered by the first lti parameter
         end
-        sorted_list.each_with_object({}) { |k, a| a[k] = attempts[k] }
+        sorted_list.index_with { |k| attempts[k] }
       end
     end
 

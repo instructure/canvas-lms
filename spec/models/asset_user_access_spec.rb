@@ -149,10 +149,10 @@ describe AssetUserAccess do
   end
 
   describe '#log_action' do
-    let(:scores) { Hash.new }
-    let(:asset) { AssetUserAccess.new(scores) }
-
     subject { asset }
+
+    let(:scores) { {} }
+    let(:asset) { AssetUserAccess.new(scores) }
 
     describe 'when action level is nil' do
       describe 'with nil scores' do
@@ -161,16 +161,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to eq 1 }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to be_nil }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'view' }
           end
         end
@@ -180,16 +183,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to eq 1 }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to eq 1 }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'participate' }
           end
         end
@@ -199,16 +205,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to be_nil }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to eq 1 }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'participate' }
           end
         end
@@ -222,16 +231,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to eq 4 }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to eq 3 }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'view' }
           end
         end
@@ -241,16 +253,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to eq 4 }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to eq 4 }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'participate' }
           end
         end
@@ -260,16 +275,19 @@ describe AssetUserAccess do
 
           describe '#view_score' do
             subject { super().view_score }
+
             it { is_expected.to eq 3 }
           end
 
           describe '#participate_score' do
             subject { super().participate_score }
+
             it { is_expected.to eq 4 }
           end
 
           describe '#action_level' do
             subject { super().action_level }
+
             it { is_expected.to eq 'participate' }
           end
         end
@@ -298,10 +316,10 @@ describe AssetUserAccess do
   end
 
   describe '#log' do
+    subject { access }
+
     let(:access) { AssetUserAccess.new }
     let(:context) { User.new }
-
-    subject { access }
 
     before { allow(access).to receive :save }
 
@@ -325,26 +343,31 @@ describe AssetUserAccess do
 
       describe '#context' do
         subject { super().context }
+
         it { is_expected.to eq context }
       end
 
       describe '#last_access' do
         subject { super().last_access }
+
         it { is_expected.not_to be_nil }
       end
 
       describe '#view_score' do
         subject { super().view_score }
+
         it { is_expected.to eq 1 }
       end
 
       describe '#participate_score' do
         subject { super().participate_score }
+
         it { is_expected.to be_nil }
       end
 
       describe '#action_level' do
         subject { super().action_level }
+
         it { is_expected.to eq 'view' }
       end
     end

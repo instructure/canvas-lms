@@ -32,7 +32,7 @@ module ActiveRecord
       end
 
       it 'escapes special characters in the query' do
-        %w(% _).each do |char|
+        %w[% _].each do |char|
           expect(Base.wildcard_pattern('some' + char + 'string')).to include('some\\' + char + 'string')
         end
       end
@@ -142,9 +142,9 @@ module ActiveRecord
           selectors = ["*", "users.*", "users.id, users.updated_at"]
           User.create!
           selectors.each do |selector|
-            expect {
+            expect do
               User.select(selector).find_in_batches(strategy: :id) { nil }
-            }.not_to raise_error
+            end.not_to raise_error
           end
         end
 
@@ -203,12 +203,12 @@ module ActiveRecord
         end
 
         it "keeps the specified order" do
-          ["user_F", "user_D", "user_A", "user_C", "user_B", "user_E"].map { |name| user_model(name: name) }
+          %w[user_F user_D user_A user_C user_B user_E].map { |name| user_model(name: name) }
           names = []
           User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
             names += u_batch.map(&:name)
           end
-          expect(names).to eq(["user_A", "user_B", "user_C", "user_D", "user_E", "user_F"])
+          expect(names).to eq(%w[user_A user_B user_C user_D user_E user_F])
         end
       end
     end
@@ -265,10 +265,10 @@ module ActiveRecord
           User.create(name: 'dr who')
           User.create(name: 'dr who')
 
-          expect {
+          expect do
             User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name")
                 .where("u.sortable_name <> users.sortable_name").delete_all
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
     end
@@ -314,7 +314,7 @@ module ActiveRecord
       end
 
       it "accepts an array" do
-        expect(ActiveRecord::Base.parse_asset_string_list(%w{course_1 course_2 user_3}))
+        expect(ActiveRecord::Base.parse_asset_string_list(%w[course_1 course_2 user_3]))
           .to eq({ 'Course' => [1, 2], 'User' => [3] })
       end
     end
@@ -398,13 +398,15 @@ module ActiveRecord
       end
 
       context "directly on the table" do
-        include_examples "query creation"
         let(:base) { User.active }
+
+        include_examples "query creation"
       end
 
       context "through a relation" do
-        include_examples "query creation"
         let(:base) { Account.create.users }
+
+        include_examples "query creation"
       end
     end
   end

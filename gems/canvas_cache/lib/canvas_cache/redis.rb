@@ -50,7 +50,7 @@ module CanvasCache
     end
 
     def self.enabled?
-      @enabled ||= self.config.present?
+      @enabled ||= config.present?
     end
 
     def self.disconnect!
@@ -172,7 +172,7 @@ module CanvasCache
       Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
       settings_store.skip_cache do
-        if self.ignore_redis_failures?
+        if ignore_redis_failures?
           CanvasCache.invoke_on_captured_error(e)
           last_redis_failure[redis_name] = Time.zone.now
           failure_retval
@@ -186,7 +186,7 @@ module CanvasCache
     end
 
     BoolifySet =
-      lambda { |value|
+      lambda do |value|
         if value && value == "OK"
           true
         elsif value && value == :failure
@@ -194,7 +194,7 @@ module CanvasCache
         else
           false
         end
-      }
+      end
 
     module Client
       def disconnect_if_idle(since_when)
@@ -230,7 +230,7 @@ module CanvasCache
         if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
           failure_val = :failure
         end
-        CanvasCache::Redis.handle_redis_failure(failure_val, self.location) do
+        CanvasCache::Redis.handle_redis_failure(failure_val, location) do
           super
         end
       end
@@ -249,7 +249,7 @@ module CanvasCache
         response
       end
 
-      SET_COMMANDS = %i{set setex}.freeze
+      SET_COMMANDS = %i[set setex].freeze
       def log_request_response(request, response, start_time)
         return if request.nil? # redis client does internal keepalives and connection commands
         return if CanvasCache::Redis.log_style == 'off'
@@ -265,10 +265,11 @@ module CanvasCache
           host: location,
         }
         unless NON_KEY_COMMANDS.include?(command)
-          message[:key] = if command == :mset
+          message[:key] = case command
+                          when :mset
                             # This is an array with a single element: an array alternating key/values
-                            request.first { |v| v.first }.select.with_index { |_, i| i % 2 == 0 }
-                          elsif command == :mget
+                            request.first(&:first).select.with_index { |_, i| i.even? }
+                          when :mget
                             request
                           else
                             request.first
@@ -360,7 +361,6 @@ module CanvasCache
       # one-off in script/console if you aren't using twemproxy, or in specs:
       ALLOWED_UNSUPPORTED = %w[
         keys
-        auth
         quit
         flushall
         flushdb

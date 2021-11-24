@@ -38,7 +38,7 @@ describe DeveloperKey do
     DeveloperKey.new(
       name: 'test',
       email: 'test@test.com',
-      redirect_uri: 'http://test.com',
+      redirect_uri: 'http://test.com'
     )
   end
 
@@ -455,8 +455,8 @@ describe DeveloperKey do
 
     context 'when api token scoping FF is enabled' do
       let(:valid_scopes) do
-        %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+        %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
+           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id]
       end
 
       describe 'before_save' do
@@ -552,14 +552,14 @@ describe DeveloperKey do
       end
 
       describe 'destroy_external_tools!' do
-        include_context 'lti_1_3_spec_helper'
-        specs_require_sharding
-
         subject do
           @shard1.activate { ContextExternalTool.active }.merge(
             @shard2.activate { ContextExternalTool.active }
           )
         end
+
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
 
         context 'when developer key is an LTI key' do
           let(:shard_1_account) { @shard1.activate { account_model } }
@@ -617,10 +617,10 @@ describe DeveloperKey do
       end
 
       describe 'destroy_external_tools!' do
+        subject { ContextExternalTool.active }
+
         include_context 'lti_1_3_spec_helper'
         specs_require_sharding
-
-        subject { ContextExternalTool.active }
 
         let(:account) { account_model }
         let(:tool) do
@@ -1079,14 +1079,15 @@ describe DeveloperKey do
 
   describe "issue_token" do
     subject { DeveloperKey.create! }
+
     let(:claims) { { "key" => "value" } }
     let(:asymmetric_keypair) { CanvasSecurity::RSAKeyPair.new.to_jwk }
     let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
 
-    before {
+    before do
       # set up assymetric key
       allow(Canvas::OAuth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
-    }
+    end
 
     it "defaults to internal symmetric encryption with no audience set" do
       expect(subject.client_credentials_audience).to be_nil

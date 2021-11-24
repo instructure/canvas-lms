@@ -40,8 +40,8 @@ module GoogleDrive
       'google_drive'
     end
 
-    def with_timeout_protection
-      Timeout.timeout(@timeout || 30) { yield }
+    def with_timeout_protection(&block)
+      Timeout.timeout(@timeout || 30, &block)
     rescue Timeout::Error
       raise ConnectionException, 'Google Drive connection timed out'
     end
@@ -77,7 +77,8 @@ module GoogleDrive
 
         result = client_execute(:uri => @uri)
 
-        if result.status == 200
+        case result.status
+        when 200
           file_name = file['title']
           name_extension = file_name[/\.([a-z]+$)/, 1]
           file_extension = name_extension || file_extension_from_header(result.headers, entry)
@@ -86,7 +87,7 @@ module GoogleDrive
           file_name += ".#{file_extension}" unless name_extension
           content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
           return [result, file_name, file_extension, content_type]
-        elsif result.status == 307
+        when 307
           @uri = result.response['Location']
           redirect_limit -= 1
         else
@@ -249,7 +250,7 @@ module GoogleDrive
         folder.add_file(entry) unless is_folder
       end
 
-      if extensions && extensions.length > 0
+      if extensions.present?
         root = root.select { |e| extensions.include?(e.extension) }
       end
 
@@ -277,10 +278,9 @@ module GoogleDrive
     end
 
     def file_extension_from_header(headers, entry)
-      file_extension = (entry.extension && !entry.extension.empty? && entry.extension) || 'unknown'
+      file_extension = (entry.extension.present? && entry.extension) || 'unknown'
 
-      if headers['content-disposition'] &&
-         headers['content-disposition'].match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
+      if headers['content-disposition']&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
         file_extension = Regexp.last_match[:file_extension]
       end
 

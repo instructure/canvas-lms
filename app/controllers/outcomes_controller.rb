@@ -79,11 +79,11 @@ class OutcomesController < ApplicationController
 
     codes = [@context].map(&:asset_string)
     if @context.is_a?(Account)
-      if @context == @outcome.context
-        codes = "all"
-      else
-        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
-      end
+      codes = if @context == @outcome.context
+                "all"
+              else
+                @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
+              end
     end
     @alignments = @outcome.alignments.active.for_context(@context)
     add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
@@ -103,7 +103,7 @@ class OutcomesController < ApplicationController
     @outcome.tie_to(@context)
     render :json => @outcome.as_json(
       :methods => :artifacts_count_for_tied_context,
-      :user_content => %w(description)
+      :user_content => %w[description]
     )
   end
 
@@ -113,11 +113,11 @@ class OutcomesController < ApplicationController
 
     codes = [@context].map(&:asset_string)
     if @context.is_a?(Account)
-      if @context == @outcome.context
-        codes = "all"
-      else
-        codes = @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
-      end
+      codes = if @context == @outcome.context
+                "all"
+              else
+                @context.all_courses.pluck(:id).map { |id| "course_#{id}" }
+              end
     end
     @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort])
     render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
@@ -125,21 +125,22 @@ class OutcomesController < ApplicationController
 
   def user_outcome_results
     user_id = params[:user_id]
-    if @context.is_a?(User)
-      @user = @context
-    elsif @context.is_a?(Course)
-      @user = @context.users.find(user_id)
-    else
-      @user = @context.all_users.find_by!(id: user_id)
-    end
+    @user = case @context
+            when User
+              @context
+            when Course
+              @context.users.find(user_id)
+            else
+              @context.all_users.find_by!(id: user_id)
+            end
 
     return unless authorized_action(@context, @current_user, :manage)
 
-    if @user == @context
-      @outcomes = LearningOutcome.has_result_for(@user).active
-    else
-      @outcomes = @context.available_outcomes
-    end
+    @outcomes = if @user == @context
+                  LearningOutcome.has_result_for(@user).active
+                else
+                  @context.available_outcomes
+                end
     @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) # .for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
@@ -227,11 +228,11 @@ class OutcomesController < ApplicationController
     elsif @result.artifact.is_a?(Quizzes::QuizSubmission) && @result.associated_asset
       @submission = @result.artifact
       @asset = @result.associated_asset
-      if @submission.attempt <= @result.attempt
-        @submission_version = @submission
-      else
-        @submission_version = @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
-      end
+      @submission_version = if @submission.attempt <= @result.attempt
+                              @submission
+                            else
+                              @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
+                            end
       if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
         # anchor to first question in aligned bank
         question_bank_id = @result.alignment.content_id
@@ -333,13 +334,17 @@ class OutcomesController < ApplicationController
   def proficiency_roles_js_env
     if @context.is_a?(Account) && @context.root_account.feature_enabled?(:account_level_mastery_scales)
       proficiency_calculation_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
-        proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_calculations
+      if @context.grants_right? @current_user, :manage_proficiency_calculations
+        @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
+          proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       proficiency_scales_roles = []
-      @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
-        proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
-      end if @context.grants_right? @current_user, :manage_proficiency_scales
+      if @context.grants_right? @current_user, :manage_proficiency_scales
+        @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
+          proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+        end
+      end
       js_env(
         PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
         PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles

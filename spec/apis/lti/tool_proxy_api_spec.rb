@@ -119,8 +119,8 @@ module Lti
             course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
             tp = create_tool_proxy(context: @course)
 
-            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
-            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            fixture_file = Rails.root.join("spec/fixtures/lti/tool_proxy.json")
+            tool_proxy_fixture = JSON.parse(fixture_file.read)
             tool_proxy_fixture[:tool_proxy_guid] = tp.guid
 
             tp.update_attribute(:update_payload, {
@@ -152,8 +152,8 @@ module Lti
             course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
             tp = create_tool_proxy(context: @course)
 
-            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
-            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            fixture_file = Rails.root.join("spec/fixtures/lti/tool_proxy.json")
+            tool_proxy_fixture = JSON.parse(fixture_file.read)
             tool_proxy_fixture[:tool_proxy_guid] = tp.guid
 
             tp.update_attribute(:update_payload, {
@@ -222,8 +222,8 @@ module Lti
             course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
             tp = create_tool_proxy(context: @course)
 
-            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
-            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            fixture_file = Rails.root.join("spec/fixtures/lti/tool_proxy.json")
+            tool_proxy_fixture = JSON.parse(fixture_file.read)
             tool_proxy_fixture[:tool_proxy_guid] = tp.guid
 
             tp.update_attribute(:update_payload, {

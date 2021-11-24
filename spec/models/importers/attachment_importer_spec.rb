@@ -160,23 +160,6 @@ module Importers
         Importers::AttachmentImporter.process_migration(data, migration)
       end
 
-      it "does not import files if there is a file_to_import key" do
-        data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              files_to_import: {
-              }
-            }
-          }
-        }
-
-        expect(::Attachment).not_to receive(:where)
-
-        Importers::AttachmentImporter.process_migration(data, migration)
-      end
-
       it 'sets locked, file_state, and display_name when present' do
         data = {
           'file_map' => {
@@ -206,9 +189,9 @@ module Importers
           ]
         }
 
-        active_folders_association = double()
+        active_folders_association = double
         expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double()
+        folder = double
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
         expect(folder).to receive(:locked=).with(true)
@@ -225,9 +208,9 @@ module Importers
           ]
         }
 
-        active_folders_association = double()
+        active_folders_association = double
         expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double()
+        folder = double
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
         allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
         expect(folder).to receive(:workflow_state=).with("hidden")

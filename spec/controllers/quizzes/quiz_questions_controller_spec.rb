@@ -29,8 +29,8 @@ describe Quizzes::QuizQuestionsController do
   def quiz_question
     @question = @quiz.quiz_questions.build
     @question.write_attribute(:question_data, { :answers => [
-                                { :id => 123456, :answer_text => 'asdf', :weight => 100 },
-                                { :id => 654321, :answer_text => 'jkl;', :weight => 0 }
+                                { :id => 123_456, :answer_text => 'asdf', :weight => 100 },
+                                { :id => 654_321, :answer_text => 'jkl;', :weight => 0 }
                               ] })
     @question.save!
     @question
@@ -78,17 +78,17 @@ describe Quizzes::QuizQuestionsController do
         :question_type => "multiple_choice_question",
         :answers => [
           {
-            :id => 123456,
+            :id => 123_456,
             :answer_text => 'asdf',
             :weight => 100
           },
           {
-            :id => 654321,
+            :id => 654_321,
             :answer_text => 'jkl;',
             :weight => 0
           },
           {
-            :id => 654321,
+            :id => 654_321,
             :answer_text => 'qwer',
             :weight => 0
           }
@@ -99,9 +99,9 @@ describe Quizzes::QuizQuestionsController do
       data = assigns[:question].question_data[:answers]
 
       expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123456)
-      expect(data[1][:id]).to eql(654321)
-      expect(data[2][:id]).not_to eql(654321)
+      expect(data[0][:id]).to eql(123_456)
+      expect(data[1][:id]).to eql(654_321)
+      expect(data[2][:id]).not_to eql(654_321)
     end
 
     it 'bounces data thats too long' do
@@ -128,8 +128,8 @@ describe Quizzes::QuizQuestionsController do
           }
         }
       } }
-      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(/https:\/\/test.host/)
-      expect(assigns[:question].question_data[:answers][0][:html]).to match(/href=['"]\/courses\/#{@course.id}\/files\/27/)
+      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
+      expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
 
     it 'strips the origin from local URLs in answers when they are provided as an array' do
@@ -142,8 +142,8 @@ describe Quizzes::QuizQuestionsController do
           :comment_html => "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
         }]
       } }
-      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(/https:\/\/test.host/)
-      expect(assigns[:question].question_data[:answers][0][:html]).to match(/href=['"]\/courses\/#{@course.id}\/files\/27/)
+      expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
+      expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
   end
 
@@ -186,17 +186,17 @@ describe Quizzes::QuizQuestionsController do
         :question_type => "multiple_choice_question",
         :answers => {
           '0' => {
-            :id => 123456,
+            :id => 123_456,
             :answer_text => 'asdf',
             :weight => 100
           },
           '1' => {
-            :id => 654321,
+            :id => 654_321,
             :answer_text => 'jkl;',
             :weight => 0
           },
           '2' => {
-            :id => 654321,
+            :id => 654_321,
             :answer_text => 'qwer',
             :weight => 0
           }
@@ -206,9 +206,9 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
       expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123456)
-      expect(data[1][:id]).to eql(654321)
-      expect(data[2][:id]).not_to eql(654321)
+      expect(data[0][:id]).to eql(123_456)
+      expect(data[1][:id]).to eql(654_321)
+      expect(data[2][:id]).not_to eql(654_321)
     end
 
     it 'bounces data thats too long' do

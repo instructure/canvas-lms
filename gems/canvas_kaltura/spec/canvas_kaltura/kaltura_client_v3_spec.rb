@@ -54,7 +54,7 @@ describe CanvasKaltura::ClientV3 do
   before do
     CanvasKaltura.cache = double(read: nil)
     CanvasKaltura.logger = double.as_null_object
-    CanvasKaltura.timeout_protector_proc = lambda { |_options, &block| block.call }
+    CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
     create_config
     WebMock.enable!
   end
@@ -174,7 +174,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches for set length" do
         create_config_with_mock(2)
-        m = double()
+        m = double
         expect(m).to receive(:write).with(['media_sources2', 'hi', 2].join('/'), [@source], { :expires_in => 2 })
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -183,7 +183,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches indefinitely" do
         create_config_with_mock(nil)
-        m = double()
+        m = double
         expect(m).to receive(:write).with(['media_sources2', 'hi', nil].join('/'), [@source])
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -215,7 +215,7 @@ describe CanvasKaltura::ClientV3 do
 
   describe "startSession" do
     it "sends Kaltura a request with proper parameters for a user" do
-      user_id = 12345
+      user_id = 12_345
       session_type = CanvasKaltura::SessionType::USER
 
       kaltura_stub = stub_kaltura_session(
@@ -268,7 +268,7 @@ describe CanvasKaltura::ClientV3 do
 
   describe "mediaGet" do
     it "calls getRequest with proper parameters" do
-      entry_id = 12345
+      entry_id = 12_345
 
       expect(@kaltura).to receive(:getRequest).with(
         :media, :get, { :ks => nil, :entryId => entry_id }
@@ -292,12 +292,12 @@ describe CanvasKaltura::ClientV3 do
       expect(@kaltura).to receive(:getRequest).with(
         :media, :update, {
           :ks => nil,
-          :entryId => 12345,
+          :entryId => 12_345,
           'mediaEntry:key' => 'value'
         }
       ).and_return(double(:children => []))
 
-      @kaltura.mediaUpdate(12345, { "key" => "value" })
+      @kaltura.mediaUpdate(12_345, { "key" => "value" })
     end
 
     it "returns a properly formatted item" do
@@ -313,10 +313,10 @@ describe CanvasKaltura::ClientV3 do
   describe "mediaDelete" do
     it "calls getRequest with proper parameters" do
       expect(@kaltura).to receive(:getRequest).with(
-        :media, :delete, { :ks => nil, :entryId => 12345 }
+        :media, :delete, { :ks => nil, :entryId => 12_345 }
       )
 
-      @kaltura.mediaDelete(12345)
+      @kaltura.mediaDelete(12_345)
     end
   end
 
@@ -326,11 +326,11 @@ describe CanvasKaltura::ClientV3 do
       img = @kaltura.mediaTypeToSymbol(2)
       aud = @kaltura.mediaTypeToSymbol(5)
 
-      expect([vid, img, aud]).to eq [:video, :image, :audio]
+      expect([vid, img, aud]).to eq %i[video image audio]
     end
 
     it "defaults to video" do
-      expect(@kaltura.mediaTypeToSymbol(rand(10) + 6)).to eq :video
+      expect(@kaltura.mediaTypeToSymbol(rand(6..15))).to eq :video
     end
   end
 
@@ -345,7 +345,7 @@ describe CanvasKaltura::ClientV3 do
 
       stub_request(:get, "https://www.instructuremedia.com/api_v3/")
         .with(:query => hash_including(:service => 'bulkUpload', :action => 'get'))
-        .to_return(:body => <<-XML)
+        .to_return(:body => <<~XML)
           <result>
             <logFileUrl>#{log_file_url}</logFileUrl>
             <id>#{bulk_upload_id}</id>
@@ -373,13 +373,13 @@ describe CanvasKaltura::ClientV3 do
       log_file_url = "https://www.instructuremedia.com/bulk_uploads/12345.log"
       bulk_upload_add_stub = stub_request(:post, "https://www.instructuremedia.com/api_v3/")
                              .with(:query => hash_including(:service => 'bulkUpload', :action => 'add'))
-                             .with { |request| request.headers['Content-Type'] =~ /\Amultipart\/form-data/ }
-                             .to_return(:body => <<-XML)
-          <result>
-            <id>batch_job_12345</id>
-            <status>ready</status>
-            <logFileUrl>#{log_file_url}</logFileUrl>
-          </result>
+                             .with { |request| request.headers['Content-Type'].start_with?('multipart/form-data') }
+                             .to_return(:body => <<~XML)
+                               <result>
+                                 <id>batch_job_12345</id>
+                                 <status>ready</status>
+                                 <logFileUrl>#{log_file_url}</logFileUrl>
+                               </result>
                              XML
 
       log_file_stub = stub_request(:get, log_file_url)
@@ -409,7 +409,7 @@ describe CanvasKaltura::ClientV3 do
       }]
 
       expect(@kaltura).to receive(:bulkUploadCsv).with(
-        %Q[the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n]
+        %(the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n)
       )
 
       @kaltura.bulkUploadAdd(files)
@@ -438,7 +438,7 @@ describe CanvasKaltura::ClientV3 do
       playlist_url = "https://www.instructuremedia.com/p/100/playManifest/entryId/#{entry_id}/flavorId/#{flavor_id}"
 
       stub_request(:get, playlist_url)
-        .to_return(:body => <<-XML)
+        .to_return(:body => <<~XML)
           <manifest>
             <media url="#{media_url}" />
             </media>

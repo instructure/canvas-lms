@@ -27,7 +27,7 @@ describe PluginSetting do
     s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
     s.reload
     expect(s.valid_settings?).to be_truthy
-    expect(s.settings.keys.sort_by(&:to_s)).to eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
+    expect(s.settings.keys.sort_by(&:to_s)).to eql(%i[bar foo foo_dec foo_enc foo_salt])
     expect(s.settings[:bar]).to eql("qwerty")
     expect(s.settings[:foo_dec]).to eql("asdf")
   end

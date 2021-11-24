@@ -36,7 +36,7 @@ describe ModeratedGrading::ProvisionalGrade do
   it { is_expected.to be_valid }
 
   it do
-    is_expected.to have_one(:selection)
+    expect(subject).to have_one(:selection)
       .with_foreign_key(:selected_provisional_grade_id)
       .class_name('ModeratedGrading::Selection')
   end
@@ -150,7 +150,7 @@ describe ModeratedGrading::ProvisionalGrade do
             grade: grade,
             final: final,
             source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously,
+            graded_anonymously: graded_anonymously
           )
           @provisional_grade.save!
         end
@@ -189,7 +189,7 @@ describe ModeratedGrading::ProvisionalGrade do
             grade: grade,
             final: final,
             source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously,
+            graded_anonymously: graded_anonymously
           )
           @provisional_grade.save!
           Timecop.freeze(updated_graded_at) do

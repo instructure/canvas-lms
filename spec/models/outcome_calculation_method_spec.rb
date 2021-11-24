@@ -37,7 +37,7 @@ describe OutcomeCalculationMethod, type: :model do
         let(:calculation_int) { 3 }
 
         it do
-          is_expected.to allow_values(
+          expect(subject).to allow_values(
             1,
             20,
             99
@@ -45,7 +45,7 @@ describe OutcomeCalculationMethod, type: :model do
         end
 
         it do
-          is_expected.not_to allow_values(
+          expect(subject).not_to allow_values(
             -1,
             0,
             100,
@@ -60,7 +60,7 @@ describe OutcomeCalculationMethod, type: :model do
         let(:calculation_int) { 3 }
 
         it do
-          is_expected.to allow_values(
+          expect(subject).to allow_values(
             1,
             4,
             5
@@ -68,7 +68,7 @@ describe OutcomeCalculationMethod, type: :model do
         end
 
         it do
-          is_expected.not_to allow_values(
+          expect(subject).not_to allow_values(
             -1,
             0,
             6,
@@ -100,7 +100,7 @@ describe OutcomeCalculationMethod, type: :model do
 
   describe 'as_json' do
     it 'includes expected keys' do
-      expect(subject.as_json.keys).to match_array(['id', 'calculation_method', 'calculation_int', 'context_type', 'context_id'])
+      expect(subject.as_json.keys).to match_array(%w[id calculation_method calculation_int context_type context_id])
     end
   end
 

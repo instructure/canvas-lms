@@ -36,7 +36,7 @@ describe CalendarEvent do
   describe "default_values" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
 
       # Create the initial event
@@ -74,7 +74,7 @@ describe CalendarEvent do
     end
 
     it "populates all day flag" do
-      midnight = Time.at(1361862000) # 2013-02-26 00:00:00
+      midnight = Time.at(1_361_862_000) # 2013-02-26 00:00:00
 
       event_1 = calendar_event_model(:time_zone_edited => "Mountain Time (US & Canada)")
       event_1.start_at = event_1.end_at = midnight
@@ -121,9 +121,9 @@ describe CalendarEvent do
   describe "default_values during update" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
-      @midnight = Time.at(1220421600)
+      @midnight = Time.at(1_220_421_600)
       @event = calendar_event_model(
         :start_at => @original_start_at,
         :end_at => @original_end_at,
@@ -162,7 +162,7 @@ describe CalendarEvent do
         Time.zone = 'UTC'
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?('DTSTART:20080903T115500Z')).not_to be_nil
@@ -174,7 +174,7 @@ describe CalendarEvent do
         Time.zone = 'Alaska' # -0800
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?('DTSTART:20080903T195500Z')).not_to be_nil
@@ -186,7 +186,7 @@ describe CalendarEvent do
         Time.zone = 'UTC'
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to eq true
@@ -201,7 +201,7 @@ describe CalendarEvent do
         Time.zone = 'Alaska' # -0800
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to eq true
@@ -227,12 +227,12 @@ describe CalendarEvent do
       end
 
       it "returns a plain-text description" do
-        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
-      <p>
-        This assignment is due December 16th. <b>Please</b> do the reading.
-        <br/>
-        <a href="www.example.com">link!</a>
-      </p>
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<~HTML)
+          <p>
+            This assignment is due December 16th. <b>Please</b> do the reading.
+            <br/>
+            <a href="www.example.com">link!</a>
+          </p>
         HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
@@ -241,7 +241,7 @@ describe CalendarEvent do
 
       it "does not add verifiers to files unless course or attachment is public" do
         attachment_model(:context => course_factory)
-        html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
+        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to_not include("verifier")
@@ -271,7 +271,7 @@ describe CalendarEvent do
 
         @course.media_objects.create!(:media_id => '0_12345678')
         event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
-                                                                :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
+                                                                :description => %(<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>))
         event.effective_context_code = @course.asset_string
         event.save!
 
@@ -440,7 +440,7 @@ describe CalendarEvent do
           @users = @event1.messages_sent["New Event Created"].map(&:user_id)
         end
 
-        it "sends to participants", priority: "1", test_id: 186751 do
+        it "sends to participants", priority: "1" do
           expect(@event1.messages_sent).to be_include("New Event Created")
           expect(@users).to include(@student.id)
         end
@@ -470,7 +470,7 @@ describe CalendarEvent do
             @users = @event1.messages_sent["Event Date Changed"].map(&:user_id)
           end
 
-          it "sends to participants", priority: "1", test_id: 193162 do
+          it "sends to participants", priority: "1" do
             expect(@event1.messages_sent).to be_include("Event Date Changed")
             expect(@users).to include(@student.id)
           end
@@ -563,7 +563,7 @@ describe CalendarEvent do
         expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
       end
 
-      it "notifies all participants except the person reserving", priority: "1", test_id: 193149 do
+      it "notifies all participants except the person reserving", priority: "1" do
         @appointment2.reserve_for(@group, @student1)
         expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
@@ -575,14 +575,14 @@ describe CalendarEvent do
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
-      it "notifies participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
+      it "notifies participants if teacher deletes the appointment time slot", priority: "1" do
         @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "notifies all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
+      it "notifies all participants when the the time slot is canceled", priority: "1" do
         @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         user_evt = CalendarEvent.where(context_type: 'Group').first
@@ -591,7 +591,7 @@ describe CalendarEvent do
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "notifies admins and observers when a user reserves", priority: "1", test_id: 193144 do
+      it "notifies admins and observers when a user reserves", priority: "1" do
         reservation = @appointment.reserve_for(@student1, @student1)
         messages = reservation.messages_sent["Appointment Reserved By User"]
         expect(messages).to be_present
@@ -605,7 +605,7 @@ describe CalendarEvent do
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "notifies admins and observers when a user cancels", priority: "1", test_id: 193147 do
+      it "notifies admins and observers when a user cancels", priority: "1" do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy
@@ -658,10 +658,10 @@ describe CalendarEvent do
       appointment.participants_per_appointment = 3
       appointment.save!
 
-      s1, s2, s3 = 3.times.map {
+      s1, s2, s3 = Array.new(3) do
         student_in_course(:course => @course, :active_all => true)
         @user
-      }
+      end
 
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(s1, s1)).not_to be_nil
@@ -908,23 +908,23 @@ describe CalendarEvent do
       end
 
       it "validates child events" do
-        expect {
+        expect do
           @course.calendar_events.create! :title => "ohai",
                                           :child_event_data => [
                                             { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string }
                                           ]
-        }.to raise_error(/Can't update child events unless an updating_user is set/)
+        end.to raise_error(/Can't update child events unless an updating_user is set/)
 
-        expect {
+        expect do
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
                                                   { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => "invalid_1" }
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Invalid child event context/)
+        end.to raise_error(/Invalid child event context/)
 
-        expect {
+        expect do
           other_section = Course.create!.default_section
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
@@ -932,9 +932,9 @@ describe CalendarEvent do
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Invalid child event context/)
+        end.to raise_error(/Invalid child event context/)
 
-        expect {
+        expect do
           event = @course.calendar_events.build :title => "ohai",
                                                 :child_event_data => [
                                                   { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },
@@ -942,7 +942,7 @@ describe CalendarEvent do
                                                 ]
           event.updating_user = @user
           event.save!
-        }.to raise_error(/Duplicate child event contexts/)
+        end.to raise_error(/Duplicate child event contexts/)
       end
 
       it "creates child events" do
@@ -1168,7 +1168,7 @@ describe CalendarEvent do
         expect(event.web_conference.reload.title).to eq 'updated title'
       end
 
-      it "keeps date  of conference in sync with event" do
+      it "keeps date of conference in sync with event" do
         event = course.calendar_events.create! title: 'Foo', web_conference: conference(context: course)
         start_at = Time.zone.now + 3.days
         event.reload.update! start_at: start_at

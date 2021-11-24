@@ -223,7 +223,7 @@ describe WikiPage do
     end
 
     context 'allows account admins to read' do
-      [:manage_wiki_create, :manage_wiki_update, :manage_wiki_delete].each do |perm|
+      %i[manage_wiki_create manage_wiki_update manage_wiki_delete].each do |perm|
         it "with #{perm} rights" do
           account = @course.root_account
           role = custom_account_role('CustomAccountUser', :account => account)
@@ -317,8 +317,8 @@ describe WikiPage do
 
       it 'does not change the URL in a wiki page link' do
         allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
-        course = course_factory()
-        some_other_course = course_factory()
+        course = course_factory
+        some_other_course = course_factory
 
         file_url = "/courses/#{some_other_course.id}/files/1"
         link_string = "<a href='#{file_url}'>link</a>"
@@ -414,11 +414,6 @@ describe WikiPage do
 
       it 'is given read rights' do
         expect(@page.grants_right?(@user, :read)).to be_truthy
-      end
-
-      it 'is given read rights, unless hidden from students' do
-        @page.workflow_state = 'unpublished'
-        expect(@page.grants_right?(@user, :read)).to be_falsey
       end
 
       it 'is given read rights, unless unpublished' do

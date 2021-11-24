@@ -72,7 +72,7 @@ RSpec.describe Lti::Result, type: :model do
         lti_result_model(
           assignment: assignment,
           result_maximum: 1,
-          result_score: 0.5,
+          result_score: 0.5
         )
       end
 
@@ -259,6 +259,8 @@ RSpec.describe Lti::Result, type: :model do
     end
 
     it_behaves_like "soft deletion" do
+      subject { Lti::Result }
+
       let(:user) { user_model }
       let(:line_item) { line_item_model }
       let(:second_line_item) { line_item_model }
@@ -278,7 +280,6 @@ RSpec.describe Lti::Result, type: :model do
           }
         ]
       end
-      subject { Lti::Result }
     end
   end
 

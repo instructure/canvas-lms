@@ -27,7 +27,7 @@ module Canvas
     class Info
       attr_reader :req, :account, :user, :rci, :type
 
-      MAX_DATA_SIZE = 65535
+      MAX_DATA_SIZE = 65_535
 
       def initialize(request, root_account, user, opts = {})
         @req = request
@@ -59,24 +59,24 @@ module Canvas
         }
       end
 
-      USEFUL_ENV = [
-        "HTTP_ACCEPT",
-        "HTTP_ACCEPT_ENCODING",
-        "HTTP_HOST",
-        "HTTP_REFERER",
-        "HTTP_USER_AGENT",
-        "PATH_INFO",
-        "QUERY_STRING",
-        "REMOTE_HOST",
-        "REQUEST_METHOD",
-        "REQUEST_PATH",
-        "REQUEST_URI",
-        "SERVER_NAME",
-        "SERVER_PORT",
-        "SERVER_PROTOCOL",
-        "HTTP_X_FORWARDED_HOST",
-        "HTTP_X_FORWARDED_PROTO",
-        "HTTP_X_FORWARDED_FOR",
+      USEFUL_ENV = %w[
+        HTTP_ACCEPT
+        HTTP_ACCEPT_ENCODING
+        HTTP_HOST
+        HTTP_REFERER
+        HTTP_USER_AGENT
+        PATH_INFO
+        QUERY_STRING
+        REMOTE_HOST
+        REQUEST_METHOD
+        REQUEST_PATH
+        REQUEST_URI
+        SERVER_NAME
+        SERVER_PORT
+        SERVER_PROTOCOL
+        HTTP_X_FORWARDED_HOST
+        HTTP_X_FORWARDED_PROTO
+        HTTP_X_FORWARDED_FOR
       ].freeze
 
       def self.useful_http_env_stuff_from_request(req)
@@ -91,7 +91,7 @@ module Canvas
         }
 
         # if we have an oauth1 header lets get the appropriate info from it
-        if req.authorization && req.authorization.match(/^OAuth/)
+        if req.authorization&.match(/^OAuth/)
           headers.merge!(::OAuth::Helper.parse_header(req.authorization))
         end
 

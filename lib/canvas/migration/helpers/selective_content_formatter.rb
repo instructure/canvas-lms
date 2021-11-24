@@ -37,7 +37,7 @@ module Canvas::Migration::Helpers
       ['groups', -> { I18n.t('lib.canvas.migration.groups', 'Student Groups') }],
       ['learning_outcomes', -> { I18n.t('lib.canvas.migration.learning_outcomes', 'Learning Outcomes') }],
       ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
-    ]
+    ].freeze
 
     def initialize(migration = nil, base_url = nil, global_identifiers:)
       @migration = migration
@@ -81,10 +81,8 @@ module Canvas::Migration::Helpers
         data["learning_outcomes"] ||= data["outcomes"]
 
         # skip auto generated quiz question banks for canvas imports
-        if data['assessment_question_banks']
-          data['assessment_question_banks'].select! do |item|
-            !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
-          end
+        data['assessment_question_banks']&.select! do |item|
+          !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
         end
 
         att.close
@@ -149,7 +147,7 @@ module Canvas::Migration::Helpers
         content_list << process_group(group, outcomes)
       end
       content_list.concat(
-        outcomes.select { |outcome| outcome['parent_migration_id'] == nil }.map { |outcome| item_hash('learning_outcomes', outcome) }
+        outcomes.select { |outcome| outcome['parent_migration_id'].nil? }.map { |outcome| item_hash('learning_outcomes', outcome) }
       )
     end
 
@@ -167,19 +165,17 @@ module Canvas::Migration::Helpers
     # Returns all the assignments in their assignment groups
     def assignment_data(content_list, course_data)
       added_asmnts = []
-      if course_data['assignment_groups']
-        course_data['assignment_groups'].each do |group|
-          item = item_hash('assignment_groups', group)
-          sub_items = []
-          course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
-            sub_items << item_hash('assignments', asmnt)
-            added_asmnts << asmnt['migration_id']
-          end
-          if sub_items.any?
-            item['sub_items'] = sub_items
-          end
-          content_list << item
+      course_data['assignment_groups']&.each do |group|
+        item = item_hash('assignment_groups', group)
+        sub_items = []
+        course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
+          sub_items << item_hash('assignments', asmnt)
+          added_asmnts << asmnt['migration_id']
         end
+        if sub_items.any?
+          item['sub_items'] = sub_items
+        end
+        content_list << item
       end
       course_data['assignments'].each do |asmnt|
         next if added_asmnts.member? asmnt['migration_id']
@@ -189,12 +185,16 @@ module Canvas::Migration::Helpers
     end
 
     def attachment_data(content_list, course_data)
-      return [] unless course_data['attachments'] && course_data['attachments'].length > 0
+      return [] unless course_data['attachments'].present?
 
       remove_name_regex = %r{/[^/]*\z}
-      course_data['attachments'].each { |a| next unless a['path_name']; a['path_name'].gsub!(remove_name_regex, '') }
+      course_data['attachments'].each do |a|
+        next unless a['path_name']
+
+        a['path_name'].gsub!(remove_name_regex, '')
+      end
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
-      sorted = folder_groups.sort_by { |i| i.first }
+      sorted = folder_groups.sort_by(&:first)
       sorted.each do |folder_name, atts|
         if atts.length == 1 && atts[0]['file_name'] == folder_name
           content_list << item_hash('attachments', atts[0])
@@ -237,8 +237,7 @@ module Canvas::Migration::Helpers
           add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
         end
       end
-      hash = add_linked_resource(type, item, hash)
-      hash
+      add_linked_resource(type, item, hash)
     end
 
     def add_linked_resource(type, item, hash)
@@ -250,7 +249,7 @@ module Canvas::Migration::Helpers
         elsif (mig_id = item['page_migration_id'])
           hash[:linked_resource] = { :type => 'wiki_pages', :migration_id => mig_id }
         end
-      elsif ['discussion_topics', 'quizzes', 'wiki_pages'].include?(type) &&
+      elsif %w[discussion_topics quizzes wiki_pages].include?(type) &&
             (mig_id = item['assignment_migration_id'])
         hash[:linked_resource] = { :type => 'assignments', :migration_id => mig_id }
       end
@@ -301,11 +300,11 @@ module Canvas::Migration::Helpers
 
               scope = scope.select(:assignment_id) if type == 'quizzes'
 
-              if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
-                scope = scope.select(:name)
-              else
-                scope = scope.select(:title)
-              end
+              scope = if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
+                        scope.select(:name)
+                      else
+                        scope.select(:title)
+                      end
 
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
@@ -440,7 +439,7 @@ module Canvas::Migration::Helpers
 
     def course_attachments_data(content_list, source_course)
       Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').preload(:active_file_attachments), &:full_name).each do |folder|
-        next if folder.active_file_attachments.length == 0
+        next if folder.active_file_attachments.empty?
 
         item = course_item_hash('folders', folder)
         item[:sub_items] = []

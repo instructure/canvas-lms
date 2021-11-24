@@ -25,6 +25,8 @@ module Services
   describe ScreencapService do
     include WebMock::API
 
+    subject { described_class.new(config) }
+
     before do
       WebMock.disable_net_connect!
     end
@@ -39,8 +41,6 @@ module Services
         token: 'AN_API_TOKEN'
       }
     end
-
-    subject { described_class.new(config) }
 
     context ".snapshot_url_to_file" do
       it 'calls the provided url' do

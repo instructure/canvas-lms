@@ -144,11 +144,11 @@
 #     }
 #
 class ProfileController < ApplicationController
-  before_action :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_action :require_user, :only => [:settings, :communication, :communication_update, :qr_mobile_login]
+  before_action :require_registered_user, :except => %i[show settings communication communication_update]
+  before_action :require_user, :only => %i[settings communication communication_update qr_mobile_login]
   before_action :require_user_for_private_profile, :only => :show
   before_action :reject_student_view_student
-  before_action :require_password_session, :only => [:communication, :communication_update, :update]
+  before_action :require_password_session, :only => %i[communication communication_update update]
 
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel
@@ -206,11 +206,11 @@ class ProfileController < ApplicationController
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select { |c| c.path_type == "email" }
     @sms_channels = @channels.select { |c| c.path_type == 'sms' }
-    @other_channels = @channels.select { |c| c.path_type != "email" }
+    @other_channels = @channels.reject { |c| c.path_type == "email" }
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active_only
-    @password_pseudonyms = @pseudonyms.select { |p| !p.managed_password? }
+    @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
     js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
@@ -245,7 +245,13 @@ class ProfileController < ApplicationController
       enable_course_selector:
         Account.site_admin.feature_enabled?(:notification_settings_course_selector) || @user&.active_k5_enrollments?,
       allowed_push_categories: Notification.categories_to_send_in_push,
-      send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
+      send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@user, @domain_root_account),
+      daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
+      weekly_notification_range: {
+        weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, :format => :weekday),
+        start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
+        end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone)
+      },
       read_privacy_info: @user.preferences[:read_notification_privacy_info],
       account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
     }
@@ -303,7 +309,7 @@ class ProfileController < ApplicationController
   #   ]
   # @returns [Avatar]
   def profile_pics
-    @user = if api_request? then api_find(User, params[:user_id]) else @current_user end
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     if authorized_action(@user, @current_user, :update_avatar)
       render :json => avatars_json_for_user(@user)
     end
@@ -334,15 +340,18 @@ class ProfileController < ApplicationController
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save
 
-      return head 208
+      return head :already_reported
     end
 
     respond_to do |format|
-      user_params = params[:user] ? params[:user]
-        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
-        : {}
-      if !@user.user_can_edit_name?
+      user_params = if params[:user]
+                      params[:user]
+                        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+                                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
+                    else
+                      {}
+                    end
+      unless @user.user_can_edit_name?
         user_params.delete(:name)
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
@@ -500,7 +509,7 @@ class ProfileController < ApplicationController
 
   def qr_mobile_login
     unless instructure_misc_plugin_available? && !!@domain_root_account&.mobile_qr_login_is_enabled?
-      head 404
+      head :not_found
       return
     end
 

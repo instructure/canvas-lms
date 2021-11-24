@@ -18,16 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Api::V1::AssignmentOverride do
+  subject { test_class.new }
+
   let(:test_class) do
     Class.new do
       include Api::V1::AssignmentOverride
       attr_accessor :current_user
 
-      def session; {} end
+      def session
+        {}
+      end
     end
   end
-
-  subject { test_class.new }
 
   describe "#interpret_assignment_override_data" do
     it "works even with nil date fields" do
@@ -65,22 +67,22 @@ describe Api::V1::AssignmentOverride do
   end
 
   describe "interpret_batch_assignment_overrides_data" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @a = assignment_model(course: @course, group_category: 'category1')
-      @b = assignment_model(course: @course, group_category: 'category2')
-      @a1, @a2 = 2.times.map do
-        create_section_override_for_assignment @a, course_section: @course.course_sections.create!
-      end
-      @b1, @b2, @b3 = 2.times.map do
-        create_section_override_for_assignment @b, course_section: @course.course_sections.create!
-      end
-    end
-
     subject do
       subj = test_class.new
       subj.current_user = @teacher
       subj
+    end
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @a = assignment_model(course: @course, group_category: 'category1')
+      @b = assignment_model(course: @course, group_category: 'category2')
+      @a1, @a2 = Array.new(2) do
+        create_section_override_for_assignment @a, course_section: @course.course_sections.create!
+      end
+      @b1, @b2, @b3 = Array.new(2) do
+        create_section_override_for_assignment @b, course_section: @course.course_sections.create!
+      end
     end
 
     it "has error if no updates requested" do
@@ -200,7 +202,7 @@ describe Api::V1::AssignmentOverride do
 
     context 'with no restrictions' do
       before do
-        2.times do @course.course_sections.create! end
+        2.times { @course.course_sections.create! }
         @section_invisible = @course.active_course_sections[2]
         @section_visible = @course.active_course_sections.second
 
@@ -244,14 +246,14 @@ describe Api::V1::AssignmentOverride do
   end
 
   describe '#assignment_overrides_json' do
+    subject(:assignment_overrides_json) { test_class.new.assignment_overrides_json([@override], @student) }
+
     before :once do
       course_model
       student_in_course(active_all: true)
       @quiz = quiz_model course: @course
       @override = create_section_override_for_assignment(@quiz)
     end
-
-    subject(:assignment_overrides_json) { test_class.new.assignment_overrides_json([@override], @student) }
 
     it 'delegates to AssignmentOverride.visible_enrollments_for' do
       expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)

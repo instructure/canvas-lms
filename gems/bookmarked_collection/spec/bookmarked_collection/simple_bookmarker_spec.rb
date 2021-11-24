@@ -26,9 +26,9 @@ describe BookmarkedCollection::SimpleBookmarker do
       self.table_name = 'examples'
     end
 
-    BookmarkedCollection.best_unicode_collation_key_proc = lambda { |col|
+    BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
       return "lower(#{col})"
-    }
+    end
 
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
     @date_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)

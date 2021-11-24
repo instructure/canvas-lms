@@ -28,7 +28,4 @@ class CleanupCrossShardDeveloperKeys < ActiveRecord::Migration[5.2]
   def up
     DataFixup::CleanupCrossShardDeveloperKeys.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
   end
-
-  def down
-  end
 end

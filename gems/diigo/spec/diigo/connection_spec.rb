@@ -26,7 +26,7 @@ describe Diigo::Connection do
       config = {
         api_key: 'key'
       }
-      Diigo::Connection.config = Proc.new do
+      Diigo::Connection.config = proc do
         config
       end
       response = Diigo::Connection.config_check(config)
@@ -37,7 +37,7 @@ describe Diigo::Connection do
       config = {
         api_key: nil
       }
-      Diigo::Connection.config = Proc.new do
+      Diigo::Connection.config = proc do
         config
       end
       response = Diigo::Connection.config_check(config)

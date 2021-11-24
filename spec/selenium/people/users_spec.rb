@@ -44,7 +44,7 @@ describe "users" do
 
       new_login = f('.login:not(.blank)')
       expect(new_login).not_to be_nil
-      expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
+      expect(new_login.find_element(:css, '.account_name').text).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
       expect(pseudonym.valid_password?('qwertyuiop')).to be_truthy
     end
@@ -124,7 +124,7 @@ describe "users" do
     end
 
     def reload_users(users)
-      users.each { |user| user.reload }
+      users.each(&:reload)
     end
 
     def submit_merge
@@ -220,7 +220,7 @@ describe "users" do
     it "shows an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
       expect_no_flash_message :error
-      f('#manual_user_id').send_keys(1234567809)
+      f('#manual_user_id').send_keys(1_234_567_809)
       expect_new_page_load { f('button[type="submit"]').click }
       expect_flash_message :error, "No active user with that ID was found."
     end
@@ -236,7 +236,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -251,7 +251,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -264,7 +264,7 @@ describe "users" do
 
       get "/register"
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         input = f('input[name="user[terms_of_use]"]', form)
@@ -358,7 +358,7 @@ describe "users" do
   end
 
   context "masquerading" do
-    it "masquerades as a user", priority: "1", test_id: 134743 do
+    it "masquerades as a user", priority: "1" do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
 

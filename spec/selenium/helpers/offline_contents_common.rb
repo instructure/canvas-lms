@@ -28,7 +28,7 @@ shared_examples 'show courses for ePub generation' do |context|
   include SharedExamplesCommon
 
   it "shows the courses the user is enrolled in and feature enabled in ePub exports page",
-     priority: "1", test_id: pick_test_id(context, teacher: "417579", student: "498316") do
+     priority: "1" do
     @course2 = course_model(name: 'Second Course')
     @course2.offer!
     enroll_context_user(context)
@@ -57,16 +57,16 @@ shared_examples 'show courses for ePub generation' do |context|
   end
 end
 
-shared_examples 'generate and download ePub' do |context|
+shared_examples 'generate and download ePub' do
   include SharedExamplesCommon
 
-  it "shows progress", priority: "1", test_id: pick_test_id(context, teacher: "417580", student: "498317") do
+  it "shows progress", priority: "1" do
     get '/epub_exports'
     f('.ig-admin .Button').click
     expect(f('.progress-bar__bar')).to be_present
   end
 
-  it "generates ePub file", priority: "1", test_id: pick_test_id(context, teacher: "588916", student: "588917") do
+  it "generates ePub file", priority: "1" do
     get '/epub_exports'
     f('.ig-admin .Button').click
     wait_for_ajaximations

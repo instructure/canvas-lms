@@ -56,30 +56,30 @@ describe SubmissionDraftAttachment do
 
   context 'validation' do
     it 'will not let you have multiple of the same attachment to submission draft' do
-      expect {
+      expect do
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
           attachment: @attachment
         )
-      }.to raise_error(ActiveRecord::RecordInvalid)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'requires an attachment' do
-      expect {
+      expect do
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
           attachment: nil
         )
-      }.to raise_error(ActiveRecord::RecordInvalid)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'requires a submission draft' do
-      expect {
+      expect do
         SubmissionDraftAttachment.create!(
           submission_draft: nil,
           attachment: @attachment
         )
-      }.to raise_error(ActiveRecord::RecordInvalid)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 

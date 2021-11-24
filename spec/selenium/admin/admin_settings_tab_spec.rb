@@ -39,7 +39,7 @@ describe "admin settings tab" do
     default_services
   end
 
-  def state_checker checker, check_state
+  def state_checker(checker, check_state)
     if checker
       expect(check_state).to be_truthy
     else
@@ -76,22 +76,20 @@ describe "admin settings tab" do
     if is_symbol == false
       check_state = Account.default.service_enabled?(features[:allowed_services])
       state_checker checker, check_state
-    else
-      if features.is_a? Array
-        default_selectors = []
-        features.each do |feature|
-          check_state = Account.default.service_enabled?(feature)
-          state_checker checker, check_state
-          default_selectors.push("#account_services_#{feature}")
-        end
-        if checker
-          default_selectors += css_selectors
-        end
-        css_selectors = default_selectors
-      else
-        check_state = Account.default.settings[features]
+    elsif features.is_a? Array
+      default_selectors = []
+      features.each do |feature|
+        check_state = Account.default.service_enabled?(feature)
         state_checker checker, check_state
+        default_selectors.push("#account_services_#{feature}")
       end
+      if checker
+        default_selectors += css_selectors
+      end
+      css_selectors = default_selectors
+    else
+      check_state = Account.default.settings[features]
+      state_checker checker, check_state
     end
     css_selectors.each do |selector|
       check_state = is_checked(selector)
@@ -185,7 +183,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
     end
 
-    def add_quiz_filter name = "www.canvas.instructure.com", value = "192.168.217.1/24"
+    def add_quiz_filter(name = "www.canvas.instructure.com", value = "192.168.217.1/24")
       fj("#ip_filters .name[value='']:visible").send_keys name
       fj("#ip_filters .value[value='']:visible").send_keys value
       click_submit
@@ -408,7 +406,7 @@ describe "admin settings tab" do
 
     it "does not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
       Account.default.save!
 
@@ -419,12 +417,12 @@ describe "admin settings tab" do
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
-        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => ["user", "student", "teacher"] }
+        { "text" => "text", "subtext" => "subtext", "url" => "http://www.example.com/example", "available_to" => %w[user student teacher] }
       ]
     end
 
     it "preserves the default help links if the account hasn't been configured with the new ui yet" do
-      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"] }
+      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => %w[user student teacher] }
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
@@ -443,8 +441,8 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.map { |x| x[:id] }).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
-      expect(new_help_links.map { |x| x[:id] }).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
+      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
+      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 
@@ -470,7 +468,7 @@ describe "admin settings tab" do
           "type" => "custom",
           "is_featured" => true,
           "is_new" => false,
-          "available_to" => ["user", "student", "teacher", "admin", "observer", "unenrolled"]
+          "available_to" => %w[user student teacher admin observer unenrolled]
         }
       )
     end
@@ -498,7 +496,7 @@ describe "admin settings tab" do
 
     it "edits a custom link" do
       a = Account.default
-      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => ["user", "student", "teacher", "admin"] }]
+      a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => %w[user student teacher admin] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
@@ -608,24 +606,6 @@ describe "admin settings tab" do
       else
         expect(features_text).to include(feature.display_name.call)
       end
-    end
-  end
-
-  context 'feature flag search and filters' do
-    before do
-      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
-      Account.site_admin.enable_feature!(:feature_flag_filters)
-    end
-
-    it 'allows for searching and deleting a feature flag filter ' do
-      go_to_feature_options(Account.site_admin.id)
-      select_filter_option('Pending Enforcement')
-      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
-
-      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
-      f(pending_enforcement_filter_button_selector).click
-      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
     end
   end
 

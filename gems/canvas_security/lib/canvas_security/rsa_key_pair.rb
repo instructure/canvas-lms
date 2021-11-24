@@ -19,6 +19,8 @@
 #
 require 'openssl'
 
+require "active_support/core_ext/module/delegation"
+
 module CanvasSecurity
   class RSAKeyPair < JWKKeyPair
     KTY = 'RSA'
@@ -31,8 +33,6 @@ module CanvasSecurity
       @private_key = OpenSSL::PKey::RSA.new SIZE
     end
 
-    def public_key
-      private_key.public_key
-    end
+    delegate :public_key, to: :private_key
   end
 end

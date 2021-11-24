@@ -21,8 +21,20 @@
 require 'spec_helper'
 
 describe IncomingMailProcessor::SqsMailbox do
-  include_examples 'Mailbox'
+  subject { IncomingMailProcessor::SqsMailbox.new(default_config) }
 
+  let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
+  let(:sqs_message) { double(body: sqs_message_body) }
+  let(:sqs_message_body) do
+    {
+      Message: {
+        mail: {
+          messageId: 's3_key'
+        }
+      }.to_json
+    }.to_json
+  end
+  let(:queue) { double }
   let(:default_config) do
     {
       access_key_id: 'access-key',
@@ -35,20 +47,7 @@ describe IncomingMailProcessor::SqsMailbox do
     }
   end
 
-  let(:queue) { double }
-  let(:sqs_message_body) {
-    {
-      Message: {
-        mail: {
-          messageId: 's3_key'
-        }
-      }.to_json
-    }.to_json
-  }
-  let(:sqs_message) { double(body: sqs_message_body) }
-  let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
-
-  subject { IncomingMailProcessor::SqsMailbox.new(default_config) }
+  include_examples 'Mailbox'
 
   describe '#connect' do
     it 'returns the incoming mail queue' do
@@ -59,12 +58,12 @@ describe IncomingMailProcessor::SqsMailbox do
 
   describe '#each_message' do
     it 'yields the SQS message and raw message content from S3' do
-      s3 = double()
+      s3 = double
       expect(s3).to receive(:bucket)
         .with(default_config[:incoming_mail_bucket])
         .and_return(message_bucket)
       expect(Aws::S3::Resource).to receive(:new).and_return(s3)
-      sqs = double()
+      sqs = double
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])
         .and_return(double(queue_url: 'some_url'))
@@ -85,7 +84,7 @@ describe IncomingMailProcessor::SqsMailbox do
       msg = double
       expect(msg).to receive(:body).and_return('msg body')
 
-      sqs = double()
+      sqs = double
       expect(Aws::SQS::Client).to receive(:new).and_return(sqs)
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])
@@ -102,7 +101,7 @@ describe IncomingMailProcessor::SqsMailbox do
 
   describe '#unprocessed_message_count' do
     it 'fetches the number of visible messages from the queue' do
-      sqs = double()
+      sqs = double
       expect(Aws::SQS::Client).to receive(:new).and_return(sqs)
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])

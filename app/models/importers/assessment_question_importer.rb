@@ -43,7 +43,7 @@ module Importers
       existing_questions = migration.context.assessment_questions
                                     .except(:select)
                                     .select("assessment_questions.id, assessment_questions.migration_id")
-                                    .where("assessment_questions.migration_id IS NOT NULL").reorder(nil)
+                                    .where.not(assessment_questions: { migration_id: nil }).reorder(nil)
                                     .index_by(&:migration_id)
       questions.each do |q|
         existing_question = existing_questions[q['migration_id']]
@@ -66,7 +66,7 @@ module Importers
           bank.mark_as_importing!(migration)
           next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
-          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.map { |aq| aq["assessment_question_id"] }.compact
+          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.filter_map { |aq| aq["assessment_question_id"] }
           bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
         end
       end
@@ -114,12 +114,12 @@ module Importers
         end
 
         begin
-          if migration.for_master_course_import?
-            # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
-            next if question['assessment_question_id'] && question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
-          end
+          # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
+          next if migration.for_master_course_import? &&
+                  question['assessment_question_id'] &&
+                  question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
-          question = self.import_from_migration(question, migration.context, migration, question_bank)
+          question = import_from_migration(question, migration.context, migration, question_bank)
           question_data[:aq_data][question['migration_id']] = question
         rescue
           migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
@@ -127,7 +127,7 @@ module Importers
       end
 
       if migration.context.is_a?(Course)
-        imported_aq_ids = question_data[:aq_data].values.map { |aq| aq['assessment_question_id'] }.compact
+        imported_aq_ids = question_data[:aq_data].values.filter_map { |aq| aq['assessment_question_id'] }
         imported_aq_ids.each_slice(100) do |sliced_aq_ids|
           migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
         end
@@ -138,9 +138,9 @@ module Importers
 
     def self.import_from_migration(hash, context, migration, bank, **)
       hash = hash.with_indifferent_access
-      hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
+      hash.delete(:question_bank_migration_id) if hash.key?(:question_bank_migration_id)
 
-      self.prep_for_import(hash, migration, :assessment_question)
+      prep_for_import(hash, migration, :assessment_question)
 
       import_warnings = hash.delete(:import_warnings) || []
       if (error = hash.delete(:import_error))
@@ -155,7 +155,7 @@ module Importers
                                                     workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
                                                     assessment_question_bank_id: bank.id)
       else
-        sql = <<~SQL
+        sql = <<~SQL.squish
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)
           VALUES (?,?,'active',?,?,?,?,?)
         SQL
@@ -170,12 +170,10 @@ module Importers
         end
       end
 
-      if import_warnings
-        import_warnings.each do |warning|
-          migration.add_warning(warning, {
-                                  :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
-                                })
-        end
+      import_warnings&.each do |warning|
+        migration.add_warning(warning, {
+                                :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+                              })
       end
       hash
     end
@@ -188,12 +186,12 @@ module Importers
                                      t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
       end
 
-      [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
-        if hash[field].present?
-          hash[field] = migration.convert_html(
-            hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
-          )
-        end
+      %i[question_text correct_comments_html incorrect_comments_html neutral_comments_html more_comments_html].each do |field|
+        next unless hash[field].present?
+
+        hash[field] = migration.convert_html(
+          hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
+        )
       end
 
       if hash[:question_text]&.length&.> 16.kilobytes
@@ -202,27 +200,27 @@ module Importers
                                 :question_name => hash[:question_name]))
       end
 
-      [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
+      %i[correct_comments incorrect_comments neutral_comments more_comments].each do |field|
         html_field = "#{field}_html".to_sym
         if hash[field].present? && hash[field] == hash[html_field]
           hash.delete(html_field)
         end
       end
 
-      hash[:answers].each_with_index do |answer, i|
-        [:html, :comments_html, :left_html].each do |field|
+      hash[:answers]&.each_with_index do |answer, i|
+        %i[html comments_html left_html].each do |field|
           key = "answer #{i} #{field}"
 
-          if answer[field].present?
-            answer[field] = migration.convert_html(
-              answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
-            )
-          end
+          next unless answer[field].present?
+
+          answer[field] = migration.convert_html(
+            answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
+          )
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)
         end
-      end if hash[:answers]
+      end
 
       hash[:prepped_for_import] = true
       hash

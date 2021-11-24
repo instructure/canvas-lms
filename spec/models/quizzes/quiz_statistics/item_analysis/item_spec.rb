@@ -20,6 +20,16 @@
 require_relative 'common'
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
+  let(:no_dev_item) do
+    simple_quiz_with_submissions %w[T T], %w[T T], %w[T T], %w[T T]
+    @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+    @summary.sorted_items.last
+  end
+  let(:item) do
+    @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+    @summary.sorted_items.last
+  end
+
   describe ".from" do
     it "creates an item for a supported question type" do
       qq = { :question_type => "true_false_question", :answers => [] }
@@ -32,14 +42,9 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
     end
   end
 
-  before(:once) {
-    simple_quiz_with_submissions %w{T T A}, %w{T T A}, %w{T F A}, %w{T T B}, %w{T T}
-  }
-
-  let(:item) {
-    @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
-    @summary.sorted_items.last
-  }
+  before(:once) do
+    simple_quiz_with_submissions %w[T T A], %w[T T A], %w[T F A], %w[T T B], %w[T T]
+  end
 
   describe "#num_respondents" do
     it "returns all respondents" do
@@ -103,11 +108,6 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
     it "matches R's output" do
       expect(item.point_biserials).to be_approximately [0.5, -0.5, nil, nil]
     end
-  end
-  let(:no_dev_item) do
-    simple_quiz_with_submissions %w|T T|, %w|T T|, %w|T T|, %w|T T|
-    @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
-    @summary.sorted_items.last
   end
 
   it "explodes when the standard deviation is 0" do

@@ -29,7 +29,7 @@ describe DiscussionTopic do
     user = user_factory(opts)
     user.save!
     course.enroll_user(user, opts[:enrollment_type], opts)
-    return user
+    user
   end
 
   def add_section_to_topic(topic, section, opts = {})
@@ -265,44 +265,44 @@ describe DiscussionTopic do
       @entry = @topic.discussion_entries.create!(:user => @teacher1)
       @entry.discussion_topic = @topic
 
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
     end
 
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach, :student_reporting]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting]
     end
 
     it "grants permissions if it not locked" do
       @topic.publish!
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply'].sort
     end
 
     it "does not grant reply permissions to students if it is locked" do
       @topic.publish!
       @topic.lock!
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s)).to eq ['read']
     end
 
     it "does not grant any permissions to students if it is unpublished" do
-      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@topic.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
 
-      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
-      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
+      expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
+      expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
     end
   end
@@ -567,7 +567,7 @@ describe DiscussionTopic do
         end
 
         it "does not grant reply permissions to group if course is concluded" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -580,7 +580,7 @@ describe DiscussionTopic do
         end
 
         it "does not grant reply permissions to group if course is soft-concluded" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -593,7 +593,7 @@ describe DiscussionTopic do
         end
 
         it "grants reply permissions to group members if course is concluded but their section isn't" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -604,11 +604,11 @@ describe DiscussionTopic do
           @topic.save!
 
           expect(@topic.context).to eq(@group)
-          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies, :reply].sort
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq %i[read read_replies reply].sort
         end
 
         it "does not grant reply permissions to group if group isn't active" do
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -626,7 +626,7 @@ describe DiscussionTopic do
           course.enroll_teacher(@teacher).accept!
           course.enroll_student(@student1)
 
-          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          @relevant_permissions = %i[read reply update delete read_replies]
           group_category = course.group_categories.create(:name => "new cat")
           @group = course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
@@ -688,7 +688,7 @@ describe DiscussionTopic do
     end
 
     it "grants observers read permission by default" do
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
 
       @topic = @course.discussion_topics.create!(:user => @teacher)
       expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s).sort).to eq ['read'].sort
@@ -700,7 +700,7 @@ describe DiscussionTopic do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
 
-      @relevant_permissions = [:read, :reply, :update, :delete]
+      @relevant_permissions = %i[read reply update delete]
       @topic = @course.discussion_topics.create!(:user => @teacher)
       expect((@topic.check_policy(@observer) & @relevant_permissions).map(&:to_s)).to be_empty
       @entry = @topic.discussion_entries.create!(:user => @teacher)
@@ -1166,9 +1166,9 @@ describe DiscussionTopic do
       expect(student1.stream_item_instances.count).to eq 1
       expect(student2.stream_item_instances.count).to eq 1
 
-      expect {
+      expect do
         topic.update!(course_sections: [section1])
-      }.to change { student1.stream_item_instances.count }.by(0).and change {
+      end.to change { student1.stream_item_instances.count }.by(0).and change {
         student2.stream_item_instances.count
       }.from(1).to(0)
     end
@@ -1671,7 +1671,7 @@ describe DiscussionTopic do
     end
 
     it "fixes submission date after deleting the oldest entry" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry2 = @topic.discussion_entries.create!(:message => "some message", :user => @student)
       @entry2.created_at = 1.day.ago
       @entry2.save!
@@ -1685,7 +1685,7 @@ describe DiscussionTopic do
     end
 
     it "marks submission as unsubmitted after deletion" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -1697,7 +1697,7 @@ describe DiscussionTopic do
     end
 
     it "has new submission date after deletion and re-submission" do
-      build_submitted_assignment()
+      build_submitted_assignment
       @entry1.destroy
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
@@ -2177,6 +2177,10 @@ describe DiscussionTopic do
   end
 
   describe "reply_from" do
+    before(:once) do
+      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
+    end
+
     it "ignores responses in deleted account" do
       account = Account.create!
       @teacher = course_with_teacher(:active_all => true, :account => account).user
@@ -2213,7 +2217,10 @@ describe DiscussionTopic do
     it "reflects account setting for when lock_all_announcements is enabled" do
       announcement = @course.announcements.create!(message: "Lock this")
       expect(announcement.comments_disabled?).to be_falsey
-      @course.account.tap { |a| a.settings[:lock_all_announcements] = { :value => true, :locked => true }; a.save! }
+      @course.account.tap do |a|
+        a.settings[:lock_all_announcements] = { :value => true, :locked => true }
+        a.save!
+      end
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
@@ -2226,12 +2233,25 @@ describe DiscussionTopic do
       student_in_course(:course => @course).accept!
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
+
+    it 'returns entry for valid arguments' do
+      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
+      expect(val).to be_a_kind_of DiscussionEntry
+    end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
+    end
   end
 
   describe "update_order" do
     it "handles existing null positions" do
       topics = (1..4).map { discussion_topic_model(pinned: true) }
-      topics.each { |x| x.position = nil; x.save }
+      topics.each do |x|
+        x.position = nil
+        x.save
+      end
 
       new_order = [2, 3, 4, 1]
       ids = new_order.map { |x| topics[x - 1].id }
@@ -2273,7 +2293,7 @@ describe DiscussionTopic do
         :message => opts[:message],
         :user => @teacher,
         :context => opts[:course],
-        :workflow_state => "published",
+        :workflow_state => "published"
       )
       announcement.is_section_specific = opts[:is_section_specific]
       announcement
@@ -2332,7 +2352,7 @@ describe DiscussionTopic do
       add_section_to_topic(announcement, @section)
       expect(announcement.valid?).to eq false
       errors = announcement.errors[:is_section_specific]
-      # note that the feature flag validation will also fail here, but we still want this
+      # NOTE: the feature flag validation will also fail here, but we still want this
       # validation to trigger too.
       expect(errors.include?("Only course announcements and discussions can be section-specific")).to eq true
     end
@@ -2359,7 +2379,7 @@ describe DiscussionTopic do
     it "does not include deleted sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2400,7 +2420,7 @@ describe DiscussionTopic do
     it "scope allows section-specific announcements if in right section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       announcement.save!
@@ -2411,7 +2431,7 @@ describe DiscussionTopic do
     it "scope forbids section-specific announcements if in wrong section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.second)
       announcement.save!
@@ -2431,7 +2451,7 @@ describe DiscussionTopic do
     it "don't return duplicates if matched multiple sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        :course => course,
+        :course => course
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2480,9 +2500,9 @@ describe DiscussionTopic do
     end
 
     it 'clears stream items when added to unpublished module items' do
-      expect {
+      expect do
         @module.content_tags.create!(workflow_state: 'unpublished', content: @topic, context: @course)
-      }.to change { @student.stream_item_instances.count }.by(-1)
+      end.to change { @student.stream_item_instances.count }.by(-1)
     end
 
     describe 'unpublished context module' do
@@ -2553,22 +2573,6 @@ describe DiscussionTopic do
     end
   end
 
-  describe 'reply_from' do
-    before(:once) do
-      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
-    end
-
-    it 'returns entry for valid arguments' do
-      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
-      expect(val).to be_a_kind_of DiscussionEntry
-    end
-
-    it 'raises InvalidParticipant for invalid participants' do
-      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
-    end
-  end
-
   describe 'to_podcast' do
     it "includes media extension in enclosure url even though it is a redirect (for itunes)" do
       @topic = @course.discussion_topics.create!(
@@ -2579,7 +2583,7 @@ describe DiscussionTopic do
       @attachment.podcast_associated_asset = @topic
 
       rss = DiscussionTopic.to_podcast([@attachment])
-      expect(rss.first.enclosure.url).to match(%r{download.mp4})
+      expect(rss.first.enclosure.url).to match(/download.mp4/)
     end
   end
 
@@ -2597,7 +2601,7 @@ describe DiscussionTopic do
         end
 
         it "properly sorts collections by delayed_post_at and posted_at" do
-          anns = 10.times.map do |i|
+          anns = Array.new(10) do |i|
             ann = new_ann.call
             setter = [:delayed_post_at=, :posted_at=][i % 2]
             ann.send(setter, i.days.ago)
@@ -2669,7 +2673,7 @@ describe DiscussionTopic do
     end
 
     it "without custom opts" do
-      group_discussion_assignment() # Discussion has title "topic"
+      group_discussion_assignment # Discussion has title "topic"
       @topic.podcast_has_student_posts = true
       new_topic = @topic.duplicate({ :user => @teacher })
       expect(new_topic.title).to eql "topic Copy"
@@ -2692,7 +2696,7 @@ describe DiscussionTopic do
     end
 
     it "respect provided user" do
-      discussion_topic_model()
+      discussion_topic_model
       @topic.save!
       new_topic = @topic.duplicate({ :user => @student })
       expect(new_topic.user_id).to eq @student.id

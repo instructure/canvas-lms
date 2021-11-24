@@ -19,8 +19,8 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_action :load_account, :only => [:health_check, :readiness, :deep]
-  skip_before_action :load_user, :only => [:health_check, :readiness, :deep, :browserconfig]
+  skip_before_action :load_account, :only => %i[health_check readiness deep]
+  skip_before_action :load_user, :only => %i[health_check readiness deep browserconfig]
 
   def styleguide
     render :layout => "layouts/styleguide"
@@ -57,7 +57,10 @@ class InfoController < ApplicationController
        Account.connection != Delayed::Job.connection
       Delayed::Job.connection.active?
     end
-    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
+    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) do |f|
+      f.write("heartbeat")
+      f.flush
+    end
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
     DynamicSettings.find(tree: :private)['enable_rack_brotli']
@@ -73,13 +76,13 @@ class InfoController < ApplicationController
 
     respond_to do |format|
       format.html { render plain: 'canvas ok' }
-      format.json {
+      format.json do
         render json:
                                { status: 'canvas ok',
                                  asset_urls: asset_urls,
                                  revision: Canvas.revision,
                                  installation_uuid: Canvas.installation_uuid }
-      }
+      end
     end
   end
 
@@ -122,6 +125,11 @@ class InfoController < ApplicationController
     end
 
     render status: :not_found, template: "shared/errors/404_message"
+  end
+
+  def live_events_heartbeat
+    Canvas::LiveEvents.heartbeat
+    render plain: "heartbeat event sent at #{Time.now.utc.iso8601}"
   end
 
   def web_app_manifest
@@ -235,7 +243,7 @@ class InfoController < ApplicationController
     }
 
     if InstFS.enabled?
-      ret[:insf_fs] = -> do
+      ret[:insf_fs] = lambda do
         CanvasHttp
           .get(URI.join(InstFS.app_host, '/readiness').to_s)
           .is_a?(Net::HTTPSuccess)
@@ -243,14 +251,14 @@ class InfoController < ApplicationController
     end
 
     if Canvas.redis_enabled?
-      ret[:redis] = -> do
+      ret[:redis] = lambda do
         nodes = Canvas.redis.try(:ring)&.nodes || Array.wrap(Canvas.redis)
         nodes.all? { |node| node.get("deep_check").nil? }
       end
     end
 
     if Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST]
-      ret[:rich_content_service] = -> do
+      ret[:rich_content_service] = lambda do
         CanvasHttp
           .get(
             URI::HTTPS.build(
@@ -262,7 +270,7 @@ class InfoController < ApplicationController
     end
 
     if MathMan.use_for_svg?
-      ret[:mathman] = -> do
+      ret[:mathman] = lambda do
         CanvasHttp
           .get(MathMan.url_for(latex: 'x', target: :svg))
           .is_a?(Net::HTTPSuccess)
@@ -270,7 +278,7 @@ class InfoController < ApplicationController
     end
 
     if LiveEvents::Client.config
-      ret[:live_events] = -> do
+      ret[:live_events] = lambda do
         !LiveEvents.send(:client).stream_client.put_records(
           records: [
             {
@@ -294,7 +302,7 @@ class InfoController < ApplicationController
   def secondary_checks
     ret = {}
     if PageView.pv4?
-      ret[:pv4] = -> do
+      ret[:pv4] = lambda do
         CanvasHttp
           .get(URI.join(ConfigFile.load('pv4')['uri'], '/health_check').to_s)
           .is_a?(Net::HTTPSuccess)
@@ -302,7 +310,7 @@ class InfoController < ApplicationController
     end
 
     if Canvadocs.enabled?
-      ret[:canvadocs] = -> do
+      ret[:canvadocs] = lambda do
         CanvasHttp
           .get(URI.join(Canvadocs.config['base_url'], '/readiness').to_s)
           .is_a?(Net::HTTPSuccess)
@@ -310,7 +318,7 @@ class InfoController < ApplicationController
     end
 
     if CutyCapt.enabled? && CutyCapt.screencap_service
-      ret[:screencap] = -> do
+      ret[:screencap] = lambda do
         Tempfile.create('example.png', :encoding => 'ascii-8bit') do |f|
           CutyCapt.screencap_service.snapshot_url_to_file("about:blank", f)
         end
@@ -318,13 +326,13 @@ class InfoController < ApplicationController
     end
 
     if Account.site_admin.feature_enabled?(:notification_service)
-      ret[:notification_queue] = -> do
+      ret[:notification_queue] = lambda do
         !Services::NotificationService.process(Account.site_admin.global_id, nil, 'noop', 'nobody').nil?
       end
     end
 
     if ReleaseNote.enabled?
-      ret[:release_notes] = -> do
+      ret[:release_notes] = lambda do
         !ReleaseNote.ddb_client.update_item(
           table_name: ReleaseNote.ddb_table_name,
           key: { 'PartitionKey' => "healthcheck",
@@ -334,7 +342,7 @@ class InfoController < ApplicationController
     end
 
     if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
-      ret[:incoming_mail] = -> do
+      ret[:incoming_mail] = lambda do
         IncomingMailProcessor::IncomingMessageProcessor.healthy?
       end
     end

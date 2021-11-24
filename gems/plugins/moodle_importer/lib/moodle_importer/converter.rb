@@ -43,7 +43,7 @@ module Moodle
       File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json }
       @course
     ensure
-      FileUtils.rm migrator.imscc_path if migrator && migrator.imscc_path && File.exist?(migrator.imscc_path)
+      FileUtils.rm migrator.imscc_path if migrator&.imscc_path && File.exist?(migrator.imscc_path)
     end
 
     def add_question_warnings
@@ -54,11 +54,11 @@ module Moodle
       @course[:assessment_questions][:assessment_questions].each do |q_hash|
         qb_ident = q_hash['question_bank_id'] || q_hash['question_bank_name'] || :default
 
-        if q_hash['question_type'] == 'multiple_dropdowns_question' || q_hash['question_type'] == 'calculated_question'
-          warning_map[qb_ident] ||= {}
-          warning_map[qb_ident][q_hash['question_type']] ||= []
-          warning_map[qb_ident][q_hash['question_type']] << q_hash
-        end
+        next unless q_hash['question_type'] == 'multiple_dropdowns_question' || q_hash['question_type'] == 'calculated_question'
+
+        warning_map[qb_ident] ||= {}
+        warning_map[qb_ident][q_hash['question_type']] ||= []
+        warning_map[qb_ident][q_hash['question_type']] << q_hash
       end
 
       add_warnings_to_map(warning_map)
