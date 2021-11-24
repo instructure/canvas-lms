@@ -36,7 +36,7 @@ describe "Gradebook History Page" do
   end
 
   context "shows the results table for a valid search" do
-    it "with student name input and typeahead selection", test_id: %w[3308073 3308054], priority: "1" do
+    it "with student name input and typeahead selection", priority: "1" do
       student_name = @course.students.first.name
       GradeBookHistory.search_with_student_name(
         student_name[0...3], student_name
@@ -44,14 +44,14 @@ describe "Gradebook History Page" do
       expect(GradeBookHistory.check_table_for_student_name(student_name)).to be true
     end
 
-    it "with grader name input and typeahead selection", test_id: %w[3308073 3308054], priority: "1" do
+    it "with grader name input and typeahead selection", priority: "1" do
       GradeBookHistory.search_with_grader_name(
         @teacher.email
       )
       expect(GradeBookHistory.check_table_for_grader_name(@teacher.email)).to be true
     end
 
-    it "with all assignment name and typeahead selection", test_id: %w[3308073 3308054], priority: "1" do
+    it "with all assignment name and typeahead selection", priority: "1" do
       GradeBookHistory.search_with_assignment_name(
         @assignment_past_due_day.title
       )

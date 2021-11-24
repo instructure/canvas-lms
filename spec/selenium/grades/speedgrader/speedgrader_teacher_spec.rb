@@ -331,13 +331,13 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     end
 
-    it "show all sections menu item is present", priority: "2", test_id: "164207" do
+    it "show all sections menu item is present", priority: "2" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
       expect(f("#section-menu .ui-menu")).to include_text("Show All Sections")
     end
 
-    it "lists all course sections", priority: "2", test_id: "588914" do
+    it "lists all course sections", priority: "2" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
       expect(f("#section-menu .ui-menu")).to include_text(@section0.name)

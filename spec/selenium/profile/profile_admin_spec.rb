@@ -28,14 +28,14 @@ describe 'profile_pics' do
       admin_logged_in
     end
 
-    it_behaves_like 'profile_settings_page', :admin
+    it_behaves_like 'profile_settings_page'
 
-    it_behaves_like 'profile_user_about_page', :admin
+    it_behaves_like 'profile_user_about_page'
 
-    it_behaves_like 'user settings page change pic window', :admin
+    it_behaves_like 'user settings page change pic window'
 
-    it_behaves_like 'user settings change pic cancel', :admin
+    it_behaves_like 'user settings change pic cancel'
 
-    it_behaves_like 'with gravatar settings', :admin
+    it_behaves_like 'with gravatar settings'
   end
 end

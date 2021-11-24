@@ -26,7 +26,7 @@ describe "root account basic settings" do
   let(:reports_url) { "/accounts/#{account.id}/reports_tab" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
 
-  include_examples "settings basic tests", :root_account
+  include_examples "settings basic tests"
 
   it "is able to disable enable_gravatar" do
     account_admin_user(:active_all => true)

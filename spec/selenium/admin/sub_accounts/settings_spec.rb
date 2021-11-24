@@ -25,7 +25,7 @@ describe "sub account basic settings" do
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
 
-  include_examples "settings basic tests", :sub_account
+  include_examples "settings basic tests"
 
   it "disables inherited settings if locked by a parent account", priority: "1" do
     parent = Account.default

@@ -57,7 +57,7 @@ describe 'announcement permissions' do
         user_session(context_user)
       end
 
-      it "allows viewing announcements with discussions disallowed", priority: pick_priority(context, student: "1", observer: "1", teacher: "2", ta: "2", designer: "2"), test_id: pick_test_id(context, student: "779908", teacher: "779909", ta: "779910", observer: "779911", designer: "779912") do
+      it "allows viewing announcements with discussions disallowed", priority: pick_priority(context, student: "1", observer: "1", teacher: "2", ta: "2", designer: "2") do
         get announcements_page
         expect(DiscussionsIndex.summary_content).to be_displayed
       end
@@ -94,12 +94,12 @@ describe 'announcement permissions' do
         user_session(context_user)
       end
 
-      it "does not allow user to view announcements", priority: pick_priority(context, student: "1", observer: "1"), test_id: pick_test_id(context, student: "790700", observer: "790701") do
+      it "does not allow user to view announcements", priority: pick_priority(context, student: "1", observer: "1") do
         get announcements_page
         assert_flash_notice_message course_page_disabled_notice
       end
 
-      it "shows no announcements link on course page", priority: pick_priority(context, student: "1", observer: "1"), test_id: pick_test_id(context, student: "790702", observer: "790703") do
+      it "shows no announcements link on course page", priority: pick_priority(context, student: "1", observer: "1") do
         get course_page
         expect(f(course_section_tabs)).not_to contain_css(announcement_link)
       end
@@ -123,12 +123,12 @@ describe 'announcement permissions' do
         user_session(context_user)
       end
 
-      it "allows announcement view, discussion topic view disabled", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "803850", teacher: "804384", ta: "804385", observer: "804386", designer: "804387") do
+      it "allows announcement view, discussion topic view disabled", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_page
         expect(find(unauthorized_message)).to be_displayed
       end
 
-      it "shows announcements link on course page", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "804655", teacher: "804656", ta: "804657", observer: "804658", designer: "804659") do
+      it "shows announcements link on course page", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
         get course_page
         expect(f(announcement_link)).to be_displayed
       end
@@ -165,7 +165,7 @@ describe 'announcement permissions' do
         user_session(context_user)
       end
 
-      it "allows user to view announcements, discussion detail view disabled", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "805192", ta: "805193", observer: "805194", designer: "805195") do
+      it "allows user to view announcements, discussion detail view disabled", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(find(unauthorized_message)).to be_displayed
       end
@@ -211,7 +211,7 @@ describe 'announcement permissions' do
         user_session(context_user)
       end
 
-      it "does not allow user to view discussion details with announcements allowed", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "805196", ta: "805463", observer: "805464", designer: "805465") do
+      it "does not allow user to view discussion details with announcements allowed", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
         get discussions_topic_detail_page
         expect(find(unauthorized_message)).to be_displayed
       end

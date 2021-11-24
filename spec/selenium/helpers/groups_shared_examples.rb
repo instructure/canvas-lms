@@ -30,7 +30,7 @@ shared_examples 'home_page' do |context|
   include SharedExamplesCommon
   include RCENextPage
 
-  it "displays a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273602, teacher: 319909) do
+  it "displays a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2") do
     # Create an event to have something in the Coming up Section
     event = @testgroup[0].calendar_events.create!(title: "ohai",
                                                   start_at: Time.zone.now + 1.day)
@@ -41,19 +41,19 @@ shared_examples 'home_page' do |context|
     expect(f('.coming_up .event a b')).to include_text(event.title)
   end
 
-  it "displays a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273603, teacher: 319910) do
+  it "displays a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     get url
     expect(f('.event-list-view-calendar')).to be_displayed
   end
 
-  it "has a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273604, teacher: 319911) do
+  it "has a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     get url
     expect_new_page_load { fln('Announcement').click }
     add_announcement_url = "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
     expect(f("a[href=\"#{add_announcement_url}\"]")).to be_displayed
   end
 
-  it "displays recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273605, teacher: 319912) do
+  it "displays recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                             title: 'Discussion Topic', message: 'test')
     @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
@@ -66,7 +66,7 @@ shared_examples 'home_page' do |context|
     expect(activity[1]).to include_text('1 Discussion')
   end
 
-  it "displays announcements on the group home page feed", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273609, teacher: 319913) do
+  it "displays announcements on the group home page feed", priority: pick_priority(context, student: "1", teacher: "2") do
     @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
     get url
     expect(f('.title')).to include_text('1 Announcement')
@@ -81,13 +81,13 @@ shared_examples 'announcements_page' do |context|
   include SharedExamplesCommon
   include RCENextPage
 
-  it "centers the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273606, teacher: 324936) do
+  it "centers the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2") do
     get announcements_page
     expect(f('#content div')).to have_attribute(:style, 'text-align: center;')
     expect(f('.btn.btn-large.btn-primary')).to be_displayed
   end
 
-  it "lists all announcements", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273608, teacher: 324935) do
+  it "lists all announcements", priority: pick_priority(context, student: "1", teacher: "2") do
     # Create 5 announcements in the group
     announcements = []
     5.times do |n|
@@ -98,7 +98,7 @@ shared_examples 'announcements_page' do |context|
     expect(ff('.discussion-topic').size).to eq 5
   end
 
-  it "only lists in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273621, teacher: 324934) do
+  it "only lists in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
@@ -111,7 +111,7 @@ shared_examples 'announcements_page' do |context|
     expect(f("#content")).not_to contain_link('Course Announcement')
   end
 
-  it "only accesses group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273624, teacher: 324931) do
+  it "only accesses group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
@@ -119,12 +119,12 @@ shared_examples 'announcements_page' do |context|
     expect(ffj('.file .text:visible').size).to eq 1
   end
 
-  it "has an Add External Feed link on announcements", priority: "2", test_id: pick_test_id(context, student: 329628, teacher: 329629) do
+  it "has an Add External Feed link on announcements", priority: "2" do
     get announcements_page
     expect(fln('Add External Feed')).to be_displayed
   end
 
-  it "has an RSS feed button on announcements", priority: "2", test_id: pick_test_id(context, student: 329630, teacher: 329631) do
+  it "has an RSS feed button on announcements", priority: "2" do
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     get announcements_page
     expect(f('.btn[title="RSS feed"]')).to be_displayed
@@ -208,14 +208,14 @@ shared_examples 'pages_page' do |context|
     stub_rcs_config
   end
 
-  it "loads pages index and display all pages", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273610, teacher: 324927) do
+  it "loads pages index and display all pages", priority: pick_priority(context, student: "1", teacher: "2") do
     @testgroup.first.wiki_pages.create!(title: "Page 1", user: @teacher)
     @testgroup.first.wiki_pages.create!(title: "Page 2", user: @teacher)
     get pages_page
     expect(ff('.collectionViewItems .clickable').size).to eq 2
   end
 
-  it "only lists in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
+  it "only lists in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
     @testgroup.first.wiki_pages.create!(user: @teacher,
                                         title: 'Group Page')
@@ -229,7 +229,7 @@ shared_examples 'pages_page' do |context|
     expect(pages_list_item_exists?('Course Page')).to be_falsey
   end
 
-  it "only accesses group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
+  it "only accesses group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
 
     get "/groups/#{@testgroup.first.id}/pages/test_page/edit"
@@ -247,7 +247,7 @@ shared_examples 'people_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "allows group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323329, teacher: 324926) do
+  it "allows group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2") do
     get people_page
     expect_new_page_load do
       f("#people-options .Button").click
@@ -268,7 +268,7 @@ shared_examples 'discussions_page' do |context|
     stub_rcs_config
   end
 
-  it "only lists in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
+  it "only lists in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -288,7 +288,7 @@ shared_examples 'discussions_page' do |context|
     expect(course_item_link_exists?(course_dt.title.to_s)).to be_falsey
   end
 
-  it "only accesses group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
+  it "only accesses group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }
@@ -305,7 +305,7 @@ shared_examples 'files_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "allows group users to rename a file", priority: "2", test_id: pick_test_id(context, student: 312869, teacher: 315577) do
+  it "allows group users to rename a file", priority: "2" do
     add_test_files
     get files_page
     edit_name_from_cog_icon('cool new name')
@@ -313,7 +313,7 @@ shared_examples 'files_page' do |context|
     expect(fln('cool new name')).to be_present
   end
 
-  it "searches files only within the scope of a group", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273627, teacher: 324937) do
+  it "searches files only within the scope of a group", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get files_page
     f('input[type="search"]').send_keys 'example.pdf'
@@ -330,7 +330,7 @@ shared_examples 'conferences_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "allows group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 307624, teacher: 308534) do
+  it "allows group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_chrome('issue with invite_all_but_one_user method')
     title = 'test conference'
     get conferences_page
@@ -338,7 +338,7 @@ shared_examples 'conferences_page' do |context|
     expect(f('#new-conference-list .ig-title').text).to include(title)
   end
 
-  it "allows group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323557, teacher: 323558) do
+  it "allows group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
@@ -348,7 +348,7 @@ shared_examples 'conferences_page' do |context|
     expect(f('#new-conference-list')).to include_text('There are no new conferences')
   end
 
-  it "allows group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323559, teacher: 323560) do
+  it "allows group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
