@@ -65,6 +65,7 @@ module SIS
       def add_user(user, login_only: false)
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
         raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
+        raise ImportError, "No status given for user #{user.user_id}" if user.status.blank?
         raise ImportError, "Improper status for user #{user.user_id}" unless user.status.match?(/\A(active|suspended|deleted)/i)
         return if @batch.skip_deletes? && user.status.match?(/deleted/i)
 
