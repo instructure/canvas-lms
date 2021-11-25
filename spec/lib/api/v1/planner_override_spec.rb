@@ -23,36 +23,36 @@ describe Api::V1::PlannerOverride do
     student_in_course active_all: true
   end
 
-  describe '.planner_override_json' do
+  describe ".planner_override_json" do
     let(:api) { Class.new { include Api::V1::PlannerOverride }.new }
     let(:session) { double }
 
-    it 'shows plannable_type as a string' do
+    it "shows plannable_type as a string" do
       assignment_model
       po = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: Assignment, user_id: @student.id)
       json = api.planner_override_json(po, @student, session)
-      expect(json['plannable_type']).to eq 'assignment'
+      expect(json["plannable_type"]).to eq "assignment"
     end
 
-    it 'identifies an assignment and populates the assignment_id' do
+    it "identifies an assignment and populates the assignment_id" do
       assignment_model
       po = @assignment.planner_overrides.create!(user: @student)
       json = api.planner_override_json(po, @student, session)
-      expect(json['assignment_id']).to eq @assignment.id
+      expect(json["assignment_id"]).to eq @assignment.id
     end
 
-    it 'identifies a submittable linked to an assignment and populate the assignment_id' do
-      assignment_model(submission_types: 'discussion_topic')
+    it "identifies a submittable linked to an assignment and populate the assignment_id" do
+      assignment_model(submission_types: "discussion_topic")
       po = @assignment.discussion_topic.planner_overrides.create!(user: @student)
       json = api.planner_override_json(po, @student, session)
-      expect(json['assignment_id']).to eq @assignment.id
+      expect(json["assignment_id"]).to eq @assignment.id
     end
 
-    it 'leaves assignment_id null if there is no associated assignment' do
+    it "leaves assignment_id null if there is no associated assignment" do
       topic = discussion_topic_model
       po = topic.planner_overrides.create!(user: @student)
       json = api.planner_override_json(po, @student, session)
-      expect(json['assignment_id']).to be_nil
+      expect(json["assignment_id"]).to be_nil
     end
   end
 end

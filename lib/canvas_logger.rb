@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support'
+require "active_support"
 
 class CanvasLogger < ActiveSupport::Logger
   attr_reader :log_path
@@ -52,7 +52,7 @@ class CanvasLogger < ActiveSupport::Logger
     @log_path = log_path
 
     old_logdev = @logdev
-    @logdev = ::Logger::LogDevice.new(log_path, :shift_age => 0, :shift_size => 1_048_576)
+    @logdev = ::Logger::LogDevice.new(log_path, shift_age: 0, shift_size: 1_048_576)
     old_logdev.close
   end
 

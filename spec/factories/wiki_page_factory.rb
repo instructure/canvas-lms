@@ -31,8 +31,8 @@ module Factories
     assignment_model({
       course: @page.course,
       wiki_page: @page,
-      submission_types: 'wiki_page',
-      title: 'Content Page Assignment',
+      submission_types: "wiki_page",
+      title: "Content Page Assignment",
       due_at: nil
     }.merge(opts))
   end

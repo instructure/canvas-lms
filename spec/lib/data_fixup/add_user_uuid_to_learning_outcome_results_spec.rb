@@ -33,11 +33,11 @@ describe DataFixup::AddUserUuidToLearningOutcomeResults do
   end
 
   let_once :learning_outcome_result do
-    outcome = course.created_learning_outcomes.create!(title: 'outcome')
+    outcome = course.created_learning_outcomes.create!(title: "outcome")
 
     LearningOutcomeResult.new(
       alignment: ContentTag.create!({
-                                      title: 'content',
+                                      title: "content",
                                       context: course,
                                       learning_outcome: outcome
                                     }),

@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'uri'
-require 'ipaddr'
-require 'resolv'
-require 'canvas_http/circuit_breaker'
-require 'logger'
+require "uri"
+require "ipaddr"
+require "resolv"
+require "canvas_http/circuit_breaker"
+require "logger"
 
 module CanvasHttp
   class Error < ::StandardError
@@ -118,7 +118,7 @@ module CanvasHttp
           redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
-          url_str = response['Location']
+          url_str = response["Location"]
           logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str} | elapsed: #{elapsed_time} s")
           redirect_limit -= 1
         else
@@ -146,7 +146,7 @@ module CanvasHttp
   def self.read_body_max_length(response, max_length)
     body = nil
     response.read_body do |chunk|
-      body ||= +''
+      body ||= +""
       raise ResponseTooLargeError if body.length + chunk.length > max_length
 
       body << chunk
@@ -162,10 +162,10 @@ module CanvasHttp
       else
         request.body, header = Multipart::Post.new.prepare_query(form_data)
       end
-      request.content_type = header['Content-type']
+      request.content_type = header["Content-type"]
     elsif form_data.is_a?(String)
       request.body = form_data
-      request.content_type = 'application/x-www-form-urlencoded'
+      request.content_type = "application/x-www-form-urlencoded"
     else
       request.set_form_data(form_data)
     end
@@ -180,7 +180,7 @@ module CanvasHttp
     begin
       uri = URI.parse(value)
     rescue URI::InvalidURIError => e
-      if e.message.include?('URI must be ascii only')
+      if e.message.include?("URI must be ascii only")
         uri = URI.parse(Addressable::URI.normalized_encode(value).chomp("/"))
         value = uri.to_s
       else
@@ -242,7 +242,7 @@ module CanvasHttp
   # returns a Net::HTTP connection object for the given URI object
   def self.connection_for_uri(uri)
     http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = (uri.scheme == 'https')
+    http.use_ssl = (uri.scheme == "https")
     http.ssl_timeout = http.open_timeout = open_timeout
     http.read_timeout = read_timeout
     http

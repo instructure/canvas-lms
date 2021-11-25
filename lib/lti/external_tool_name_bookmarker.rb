@@ -30,7 +30,7 @@ module Lti
       # by ContextExternalTools.all_tools_for()
       restrict_scope_by_name_and_id_fields(
         scope: scope, pager: pager,
-        name_field: 'context_external_tools.name', id_field: 'context_external_tools.id',
+        name_field: "context_external_tools.name", id_field: "context_external_tools.id",
         order: false
       )
     end

@@ -20,14 +20,14 @@
 
 module LiveAssessments
   class Result < ActiveRecord::Base
-    belongs_to :assessor, class_name: 'User'
+    belongs_to :assessor, class_name: "User"
     belongs_to :user
-    belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
+    belongs_to :assessment, class_name: "LiveAssessments::Assessment"
 
     validates :assessor_id, :assessment_id, :assessed_at, presence: true
-    validates :passed, inclusion: { :in => [true, false] }
+    validates :passed, inclusion: { in: [true, false] }
 
-    scope :for_user, ->(user) { where(:user_id => user) }
+    scope :for_user, ->(user) { where(user_id: user) }
 
     set_policy do
       given { |user, session| assessment.grants_right?(user, session, :update) }

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::Backend::ActiveRecord do
   let(:ar_type) do
@@ -53,7 +53,7 @@ describe EventStream::Backend::ActiveRecord do
         end
 
         def name
-          'shard_name'
+          "shard_name"
         end
 
         def active?
@@ -102,11 +102,11 @@ describe EventStream::Backend::ActiveRecord do
     end
 
     it "uses shard as fingerprint" do
-      expect(backend.database_fingerprint).to eq('shard_name')
+      expect(backend.database_fingerprint).to eq("shard_name")
     end
 
     it "uses shard as name" do
-      expect(backend.database_name).to eq('shard_name')
+      expect(backend.database_name).to eq("shard_name")
     end
   end
 end

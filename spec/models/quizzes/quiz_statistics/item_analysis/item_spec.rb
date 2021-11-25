@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'common'
+require_relative "common"
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
   let(:no_dev_item) do
@@ -32,12 +32,12 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
 
   describe ".from" do
     it "creates an item for a supported question type" do
-      qq = { :question_type => "true_false_question", :answers => [] }
+      qq = { question_type: "true_false_question", answers: [] }
       expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).not_to be_nil
     end
 
     it "does not create an item for an unsupported question type" do
-      qq = { :question_type => "essay_question" }
+      qq = { question_type: "essay_question" }
       expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).to be_nil
     end
   end

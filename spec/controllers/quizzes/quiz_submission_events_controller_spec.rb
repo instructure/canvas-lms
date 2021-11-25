@@ -23,9 +23,9 @@ describe Quizzes::QuizSubmissionEventsController do
     Account.default.enable_feature!(:quiz_log_auditing)
   end
 
-  describe 'GET /log (#index)' do
+  describe "GET /log (#index)" do
     def subject
-      get 'index', params: {
+      get "index", params: {
         course_id: @course.id,
         quiz_id: @quiz.id,
         quiz_submission_id: @quiz_submission.id
@@ -33,9 +33,9 @@ describe Quizzes::QuizSubmissionEventsController do
     end
 
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      quiz_model(:course => @course)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student, false)
     end
 
@@ -62,7 +62,7 @@ describe Quizzes::QuizSubmissionEventsController do
       expect(response).to be_client_error
     end
 
-    context 'when quiz_log_auditing feature flag is off' do
+    context "when quiz_log_auditing feature flag is off" do
       before do
         Account.default.disable_feature!(:quiz_log_auditing)
       end

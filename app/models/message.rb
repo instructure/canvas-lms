@@ -49,7 +49,7 @@ class Message < ActiveRecord::Base
       @id, @created_at = id, created_at
     end
 
-    delegate :dispatch_at, :to => :message
+    delegate :dispatch_at, to: :message
 
     def deliver
       message.deliver
@@ -60,7 +60,7 @@ class Message < ActiveRecord::Base
     def message
       return @message if @message.present?
 
-      @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      @message = Message.in_partition("id" => id, "created_at" => @created_at).where(id: @id, created_at: @created_at).first || Message.where(id: @id).first
       raise QueuedNotFound if @message.nil?
 
       @message
@@ -76,8 +76,8 @@ class Message < ActiveRecord::Base
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
   belongs_to :user
-  belongs_to :root_account, :class_name => 'Account'
-  has_many   :attachments, :as => :context, :inverse_of => :context
+  belongs_to :root_account, class_name: "Account"
+  has_many   :attachments, as: :context, inverse_of: :context
 
   attr_writer :delayed_messages
   attr_accessor :output_buffer
@@ -110,7 +110,7 @@ class Message < ActiveRecord::Base
 
   # Stream policy
   on_create_send_to_streams do
-    if to == 'dashboard' && Notification.types_to_show_in_feed.include?(notification_name)
+    if to == "dashboard" && Notification.types_to_show_in_feed.include?(notification_name)
       user_id
     else
       []
@@ -120,68 +120,68 @@ class Message < ActiveRecord::Base
   # State machine
   workflow do
     state :created do
-      event :stage, :transitions_to => :staged do
+      event :stage, transitions_to: :staged do
         self.dispatch_at = Time.now.utc + delay_for
-        if to != 'dashboard'
+        if to != "dashboard"
           MessageDispatcher.dispatch(self)
         end
       end
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed # needed for dashboard messages
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed # needed for dashboard messages
     end
 
     state :staged do
-      event :dispatch, :transitions_to => :sending
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed # needed for dashboard messages
+      event :dispatch, transitions_to: :sending
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed # needed for dashboard messages
     end
 
     state :sending do
-      event :complete_dispatch, :transitions_to => :sent do
+      event :complete_dispatch, transitions_to: :sent do
         self.sent_at ||= Time.now
       end
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed
-      event :errored_dispatch, :transitions_to => :staged do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed
+      event :errored_dispatch, transitions_to: :staged do
         # A little delay so we don't churn so much when the server is down.
         self.dispatch_at = Time.now.utc + 5.minutes
       end
     end
 
     state :sent do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :close, :transitions_to => :closed
-      event :bounce, :transitions_to => :bounced do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :close, transitions_to: :closed
+      event :bounce, transitions_to: :bounced do
         # Permenant reminder that this bounced.
         communication_channel.bounce_count += 1
         communication_channel.save!
         self.is_bounced = true
       end
-      event :recycle, :transitions_to => :staged
+      event :recycle, transitions_to: :staged
     end
 
     state :bounced do
-      event :close, :transitions_to => :closed
+      event :close, transitions_to: :closed
     end
 
     state :dashboard do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :close, :transitions_to => :closed
-      event :cancel, :transitions_to => :closed
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :close, transitions_to: :closed
+      event :cancel, transitions_to: :closed
     end
 
     state :cancelled
 
     state :transmission_error do
-      event :close, :transitions_to => :closed
+      event :close, transitions_to: :closed
     end
 
     state :closed do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :send_message, :transitions_to => :closed do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :send_message, transitions_to: :closed do
         self.sent_at ||= Time.now
       end
     end
@@ -197,13 +197,13 @@ class Message < ActiveRecord::Base
     shard.activate do
       self.updated_at = Time.now.utc
       updates = changes_to_save.transform_values(&:last)
-      self.class.in_partition(attributes).where(:id => id, :created_at => created_at).update_all(updates)
+      self.class.in_partition(attributes).where(id: id, created_at: created_at).update_all(updates)
       clear_changes_information
     end
   end
 
   # Named scopes
-  scope :for, ->(context) { where(:context_type => context.class.base_class.to_s, :context_id => context) }
+  scope :for, ->(context) { where(context_type: context.class.base_class.to_s, context_id: context) }
 
   scope :after, ->(date) { where("messages.created_at>?", date) }
   scope :more_recent_than, ->(date) { where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
@@ -212,19 +212,19 @@ class Message < ActiveRecord::Base
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  scope :to_email, -> { where(:path_type => ['email', 'sms']) }
+  scope :to_email, -> { where(path_type: ["email", "sms"]) }
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
-  scope :by_name, ->(notification_name) { where(:notification_name => notification_name) }
+  scope :by_name, ->(notification_name) { where(notification_name: notification_name) }
 
   scope :before, ->(date) { where("messages.created_at<?", date) }
 
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, -> { where(:workflow_state => %w[created staged sending]) }
+  scope :cancellable, -> { where(workflow_state: %w[created staged sending]) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
@@ -232,7 +232,7 @@ class Message < ActiveRecord::Base
   # Where user can be a User or id, name needs to be the Notification name.
   scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
-  scope :in_state, ->(state) { where(:workflow_state => Array(state).map(&:to_s)) }
+  scope :in_state, ->(state) { where(workflow_state: Array(state).map(&:to_s)) }
 
   scope :at_timestamp, ->(timestamp) { where("created_at >= ? AND created_at < ?", Time.at(timestamp.to_i), Time.at(timestamp.to_i + 1)) }
 
@@ -254,7 +254,7 @@ class Message < ActiveRecord::Base
       tap do
         @table = klass.arel_table_from_key_values(attrs)
         @predicate_builder = predicate_builder.dup
-        @predicate_builder.instance_variable_set('@table', ActiveRecord::TableMetadata.new(klass, @table))
+        @predicate_builder.instance_variable_set("@table", ActiveRecord::TableMetadata.new(klass, @table))
       end
     end
   }
@@ -452,7 +452,7 @@ class Message < ActiveRecord::Base
     return if state == :bounced
 
     self.dispatch_at = Time.now.utc + delay_for
-    self.workflow_state = 'staged'
+    self.workflow_state = "staged"
   end
 
   # Public: Stage the message during the dispatch process. Messages travel
@@ -464,10 +464,10 @@ class Message < ActiveRecord::Base
 
     if dashboard?
       messages = Message.in_state(:dashboard).where(
-        :notification_id => notification_id,
-        :context_id => context_id,
-        :context_type => context_type,
-        :user_id => user_id
+        notification_id: notification_id,
+        context_id: context_id,
+        context_type: context_type,
+        user_id: user_id
       )
 
       (messages - [self]).each(&:close)
@@ -502,7 +502,7 @@ class Message < ActiveRecord::Base
       @output_buffer = old_output_buffer.class.new(@output_buffer)
     end
 
-    ''
+    ""
   end
 
   # Public: Get a message_content_... instance variable.
@@ -530,13 +530,13 @@ class Message < ActiveRecord::Base
     path = Canvas::MessageHelper.find_message_path(filename)
 
     unless (File.exist?(path) rescue false)
-      return false if filename.include?('slack')
+      return false if filename.include?("slack")
 
-      filename = notification.name.downcase.gsub(/\s/, '_') + ".email.erb"
+      filename = notification.name.downcase.gsub(/\s/, "_") + ".email.erb"
       path = Canvas::MessageHelper.find_message_path(filename)
     end
 
-    @i18n_scope = "messages." + filename.delete_suffix('.erb')
+    @i18n_scope = "messages." + filename.delete_suffix(".erb")
 
     if (File.exist?(path) rescue false)
       File.read(path)
@@ -566,11 +566,11 @@ class Message < ActiveRecord::Base
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = ActionView::OutputBuffer.new
-    inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, :bufvar => '@output_buffer').src, binding, template_path)
+    inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, bufvar: "@output_buffer").src, binding, template_path)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding, __FILE__, __LINE__
     setter.call(inner_html)
 
-    layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
+    layout_path = Canvas::MessageHelper.find_message_path("_layout.email.html.erb")
     @output_buffer = ActionView::OutputBuffer.new
     eval(ActionView::Template::Handlers::ERB::Erubi.new(File.read(layout_path)).src, binding, layout_path)
   ensure
@@ -578,7 +578,7 @@ class Message < ActiveRecord::Base
   end
 
   def load_html_template
-    html_file = template_filename('email.html')
+    html_file = template_filename("email.html")
     html_path = Canvas::MessageHelper.find_message_path(html_file)
     [File.read(html_path), html_path] if File.exist?(html_path)
   end
@@ -591,14 +591,14 @@ class Message < ActiveRecord::Base
   # Returns message body
   def populate_body(message_body_template, path_type, binding, filename)
     # Build the body content based on the path type
-    self.body = eval(Erubi::Engine.new(message_body_template, bufvar: '@output_buffer').src, binding, filename)
-    self.html_body = apply_html_template(binding) if path_type == 'email'
+    self.body = eval(Erubi::Engine.new(message_body_template, bufvar: "@output_buffer").src, binding, filename)
+    self.html_body = apply_html_template(binding) if path_type == "email"
 
     # Append a footer to the body if the path type is email
-    if path_type == 'email'
-      footer_path = Canvas::MessageHelper.find_message_path('_email_footer.email.erb')
+    if path_type == "email"
+      footer_path = Canvas::MessageHelper.find_message_path("_email_footer.email.erb")
       raw_footer_message = File.read(footer_path)
-      footer_message = eval(Erubi::Engine.new(raw_footer_message, :bufvar => "@output_buffer").src, nil, footer_path)
+      footer_message = eval(Erubi::Engine.new(raw_footer_message, bufvar: "@output_buffer").src, nil, footer_path)
       # currently, _email_footer.email.erb only contains a way for users to change notification prefs
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
@@ -639,13 +639,13 @@ class Message < ActiveRecord::Base
     # (temporarily) override course name with user's nickname for the course
     hacked_course = apply_course_nickname_to_asset(context, user)
 
-    path_type ||= communication_channel.try(:path_type) || 'email'
+    path_type ||= communication_channel.try(:path_type) || "email"
 
     # Determine the message template file to be used in the message
     filename = template_filename(path_type)
     message_body_template = get_template(filename)
-    if !message_body_template && path_type == 'slack'
-      filename = template_filename('sms')
+    if !message_body_template && path_type == "slack"
+      filename = template_filename("sms")
       message_body_template = get_template(filename)
     end
 
@@ -657,7 +657,7 @@ class Message < ActiveRecord::Base
         populate_body(message_body_template, path_type, binding, filename)
 
         # Set the subject and url
-        self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
+        self.subject = @message_content_subject || t("#message.default_subject", "Canvas Alert")
         self.url     = @message_content_link || nil
       else
         # Message doesn't exist so we flag the message as an error
@@ -690,14 +690,14 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    if path_type == 'slack' && !context_root_account.settings[:encrypted_slack_key]
-      logger.warn('Could not send slack message without configured key')
+    if path_type == "slack" && !context_root_account.settings[:encrypted_slack_key]
+      logger.warn("Could not send slack message without configured key")
       return nil
     end
 
     check_acct = infer_feature_account
 
-    return skip_and_cancel if path_type == 'sms'
+    return skip_and_cancel if path_type == "sms"
 
     if path_type == "push" &&
        (Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?)
@@ -705,12 +705,12 @@ class Message < ActiveRecord::Base
     end
 
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
-                                 short_stat: 'message.deliver',
+                                 short_stat: "message.deliver",
                                  tags: { path_type: path_type, notification_name: notification_name })
 
     global_account_id = Shard.global_id_for(root_account_id, shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
-                                 short_stat: 'message.deliver_per_account',
+                                 short_stat: "message.deliver_per_account",
                                  tags: { path_type: path_type, root_account_id: global_account_id })
 
     if check_acct.feature_enabled?(:notification_service)
@@ -727,7 +727,7 @@ class Message < ActiveRecord::Base
 
   def skip_and_cancel
     InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
-                                 short_stat: 'message.skip',
+                                 short_stat: "message.skip",
                                  tags: { path_type: path_type, notification_name: notification_name })
     cancel
   end
@@ -740,7 +740,7 @@ class Message < ActiveRecord::Base
     if targets.empty?
       # Log no_targets_specified error to DataDog
       InstStatsd::Statsd.increment("message.no_targets_specified",
-                                   short_stat: 'message.no_targets_specified',
+                                   short_stat: "message.no_targets_specified",
                                    tags: { path_type: path_type })
 
       self.transmission_errors = "No notification targets specified"
@@ -760,7 +760,7 @@ class Message < ActiveRecord::Base
   rescue Aws::SQS::Errors::ServiceError => e
     Canvas::Errors.capture(
       e,
-      message: 'Message delivery failed',
+      message: "Message delivery failed",
       to: to,
       object: inspect.to_s
     )
@@ -785,7 +785,7 @@ class Message < ActiveRecord::Base
       truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
       "#{truncated_body} #{url}"
     else
-      if to =~ /^\+[0-9]+$/ || path_type == 'slack'
+      if to =~ /^\+[0-9]+$/ || path_type == "slack"
         body
       else
         Mailer.create_message(self).to_s
@@ -801,17 +801,17 @@ class Message < ActiveRecord::Base
     when "push"
       user.notification_endpoints.pluck(:arn)
     when "twitter"
-      twitter_service = user.user_services.where(service: 'twitter').first
+      twitter_service = user.user_services.where(service: "twitter").first
       [
         "access_token" => twitter_service.token,
         "access_token_secret" => twitter_service.secret,
         "user_id" => twitter_service.service_user_id
       ]
-    when 'slack'
+    when "slack"
       [
-        'recipient' => to,
-        'access_token' => Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
-                                                            context_root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key')
+        "recipient" => to,
+        "access_token" => Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
+                                                            context_root_account.settings[:encrypted_slack_key_salt], "instructure_slack_encrypted_key")
       ]
     else
       [to]
@@ -825,7 +825,7 @@ class Message < ActiveRecord::Base
   # Returns an array of dashboard messages.
   def self.dashboard_messages(messages)
     message_types = messages.inject({}) do |types, message|
-      type = message.notification.category rescue 'Other'
+      type = message.notification.category rescue "Other"
 
       if type.present?
         types[type] ||= []
@@ -836,14 +836,14 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
+    message_types.to_a.sort_by { |m| m[0] == "Other" ? CanvasSort::Last : m[0] }
   end
 
   # Public: Message to use if the message is unavailable to send.
   #
   # Returns a string
   def self.unavailable_message
-    I18n.t('message preview unavailable')
+    I18n.t("message preview unavailable")
   end
 
   # Public: Get the root account of this message's context.
@@ -921,8 +921,8 @@ class Message < ActiveRecord::Base
     end
 
     self.path_type ||= communication_channel.try(:path_type)
-    self.path_type = 'summary' if to == 'dashboard'
-    self.path_type = 'email'   if context_type == 'ErrorReport'
+    self.path_type = "summary" if to == "dashboard"
+    self.path_type = "email"   if context_type == "ErrorReport"
 
     self.to_email  = true if %w[email sms].include?(path_type)
 
@@ -968,8 +968,8 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def move_messages_for_deleted_users
-    if context_type != 'ErrorReport' && (!user || user.deleted?)
-      self.workflow_state = 'closed'
+    if context_type != "ErrorReport" && (!user || user.deleted?)
+      self.workflow_state = "closed"
     end
   end
 
@@ -988,8 +988,8 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def move_dashboard_messages
-    if to == 'dashboard' && !cancelled? && !closed?
-      self.workflow_state = 'dashboard'
+    if to == "dashboard" && !cancelled? && !closed?
+      self.workflow_state = "dashboard"
     end
   end
 
@@ -998,7 +998,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(**)
-    super(:only => %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])['message']
+    super(only: %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])["message"]
   end
 
   protected
@@ -1041,7 +1041,7 @@ class Message < ActiveRecord::Base
       if log_error
         Canvas::Errors.capture(
           @exception,
-          message: 'Message delivery failed',
+          message: "Message delivery failed",
           to: to,
           object: inspect.to_s
         )
@@ -1064,7 +1064,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    twitter_service = user.user_services.where(service: 'twitter').first
+    twitter_service = user.user_services.where(service: "twitter").first
     host = HostUrl.context_host(link_root_account)
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
@@ -1093,7 +1093,7 @@ class Message < ActiveRecord::Base
         logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         Canvas::Errors.capture(
           e,
-          message: 'SMS delivery failed',
+          message: "SMS delivery failed",
           to: to,
           object: inspect.to_s,
           tags: {

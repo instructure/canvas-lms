@@ -22,7 +22,7 @@ class Progress < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:content_migration, :course, :account, :group_category, :content_export,
        :assignment, :attachment, :epub_export, :sis_batch, :pace_plan,
-       { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
+       { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
   belongs_to :user
 
   validates :context_id, presence: true
@@ -35,12 +35,12 @@ class Progress < ActiveRecord::Base
   include Workflow
   workflow do
     state :queued do
-      event :start, :transitions_to => :running
-      event :fail, :transitions_to => :failed
+      event :start, transitions_to: :running
+      event :fail, transitions_to: :failed
     end
     state :running do
-      event(:complete, :transitions_to => :completed) { self.completion = 100 }
-      event :fail, :transitions_to => :failed
+      event(:complete, transitions_to: :completed) { self.completion = 100 }
+      event :fail, transitions_to: :failed
     end
     state :completed
     state :failed
@@ -48,7 +48,7 @@ class Progress < ActiveRecord::Base
 
   def reset!
     self.results = nil
-    self.workflow_state = 'queued'
+    self.workflow_state = "queued"
     self.completion = 0
     GuardRail.activate(:primary) { save! }
   end
@@ -122,7 +122,7 @@ class Progress < ActiveRecord::Base
       er_id = @progress.shard.activate do
         Canvas::Errors.capture_exception("Progress::Work", error)[:error_report]
       end
-      @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
+      @progress.message = "Unexpected error, ID: #{er_id || "unknown"}"
       @progress.save
       @progress.fail
       @context.fail_with_error!(error) if @context.respond_to?(:fail_with_error!)

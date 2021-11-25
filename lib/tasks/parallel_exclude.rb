@@ -28,6 +28,6 @@ module Tasks::ParallelExclude
     "spec/models/attachment_spec.rb"
   ].freeze
 
-  test_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r{spec_canvas/selenium}) + FileList['spec/**/*_spec.rb'].exclude(%r{spec/selenium})
+  test_files = FileList["{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb"].exclude(%r{spec_canvas/selenium}) + FileList["spec/**/*_spec.rb"].exclude(%r{spec/selenium})
   AVAILABLE_FILES = FILES.select { |file_name| test_files.include?(file_name) }
 end

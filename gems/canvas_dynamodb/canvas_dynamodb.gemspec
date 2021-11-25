@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Brent Burgoyne"]
   spec.email         = ["brent@instructure.com"]
-  spec.summary       = 'DynamoDB wrapper for Canvas LMS'
+  spec.summary       = "DynamoDB wrapper for Canvas LMS"
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
 
@@ -14,8 +14,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'aws-sdk-applicationautoscaling', '~> 1.26'
-  spec.add_runtime_dependency 'aws-sdk-dynamodb', '~> 1.32'
+  spec.add_runtime_dependency "aws-sdk-applicationautoscaling", "~> 1.26"
+  spec.add_runtime_dependency "aws-sdk-dynamodb", "~> 1.32"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake"

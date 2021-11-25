@@ -38,11 +38,11 @@ module Quizzes::QuizQuestion::AnswerSerializers
                         question[:question_type]
                       end
 
-      klass = question_type.gsub(/_question$/, '').demodulize.camelize
+      klass = question_type.gsub(/_question$/, "").demodulize.camelize
 
       begin
         # raise name_error because `::Error` is in the namespace, but is not a valid answer type
-        raise NameError if klass == 'Error'
+        raise NameError if klass == "Error"
 
         "Quizzes::QuizQuestion::AnswerSerializers::#{klass}".constantize.new(question)
       rescue NameError

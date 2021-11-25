@@ -35,7 +35,7 @@ module LuckySneaks
       if defined?(RedCloth)
         if lite_mode
           RedCloth.new(self, [:lite_mode]).to_html
-        elsif include?('<pre>')
+        elsif include?("<pre>")
           RedCloth.new(self).to_html.tr("\t", "")
         else
           RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")
@@ -140,7 +140,7 @@ module LuckySneaks
         /(\s|^)\$(\d+)\.(\d+)(\s|$)/ => '\2 dollars \3 cents',
         /(\s|^)£(\d+)\.(\d+)(\s|$)/u => '\2 pounds \3 pence',
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced.include?('\\1')
+        replaced = " #{replaced} " unless replaced.include?("\\1")
         dummy.gsub!(found, replaced)
       end
       # Back to normal rules
@@ -156,7 +156,7 @@ module LuckySneaks
         /\s*%\s*/ => "percent",
         %r{\s*(\\|/)\s*} => "slash",
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced.include?('\\1')
+        replaced = " #{replaced} " unless replaced.include?("\\1")
         dummy.gsub!(found, replaced)
       end
       dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(%r{[.,:;()\[\]/?!\^'"_]}, " ")
@@ -181,7 +181,7 @@ module LuckySneaks
 
     # Returns a copy of the string safe for use in file paths and URLs.
     def path_safe
-      gsub(/[^a-zA-Z0-9\-_]+/, '-')
+      gsub(/[^a-zA-Z0-9\-_]+/, "-")
     end
 
     module ClassMethods

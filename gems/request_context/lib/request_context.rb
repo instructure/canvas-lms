@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'request_context/generator'
-require 'request_context/session'
+require "request_context/generator"
+require "request_context/session"
 
 module RequestContext
 end

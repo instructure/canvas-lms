@@ -62,7 +62,7 @@ module BasicLTI
       #   version, created in #update_submission)
       # the acive/open version is sync'ed with submission.
       # In this scenario, the open version is the version to be reverted.
-      @submission.with_versioning(:explicit => true) { @submission.save! }
+      @submission.with_versioning(explicit: true) { @submission.save! }
       @submission.revert_to_version(
         version_to_be_reverted[:number],
         # grade is a derived field, will be calculated automatically on saving
@@ -146,7 +146,7 @@ module BasicLTI
       return @submission.save! if @submission.url == @launch_url
 
       @submission.url = @launch_url
-      @submission.with_versioning(:explicit => true) { @submission.save! }
+      @submission.with_versioning(explicit: true) { @submission.save! }
     end
   end
 end

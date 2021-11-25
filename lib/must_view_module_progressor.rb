@@ -47,9 +47,9 @@ class MustViewModuleProgressor
         if (progression = mod.find_or_create_progression(user)&.evaluate)
           { status: progression.workflow_state }
         elsif mod.grants_right?(user, :read)
-          { status: 'unlocked' }
+          { status: "unlocked" }
         else
-          { status: 'locked' }
+          { status: "locked" }
         end
       progress[mod.id][:items] = items_current_progress(mod, progression)
     end

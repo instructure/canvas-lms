@@ -61,7 +61,7 @@ module DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView
       # a concluded enrollment already has the unposted scores, we'll
       # want to use those
       score_ids = Score.joins(:enrollment)
-                       .where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'],
+                       .where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"],
                                              course_id: course.id, user_id: user_ids_group },
                               unposted_current_score: nil, unposted_final_score: nil).pluck(:id)
       score_ids.each_slice(1000) do |ids|

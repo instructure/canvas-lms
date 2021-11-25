@@ -29,7 +29,7 @@ class AddFlagAuditorsCassandra < ActiveRecord::Migration[6.0]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.indexes

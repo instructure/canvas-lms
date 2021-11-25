@@ -24,15 +24,15 @@ module Api::V1::Role
 
   def role_json(account, role, current_user, session, skip_permissions: false, preloaded_overrides: nil)
     json = {
-      :id => role.id,
-      :role => role.name,
-      :label => role.label,
-      :last_updated_at => role.updated_at,
-      :base_role_type => role.built_in? && role.account_role? ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
-      :workflow_state => role.workflow_state,
-      :created_at => role.created_at&.iso8601,
-      :permissions => {},
-      :is_account_role => role.account_role?
+      id: role.id,
+      role: role.name,
+      label: role.label,
+      last_updated_at: role.updated_at,
+      base_role_type: role.built_in? && role.account_role? ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
+      workflow_state: role.workflow_state,
+      created_at: role.created_at&.iso8601,
+      permissions: {},
+      is_account_role: role.account_role?
     }
 
     json[:account] = account_json(role.account, current_user, session, []) if role.account_id

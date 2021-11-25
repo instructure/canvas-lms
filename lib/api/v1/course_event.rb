@@ -26,10 +26,10 @@ module Api::V1::CourseEvent
 
   def course_event_json(event, _user, _session)
     links = {
-      :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
-      :page_view => event.request_id && PageView.find_by(id: event.request_id).try(:id),
-      :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
-      :sis_batch => Shard.relative_id_for(event.sis_batch_id, Shard.current, Shard.current)
+      course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
+      page_view: event.request_id && PageView.find_by(id: event.request_id).try(:id),
+      user: Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
+      sis_batch: Shard.relative_id_for(event.sis_batch_id, Shard.current, Shard.current)
     }
 
     # Since copied/reset events relate to another course lets put that where it
@@ -46,15 +46,15 @@ module Api::V1::CourseEvent
     end
 
     {
-      :id => event.id,
-      :created_at => event.created_at.in_time_zone,
-      :event_type => event.event_type,
-      :event_source => event.event_source,
+      id: event.id,
+      created_at: event.created_at.in_time_zone,
+      event_type: event.event_type,
+      event_source: event.event_source,
 
       # since its storing data as json it would be nice just to
       # return it directly instead of having to parse it each time.
-      :event_data => event_data,
-      :links => links
+      event_data: event_data,
+      links: links
     }
   end
 

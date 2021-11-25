@@ -74,13 +74,13 @@ module Canvas::Plugins::TicketingSystem
 
       it "is true if the plugin is selected and the config has values" do
         allow(ticketing).to receive(:is_selected?).with("fake_plugin").and_return(true)
-        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({ some: 'value' })
+        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({ some: "value" })
         expect(plugin.enabled?).to be(true)
       end
 
       it "is false if the plugin is not selected" do
         allow(ticketing).to receive(:is_selected?).with("fake_plugin").and_return(false)
-        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({ some: 'value' })
+        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({ some: "value" })
         expect(plugin.enabled?).to be(false)
       end
 

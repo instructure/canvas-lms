@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 describe Api::V1::QuizSubmissionQuestion do
   before :once do
@@ -36,7 +36,7 @@ describe Api::V1::QuizSubmissionQuestion do
              factory.call
            end
 
-    data = data.except('id', 'assessment_question_id')
+    data = data.except("id", "assessment_question_id")
 
     qq = quiz.quiz_questions.create!({ question_data: data })
     qq.assessment_question.question_data = data

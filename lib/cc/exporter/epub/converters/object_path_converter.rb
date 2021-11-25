@@ -37,18 +37,18 @@ module CC::Exporter::Epub::Converters
     def convert_object_paths!(html_node)
       html_node.tap do |node|
         node.search(object_path_selector).each do |tag|
-          tag['href'] = href_for_tag(tag)
-          replace_missing_content!(tag) unless tag['href'].present?
+          tag["href"] = href_for_tag(tag)
+          replace_missing_content!(tag) unless tag["href"].present?
         end
       end
     end
 
     def href_for_tag(tag)
-      match = tag['href'].match(%r{([a-z]+)/(.+)})
+      match = tag["href"].match(%r{([a-z]+)/(.+)})
       return nil unless match.present?
 
       if sort_by_content
-        match[1].include?('module') ? nil : "#{match[1]}.xhtml##{match[2]}"
+        match[1].include?("module") ? nil : "#{match[1]}.xhtml##{match[2]}"
       else
         item = get_item(match[1], match[2])
         item[:href]
@@ -70,9 +70,9 @@ module CC::Exporter::Epub::Converters
     def object_path_selector
       [
         "a", [
-          "[href*='#{OBJECT_TOKEN.delete('$')}']",
-          "[href*='#{WIKI_TOKEN.delete('$')}']"
-        ].join(',')
+          "[href*='#{OBJECT_TOKEN.delete("$")}']",
+          "[href*='#{WIKI_TOKEN.delete("$")}']"
+        ].join(",")
       ].join
     end
 

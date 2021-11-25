@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Lint::NoFileUtilsRmRf do
   subject(:cop) { described_class.new }
 
-  it 'disallows FileUtils.rm_rf' do
+  it "disallows FileUtils.rm_rf" do
     inspect_source(<<~RUBY)
       def rm_sekrets
         FileUtils.rm_rf

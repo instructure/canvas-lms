@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'shellwords'
-require 'json'
-require 'jira_ref_parser'
-require 'yaml'
+require "shellwords"
+require "json"
+require "jira_ref_parser"
+require "yaml"
 
 GERGICH_GIT_PATH = ENV.fetch("GERGICH_GIT_PATH", ".")
 
@@ -16,7 +16,7 @@ end
 
 # rubocop:disable Style/GlobalVars yeah a global, I'm being lazy and refactoring to an object
 def comment(severity, line, message, link_to_guidelines: false)
-  if ENV['GERRIT_REFSPEC']
+  if ENV["GERRIT_REFSPEC"]
     if link_to_guidelines
       message += "\n\nHere are some guidelines to keep our git log pretty and useful: http://chris.beams.io/posts/git-commit/"
     end
@@ -109,7 +109,7 @@ starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
 commit_files = git("show --pretty=format:'' --name-only").split("\n")
-if ENV['GERRIT_REFSPEC']
+if ENV["GERRIT_REFSPEC"]
   puts "detected file changes"
   puts commit_files
 end
@@ -152,7 +152,7 @@ unless has_a_test_plan
   comment "warn", nil, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
 
-skip_eslint_flag = commit_message.include? '[skip-eslint]'
+skip_eslint_flag = commit_message.include? "[skip-eslint]"
 if skip_eslint_flag
   comment "error", nil,
           "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"

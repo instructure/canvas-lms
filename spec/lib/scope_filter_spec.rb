@@ -22,21 +22,21 @@ describe ScopeFilter do
   let_once(:current_course) { course_factory }
   let_once(:current_user) { course_factory.all_real_users.first }
   let_once(:scope_filter) { ScopeFilter.new(current_course, current_user) }
-  describe '#initialize' do
-    it 'sets instance vars' do
+  describe "#initialize" do
+    it "sets instance vars" do
       expect(scope_filter.context).to eq(current_course)
       expect(scope_filter.user).to eq(current_user)
     end
 
-    describe '#concat_scope' do
-      it 'sets @relation as value returned from provided block' do
+    describe "#concat_scope" do
+      it "sets @relation as value returned from provided block" do
         scope_filter.send(:concat_scope) { Course.all }
         expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all)
       end
 
-      it 'maintains @relation when block returns a falsey value' do
+      it "maintains @relation when block returns a falsey value" do
         scope_filter.send(:concat_scope) { Course.all }
-        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all), 'precondition'
+        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all), "precondition"
         scope_filter.send(:concat_scope) { nil }
         expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all)
       end

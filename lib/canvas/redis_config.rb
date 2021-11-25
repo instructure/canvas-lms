@@ -35,7 +35,7 @@ module Canvas
     end
 
     def self.factory
-      Bundler.require 'redis'
+      Bundler.require "redis"
       ::Redis::Store::Factory
     end
 

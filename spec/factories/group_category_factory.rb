@@ -21,7 +21,7 @@ module Factories
   VALID_GROUP_CATEGORY_ATTRIBUTES = %i[name context group_limit sis_source_id].freeze
 
   def group_category(opts = {})
-    opts[:name] = opts[:name].presence || 'foo'
+    opts[:name] = opts[:name].presence || "foo"
     context = opts[:context] || @course
     @group_category = context.group_categories.create! opts.slice(*VALID_GROUP_CATEGORY_ATTRIBUTES)
   end

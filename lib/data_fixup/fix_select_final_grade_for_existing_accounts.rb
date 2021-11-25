@@ -24,15 +24,15 @@ module DataFixup
       # roles, but moderate_grades defaults to disabled for ta roles while
       # select_final_grade defaults to true. That is the only difference.
       # There are three cases we want to accomplish: non-ta, ta, ta-based
-      all_moderate_grades_overrides = RoleOverride.where(permission: 'moderate_grades')
-      all_select_final_grade_overrides = RoleOverride.where(permission: 'select_final_grade')
-      all_ta_and_related_roles = Role.where(base_role_type: 'TaEnrollment')
+      all_moderate_grades_overrides = RoleOverride.where(permission: "moderate_grades")
+      all_select_final_grade_overrides = RoleOverride.where(permission: "select_final_grade")
+      all_ta_and_related_roles = Role.where(base_role_type: "TaEnrollment")
       site_admin = Account.site_admin
       # this fixup gets run from a migration that takes place before the
       # root_account_id column is added to the table.  it also gets run from
       # its own specs which execute after said column is added.  so both
       # versions of the table need to be accommodated.
-      add_root_account_id = RoleOverride.column_names.include?('root_account_id')
+      add_root_account_id = RoleOverride.column_names.include?("root_account_id")
 
       # The case where moderate_grades RoleOverrides exist for non-ta roles.
       all_moderate_grades_overrides.where(enabled: false).find_in_batches do |moderate_overrides|
@@ -44,7 +44,7 @@ module DataFixup
           next if all_ta_and_related_roles.where(id: moderate_override.role_id).exists?
 
           new_role_overrides << {
-            permission: 'select_final_grade',
+            permission: "select_final_grade",
             context_id: moderate_override.context_id,
             context_type: moderate_override.context_type,
             enabled: moderate_override.enabled,
@@ -72,7 +72,7 @@ module DataFixup
           select_overrides = all_select_final_grade_overrides.where(context_id: account.id)
           # The default TaEnrollment role belongs to no specific account, so we
           # grab it by name here.
-          ta_roles = all_ta_and_related_roles.where('account_id=? OR name=?', account.id, 'TaEnrollment')
+          ta_roles = all_ta_and_related_roles.where("account_id=? OR name=?", account.id, "TaEnrollment")
 
           ta_roles.each do |ta_role|
             # Skip if a RoleOverride already exists for this role, or if a
@@ -81,9 +81,9 @@ module DataFixup
             next if moderate_overrides.where(role_id: ta_role.id).exists?
 
             new_role_overrides << {
-              permission: 'select_final_grade',
+              permission: "select_final_grade",
               context_id: account.id,
-              context_type: 'Account',
+              context_type: "Account",
               enabled: false,
               locked: false,
               role_id: ta_role.id

@@ -22,8 +22,8 @@ module Polling
   class PollSession < ActiveRecord::Base
     belongs_to :course
     belongs_to :course_section
-    belongs_to :poll, class_name: 'Polling::Poll'
-    has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
+    belongs_to :poll, class_name: "Polling::Poll"
+    has_many :poll_submissions, class_name: "Polling::PollSubmission", dependent: :destroy
     validates :poll, :course, presence: true
     validate :section_belongs_to_course
 
@@ -51,7 +51,7 @@ module Polling
     end
 
     def results
-      poll_submissions.group('poll_choice_id').count
+      poll_submissions.group("poll_choice_id").count
     end
 
     def has_submission_from?(user)
@@ -77,8 +77,8 @@ module Polling
 
     def section_belongs_to_course
       if course && course_section && !course.course_sections.include?(course_section)
-        errors.add(:base, I18n.t('polling.poll_sessions.validations.section_belongs_to_course',
-                                 'That course section does not belong to the existing course.'))
+        errors.add(:base, I18n.t("polling.poll_sessions.validations.section_belongs_to_course",
+                                 "That course section does not belong to the existing course."))
       end
     end
   end

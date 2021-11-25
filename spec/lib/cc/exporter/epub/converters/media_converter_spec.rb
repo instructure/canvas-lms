@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../cc_spec_helper'
+require_relative "../../../cc_spec_helper"
 
 describe "MediaConverter" do
   let(:klass) do
@@ -64,40 +64,40 @@ describe "MediaConverter" do
     end
 
     it "updates link hrefs containing WEB_CONTENT_TOKEN" do
-      expect(doc.search('a').all? do |element|
-        element['href'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
-      end).to be_truthy, 'precondition'
+      expect(doc.search("a").all? do |element|
+        element["href"].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
+      end).to be_truthy, "precondition"
 
       test_instance.convert_media_paths!(doc)
 
-      expect(doc.search('a').all? do |element|
-        element['href'].match(CC::Exporter::Epub::FILE_PATH)
+      expect(doc.search("a").all? do |element|
+        element["href"].match(CC::Exporter::Epub::FILE_PATH)
       end).to be_truthy
 
-      expect(doc.search('a').all? do |element|
-        element['href'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
+      expect(doc.search("a").all? do |element|
+        element["href"].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_falsey
     end
 
     it "updates img srcs containing WEB_CONTENT_TOKEN" do
-      expect(doc.search('img').all? do |element|
-        element['src'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
-      end).to be_truthy, 'precondition'
+      expect(doc.search("img").all? do |element|
+        element["src"].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
+      end).to be_truthy, "precondition"
 
       test_instance.convert_media_paths!(doc)
 
-      expect(doc.search('img').all? do |element|
-        element['src'].match(CC::Exporter::Epub::FILE_PATH)
+      expect(doc.search("img").all? do |element|
+        element["src"].match(CC::Exporter::Epub::FILE_PATH)
       end).to be_truthy
 
-      expect(doc.search('img').all? do |element|
-        element['src'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
+      expect(doc.search("img").all? do |element|
+        element["src"].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_falsey
     end
 
     it "replaces media that is not present with a span" do
-      expect(doc.search("a[href*='#{mov_path}']").any?).to be_truthy, 'precondition'
-      expect(doc.search("span").empty?).to be_truthy, 'precondition'
+      expect(doc.search("a[href*='#{mov_path}']").any?).to be_truthy, "precondition"
+      expect(doc.search("span").empty?).to be_truthy, "precondition"
 
       test_instance.convert_media_paths!(doc)
 
@@ -130,18 +130,18 @@ describe "MediaConverter" do
     end
 
     it "hrefses with flv to hrefs with mp4" do
-      expect(doc.search('a').all? do |element|
-        element['href'].match('flv')
-      end).to be_truthy, 'precondition'
+      expect(doc.search("a").all? do |element|
+        element["href"].match("flv")
+      end).to be_truthy, "precondition"
 
       test_instance.convert_flv_paths!(doc)
 
-      expect(doc.search('a').all? do |element|
-        element['href'].match('mp4')
+      expect(doc.search("a").all? do |element|
+        element["href"].match("mp4")
       end).to be_truthy
 
-      expect(doc.search('a').all? do |element|
-        element['href'].match('flv')
+      expect(doc.search("a").all? do |element|
+        element["href"].match("flv")
       end).to be_falsey
     end
   end
@@ -160,13 +160,13 @@ describe "MediaConverter" do
       end
 
       it "changes a tags to audio tags" do
-        expect(doc.search('a').any?).to be_truthy, 'precondition'
-        expect(doc.search('audio').empty?).to be_truthy, 'precondition'
+        expect(doc.search("a").any?).to be_truthy, "precondition"
+        expect(doc.search("audio").empty?).to be_truthy, "precondition"
 
         test_instance.convert_audio_tags!(doc)
 
-        expect(doc.search('a').empty?).to be_truthy
-        expect(doc.search('audio').any?).to be_truthy
+        expect(doc.search("a").empty?).to be_truthy
+        expect(doc.search("audio").any?).to be_truthy
       end
     end
 
@@ -183,13 +183,13 @@ describe "MediaConverter" do
       end
 
       it "changes a tags to audio tags" do
-        expect(doc.search('a').any?).to be_truthy, 'precondition'
-        expect(doc.search('audio').empty?).to be_truthy, 'precondition'
+        expect(doc.search("a").any?).to be_truthy, "precondition"
+        expect(doc.search("audio").empty?).to be_truthy, "precondition"
 
         test_instance.convert_audio_tags!(doc)
 
-        expect(doc.search('a').empty?).to be_truthy
-        expect(doc.search('audio').any?).to be_truthy
+        expect(doc.search("a").empty?).to be_truthy
+        expect(doc.search("audio").any?).to be_truthy
       end
     end
   end
@@ -208,13 +208,13 @@ describe "MediaConverter" do
       end
 
       it "changes a tags to audio tags" do
-        expect(doc.search('a').any?).to be_truthy, 'precondition'
-        expect(doc.search('video').empty?).to be_truthy, 'precondition'
+        expect(doc.search("a").any?).to be_truthy, "precondition"
+        expect(doc.search("video").empty?).to be_truthy, "precondition"
 
         test_instance.convert_video_tags!(doc)
 
-        expect(doc.search('a').empty?).to be_truthy
-        expect(doc.search('video').any?).to be_truthy
+        expect(doc.search("a").empty?).to be_truthy
+        expect(doc.search("video").any?).to be_truthy
       end
     end
 
@@ -231,13 +231,13 @@ describe "MediaConverter" do
       end
 
       it "changes a tags to audio tags" do
-        expect(doc.search('a').any?).to be_truthy, 'precondition'
-        expect(doc.search('video').empty?).to be_truthy, 'precondition'
+        expect(doc.search("a").any?).to be_truthy, "precondition"
+        expect(doc.search("video").empty?).to be_truthy, "precondition"
 
         test_instance.convert_video_tags!(doc)
 
-        expect(doc.search('a').empty?).to be_truthy
-        expect(doc.search('video').any?).to be_truthy
+        expect(doc.search("a").empty?).to be_truthy
+        expect(doc.search("video").any?).to be_truthy
       end
     end
   end

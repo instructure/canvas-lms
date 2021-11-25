@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Importing Rubrics" do
   SYSTEMS.each do |system|
-    next unless import_data_exists? system, 'rubric'
+    next unless import_data_exists? system, "rubric"
 
     it "imports from #{system}" do
-      data = get_import_data(system, 'rubric')
+      data = get_import_data(system, "rubric")
       context = get_import_context(system)
       migration = double
       allow(migration).to receive(:context).and_return(context)
@@ -56,8 +56,8 @@ describe "Importing Rubrics" do
 
   context "with the account_level_mastery_scales FF" do
     before do
-      @data = get_import_data('vista', 'rubric')
-      @context = get_import_context('vista')
+      @data = get_import_data("vista", "rubric")
+      @context = get_import_context("vista")
       @migration = @context.content_migrations.create!
       outcome_proficiency_model(@context.root_account)
       outcome_with_rubric({ mastery_points: 3, context: @context })
@@ -72,7 +72,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(@data, @migration)
         rubric = Rubric.where(migration_id: @data[:migration_id]).first
         outcome_criterion = rubric.data[0]
-        expect(outcome_criterion[:ratings].pluck(:description)).to eq ['best', 'worst']
+        expect(outcome_criterion[:ratings].pluck(:description)).to eq ["best", "worst"]
         expect(outcome_criterion[:mastery_points]).to eq 10
       end
     end
@@ -83,7 +83,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(@data, @migration)
         rubric = Rubric.where(migration_id: @data[:migration_id]).first
         outcome_criterion = rubric.data[0]
-        expect(outcome_criterion[:ratings].pluck(:description)).to eq ['Rating 1']
+        expect(outcome_criterion[:ratings].pluck(:description)).to eq ["Rating 1"]
       end
     end
   end

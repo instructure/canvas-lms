@@ -36,7 +36,7 @@ module Api::V1::Pseudonym
     opts -= %i[sis_user_id integration_id] unless pseudonym.account.grants_any_right?(
       current_user, :read_sis, :manage_sis
     )
-    api_json(pseudonym, current_user, session, :only => opts).tap do |result|
+    api_json(pseudonym, current_user, session, only: opts).tap do |result|
       if pseudonym.authentication_provider
         result[:authentication_provider_type] = pseudonym.authentication_provider.auth_type
       end

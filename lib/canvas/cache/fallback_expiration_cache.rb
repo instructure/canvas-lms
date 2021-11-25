@@ -28,7 +28,7 @@ module Canvas
     # that puts a call to `fetch_without_expiration` in the rescue
     # clause
     module FallbackExpirationCache
-      KEY_SUFFIX = '__no_expire'
+      KEY_SUFFIX = "__no_expire"
 
       def fetch(*, expires_in: nil, race_condition_ttl: nil)
         return yield if expires_in == 0

@@ -22,13 +22,13 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
   # also links the associated course to child_content_tags to keep track of changes
 
-  belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
-  belongs_to :child_course, :class_name => "Course"
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
+  belongs_to :child_course, class_name: "Course"
+  belongs_to :root_account, class_name: "Account"
 
   before_create :set_root_account_id
 
-  has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
+  has_many :child_content_tags, class_name: "MasterCourses::ChildContentTag", inverse_of: :child_subscription
 
   validate :require_same_root_account
 
@@ -63,19 +63,19 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def self.is_child_course?(course_id)
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      where(:child_course_id => course_id).active.exists?
+      where(child_course_id: course_id).active.exists?
     end
   end
 
   def check_migration_id_deactivation
     # mess up the migration ids so restrictions no longer get applied
     if workflow_state_changed?
-      if deleted? && workflow_state_was == 'active'
+      if deleted? && workflow_state_was == "active"
         self.class.connection.after_transaction_commit do
           unlink_syllabus!
           add_deactivation_prefix!
         end
-      elsif active? && workflow_state_was == 'deleted'
+      elsif active? && workflow_state_was == "deleted"
         self.use_selective_copy = false # require a full import next time
         self.class.connection.after_transaction_commit do
           link_syllabus!
@@ -136,7 +136,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def last_migration_id
-    child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+    child_course.content_migrations.where(child_subscription_id: self).order("id desc").limit(1).pluck(:id).first
   end
 
   def set_root_account_id

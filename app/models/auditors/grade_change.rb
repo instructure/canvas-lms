@@ -54,18 +54,18 @@ class Auditors::GradeChange
 
     def self.generate(submission, event_type = nil)
       new(
-        'submission' => submission,
-        'event_type' => event_type
+        "submission" => submission,
+        "event_type" => event_type
       )
     end
 
     def initialize(*args)
       super(*args)
 
-      if attributes['submission']
-        self.submission = attributes.delete('submission')
-      elsif attributes['override_grade_change']
-        self.override_grade_change = attributes.delete('override_grade_change')
+      if attributes["submission"]
+        self.submission = attributes.delete("submission")
+      elsif attributes["override_grade_change"]
+        self.override_grade_change = attributes.delete("override_grade_change")
       end
     end
 
@@ -74,21 +74,21 @@ class Auditors::GradeChange
       @grader = override_grade_change.grader
       enrollment = @score.enrollment
 
-      attributes['student_id'] = Shard.global_id_for(enrollment.user_id)
-      attributes['context_id'] = Shard.global_id_for(enrollment.course_id)
-      attributes['context_type'] = "Course"
-      attributes['account_id'] = Shard.global_id_for(enrollment.course.account_id)
-      attributes['assignment_id'] = Auditors::GradeChange::NULL_PLACEHOLDER
-      attributes['submission_id'] = Auditors::GradeChange::NULL_PLACEHOLDER
-      attributes['version_number'] = Auditors::GradeChange::NULL_PLACEHOLDER
-      attributes['grade_after'] = @score.override_grade
-      attributes['score_after'] = @score.override_score
-      attributes['excused_after'] = false
-      attributes['grader_id'] = @grader ? Shard.global_id_for(@grader) : nil
-      attributes['grade_before'] = override_grade_change.old_grade
-      attributes['score_before'] = override_grade_change.old_score
-      attributes['excused_before'] = false
-      attributes['grading_period_id'] = id_or_placeholder(@score.grading_period_id)
+      attributes["student_id"] = Shard.global_id_for(enrollment.user_id)
+      attributes["context_id"] = Shard.global_id_for(enrollment.course_id)
+      attributes["context_type"] = "Course"
+      attributes["account_id"] = Shard.global_id_for(enrollment.course.account_id)
+      attributes["assignment_id"] = Auditors::GradeChange::NULL_PLACEHOLDER
+      attributes["submission_id"] = Auditors::GradeChange::NULL_PLACEHOLDER
+      attributes["version_number"] = Auditors::GradeChange::NULL_PLACEHOLDER
+      attributes["grade_after"] = @score.override_grade
+      attributes["score_after"] = @score.override_score
+      attributes["excused_after"] = false
+      attributes["grader_id"] = @grader ? Shard.global_id_for(@grader) : nil
+      attributes["grade_before"] = override_grade_change.old_grade
+      attributes["score_before"] = override_grade_change.old_score
+      attributes["excused_before"] = false
+      attributes["grading_period_id"] = id_or_placeholder(@score.grading_period_id)
     end
 
     def version
@@ -129,24 +129,24 @@ class Auditors::GradeChange
       # hasn't been set up yet
       grader = submission.autograded? ? nil : submission.grader
 
-      attributes['submission_id'] = Shard.global_id_for(@submission)
-      attributes['version_number'] = @submission.version_number
-      attributes['grade_after'] = @submission.grade
-      attributes['grade_before'] = previous_submission.try(:grade)
-      attributes['assignment_id'] = Shard.global_id_for(assignment)
-      attributes['grader_id'] = grader ? Shard.global_id_for(grader) : nil
-      attributes['graded_anonymously'] = @submission.graded_anonymously
-      attributes['student_id'] = Shard.global_id_for(student)
-      attributes['context_id'] = Shard.global_id_for(context)
-      attributes['context_type'] = assignment.context_type
-      attributes['account_id'] = Shard.global_id_for(context.account)
-      attributes['excused_after'] = @submission.excused?
-      attributes['excused_before'] = !!previous_submission.try(:excused?)
-      attributes['score_after'] = @submission.score
-      attributes['score_before'] = previous_submission.try(:score)
-      attributes['points_possible_after'] = assignment.points_possible
-      attributes['points_possible_before'] = previous_assignment.points_possible
-      attributes['grading_period_id'] = id_or_placeholder(@submission.grading_period)
+      attributes["submission_id"] = Shard.global_id_for(@submission)
+      attributes["version_number"] = @submission.version_number
+      attributes["grade_after"] = @submission.grade
+      attributes["grade_before"] = previous_submission.try(:grade)
+      attributes["assignment_id"] = Shard.global_id_for(assignment)
+      attributes["grader_id"] = grader ? Shard.global_id_for(grader) : nil
+      attributes["graded_anonymously"] = @submission.graded_anonymously
+      attributes["student_id"] = Shard.global_id_for(student)
+      attributes["context_id"] = Shard.global_id_for(context)
+      attributes["context_type"] = assignment.context_type
+      attributes["account_id"] = Shard.global_id_for(context.account)
+      attributes["excused_after"] = @submission.excused?
+      attributes["excused_before"] = !!previous_submission.try(:excused?)
+      attributes["score_after"] = @submission.score
+      attributes["score_before"] = previous_submission.try(:score)
+      attributes["points_possible_after"] = assignment.points_possible
+      attributes["points_possible_before"] = previous_assignment.points_possible
+      attributes["grading_period_id"] = id_or_placeholder(@submission.grading_period)
     end
 
     def id_or_placeholder(record)
@@ -159,11 +159,11 @@ class Auditors::GradeChange
     delegate :assignment, to: :submission
 
     def course
-      context if context_type == 'Course'
+      context if context_type == "Course"
     end
 
     def course_id
-      context_id if context_type == 'Course'
+      context_id if context_type == "Course"
     end
 
     def context
@@ -239,7 +239,7 @@ class Auditors::GradeChange
       entry_proc ->(record) { record.course }
       key_proc ->(course) { course.global_id }
       ar_scope_proc lambda { |course|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course')
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course")
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -271,7 +271,7 @@ class Auditors::GradeChange
       entry_proc ->(record) { [record.course, record.assignment] }
       key_proc ->(course, assignment) { [course.global_id, assignment&.global_id] }
       ar_scope_proc lambda { |course, assignment|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', assignment_id: assignment&.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", assignment_id: assignment&.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -283,7 +283,7 @@ class Auditors::GradeChange
       }
       key_proc ->(course, assignment, grader) { [course.global_id, assignment&.global_id, grader.global_id] }
       ar_scope_proc lambda { |course, assignment, grader|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', assignment_id: assignment&.id, grader_id: grader.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", assignment_id: assignment&.id, grader_id: grader.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -299,7 +299,7 @@ class Auditors::GradeChange
         [course.global_id, assignment&.global_id, grader.global_id, student.global_id]
       }
       ar_scope_proc lambda { |course, assignment, grader, student|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', assignment_id: assignment&.id, grader_id: grader.id, student_id: student.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", assignment_id: assignment&.id, grader_id: grader.id, student_id: student.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -309,7 +309,7 @@ class Auditors::GradeChange
       entry_proc ->(record) { [record.course, record.assignment, record.student] }
       key_proc ->(course, assignment, student) { [course.global_id, assignment&.global_id, student.global_id] }
       ar_scope_proc lambda { |course, assignment, student|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', assignment_id: assignment&.id, student_id: student.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", assignment_id: assignment&.id, student_id: student.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -319,7 +319,7 @@ class Auditors::GradeChange
       entry_proc ->(record) { [record.course, record.grader] if record.grader && !record.autograded? }
       key_proc ->(course, grader) { [course.global_id, grader.global_id] }
       ar_scope_proc lambda { |course, grader|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', grader_id: grader.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", grader_id: grader.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -331,7 +331,7 @@ class Auditors::GradeChange
       }
       key_proc ->(course, grader, student) { [course.global_id, grader.global_id, student.global_id] }
       ar_scope_proc lambda { |course, grader, student|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', grader_id: grader.id, student_id: student.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", grader_id: grader.id, student_id: student.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -341,7 +341,7 @@ class Auditors::GradeChange
       entry_proc ->(record) { [record.course, record.student] }
       key_proc ->(course, student) { [course.global_id, student.global_id] }
       ar_scope_proc lambda { |course, student|
-        scope = grades_ar_type.where(context_id: course.id, context_type: 'Course', student_id: student.id)
+        scope = grades_ar_type.where(context_id: course.id, context_type: "Course", student_id: student.id)
         Auditors::GradeChange.filter_by_assignment(scope)
       }
     end
@@ -360,7 +360,7 @@ class Auditors::GradeChange
       end
     else
       override_grade_change.score.shard.activate do
-        event_record = Auditors::GradeChange::Record.new('override_grade_change' => override_grade_change, 'event_type' => event_type)
+        event_record = Auditors::GradeChange::Record.new("override_grade_change" => override_grade_change, "event_type" => event_type)
         insert_record(event_record) unless skip_insert
       end
     end

@@ -24,7 +24,7 @@ module DataFixup
       new.build_indexes
     end
 
-    LAST_BATCH_TABLE = 'grade_changes_index_last_batch'
+    LAST_BATCH_TABLE = "grade_changes_index_last_batch"
     SEARCH_CQL = %{
       SELECT id, created_at, context_id, assignment_id, grader_id, student_id
       FROM grade_changes
@@ -43,12 +43,12 @@ module DataFixup
 
     def read_batch_size
       @read_batch_size ||=
-        Setting.get('init_new_grade_history_audit_log_indexes_read_batch_size', 1000).to_i
+        Setting.get("init_new_grade_history_audit_log_indexes_read_batch_size", 1000).to_i
     end
 
     def write_batch_size
       @write_batch_size ||=
-        Setting.get('init_new_grade_history_audit_log_indexes_write_batch_size', 200).to_i
+        Setting.get("init_new_grade_history_audit_log_indexes_write_batch_size", 200).to_i
     end
 
     def build_indexes
@@ -68,7 +68,7 @@ module DataFixup
       return true, nil if result.rows == 0
 
       result.fetch do |row|
-        last_id = row['id']
+        last_id = row["id"]
         INDEX_METHODS.each do |method|
           result = send(method, row)
           index_entries << result if result
@@ -99,57 +99,57 @@ module DataFixup
 
     def add_course_assignment_index(row)
       index = ::Auditors::GradeChange::Stream.course_assignment_index
-      key = [row['context_id'], row['assignment_id']]
+      key = [row["context_id"], row["assignment_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_assignment_grader_index(row)
-      return unless row['grader_id']
+      return unless row["grader_id"]
 
       index = ::Auditors::GradeChange::Stream.course_assignment_grader_index
-      key = [row['context_id'], row['assignment_id'], row['grader_id']]
+      key = [row["context_id"], row["assignment_id"], row["grader_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_assignment_grader_student_index(row)
-      return unless row['grader_id']
+      return unless row["grader_id"]
 
       index = ::Auditors::GradeChange::Stream.course_assignment_grader_student_index
-      key = [row['context_id'], row['assignment_id'], row['grader_id'], row['student_id']]
+      key = [row["context_id"], row["assignment_id"], row["grader_id"], row["student_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_assignment_student_index(row)
       index = ::Auditors::GradeChange::Stream.course_assignment_student_index
-      key = [row['context_id'], row['assignment_id'], row['student_id']]
+      key = [row["context_id"], row["assignment_id"], row["student_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_grader_index(row)
-      return unless row['grader_id']
+      return unless row["grader_id"]
 
       index = ::Auditors::GradeChange::Stream.course_grader_index
-      key = [row['context_id'], row['grader_id']]
+      key = [row["context_id"], row["grader_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_grader_student_index(row)
-      return unless row['grader_id']
+      return unless row["grader_id"]
 
       index = ::Auditors::GradeChange::Stream.course_grader_student_index
-      key = [row['context_id'], row['grader_id'], row['student_id']]
+      key = [row["context_id"], row["grader_id"], row["student_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_student_index(row)
       index = ::Auditors::GradeChange::Stream.course_student_index
-      key = [row['context_id'], row['student_id']]
+      key = [row["context_id"], row["student_id"]]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def fetch_last_id
       database.execute("SELECT last_id FROM #{LAST_BATCH_TABLE}").fetch do |row|
-        return row.to_hash['last_id']
+        return row.to_hash["last_id"]
       end
 
       nil

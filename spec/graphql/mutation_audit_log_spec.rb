@@ -67,7 +67,7 @@ describe AuditLogFieldExtension do
   end
 
   it "fails gracefully when dynamo isn't working, with captured exception" do
-    require 'canvas_dynamodb'
+    require "canvas_dynamodb"
     dynamo = CanvasDynamoDB::Database.new(
       "asdf",
       prefix: "asdf",

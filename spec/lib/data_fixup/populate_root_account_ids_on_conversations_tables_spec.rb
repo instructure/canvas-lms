@@ -19,7 +19,7 @@
 
 describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
   def ids_to_string(*ids)
-    ids.sort.join(',')
+    ids.sort.join(",")
   end
 
   def reset_root_account_ids(*models)
@@ -63,45 +63,45 @@ describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
     check_root_account_ids(ids, cmp1, cmp2)
   end
 
-  context 'single-account Conversation' do
+  context "single-account Conversation" do
     before :once do
       @ids = [@root_account1.id]
       @c = Conversation.create!(root_account_ids: ids_to_string(@root_account1.id))
     end
 
-    it 'sets root account id on all associated ConversationMessages' do
+    it "sets root account id on all associated ConversationMessages" do
       check_conversation_messages(@c, @ids)
     end
 
-    it 'sets root account id on all associated ConversationParticipants' do
+    it "sets root account id on all associated ConversationParticipants" do
       check_conversation_participants(@c, @ids)
     end
 
-    it 'sets root account id on all ConversationMessageParticipants through ConversationMessage' do
+    it "sets root account id on all ConversationMessageParticipants through ConversationMessage" do
       check_conversation_message_participants(@c, @ids)
     end
   end
 
-  context 'multiple-account Conversation' do
+  context "multiple-account Conversation" do
     before :once do
       @ids = [@root_account1.id, @root_account2.id]
       @c = Conversation.create!(root_account_ids: ids_to_string(@root_account1.id, @root_account2.id))
     end
 
-    it 'sets root account ids on all associated ConversationMessages' do
+    it "sets root account ids on all associated ConversationMessages" do
       check_conversation_messages(@c, @ids)
     end
 
-    it 'sets root account ids on all associated ConversationParticipants' do
+    it "sets root account ids on all associated ConversationParticipants" do
       check_conversation_participants(@c, @ids)
     end
 
-    it 'sets root account ids on all ConversationMessageParticipants through ConversationMessage' do
+    it "sets root account ids on all ConversationMessageParticipants through ConversationMessage" do
       check_conversation_message_participants(@c, @ids)
     end
   end
 
-  context 'cross-shard Conversation' do
+  context "cross-shard Conversation" do
     specs_require_sharding
 
     before :once do
@@ -113,15 +113,15 @@ describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
       @c = Conversation.create!(root_account_ids: ids_to_string(@root_account1.id, cross_shard_account.id))
     end
 
-    it 'sets root account ids on all associated ConversationMessages' do
+    it "sets root account ids on all associated ConversationMessages" do
       check_conversation_messages(@c, @ids)
     end
 
-    it 'sets root account ids on all associated ConversationParticipants' do
+    it "sets root account ids on all associated ConversationParticipants" do
       check_conversation_participants(@c, @ids)
     end
 
-    it 'sets root account ids on all ConversationMessageParticipants through ConversationMessage' do
+    it "sets root account ids on all ConversationMessageParticipants through ConversationMessage" do
       check_conversation_message_participants(@c, @ids)
     end
   end

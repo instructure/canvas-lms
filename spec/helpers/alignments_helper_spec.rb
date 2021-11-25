@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe AlignmentsHelper do
   include AlignmentsHelper
@@ -31,18 +31,18 @@ describe AlignmentsHelper do
   end
 
   let_once(:outcome) do
-    @course.created_learning_outcomes.create!(title: 'outcome')
+    @course.created_learning_outcomes.create!(title: "outcome")
   end
 
   let_once(:account_outcome) do
-    @account.created_learning_outcomes.create!(title: 'account outcome!')
+    @account.created_learning_outcomes.create!(title: "account outcome!")
   end
 
   let_once(:alignment) do
     tag = ContentTag.create(
       content: outcome,
       context: outcome.context,
-      tag_type: 'learning_outcome'
+      tag_type: "learning_outcome"
     )
     outcome.alignments << tag
     tag
@@ -52,7 +52,7 @@ describe AlignmentsHelper do
     tag = ContentTag.create(
       content: @assignment,
       context: outcome.context,
-      tag_type: 'learning_outcome'
+      tag_type: "learning_outcome"
     )
     outcome.alignments << tag
     tag
@@ -77,7 +77,7 @@ describe AlignmentsHelper do
       let(:string) { link_to_outcome_alignment(@course, outcome) }
 
       it "does not include an icon-* html class" do
-        expect(string.include?('icon-')).to be_falsey
+        expect(string.include?("icon-")).to be_falsey
       end
 
       it "is a blank link tag" do
@@ -92,7 +92,7 @@ describe AlignmentsHelper do
       end
 
       it "does not include an icon-* html class" do
-        expect(string.include?('icon-')).to be_truthy
+        expect(string.include?("icon-")).to be_truthy
       end
 
       it "is a blank link tag" do
@@ -108,21 +108,21 @@ describe AlignmentsHelper do
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes an id of 'alignment_blank'" do
-        expect(string.include?('alignment_blank')).to be_truthy
+        expect(string.include?("alignment_blank")).to be_truthy
       end
 
       it "includes class alignment" do
-        expect(html['class'].split).to include('alignment')
+        expect(html["class"].split).to include("alignment")
       end
 
       it "includes 1 data-* attribute" do
         expect(html.keys.select do |k|
-          k.include?('data-')
-        end).to include('data-url')
+          k.include?("data-")
+        end).to include("data-url")
       end
 
       it "is hidden" do
-        expect(html['style']).to match(/display:\ none/)
+        expect(html["style"]).to match(/display:\ none/)
       end
     end
 
@@ -135,18 +135,18 @@ describe AlignmentsHelper do
       end
 
       it "has classes alignment & its content_type_class" do
-        classes = html['class'].split
-        expect(classes).to include('alignment', alignment.content_type_class)
+        classes = html["class"].split
+        expect(classes).to include("alignment", alignment.content_type_class)
       end
 
       it "data-ids & data-url attributes" do
         expect(html.keys.select do |k|
-          k.include?('data-')
-        end).to include('data-id', 'data-url')
+          k.include?("data-")
+        end).to include("data-id", "data-url")
       end
 
       it "is not hidden" do
-        expect(html['style']).not_to match(/display:\ none/)
+        expect(html["style"]).not_to match(/display:\ none/)
       end
     end
 
@@ -155,8 +155,8 @@ describe AlignmentsHelper do
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes html class 'also_assignment'" do
-        classes = html['class'].split
-        expect(classes).to include('also_assignment')
+        classes = html["class"].split
+        expect(classes).to include("also_assignment")
       end
     end
 
@@ -172,7 +172,7 @@ describe AlignmentsHelper do
 
       it "has html 'data-has-rubric-association' data attritbute" do
         expect(html.keys.find do |k|
-          k.include?('data-has-rubric-association')
+          k.include?("data-has-rubric-association")
         end).to be_truthy
       end
     end

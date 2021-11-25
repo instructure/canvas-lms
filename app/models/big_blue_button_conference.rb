@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 class BigBlueButtonConference < WebConference
   include ActionDispatch::Routing::PolymorphicRoutes
@@ -27,24 +27,24 @@ class BigBlueButtonConference < WebConference
   after_destroy :delete_all_recordings
 
   user_setting_field :record, {
-    name: -> { t('recording_setting', 'Recording') },
-    description: -> { t('recording_setting_enabled_description', 'Enable recording for this conference') },
+    name: -> { t("recording_setting", "Recording") },
+    description: -> { t("recording_setting_enabled_description", "Enable recording for this conference") },
     type: :boolean,
     default: false,
     visible: -> { WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
   }
 
   user_setting_field :scheduled_date, {
-    name: -> { t('Scheduled Date') },
-    description: -> { t('Enable recording for this conference') },
+    name: -> { t("Scheduled Date") },
+    description: -> { t("Enable recording for this conference") },
     type: :date,
     default: false,
     visible: false
   }
 
   user_setting_field :create_time, {
-    name: -> { t('create_time', 'Create Time') },
-    description: -> { t('Security setting to restrict join URLs to a conference') },
+    name: -> { t("create_time", "Create Time") },
+    description: -> { t("Security setting to restrict join URLs to a conference") },
     type: :integer,
     default: false,
     visible: false
@@ -61,7 +61,7 @@ class BigBlueButtonConference < WebConference
       case http_response
       when Net::HTTPSuccess
         response = xml_to_hash(http_response.body)
-        if response[:returncode] == 'SUCCESS'
+        if response[:returncode] == "SUCCESS"
           return response
         else
           logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
@@ -123,7 +123,7 @@ class BigBlueButtonConference < WebConference
 
     unless conference_key
       self.conference_key = "instructure_#{feed_code}".gsub(/[^a-zA-Z0-9_]/, "_")
-      chars = ('a'..'z').to_a + ('0'..'9').to_a
+      chars = ("a".."z").to_a + ("0".."9").to_a
       # create user/admin passwords for this conference. we may want to show
       # the admin passwords in the ui in case moderators need them for any
       # admin-specific functionality within the BBB ui (or we could provide
@@ -154,7 +154,7 @@ class BigBlueButtonConference < WebConference
 
   def recording_ready_user
     if grants_right?(user, :create)
-      "#{user['name']} <#{user.email}>"
+      "#{user["name"]} <#{user.email}>"
     end
   end
 
@@ -166,7 +166,7 @@ class BigBlueButtonConference < WebConference
   end
 
   def conference_status
-    if (result = send_request(:isMeetingRunning, :meetingID => conference_key)) && result[:running] == 'true'
+    if (result = send_request(:isMeetingRunning, meetingID: conference_key)) && result[:running] == "true"
       :active
     else
       :closed
@@ -197,7 +197,7 @@ class BigBlueButtonConference < WebConference
   def recording_formats(recording)
     recording_formats = recording.fetch(:playback, []).map do |format|
       show_to_students = !!format[:length] || format[:type] == "notes" # either is an actual recording or shared notes
-      format.merge(:show_to_students => show_to_students)
+      format.merge(show_to_students: show_to_students)
     end
     {
       recording_id: recording[:recordID],
@@ -213,7 +213,7 @@ class BigBlueButtonConference < WebConference
     return { deleted: false } if recording_id.nil?
 
     response = send_request(:deleteRecordings, recordID: recording_id)
-    { deleted: response.present? && response[:deleted].casecmp('true') == 0 }
+    { deleted: response.present? && response[:deleted].casecmp("true") == 0 }
   end
 
   def delete_all_recordings
@@ -246,7 +246,7 @@ class BigBlueButtonConference < WebConference
     conferences.each_slice(limit) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
-                              { :meetingID => meeting_ids },
+                              { meetingID: meeting_ids },
                               use_fallback_config: use_fallback_config)
       result = response[:recordings] if response
       result = [] if result.is_a?(String)
@@ -281,17 +281,17 @@ class BigBlueButtonConference < WebConference
 
   def join_url(user, type = :user)
     generate_request :join,
-                     :fullName => user.short_name,
-                     :meetingID => conference_key,
-                     :password => settings[(type == :user ? :user_key : :admin_key)],
-                     :userID => user.id,
-                     :createTime => settings[:create_time]
+                     fullName: user.short_name,
+                     meetingID: conference_key,
+                     password: settings[(type == :user ? :user_key : :admin_key)],
+                     userID: user.id,
+                     createTime: settings[:create_time]
   end
 
   def end_meeting
     response = send_request(:end, {
-                              :meetingID => conference_key,
-                              :password => settings[(type == :user ? :user_key : :admin_key)],
+                              meetingID: conference_key,
+                              password: settings[(type == :user ? :user_key : :admin_key)],
                             })
     response[:ended] if response
   end
@@ -299,7 +299,7 @@ class BigBlueButtonConference < WebConference
   def fetch_recordings
     @loaded_recordings ||= if conference_key && settings[:record]
                              response = send_request(:getRecordings, {
-                                                       :meetingID => conference_key,
+                                                       meetingID: conference_key,
                                                      })
                              result = response[:recordings] if response
                              result = [] if result.is_a?(String)

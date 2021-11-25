@@ -29,7 +29,7 @@ module Lti
 
     DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9"
 
-    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.instructure.webhooks.root_account.all'
+    WEBHOOK_GRANT_ALL_CAPABILITY = "vnd.instructure.webhooks.root_account.all"
     WEBHOOK_SUBSCRIPTION_CAPABILITIES = {
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
       quiz_submitted: %w[vnd.instructure.webhooks.root_account.quiz_submitted
@@ -62,7 +62,7 @@ module Lti
     ).freeze
 
     RESTRICTED_CAPABILITIES = [
-      'Canvas.placements.similarityDetection',
+      "Canvas.placements.similarityDetection",
       "#{Lti::OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE}.url",
       *WEBHOOK_SUBSCRIPTION_CAPABILITIES.values.flatten
     ].freeze

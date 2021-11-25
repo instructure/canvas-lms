@@ -31,7 +31,7 @@ module Factories
   end
 
   def assignment_override_valid_attributes
-    { :title => "Some Title" }
+    { title: "Some Title" }
   end
 
   def create_section_override_for_assignment(assignment_or_quiz, opts = {})
@@ -60,7 +60,7 @@ module Factories
     group_category = group_category(context: assignment.context)
     group_opts = opts.merge({ context: group_category })
     group = opts[:group] || group(group_opts)
-    group.add_user(opts[:user], 'accepted', opts[:moderator]) if opts[:user]
+    group.add_user(opts[:user], "accepted", opts[:moderator]) if opts[:user]
     opts_with_default = opts.reverse_merge({
                                              due_at: 2.days.from_now,
                                              due_at_overridden: true,
@@ -84,7 +84,7 @@ module Factories
   def create_adhoc_override_for_assignment(assignment_or_quiz, users, opts = {})
     assignment_override_model(opts.merge(assignment: assignment_or_quiz))
     @override.set = nil
-    @override.set_type = 'ADHOC'
+    @override.set_type = "ADHOC"
     @override.due_at = opts[:due_at]
     @override.save!
 

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'json/jwt'
+require "json/jwt"
 
 module Lti
   module IMS
@@ -65,16 +65,16 @@ module Lti
 
       SERVICE_DEFINITIONS = [
         {
-          id: 'vnd.Canvas.authorization',
+          id: "vnd.Canvas.authorization",
           endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/authorize" },
-          format: ['application/json'].freeze,
-          action: ['POST'].freeze
+          format: ["application/json"].freeze,
+          action: ["POST"].freeze
         }.freeze
       ].freeze
 
       class InvalidGrant < RuntimeError; end
-      JWT_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'
-      AUTHORIZATION_CODE_GRANT_TYPE = 'authorization_code'
+      JWT_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer"
+      AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code"
       GRANT_TYPES = [JWT_GRANT_TYPE, AUTHORIZATION_CODE_GRANT_TYPE].freeze
 
       rescue_from JSON::JWS::VerificationFailed,
@@ -85,7 +85,7 @@ module Lti
                   Lti::OAuth2::AuthorizationValidator::MissingAuthorizationCode,
                   InvalidGrant do |e|
         Lti::Errors::ErrorLogger.log_error(e)
-        render json: { error: 'invalid_grant' }, status: :bad_request
+        render json: { error: "invalid_grant" }, status: :bad_request
       end
       # @API authorize
       #
@@ -125,8 +125,8 @@ module Lti
         reg_key = code || jwt_validator.sub
         render json: {
           access_token: Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: reg_key).to_s,
-          token_type: 'bearer',
-          expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
+          token_type: "bearer",
+          expires_in: Setting.get("lti.oauth2.access_token.expiration", 1.hour.to_s)
         }
       end
 

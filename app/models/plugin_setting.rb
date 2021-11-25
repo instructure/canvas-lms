@@ -29,7 +29,7 @@
 #  updated_at :datetime
 #
 class PluginSetting < ActiveRecord::Base
-  validates :name, uniqueness: { :if => :validate_uniqueness_of_name? }
+  validates :name, uniqueness: { if: :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
   serialize :settings
   attr_accessor :posted_settings
@@ -144,11 +144,11 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.encrypt(text)
-    Canvas::Security.encrypt_password(text, 'instructure_plugin_setting')
+    Canvas::Security.encrypt_password(text, "instructure_plugin_setting")
   end
 
   def self.decrypt(text, salt)
-    Canvas::Security.decrypt_password(text, salt, 'instructure_plugin_setting')
+    Canvas::Security.decrypt_password(text, salt, "instructure_plugin_setting")
   end
 
   def self.find_by_name(name)

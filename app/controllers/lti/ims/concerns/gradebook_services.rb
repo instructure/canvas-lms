@@ -57,11 +57,11 @@ module Lti::IMS::Concerns
       def verify_user_in_context
         return if context.user_is_student? user
 
-        render_error('User not found in course or is not a student', :unprocessable_entity)
+        render_error("User not found in course or is not a student", :unprocessable_entity)
       end
 
       def verify_line_item_client_id_connection
-        render_error('Tool does not have permission to view line_item') unless line_item.client_id == developer_key.global_id
+        render_error("Tool does not have permission to view line_item") unless line_item.client_id == developer_key.global_id
       end
 
       def verify_line_item_in_context
@@ -87,7 +87,7 @@ module Lti::IMS::Concerns
           assignment.prepare_for_ags_if_needed!(tool)
           return
         end
-        render_error('Resource link id points to Tool not associated with this Context', :unprocessable_entity)
+        render_error("Resource link id points to Tool not associated with this Context", :unprocessable_entity)
       end
     end
   end

@@ -30,7 +30,7 @@ describe ImportedHtmlConverter do
     end
 
     def convert_and_replace(test_string)
-      html = @migration.convert_html(test_string, 'sometype', 'somemigid', 'somefield')
+      html = @migration.convert_html(test_string, "sometype", "somemigid", "somefield")
       link_map = @converter.link_parser.unresolved_link_map
 
       @converter.link_resolver.resolve_links!(link_map)
@@ -42,21 +42,21 @@ describe ImportedHtmlConverter do
 
     it "converts a wiki reference" do
       test_string = %(<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
       expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference without $ escaped" do
       test_string = %(<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
       expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference by migration id" do
       test_string = %(<a href="wiki_page_migration_id=123456677788">Test Wiki Page</a>)
-      wiki = @course.wiki_pages.create(:title => "Test Wiki Page", :body => "stuff")
+      wiki = @course.wiki_pages.create(title: "Test Wiki Page", body: "stuff")
       wiki.migration_id = "123456677788"
       wiki.save!
 
@@ -65,7 +65,7 @@ describe ImportedHtmlConverter do
 
     it "converts a discussion reference by migration id" do
       test_string = %(<a href="discussion_topic_migration_id=123456677788">Test topic</a>)
-      topic = @course.discussion_topics.create(:title => "Test discussion")
+      topic = @course.discussion_topics.create(title: "Test discussion")
       topic.migration_id = "123456677788"
       topic.save!
 
@@ -73,7 +73,7 @@ describe ImportedHtmlConverter do
     end
 
     def make_test_att
-      att = Attachment.create(:filename => 'test.png', :display_name => "test.png", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      att = Attachment.create(filename: "test.png", display_name: "test.png", uploaded_data: StringIO.new("psych!"), folder: Folder.unfiled_folder(@course), context: @course)
       att.migration_id = "1768525836051"
       att.save!
       att
@@ -158,7 +158,7 @@ describe ImportedHtmlConverter do
     end
 
     it "recognizes and relative-ize absolute links outside the course but in one of the course's domains" do
-      allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(['my-canvas.example.com', 'vanity.my-canvas.edu'])
+      allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(["my-canvas.example.com", "vanity.my-canvas.edu"])
       test_string = %(<a href="https://my-canvas.example.com/courses/123">Mine</a><br><a href="https://vanity.my-canvas.edu/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>)
       expect(convert_and_replace(test_string)).to eq %(<a href="/courses/123">Mine</a><br><a href="/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>)
     end
@@ -234,7 +234,7 @@ describe ImportedHtmlConverter do
       test_string = "<p><img src=\"data:image/gif;base64,#{base64}\"></p>"
       new_string = convert_and_replace(test_string)
       attachment = Attachment.last
-      expect(attachment.content_type).to eq 'image/gif'
+      expect(attachment.content_type).to eq "image/gif"
       expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
     end

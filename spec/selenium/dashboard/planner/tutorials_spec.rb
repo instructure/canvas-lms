@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 describe "Tutorials" do
   include_context "in-process server selenium tests"
@@ -32,7 +32,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the home page", priority: "1" do
       get "/courses/#{@course.id}"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Home")
       expect(element).to include_text("Welcome your students")
       expect(element).to include_text("The Course Home Page is the first page students see")
@@ -41,7 +41,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the assignments page", priority: "1" do
       get "/courses/#{@course.id}/assignments"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Assignments")
       expect(element).to include_text("Reinforce student understanding")
       expect(element).to include_text("Assignments include quizzes, graded discussions")
@@ -50,7 +50,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the announcements page", priority: "1" do
       get "/courses/#{@course.id}/announcements"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Announcements")
       expect(element).to include_text("Keep students informed")
       expect(element).to include_text("Share important information about your course with all users")
@@ -59,7 +59,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the discussions page", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Discussions")
       expect(element).to include_text("Encourage student discourse")
       expect(element).to include_text("Discussions allow students and instructors to communicate")
@@ -68,7 +68,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the grades page", priority: "1" do
       get "/courses/#{@course.id}/gradebook"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Grades")
       expect(element).to include_text("Enter and distribute grades")
       expect(element).to include_text("Display grades as points, percentages")
@@ -77,7 +77,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the users page", priority: "1" do
       get "/courses/#{@course.id}/users"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("People")
       expect(element).to include_text("Know your users")
       expect(element).to include_text("You can also create student groups to house group assignments")
@@ -85,7 +85,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the pages page", priority: "1" do
       get "/courses/#{@course.id}/pages"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Pages")
       expect(element).to include_text("Create interactive course content")
       expect(element).to include_text("Pages let you create interactive content directly in Canvas")
@@ -94,7 +94,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the files page", priority: "1" do
       get "/courses/#{@course.id}/files"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Files")
       expect(element).to include_text("Store and share course assets")
       expect(element).to include_text("When you save assets in Files")
@@ -103,7 +103,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the syllabus page", priority: "1" do
       get "/courses/#{@course.id}/assignments/syllabus"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Syllabus")
       expect(element).to include_text("Communicate course objectives")
       expect(element).to include_text("The Syllabus lets you welcome your course users")
@@ -112,7 +112,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the quizzes page", priority: "1" do
       get "/courses/#{@course.id}/quizzes"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Quizzes")
       expect(element).to include_text("Assess student understanding")
       expect(element).to include_text("Use quizzes to challenge student understanding")
@@ -120,7 +120,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the modules page", priority: "1" do
       get "/courses/#{@course.id}/modules"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Modules")
       expect(element).to include_text("Organize course content")
       expect(element).to include_text("Use modules to organize your content and create a linear flow")
@@ -129,7 +129,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the settings page", priority: "1" do
       get "/courses/#{@course.id}/settings#!/configurations"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Settings")
       expect(element).to include_text("Customize course details")
       expect(element).to include_text("Make your course your own!")
@@ -138,7 +138,7 @@ describe "Tutorials" do
 
     it "the tutorial tray appears on the course import page", priority: "1" do
       get "/courses/#{@course.id}/content_migrations"
-      element = f('.NewUserTutorialTray')
+      element = f(".NewUserTutorialTray")
       expect(element).to include_text("Import")
       expect(element).to include_text("Bring existing content into your course")
       expect(element).to include_text("Easily import or copy content from another")
@@ -158,7 +158,7 @@ describe "Tutorials" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
       fj("button:contains('Close')").click
-      expect(f('.NewUserTutorialTray')).to be_displayed
+      expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end
 
@@ -166,7 +166,7 @@ describe "Tutorials" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
       fj("span button:contains('Cancel')").click
-      expect(f('.NewUserTutorialTray')).to be_displayed
+      expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end
   end

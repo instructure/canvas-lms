@@ -31,16 +31,16 @@ class DelayedMessage < ActiveRecord::Base
       :account, :user, :appointment_group, :collaborator, :account_report,
       :alert, :content_migration, :account_notification,
       {
-        context_communication_channel: 'CommunicationChannel',
-        quiz_submission: 'Quizzes::QuizSubmission',
-        quiz_regrade_run: 'Quizzes::QuizRegradeRun',
-        master_migration: 'MasterCourses::MasterMigration',
-        quizzes: 'Quizzes::Quiz'
+        context_communication_channel: "CommunicationChannel",
+        quiz_submission: "Quizzes::QuizSubmission",
+        quiz_regrade_run: "Quizzes::QuizRegradeRun",
+        master_migration: "MasterCourses::MasterMigration",
+        quizzes: "Quizzes::Quiz"
       }
     ]
   belongs_to :communication_channel
 
-  validates :summary, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :summary, length: { maximum: maximum_text_length, allow_blank: true }
   validates :link, length: { maximum: maximum_text_length, allow_blank: true }
   validates :communication_channel_id, :workflow_state, presence: true
 
@@ -57,30 +57,30 @@ class DelayedMessage < ActiveRecord::Base
   scope :for, lambda { |context|
     case context
     when :daily
-      where(:frequency => 'daily')
+      where(frequency: "daily")
     when :weekly
-      where(:frequency => 'weekly')
+      where(frequency: "weekly")
     when Notification
-      where(:notification_id => context)
+      where(notification_id: context)
     when NotificationPolicy
-      where(:notification_policy_id => context)
+      where(notification_policy_id: context)
     when CommunicationChannel
-      where(:communication_channel_id => context)
+      where(communication_channel_id: context)
     else
-      where(:context_id => context, :context_type => context.class.base_class.to_s)
+      where(context_id: context, context_type: context.class.base_class.to_s)
     end
   }
 
-  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
+  scope :in_state, ->(state) { where(workflow_state: state.to_s) }
 
   include Workflow
 
   workflow do
     state :pending do
-      event :begin_send, :transitions_to => :sent do
+      event :begin_send, transitions_to: :sent do
         self.batched_at = Time.now
       end
-      event :cancel, :transitions_to => :cancelled
+      event :cancel, transitions_to: :cancelled
     end
 
     state :cancelled
@@ -113,18 +113,18 @@ class DelayedMessage < ActiveRecord::Base
     context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
-    notification = BroadcastPolicy.notification_finder.by_name('Summaries')
+    notification = BroadcastPolicy.notification_finder.by_name("Summaries")
     path = HostUrl.outgoing_email_address
     root_account_id = delayed_messages.first.try(:root_account_id)
     locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
     I18n.with_locale(locale) do
       message = to.messages.build(
-        :subject => notification.subject,
-        :to => to.path,
-        :notification_name => notification.name,
-        :notification => notification,
-        :from => path,
-        :user => user
+        subject: notification.subject,
+        to: to.path,
+        notification_name: notification.name,
+        notification: notification,
+        from: path,
+        user: user
       )
       message.delayed_messages = delayed_messages
       message.context = context
@@ -148,15 +148,15 @@ class DelayedMessage < ActiveRecord::Base
 
     # I got tired of trying to figure out time zones in my head, and I realized
     # if we do it this way, Rails will take care of it all for us!
-    if frequency == 'weekly'
+    if frequency == "weekly"
       target = communication_channel.user.weekly_notification_time
     else
       # Find the appropriate timezone. For weekly notifications, always use
       # Eastern. For other notifications, try and user the user's time zone,
       # defaulting to mountain. (Should be impossible to not find mountain, but
       # default to system time if necessary.)
-      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
-      target = time_zone.now.change(:hour => 18)
+      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone
+      target = time_zone.now.change(hour: 18)
       target += 1.day if target < time_zone.now
     end
 

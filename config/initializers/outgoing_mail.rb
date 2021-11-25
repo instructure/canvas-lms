@@ -21,11 +21,11 @@
 
 # This doesn't get required if we're not using smtp, and there's some
 # references to SMTP exception classes in the code.
-require 'net/smtp'
+require "net/smtp"
 
 config = {
-  :domain => "unknowndomain.example.com",
-  :delivery_method => :smtp,
+  domain: "unknowndomain.example.com",
+  delivery_method: :smtp,
 }.merge((ConfigFile.load("outgoing_mail").dup || {}).symbolize_keys)
 
 [:authentication, :delivery_method].each do |key|

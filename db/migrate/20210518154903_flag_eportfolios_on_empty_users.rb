@@ -22,6 +22,6 @@ class FlagEportfoliosOnEmptyUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    DataFixup::FlagEportfoliosOnEmptyUsers.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    DataFixup::FlagEportfoliosOnEmptyUsers.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 end

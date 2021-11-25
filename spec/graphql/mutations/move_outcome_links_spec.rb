@@ -37,8 +37,8 @@ describe Mutations::MoveOutcomeLinks do
     @outcome_other_context_link = @other_account.root_outcome_group.child_outcome_links.first
 
     # global groups
-    @global_source = LearningOutcomeGroup.create!(title: 'source')
-    @global_destination = LearningOutcomeGroup.create!(title: 'destination')
+    @global_source = LearningOutcomeGroup.create!(title: "source")
+    @global_destination = LearningOutcomeGroup.create!(title: "destination")
     outcome_model(outcome_group: @global_source, global: true)
     @global_link = @global_source.child_outcome_links.first
   end
@@ -52,7 +52,7 @@ describe Mutations::MoveOutcomeLinks do
     <<~GQL
       mutation {
         moveOutcomeLinks(input: {
-          #{gql_arguments('', attrs)}
+          #{gql_arguments("", attrs)}
         }) {
           movedOutcomeLinks {
             _id
@@ -95,7 +95,7 @@ describe Mutations::MoveOutcomeLinks do
         current_user: @teacher
       }
     )
-    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link['_id'] }
+    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link["_id"] }
     expect(moved_links).to eql([@outcome_link.id.to_s])
     expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
                                                                                 { "attribute" => @outcome_other_context_link.id.to_s, "message" => "Could not find associated outcome in this context" }

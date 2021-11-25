@@ -27,7 +27,7 @@ module Quizzes
       }
     end
 
-    def send_message(recipients = 'all')
+    def send_message(recipients = "all")
       options = {
         quiz: @quiz,
         sender: @teacher,

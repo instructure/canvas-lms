@@ -26,7 +26,7 @@ class Feature
   attr_reader(*ATTRS)
 
   def initialize(opts = {})
-    @state = 'allowed'
+    @state = "allowed"
     opts.each do |key, val|
       next unless ATTRS.include?(key)
       next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
@@ -34,7 +34,7 @@ class Feature
       instance_variable_set "@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
-    @root_opt_in = true if @applies_to == 'RootAccount'
+    @root_opt_in = true if @applies_to == "RootAccount"
   end
 
   def clone_for_cache
@@ -58,7 +58,7 @@ class Feature
   end
 
   def hidden?
-    @state == 'hidden'
+    @state == "hidden"
   end
 
   def self.environment
@@ -66,9 +66,9 @@ class Feature
       :development
     elsif Rails.env.test?
       :ci
-    elsif ApplicationController.test_cluster_name == 'beta'
+    elsif ApplicationController.test_cluster_name == "beta"
       :beta
-    elsif ApplicationController.test_cluster_name == 'test'
+    elsif ApplicationController.test_cluster_name == "test"
       :test
     else
       :production
@@ -124,12 +124,12 @@ class Feature
   #     # queue a delayed_job to perform any nontrivial processing
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
-  STATE_OFF = 'off'
-  STATE_ON = 'on'
-  STATE_DEFAULT_OFF = 'allowed'
-  STATE_DEFAULT_ON = 'allowed_on'
-  STATE_HIDDEN = 'hidden'
-  STATE_DISABLED = 'disabled'
+  STATE_OFF = "off"
+  STATE_ON = "on"
+  STATE_DEFAULT_OFF = "allowed"
+  STATE_DEFAULT_ON = "allowed_on"
+  STATE_HIDDEN = "hidden"
+  STATE_DISABLED = "disabled"
 
   VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
   VALID_APPLIES_TO = %w[Course Account RootAccount User SiteAdmin].freeze
@@ -180,15 +180,15 @@ class Feature
 
   def applies_to_object(object)
     case @applies_to
-    when 'SiteAdmin'
+    when "SiteAdmin"
       object.is_a?(Account) && object.site_admin?
-    when 'RootAccount'
+    when "RootAccount"
       object.is_a?(Account) && object.root_account?
-    when 'Account'
+    when "Account"
       object.is_a?(Account)
-    when 'Course'
+    when "Course"
       object.is_a?(Course) || object.is_a?(Account)
-    when 'User'
+    when "User"
       object.is_a?(User) || (object.is_a?(Account) && object.site_admin?)
     else
       false
@@ -210,15 +210,15 @@ class Feature
     applicable_types = []
     case object
     when Account
-      applicable_types << 'Account'
-      applicable_types << 'Course'
-      applicable_types << 'RootAccount' if object.root_account?
-      applicable_types << 'User' if object.site_admin?
-      applicable_types << 'SiteAdmin' if object.site_admin?
+      applicable_types << "Account"
+      applicable_types << "Course"
+      applicable_types << "RootAccount" if object.root_account?
+      applicable_types << "User" if object.site_admin?
+      applicable_types << "SiteAdmin" if object.site_admin?
     when Course
-      applicable_types << 'Course'
+      applicable_types << "Course"
     when User
-      applicable_types << 'User'
+      applicable_types << "User"
     end
     definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }
   end
@@ -227,7 +227,7 @@ class Feature
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
     (valid_states - [orig_state]).index_with do |state|
-      { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
+      { "locked" => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == "RootAccount" &&
         context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
     end
   end
@@ -249,8 +249,8 @@ class Feature
 
   def self.remove_obsolete_flags
     valid_features = definitions.keys
-    cutoff = Setting.get('obsolete_feature_flag_cutoff_days', 60).to_i.days.ago
-    delete_scope = FeatureFlag.where('updated_at<?', cutoff).where.not(feature: valid_features)
+    cutoff = Setting.get("obsolete_feature_flag_cutoff_days", 60).to_i.days.ago
+    delete_scope = FeatureFlag.where("updated_at<?", cutoff).where.not(feature: valid_features)
     delete_scope.in_batches.delete_all
   end
 end

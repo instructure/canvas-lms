@@ -29,8 +29,8 @@
 # wants to do with errors can be hooked into this path with the
 # .register! method.
 
-require 'inst-jobs'
-require 'canvas_errors/job_info'
+require "inst-jobs"
+require "canvas_errors/job_info"
 
 module CanvasErrors
   # register something to happen on every exception that occurs.

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe "quizzes section hierarchy" do
   include_context "in-process server selenium tests"
@@ -26,7 +26,7 @@ describe "quizzes section hierarchy" do
 
   before do
     course_with_teacher_logged_in
-    @new_section = @course.course_sections.create!(name: 'New Section')
+    @new_section = @course.course_sections.create!(name: "New Section")
     @student = student_in_section(@new_section)
     @course.start_at = Time.zone.now.advance(days: -30)
     @course.conclude_at = Time.zone.now.advance(days: -10)
@@ -49,21 +49,21 @@ describe "quizzes section hierarchy" do
 
   def take_hierarchy_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load { f('#take_quiz_link').click }
+    expect_new_page_load { f("#take_quiz_link").click }
     # make sure it does not create a blank submissions
-    expect(f("#content")).not_to contain_css('.quiz_score')
-    expect(f("#content")).not_to contain_css('.quiz_duration')
+    expect(f("#content")).not_to contain_css(".quiz_score")
+    expect(f("#content")).not_to contain_css(".quiz_duration")
     # take and submit the quiz
     answer_questions_and_submit(@quiz, 3)
   end
 
   def verify_quiz_accessible
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load { f('#take_quiz_link').click }
+    expect_new_page_load { f("#take_quiz_link").click }
     # make sure it does not create a blank submissions
-    expect(f("#content")).not_to contain_css('.quiz_score')
-    expect(f("#content")).not_to contain_css('.quiz_duration')
-    f('#section-tabs .quizzes').click
+    expect(f("#content")).not_to contain_css(".quiz_score")
+    expect(f("#content")).not_to contain_css(".quiz_duration")
+    f("#section-tabs .quizzes").click
     accept_alert
     wait_for_ajaximations
   end
@@ -78,9 +78,9 @@ describe "quizzes section hierarchy" do
 
       it "allows the teacher to preview the quiz", priority: "1" do
         get "/courses/#{@course.id}/quizzes"
-        fln('Test Quiz').click
-        expect_new_page_load { f('#preview_quiz_button').click }
-        expect(f(' .quiz-header')).to include_text('This is a preview of the published version of the quiz')
+        fln("Test Quiz").click
+        expect_new_page_load { f("#preview_quiz_button").click }
+        expect(f(" .quiz-header")).to include_text("This is a preview of the published version of the quiz")
       end
 
       it "works with lock and unlock dates set up", priority: "1" do
@@ -112,12 +112,12 @@ describe "quizzes section hierarchy" do
       end
 
       it "is not accessible for student in the main section", priority: "1" do
-        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        student1 = user_with_pseudonym(username: "student1@example.com", active_all: 1)
         student_in_course(course: @course, user: student1)
         user_session(student1)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(f('#quiz_show .quiz-header .lock_explanation').text)
-          .to include('This quiz is no longer available as the course has been concluded')
+        expect(f("#quiz_show .quiz-header .lock_explanation").text)
+          .to include("This quiz is no longer available as the course has been concluded")
       end
     end
   end
@@ -132,8 +132,8 @@ describe "quizzes section hierarchy" do
       it "disallows student to view quiz", priority: "1" do
         user_session(@student)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(f('#quiz_show .quiz-header .lock_explanation').text)
-          .to include('This quiz is no longer available as the course has been concluded')
+        expect(f("#quiz_show .quiz-header .lock_explanation").text)
+          .to include("This quiz is no longer available as the course has been concluded")
       end
     end
 
@@ -167,7 +167,7 @@ describe "quizzes section hierarchy" do
       end
 
       it "allows students in the main section to take the quiz", priority: "1" do
-        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        student1 = user_with_pseudonym(username: "student1@example.com", active_all: 1)
         enrollment = student_in_course(course: @course, user: student1)
         enrollment.accept!
         user_session(student1)

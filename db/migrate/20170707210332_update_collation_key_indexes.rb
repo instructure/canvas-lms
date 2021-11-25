@@ -49,6 +49,6 @@ class UpdateCollationKeyIndexes < ActiveRecord::Migration[5.0]
 
     add_index :attachments, "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 3, true)",
               algorithm: :concurrently, name: :index_attachments_on_folder_id_and_file_state_and_display_name,
-              where: 'folder_id IS NOT NULL'
+              where: "folder_id IS NOT NULL"
   end
 end

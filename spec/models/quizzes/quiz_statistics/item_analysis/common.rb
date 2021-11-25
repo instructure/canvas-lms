@@ -87,13 +87,13 @@ def simple_quiz_with_submissions(answer_key, *submissions)
   questions = answer_key.each_with_index.map do |answer, i|
     points = 1
     answer, points = answer if answer.is_a?(Array)
-    true_false = answer == 'T' || answer == 'F'
-    type = true_false ? 'true_false_question' : 'multiple_choice_question'
-    answers = (true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map do |a, j|
-      { :answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => ((4 * i) + j) }
+    true_false = answer == "T" || answer == "F"
+    type = true_false ? "true_false_question" : "multiple_choice_question"
+    answers = (true_false ? ["T", "F"] : "A".."D").each_with_index.map do |a, j|
+      { answer_text: a, answer_weight: (a == answer ? 100 : 0), id: ((4 * i) + j) }
     end
 
-    { :question_data => { :name => "question #{i + 1}", :points_possible => points, :question_type => type, :answers => answers } }
+    { question_data: { name: "question #{i + 1}", points_possible: points, question_type: type, answers: answers } }
   end
   assignment_quiz(questions, opts)
   students = create_users_in_course(@quiz.context, submissions.size, return_type: :record)
@@ -114,12 +114,12 @@ def simple_quiz_with_shuffled_answers(answer_key, *submissions)
   questions = answer_key.each_with_index.map do |answer, i|
     points = 1
     answer, points = answer if answer.is_a?(Array)
-    true_false = answer == 'T' || answer == 'F'
-    type = true_false ? 'true_false_question' : 'multiple_choice_question'
-    answers = (true_false ? ['T', 'F'] : 'A'..'D').each_with_index.map do |a, j|
-      { :answer_text => a, :answer_weight => (a == answer ? 100 : 0), :id => ((4 * i) + j) }
+    true_false = answer == "T" || answer == "F"
+    type = true_false ? "true_false_question" : "multiple_choice_question"
+    answers = (true_false ? ["T", "F"] : "A".."D").each_with_index.map do |a, j|
+      { answer_text: a, answer_weight: (a == answer ? 100 : 0), id: ((4 * i) + j) }
     end
-    { :question_data => { :name => "question #{i + 1}", :points_possible => points, :question_type => type, :answers => answers } }
+    { question_data: { name: "question #{i + 1}", points_possible: points, question_type: type, answers: answers } }
   end
 
   assignment_quiz(questions, opts)

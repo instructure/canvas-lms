@@ -144,9 +144,9 @@ class OutcomeProficiencyApiController < ApplicationController
   private
 
   def update_ratings(proficiency, context = nil)
-    proficiency.replace_ratings(proficiency_params['ratings'])
+    proficiency.replace_ratings(proficiency_params["ratings"])
     proficiency.context = context if context
-    proficiency.workflow_state = 'active'
+    proficiency.workflow_state = "active"
     proficiency.save!
     proficiency
   end

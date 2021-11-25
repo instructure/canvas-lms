@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe CommentBankItem, type: :model do
   let(:course) { course_model }
   let(:user) { user_model }
-  let(:comment) { 'comment' }
+  let(:comment) { "comment" }
   let(:creation_params) { { course: course, comment: comment, user: user } }
 
-  describe 'validations' do
+  describe "validations" do
     subject { CommentBankItem.create!(creation_params) }
 
     it { is_expected.to validate_presence_of :course }
@@ -42,24 +42,24 @@ describe CommentBankItem, type: :model do
     let(:creation_arguments) { [creation_params] }
   end
 
-  describe 'root_account_id' do
-    subject { CommentBankItem.create!(comment: 'A', course: @course, user: user) }
+  describe "root_account_id" do
+    subject { CommentBankItem.create!(comment: "A", course: @course, user: user) }
 
     before do
       root_account = account_model
       @course = course_model(account: root_account)
     end
 
-    it 'sets root account from course' do
+    it "sets root account from course" do
       expect(subject.root_account_id).to eq(@course.root_account_id)
     end
   end
 
-  describe 'permissions' do
-    subject { CommentBankItem.create!(comment: 'A', course: course, user: user) }
+  describe "permissions" do
+    subject { CommentBankItem.create!(comment: "A", course: course, user: user) }
 
-    describe 'read/update/delete' do
-      it 'is allowed for the creator' do
+    describe "read/update/delete" do
+      it "is allowed for the creator" do
         aggregate_failures do
           %i[read update delete].each do |permission|
             expect(subject.grants_right?(user, permission)).to be(true)
@@ -67,7 +67,7 @@ describe CommentBankItem, type: :model do
         end
       end
 
-      it 'is not allowed for other users' do
+      it "is not allowed for other users" do
         user2 = user_model
         %i[read update delete].each do |permission|
           expect(subject.grants_right?(user2, permission)).to be(false)
@@ -75,10 +75,10 @@ describe CommentBankItem, type: :model do
       end
     end
 
-    describe 'create' do
+    describe "create" do
       let(:user) { account_admin_user }
 
-      it 'requires manage_grades permissions' do
+      it "requires manage_grades permissions" do
         expect(subject.grants_right?(user, :create)).to be(true)
         user = account_admin_user_with_role_changes(user: user, role_changes: { manage_grades: false })
         expect(subject.grants_right?(user, :create)).to be(false)

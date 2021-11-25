@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::GraphService::EducationClassesEndpoints do
-  include_context 'microsoft_sync_graph_service_endpoints'
+  include_context "microsoft_sync_graph_service_endpoints"
 
-  describe '#list' do
+  describe "#list" do
     let(:method_name) { :list }
     let(:method_args) { [] }
-    let(:url) { 'https://graph.microsoft.com/v1.0/education/classes' }
+    let(:url) { "https://graph.microsoft.com/v1.0/education/classes" }
 
-    it_behaves_like 'a paginated list endpoint' do
-      it_behaves_like 'an endpoint that uses up quota', [1, 0]
+    it_behaves_like "a paginated list endpoint" do
+      it_behaves_like "an endpoint that uses up quota", [1, 0]
     end
 
-    context 'when the API says the tenant is not an Education tenant' do
+    context "when the API says the tenant is not an Education tenant" do
       let(:http_method) { :get }
       let(:status) { 400 }
       let(:response) do
@@ -39,7 +39,7 @@ describe MicrosoftSync::GraphService::EducationClassesEndpoints do
         }
       end
 
-      it 'raises a graceful cancel NotEducationTenant error' do
+      it "raises a graceful cancel NotEducationTenant error" do
         klass = MicrosoftSync::Errors::NotEducationTenant
         msg =  /not an Education tenant, so cannot be used/
         expect do
@@ -49,17 +49,17 @@ describe MicrosoftSync::GraphService::EducationClassesEndpoints do
     end
   end
 
-  describe '#create' do
+  describe "#create" do
     subject { endpoints.create(abc: 123) }
 
     let(:http_method) { :post }
-    let(:url) { 'https://graph.microsoft.com/v1.0/education/classes' }
+    let(:url) { "https://graph.microsoft.com/v1.0/education/classes" }
     let(:with_params) { { body: { abc: 123 } } }
-    let(:response_body) { { 'id' => 'newclass', 'val' => 'etc' } }
+    let(:response_body) { { "id" => "newclass", "val" => "etc" } }
 
     it { is_expected.to eq(response_body) }
 
-    it_behaves_like 'a graph service endpoint'
-    it_behaves_like 'an endpoint that uses up quota', [1, 1]
+    it_behaves_like "a graph service endpoint"
+    it_behaves_like "an endpoint that uses up quota", [1, 1]
   end
 end

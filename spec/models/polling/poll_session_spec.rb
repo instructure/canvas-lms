@@ -21,11 +21,11 @@
 describe Polling::PollSession do
   before :once do
     course_factory
-    @section = @course.course_sections.create!(name: 'Section 2')
+    @section = @course.course_sections.create!(name: "Section 2")
     teacher_in_course(course: @course, active_all: true)
 
-    @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')
-    @choice = @poll.poll_choices.create(text: 'A Poll Choice')
+    @poll = Polling::Poll.create!(user: @teacher, question: "A Test Poll")
+    @choice = @poll.poll_choices.create(text: "A Poll Choice")
   end
 
   context "creating a poll session" do
@@ -76,8 +76,8 @@ describe Polling::PollSession do
       @student1 = student_in_course(course: @course1).user
       @student2 = student_in_course(course: @course2).user
       @unenrolled_student = user_model
-      @poll1 = Polling::Poll.create!(user: @teacher1, question: 'A Test Poll')
-      @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
+      @poll1 = Polling::Poll.create!(user: @teacher1, question: "A Test Poll")
+      @poll2 = Polling::Poll.create!(user: @teacher2, question: "Another Test Poll")
     end
 
     it "returns the poll sessions available for a user" do

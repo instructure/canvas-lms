@@ -19,8 +19,8 @@
 #
 
 describe Canvas::Crocodoc do
-  describe '.enabled?' do
-    it 'returns true when there crocodoc is configured' do
+  describe ".enabled?" do
+    it "returns true when there crocodoc is configured" do
       expect(Canvas::Crocodoc.enabled?).to eq false
 
       PluginSetting.create! name: "crocodoc", settings: { api_key: "abc123" }

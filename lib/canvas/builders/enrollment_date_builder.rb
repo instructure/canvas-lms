@@ -59,11 +59,11 @@ module Canvas::Builders
     end
 
     def self.cache_key(enrollment)
-      [enrollment, enrollment.course, 'enrollment_date_ranges'].cache_key
+      [enrollment, enrollment.course, "enrollment_date_ranges"].cache_key
     end
 
     def self.fetch(enrollment)
-      result = RequestCache.cache('enrollment_dates', enrollment) do
+      result = RequestCache.cache("enrollment_dates", enrollment) do
         Rails.cache.read(cache_key(enrollment))
       end
       enrollment.instance_variable_set(:@enrollment_dates, result)
@@ -92,7 +92,7 @@ module Canvas::Builders
         @enrollment_dates << default_dates
       end
 
-      RequestCache.cache('enrollment_dates', self) do
+      RequestCache.cache("enrollment_dates", self) do
         @enrollment_dates
       end
 

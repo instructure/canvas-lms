@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Specs::NoDisableImplicitWait do
   subject(:cop) { described_class.new }
 
-  it 'disallows disable_implicit_wait' do
+  it "disallows disable_implicit_wait" do
     inspect_source(%{
       describe "sis imports ui" do
         it 'should properly show sis stickiness options' do

@@ -40,8 +40,8 @@
 # THE SOFTWARE.
 #
 
-require 'rubygems'
-require 'active_support'
+require "rubygems"
+require "active_support"
 
 module Workflow
   class Specification

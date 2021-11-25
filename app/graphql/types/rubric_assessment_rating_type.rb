@@ -20,7 +20,7 @@
 
 module Types
   class RubricAssessmentRatingType < ApplicationObjectType
-    description 'An assessment for a specific criteria in a rubric'
+    description "An assessment for a specific criteria in a rubric"
 
     # This can actually have a nil id (:sigh:), so we cannot use the LegacyIDInterface here
     field :_id, ID, "legacy canvas id", method: :id, null: true

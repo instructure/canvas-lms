@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../../spec_helper'
+require_relative "../../../../spec_helper"
 
 describe Canvas::Migration::ExternalContent::Translator do
   context "#translate_data" do
@@ -38,23 +38,23 @@ describe Canvas::Migration::ExternalContent::Translator do
 
     it "searches through arrays" do
       data = [
-        { 'something' => 'somethingelse' },
-        { '$canvas_quiz_id' => @quiz.id }
+        { "something" => "somethingelse" },
+        { "$canvas_quiz_id" => @quiz.id }
       ]
       exported_data = @translator.translate_data(data, :export)
-      expect(exported_data.last['$canvas_quiz_id']).to eq @mig_id
+      expect(exported_data.last["$canvas_quiz_id"]).to eq @mig_id
 
       imported_data = @translator.translate_data(exported_data, :import)
-      expect(imported_data.last['$canvas_quiz_id']).to eq @quiz_copy.id
+      expect(imported_data.last["$canvas_quiz_id"]).to eq @quiz_copy.id
     end
 
     it "searches through nested hashes" do
-      data = { 'key' => { '$canvas_quiz_id' => @quiz.id } }
+      data = { "key" => { "$canvas_quiz_id" => @quiz.id } }
       exported_data = @translator.translate_data(data, :export)
-      expect(exported_data['key']['$canvas_quiz_id']).to eq @mig_id
+      expect(exported_data["key"]["$canvas_quiz_id"]).to eq @mig_id
 
       imported_data = @translator.translate_data(exported_data, :import)
-      expect(imported_data['key']['$canvas_quiz_id']).to eq @quiz_copy.id
+      expect(imported_data["key"]["$canvas_quiz_id"]).to eq @quiz_copy.id
     end
   end
 
@@ -100,7 +100,7 @@ describe Canvas::Migration::ExternalContent::Translator do
       mm = template.master_migrations.create!
       @cm = @course.content_migrations.create!
       ce = ContentExport.create!(export_type: ContentExport::MASTER_COURSE_COPY, content_migration: @cm,
-                                 context: @course, workflow_state: 'active', settings: { master_migration_id: mm.id })
+                                 context: @course, workflow_state: "active", settings: { master_migration_id: mm.id })
       @translator = described_class.new(content_export: ce)
     end
 

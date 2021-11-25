@@ -38,7 +38,7 @@ module SIS
       end
 
       i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
-        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        Enrollment.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
@@ -57,7 +57,7 @@ module SIS
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       i.incrementally_update_account_associations
-      User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
+      User.update_account_associations(i.update_account_association_user_ids.to_a, account_chain_cache: i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
         User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
@@ -195,7 +195,7 @@ module SIS
 
           # reset cached/inferred course and section if they don't match with the opposite piece that was
           # explicitly provided
-          @section = @course.default_section(:include_xlists => true) if @section.nil? || (enrollment_info.section_id.blank? && !@section.default_section)
+          @section = @course.default_section(include_xlists: true) if @section.nil? || (enrollment_info.section_id.blank? && !@section.default_section)
           @course = @section.course if @course.nil? ||
                                        (enrollment_info.course_id.blank? && @course.id != @section.course_id) ||
                                        (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
@@ -230,15 +230,15 @@ module SIS
                  else
                    case enrollment_info.role
                    when /\Ateacher\z/i
-                     'TeacherEnrollment'
+                     "TeacherEnrollment"
                    when /\Astudent/i
-                     'StudentEnrollment'
+                     "StudentEnrollment"
                    when /\Ata\z/i
-                     'TaEnrollment'
+                     "TaEnrollment"
                    when /\Aobserver\z/i
-                     'ObserverEnrollment'
+                     "ObserverEnrollment"
                    when /\Adesigner\z/i
-                     'DesignerEnrollment'
+                     "DesignerEnrollment"
                    end
                  end
           unless type
@@ -247,7 +247,7 @@ module SIS
             next
           end
 
-          if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(@course)
+          if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(@course)
             message = "Student enrollment for \"#{enrollment_info.user_id}\" not allowed in blueprint course \"#{@course.sis_course_id}\""
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
@@ -255,7 +255,7 @@ module SIS
 
           role ||= Role.get_built_in_role(type, root_account_id: @root_account.id)
 
-          if enrollment_info.associated_user_id && type == 'ObserverEnrollment'
+          if enrollment_info.associated_user_id && type == "ObserverEnrollment"
             a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.associated_user_id).take
             if a_pseudo
               associated_user_id = a_pseudo.user_id
@@ -305,7 +305,7 @@ module SIS
                 courses_to_recache_due_dates[enrollment.course_id] ||= []
                 courses_to_recache_due_dates[enrollment.course_id] << enrollment.user_id
               end
-              if enrollment.workflow_state == 'active'
+              if enrollment.workflow_state == "active"
                 enrollments_to_add_to_favorites << enrollment
               end
             end
@@ -357,8 +357,8 @@ module SIS
           @update_account_association_user_ids.merge(@incrementally_update_account_associations_user_ids)
         else
           User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
-                                           :incremental => true,
-                                           :precalculated_associations => User.calculate_account_associations_from_accounts(
+                                           incremental: true,
+                                           precalculated_associations: User.calculate_account_associations_from_accounts(
                                              [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq, @account_chain_cache
                                            ))
         end
@@ -369,7 +369,7 @@ module SIS
 
       def enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
         all_done = false
-        return true if enrollment.workflow_state == 'deleted' && pseudo.workflow_state == 'deleted'
+        return true if enrollment.workflow_state == "deleted" && pseudo.workflow_state == "deleted"
 
         case enrollment_info.status
         when /\Aactive/i
@@ -378,7 +378,7 @@ module SIS
         when /\Acompleted/i
           completed_status(enrollment)
         when /\Ainactive/i
-          enrollment.workflow_state = 'inactive'
+          enrollment.workflow_state = "inactive"
         when /\Adeleted_last_completed/i
           # if any matching enrollment for the same user in the same course
           # exists, we will mark the enrollment as deleted, but if it is the
@@ -399,17 +399,17 @@ module SIS
       end
 
       def completed_status(enrollment)
-        enrollment.workflow_state = 'completed'
+        enrollment.workflow_state = "completed"
         enrollment.completed_at ||= Time.zone.now
       end
 
       def deleted_status(enrollment)
         if enrollment.id.nil?
-          enrollment.workflow_state = 'deleted'
+          enrollment.workflow_state = "deleted"
           # this will allow the enrollment to continue to be created
           false
         else
-          if enrollment.workflow_state == 'deleted'
+          if enrollment.workflow_state == "deleted"
             @enrollments_to_update_sis_batch_ids << enrollment.id
             @success_count += 1
           else
@@ -423,12 +423,12 @@ module SIS
       def set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
         message = nil
         # the user is active, and the pseudonym is active
-        if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
-          enrollment.workflow_state = 'active'
+        if user.workflow_state != "deleted" && pseudo.workflow_state != "deleted"
+          enrollment.workflow_state = "active"
           # the user is active, but the pseudonym is deleted, check for other active pseudonym
-        elsif user.workflow_state != 'deleted' && pseudo.workflow_state == 'deleted'
+        elsif user.workflow_state != "deleted" && pseudo.workflow_state == "deleted"
           if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", enrollment_info.user_id).exists?
-            enrollment.workflow_state = 'active'
+            enrollment.workflow_state = "active"
             message = "Enrolled a user #{enrollment_info.user_id} in course #{enrollment_info.course_id}, but referenced a deleted sis login"
           else
             message = invalid_active_enrollment(enrollment, enrollment_info)
@@ -440,7 +440,7 @@ module SIS
       end
 
       def invalid_active_enrollment(enrollment, enrollment_info)
-        enrollment.workflow_state = 'deleted'
+        enrollment.workflow_state = "deleted"
         "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
       end
 

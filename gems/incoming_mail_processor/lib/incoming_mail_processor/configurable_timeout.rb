@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'timeout'
+require "timeout"
 
 module IncomingMailProcessor
   # Internal: A helper mixin for Mailbox implementation to properly implement

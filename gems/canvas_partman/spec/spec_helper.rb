@@ -19,14 +19,14 @@
 #
 
 begin
-  require 'byebug'
+  require "byebug"
 rescue LoadError
   # do nothing if its not available
 end
 
 begin
-  require '../../spec/coverage_tool'
-  CoverageTool.start('canvas-partman-gem')
+  require "../../spec/coverage_tool"
+  CoverageTool.start("canvas-partman-gem")
 rescue LoadError => e
   puts "Error: #{e} "
 end
@@ -34,20 +34,20 @@ end
 module CanvasPartmanTest
 end
 
-require 'active_record'
-require 'rails/version'
-require 'canvas_partman'
+require "active_record"
+require "rails/version"
+require "canvas_partman"
 
-require 'uri'
-ActiveRecord::Base.establish_connection(ENV.fetch('DATABASE_URL', nil))
+require "uri"
+ActiveRecord::Base.establish_connection(ENV.fetch("DATABASE_URL", nil))
 # we need to ensure this callback is called for active_record-pg_extensions,
 # which isn't running because we're not using Rails to setup the database
 ActiveRecord::PGExtensions::Railtie.run_initializers
-require 'support/schema_helper'
-require 'fixtures/zoo'
-require 'fixtures/animal'
-require 'fixtures/trail'
-require 'fixtures/week_event'
+require "support/schema_helper"
+require "fixtures/zoo"
+require "fixtures/animal"
+require "fixtures/trail"
+require "fixtures/week_event"
 
 Zoo = CanvasPartmanTest::Zoo
 Animal = CanvasPartmanTest::Animal

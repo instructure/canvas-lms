@@ -49,12 +49,12 @@ module Courses
     end
 
     describe "#teachers_for_student" do
-      it 'returns teacher ids for a given student id' do
+      it "returns teacher ids for a given student id" do
         teacher_student_mapper = TeacherStudentMapper.new(mock_student_enrollments, mock_teacher_enrollments)
         expect(teacher_student_mapper.teachers_for_student(student_id)).to match_array [teacher_id, privileged_teacher_id]
       end
 
-      it 'works even if all teachers are section limited' do
+      it "works even if all teachers are section limited" do
         teacher_student_mapper = TeacherStudentMapper.new(
           mock_student_enrollments,
           mock_only_section_limited_teacher_enrollments

@@ -27,24 +27,24 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
     # only one job can be queued in a singleton
     add_index :delayed_jobs,
               :singleton,
-              where: 'singleton IS NOT NULL AND locked_by IS NULL',
+              where: "singleton IS NOT NULL AND locked_by IS NULL",
               unique: true,
-              name: 'index_delayed_jobs_on_singleton_not_running',
+              name: "index_delayed_jobs_on_singleton_not_running",
               algorithm: :concurrently,
               if_not_exists: true
     # only one job can be running for a singleton
     add_index :delayed_jobs,
               :singleton,
-              where: 'singleton IS NOT NULL AND locked_by IS NOT NULL',
+              where: "singleton IS NOT NULL AND locked_by IS NOT NULL",
               unique: true,
-              name: 'index_delayed_jobs_on_singleton_running',
+              name: "index_delayed_jobs_on_singleton_running",
               algorithm: :concurrently,
               if_not_exists: true
 
     reversible do |direction|
       direction.up do
         execute(<<~SQL)
-          CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+          CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
           DECLARE
             running_count integer;
             should_lock boolean;
@@ -108,7 +108,7 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
           $$ LANGUAGE plpgsql SET search_path TO #{::Switchman::Shard.current.name};
         SQL
         execute(<<~SQL)
-          CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
+          CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
           BEGIN
             IF NEW.strand IS NOT NULL THEN
               PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
@@ -131,7 +131,7 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
       end
       direction.down do
         execute(<<~SQL)
-          CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+          CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
           DECLARE
             running_count integer;
             should_lock boolean;
@@ -180,7 +180,7 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
           $$ LANGUAGE plpgsql SET search_path TO #{::Switchman::Shard.current.name};
         SQL
         execute(<<~SQL)
-          CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
+          CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
           BEGIN
             IF NEW.strand IS NOT NULL THEN
               PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
@@ -201,13 +201,13 @@ class AddSingletonColumn < ActiveRecord::Migration[5.2]
       reversible do |direction|
         direction.up do
           drop_triggers
-          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL OR NEW.singleton IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()")
-          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN ((OLD.strand IS NOT NULL OR OLD.singleton IS NOT NULL) AND OLD.next_in_strand=true) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()")
+          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL OR NEW.singleton IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
+          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN ((OLD.strand IS NOT NULL OR OLD.singleton IS NOT NULL) AND OLD.next_in_strand=true) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
         end
         direction.down do
           drop_triggers
-          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()")
-          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn()')}")
+          execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
+          execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{::Delayed::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn()")}")
         end
       end
     end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
+require "hash_view"
 
 class ReturnViewNull < HashView
   def array?
@@ -54,11 +54,11 @@ class ReturnView < ReturnViewNull
   end
 
   def array?
-    @line.include?('[') && @line.include?(']')
+    @line.include?("[") && @line.include?("]")
   end
 
   def type
-    @line.delete('[').delete(']')
+    @line.delete("[").delete("]")
   end
 
   def to_swagger

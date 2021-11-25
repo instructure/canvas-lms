@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'announcement_created_by_you' do
+describe "announcement_created_by_you" do
   include MessagesCommon
 
   before :once do

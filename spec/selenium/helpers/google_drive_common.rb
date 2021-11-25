@@ -21,13 +21,13 @@ module GoogleDriveCommon
   def setup_google_drive(add_user_service = true, authorized = true)
     if add_user_service
       UserService.register(
-        :service => "google_drive",
-        :token => "token",
-        :secret => "secret",
-        :user => @user,
-        :service_domain => "drive.google.com",
-        :service_user_id => "service_user_id",
-        :service_user_name => "service_user_name"
+        service: "google_drive",
+        token: "token",
+        secret: "secret",
+        user: @user,
+        service_domain: "drive.google.com",
+        service_user_id: "service_user_id",
+        service_user_name: "service_user_name"
       )
     end
 
@@ -35,9 +35,9 @@ module GoogleDriveCommon
       .to receive(:authorized?)
       .and_return(authorized)
 
-    data = double('data', id: 1, to_json: { id: 1 }, alternateLink: 'http://localhost/googleDoc')
-    doc = double('doc', data: data)
-    adapter = double('google_adapter', create_doc: doc, acl_add: nil, acl_remove: nil)
+    data = double("data", id: 1, to_json: { id: 1 }, alternateLink: "http://localhost/googleDoc")
+    doc = double("doc", data: data)
+    adapter = double("google_adapter", create_doc: doc, acl_add: nil, acl_remove: nil)
     allow_any_instance_of(GoogleDocsCollaboration)
       .to receive(:google_adapter_for_user)
       .and_return(adapter)

@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'dynamic_settings'
+require "dynamic_settings"
 
 # This looks like a test for a class that is in another
 # package, and it IS, but the reason it exists is that
@@ -33,10 +33,10 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   end
 
   let(:proxy) do
-    DynamicSettings::PrefixProxy.new('test/prefix',
-                                     service: 'test_svc',
-                                     tree: 'test_tree',
-                                     environment: 'test_env',
+    DynamicSettings::PrefixProxy.new("test/prefix",
+                                     service: "test_svc",
+                                     tree: "test_tree",
+                                     environment: "test_env",
                                      default_ttl: 3.minutes)
   end
 
@@ -52,44 +52,44 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   end
 
   it "caches tree values from client" do
-    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+    expect(Diplomat::Kv).to receive(:get_all).with("test_tree/test_svc/test_env", { recurse: true, stale: true }).and_return([
                                                                                                                                {
-                                                                                                                                 :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
-                                                                                                                                 :value => 'http://test-host'
+                                                                                                                                 key: "test_tree/test_svc/test_env/test/prefix/svc_config/app-host",
+                                                                                                                                 value: "http://test-host"
                                                                                                                                },
                                                                                                                                {
-                                                                                                                                 :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
-                                                                                                                                 :value => 'sekret'
+                                                                                                                                 key: "test_tree/test_svc/test_env/test/prefix/svc_config/app-secret",
+                                                                                                                                 value: "sekret"
                                                                                                                                }
                                                                                                                              ]).ordered
     # shouldn't need to get a specific key because it's already populated in the cache
-    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
-    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret')
-    output = proxy['svc_config/app-host']
-    expect(output).to eq('http://test-host')
-    expect(proxy['svc_config/app-secret']).to eq('sekret')
+    expect(Diplomat::Kv).to_not receive(:get).with("test_tree/test_svc/test_env/test/prefix/svc_config/app-host", { stale: true })
+    expect(Diplomat::Kv).to_not receive(:get).with("test_tree/test_svc/test_env/test/prefix/svc_config/app-secret")
+    output = proxy["svc_config/app-host"]
+    expect(output).to eq("http://test-host")
+    expect(proxy["svc_config/app-secret"]).to eq("sekret")
   end
 
   it "can handle a cache clear" do
-    skip('10/5/2020 FOO-1030')
+    skip("10/5/2020 FOO-1030")
 
-    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+    expect(Diplomat::Kv).to receive(:get_all).with("test_tree/test_svc/test_env", { recurse: true, stale: true }).and_return([
                                                                                                                                {
-                                                                                                                                 :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
-                                                                                                                                 :value => 'http://test-host'
+                                                                                                                                 key: "test_tree/test_svc/test_env/test/prefix/svc_config/app-host",
+                                                                                                                                 value: "http://test-host"
                                                                                                                                },
                                                                                                                                {
-                                                                                                                                 :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
-                                                                                                                                 :value => 'sekret'
+                                                                                                                                 key: "test_tree/test_svc/test_env/test/prefix/svc_config/app-secret",
+                                                                                                                                 value: "sekret"
                                                                                                                                }
                                                                                                                              ]).ordered
-    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
-    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret', { stale: true }).and_return('sekret').ordered
-    output = proxy['svc_config/app-host']
-    expect(output).to eq('http://test-host')
+    expect(Diplomat::Kv).to_not receive(:get).with("test_tree/test_svc/test_env/test/prefix/svc_config/app-host", { stale: true })
+    expect(Diplomat::Kv).to receive(:get).with("test_tree/test_svc/test_env/test/prefix/svc_config/app-secret", { stale: true }).and_return("sekret").ordered
+    output = proxy["svc_config/app-host"]
+    expect(output).to eq("http://test-host")
     # CACHE CLEAR, but force race condition
     LocalCache.clear
     LocalCache.write("dynamic_settings/test_tree/test_svc/test_env/", true)
-    expect(proxy['svc_config/app-secret']).to eq('sekret')
+    expect(proxy["svc_config/app-secret"]).to eq("sekret")
   end
 end

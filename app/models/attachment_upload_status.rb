@@ -26,7 +26,7 @@ class AttachmentUploadStatus < ApplicationRecord
   end
 
   def self.pending!(attachment)
-    Rails.cache.write(cache_key(attachment), 'pending', expires_in: 1.day.from_now)
+    Rails.cache.write(cache_key(attachment), "pending", expires_in: 1.day.from_now)
   end
 
   def self.success!(attachment)
@@ -55,8 +55,8 @@ class AttachmentUploadStatus < ApplicationRecord
              else
                attachment.attachment_upload_statuses.exists?
              end
-    return 'failed' if failed
+    return "failed" if failed
 
-    'success'
+    "success"
   end
 end

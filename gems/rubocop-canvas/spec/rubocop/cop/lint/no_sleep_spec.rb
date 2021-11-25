@@ -25,7 +25,7 @@ describe RuboCop::Cop::Lint::NoSleep do
       allow(cop).to receive(:file_name).and_return("knights_controller.rb")
     end
 
-    it 'disallows sleep' do
+    it "disallows sleep" do
       inspect_source(<<~RUBY)
         class KnightsController < ApplicationController
           def find_sword
@@ -44,7 +44,7 @@ describe RuboCop::Cop::Lint::NoSleep do
       allow(cop).to receive(:file_name).and_return("alerts_spec.rb")
     end
 
-    it 'disallows sleep' do
+    it "disallows sleep" do
       inspect_source(<<~RUBY)
         describe "Alerts" do
           it "should validate the form" do
@@ -63,7 +63,7 @@ describe RuboCop::Cop::Lint::NoSleep do
       allow(cop).to receive(:file_name).and_return("bookmark_service.rb")
     end
 
-    it 'disallows sleep' do
+    it "disallows sleep" do
       inspect_source(<<~RUBY)
         class BookmarkService < UserService
           def find_bookmarks(query)

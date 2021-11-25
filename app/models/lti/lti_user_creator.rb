@@ -54,7 +54,7 @@ module Lti
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
       user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
       user.current_observee_ids = -> { current_course_observee_lti_context_ids }
-      user.current_roles = lti_helper.current_lis_roles.split(',')
+      user.current_roles = lti_helper.current_lis_roles.split(",")
 
       user
     end

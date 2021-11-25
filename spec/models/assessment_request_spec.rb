@@ -48,11 +48,11 @@ describe AssessmentRequest do
   describe "peer review invitation" do
     before :once do
       @notification_name = "Peer Review Invitation"
-      notification = Notification.create!(:name => @notification_name, :category => "Invitation")
+      notification = Notification.create!(name: @notification_name, category: "Invitation")
       NotificationPolicy.create!(
-        :notification => notification,
-        :communication_channel => @student.communication_channel,
-        :frequency => "immediately"
+        notification: notification,
+        communication_channel: @student.communication_channel,
+        frequency: "immediately"
       )
     end
 
@@ -82,14 +82,14 @@ describe AssessmentRequest do
   describe "rubric assessment reminder" do
     before :once do
       @notification_name = "Rubric Assessment Submission Reminder"
-      notification = Notification.create!(:name => @notification_name, :category => "Invitation")
+      notification = Notification.create!(name: @notification_name, category: "Invitation")
       NotificationPolicy.create!(
-        :notification => notification,
-        :communication_channel => @student.communication_channel,
-        :frequency => "immediately"
+        notification: notification,
+        communication_channel: @student.communication_channel,
+        frequency: "immediately"
       )
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => "grading", :use_for_grading => true)
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
       @assignment.update_attribute(:title, "new assmt title")
       @request.rubric_association = @association
       @request.save!
@@ -121,7 +121,7 @@ describe AssessmentRequest do
     end
 
     it "sends the correct url if anonymous" do
-      @assignment.update(:anonymous_peer_reviews => true)
+      @assignment.update(anonymous_peer_reviews: true)
       @request.reload
       @request.send_reminder!
 
@@ -136,7 +136,7 @@ describe AssessmentRequest do
   describe "policies" do
     before :once do
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => "grading", :use_for_grading => true)
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @reviewed = @student
       @reviewer = student_in_course(active_all: true, course: @course).user

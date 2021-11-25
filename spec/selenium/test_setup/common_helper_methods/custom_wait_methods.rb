@@ -219,10 +219,10 @@ module CustomWaitMethods
   # pass in an Element pointing to the textarea that is tinified.
   def wait_for_tiny(element)
     # TODO: Better to wait for an event from tiny?
-    parent = element.find_element(:xpath, '..')
+    parent = element.find_element(:xpath, "..")
     tiny_frame = nil
     keep_trying_until do
-      tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
+      tiny_frame = disable_implicit_wait { parent.find_element(:css, "iframe") }
     rescue => e
       puts e.inspect
       false
@@ -235,10 +235,10 @@ module CustomWaitMethods
   # there's only 1 RCE on  the pge
   def wait_for_rce(element = nil)
     element = f(element) if element.is_a? String
-    element ||= f('.rce-wrapper')
+    element ||= f(".rce-wrapper")
     tiny_frame = nil
     keep_trying_until do
-      tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
+      tiny_frame = disable_implicit_wait { element.find_element(:css, "iframe") }
     rescue => e
       puts e.inspect
       false

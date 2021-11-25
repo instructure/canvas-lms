@@ -22,17 +22,17 @@ describe Polling::PollChoice do
   before do
     course_factory
     teacher_in_course(course: @course, active_all: true)
-    @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')
+    @poll = Polling::Poll.create!(user: @teacher, question: "A Test Poll")
   end
 
   context "creating a poll choice" do
     it "requires an associated poll" do
-      expect { Polling::PollChoice.create!(is_correct: false, text: 'Poll Choice A') }.to raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::PollChoice.create!(is_correct: false, text: "Poll Choice A") }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                                       /Poll can't be blank/)
     end
 
     it "saves successfully" do
-      @poll_choice = Polling::PollChoice.new(poll: @poll, text: 'A Poll Choice', is_correct: true)
+      @poll_choice = Polling::PollChoice.new(poll: @poll, text: "A Poll Choice", is_correct: true)
       @poll_choice.save
       expect(@poll_choice).to be_valid
     end

@@ -28,7 +28,7 @@ module Alerts
         data = {}
         student_ids.each { |id| data[id] = {} }
         scope = ::UserNote.active
-                          .where(:created_by_id => teacher_ids, :user_id => student_ids)
+                          .where(created_by_id: teacher_ids, user_id: student_ids)
         note_dates = scope.group(:user_id, :created_by_id).maximum(:created_at)
         note_dates.each do |key, date|
           student = data[key.first]

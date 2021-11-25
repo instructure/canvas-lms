@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/gradebook_history_page'
-require_relative '../setup/gb_history_search_setup'
+require_relative "../pages/gradebook_history_page"
+require_relative "../setup/gb_history_search_setup"
 
 describe "Gradebook History Page" do
   include_context "in-process server selenium tests"

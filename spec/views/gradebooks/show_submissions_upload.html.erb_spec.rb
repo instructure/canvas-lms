@@ -40,14 +40,14 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     it "displays a message indicating no uploads" do
       Progress.where(tag: "submissions_reupload").order(created_at: :desc).first.destroy
       render "gradebooks/show_submissions_upload"
-      expect(document.css('h2').first.text).to include("No Submissions Have Been Uploaded")
+      expect(document.css("h2").first.text).to include("No Submissions Have Been Uploaded")
     end
   end
 
   describe "when the submissions upload is in progress" do
     it "displays a message indicating upload in progress" do
       render "gradebooks/show_submissions_upload"
-      expect(document.css('.Alert').first.text).to include("We are currently processing your files.")
+      expect(document.css(".Alert").first.text).to include("We are currently processing your files.")
     end
   end
 
@@ -107,12 +107,12 @@ describe "/gradebooks/show_submissions_upload", type: :view do
 
     it "displays a message indicating successful upload" do
       render "gradebooks/show_submissions_upload"
-      expect(document.css('.Alert').first.text).to include("Done!")
+      expect(document.css(".Alert").first.text).to include("Done!")
     end
 
     it "displays a message with the number of uploads" do
       render "gradebooks/show_submissions_upload"
-      expect(document.css('h3').first.text).to include("(3) files were attached")
+      expect(document.css("h3").first.text).to include("(3) files were attached")
     end
 
     context "when some files were uploaded" do
@@ -121,29 +121,29 @@ describe "/gradebooks/show_submissions_upload", type: :view do
       end
 
       it "includes a row for each student" do
-        student_names = document.css('#student-files tbody tr th').map(&:text).map(&:strip)
+        student_names = document.css("#student-files tbody tr th").map(&:text).map(&:strip)
         expect(student_names).to match_array ["Adam Jones", "Betty Ford", "Albert Breakfast"]
       end
 
       it "includes the files uploaded for each student" do
-        file = document.css('#student-files tbody tr td')[0]
-        expect(file.text.strip.gsub(/\s+/, ' ')).to eql "egg.png"
+        file = document.css("#student-files tbody tr td")[0]
+        expect(file.text.strip.gsub(/\s+/, " ")).to eql "egg.png"
       end
 
       it "mentions renamed files" do
-        file = document.css('#student-files tbody tr td')[1]
-        expect(file.text.strip.gsub(/\s+/, ' ')).to eql "My Dog (renamed from mydog.png)"
+        file = document.css("#student-files tbody tr td")[1]
+        expect(file.text.strip.gsub(/\s+/, " ")).to eql "My Dog (renamed from mydog.png)"
       end
 
       it "separates each file with a comma" do
-        file = document.css('#student-files tbody tr td')[2]
-        expect(file.text.strip.gsub(/\s+/, ' ')).to eql "Delicious Bacon (renamed from bacon.png), toast.png, coffee.png"
+        file = document.css("#student-files tbody tr td")[2]
+        expect(file.text.strip.gsub(/\s+/, " ")).to eql "Delicious Bacon (renamed from bacon.png), toast.png, coffee.png"
       end
     end
 
     it "displays a message with the number of files ignored when some files were ignored" do
       render "gradebooks/show_submissions_upload"
-      expect(document.css('h3').last.text).to include("(2) files were ignored")
+      expect(document.css("h3").last.text).to include("(2) files were ignored")
     end
 
     it "does not display a 'files ignored' message when no files were ignored" do
@@ -151,7 +151,7 @@ describe "/gradebooks/show_submissions_upload", type: :view do
       results[:ignored_files] = []
       progress.set_results(results)
       render "gradebooks/show_submissions_upload"
-      expect(document.css('h3').count).to be 1
+      expect(document.css("h3").count).to be 1
     end
   end
 
@@ -159,7 +159,7 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     it "displays a message indicating a failed upload" do
       progress.workflow_state = "failed"
       render "gradebooks/show_submissions_upload"
-      expect(document.css('.Alert').first.text).to include("Oops, there was a problem")
+      expect(document.css(".Alert").first.text).to include("Oops, there was a problem")
     end
   end
 end

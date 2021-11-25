@@ -20,7 +20,7 @@
 
 module Types
   class MessageableUserType < ApplicationObjectType
-    graphql_name 'MessageableUser'
+    graphql_name "MessageableUser"
 
     implements GraphQL::Types::Relay::Node
     global_id_field :id  # this is a relay-style "global" identifier

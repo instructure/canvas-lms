@@ -51,7 +51,7 @@ shared_examples_for "All answer parsers" do
   end
 
   it "sanitizes answer comments" do
-    expect(@answer_data.first[:comments_html]).to include('<img')
-    expect(@answer_data.first[:comments_html]).not_to include('onerror')
+    expect(@answer_data.first[:comments_html]).to include("<img")
+    expect(@answer_data.first[:comments_html]).not_to include("onerror")
   end
 end

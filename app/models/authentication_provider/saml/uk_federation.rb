@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'saml2'
+require "saml2"
 
 class AuthenticationProvider::SAML::UKFederation < AuthenticationProvider::SAML::Federation
-  URN = 'http://ukfederation.org.uk'
+  URN = "http://ukfederation.org.uk"
 
   class << self
     def endpoint
-      Setting.get('ukfederation_metadata_url', 'http://metadata.ukfederation.org.uk/ukfederation-metadata.xml')
+      Setting.get("ukfederation_metadata_url", "http://metadata.ukfederation.org.uk/ukfederation-metadata.xml")
     end
 
     protected

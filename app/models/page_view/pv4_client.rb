@@ -46,20 +46,20 @@ class PageView
       )
 
       json = JSON.parse(response.body)
-      raise response.body unless json['page_views']
+      raise response.body unless json["page_views"]
 
-      json['page_views'].map! do |pv|
-        pv['session_id'] = pv.delete('sessionid')
-        pv['url'] = "#{HostUrl.protocol}://#{pv.delete('vhost')}#{pv.delete('http_request')}"
-        pv['context_id'] = pv.delete('canvas_context_id')
-        pv['context_type'] = pv.delete('canvas_context_type')
-        pv['updated_at'] = pv['created_at'] = pv.delete('timestamp')
-        pv['user_agent'] = pv.delete('agent')
-        pv['account_id'] = pv.delete('root_account_id')
-        pv['remote_ip'] = pv.delete('client_ip')
-        pv['render_time'] = pv.delete('microseconds').to_f / 1_000_000
-        pv['http_method'].try(:downcase!)
-        pv['developer_key_id'] = pv.delete('developer_key_id')
+      json["page_views"].map! do |pv|
+        pv["session_id"] = pv.delete("sessionid")
+        pv["url"] = "#{HostUrl.protocol}://#{pv.delete("vhost")}#{pv.delete("http_request")}"
+        pv["context_id"] = pv.delete("canvas_context_id")
+        pv["context_type"] = pv.delete("canvas_context_type")
+        pv["updated_at"] = pv["created_at"] = pv.delete("timestamp")
+        pv["user_agent"] = pv.delete("agent")
+        pv["account_id"] = pv.delete("root_account_id")
+        pv["remote_ip"] = pv.delete("client_ip")
+        pv["render_time"] = pv.delete("microseconds").to_f / 1_000_000
+        pv["http_method"].try(:downcase!)
+        pv["developer_key_id"] = pv.delete("developer_key_id")
 
         PageView.from_attributes(pv)
       end

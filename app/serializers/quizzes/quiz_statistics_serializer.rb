@@ -120,10 +120,10 @@ module Quizzes
           out[$1] = statistic if key =~ SubmissionStatisticsExtractor
         end
 
-        out.delete('user_ids')
-        out.delete('logged_out_users')
+        out.delete("user_ids")
+        out.delete("logged_out_users")
 
-        out['unique_count'] = student_analysis_report[:unique_submission_count]
+        out["unique_count"] = student_analysis_report[:unique_submission_count]
       end
     end
 

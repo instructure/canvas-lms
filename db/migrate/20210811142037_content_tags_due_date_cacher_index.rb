@@ -25,7 +25,7 @@ class ContentTagsDueDateCacherIndex < ActiveRecord::Migration[6.0]
     add_index :content_tags,
               %i[content_type context_type context_id],
               where: "workflow_state<>'deleted'",
-              name: 'index_content_tags_for_due_date_cacher',
+              name: "index_content_tags_for_due_date_cacher",
               algorithm: :concurrently,
               if_not_exists: true
   end

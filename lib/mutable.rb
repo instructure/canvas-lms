@@ -47,15 +47,15 @@ module Mutable
     if submissions.present?
       submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select(%i[id context_type context_id])
-                               .where(asset_type: 'Submission', asset_id: submission_ids)
+                               .where(asset_type: "Submission", asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       user_ids = submissions.map(&:user_id).uniq # hide stream items for submission owners, not instructors
       # note: unfortunately this will hide items for an instructor if instructor (somehow) has a submission too
 
       Shard.partition_by_shard(user_ids) do |user_ids_subset|
-        StreamItemInstance.where(:stream_item_id => stream_items, :user_id => user_ids_subset)
-                          .update_all_with_invalidation(stream_item_contexts, :hidden => true)
+        StreamItemInstance.where(stream_item_id: stream_items, user_id: user_ids_subset)
+                          .update_all_with_invalidation(stream_item_contexts, hidden: true)
       end
 
       # Teachers want to hide their submission comments if they mute
@@ -72,13 +72,13 @@ module Mutable
     if submissions.present?
       submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select(%i[id context_type context_id])
-                               .where(asset_type: 'Submission', asset_id: submission_ids)
+                               .where(asset_type: "Submission", asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do
-        StreamItemInstance.where(:hidden => true, :stream_item_id => stream_items)
-                          .update_all_with_invalidation(stream_item_contexts, :hidden => false)
+        StreamItemInstance.where(hidden: true, stream_item_id: stream_items)
+                          .update_all_with_invalidation(stream_item_contexts, hidden: false)
       end
 
       hidden_comment_sub_ids = SubmissionComment.where(hidden: true, submission_id: submission_ids).pluck(:submission_id)
@@ -93,7 +93,7 @@ module Mutable
       submission_comment_scope = submission_comment_scope.where(author_id: instructor_ids) if instructor_ids.present?
       submission_comment_scope.update_all(hidden: hidden, updated_at: update_time)
 
-      Submission.where(:id => submission_id_slice)
+      Submission.where(id: submission_id_slice)
                 .update_all(["submission_comments_count = (SELECT COUNT(*) FROM #{SubmissionComment.quoted_table_name} WHERE
             submissions.id = submission_comments.submission_id AND submission_comments.hidden = ? AND
             submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)", false])

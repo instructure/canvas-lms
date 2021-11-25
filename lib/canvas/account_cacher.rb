@@ -51,12 +51,12 @@ module Canvas
     def self.apply_to_reflections(klass)
       klass.reflections.each do |(name, r)|
         next unless r.macro == :belongs_to
-        next if name == 'root_account'
+        next if name == "root_account"
 
         if r.options[:polymorphic]
-          next unless klass.canonicalize_polymorph_list(r.options[:polymorphic]).map(&:last).include?('Account')
+          next unless klass.canonicalize_polymorph_list(r.options[:polymorphic]).map(&:last).include?("Account")
         else
-          next unless r.class_name == 'Account'
+          next unless r.class_name == "Account"
         end
 
         next if [Canvas::RootAccountCacher::ExtendRootAccountReflection,
@@ -65,7 +65,7 @@ module Canvas
 
         r.extend(r.options[:polymorphic] ? ExtendPolymorphicAccountReflection : ExtendAccountReflection)
 
-        next unless klass.reflections.key?('root_account')
+        next unless klass.reflections.key?("root_account")
 
         m = Module.new
         polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]

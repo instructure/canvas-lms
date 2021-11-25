@@ -51,9 +51,9 @@ module GoogleDrive
 
     def to_hash
       {
-        :name => @name,
-        :folders => @folders.map(&:to_hash),
-        :files => @files.map(&:to_hash)
+        name: @name,
+        folders: @folders.map(&:to_hash),
+        files: @files.map(&:to_hash)
       }
     end
   end

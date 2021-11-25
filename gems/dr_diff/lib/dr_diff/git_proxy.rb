@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'shellwords'
+require "shellwords"
 
 module DrDiff
   class Change
@@ -20,7 +20,7 @@ module DrDiff
       @git_dir = git_dir
     end
 
-    ROOT_DIR = File.expand_path('../../../..', __dir__)
+    ROOT_DIR = File.expand_path("../../../..", __dir__)
     def path_from_root
       File.join(ROOT_DIR, git_dir || ".", path)
     end

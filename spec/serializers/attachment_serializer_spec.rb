@@ -33,20 +33,20 @@ describe AttachmentSerializer do
   end
 
   let :quiz do
-    context.quizzes.build(title: 'banana split').tap do |quiz|
+    context.quizzes.build(title: "banana split").tap do |quiz|
       quiz.id = 2
       quiz.save!
     end
   end
 
   let :attachment do
-    stats = quiz.current_statistics_for('student_analysis')
+    stats = quiz.current_statistics_for("student_analysis")
     stats.generate_csv
     stats.reload
     stats.csv_attachment
   end
 
-  let(:host_name) { 'example.com' }
+  let(:host_name) { "example.com" }
 
   let :controller do
     options = {

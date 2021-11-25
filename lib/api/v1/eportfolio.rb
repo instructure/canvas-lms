@@ -25,7 +25,7 @@ module Api::V1::Eportfolio
 
   def eportfolio_json(eportfolio, current_user, session)
     api_json(eportfolio, current_user, session, only: EPORTFOLIO_ATTRIBUTES).tap do |hash|
-      hash['public'] = !!hash['public']
+      hash["public"] = !!hash["public"]
     end
   end
 

@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class PacePlanImporter < Importer
     self.item_class = PacePlan
 
     def self.process_migration(data, migration)
-      pace_plans = data['pace_plans'] || []
+      pace_plans = data["pace_plans"] || []
       pace_plans.each do |pace_plan|
         import_from_migration(pace_plan, migration.context, migration)
       end
@@ -32,7 +32,7 @@ module Importers
 
     def self.import_from_migration(hash, context, migration)
       hash = hash.with_indifferent_access
-      return unless migration.import_object?('pace_plans', hash[:migration_id])
+      return unless migration.import_object?("pace_plans", hash[:migration_id])
 
       pace_plan = context.pace_plans.primary.where(workflow_state: hash[:workflow_state]).take
       pace_plan ||= context.pace_plans.create

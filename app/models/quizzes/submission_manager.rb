@@ -25,7 +25,7 @@ module Quizzes
 
     def find_or_create_submission(user, temporary = false, state = nil)
       s = nil
-      state ||= 'untaken'
+      state ||= "untaken"
       @quiz.shard.activate do
         Quizzes::QuizSubmission.unique_constraint_retry do
           query_hash = if !user.is_a?(::User)

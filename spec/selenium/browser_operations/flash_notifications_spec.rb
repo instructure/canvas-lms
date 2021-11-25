@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "flash notifications" do
   include_context "in-process server selenium tests"
@@ -30,6 +30,6 @@ describe "flash notifications" do
     dismiss_flash_messages
 
     get "/login"
-    expect(f('body')).not_to contain_css(flash_message_selector)
+    expect(f("body")).not_to contain_css(flash_message_selector)
   end
 end

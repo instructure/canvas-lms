@@ -20,7 +20,7 @@
 
 module Types
   class MessagePermissionsType < ApplicationObjectType
-    graphql_name 'MessagePermissions'
+    graphql_name "MessagePermissions"
 
     field :send_messages, Boolean, null: false
     field :send_messages_all, Boolean, null: false

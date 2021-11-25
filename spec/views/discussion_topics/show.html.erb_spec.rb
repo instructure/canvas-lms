@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../spec_helper'
-require_relative '../views_helper'
+require_relative "../../spec_helper"
+require_relative "../views_helper"
 
 describe "/discussion_topics/show" do
   it "renders" do
     course_with_teacher
     view_context(@course, @user)
-    assignment_model(course: @course, submission_types: 'discussion_topic')
+    assignment_model(course: @course, submission_types: "discussion_topic")
     @topic = @assignment.discussion_topic
-    @entry = @topic.discussion_entries.create!(:message => "some message")
-    @topic.discussion_entries.create!(:message => "another message")
+    @entry = @topic.discussion_entries.create!(message: "some message")
+    @topic.discussion_entries.create!(message: "another message")
     @topic.message = nil
     assign(:assignment, @assignment)
     assign(:topic, @topic)
@@ -41,16 +41,16 @@ describe "/discussion_topics/show" do
   end
 
   it "renders in a group context" do
-    assignment_model(:submission_types => 'discussion_topic')
-    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
+    assignment_model(submission_types: "discussion_topic")
+    rubric_association_model(association_object: @assignment, purpose: "grading")
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic
     @topic.message = nil # the assigns for @context don't seem to carry over to the controller helper method
     @topic.user = @user
     @topic.save!
-    @entry = @topic.discussion_entries.create!(:message => "some message")
-    @topic.discussion_entries.create!(:message => "another message")
+    @entry = @topic.discussion_entries.create!(message: "some message")
+    @topic.discussion_entries.create!(message: "another message")
     assign(:topic, @topic)
     assign(:grouped_entries, @topic.discussion_entries.group_by(&:parent_id))
     assign(:entries, @topic.discussion_entries)
@@ -65,8 +65,8 @@ describe "/discussion_topics/show" do
   end
 
   it "renders the student to-do date" do
-    assignment_model(:submission_types => 'discussion_topic')
-    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
+    assignment_model(submission_types: "discussion_topic")
+    rubric_association_model(association_object: @assignment, purpose: "grading")
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic
@@ -86,8 +86,8 @@ describe "/discussion_topics/show" do
     it "renders a speedgrader link if user can manage grades but not view all grades" do
       course_with_teacher
       course_with_ta(course: @course)
-      assignment_model(course: @course, submission_types: 'discussion_topic')
-      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      assignment_model(course: @course, submission_types: "discussion_topic")
+      @course.account.role_overrides.create!(permission: "view_all_grades", role: ta_role, enabled: false)
       @topic = @assignment.discussion_topic
       @topic.message = nil
       assign(:topic, @topic)
@@ -103,8 +103,8 @@ describe "/discussion_topics/show" do
     it "renders a speedgrader link if user can view all grades but not manage grades" do
       course_with_teacher
       course_with_ta(course: @course)
-      assignment_model(course: @course, submission_types: 'discussion_topic')
-      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      assignment_model(course: @course, submission_types: "discussion_topic")
+      @course.account.role_overrides.create!(permission: "manage_grades", role: ta_role, enabled: false)
       @topic = @assignment.discussion_topic
       @topic.message = nil
       assign(:topic, @topic)
@@ -120,9 +120,9 @@ describe "/discussion_topics/show" do
     it "does not render a speedgrader link if user can neither manage grades nor view all grades" do
       course_with_teacher
       course_with_ta(course: @course)
-      assignment_model(course: @course, submission_types: 'discussion_topic')
-      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
-      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      assignment_model(course: @course, submission_types: "discussion_topic")
+      @course.account.role_overrides.create!(permission: "view_all_grades", role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "manage_grades", role: ta_role, enabled: false)
       @topic = @assignment.discussion_topic
       @topic.message = nil
       assign(:topic, @topic)

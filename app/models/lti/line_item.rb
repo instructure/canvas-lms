@@ -32,14 +32,14 @@ class Lti::LineItem < ApplicationRecord
   belongs_to :resource_link,
              inverse_of: :line_items,
              foreign_key: :lti_resource_link_id,
-             class_name: 'Lti::ResourceLink'
+             class_name: "Lti::ResourceLink"
   belongs_to :assignment,
              inverse_of: :line_items
   belongs_to :root_account,
-             class_name: 'Account'
+             class_name: "Account"
   has_many :results,
            inverse_of: :line_item,
-           class_name: 'Lti::Result',
+           class_name: "Lti::Result",
            foreign_key: :lti_line_item_id,
            dependent: :destroy
 
@@ -47,7 +47,7 @@ class Lti::LineItem < ApplicationRecord
   before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
   before_destroy :destroy_assignment
 
-  AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'
+  AGS_EXT_SUBMISSION_TYPE = "https://canvas.instructure.com/lti/submission_type"
 
   def assignment_line_item?
     assignment.line_items.order(:created_at).first.id == id
@@ -59,7 +59,7 @@ class Lti::LineItem < ApplicationRecord
         context: context,
         name: params[:label],
         points_possible: params[:score_maximum],
-        submission_types: 'none'
+        submission_types: "none"
       }
 
       submission_type = params[AGS_EXT_SUBMISSION_TYPE]
@@ -108,7 +108,7 @@ class Lti::LineItem < ApplicationRecord
     return if ids.size.zero?
     return if ids.uniq.size == 1 && ids.first == assignment_id
 
-    errors.add(:assignment, 'does not match ltiLink')
+    errors.add(:assignment, "does not match ltiLink")
   end
 
   def set_client_id_if_possible

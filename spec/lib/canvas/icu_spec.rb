@@ -22,14 +22,14 @@ describe Canvas::ICU do
   shared_examples_for "Collator" do
     describe ".collate_by" do
       it "works" do
-        array = [{ id: 2, str: 'a' }, { id: 1, str: 'b' }]
+        array = [{ id: 2, str: "a" }, { id: 1, str: "b" }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
         expect(result.last[:id]).to eq 1
       end
 
       it "handles CanvasSort::First" do
-        array = [{ id: 2, str: CanvasSort::First }, { id: 1, str: 'b' }]
+        array = [{ id: 2, str: CanvasSort::First }, { id: 1, str: "b" }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
         expect(result.last[:id]).to eq 1
@@ -153,13 +153,13 @@ describe Canvas::ICU do
       include_examples "ICU Collator"
 
       before do
-        skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key('col').include?('LOWER')
+        skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key("col").include?("LOWER")
       end
 
       def collate(values)
         ActiveRecord::Base.connection.select_values <<~SQL.squish
           SELECT col FROM ( VALUES #{values.map { |v| "(#{ActiveRecord::Base.connection.quote(v)})" }.join(", ")} ) AS s(col)
-          ORDER BY #{ActiveRecord::Base.best_unicode_collation_key('col')}
+          ORDER BY #{ActiveRecord::Base.best_unicode_collation_key("col")}
         SQL
       end
     end

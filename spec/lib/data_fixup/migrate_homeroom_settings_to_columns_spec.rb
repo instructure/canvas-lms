@@ -30,7 +30,7 @@ describe DataFixup::MigrateHomeroomSettingsToColumns do
     @c2.save!
 
     @c3 = course_factory
-    @c3.settings_frd[:homeroom_course_id] = 'null'
+    @c3.settings_frd[:homeroom_course_id] = "null"
     @c3.save!
   end
 

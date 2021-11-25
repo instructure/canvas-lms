@@ -22,6 +22,6 @@ class RunLtiIdDataFixup < ActiveRecord::Migration[5.1]
 
   def change
     DataFixup::AddLtiIdToUsers.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                                   n_strand: ['add_lti_id_datafixup', Shard.current.database_server.id]).run
+                                                   n_strand: ["add_lti_id_datafixup", Shard.current.database_server.id]).run
   end
 end

@@ -48,7 +48,7 @@
 #     }
 class Bookmarks::BookmarksController < ApplicationController
   before_action :require_user
-  before_action :find_bookmark, :only => %i[show update destroy]
+  before_action :find_bookmark, only: %i[show update destroy]
 
   # @API List bookmarks
   # Returns the paginated list of bookmarks.
@@ -175,6 +175,6 @@ class Bookmarks::BookmarksController < ApplicationController
   end
 
   def render_errors
-    render :json => { errors: @bookmark.errors }, :status => :bad_request
+    render json: { errors: @bookmark.errors }, status: :bad_request
   end
 end

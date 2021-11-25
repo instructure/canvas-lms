@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'support/answer_serializers_specs'
-require_relative 'support/id_answer_serializers_specs'
+require_relative "support/answer_serializers_specs"
+require_relative "support/id_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
   let :output do
@@ -35,7 +35,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
     }.with_indifferent_access
   end
   let :input do
-    ['9761']
+    ["9761"]
   end
   let :factory_options do
     {
@@ -43,18 +43,18 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
     }
   end
 
-  include_examples 'Answer Serializers'
+  include_examples "Answer Serializers"
 
   # for auto specs
   def format(value)
     [value]
   end
 
-  context 'validations' do
-    include_examples 'Id Answer Serializers'
+  context "validations" do
+    include_examples "Id Answer Serializers"
 
-    it 'rejects unexpected types' do
-      [nil, 'asdf'].each do |bad_input|
+    it "rejects unexpected types" do
+      [nil, "asdf"].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
         expect(rc.error).to match(/of type array/i)

@@ -19,6 +19,6 @@
 
 module CC::Exporter
   module Epub
-    FILE_PATH = 'media'
+    FILE_PATH = "media"
   end
 end

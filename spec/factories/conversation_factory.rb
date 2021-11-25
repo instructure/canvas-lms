@@ -24,7 +24,7 @@ module Factories
 
     # if the "body" hash is passed in, use that for the message body
     @message = if options[:body].nil?
-                 @conversation.add_message('test')
+                 @conversation.add_message("test")
                else
                  @conversation.add_message(options[:body].to_s)
                end

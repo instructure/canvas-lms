@@ -53,7 +53,7 @@ class UserList
     @initial_type = initial_type
     @search_method = (@root_account.open_registration? ? :open : :closed) if @search_method == :infer
     @current_user = current_user
-    list_in ||= ''
+    list_in ||= ""
     parse_list(list_in)
     resolve
   end
@@ -62,9 +62,9 @@ class UserList
 
   def as_json(**)
     {
-      :users => addresses.map { |a| a.except(:shard) },
-      :duplicates => duplicate_addresses,
-      :errored_users => errors
+      users: addresses.map { |a| a.except(:shard) },
+      duplicates: duplicate_addresses,
+      errored_users: errors
     }
   end
 
@@ -76,10 +76,10 @@ class UserList
 
     non_existing = @addresses.reject { |a| a[:user_id] }
     non_existing_users = non_existing.map do |a|
-      user = User.new(:name => a[:name] || a[:address])
-      cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
+      user = User.new(name: a[:name] || a[:address])
+      cc = user.communication_channels.build(path: a[:address], path_type: "email")
       cc.user = user
-      user.workflow_state = 'creation_pending'
+      user.workflow_state = "creation_pending"
       user.root_account_ids = [@root_account.id]
       user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
@@ -101,17 +101,17 @@ class UserList
       # any non-word characters
       if /^([^\d\w]*\d[^\d\w]*){10}$/.match?(path)
         type = :sms
-      elsif path.include?('@') && (email = parse_email(path))
+      elsif path.include?("@") && (email = parse_email(path))
         type = :email
         name, path = email
       elsif path&.match?(unique_id_regex)
         type = :pseudonym
       else
-        @errors << { :address => path, :details => :unparseable }
+        @errors << { address: path, details: :unparseable }
         return
       end
 
-      @addresses << { :name => name, :address => path, :type => type }
+      @addresses << { name: name, address: path, type: type }
     end
 
     def parse_email(email)
@@ -134,7 +134,7 @@ class UserList
       loop do
         i += 1
         return false if i >= chars.size
-        return false if chars[i] == '@'
+        return false if chars[i] == "@"
         return true if chars[i] == '"'
       end
     end
@@ -144,7 +144,7 @@ class UserList
         list = list_in.map(&:strip)
         list.each { |path| parse_single_user(path) }
       else
-        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").tr(';', ",") + ","
+        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").tr(";", ",") + ","
         chars = str.chars
         user_start = 0
         in_quotes = false
@@ -153,7 +153,7 @@ class UserList
             in_quotes = false if char == '"'
           else
             case char
-            when ','
+            when ","
               user_line = str[user_start, i - user_start].strip
               parse_single_user(user_line) unless user_line.blank?
               user_start = i + 1
@@ -226,8 +226,8 @@ class UserList
         next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
 
         pseudos = Pseudonym.active
-                           .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
-                           .joins(:user => :communication_channels)
+                           .select("path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state")
+                           .joins(user: :communication_channels)
                            .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase }, account_ids)
         pseudos = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
                     pseudos.merge(CommunicationChannel.unretired)
@@ -239,13 +239,13 @@ class UserList
           addresses = emails.select { |a| a[:address].casecmp?(login[:address]) }
           addresses.each do |address|
             # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
-            if address[:workflow_state] == 'unconfirmed' && login[:workflow_state] == 'active'
+            if address[:workflow_state] == "unconfirmed" && login[:workflow_state] == "active"
               address.delete(:user_id)
               address.delete(:details)
               address.delete(:shard)
             end
             # if we've seen an active, and this one is unconfirmed, skip it
-            next if address[:workflow_state] == 'active' && login[:workflow_state] == 'unconfirmed'
+            next if address[:workflow_state] == "active" && login[:workflow_state] == "unconfirmed"
 
             # ccs are not unique; just error out on duplicates
             # we're in a bit of a pickle if open registration is disabled, and there are conflicting
@@ -268,20 +268,20 @@ class UserList
     smses = @addresses.select { |a| a[:type] == :sms }
     # reformat
     smses.each do |sms|
-      number = sms[:address].gsub(/[^\d\w]/, '')
+      number = sms[:address].gsub(/[^\d\w]/, "")
       sms[:address] = "(#{number[0, 3]}) #{number[3, 3]}-#{number[6, 4]}"
     end
     sms_account_ids = @search_method == :closed ? all_account_ids : [@root_account]
     unless smses.empty?
       Shard.partition_by_shard(sms_account_ids) do |account_ids|
-        sms_scope = @search_method == :closed ? Pseudonym.where(:account_id => account_ids) : Pseudonym
+        sms_scope = @search_method == :closed ? Pseudonym.where(account_id: account_ids) : Pseudonym
         sms_scope.active
-                 .select('path AS address, users.name AS name, communication_channels.user_id AS user_id')
-                 .joins(:user => :communication_channels)
-                 .where("communication_channels.workflow_state='active' AND (#{smses.map { |x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})")
+                 .select("path AS address, users.name AS name, communication_channels.user_id AS user_id")
+                 .joins(user: :communication_channels)
+                 .where("communication_channels.workflow_state='active' AND (#{smses.map { |x| "path LIKE '#{x[:address].gsub(/[^\d]/, "")}%'" }.join(" OR ")})")
                  .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
           address = sms.delete(:address)[/\d+/]
-          addresses = smses.select { |a| a[:address].gsub(/[^\d]/, '') == address }
+          addresses = smses.select { |a| a[:address].gsub(/[^\d]/, "") == address }
           addresses.each do |a|
             # ccs are not unique; just error out on duplicates
             if a.key?(:user_id) && (a[:user_id] != login[:user_id] || a[:shard] != Shard.current)
@@ -316,7 +316,7 @@ class UserList
         address.delete :user_id
         (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
       else
-        @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
+        @errors << { address: address[:address], type: address[:type], details: (address[:details] || :not_found) }
       end
     end
   end

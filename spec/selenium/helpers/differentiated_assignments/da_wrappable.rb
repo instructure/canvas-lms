@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_homework_assignee_module'
+require_relative "da_homework_assignee_module"
 
 module DifferentiatedAssignments
   module DifferentiatedAssignmentsWrappable
@@ -57,7 +57,7 @@ module DifferentiatedAssignments
     end
 
     def validate_self
-      raise ArgumentError, 'Invalid homework assignee!' unless validate_assignees
+      raise ArgumentError, "Invalid homework assignee!" unless validate_assignees
     end
 
     def validate_assignees
@@ -86,7 +86,7 @@ module DifferentiatedAssignments
     end
 
     def remove_word_from_array_items(an_array, word)
-      an_array.map { |item| item.sub(word, '').strip }
+      an_array.map { |item| item.sub(word, "").strip }
     end
 
     def assignees_by_type(type)

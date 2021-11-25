@@ -27,11 +27,11 @@ class OutcomeProficiency < ApplicationRecord
     true
   end
 
-  has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
+  has_many :outcome_proficiency_ratings, -> { order "points DESC, id ASC" },
            dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :context, polymorphic: %i[account course], required: true
 
-  validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }, unless: :deleted?
+  validates :outcome_proficiency_ratings, presence: { message: t("Missing required ratings") }, unless: :deleted?
   validate :single_mastery_rating, unless: :deleted?
   validate :strictly_decreasing_points, unless: :deleted?
   validates :context, presence: true
@@ -53,7 +53,7 @@ class OutcomeProficiency < ApplicationRecord
   private :original_undestroy
   def undestroy
     transaction do
-      OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: 'active', updated_at: Time.zone.now.utc)
+      OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: "active", updated_at: Time.zone.now.utc)
       reload
       original_undestroy
     end
@@ -61,7 +61,7 @@ class OutcomeProficiency < ApplicationRecord
 
   def as_json(_options = {})
     {
-      'ratings' => outcome_proficiency_ratings.map(&:as_json)
+      "ratings" => outcome_proficiency_ratings.map(&:as_json)
     }
   end
 
@@ -99,24 +99,24 @@ class OutcomeProficiency < ApplicationRecord
 
   def self.default_ratings
     ratings = []
-    ratings << { description: I18n.t('Exceeds Mastery'), points: 4, mastery: false, color: '008EE2' }
-    ratings << { description: I18n.t('Mastery'), points: 3, mastery: true, color: '00AC18' }
-    ratings << { description: I18n.t('Near Mastery'), points: 2, mastery: false, color: 'FAB901' }
-    ratings << { description: I18n.t('Below Mastery'), points: 1, mastery: false, color: 'D97900' }
-    ratings << { description: I18n.t('No Evidence'), points: 0, mastery: false, color: 'EE0612' }
+    ratings << { description: I18n.t("Exceeds Mastery"), points: 4, mastery: false, color: "008EE2" }
+    ratings << { description: I18n.t("Mastery"), points: 3, mastery: true, color: "00AC18" }
+    ratings << { description: I18n.t("Near Mastery"), points: 2, mastery: false, color: "FAB901" }
+    ratings << { description: I18n.t("Below Mastery"), points: 1, mastery: false, color: "D97900" }
+    ratings << { description: I18n.t("No Evidence"), points: 0, mastery: false, color: "EE0612" }
     ratings
   end
 
   def self.find_or_create_default!(context)
     proficiency = OutcomeProficiency.find_by(context: context)
-    if proficiency&.workflow_state == 'active'
+    if proficiency&.workflow_state == "active"
       return proficiency
     end
 
     GuardRail.activate(:primary) do
       OutcomeProficiency.transaction do
         proficiency ||= OutcomeProficiency.new(context: context)
-        proficiency.workflow_state = 'active'
+        proficiency.workflow_state = "active"
         proficiency.replace_ratings(default_ratings)
         proficiency.save!
         proficiency
@@ -125,7 +125,7 @@ class OutcomeProficiency < ApplicationRecord
   rescue ActiveRecord::RecordNotUnique
     retry
   rescue ActiveRecord::RecordInvalid => e
-    raise unless e.record.errors[:context_id] == ['has already been taken']
+    raise unless e.record.errors[:context_id] == ["has already been taken"]
 
     retry
   end
@@ -138,7 +138,7 @@ class OutcomeProficiency < ApplicationRecord
 
   def single_mastery_rating
     if next_ratings.count(&:mastery) != 1
-      errors.add(:outcome_proficiency_ratings, t('Exactly one rating can have mastery'))
+      errors.add(:outcome_proficiency_ratings, t("Exactly one rating can have mastery"))
     end
   end
 
@@ -154,7 +154,7 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   def clear_cached_proficiencies
-    if context_type == 'Account'
+    if context_type == "Account"
       context.clear_downstream_caches(:resolved_outcome_proficiency)
     end
   end
@@ -189,10 +189,10 @@ class OutcomeProficiency < ApplicationRecord
 
   def updateable_rubric_scopes
     case context_type
-    when 'Account'
+    when "Account"
       [
         Rubric.where(
-          context_type: 'Account',
+          context_type: "Account",
           context_id: [context_id] + Account.sub_account_ids_recursive(context_id)
         ),
         Rubric.where(context: context.associated_courses)

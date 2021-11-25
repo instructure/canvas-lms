@@ -22,7 +22,7 @@ module SIS
   module CSV
     class AbstractCourseImporter < CSVBaseImporter
       def self.abstract_course_csv?(row)
-        row.include?('abstract_course_id') && !row.include?('course_id') && row.include?('short_name')
+        row.include?("abstract_course_id") && !row.include?("course_id") && row.include?("short_name")
       end
 
       # expected columns
@@ -30,11 +30,11 @@ module SIS
       def process(csv, index = nil, count = nil)
         SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            importer.add_abstract_course(row['abstract_course_id'], row['short_name'],
-                                         row['long_name'], row['status'], row['term_id'],
-                                         row['account_id'], row['fallback_account_id'])
+            importer.add_abstract_course(row["abstract_course_id"], row["short_name"],
+                                         row["long_name"], row["status"], row["term_id"],
+                                         row["account_id"], row["fallback_account_id"])
           rescue ImportError => e
-            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
           end
         end
       end

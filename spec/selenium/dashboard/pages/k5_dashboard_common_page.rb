@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/color_common'
+require_relative "../../common"
+require_relative "../../helpers/color_common"
 
 module K5DashboardCommonPageObject
   include ColorCommon
@@ -26,15 +26,15 @@ module K5DashboardCommonPageObject
   def add_and_assess_rubric_assignment
     rubric = outcome_with_rubric(course: @subject_course)
     assignment = create_assignment(@course, "Rubric Assignment", "Description of Rubric", 10)
-    association = rubric.associate_with(assignment, @subject_course, purpose: 'grading', use_for_grading: true)
+    association = rubric.associate_with(assignment, @subject_course, purpose: "grading", use_for_grading: true)
     submission = assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
     association.assess(
       user: @student,
       assessor: @teacher,
       artifact: submission,
       assessment: {
-        assessment_type: 'grading',
-        :"criterion_#{@rubric.criteria_object.first.id}" => {
+        assessment_type: "grading",
+        "criterion_#{@rubric.criteria_object.first.id}": {
           points: 3,
           comments: "a comment",
         }
@@ -46,7 +46,7 @@ module K5DashboardCommonPageObject
   def admin_setup
     feature_setup
     teacher_setup
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
   end
 
   def create_and_submit_assignment(course, assignment_title, description, points_possible)
@@ -60,8 +60,8 @@ module K5DashboardCommonPageObject
       title: assignment_title,
       description: description,
       points_possible: points_possible,
-      submission_types: 'online_text_entry',
-      workflow_state: 'published'
+      submission_types: "online_text_entry",
+      workflow_state: "published"
     )
   end
 
@@ -69,21 +69,21 @@ module K5DashboardCommonPageObject
     course.calendar_events.create!(title: calendar_event_title, start_at: start_at)
   end
 
-  def create_course_module(workflow_state = 'active')
+  def create_course_module(workflow_state = "active")
     @module_title = "Course Module"
-    @course_module = @subject_course.context_modules.create!(:name => @module_title, :workflow_state => workflow_state)
+    @course_module = @subject_course.context_modules.create!(name: @module_title, workflow_state: workflow_state)
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
-    @course_module.add_item(:id => assignment.id, :type => 'assignment')
+    @course_module.add_item(id: assignment.id, type: "assignment")
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
     course.assignments.create!(
       title: assignment_title,
-      grading_type: 'points',
+      grading_type: "points",
       points_possible: points_possible,
       due_at: assignment_due_at,
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
   end
 
@@ -105,28 +105,28 @@ module K5DashboardCommonPageObject
   end
 
   def create_lti_resource(resource_name)
-    rendered_icon = 'https://lor.instructure.com/img/icon_commons.png'
-    lti_resource_url = 'http://www.example.com'
+    rendered_icon = "https://lor.instructure.com/img/icon_commons.png"
+    lti_resource_url = "http://www.example.com"
     tool =
       Account.default.context_external_tools.new(
         {
           name: resource_name,
-          domain: 'canvaslms.com',
-          consumer_key: '12345',
-          shared_secret: 'secret',
-          is_rce_favorite: 'true'
+          domain: "canvaslms.com",
+          consumer_key: "12345",
+          shared_secret: "secret",
+          is_rce_favorite: "true"
         }
       )
     tool.set_extension_setting(
       :editor_button,
       {
-        message_type: 'ContentItemSelectionRequest',
+        message_type: "ContentItemSelectionRequest",
         url: lti_resource_url,
         icon_url: rendered_icon,
         text: "#{resource_name} Favorites",
-        enabled: 'true',
-        use_tray: 'true',
-        favorite: 'true'
+        enabled: "true",
+        use_tray: "true",
+        favorite: "true"
       }
     )
     tool.course_navigation = { enabled: true }
@@ -140,7 +140,7 @@ module K5DashboardCommonPageObject
   end
 
   def hex_value_for_color(element, style_type)
-    '#' + ColorCommon.rgba_to_hex(element.style(style_type))
+    "#" + ColorCommon.rgba_to_hex(element.style(style_type))
   end
 
   def new_announcement(course, title, message)
@@ -150,18 +150,18 @@ module K5DashboardCommonPageObject
   def student_setup
     feature_setup
     @course_name = "K5 Course"
-    @teacher_name = 'K5Teacher'
+    @teacher_name = "K5Teacher"
     course_with_teacher(
       active_course: 1,
       active_enrollment: 1,
       course_name: @course_name,
       name: @teacher_name,
-      email: 'teacher_person@example.com'
+      email: "teacher_person@example.com"
     )
     @homeroom_teacher = @teacher
     course_with_student(
       active_all: true,
-      name: 'K5Student',
+      name: "K5Student",
       course: @course
     )
     @original_student = @student
@@ -174,8 +174,8 @@ module K5DashboardCommonPageObject
       course_name: @subject_course_title
     )
     @subject_course = @course
-    @student_enrollment.update!(workflow_state: 'active')
-    @subject_course.enroll_teacher(@homeroom_teacher, :enrollment_state => 'active')
+    @student_enrollment.update!(workflow_state: "active")
+    @subject_course.enroll_teacher(@homeroom_teacher, enrollment_state: "active")
   end
 
   def observer_setup
@@ -190,7 +190,7 @@ module K5DashboardCommonPageObject
       active_course: 1,
       active_enrollment: 1,
       course_name: @course_name,
-      name: 'K5Teacher'
+      name: "K5Teacher"
     )
     @homeroom_teacher = @teacher
     @course.update!(homeroom_course: true)

@@ -29,11 +29,11 @@ class AuthenticationProvider::SamlIdpDiscovery < AuthenticationProvider::Delegat
     end
 
     def display_name
-      'SAML IdP Discovery Service'
+      "SAML IdP Discovery Service"
     end
 
     def sti_name
-      'saml_idp_discovery'
+      "saml_idp_discovery"
     end
   end
 

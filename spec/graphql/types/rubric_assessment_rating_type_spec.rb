@@ -31,7 +31,7 @@ describe Types::RubricAssessmentRatingType do
       context: course,
       rubric: rubric,
       association_object: assignment,
-      purpose: 'grading'
+      purpose: "grading"
     )
   end
   let!(:rubric_assessment) do
@@ -39,53 +39,53 @@ describe Types::RubricAssessmentRatingType do
       user: student,
       assessor: teacher,
       rubric_association: rubric_association,
-      assessment_type: 'grading'
+      assessment_type: "grading"
     )
   end
   let(:learning_outcome) { outcome_model }
   let(:submission) { assignment.submissions.where(user: student).first }
   let(:submission_type) { GraphQLTypeTester.new(submission, current_user: teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }')
+      submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }")
     ).to eq [rubric_assessment.data.map { |r| r[:id].to_s }]
   end
 
-  describe 'works for the field' do
-    it 'comments' do
-      rubric_assessment.data[0][:comments] = 'hello world'
+  describe "works for the field" do
+    it "comments" do
+      rubric_assessment.data[0][:comments] = "hello world"
       rubric_assessment.save!
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { comments } } }')
-      ).to eq [['hello world']]
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { comments } } }")
+      ).to eq [["hello world"]]
     end
 
-    it 'criterion' do
-      rubric_assessment.data[0][:comments] = 'hello world'
+    it "criterion" do
+      rubric_assessment.data[0][:comments] = "hello world"
       rubric_assessment.save!
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { criterion { _id } } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { criterion { _id } } } }")
       ).to eq [rubric.criteria.map { |c| c[:id].to_s }]
     end
 
-    it 'description' do
+    it "description" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { description } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { description } } }")
       ).to eq [rubric_assessment.data.pluck(:description)]
     end
 
-    it 'outcome' do
+    it "outcome" do
       rubric_assessment.data[0][:learning_outcome_id] = learning_outcome.id
       rubric_assessment.save!
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { outcome { _id } } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { outcome { _id } } } }")
       ).to eq [[learning_outcome.id.to_s]]
     end
 
-    it 'points' do
+    it "points" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { points } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { points } } }")
       ).to eq [rubric_assessment.data.pluck(:points)]
     end
   end

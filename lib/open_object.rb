@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'ostruct'
+require "ostruct"
 
 class OpenStruct
   def as_json(**)

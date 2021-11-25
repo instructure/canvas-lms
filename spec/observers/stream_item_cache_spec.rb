@@ -24,17 +24,17 @@ describe StreamItemCache do
       enable_cache do
         # GIVEN: I have an existing stream item and cache it
         # by calling cached_recent_stream_items
-        course_with_teacher(:active_all => true)
-        discussion_topic_model(:context => @course) # stream item
+        course_with_teacher(active_all: true)
+        discussion_topic_model(context: @course) # stream item
         @teacher.cached_recent_stream_items # cache the dashboard items
-        @teacher.cached_recent_stream_items(:contexts => [@course]) # cache the context items
+        @teacher.cached_recent_stream_items(contexts: [@course]) # cache the context items
         dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
-        context_key   = StreamItemCache.recent_stream_items_key(@teacher, 'Course', @course.id)
+        context_key   = StreamItemCache.recent_stream_items_key(@teacher, "Course", @course.id)
         expect(Rails.cache.read(dashboard_key)).not_to be_blank
         expect(Rails.cache.read(context_key)).not_to be_blank
 
         # WHEN: I create another stream item
-        discussion_topic_model(:context => @course) # observer fires
+        discussion_topic_model(context: @course) # observer fires
 
         # EXPEXT: the cache to be cleared
         expect(Rails.cache.read(dashboard_key)).to be_blank

@@ -50,7 +50,7 @@ describe "graphql pg statement_timeouts" do
 
     it "fails when slow" do
       make_stuff_slow
-      Setting.set('graphql_statement_timeout', 1)
+      Setting.set("graphql_statement_timeout", 1)
       expect do
         CanvasSchema.execute(query, context: { current_user: @teacher })
       end.to raise_error(GraphQLPostgresTimeout::Error)
@@ -67,7 +67,7 @@ describe "graphql pg statement_timeouts" do
 
     it "fails when slow" do
       make_stuff_slow
-      Setting.set('graphql_statement_timeout', 1)
+      Setting.set("graphql_statement_timeout", 1)
       result = CanvasSchema.execute(mutation, context: { current_user: @teacher })
       expect(result.dig("data", "updateAssignment")).to be_nil
       expect(result.dig("errors", 0, "path")).to eq ["updateAssignment"]

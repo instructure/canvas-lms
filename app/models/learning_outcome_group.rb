@@ -27,17 +27,17 @@ class LearningOutcomeGroup < ActiveRecord::Base
   self.ignored_columns = %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
-  belongs_to :source_outcome_group, class_name: 'LearningOutcomeGroup', inverse_of: :destination_outcome_groups
-  has_many :destination_outcome_groups, class_name: 'LearningOutcomeGroup', inverse_of: :source_outcome_group, dependent: :nullify
-  has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup'
-  has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
+  belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
+  has_many :destination_outcome_groups, class_name: "LearningOutcomeGroup", inverse_of: :source_outcome_group, dependent: :nullify
+  has_many :child_outcome_groups, class_name: "LearningOutcomeGroup"
+  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
   resolves_root_account through: ->(group) { group.context_id ? group.context.resolved_root_account_id : 0 }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
-  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates :description, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_blank: true }
   validates :title, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
 
@@ -159,7 +159,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   def adopt_outcome_link(outcome_link, opts = {})
     return if context && context != outcome_link.context
     # no-op if the group is global and the link isn't
-    return if context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
+    return if context.nil? && outcome_link.context_type != "LearningOutcomeGroup"
     # no-op if we're already the parent
     return outcome_link if outcome_link.associated_asset == self
 
@@ -204,7 +204,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         outcome_group.destroy
       end
 
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       save!
     end
   end
@@ -212,9 +212,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
   scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
   scope :active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) }
 
-  scope :global, -> { where(:context_id => nil) }
+  scope :global, -> { where(context_id: nil) }
 
-  scope :root, -> { where(:learning_outcome_group_id => nil) }
+  scope :root, -> { where(learning_outcome_group_id: nil) }
 
   def self.for_context(context)
     context ? context.learning_outcome_groups : LearningOutcomeGroup.global
@@ -227,7 +227,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       group = scope.active.root.take
       if !group && force
-        group = scope.build :title => context.try(:name) || 'ROOT'
+        group = scope.build title: context.try(:name) || "ROOT"
         group.building_default = true
         GuardRail.activate(:primary) do
           # during course copies/imports, observe may be disabled but import job will

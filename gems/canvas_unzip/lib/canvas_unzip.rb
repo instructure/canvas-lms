@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "active_support/core_ext/module/delegation"
-require 'zip'
-require 'fileutils'
-require 'canvas_mimetype_fu'
-require 'rubygems/package'
-require 'zlib'
+require "zip"
+require "fileutils"
+require "canvas_mimetype_fu"
+require "rubygems/package"
+require "zlib"
 
 module SkipStrictOctCheck
   def strict_oct(str)
@@ -45,7 +45,7 @@ class CanvasUnzip
   Limits = Struct.new(:maximum_bytes, :maximum_files)
 
   def self.unsafe_entry?(entry)
-    entry.symlink? || entry.name == '/' || entry.name.split('/').include?('..')
+    entry.symlink? || entry.name == "/" || entry.name.split("/").include?("..")
   end
 
   def self.add_warning(warnings, entry, tag)
@@ -94,7 +94,7 @@ class CanvasUnzip
 
         begin
           name = entry.name
-          name = name.sub(nested_dir, '') if nested_dir # pretend the dir doesn't exist
+          name = name.sub(nested_dir, "") if nested_dir # pretend the dir doesn't exist
           f_path = File.join(dest_folder, name)
           entry.extract(f_path, false, bytes_left) do |size|
             bytes_left -= size
@@ -121,25 +121,25 @@ class CanvasUnzip
     mime_type = File.mime_type?(file)
 
     # on some systems `file` fails to recognize a zip file with no entries; fall back on using the extension
-    mime_type = File.mime_type?(archive_filename) if mime_type == 'application/octet-stream'
+    mime_type = File.mime_type?(archive_filename) if mime_type == "application/octet-stream"
 
-    if ['application/x-gzip', 'application/gzip'].include? mime_type
+    if ["application/x-gzip", "application/gzip"].include? mime_type
       file = Zlib::GzipReader.new(file)
-      mime_type = 'application/x-tar' # it may not actually be a tar though, so rescue if there's a problem
+      mime_type = "application/x-tar" # it may not actually be a tar though, so rescue if there's a problem
     end
 
     case mime_type
-    when 'application/zip'
+    when "application/zip"
       Zip::File.open(file) do |zipfile|
         zipfile.entries.each_with_index do |zip_entry, index|
           yield(Entry.new(zip_entry), index)
         end
       end
-    when 'application/x-tar'
+    when "application/x-tar"
       index = 0
       begin
         Gem::Package::TarReader.new(file).each do |tar_entry|
-          next if tar_entry.header.typeflag == 'x'
+          next if tar_entry.header.typeflag == "x"
 
           yield(Entry.new(tar_entry), index)
           index += 1
@@ -189,10 +189,10 @@ class CanvasUnzip
       @name ||= case type
                 when :zip
                   # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
-                  normalize_name(entry.name, 'cp437')
+                  normalize_name(entry.name, "cp437")
                 when :tar
                   # there is no standard. this seems like a reasonable fallback to me
-                  normalize_name(entry.full_name.sub(%r{^\./}, ''), 'iso-8859-1')
+                  normalize_name(entry.full_name.sub(%r{^\./}, ""), "iso-8859-1")
                 end
     end
 
@@ -222,7 +222,7 @@ class CanvasUnzip
         when :zip
           entry.get_input_stream do |is|
             entry.set_extra_attributes_on_path(dest_path)
-            buf = +''
+            buf = +""
             while (buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf))
               os << buf
               digest.update(buf)
@@ -242,8 +242,8 @@ class CanvasUnzip
 
     # forces name to UTF-8, converting from fallback_encoding if it isn't UTF-8 to begin with
     def normalize_name(name, fallback_encoding)
-      utf8_name = name.dup.force_encoding('utf-8')
-      utf8_name = name.dup.force_encoding(fallback_encoding).encode('utf-8') unless utf8_name.valid_encoding?
+      utf8_name = name.dup.force_encoding("utf-8")
+      utf8_name = name.dup.force_encoding(fallback_encoding).encode("utf-8") unless utf8_name.valid_encoding?
       utf8_name
     end
   end

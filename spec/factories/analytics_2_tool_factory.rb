@@ -21,18 +21,18 @@
 module Factories
   def analytics_2_tool_factory(context: Account.default)
     context.context_external_tools.create!(
-      name: 'Analytics 2',
-      shared_secret: '1',
-      consumer_key: '1',
-      url: 'http://analytics2.example.com/',
+      name: "Analytics 2",
+      shared_secret: "1",
+      consumer_key: "1",
+      url: "http://analytics2.example.com/",
       tool_id: ContextExternalTool::ANALYTICS_2,
       settings: {
         student_context_card: {
-          required_permissions: 'view_all_grades',
-          canvas_icon_class: 'icon-analytics'
+          required_permissions: "view_all_grades",
+          canvas_icon_class: "icon-analytics"
         }.with_indifferent_access,
         course_navigation: {
-          canvas_icon_class: 'icon-analytics'
+          canvas_icon_class: "icon-analytics"
         }.with_indifferent_access
       }
     )

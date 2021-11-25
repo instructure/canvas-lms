@@ -51,11 +51,11 @@ module Canvas::Migration::ExternalContent
       end
 
       def retry_delay
-        Setting.get('external_content_retry_delay_seconds', '20').to_i.seconds
+        Setting.get("external_content_retry_delay_seconds", "20").to_i.seconds
       end
 
       def retry_limit
-        Setting.get('external_content_retry_limit', '5').to_i
+        Setting.get("external_content_retry_limit", "5").to_i
       end
 
       def retry_block_for_each(pending_keys)
@@ -73,7 +73,7 @@ module Canvas::Migration::ExternalContent
           retry_count += 1
         end
         if pending_keys.any?
-          message = "External content migrations timed out for #{pending_keys.join(', ')}"
+          message = "External content migrations timed out for #{pending_keys.join(", ")}"
           Canvas::Errors.capture_exception(:external_content_migration, message, :warn)
         end
       end

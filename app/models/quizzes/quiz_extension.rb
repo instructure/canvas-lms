@@ -23,7 +23,7 @@ class Quizzes::QuizExtension
   attr_accessor :quiz_submission, :ext_params
 
   delegate :quiz_id, :user_id, :extra_attempts, :extra_time,
-           :manually_unlocked, :end_at, :to => :quiz_submission
+           :manually_unlocked, :end_at, to: :quiz_submission
 
   def initialize(quiz_submission, ext_params)
     @quiz_submission = quiz_submission
@@ -44,7 +44,7 @@ class Quizzes::QuizExtension
       sub_manager = Quizzes::SubmissionManager.new(quiz)
       ext_params.map do |params|
         student    = students.find(params[:user_id])
-        submission = sub_manager.find_or_create_submission(student, nil, 'settings_only')
+        submission = sub_manager.find_or_create_submission(student, nil, "settings_only")
         extension  = new(submission, params)
         yield extension if block_given? # use yielded block to check permissions
         extensions << extension

@@ -19,18 +19,18 @@
 #
 
 class DiscussionFilterType < Types::BaseEnum
-  graphql_name 'DiscussionFilterType'
-  description 'Search types that can be associated with discussions'
-  value 'all'
-  value 'unread'
-  value 'drafts'
-  value 'deleted'
+  graphql_name "DiscussionFilterType"
+  description "Search types that can be associated with discussions"
+  value "all"
+  value "unread"
+  value "drafts"
+  value "deleted"
 end
 
 class DiscussionSortOrderType < Types::BaseEnum
-  graphql_name 'DiscussionSortOrderType'
-  value 'asc', value: :asc
-  value 'desc', value: :desc
+  graphql_name "DiscussionSortOrderType"
+  value "asc", value: :asc
+  value "desc", value: :desc
 end
 
 module Types

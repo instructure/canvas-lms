@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'active_support/core_ext/module/delegation'
+require "active_support/core_ext/module/delegation"
 
 module EventStream::IndexStrategy
   class Cassandra
@@ -51,7 +51,7 @@ module EventStream::IndexStrategy
     end
 
     def create_key(bucket, key)
-      [*key, bucket].join('/')
+      [*key, bucket].join("/")
     end
 
     def select_cql
@@ -103,7 +103,7 @@ module EventStream::IndexStrategy
         if item.is_a?(@cass_index.event_stream.record_type)
           @cass_index.bookmark_for(item)
         else
-          [item['bucket'], item['ordered_id']]
+          [item["bucket"], item["ordered_id"]]
         end
       end
 
@@ -159,7 +159,7 @@ module EventStream::IndexStrategy
           if pager.size == pager.per_page
             pager.has_more!
           else
-            pager << row.to_hash.merge('bucket' => bucket)
+            pager << row.to_hash.merge("bucket" => bucket)
           end
         end
         ordered_id = nil

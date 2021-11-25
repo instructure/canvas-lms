@@ -71,7 +71,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
   def question_attachment_filename(question, attach, user)
     name = user.last_name_first.gsub(/_(\d+)_/, '-\1-')
     name += user.id.to_s
-    name = name.tr(' ', "_").gsub(/[^-\w]/, "").downcase
+    name = name.tr(" ", "_").gsub(/[^-\w]/, "").downcase
     name = "#{name}_question_#{question[:question_id]}_#{attach.id}_#{attach.display_name}"
     [attach, name]
   end
@@ -81,7 +81,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
     ids = submissions.filter_map(&:submission_data).flatten.select do |submission|
       submission[:attachment_ids].present?
     end.pluck(:attachment_ids).flatten
-    Attachment.where(:id => ids).index_by(&:id)
+    Attachment.where(id: ids).index_by(&:id)
   end
 
   def find_submissions
@@ -90,7 +90,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
       visible_student_ids = quiz.context.apply_enrollment_visibility(
         quiz.context.student_enrollments, zip_attachment.user
       ).pluck(:user_id)
-      submissions = submissions.where(:user_id => visible_student_ids)
+      submissions = submissions.where(user_id: visible_student_ids)
     end
     @submissions = submissions.reject(&:was_preview).filter_map(&:latest_submitted_attempt)
   end

@@ -96,7 +96,7 @@ class EpubExportsController < ApplicationController
   include Api::V1::EpubExport
 
   before_action :require_user
-  before_action :require_context, :only => [:create]
+  before_action :require_context, only: [:create]
   before_action :check_feature_enabled
 
   def check_feature_enabled
@@ -104,7 +104,7 @@ class EpubExportsController < ApplicationController
        @domain_root_account.enable_offline_web_export?
       respond_to do |format|
         format.html do
-          render status: :not_found, template: 'shared/errors/404_message'
+          render status: :not_found, template: "shared/errors/404_message"
         end
         format.json { render status: :not_found }
       end

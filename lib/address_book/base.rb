@@ -176,7 +176,7 @@ module AddressBook
         case context
         when Course then context.id
         when CourseSection then context.course_id
-        when Group then context.context_type == 'Course' && context.context_id
+        when Group then context.context_type == "Course" && context.context_id
         end
       return false if course_id && @sender.current_and_concluded_courses.where(id: course_id).exists?
 

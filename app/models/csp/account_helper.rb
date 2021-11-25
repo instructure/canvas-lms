@@ -19,10 +19,10 @@
 #
 module Csp::AccountHelper
   def self.included(account_class)
-    account_class.has_many :csp_domains, :class_name => "Csp::Domain"
+    account_class.has_many :csp_domains, class_name: "Csp::Domain"
 
     # the setting (and id of the account to search) that will be passed down to sub-accounts e.g. ([true, 2])
-    account_class.add_setting :csp_inherited_data, :inheritable => true
+    account_class.add_setting :csp_inherited_data, inheritable: true
 
     account_class.after_save :unload_csp_data
   end
@@ -104,25 +104,25 @@ module Csp::AccountHelper
   def add_domain!(domain)
     domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
-      if retry_count > 0 && (record = csp_domains.where(:domain => domain).take)
+      if retry_count > 0 && (record = csp_domains.where(domain: domain).take)
         record.undestroy if record.deleted?
         record
       else
-        record = csp_domains.create(:domain => domain)
+        record = csp_domains.create(domain: domain)
         record.valid? && record
       end
     end
   end
 
   def remove_domain!(domain)
-    csp_domains.active.where(:domain => domain.downcase).take&.destroy!
+    csp_domains.active.where(domain: domain.downcase).take&.destroy!
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
     # first, get the allowed domain list from the enabled csp account
     # then get the list of domains extracted from external tools
     domains = ::Csp::Domain.get_cached_domains_for_account(csp_account_id)
-    domains += Setting.get('csp.global_whitelist', '').split(',').map(&:strip)
+    domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
     domains.uniq.sort
@@ -149,7 +149,7 @@ module Csp::AccountHelper
   end
 
   def csp_tool_scope
-    ContextExternalTool.where(:context_type => "Account", :context_id => account_chain_ids).active
+    ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
   end
 
   def clear_tool_domain_cache
@@ -160,20 +160,20 @@ module Csp::AccountHelper
   def csp_files_domains(request)
     files_host = HostUrl.file_host(root_account, request.host_with_port)
     config = Canvas::DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
-    if config['attachment_specific_file_domain'] == 'true'
-      separator = config['attachment_specific_file_domain_separator'] || '.'
-      files_host = if separator == '.'
+    if config["attachment_specific_file_domain"] == "true"
+      separator = config["attachment_specific_file_domain_separator"] || "."
+      files_host = if separator == "."
                      "*.#{files_host}"
                    else
-                     "*.#{files_host[files_host.index('.') + 1..]}"
+                     "*.#{files_host[files_host.index(".") + 1..]}"
                    end
     end
-    canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config['base_url']).host
+    canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config["base_url"]).host
     inst_fs_host = InstFS.enabled?.presence && URI.parse(InstFS.app_host).host
     [files_host, canvadocs_host, inst_fs_host].compact
   end
 
   def csp_logging_config
-    @config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)['csp_logging.yml'] || '{}')
+    @config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)["csp_logging.yml"] || "{}")
   end
 end

@@ -55,10 +55,10 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
       end
 
       UnzipAttachment.process(
-        :context => cm.context,
-        :root_directory => folder,
-        :filename => zipfile.path,
-        :callback => update_callback
+        context: cm.context,
+        root_directory: folder,
+        filename: zipfile.path,
+        callback: update_callback
       )
 
       zipfile.close
@@ -74,8 +74,8 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
 
   def self.enqueue(content_migration)
     Delayed::Job.enqueue(new(content_migration.id),
-                         :priority => Delayed::LOW_PRIORITY,
-                         :max_attempts => 1,
-                         :strand => content_migration.strand)
+                         priority: Delayed::LOW_PRIORITY,
+                         max_attempts: 1,
+                         strand: content_migration.strand)
   end
 end

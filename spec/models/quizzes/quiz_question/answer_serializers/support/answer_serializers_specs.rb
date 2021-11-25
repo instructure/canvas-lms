@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples_for 'Answer Serializers' do
+shared_examples_for "Answer Serializers" do
   # A QuizQuestion of the type the AnswerSerializer deals with.
   #
   # Exports 'qq'.
@@ -63,19 +63,19 @@ shared_examples_for 'Answer Serializers' do
     qq
   end
 
-  context 'serialization' do
+  context "serialization" do
     before do
       if !respond_to?(:input) && !respond_to?(:inputs)
-        raise 'missing :input or :outputs definition'
+        raise "missing :input or :outputs definition"
       elsif !respond_to?(:output) && !respond_to?(:outputs)
-        raise 'missing :output or :outputs definition'
+        raise "missing :output or :outputs definition"
       end
 
       @inputs = respond_to?(:inputs) ? inputs : [input]
       @outputs = respond_to?(:outputs) ? outputs : [output]
     end
 
-    it '[auto] should serialize' do
+    it "[auto] should serialize" do
       @inputs.each_with_index do |input, index|
         rc = subject.serialize(input)
         expect(rc.error).to be_nil
@@ -83,7 +83,7 @@ shared_examples_for 'Answer Serializers' do
       end
     end
 
-    it '[auto] should deserialize' do
+    it "[auto] should deserialize" do
       @outputs.each_with_index do |output, index|
         input = @inputs[index]
 

@@ -20,7 +20,7 @@
 
 module Login::CanvasHelper
   def session_timeout_enabled?
-    PluginSetting.cached_plugin_setting('sessions')&.enabled?
+    PluginSetting.cached_plugin_setting("sessions")&.enabled?
   end
 
   def reg_link_data(auth_type)

@@ -23,7 +23,7 @@ class CleanUpAssignmentOverrides < ActiveRecord::Migration[5.1]
 
   def self.up
     DataFixup::RemoveOrphanedAssignmentOverrideStudents
-      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups')
+      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups")
       .run
 
     # this fix is fast enough to run synchronously, without requiring a multi-deploy rollout of the check constraint

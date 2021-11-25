@@ -98,11 +98,11 @@ class ApiRouteSet
     only, except = opts.delete(:only), opts.delete(:except)
     maybe_action = ->(action) { (!only || Array(only).include?(action)) && (!except || !Array(except).include?(action)) }
 
-    get(path.to_s, opts.merge(:action => :index, :as => "#{name_prefix}#{resource_name}")) if maybe_action[:index]
-    get("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :show, :as => "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
-    post(path.to_s, opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
-    put("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :update)) if maybe_action[:update]
-    delete("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :destroy)) if maybe_action[:destroy]
+    get(path.to_s, opts.merge(action: :index, as: "#{name_prefix}#{resource_name}")) if maybe_action[:index]
+    get("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :show, as: "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
+    post(path.to_s, opts.merge(action: :create, as: (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
+    put("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :update)) if maybe_action[:update]
+    delete("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :destroy)) if maybe_action[:destroy]
   end
 
   def mapper_prefix
@@ -114,8 +114,8 @@ class ApiRouteSet
     opts[:as] ||= opts.delete(:path_name)
     opts[:as] = "#{mapper_prefix}#{opts[:as]}" if opts[:as]
     opts[:constraints] ||= {}
-    opts[:constraints][:format] = 'json' if opts[:constraints].is_a? Hash
-    opts[:format] = 'json'
+    opts[:constraints][:format] = "json" if opts[:constraints].is_a? Hash
+    opts[:format] = "json"
     mapper.send(method, "#{prefix}/#{path}", opts)
   end
 
@@ -138,7 +138,7 @@ class ApiRouteSet
 
     def route(method, path, opts)
       opts[:constraints] ||= {}
-      path.split('/').each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      path.split("/").each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
       super(method, path, opts)
     end
   end

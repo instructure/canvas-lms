@@ -20,10 +20,10 @@
 
 module Factories
   BASE_ATTRS = {
-    :name => "a",
-    :url => "http://google.com",
-    :consumer_key => '12345',
-    :shared_secret => 'secret'
+    name: "a",
+    url: "http://google.com",
+    consumer_key: "12345",
+    shared_secret: "secret"
   }.freeze
 
   def external_tool_model(context: nil, opts: {})

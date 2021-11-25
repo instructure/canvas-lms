@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'swagger_helper'
-require 'formatted_type'
+require_relative "swagger_helper"
+require "formatted_type"
 
 describe FormattedType do
   subject { ft }
@@ -29,25 +29,25 @@ describe FormattedType do
   context "integer" do
     let(:example) { 1 }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["integer", "int64"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "integer", "format" => "int64" }) }
@@ -57,25 +57,25 @@ describe FormattedType do
   context "integer from string" do
     let(:example) { "1" }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["integer", "int64"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "integer", "format" => "int64" }) }
@@ -85,25 +85,25 @@ describe FormattedType do
   context "float" do
     let(:example) { 1.1 }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["number", "double"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "number", "format" => "double" }) }
@@ -113,25 +113,25 @@ describe FormattedType do
   context "float from string" do
     let(:example) { "1.1" }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["number", "double"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "number", "format" => "double" }) }
@@ -141,31 +141,31 @@ describe FormattedType do
   context "string" do
     let(:example) { "my name" }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#string?' do
+    describe "#string?" do
       subject { super().string? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["string", nil] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "string" }) }
@@ -175,37 +175,37 @@ describe FormattedType do
   context "boolean" do
     let(:example) { true }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#string?' do
+    describe "#string?" do
       subject { super().string? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#boolean?' do
+    describe "#boolean?" do
       subject { super().boolean? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["boolean", nil] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "boolean" }) }
@@ -215,37 +215,37 @@ describe FormattedType do
   context "date" do
     let(:example) { "2012-01-01" }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#string?' do
+    describe "#string?" do
       subject { super().string? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#date?' do
+    describe "#date?" do
       subject { super().date? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["string", "date"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "string", "format" => "date" }) }
@@ -255,43 +255,43 @@ describe FormattedType do
   context "datetime" do
     let(:example) { "2012-01-01T12:00:00Z" }
 
-    describe '#integer?' do
+    describe "#integer?" do
       subject { super().integer? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#float?' do
+    describe "#float?" do
       subject { super().float? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#string?' do
+    describe "#string?" do
       subject { super().string? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#date?' do
+    describe "#date?" do
       subject { super().date? }
 
       it { is_expected.not_to be_truthy }
     end
 
-    describe '#datetime?' do
+    describe "#datetime?" do
       subject { super().datetime? }
 
       it { is_expected.to be_truthy }
     end
 
-    describe '#type_and_format' do
+    describe "#type_and_format" do
       subject { super().type_and_format }
 
       it { is_expected.to eq ["string", "date-time"] }
     end
 
-    describe '#to_hash' do
+    describe "#to_hash" do
       subject { super().to_hash }
 
       it { is_expected.to eq({ "type" => "string", "format" => "date-time" }) }

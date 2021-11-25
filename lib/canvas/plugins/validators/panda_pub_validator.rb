@@ -23,14 +23,14 @@ module Canvas::Plugins::Validators::PandaPubValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     elsif settings.map(&:last).any?(&:blank?)
-      plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
       false
     else
       uri = URI.parse(settings[:base_url].strip) rescue nil
       if uri
         settings.slice(:base_url, :application_id, :key_id, :key_secret).to_h.with_indifferent_access
       else
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.invalid_url', 'Invalid URL'))
+        plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.invalid_url", "Invalid URL"))
         false
       end
     end

@@ -44,7 +44,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
   end
 
   before do
-    @root_account = Account.create(name: 'new account')
+    @root_account = Account.create(name: "new account")
     @sub_account = @root_account.sub_accounts.create!
   end
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-sns'
+require "aws-sdk-sns"
 
 class NotificationEndpoint < ActiveRecord::Base
   class FailedSnsInteraction < StandardError; end
@@ -35,7 +35,7 @@ class NotificationEndpoint < ActiveRecord::Base
   def push_json(json)
     return false unless endpoint_exists? && own_endpoint? && endpoint_enabled? && !token_changed?
 
-    sns_client.publish(target_arn: arn, message: json, message_structure: 'json')
+    sns_client.publish(target_arn: arn, message: json, message_structure: "json")
   end
 
   private
@@ -58,15 +58,15 @@ class NotificationEndpoint < ActiveRecord::Base
   end
 
   def own_endpoint?
-    endpoint_attributes['CustomUserData'] == access_token.global_id.to_s
+    endpoint_attributes["CustomUserData"] == access_token.global_id.to_s
   end
 
   def endpoint_enabled?
-    endpoint_attributes['Enabled'] == 'true'
+    endpoint_attributes["Enabled"] == "true"
   end
 
   def token_changed?
-    token != endpoint_attributes['Token']
+    token != endpoint_attributes["Token"]
   end
 
   def create_platform_endpoint
@@ -90,7 +90,7 @@ class NotificationEndpoint < ActiveRecord::Base
       begin
         sns_client.set_endpoint_attributes(
           endpoint_arn: arn,
-          attributes: { 'CustomUserData' => access_token.global_id.to_s }
+          attributes: { "CustomUserData" => access_token.global_id.to_s }
         )
         endpoint_updated = true
       rescue Aws::SNS::Errors::NotFound => ex

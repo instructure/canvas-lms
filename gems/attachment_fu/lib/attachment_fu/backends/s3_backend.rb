@@ -143,19 +143,19 @@ module AttachmentFu # :nodoc:
       mattr_reader :bucket
 
       def self.included(base) # :nodoc:
-        require 'aws-sdk-s3'
+        require "aws-sdk-s3"
 
         s3_config = load_s3_config(base.attachment_options[:s3_config_path])
         bucket_name = s3_config.delete(:bucket_name)
 
-        s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, 'amazon_s3.yml'))
+        s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, "amazon_s3.yml"))
         @@bucket = s3.bucket(bucket_name)
 
         base.before_update :rename_file
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || Rails.root.join('config/amazon_s3.yml')
+        s3_config_path = path || Rails.root.join("config/amazon_s3.yml")
         YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
@@ -201,7 +201,7 @@ module AttachmentFu # :nodoc:
       def full_filename(thumbnail = nil)
         # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
         # them as spaces. Continue that behavior.
-        basename = thumbnail_name_for(thumbnail).tr('+', ' ')
+        basename = thumbnail_name_for(thumbnail).tr("+", " ")
         File.join(base_path, basename)
       end
 

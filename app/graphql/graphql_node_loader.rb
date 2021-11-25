@@ -92,7 +92,7 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
-    when 'MediaObject'
+    when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"
       Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
@@ -159,7 +159,7 @@ module GraphQLNodeLoader
           progress
         end
       end
-    when 'Rubric'
+    when "Rubric"
       Loaders::IDLoader.for(Rubric).load(id).then(check_read_permission)
     when "Term"
       Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|

@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'html_text_helper'
+require "html_text_helper"
 
 module CanvasQuizStatistics
   module Util
     def self.digest(str)
-      Digest::MD5.hexdigest((str || '').to_s.strip)
+      Digest::MD5.hexdigest((str || "").to_s.strip)
     end
 
     # Converts a hash to use symbol keys.

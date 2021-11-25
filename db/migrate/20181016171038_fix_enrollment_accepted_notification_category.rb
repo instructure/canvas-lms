@@ -45,7 +45,7 @@ class FixEnrollmentAcceptedNotificationCategory < ActiveRecord::Migration[5.1]
     # These are what we need to update. They should now have the same frequency
     # settings as everything else in the "Other" notification category group
     communication_channel_ids_to_update = []
-    NotificationPolicy.find_ids_in_ranges(:batch_size => 100_000) do |min_id, max_id|
+    NotificationPolicy.find_ids_in_ranges(batch_size: 100_000) do |min_id, max_id|
       communication_channel_ids_to_update += NotificationPolicy
                                              .where(id: min_id..max_id)
                                              .where(notification_id: n.id)
@@ -71,7 +71,7 @@ class FixEnrollmentAcceptedNotificationCategory < ActiveRecord::Migration[5.1]
                                .where(notification_id: other_category_target_ids)
                                .where(communication_channel_id: batched_cc_ids)
       batched_cc_ids.each do |communication_channel_id|
-        channel_freq_map[communication_channel_id] = 'daily'
+        channel_freq_map[communication_channel_id] = "daily"
       end
       other_category_targets.each do |np|
         channel_freq_map[np.communication_channel_id] = np.frequency

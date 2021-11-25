@@ -24,38 +24,38 @@ module AccountsHelper
   end
 
   def print_messages(batch)
-    return '' unless batch
+    return "" unless batch
 
-    render :partial => 'accounts/sis_batch_messages', :object => batch
+    render partial: "accounts/sis_batch_messages", object: batch
   end
 
   def print_counts(batch)
-    return '' unless batch.data && batch.data[:counts]
+    return "" unless batch.data && batch.data[:counts]
 
-    render :partial => 'accounts/sis_batch_counts', :object => batch
+    render partial: "accounts/sis_batch_counts", object: batch
   end
 
   def show_code_and_term_for(course)
     show_term = course.enrollment_term && !course.enrollment_term.default_term?
     show_code = course.course_code != course.name
-    "#{course.course_code if show_code}#{', ' if show_term && show_code}#{course.enrollment_term.name if show_term}"
+    "#{course.course_code if show_code}#{", " if show_term && show_code}#{course.enrollment_term.name if show_term}"
   end
 
   def turnitin_originality_options(account)
     [
-      account.root_account? ? nil : [I18n.t('Use parent account setting'), nil],
-      [I18n.t('#turnitin_settings.originality_report_visible_immediately', "Immediately"), 'immediate'],
-      [I18n.t('#turnitin_settings.originality_report_visible_after_grading', "After the assignment is graded"), 'after_grading'],
-      [I18n.t('#turnitin_settings.originality_report_visible_after_due_date', "After the Due Date"), 'after_due_date'],
-      [I18n.t('#turnitin_settings.originality_report_never', "Never"), 'never']
+      account.root_account? ? nil : [I18n.t("Use parent account setting"), nil],
+      [I18n.t("#turnitin_settings.originality_report_visible_immediately", "Immediately"), "immediate"],
+      [I18n.t("#turnitin_settings.originality_report_visible_after_grading", "After the assignment is graded"), "after_grading"],
+      [I18n.t("#turnitin_settings.originality_report_visible_after_due_date", "After the Due Date"), "after_due_date"],
+      [I18n.t("#turnitin_settings.originality_report_never", "Never"), "never"]
     ].compact
   end
 
   def dashboard_view_options
     [
-      [I18n.t('Card View'), 'cards'],
-      [I18n.t('Recent Activity'), 'activity'],
-      [I18n.t('List View'), 'planner']
+      [I18n.t("Card View"), "cards"],
+      [I18n.t("Recent Activity"), "activity"],
+      [I18n.t("List View"), "planner"]
     ]
   end
 end

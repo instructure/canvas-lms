@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "browser" do
   include_context "in-process server selenium tests"
 
   it "pulls logs" do
-    skip_if_ie('not supported')
-    skip_if_firefox('not supported')
-    skip_if_safari('not supported')
+    skip_if_ie("not supported")
+    skip_if_firefox("not supported")
+    skip_if_safari("not supported")
 
-    sample_msg = '=== Test Logging ==='
+    sample_msg = "=== Test Logging ==="
 
-    get('/login')
+    get("/login")
     driver.execute_script("window.console.log('#{sample_msg}')")
     browser_logs = driver.manage.logs.get(:browser)
 

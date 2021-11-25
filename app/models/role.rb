@@ -23,8 +23,8 @@ class Role < ActiveRecord::Base
 
   ENROLLMENT_TYPES = %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment].freeze
 
-  DEFAULT_ACCOUNT_TYPE = 'AccountMembership'
-  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership'].freeze
+  DEFAULT_ACCOUNT_TYPE = "AccountMembership"
+  ACCOUNT_TYPES = ["AccountAdmin", "AccountMembership"].freeze
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +
@@ -54,17 +54,17 @@ class Role < ActiveRecord::Base
   end
 
   belongs_to :account
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: "Account"
   has_many :role_overrides
 
-  before_validation :infer_root_account_id, :if => :belongs_to_account?
+  before_validation :infer_root_account_id, if: :belongs_to_account?
 
-  validate :ensure_unique_name_for_account, :if => :belongs_to_account?
+  validate :ensure_unique_name_for_account, if: :belongs_to_account?
   validates :name, :workflow_state, presence: true
-  validates :account_id, presence: { :if => :belongs_to_account? }
+  validates :account_id, presence: { if: :belongs_to_account? }
 
-  validates :base_role_type, inclusion: { :in => BASE_TYPES, :message => 'is invalid' }
-  validates :name, exclusion: { :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved' }
+  validates :base_role_type, inclusion: { in: BASE_TYPES, message: "is invalid" }
+  validates :name, exclusion: { in: KNOWN_TYPES, unless: :built_in?, message: "is reserved" }
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
@@ -79,9 +79,9 @@ class Role < ActiveRecord::Base
 
   def ensure_unique_name_for_account
     if active?
-      scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", name, account_id, 'active')
+      scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", name, account_id, "active")
       if new_record? ? scope.exists? : scope.where.not(id: id).exists?
-        errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+        errors.add(:label, t(:duplicate_role, "A role with this name already exists"))
         false
       end
     end
@@ -89,7 +89,7 @@ class Role < ActiveRecord::Base
 
   def ensure_non_built_in_name
     if !built_in? && Role.built_in_roles(root_account_id: root_account_id).map(&:label).include?(name)
-      errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
+      errors.add(:label, t(:duplicate_role, "A role with this name already exists"))
       false
     end
   end
@@ -105,10 +105,10 @@ class Role < ActiveRecord::Base
   include Workflow
   workflow do
     state :active do
-      event :deactivate, :transitions_to => :inactive
+      event :deactivate, transitions_to: :inactive
     end
     state :inactive do
-      event :activate, :transitions_to => :active
+      event :activate, transitions_to: :active
     end
     state :built_in # for previously built-in roles
     state :deleted
@@ -122,10 +122,10 @@ class Role < ActiveRecord::Base
     raise "root_account_id required" unless root_account_id
 
     # giving up on in-process built-in role caching because it's probably not really worth it anymore
-    RequestCache.cache('built_in_roles', root_account_id) do
+    RequestCache.cache("built_in_roles", root_account_id) do
       local_id, shard = Shard.local_id_for(root_account_id)
       (shard || Shard.current).activate do
-        Role.where(:workflow_state => 'built_in', :root_account_id => local_id).order(:id).to_a
+        Role.where(workflow_state: "built_in", root_account_id: local_id).order(:id).to_a
       end
     end
   end
@@ -142,7 +142,7 @@ class Role < ActiveRecord::Base
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
 
-    Role.where(:id => id).take # giving up on built-in role caching because it's silly now and we should just preload more
+    Role.where(id: id).take # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
@@ -173,7 +173,7 @@ class Role < ActiveRecord::Base
     if built_in?
       if course_role?
         RoleOverride.enrollment_type_labels.detect { |label| label[:name] == name }[:label].call
-      elsif name == 'AccountAdmin'
+      elsif name == "AccountAdmin"
         RoleOverride::ACCOUNT_ADMIN_LABEL.call
       else
         name
@@ -194,20 +194,20 @@ class Role < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save!
   end
 
   scope :not_deleted, -> { where("roles.workflow_state IN ('active', 'inactive')") }
-  scope :deleted, -> { where(:workflow_state => 'deleted') }
-  scope :active, -> { where(:workflow_state => 'active') }
-  scope :inactive, -> { where(:workflow_state => 'inactive') }
-  scope :for_courses, -> { where(:base_role_type => ENROLLMENT_TYPES) }
-  scope :for_accounts, -> { where(:base_role_type => ACCOUNT_TYPES) }
-  scope :full_account_admin, -> { where(base_role_type: 'AccountAdmin') }
+  scope :deleted, -> { where(workflow_state: "deleted") }
+  scope :active, -> { where(workflow_state: "active") }
+  scope :inactive, -> { where(workflow_state: "inactive") }
+  scope :for_courses, -> { where(base_role_type: ENROLLMENT_TYPES) }
+  scope :for_accounts, -> { where(base_role_type: ACCOUNT_TYPES) }
+  scope :full_account_admin, -> { where(base_role_type: "AccountAdmin") }
   scope :custom_account_admin_with_permission, lambda { |permission|
-    where(base_role_type: 'AccountMembership')
+    where(base_role_type: "AccountMembership")
       .where("EXISTS (
       SELECT 1
       FROM #{RoleOverride.quoted_table_name}
@@ -237,7 +237,7 @@ class Role < ActiveRecord::Base
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select { |cr| cr.base_role_type == new[:base_role_name] }.map do |cr|
-        { :id => cr.id, :base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name, :asset_string => cr.asset_string, :workflow_state => cr.workflow_state }
+        { id: cr.id, base_role_name: cr.base_role_type, name: cr.name, label: cr.name, asset_string: cr.asset_string, workflow_state: cr.workflow_state }
       end
       new
     end
@@ -249,9 +249,9 @@ class Role < ActiveRecord::Base
     users_scope = course.users_visible_to(user)
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
     base_counts = users_scope.where(enrollments: { role_id: built_in_role_ids })
-                             .group('enrollments.type').select('users.id').distinct.count
+                             .group("enrollments.type").select("users.id").distinct.count
     role_counts = users_scope.where.not(enrollments: { role_id: built_in_role_ids })
-                             .group('enrollments.role_id').select('users.id').distinct.count
+                             .group("enrollments.role_id").select("users.id").distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|
@@ -268,7 +268,7 @@ class Role < ActiveRecord::Base
   def self.manageable_roles_by_user(user, context)
     manageable = []
     if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
-      manageable += ['StudentEnrollment', 'ObserverEnrollment']
+      manageable += ["StudentEnrollment", "ObserverEnrollment"]
     end
     if context.grants_right?(user, :manage_admin_users)
       manageable += %w[ObserverEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
@@ -279,16 +279,16 @@ class Role < ActiveRecord::Base
   def self.add_delete_roles_by_user(user, context)
     addable = []
     deleteable = []
-    addable += ['TeacherEnrollment'] if context.grants_right?(user, :add_teacher_to_course)
-    deleteable += ['TeacherEnrollment'] if context.grants_right?(user, :remove_teacher_from_course)
-    addable += ['TaEnrollment'] if context.grants_right?(user, :add_ta_to_course)
-    deleteable += ['TaEnrollment'] if context.grants_right?(user, :remove_ta_from_course)
-    addable += ['DesignerEnrollment'] if context.grants_right?(user, :add_designer_to_course)
-    deleteable += ['DesignerEnrollment'] if context.grants_right?(user, :remove_designer_from_course)
-    addable += ['StudentEnrollment'] if context.grants_right?(user, :add_student_to_course)
-    deleteable += ['StudentEnrollment'] if context.grants_right?(user, :remove_student_from_course)
-    addable += ['ObserverEnrollment'] if context.grants_right?(user, :add_observer_to_course)
-    deleteable += ['ObserverEnrollment'] if context.grants_right?(user, :remove_observer_from_course)
+    addable += ["TeacherEnrollment"] if context.grants_right?(user, :add_teacher_to_course)
+    deleteable += ["TeacherEnrollment"] if context.grants_right?(user, :remove_teacher_from_course)
+    addable += ["TaEnrollment"] if context.grants_right?(user, :add_ta_to_course)
+    deleteable += ["TaEnrollment"] if context.grants_right?(user, :remove_ta_from_course)
+    addable += ["DesignerEnrollment"] if context.grants_right?(user, :add_designer_to_course)
+    deleteable += ["DesignerEnrollment"] if context.grants_right?(user, :remove_designer_from_course)
+    addable += ["StudentEnrollment"] if context.grants_right?(user, :add_student_to_course)
+    deleteable += ["StudentEnrollment"] if context.grants_right?(user, :remove_student_from_course)
+    addable += ["ObserverEnrollment"] if context.grants_right?(user, :add_observer_to_course)
+    deleteable += ["ObserverEnrollment"] if context.grants_right?(user, :remove_observer_from_course)
 
     [addable, deleteable]
   end

@@ -21,7 +21,7 @@
 class Mutations::UpdateCommentBankItem < Mutations::BaseMutation
   graphql_name "UpdateCommentBankItem"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem')
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem")
   argument :comment, String, required: true
 
   field :comment_bank_item, Types::CommentBankItemType, null: true
@@ -37,6 +37,6 @@ class Mutations::UpdateCommentBankItem < Mutations::BaseMutation
 
     { comment_bank_item: record }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, I18n.t('Record not found')
+    raise GraphQL::ExecutionError, I18n.t("Record not found")
   end
 end

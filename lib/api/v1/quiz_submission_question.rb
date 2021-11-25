@@ -40,7 +40,7 @@ module Api::V1::QuizSubmissionQuestion
       quiz_submission_question_json(qq, quiz_submission, meta)
     end
 
-    if includes.include?('quiz_question')
+    if includes.include?("quiz_question")
       data[:quiz_questions] = questions_json(quiz_questions,
                                              meta[:user],
                                              meta[:session],
@@ -51,7 +51,7 @@ module Api::V1::QuizSubmissionQuestion
     end
 
     unless includes.empty?
-      data[:meta] = { primaryCollection: 'quiz_submission_questions' }
+      data[:meta] = { primaryCollection: "quiz_submission_questions" }
     end
 
     data

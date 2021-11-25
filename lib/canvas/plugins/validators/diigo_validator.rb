@@ -23,7 +23,7 @@ module Canvas::Plugins::Validators::DiigoValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     elsif settings.map(&:last).any?(&:blank?)
-      plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
       false
     else
       res = Diigo::Connection.config_check(settings)

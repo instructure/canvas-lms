@@ -27,11 +27,11 @@ module Factories
 
   def valid_planner_note_attributes
     {
-      :title => 'note title',
-      :details => 'note details',
-      :workflow_state => 'active',
-      :todo_date => Time.zone.today,
-      :course => nil
+      title: "note title",
+      details: "note details",
+      workflow_state: "active",
+      todo_date: Time.zone.today,
+      course: nil
     }
   end
 end

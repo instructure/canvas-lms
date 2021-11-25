@@ -21,6 +21,6 @@ module ModeratedGrading
   GRADE_ATTRIBUTES_ONLY = %i[grade score graded_at scorer_id final graded_anonymously].freeze
 
   def self.table_name_prefix
-    'moderated_grading_'
+    "moderated_grading_"
   end
 end

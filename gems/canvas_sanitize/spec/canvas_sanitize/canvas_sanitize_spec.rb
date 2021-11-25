@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-require 'timeout'
+require "spec_helper"
+require "timeout"
 
 describe CanvasSanitize do
   describe "#clean" do
@@ -171,7 +171,7 @@ describe CanvasSanitize do
     Timeout.timeout(1) { Sanitize.clean(str, CanvasSanitize::SANITIZE) }
   end
 
-  Dir.glob(File.expand_path(File.join(__FILE__, '..', '..', 'fixtures', 'xss', '*.xss'))) do |filename|
+  Dir.glob(File.expand_path(File.join(__FILE__, "..", "..", "fixtures", "xss", "*.xss"))) do |filename|
     name = File.split(filename).last
     it "sanitizes xss attempts for #{name}" do
       f = File.open(filename)

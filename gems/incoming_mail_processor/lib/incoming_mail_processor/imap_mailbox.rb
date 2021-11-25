@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'net/imap'
+require "net/imap"
 
-require_relative 'configurable_timeout'
+require_relative "configurable_timeout"
 
 module IncomingMailProcessor
   class ImapMailbox
@@ -41,7 +41,7 @@ module IncomingMailProcessor
     end
 
     def connect
-      @imap = with_timeout { Net::IMAP.new(@server, :port => @port, :ssl => @ssl) }
+      @imap = with_timeout { Net::IMAP.new(@server, port: @port, ssl: @ssl) }
       wrap_with_timeout(@imap, UsedImapMethods)
       @imap.login(@username, @password)
     end

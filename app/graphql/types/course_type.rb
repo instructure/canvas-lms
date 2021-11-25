@@ -125,13 +125,13 @@ module Types
     field :sections_connection, SectionType.connection_type, null: true
     def sections_connection
       course.active_course_sections
-            .order(CourseSection.best_unicode_collation_key('name'))
+            .order(CourseSection.best_unicode_collation_key("name"))
     end
 
     field :modules_connection, ModuleType.connection_type, null: true
     def modules_connection
       course.modules_visible_to(current_user)
-            .order('name')
+            .order("name")
     end
 
     field :users_connection, UserType.connection_type, null: true do
@@ -225,7 +225,7 @@ module Types
       end
 
       (order_by || []).each do |order|
-        direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
+        direction = order[:direction] == "descending" ? "DESC NULLS LAST" : "ASC"
         submissions = submissions.order("#{order[:field]} #{direction}")
       end
 

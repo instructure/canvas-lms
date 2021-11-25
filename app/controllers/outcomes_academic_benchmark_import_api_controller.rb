@@ -140,6 +140,6 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
       raise "invalid description value: #{rating[:description]}"
     end
 
-    { :description => rating[:description], :points => parse_int(rating[:points]) }
+    { description: rating[:description], points: parse_int(rating[:points]) }
   end
 end

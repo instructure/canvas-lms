@@ -23,7 +23,7 @@ class Csp::Domain < ActiveRecord::Base
   belongs_to :account
 
   validates :account_id, :domain, presence: true
-  validates :domain, length: { :maximum => maximum_string_length }
+  validates :domain, length: { maximum: maximum_string_length }
 
   validate :validate_domain
 
@@ -57,7 +57,7 @@ class Csp::Domain < ActiveRecord::Base
   def self.domains_for_account(global_account_id)
     local_id, shard = Shard.local_id_for(global_account_id)
     (shard || Shard.current).activate do
-      where(:account_id => local_id).active.pluck(:domain).sort
+      where(account_id: local_id).active.pluck(:domain).sort
     end
   end
 

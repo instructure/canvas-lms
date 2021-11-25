@@ -22,11 +22,11 @@ module MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
 
   SAMPLE_RESPONSES_CODES_BODIES_HEADERS = {
     success: [204, nil],
-    error400: [400, 'bad'],
-    error500: [500, 'bad2'],
-    throttled: [429, 'badthrottled'],
-    throttled123: [429, 'badthrottled', { 'Retry-After' => '123' }],
-    throttled456: [429, 'badthrottled', { 'Retry-After' => '456' }],
+    error400: [400, "bad"],
+    error500: [500, "bad2"],
+    throttled: [429, "badthrottled"],
+    throttled123: [429, "badthrottled", { "Retry-After" => "123" }],
+    throttled456: [429, "badthrottled", { "Retry-After" => "456" }],
 
     add_duplicate: [400, { error: { code: "Request_BadRequest", message: "One or more added object references already exist for the following modified properties: 'members'." } }],
     add_owners_quota_exceeded: [403, { error: { code: "Directory_QuotaExceeded", message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link owners." } }],
@@ -54,88 +54,88 @@ module MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
   end
 
   def status_code_for_sample_type(type)
-    SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type].first || raise('bad type')
+    SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type].first || raise("bad type")
   end
 end
 
 describe MicrosoftSync::GraphService::GroupsEndpoints do
   include MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
-  include_context 'microsoft_sync_graph_service_endpoints'
+  include_context "microsoft_sync_graph_service_endpoints"
 
-  describe '#update_group' do
-    subject { endpoints.update('msgroupid', abc: { def: 'ghi' }) }
+  describe "#update_group" do
+    subject { endpoints.update("msgroupid", abc: { def: "ghi" }) }
 
     let(:http_method) { :patch }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
-    let(:with_params) { { body: { abc: { def: 'ghi' } } } }
-    let(:response) { { status: 204, body: '' } }
+    let(:url) { "https://graph.microsoft.com/v1.0/groups/msgroupid" }
+    let(:with_params) { { body: { abc: { def: "ghi" } } } }
+    let(:response) { { status: 204, body: "" } }
 
     it { is_expected.to eq(nil) }
 
-    it_behaves_like 'a graph service endpoint'
-    it_behaves_like 'an endpoint that uses up quota', [1, 1]
+    it_behaves_like "a graph service endpoint"
+    it_behaves_like "an endpoint that uses up quota", [1, 1]
   end
 
-  describe '#add_users_ignore_duplicates' do
+  describe "#add_users_ignore_duplicates" do
     subject do
       endpoints.add_users_ignore_duplicates(
-        'msgroupid', members: members, owners: owners
+        "msgroupid", members: members, owners: owners
       )
     end
 
     let(:members) { Set.new %w[m1 m2] }
     let(:owners) { Set.new %w[o1 o2] }
 
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
+    let(:url) { "https://graph.microsoft.com/v1.0/groups/msgroupid" }
     let(:http_method) { :patch }
     let(:with_params) { { body: req_body } }
     let(:req_body) do
       {
-        'members@odata.bind' => %w[
+        "members@odata.bind" => %w[
           https://graph.microsoft.com/v1.0/directoryObjects/m1
           https://graph.microsoft.com/v1.0/directoryObjects/m2
         ],
-        'owners@odata.bind' => %w[
+        "owners@odata.bind" => %w[
           https://graph.microsoft.com/v1.0/directoryObjects/o1
           https://graph.microsoft.com/v1.0/directoryObjects/o2
         ]
       }
     end
-    let(:response) { { status: 204, body: '' } }
+    let(:response) { { status: 204, body: "" } }
 
-    it_behaves_like 'a graph service endpoint'
+    it_behaves_like "a graph service endpoint"
 
     it { is_expected.to eq(nil) }
 
-    context 'when members is not given' do
-      subject { endpoints.add_users_ignore_duplicates('msgroupid', owners: owners) }
+    context "when members is not given" do
+      subject { endpoints.add_users_ignore_duplicates("msgroupid", owners: owners) }
 
-      let(:req_body) { super().slice('owners@odata.bind') }
-
-      it { is_expected.to eq(nil) }
-    end
-
-    context 'when owners is not given' do
-      subject { endpoints.add_users_ignore_duplicates('msgroupid', members: members) }
-
-      let(:req_body) { super().slice('members@odata.bind') }
+      let(:req_body) { super().slice("owners@odata.bind") }
 
       it { is_expected.to eq(nil) }
     end
 
-    context 'when members and owners are not given' do
-      it 'raises an ArgumentError' do
-        expect { endpoints.add_users_ignore_duplicates('msgroupid') }.to \
-          raise_error(ArgumentError, 'Missing members/owners')
+    context "when owners is not given" do
+      subject { endpoints.add_users_ignore_duplicates("msgroupid", members: members) }
+
+      let(:req_body) { super().slice("members@odata.bind") }
+
+      it { is_expected.to eq(nil) }
+    end
+
+    context "when members and owners are not given" do
+      it "raises an ArgumentError" do
+        expect { endpoints.add_users_ignore_duplicates("msgroupid") }.to \
+          raise_error(ArgumentError, "Missing members/owners")
       end
     end
 
-    context 'when 20 users are given' do
-      subject { endpoints.add_users_ignore_duplicates('msgroupid', members: (1..20).map(&:to_s)) }
+    context "when 20 users are given" do
+      subject { endpoints.add_users_ignore_duplicates("msgroupid", members: (1..20).map(&:to_s)) }
 
       let(:req_body) do
         {
-          'members@odata.bind' =>
+          "members@odata.bind" =>
             (1..20).map { |i| "https://graph.microsoft.com/v1.0/directoryObjects/#{i}" }
         }
       end
@@ -143,14 +143,14 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       it { is_expected.to eq(nil) }
 
       # Microsoft told us write quota is about one per three users...
-      it_behaves_like 'an endpoint that uses up quota', [1, 7]
+      it_behaves_like "an endpoint that uses up quota", [1, 7]
     end
 
-    context 'when more than 20 users are given' do
-      it 'raises an ArgumentError' do
+    context "when more than 20 users are given" do
+      it "raises an ArgumentError" do
         expect do
           endpoints.add_users_ignore_duplicates(
-            'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
+            "msgroupid", members: ["x"] * 10, owners: ["y"] * 11
           )
         end.to raise_error(
           ArgumentError, "Only 20 users can be batched at once. Got 21."
@@ -158,19 +158,19 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       end
     end
 
-    shared_examples_for 'a fallback to the batch api' do
-      it 'falls back to the batch api' do
+    shared_examples_for "a fallback to the batch api" do
+      it "falls back to the batch api" do
         expect(endpoints).to receive(:add_users_via_batch)
-          .with('msgroupid', members, owners).and_return('foo')
-        expect(subject).to eq('foo')
+          .with("msgroupid", members, owners).and_return("foo")
+        expect(subject).to eq("foo")
       end
 
       it 'increments the "expected" counter' do
         allow(endpoints).to receive(:add_users_via_batch)
         subject
         expect(InstStatsd::Statsd).to have_received(:increment)
-          .with('microsoft_sync.graph_service.expected',
-                tags: hash_including(msft_endpoint: 'patch_groups'))
+          .with("microsoft_sync.graph_service.expected",
+                tags: hash_including(msft_endpoint: "patch_groups"))
       end
     end
 
@@ -178,49 +178,49 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       context "when the PATCH endpoint returns a '#{members_or_owners} quota exceeded' error" do
         let(:response) { json_response_from_sample(:"add_#{members_or_owners}_quota_exceeded") }
 
-        it_behaves_like 'a fallback to the batch api'
+        it_behaves_like "a fallback to the batch api"
       end
     end
 
-    context 'when some users are already in the group' do
+    context "when some users are already in the group" do
       let(:response) { json_response_from_sample(:add_duplicate) }
 
-      it_behaves_like 'a fallback to the batch api'
+      it_behaves_like "a fallback to the batch api"
     end
 
-    context 'when some users cannot be found on the microsoft side' do
+    context "when some users cannot be found on the microsoft side" do
       let(:response) { json_response_from_sample(:add_nonexistent_o1_user) }
 
-      it_behaves_like 'a fallback to the batch api'
+      it_behaves_like "a fallback to the batch api"
     end
 
-    context 'when the group (or something else) cannot be found on the microsoft side' do
+    context "when the group (or something else) cannot be found on the microsoft side" do
       let(:response) { json_response_from_sample(:add_nonexistent_group) }
 
-      it 'raises a HTTPNotFound' do
+      it "raises a HTTPNotFound" do
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPNotFound)
       end
     end
   end
 
-  describe '#list_members' do
+  describe "#list_members" do
     let(:method_name) { :list_members }
-    let(:method_args) { ['mygroup'] }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/members' }
+    let(:method_args) { ["mygroup"] }
+    let(:url) { "https://graph.microsoft.com/v1.0/groups/mygroup/members" }
 
-    it_behaves_like 'a paginated list endpoint' do
-      it_behaves_like 'an endpoint that uses up quota', [3, 0]
+    it_behaves_like "a paginated list endpoint" do
+      it_behaves_like "an endpoint that uses up quota", [3, 0]
     end
   end
 
-  describe '#list_owners' do
+  describe "#list_owners" do
     let(:method_name) { :list_owners }
-    let(:method_args) { ['mygroup'] }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners' }
-    let(:url_variables) { ['mygroup'] }
+    let(:method_args) { ["mygroup"] }
+    let(:url) { "https://graph.microsoft.com/v1.0/groups/mygroup/owners" }
+    let(:url_variables) { ["mygroup"] }
 
-    it_behaves_like 'a paginated list endpoint' do
-      it_behaves_like 'an endpoint that uses up quota', [2, 0]
+    it_behaves_like "a paginated list endpoint" do
+      it_behaves_like "an endpoint that uses up quota", [2, 0]
     end
   end
 
@@ -229,7 +229,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
   # Sets `batch_response_types` and `status` and expects subject to use those.
   # Tests that the proper error is raised and that it increments the statsd counters
   # for each subresponse type
-  shared_examples_for 'a members/owners batch request that can fail' do |ignored_type:, endpoint_name:|
+  shared_examples_for "a members/owners batch request that can fail" do |ignored_type:, endpoint_name:|
     ignored_code = MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
                    .status_code_for_sample_type(ignored_type)
 
@@ -273,7 +273,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       context "when batch response types are #{response_types.inspect}" do
         let(:batch_response_types) { response_types }
 
-        it 'raises an error with a message with the codes/bodies' do
+        it "raises an error with a message with the codes/bodies" do
           expected_error = if params[:throttled]
                              MicrosoftSync::GraphService::Http::BatchRequestThrottled
                            else
@@ -286,7 +286,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
           end
         end
 
-        it 'increments statsd counters based on the responses' do
+        it "increments statsd counters based on the responses" do
           expect { subject }.to raise_error(/Batch of.*codes/)
 
           params[:statsd_codes].each do |type, codes_list|
@@ -294,7 +294,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
             codes_list.uniq.each do |code|
               expect(InstStatsd::Statsd).to have_received(:count).once.with(
                 "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code), tags: {
-                  msft_endpoint: endpoint_name, status: code, extra_tag: 'abc'
+                  msft_endpoint: endpoint_name, status: code, extra_tag: "abc"
                 }
               )
             end
@@ -302,7 +302,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
         end
 
         if params[:retry_relay]
-          it 'raises an error with the proper retry delay' do
+          it "raises an error with the proper retry delay" do
             expect { subject }.to raise_error(e) do
               expect(e.retry_after_seconds).to eq(params[:retry_delay])
             end
@@ -312,13 +312,13 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#add_users_via_batch' do
+  describe "#add_users_via_batch" do
     subject do
-      endpoints.add_users_via_batch('msgroupid', %w[m1 m2], %w[o1 o2])
+      endpoints.add_users_via_batch("msgroupid", %w[m1 m2], %w[o1 o2])
                .issues_by_member_type.symbolize_keys.transform_values(&:symbolize_keys)
     end
 
-    let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
+    let(:url) { "https://graph.microsoft.com/v1.0/$batch" }
     let(:http_method) { :post }
     let(:with_params) { { body: { requests: batch_requests } } }
     let(:batch_requests) do
@@ -351,10 +351,10 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:batch_response_types) { [] }
     let(:request_ids) { %w[members_m1 members_m2 owners_o1 owners_o2] }
 
-    it_behaves_like 'a members/owners batch request that can fail',
-                    ignored_type: :add_duplicate, endpoint_name: 'group_add_users'
+    it_behaves_like "a members/owners batch request that can fail",
+                    ignored_type: :add_duplicate, endpoint_name: "group_add_users"
 
-    it 'passes along the quota used to run_batch' do
+    it "passes along the quota used to run_batch" do
       expect(endpoints.http).to \
         receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
                            .and_call_original
@@ -401,14 +401,14 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#remove_users_ignore_missing' do
+  describe "#remove_users_ignore_missing" do
     subject do
       endpoints
-        .remove_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
+        .remove_users_ignore_missing("msgroupid", members: %w[m1 m2], owners: %w[o1 o2])
         .issues_by_member_type.symbolize_keys.transform_values(&:symbolize_keys)
     end
 
-    let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
+    let(:url) { "https://graph.microsoft.com/v1.0/$batch" }
     let(:http_method) { :post }
     let(:with_params) { { body: { requests: batch_requests } } }
     let(:batch_requests) do
@@ -425,10 +425,10 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:request_ids) { %w[members_m1 members_m2 owners_o1 owners_o2] }
     let(:batch_response_types) { [] }
 
-    it_behaves_like 'a members/owners batch request that can fail',
-                    ignored_type: :remove_missing, endpoint_name: 'group_remove_users'
+    it_behaves_like "a members/owners batch request that can fail",
+                    ignored_type: :remove_missing, endpoint_name: "group_remove_users"
 
-    it 'passes along the quota used to run_batch' do
+    it "passes along the quota used to run_batch" do
       expect(endpoints.http).to \
         receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
                            .and_call_original
@@ -458,21 +458,21 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       end
     end
 
-    context 'when the last owner in a group is removed' do
+    context "when the last owner in a group is removed" do
       let(:batch_response_types) { %i[success success remove_last_owner success] }
 
-      it 'raises an MissingOwners' do
+      it "raises an MissingOwners" do
         expect { subject }.to raise_microsoft_sync_graceful_cancel_error(
           MicrosoftSync::Errors::MissingOwners, /must have owners/
         )
       end
     end
 
-    context 'when more than 20 users are given' do
-      it 'raises an ArgumentError' do
+    context "when more than 20 users are given" do
+      it "raises an ArgumentError" do
         expect do
           endpoints.remove_users_ignore_missing(
-            'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
+            "msgroupid", members: ["x"] * 10, owners: ["y"] * 11
           )
         end.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
       end

@@ -57,28 +57,28 @@ describe Mutations::UpdateCommentBankItem do
       comment: "updated comment!"
     GQL
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
-    expect(result.dig('data', 'updateCommentBankItem', 'errors')).to be_nil
-    result = result.dig('data', 'updateCommentBankItem', 'commentBankItem')
-    expect(result['courseId']).to eq @course.id.to_s
-    expect(result['userId']).to eq @admin.id.to_s
-    expect(result['comment']).to eq "updated comment!"
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateCommentBankItem", "errors")).to be_nil
+    result = result.dig("data", "updateCommentBankItem", "commentBankItem")
+    expect(result["courseId"]).to eq @course.id.to_s
+    expect(result["userId"]).to eq @admin.id.to_s
+    expect(result["comment"]).to eq "updated comment!"
   end
 
   it "allows relay id for comment bank item id" do
     query = <<~GQL
-      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment.id.to_s)},
+      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem").call(@comment.id.to_s)},
       comment: "updated comment!"
     GQL
-    comment = execute_with_input(query).dig('data', 'updateCommentBankItem', 'commentBankItem', 'comment')
+    comment = execute_with_input(query).dig("data", "updateCommentBankItem", "commentBankItem", "comment")
     expect(comment).to eq "updated comment!"
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'updateCommentBankItem', 'errors')
+      errors = result["errors"] || result.dig("data", "updateCommentBankItem", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "invalid id" do
@@ -87,7 +87,7 @@ describe Mutations::UpdateCommentBankItem do
         comment: "comment"
       GQL
       result = execute_with_input(query)
-      expect_error(result, 'Record not found')
+      expect_error(result, "Record not found")
     end
 
     it "blank comment field" do
@@ -104,7 +104,7 @@ describe Mutations::UpdateCommentBankItem do
         id: #{@comment.id}
       GQL
       result = execute_with_input(query)
-      expect_error(result, 'Argument \'comment\' on InputObject \'UpdateCommentBankItemInput\' is required.')
+      expect_error(result, "Argument 'comment' on InputObject 'UpdateCommentBankItemInput' is required.")
     end
 
     it "invalid permissions" do
@@ -113,7 +113,7 @@ describe Mutations::UpdateCommentBankItem do
         comment: "comment"
       GQL
       result = execute_with_input(query, user_executing: @student)
-      expect_error(result, 'not found')
+      expect_error(result, "not found")
     end
   end
 end

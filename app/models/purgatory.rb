@@ -19,9 +19,9 @@
 #
 class Purgatory < ActiveRecord::Base
   belongs_to :attachment
-  belongs_to :deleted_by_user, class_name: 'User'
+  belongs_to :deleted_by_user, class_name: "User"
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where(workflow_state: "active") }
 
   def self.days_until_expiration
     Setting.get("purgatory_days_until_expiration", "30").to_i
@@ -38,7 +38,7 @@ class Purgatory < ActiveRecord::Base
           ::Rails.logger.warn("error deleting purgatory from instfs: #{$!.inspect}")
         end
       end
-      Purgatory.where(:id => batch).update_all(:workflow_state => "expired")
+      Purgatory.where(id: batch).update_all(workflow_state: "expired")
     end
   end
 end

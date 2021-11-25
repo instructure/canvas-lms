@@ -22,7 +22,7 @@ class CanvasPartmanTest::WeekEvent < ActiveRecord::Base
   self.partitioning_strategy = :by_date
   self.partitioning_interval = :weeks
 
-  self.table_name = 'partman_week_events'
+  self.table_name = "partman_week_events"
 
   def self.create_schema
     drop_schema

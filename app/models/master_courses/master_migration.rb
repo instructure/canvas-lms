@@ -34,12 +34,12 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   # all the associated courses in parallel
   # and eventually the last import job will mark the sync as complete or failed
 
-  belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
+  belongs_to :root_account, class_name: "Account"
   belongs_to :user
 
   # keeps track of the import status for all associated courses
-  has_many :migration_results, :class_name => "MasterCourses::MigrationResult"
+  has_many :migration_results, class_name: "MasterCourses::MigrationResult"
 
   before_create :set_root_account_id
 
@@ -75,7 +75,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
           raise MigrationRunningError, "cannot start new migration while another one is running"
         end
       else
-        new_migration = master_template.master_migrations.create!({ :user => user }.merge(opts.except(:retry_later)))
+        new_migration = master_template.master_migrations.create!({ user: user }.merge(opts.except(:retry_later)))
         master_template.active_migration = new_migration
         master_template.save!
         new_migration.queue_export_job
@@ -93,7 +93,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def hours_until_expire
-    Setting.get('master_course_export_job_expiration_hours', '24').to_i
+    Setting.get("master_course_export_job_expiration_hours", "24").to_i
   end
 
   def in_running_state?
@@ -107,7 +107,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def expire_if_necessary!
     if in_running_state? && created_at < hours_until_expire.hours.ago
-      self.workflow_state = (workflow_state == 'imports_queued') ? 'imports_failed' : 'exports_failed'
+      self.workflow_state = (workflow_state == "imports_queued") ? "imports_failed" : "exports_failed"
       save!
     end
   end
@@ -115,13 +115,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def queue_export_job
     expires_at = hours_until_expire.hours.from_now
     queue_opts = {
-      :priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
-      :expires_at => expires_at, :on_permanent_failure => :fail_export_with_error!,
-      :n_strand => ["master_course_exports", master_template.course.global_root_account_id]
+      priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+      expires_at: expires_at, on_permanent_failure: :fail_export_with_error!,
+      n_strand: ["master_course_exports", master_template.course.global_root_account_id]
       # we may need to raise the n_strand limit (in the settings) for this key since it'll default to 1 at a time
     }
 
-    update_attribute(:workflow_state, 'queued')
+    update_attribute(:workflow_state, "queued")
     delay(**queue_opts).perform_exports
   end
 
@@ -132,19 +132,19 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     else
       export_results[:error_message] = exception_or_info
     end
-    self.workflow_state = 'exports_failed'
+    self.workflow_state = "exports_failed"
     save
   end
 
   def perform_exports
-    self.workflow_state = 'exporting'
+    self.workflow_state = "exporting"
     self.exports_started_at = Time.now
     save!
 
     subs = master_template.child_subscriptions.active.preload(:child_course).to_a
     subs.reject! { |s| s.child_course.deleted? }
     if subs.empty?
-      self.workflow_state = 'completed'
+      self.workflow_state = "completed"
       export_results[:message] = "No child courses to export to"
       save!
       return
@@ -161,8 +161,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     cms += export_to_child_courses(:selective, up_to_date_subs, true).to_a if up_to_date_subs.any?
     cms += export_to_child_courses(:full, new_subs, up_to_date_subs.none?).to_a if new_subs.any?
 
-    unless workflow_state == 'exports_failed'
-      self.workflow_state = 'imports_queued'
+    unless workflow_state == "exports_failed"
+      self.workflow_state = "imports_queued"
       self.imports_queued_at = Time.now
       save!
       queue_imports(cms)
@@ -180,10 +180,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       @updates = {}   # "
       @export_count = 0
     end
-    export = create_export(type, export_is_primary, :deletions => @deletions)
+    export = create_export(type, export_is_primary, deletions: @deletions)
 
     if export.exported_for_course_copy?
-      export_results[type] = { :subscriptions => subscriptions.map(&:id), :content_export_id => export.id }
+      export_results[type] = { subscriptions: subscriptions.map(&:id), content_export_id: export.id }
       if type == :selective
         export_results[type][:deleted] = @deletions
         export_results[type][:created] = @creations
@@ -251,7 +251,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def detect_updated_attachments(type)
     # because attachments don't get "added" to the export
     scope = master_template.course.attachments.not_deleted
-    scope = scope.where('updated_at>?', last_export_at) if type == :selective && last_export_at
+    scope = scope.where("updated_at>?", last_export_at) if type == :selective && last_export_at
     scope.each do |att|
       master_template.ensure_tag_on_export(att)
       add_exported_asset(att)
@@ -260,14 +260,14 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def detect_updated_syllabus(content_export)
     selected_content = content_export.settings[:selected_content]
-    @updates['syllabus'] = true if @updates && selected_content && selected_content[:syllabus_body]
+    @updates["syllabus"] = true if @updates && selected_content && selected_content[:syllabus_body]
   end
 
   def add_exported_asset(asset)
     return unless @export_type == :selective
 
     @export_count += 1
-    return if @export_count > Setting.get('master_courses_history_count', '150').to_i
+    return if @export_count > Setting.get("master_courses_history_count", "150").to_i
 
     set = (last_export_at.nil? || asset.created_at >= last_export_at) ? @creations : @updates
     set[asset.class.name] ||= []
@@ -276,7 +276,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   class MigrationPluginStub # so we can (ab)use queue_migration
     def self.settings
-      { :skip_initial_progress => true, :import_immediately => true }
+      { skip_initial_progress: true, import_immediately: true }
     end
   end
 
@@ -293,12 +293,12 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:publish_after_completion] = type == :full && migration_settings[:publish_after_initial_sync]
       cm.child_subscription_id = sub.id
       cm.source_course_id = master_template.course_id # apparently this is how some lti tools try to track copied content :/
-      cm.workflow_state = 'exported'
+      cm.workflow_state = "exported"
       cm.exported_attachment = export.attachment
       cm.user_id = export.user_id
       cm.save!
 
-      migration_results.create!(:content_migration => cm, :import_type => type, :child_subscription_id => sub.id, :state => "queued")
+      migration_results.create!(content_migration: cm, import_type: type, child_subscription_id: sub.id, state: "queued")
       cms << cm
     end
     save!
@@ -312,23 +312,23 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def update_import_state!(import_migration, state)
-    res = migration_results.where(:content_migration_id => import_migration).first
+    res = migration_results.where(content_migration_id: import_migration).first
     res.state = state
     res.results[:skipped] = import_migration.skipped_master_course_items.to_a if import_migration.skipped_master_course_items
     res.save!
-    if state == 'completed' && res.import_type == 'full' &&
-       (sub = master_template.child_subscriptions.active.where(:id => res.child_subscription_id, :use_selective_copy => false).first)
+    if state == "completed" && res.import_type == "full" &&
+       (sub = master_template.child_subscriptions.active.where(id: res.child_subscription_id, use_selective_copy: false).first)
       sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
     end
 
-    unless migration_results.where.not(:state => %w[completed failed]).exists?
+    unless migration_results.where.not(state: %w[completed failed]).exists?
       self.class.transaction do
         lock!
-        if workflow_state == 'imports_queued'
-          if migration_results.where.not(:state => "completed").exists?
-            self.workflow_state = 'imports_failed'
+        if workflow_state == "imports_queued"
+          if migration_results.where.not(state: "completed").exists?
+            self.workflow_state = "imports_failed"
           else
-            self.workflow_state = 'completed'
+            self.workflow_state = "completed"
             self.imports_completed_at = Time.now
           end
           save!

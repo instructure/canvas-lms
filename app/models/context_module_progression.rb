@@ -23,7 +23,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
   belongs_to :context_module
   belongs_to :user
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   before_save :set_completed_at
   before_create :set_root_account_id
@@ -110,7 +110,7 @@ class ContextModuleProgression < ActiveRecord::Base
       @orig_keys = sorted_action_keys
 
       self.view_requirements = []
-      self.actions_done.reject! { |r| r[:type] == 'min_score' }
+      self.actions_done.reject! { |r| r[:type] == "min_score" }
     end
 
     def sorted_action_keys
@@ -156,11 +156,11 @@ class ContextModuleProgression < ActiveRecord::Base
     count_needed = context_module.requirement_count.to_i
     # if no requirement_count is specified, assume all are needed
     self.workflow_state = if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
-                            'completed'
+                            "completed"
                           elsif result.met_requirement_count >= 1 || incomplete_requirements.count >= 1 # submitting to a min_score requirement should move it to started
-                            'started'
+                            "started"
                           else
-                            'unlocked'
+                            "unlocked"
                           end
 
     if result.changed?
@@ -194,14 +194,14 @@ class ContextModuleProgression < ActiveRecord::Base
         next
       end
 
-      if req[:type] == 'must_view'
+      if req[:type] == "must_view"
         calc.add_view_requirement(req)
       elsif %w[must_contribute must_mark_done].include? req[:type]
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
-      elsif req[:type] == 'must_submit'
+      elsif req[:type] == "must_submit"
         req_met = !!(subs && subs.any? do |sub|
-          if sub.workflow_state == 'graded' && sub.attempt.nil?
+          if sub.workflow_state == "graded" && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
             false
           elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
@@ -210,7 +210,7 @@ class ContextModuleProgression < ActiveRecord::Base
         end)
 
         calc.check_action!(req, req_met)
-      elsif req[:type] == 'min_score'
+      elsif req[:type] == "min_score"
         calc.check_action!(req, evaluate_score_requirement_met(req, subs))
       end
     end
@@ -296,8 +296,8 @@ class ContextModuleProgression < ActiveRecord::Base
     return nil unless requirement
 
     requirement_met = true
-    requirement_met = points && points >= requirement[:min_score].to_f && !(tag.assignment && tag.assignment.muted?) if requirement[:type] == 'min_score'
-    requirement_met = false if requirement[:type] == 'must_submit' # calculate later; requires the submission
+    requirement_met = points && points >= requirement[:min_score].to_f && !(tag.assignment && tag.assignment.muted?) if requirement[:type] == "min_score"
+    requirement_met = false if requirement[:type] == "must_submit" # calculate later; requires the submission
 
     if !requirement_met
       requirements_met.delete(requirement)
@@ -342,7 +342,7 @@ class ContextModuleProgression < ActiveRecord::Base
         save!
       end
     else
-      self.class.where(:id => self).update_all(:current => false)
+      self.class.where(id: self).update_all(current: false)
       touch_user
     end
   end
@@ -365,7 +365,7 @@ class ContextModuleProgression < ActiveRecord::Base
     related_progressions = nil
     (context_module.active_prerequisites || []).all? do |pre|
       related_progressions ||= context_module.context.find_or_create_progressions_for_user(user).index_by(&:context_module_id)
-      if pre[:type] == 'context_module' && (progression = related_progressions[pre[:id]])
+      if pre[:type] == "context_module" && (progression = related_progressions[pre[:id]])
         progression.evaluate!(context_module)
         progression.completed?
       else
@@ -382,7 +382,7 @@ class ContextModuleProgression < ActiveRecord::Base
     return false if context_module.to_be_unlocked
 
     if locked? && prerequisites_satisfied?
-      self.workflow_state = 'unlocked'
+      self.workflow_state = "unlocked"
     end
     !locked?
   end
@@ -442,7 +442,7 @@ class ContextModuleProgression < ActiveRecord::Base
       if check_prerequisites
         evaluate_requirements_met
       end
-      completion_changed = workflow_state_changed? && workflow_state_change.include?('completed')
+      completion_changed = workflow_state_changed? && workflow_state_change.include?("completed")
 
       evaluate_current_position
 
@@ -472,8 +472,8 @@ class ContextModuleProgression < ActiveRecord::Base
 
     # invalidate all, then re-evaluate each
     GuardRail.activate(:primary) do
-      ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
-      User.where(:id => progressions.map(&:user_id)).touch_all
+      ContextModuleProgression.where(id: progressions, current: true).update_all(current: false)
+      User.where(id: progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
         progression.delay_if_production(n_strand: ["dependent_progression_reevaluation", context_module.global_context_id])
@@ -490,8 +490,8 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :trigger_completion_events
 
-  scope :for_user, ->(user) { where(:user_id => user) }
-  scope :for_modules, ->(mods) { where(:context_module_id => mods) }
+  scope :for_user, ->(user) { where(user_id: user) }
+  scope :for_modules, ->(mods) { where(context_module_id: mods) }
 
   workflow do
     state :locked

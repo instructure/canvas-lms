@@ -85,15 +85,15 @@ class ScoreStatisticsGenerator
     bulk_values = statistics.map do |assignment|
       values =
         [
-          assignment['id'],
-          assignment['max'],
-          assignment['min'],
-          assignment['avg'],
-          assignment['count'],
+          assignment["id"],
+          assignment["max"],
+          assignment["min"],
+          assignment["avg"],
+          assignment["count"],
           now,
           now,
           root_account_id
-        ].join(',')
+        ].join(",")
       "(#{values})"
     end
 
@@ -101,7 +101,7 @@ class ScoreStatisticsGenerator
       connection.execute(<<~SQL.squish)
         INSERT INTO #{ScoreStatistic.quoted_table_name}
           (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)
-        VALUES #{bulk_slice.join(',')}
+        VALUES #{bulk_slice.join(",")}
         ON CONFLICT (assignment_id)
         DO UPDATE SET
            minimum = excluded.minimum,

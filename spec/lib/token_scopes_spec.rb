@@ -27,17 +27,17 @@ describe TokenScopes do
     let!(:user_info_scope) { TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope] } }
 
     it "includes the resource_name" do
-      expect(user_info_scope[:resource_name].to_s).to eq 'oauth2'
+      expect(user_info_scope[:resource_name].to_s).to eq "oauth2"
     end
 
     it "includes the resource" do
-      expect(user_info_scope[:resource].to_s).to eq 'oauth2'
+      expect(user_info_scope[:resource].to_s).to eq "oauth2"
     end
 
     it "includes a CD2 Peer Services scope" do
       scope = TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::CD2_SCOPE[:scope] }
       expect(scope).not_to be_nil
-      expect(scope[:resource_name].to_s).to eq 'peer_services'
+      expect(scope[:resource_name].to_s).to eq "peer_services"
     end
 
     it "doesn't include scopes without a name" do
@@ -75,7 +75,7 @@ describe TokenScopes do
 
       it "does not include the optional format part of the route path" do
         generated_scopes.each do |scope|
-          expect(scope.include?('(.:format)')).to be false
+          expect(scope.include?("(.:format)")).to be false
         end
       end
     end

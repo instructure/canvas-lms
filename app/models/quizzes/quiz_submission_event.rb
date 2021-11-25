@@ -28,7 +28,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   # An event for every new submission created
   EVT_SUBMISSION_CREATED = "submission_created"
 
-  belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
+  belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   resolves_root_account through: :quiz_submission
 
   serialize :event_data, JSON

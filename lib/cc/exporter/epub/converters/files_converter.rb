@@ -37,7 +37,7 @@ module CC::Exporter::Epub::Converters
           return flv_path
         end
 
-        f = File.open(mp4_path, 'wb')
+        f = File.open(mp4_path, "wb")
         CanvasHttp.get(mp4_url) do |response|
           f.write(response.body)
         end
@@ -53,7 +53,7 @@ module CC::Exporter::Epub::Converters
       end
 
       def media_id
-        flv_filename.gsub('.flv', '')
+        flv_filename.gsub(".flv", "")
       end
 
       def media_source_fetcher
@@ -61,13 +61,13 @@ module CC::Exporter::Epub::Converters
       end
 
       def mp4_path
-        flv_path.gsub('.flv', '.mp4')
+        flv_path.gsub(".flv", ".mp4")
       end
 
       def mp4_url
         @_mp4_url ||= media_source_fetcher.fetch_preferred_source_url({
                                                                         media_id: media_id,
-                                                                        file_extension: 'mp4'
+                                                                        file_extension: "mp4"
                                                                       })
       end
     end
@@ -84,7 +84,7 @@ module CC::Exporter::Epub::Converters
 
       def to_h
         {
-          identifier: data['identifier'],
+          identifier: data["identifier"],
           local_path: local_path,
           file_name: File.basename(local_path),
           path_to_file: path_to_file,
@@ -96,7 +96,7 @@ module CC::Exporter::Epub::Converters
       private
 
       def flv?
-        File.extname(original_path) == '.flv'
+        File.extname(original_path) == ".flv"
       end
 
       # The path for the file in the ePub itself. This method removes the
@@ -146,12 +146,12 @@ module CC::Exporter::Epub::Converters
       # [2]: http://tools.ietf.org/html/rfc2046
       def media_type
         case File.extname(path_to_file)
-        when '.mp3'
-          'audio/basic'
-        when '.m4v', '.mp4'
-          'video/mpg'
-        when '.jpg', '.png', '.gif', '.jpeg'
-          "image/#{File.extname(path_to_file).delete('.')}"
+        when ".mp3"
+          "audio/basic"
+        when ".m4v", ".mp4"
+          "video/mpg"
+        when ".jpg", ".png", ".gif", ".jpeg"
+          "image/#{File.extname(path_to_file).delete(".")}"
         else
           nil
         end
@@ -164,7 +164,7 @@ module CC::Exporter::Epub::Converters
 
     def convert_files(export_type)
       all_files = @manifest.css("resource[type=#{WEBCONTENT}][href^=#{WEB_RESOURCES_FOLDER}]").map do |res|
-        original_path = File.expand_path(get_full_path(res['href']))
+        original_path = File.expand_path(get_full_path(res["href"]))
         FilePresenter.new(original_path, res, export_type).to_h
       end
 

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if ENV['RAILS_DATABASE_ENVIRONMENT']
-  GuardRail.activate!(ENV['RAILS_DATABASE_ENVIRONMENT'].to_sym)
+if ENV["RAILS_DATABASE_ENVIRONMENT"]
+  GuardRail.activate!(ENV["RAILS_DATABASE_ENVIRONMENT"].to_sym)
 end
-if ENV['RAILS_DATABASE_USER']
-  GuardRail.apply_config!(:username => ENV['RAILS_DATABASE_USER'], :password => nil)
+if ENV["RAILS_DATABASE_USER"]
+  GuardRail.apply_config!(username: ENV["RAILS_DATABASE_USER"], password: nil)
 end

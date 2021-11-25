@@ -69,12 +69,12 @@ class Enrollment
 
     def last_threshold
       @_last_threshold ||= @settings
-                           .get('enrollment_last_activity_at_threshold', 2.minutes).to_i
+                           .get("enrollment_last_activity_at_threshold", 2.minutes).to_i
     end
 
     def total_threshold
       @_total_threshold ||= @settings
-                            .get('enrollment_total_activity_time_threshold', 10.minutes).to_i
+                            .get("enrollment_total_activity_time_threshold", 10.minutes).to_i
     end
 
     def record_worthwhile?(as_of, threshold)
@@ -90,7 +90,7 @@ class Enrollment
     end
 
     def all_enrollments_scope
-      Enrollment.where(:course_id => enrollment.course_id, :user_id => enrollment.user_id)
+      Enrollment.where(course_id: enrollment.course_id, user_id: enrollment.user_id)
     end
   end
 end

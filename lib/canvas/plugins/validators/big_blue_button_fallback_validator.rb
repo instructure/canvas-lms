@@ -28,7 +28,7 @@ module Canvas::Plugins::Validators::BigBlueButtonFallbackValidator
       expected_settings = [:domain]
       has_nonsecret_blank = settings.map(&:last).any?(&:blank?)
       if settings.size != expected_settings.size || has_nonsecret_blank || has_no_secret
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+        plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
         false
       else
         settings = settings.slice(*expected_settings).to_h.with_indifferent_access

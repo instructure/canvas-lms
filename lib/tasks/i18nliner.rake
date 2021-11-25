@@ -2,13 +2,13 @@
 
 require "i18nliner/processors/abstract_processor"
 require "i18nliner/scope"
-require 'i18nliner/call_helpers'
+require "i18nliner/call_helpers"
 require "yaml"
 
 module I18nliner
   module Processors
     class FeatureFlagYamlProcessor < AbstractProcessor
-      default_pattern 'config/feature_flags/*.yml'
+      default_pattern "config/feature_flags/*.yml"
 
       def check_file(file)
         @file_count += 1

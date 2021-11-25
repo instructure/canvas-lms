@@ -25,7 +25,7 @@ describe Mutations::SetOverrideScore do
   let!(:account) { Account.create! }
   let!(:course) { account.courses.create! }
   let!(:student) { User.create! }
-  let!(:student_enrollment) { course.enroll_student(student, enrollment_state: 'active') }
+  let!(:student_enrollment) { course.enroll_student(student, enrollment_state: "active") }
   let!(:grading_period) do
     group = account.grading_period_groups.create!(title: "a test group")
     group.enrollment_terms << course.enrollment_term
@@ -37,7 +37,7 @@ describe Mutations::SetOverrideScore do
       close_date: 2.weeks.from_now
     )
   end
-  let!(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+  let!(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
 
   let(:score_for_enrollment) { student_enrollment.find_score }
   let(:score_for_grading_period) { student_enrollment.find_score(grading_period_id: grading_period.id) }
@@ -47,7 +47,7 @@ describe Mutations::SetOverrideScore do
   end
 
   def mutation_str(enrollment_id: student_enrollment.id, grading_period_id: nil, override_score: 45.0)
-    override_value = override_score || 'null'
+    override_value = override_score || "null"
     input_string = "enrollmentId: #{enrollment_id} overrideScore: #{override_value}"
     input_string += " gradingPeriodId: #{grading_period_id}" if grading_period_id.present?
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe ProfileController do
   def enter_student_view(opts = {})
@@ -30,36 +30,36 @@ describe ProfileController do
 
   it "respects account setting for editing names" do
     a = Account.create!
-    u = user_with_pseudonym(:account => a, :active_user => true)
-    u.short_name = 'Bracken'
+    u = user_with_pseudonym(account: a, active_user: true)
+    u.short_name = "Bracken"
     u.save!
     p = u.pseudonyms.first
     user_session(u, p)
 
-    get '/profile/settings'
-    expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).not_to be_empty
+    get "/profile/settings"
+    expect(Nokogiri::HTML5(response.body).css("input#user_short_name")).not_to be_empty
 
-    put '/profile', params: { :user => { :short_name => 'Cody' } }
+    put "/profile", params: { user: { short_name: "Cody" } }
     expect(response).to be_redirect
-    expect(u.reload.short_name).to eq 'Cody'
+    expect(u.reload.short_name).to eq "Cody"
 
     a.settings[:users_can_edit_name] = false
     a.save!
     p.reload
 
-    get '/profile/settings'
-    expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).to be_empty
+    get "/profile/settings"
+    expect(Nokogiri::HTML5(response.body).css("input#user_short_name")).to be_empty
 
-    put '/profile', params: { :user => { :short_name => 'JT' } }
+    put "/profile", params: { user: { short_name: "JT" } }
     expect(response).to be_redirect
-    expect(u.reload.short_name).to eq 'Cody'
+    expect(u.reload.short_name).to eq "Cody"
   end
 
   it "does not show student view student edit profile or other services options" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
     enter_student_view
 
-    get '/profile/settings'
+    get "/profile/settings"
     expect(response.status).to eq 401
   end
 end

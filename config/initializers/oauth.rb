@@ -17,5 +17,5 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'oauth/request_proxy/rack_request'
+require "oauth/request_proxy/rack_request"
 OAUTH_10_SUPPORT = true

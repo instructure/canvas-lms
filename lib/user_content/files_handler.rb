@@ -22,15 +22,15 @@ module UserContent
   class FilesHandler
     class UriMatch < SimpleDelegator
       def preview?
-        rest.start_with?('/preview')
+        rest.start_with?("/preview")
       end
 
       def download?
-        rest.start_with?('/download')
+        rest.start_with?("/download")
       end
 
       def download_frd?
-        rest.include?('download_frd=1')
+        rest.include?("download_frd=1")
       end
     end
 
@@ -71,7 +71,7 @@ module UserContent
         { only_path: true }.tap do |h|
           h[:download] = 1 if match.download_frd?
           h[:verifier] = attachment.uuid unless in_app && !is_public
-          if !match.preview? && match.rest.include?('wrap=1')
+          if !match.preview? && match.rest.include?("wrap=1")
             h[:wrap] = 1
           end
         end

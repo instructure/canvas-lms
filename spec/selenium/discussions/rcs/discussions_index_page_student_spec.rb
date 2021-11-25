@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/discussions_common'
+require_relative "../../helpers/discussions_common"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
@@ -28,26 +28,26 @@ describe "discussions" do
   let(:section_student) do
     student_in_course(course: course,
                       section: new_section,
-                      name: 'section 2 student',
+                      name: "section 2 student",
                       active_all: true).user
   end
-  let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
-  let(:student_topic) { course.discussion_topics.create!(user: student, title: 'student topic title', message: 'student topic message') }
-  let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
-  let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
-  let(:group_category) { course.group_categories.create!(name: 'group category') }
+  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:student_topic) { course.discussion_topics.create!(user: student, title: "student topic title", message: "student topic message") }
+  let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
+  let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
+  let(:group_category) { course.group_categories.create!(name: "group category") }
   let(:assignment) do
     course.assignments.create!(
-      name: 'assignment',
+      name: "assignment",
       # submission_types: 'discussion_topic',
       assignment_group: assignment_group
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
-                                     title: 'assignment topic title',
-                                     message: 'assignment topic message',
+                                     title: "assignment topic title",
+                                     message: "assignment topic message",
                                      assignment: assignment)
   end
 
@@ -64,7 +64,7 @@ describe "discussions" do
 
       it "allows a student to create a discussion", priority: "1" do
         get url
-        expect_new_page_load { f('#add_discussion').click }
+        expect_new_page_load { f("#add_discussion").click }
         edit_topic("from a student", "tell me a story")
       end
     end

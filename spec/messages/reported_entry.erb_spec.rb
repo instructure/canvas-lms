@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'reported_reply' do
+describe "reported_reply" do
   before :once do
     discussion_topic_model
     @object = @topic.discussion_entries.create!(user: user_model)

@@ -36,12 +36,12 @@ class ContentParticipationCount < ActiveRecord::Base
     participant = nil
     context.shard.activate do
       unique_constraint_retry do
-        participant = context.content_participation_counts.where(:user_id => user, :content_type => type).lock.first
+        participant = context.content_participation_counts.where(user_id: user, content_type: type).lock.first
         if participant.blank?
           participant ||= context.content_participation_counts.build({
-                                                                       :user => user,
-                                                                       :content_type => type,
-                                                                       :unread_count => unread_count_for(type, context, user),
+                                                                       user: user,
+                                                                       content_type: type,
+                                                                       unread_count: unread_count_for(type, context, user),
                                                                      })
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
@@ -99,10 +99,10 @@ class ContentParticipationCount < ActiveRecord::Base
       end
       already_read_count = if potential_ids.any?
                              ContentParticipation.where(
-                               :content_type => "Submission",
-                               :content_id => potential_ids,
-                               :user_id => user,
-                               :workflow_state => "read"
+                               content_type: "Submission",
+                               content_id: potential_ids,
+                               user_id: user,
+                               workflow_state: "read"
                              ).count
                            else
                              0
@@ -132,7 +132,7 @@ class ContentParticipationCount < ActiveRecord::Base
   # - deleting a discussion/announcement/assignment/submission
   # - marking a previously graded assignment as not_graded
   def ttl
-    Setting.get('content_participation_count_ttl', 30.minutes).to_i
+    Setting.get("content_participation_count_ttl", 30.minutes).to_i
   end
   private :ttl
 end

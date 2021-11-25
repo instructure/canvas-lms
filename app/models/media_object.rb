@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 class MediaObject < ActiveRecord::Base
   include Workflow
@@ -26,9 +26,9 @@ class MediaObject < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, polymorphic:
     [:course, :group, :conversation_message, :account, :assignment,
-     :assessment_question, { context_user: 'User' }], exhaustive: false
+     :assessment_question, { context_user: "User" }], exhaustive: false
   belongs_to :attachment
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
@@ -119,7 +119,7 @@ class MediaObject < ActiveRecord::Base
         mo.attachment_id = attachment.id
         attachment.update_attribute(:media_entry_id, entry[:entryId])
         # check for attachments that were created temporarily, just to import a media object
-        if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
+        if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + "/")
           attachment.destroy
         end
       end
@@ -135,13 +135,13 @@ class MediaObject < ActiveRecord::Base
     if res[:ready]
       build_media_objects(res, root_account_id)
     else
-      if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
-        wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
+      if attempt < Setting.get("media_object_bulk_refresh_max_attempts", "5").to_i
+        wait_period = Setting.get("media_object_bulk_refresh_wait_period", "30").to_i
         MediaObject.delay(run_at: wait_period.minutes.from_now, priority: Delayed::LOW_PRIORITY)
                    .refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
-        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
+        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(media_entry_id: nil) unless attachment_ids.empty?
       end
       res
     end
@@ -163,14 +163,14 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(:media_id => media_id))
+      create!(**create_opts.merge(media_id: media_id))
     end
   end
 
   def update_title_on_kaltura
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
-    res = client.mediaUpdate(media_id, :name => user_entered_title)
+    res = client.mediaUpdate(media_id, name: user_entered_title)
     unless res[:error]
       self.title = user_entered_title
       save
@@ -216,8 +216,8 @@ class MediaObject < ActiveRecord::Base
       data[:plays] = entry[:plays].to_i
       data[:download_url] = entry[:downloadUrl]
       tags = (entry[:tags] || "").split(",").map(&:strip)
-      old_id = tags.detect { |t| t.include?('old_id_') }
-      self.old_media_id = old_id.sub(/old_id_/, '') if old_id
+      old_id = tags.detect { |t| t.include?("old_id_") }
+      self.old_media_id = old_id.sub(/old_id_/, "") if old_id
     end
     data[:extensions] ||= {}
     assets.each do |asset|
@@ -276,7 +276,7 @@ class MediaObject < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     attachment&.destroy
     save!
   end
@@ -296,7 +296,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def destroy_without_destroying_attachment
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.attachment_id = nil
     save!
   end
@@ -319,7 +319,7 @@ class MediaObject < ActiveRecord::Base
                                   })
 
     url = self.data[:download_url]
-    url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
+    url = sources.find { |s| s[:isOriginal] == "1" }&.dig(:url) if url.blank?
     url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
@@ -328,14 +328,14 @@ class MediaObject < ActiveRecord::Base
   end
 
   def deleted?
-    workflow_state == 'deleted'
+    workflow_state == "deleted"
   end
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, ->(media_id) { where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
+  scope :by_media_id, ->(media_id) { where(media_id: media_id).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
 
-  scope :by_media_type, ->(media_type) { where(:media_type => media_type) }
+  scope :by_media_type, ->(media_type) { where(media_type: media_type) }
 
   workflow do
     state :active

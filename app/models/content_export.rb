@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'English'
+require "English"
 
 class ContentExport < ActiveRecord::Base
   include Workflow
-  belongs_to :context, polymorphic: [:course, :group, { context_user: 'User' }]
+  belongs_to :context, polymorphic: [:course, :group, { context_user: "User" }]
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_one :sent_content_share
   has_many :received_content_shares
   has_one :epub_export
@@ -36,18 +36,18 @@ class ContentExport < ActiveRecord::Base
 
   validates :context_id, :workflow_state, presence: true
 
-  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
+  has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
 
   before_create :set_global_identifiers
 
   # export types
-  COMMON_CARTRIDGE = 'common_cartridge'
-  COURSE_COPY = 'course_copy'
-  MASTER_COURSE_COPY = 'master_course_copy'
-  QTI = 'qti'
-  USER_DATA = 'user_data'
-  ZIP = 'zip'
-  QUIZZES2 = 'quizzes2'
+  COMMON_CARTRIDGE = "common_cartridge"
+  COURSE_COPY = "course_copy"
+  MASTER_COURSE_COPY = "master_course_copy"
+  QTI = "qti"
+  USER_DATA = "user_data"
+  ZIP = "zip"
+  QUIZZES2 = "quizzes2"
   CC_EXPORT_TYPES = [COMMON_CARTRIDGE, COURSE_COPY, MASTER_COURSE_COPY, QTI, QUIZZES2].freeze
 
   workflow do
@@ -60,7 +60,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def send_notification?
-    context_type == 'Course' &&
+    context_type == "Course" &&
       export_type != ZIP &&
       content_migration.blank? &&
       !settings[:skip_notifications] &&
@@ -120,7 +120,7 @@ class ContentExport < ActiveRecord::Base
     # use global identifiers if no other cc export from this course has used local identifiers
     # i.e. all exports from now on should try to use global identifiers
     # unless there's a risk of not matching up with a previous export
-    !context.content_exports.where(:export_type => CC_EXPORT_TYPES, :global_identifiers => false).exists?
+    !context.content_exports.where(export_type: CC_EXPORT_TYPES, global_identifiers: false).exists?
   end
 
   def quizzes_next?
@@ -152,7 +152,7 @@ class ContentExport < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
+  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :fail_with_error!
 
   def capture_job_id
     job = Delayed::Worker.current_job
@@ -168,21 +168,21 @@ class ContentExport < ActiveRecord::Base
   end
 
   def mark_exporting
-    self.workflow_state = 'exporting'
+    self.workflow_state = "exporting"
     save
   end
 
   def mark_exported
     job_progress.try :complete!
-    self.workflow_state = 'exported'
+    self.workflow_state = "exported"
   end
 
   def mark_failed
-    self.workflow_state = 'failed'
+    self.workflow_state = "failed"
     job_progress.fail! if job_progress&.queued? || job_progress&.running?
   end
 
-  def fail_with_error!(exception_or_info = nil, error_message: I18n.t('Unexpected error while performing export'))
+  def fail_with_error!(exception_or_info = nil, error_message: I18n.t("Unexpected error while performing export"))
     add_error(error_message, exception_or_info) if exception_or_info
     mark_failed
     save!
@@ -193,14 +193,14 @@ class ContentExport < ActiveRecord::Base
     begin
       reset_and_start_job_progress
 
-      @cc_exporter = CC::CCExporter.new(self, opts.merge({ :for_course_copy => for_course_copy? }))
+      @cc_exporter = CC::CCExporter.new(self, opts.merge({ for_course_copy: for_course_copy? }))
       if @cc_exporter.export
         self.progress = 100
         job_progress.try :complete!
         self.workflow_state = if for_course_copy?
-                                'exported_for_course_copy'
+                                "exported_for_course_copy"
                               else
-                                'exported'
+                                "exported"
                               end
       else
         mark_failed
@@ -351,10 +351,10 @@ class ContentExport < ActiveRecord::Base
     if job_progress
       p = job_progress
     else
-      p = Progress.new(:context => self, :tag => "content_export")
+      p = Progress.new(context: self, tag: "content_export")
       self.job_progress = p
     end
-    p.workflow_state = 'queued'
+    p.workflow_state = "queued"
     p.completion = 0
     p.user = user
     p.save!
@@ -445,9 +445,9 @@ class ContentExport < ActiveRecord::Base
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
-      return true if selected_content['discussion_topics'] && is_set?(selected_content['discussion_topics'][select_content_key(obj)])
+      return true if selected_content["discussion_topics"] && is_set?(selected_content["discussion_topics"][select_content_key(obj)])
 
-      asset_type ||= 'announcements'
+      asset_type ||= "announcements"
     end
 
     asset_type ||= obj.class.table_name
@@ -529,12 +529,12 @@ class ContentExport < ActiveRecord::Base
   end
 
   def running?
-    ['created', 'exporting'].member? workflow_state
+    ["created", "exporting"].member? workflow_state
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     attachment&.destroy_permanently_plus
     save!
   end
@@ -546,7 +546,7 @@ class ContentExport < ActiveRecord::Base
   def fast_update_progress(val)
     content_migration&.update_conversion_progress(val)
     self.progress = val
-    ContentExport.where(:id => self).update_all(:progress => val)
+    ContentExport.where(id: self).update_all(progress: val)
     if EpubExport.where(content_export_id: id).exists?
       epub_export.update_progress_from_content_export!(val)
     end
@@ -554,7 +554,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def self.expire_days
-    Setting.get('content_exports_expire_after_days', '30').to_i
+    Setting.get("content_exports_expire_after_days", "30").to_i
   end
 
   def self.expire?
@@ -575,7 +575,7 @@ class ContentExport < ActiveRecord::Base
   scope :qti, -> { where(export_type: QTI) }
   scope :quizzes2, -> { where(export_type: QUIZZES2) }
   scope :course_copy, -> { where(export_type: COURSE_COPY) }
-  scope :running, -> { where(workflow_state: ['created', 'exporting']) }
+  scope :running, -> { where(workflow_state: ["created", "exporting"]) }
   scope :admin, lambda { |user|
     where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
             ZIP, USER_DATA
@@ -589,7 +589,7 @@ class ContentExport < ActiveRecord::Base
   scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
   scope :expired, lambda {
     if ContentExport.expire?
-      where('created_at < ?', ContentExport.expire_days.days.ago)
+      where("created_at < ?", ContentExport.expire_days.days.ago)
     else
       none
     end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/callbacks'
+require "active_support/callbacks"
 
 # Used to maintain a registry of which callbacks have been suspended for which
 # kinds (e.g. :save) and types (e.g. :before) in a specific scope.

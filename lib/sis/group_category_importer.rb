@@ -106,7 +106,7 @@ module SIS
                                     created_at: Time.zone.now,
                                     updated_at: Time.zone.now,
                                     batch_mode_delete: false,
-                                    workflow_state: 'active')
+                                    workflow_state: "active")
       end
 
       def should_build_roll_back_data?(group_category)
@@ -117,16 +117,16 @@ module SIS
 
       def old_status(group_category)
         if group_category.id_before_last_save.nil?
-          'non-existent'
+          "non-existent"
         elsif group_category.deleted_at_before_last_save.nil?
-          group_category.deleted_at.nil? ? nil : 'active'
+          group_category.deleted_at.nil? ? nil : "active"
         elsif !group_category.deleted_at_before_last_save.nil?
-          'deleted'
+          "deleted"
         end
       end
 
       def current_status(group_category)
-        group_category.deleted_at.nil? ? 'active' : 'deleted'
+        group_category.deleted_at.nil? ? "active" : "deleted"
       end
     end
   end

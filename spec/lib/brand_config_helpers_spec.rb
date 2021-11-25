@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'delayed/testing'
+require "delayed/testing"
 
 describe BrandConfigHelpers do
   def setup_account_family_with_configs
@@ -35,7 +35,7 @@ describe BrandConfigHelpers do
     @parent_account.brand_config_md5 = @parent_config.md5
     @parent_account.save!
 
-    @child_account = Account.create!(:parent_account => @parent_account)
+    @child_account = Account.create!(parent_account: @parent_account)
     @child_config = BrandConfig.for(
       variables: { "ic-brand-global-nav-bgd" => "white" },
       parent_md5: @parent_config.md5,
@@ -48,7 +48,7 @@ describe BrandConfigHelpers do
     @child_account.brand_config_md5 = @child_config.md5
     @child_account.save!
 
-    @grand_child_account = Account.create!(:parent_account => @child_account)
+    @grand_child_account = Account.create!(parent_account: @child_account)
     @grand_child_config = BrandConfig.for(
       variables: { "ic-brand-global-nav-avatar-border" => "blue" },
       parent_md5: @child_config.md5,

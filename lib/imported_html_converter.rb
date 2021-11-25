@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 class ImportedHtmlConverter
   include TextHelper
@@ -45,7 +45,7 @@ class ImportedHtmlConverter
       end
     end
 
-    node = doc.at_css('body')
+    node = doc.at_css("body")
     return "" unless node
 
     if opts[:remove_outer_nodes_if_one_child]

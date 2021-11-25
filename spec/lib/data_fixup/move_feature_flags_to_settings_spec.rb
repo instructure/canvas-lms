@@ -20,9 +20,9 @@
 
 describe DataFixup::MoveFeatureFlagsToSettings do
   before :once do
-    Account.add_setting :some_root_only_setting, :boolean => true, :root_only => true, :default => false
-    Account.add_setting :some_course_setting, :boolean => true, :default => false, :inheritable => true
-    Course.add_setting :some_course_setting, :boolean => true, :inherited => true
+    Account.add_setting :some_root_only_setting, boolean: true, root_only: true, default: false
+    Account.add_setting :some_course_setting, boolean: true, default: false, inheritable: true
+    Course.add_setting :some_course_setting, boolean: true, inherited: true
 
     @root_account = account_model
     @teacher = user_with_pseudonym account: @root_account
@@ -39,17 +39,17 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
   def with_feature_definitions
     allow(Feature).to receive(:definitions).and_return({
-                                                         'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
-                                                         'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
+                                                         "course_feature_going_away" => Feature.new(feature: "course_feature_going_away", applies_to: "Course", state: "hidden"),
+                                                         "root_account_feature_going_away" => Feature.new(feature: "root_account_feature_going_away", applies_to: "RootAccount", state: "hidden"),
                                                        })
     yield
     allow(Feature).to receive(:definitions).and_call_original
   end
 
   it "handles unknown ff state gracefully" do
-    override = @root_account.feature_flags.build(feature: 'root_account_feature_going_away')
+    override = @root_account.feature_flags.build(feature: "root_account_feature_going_away")
     override.state = "some_invalid_state"
-    override.save!(:validate => false)
+    override.save!(validate: false)
 
     DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
     reload_all

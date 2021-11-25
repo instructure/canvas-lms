@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../../lib/api/v1/group'
+require_relative "../../../../lib/api/v1/group"
 
 describe Api::V1::Group do
   include Api::V1::Group
@@ -27,13 +27,13 @@ describe Api::V1::Group do
   describe "group_json" do
     before :once do
       context = course_model
-      @group = Group.create(:name => "group1", :context => context)
+      @group = Group.create(name: "group1", context: context)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end
 
     it "basic test including users" do
-      json = group_json(@group, @user, nil, :include_inactive_users => true, :include => ['users'])
+      json = group_json(@group, @user, nil, include_inactive_users: true, include: ["users"])
       expect(json["id"]).to eq @group.id
       expect(json["name"]).to eq @group.name
       expect(json["users"].length).to eq 1
@@ -45,15 +45,15 @@ describe Api::V1::Group do
     it "caps the numer of users that will be returned" do
       other_user = user_model
       @group.add_user(other_user)
-      json = group_json(@group, @user, nil, :include_inactive_users => true, :include => ['users'])
+      json = group_json(@group, @user, nil, include_inactive_users: true, include: ["users"])
       expect(json["users"].length).to eq 2
       Setting.set("group_json_user_cap", "1")
-      json = group_json(@group, @user, nil, :include_inactive_users => true, :include => ['users'])
+      json = group_json(@group, @user, nil, include_inactive_users: true, include: ["users"])
       expect(json["users"].length).to eq 1
     end
 
     it "filter inactive users but do include users" do
-      json = group_json(@group, @user, nil, :include => ['users'])
+      json = group_json(@group, @user, nil, include: ["users"])
       expect(json["id"]).to eq @group.id
       expect(json["name"]).to eq @group.name
       expect(json["users"]).not_to be_nil
@@ -71,13 +71,13 @@ describe Api::V1::Group do
   describe "group_membership_json" do
     before :once do
       context = course_model
-      @group = Group.create(:name => "group1", :context => context)
+      @group = Group.create(name: "group1", context: context)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end
 
     it "basic test" do
-      group_memberships = GroupMembership.where(:group_id => @group.id, :user_id => @user.id)
+      group_memberships = GroupMembership.where(group_id: @group.id, user_id: @user.id)
       expect(group_memberships.length).to eq 1
       group_membership = group_memberships.first
       json = group_membership_json(group_membership, @user, nil)

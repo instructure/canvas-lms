@@ -29,9 +29,9 @@ module CC
         rubrics_file = nil
         rel_path = nil
       else
-        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
+        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
-        document = Builder::XmlMarkup.new(:target => rubrics_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: rubrics_file, indent: 2)
       end
 
       document.instruct!
@@ -52,13 +52,13 @@ module CC
           end
           imported_rubrics[rubric.id] = true
           rubric.learning_outcome_alignments.each do |align|
-            add_item_to_export(align.learning_outcome, 'learning_outcomes')
+            add_item_to_export(align.learning_outcome, "learning_outcomes")
           end
 
           add_exported_asset(rubric)
 
           migration_id = create_key(rubric)
-          rubrics_node.rubric(:identifier => migration_id) do |r_node|
+          rubrics_node.rubric(identifier: migration_id) do |r_node|
             atts = %i[read_only title reusable public points_possible
                       hide_score_total free_form_criterion_comments]
             if rubric.context != @course

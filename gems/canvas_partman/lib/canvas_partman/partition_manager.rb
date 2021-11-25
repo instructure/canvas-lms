@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_partman/partition_manager/by_date'
-require 'canvas_partman/partition_manager/by_id'
+require "canvas_partman/partition_manager/by_date"
+require "canvas_partman/partition_manager/by_id"
 require "active_record/pg_extensions"
 
 module CanvasPartman

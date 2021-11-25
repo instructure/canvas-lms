@@ -25,6 +25,6 @@ class AddLastAccountReportIndex < ActiveRecord::Migration[5.1]
     add_index :account_reports, %i[account_id report_type created_at],
               order: { created_at: :desc },
               algorithm: :concurrently,
-              name: 'index_account_reports_latest_of_type_per_account'
+              name: "index_account_reports_latest_of_type_per_account"
   end
 end

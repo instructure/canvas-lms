@@ -30,8 +30,8 @@ class PreventNonMultipartParse
   end
 
   def call(env)
-    env['ORIGINAL_CONTENT_TYPE'] = env['CONTENT_TYPE']
-    env['CONTENT_TYPE'] = 'application/octet-stream' if !@considered_paths.detect { |r| env['PATH_INFO'] =~ r }.nil? && @ignored_content_types.detect { |r| env['CONTENT_TYPE'] =~ r }.nil?
+    env["ORIGINAL_CONTENT_TYPE"] = env["CONTENT_TYPE"]
+    env["CONTENT_TYPE"] = "application/octet-stream" if !@considered_paths.detect { |r| env["PATH_INFO"] =~ r }.nil? && @ignored_content_types.detect { |r| env["CONTENT_TYPE"] =~ r }.nil?
     @app.call(env)
   end
 end

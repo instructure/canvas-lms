@@ -23,7 +23,7 @@
 #
 class DisablePostToSisApiController < ApplicationController
   before_action :require_authorized_user
-  before_action :require_valid_grading_period, :if => :grading_period_exists?
+  before_action :require_valid_grading_period, if: :grading_period_exists?
 
   # @API Disable assignments currently enabled for grade export to SIS
   #
@@ -69,7 +69,7 @@ class DisablePostToSisApiController < ApplicationController
       if params[:course_id]
         api_find(Course, params[:course_id])
       else
-        raise ActiveRecord::RecordNotFound, 'unknown context type'
+        raise ActiveRecord::RecordNotFound, "unknown context type"
       end
   end
 
@@ -98,8 +98,8 @@ class DisablePostToSisApiController < ApplicationController
 
   def require_valid_grading_period
     body = {
-      code: 'not_found',
-      error: I18n.t('The Grading Period cannot be found')
+      code: "not_found",
+      error: I18n.t("The Grading Period cannot be found")
     }
     render json: body, status: :bad_request if params[:grading_period_id] && grading_period.blank?
   end

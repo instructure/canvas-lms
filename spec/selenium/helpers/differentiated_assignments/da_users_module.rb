@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_homework_assignee_module'
+require_relative "da_homework_assignee_module"
 
 module DifferentiatedAssignments
   module Users
@@ -26,17 +26,17 @@ module DifferentiatedAssignments
                   :ta, :first_observer, :third_observer, :student_group_x, :student_group_y, :student_group_z
 
       def initialize
-        @first_student   = create_user('Student1')
-        @second_student  = create_user('Student2')
-        @third_student   = create_user('Student3')
-        @fourth_student  = create_user('Student4')
-        @teacher         = create_user('Teacher1')
-        @ta              = create_user('TeacherAssistant1')
-        @first_observer  = create_user('Observer1')
-        @third_observer  = create_user('Observer3')
-        @student_group_x = create_student_group('Student Group X')
-        @student_group_y = create_student_group('Student Group Y')
-        @student_group_z = create_student_group('Student Group Z')
+        @first_student   = create_user("Student1")
+        @second_student  = create_user("Student2")
+        @third_student   = create_user("Student3")
+        @fourth_student  = create_user("Student4")
+        @teacher         = create_user("Teacher1")
+        @ta              = create_user("TeacherAssistant1")
+        @first_observer  = create_user("Observer1")
+        @third_observer  = create_user("Observer3")
+        @student_group_x = create_student_group("Student Group X")
+        @student_group_y = create_student_group("Student Group Y")
+        @student_group_z = create_student_group("Student Group Z")
         enroll_users
       end
 
@@ -178,8 +178,8 @@ module DifferentiatedAssignments
       def enroll_observer(an_observer, student_to_observe)
         DifferentiatedAssignments.the_course.enroll_user(
           an_observer,
-          'ObserverEnrollment',
-          enrollment_state: 'active',
+          "ObserverEnrollment",
+          enrollment_state: "active",
           associated_user_id: student_to_observe.id
         )
       end

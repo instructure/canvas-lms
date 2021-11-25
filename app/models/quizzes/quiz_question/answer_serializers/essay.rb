@@ -30,7 +30,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       unless answer_html.is_a?(String)
-        return rc.reject :invalid_type, 'answer', String
+        return rc.reject :invalid_type, "answer", String
       end
 
       answer_html = Util.sanitize_html answer_html

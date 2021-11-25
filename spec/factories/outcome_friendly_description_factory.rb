@@ -20,11 +20,11 @@
 
 module Factories
   def outcome_friendly_description_model(context)
-    outcome = context.created_learning_outcomes.create!({ :title => 'new outcome' })
+    outcome = context.created_learning_outcomes.create!({ title: "new outcome" })
     OutcomeFriendlyDescription.create!(
       learning_outcome: outcome,
       context: context,
-      description: 'A friendly description'
+      description: "A friendly description"
     )
   end
 end

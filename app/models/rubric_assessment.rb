@@ -28,11 +28,11 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :rubric
   belongs_to :rubric_association
   belongs_to :user
-  belongs_to :assessor, :class_name => 'User'
+  belongs_to :assessor, class_name: "User"
   belongs_to :artifact, touch: true,
-                        polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
-  has_many :assessment_requests, :dependent => :destroy
-  has_many :learning_outcome_results, as: :artifact, :dependent => :destroy
+                        polymorphic: [:submission, :assignment, { provisional_grade: "ModeratedGrading::ProvisionalGrade" }]
+  has_many :assessment_requests, dependent: :destroy
+  has_many :learning_outcome_results, as: :artifact, dependent: :destroy
   serialize :data
 
   simply_versioned
@@ -128,7 +128,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def update_artifact_parameters
-    if artifact_type == 'Submission' && artifact
+    if artifact_type == "Submission" && artifact
       self.artifact_attempt = artifact.attempt
     end
   end
@@ -165,14 +165,14 @@ class RubricAssessment < ActiveRecord::Base
                                                                })
     end
     requests.each do |a|
-      a.attributes = { :rubric_assessment => self, :assessor => assessor }
+      a.attributes = { rubric_assessment: self, assessor: assessor }
       a.complete
     end
   end
   protected :update_assessment_requests
 
   def attempt
-    artifact_type == 'Submission' ? artifact.attempt : nil
+    artifact_type == "Submission" ? artifact.attempt : nil
   end
 
   def set_graded_anonymously
@@ -213,7 +213,7 @@ class RubricAssessment < ActiveRecord::Base
         self.user &&
         rubric_association &&
         rubric_association.context.is_a?(Course) &&
-        rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
+        rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: "active").exists?
     end
     can :read
 
@@ -235,10 +235,10 @@ class RubricAssessment < ActiveRecord::Base
     can :read_assessor
   end
 
-  scope :of_type, ->(type) { where(:assessment_type => type.to_s) }
+  scope :of_type, ->(type) { where(assessment_type: type.to_s) }
 
-  scope :for_submissions, -> { where(:artifact_type => "Submission") }
-  scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade") }
+  scope :for_submissions, -> { where(artifact_type: "Submission") }
+  scope :for_provisional_grades, -> { where(artifact_type: "ModeratedGrading::ProvisionalGrade") }
 
   scope :for_course_context, lambda { |course_id|
     joins(:rubric_association).where(rubric_associations: { context_id: course_id, context_type: "Course" })
@@ -257,7 +257,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def assessor_name
-    assessor.short_name rescue t('unknown_user', "Unknown User")
+    assessor.short_name rescue t("unknown_user", "Unknown User")
   end
 
   def assessment_url
@@ -265,7 +265,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def can_read_assessor_name?(user, session)
-    assessment_type == 'grading' ||
+    assessment_type == "grading" ||
       !considered_anonymous? ||
       assessor_id == user.id ||
       rubric_association.association_object.context.grants_right?(
@@ -276,7 +276,7 @@ class RubricAssessment < ActiveRecord::Base
   def considered_anonymous?
     return false unless active_rubric_association?
 
-    rubric_association.association_type == 'Assignment' &&
+    rubric_association.association_type == "Assignment" &&
       rubric_association.association_object.anonymous_peer_reviews?
   end
 

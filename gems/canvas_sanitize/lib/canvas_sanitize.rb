@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'sanitize'
+require "sanitize"
 module CanvasSanitize
   require "canvas_sanitize/canvas_sanitize"
 end

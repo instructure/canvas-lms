@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../lib/data_fixup/fix_planner_overrides_marked_complete_data'
+require_relative "../../../lib/data_fixup/fix_planner_overrides_marked_complete_data"
 
 describe DataFixup::FixPlannerOverridesMarkedCompleteData do
   subject do
@@ -31,9 +31,9 @@ describe DataFixup::FixPlannerOverridesMarkedCompleteData do
     course_with_student(course: @course)
     student2 = @student
     assignment_model(context: @course)
-    override1 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: 'Assignment',
+    override1 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: "Assignment",
                                         marked_complete: true, user_id: student1.id)
-    override2 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: 'Assignment',
+    override2 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: "Assignment",
                                         marked_complete: false, user_id: student2.id)
     subject.run
     expect(override1.reload.marked_complete).to be false

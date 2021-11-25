@@ -50,7 +50,7 @@ module CanvasPartman
             base_class.connection.execute(<<~SQL.squish)
               WITH x AS (
                 DELETE FROM ONLY #{base_class.quoted_table_name}
-                WHERE id IN (#{part_id_dates.map(&:first).join(', ')})
+                WHERE id IN (#{part_id_dates.map(&:first).join(", ")})
                 RETURNING *
               ) INSERT INTO #{base_class.connection.quote_table_name(partition_table)} SELECT * FROM x
             SQL

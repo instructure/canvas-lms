@@ -23,7 +23,7 @@ module SendToStream
     def self.extended(klass)
       klass.send(:class_attribute, :send_to_stream_block)
       klass.send(:class_attribute, :send_to_stream_update_block)
-      klass.has_one :stream_item, :as => :asset
+      klass.has_one :stream_item, as: :asset
     end
 
     def on_create_send_to_streams(&block)
@@ -87,7 +87,7 @@ module SendToStream
     attr_reader :generated_stream_items, :stream_item_recipient_ids
 
     def stream_item_inactive?
-      (respond_to?(:workflow_state) && workflow_state == 'deleted') || (respond_to?(:deleted?) && deleted?)
+      (respond_to?(:workflow_state) && workflow_state == "deleted") || (respond_to?(:deleted?) && deleted?)
     end
 
     def clear_stream_items_on_destroy

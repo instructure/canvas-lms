@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'common'
+require_relative "common"
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
   let(:quiz) do
@@ -100,7 +100,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
   describe "#add_response" do
     it "does not add unsupported response types" do
-      summary.add_response({ :question_type => "foo", :answers => [] }, 0, 0)
+      summary.add_response({ question_type: "foo", answers: [] }, 0, 0)
       expect(summary.size).to eq 3
     end
   end

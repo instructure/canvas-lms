@@ -24,8 +24,8 @@
 # Released under the MIT license (see accompany MIT-LICENSE file)
 #
 
-require 'simply_versioned/gem_version'
-require 'simply_versioned/version'
+require "simply_versioned/gem_version"
+require "simply_versioned/version"
 
 module SimplyVersioned
   class BadOptions < StandardError
@@ -35,15 +35,15 @@ module SimplyVersioned
   end
 
   DEFAULTS = {
-    :keep => nil,
-    :automatic => true,
-    :exclude => [],
-    :explicit => false,
+    keep: nil,
+    automatic: true,
+    exclude: [],
+    explicit: false,
     # callbacks
-    :when => nil,
-    :on_create => nil,
-    :on_update => nil,
-    :on_load => nil
+    when: nil,
+    on_create: nil,
+    on_update: nil,
+    on_load: nil
   }.freeze
 
   module ClassMethods
@@ -83,7 +83,7 @@ module SimplyVersioned
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
 
-      has_many :versions, -> { order('number DESC') },
+      has_many :versions, -> { order("number DESC") },
                class_name: "SimplyVersioned::Version",
                as: :versionable,
                dependent: :destroy,
@@ -91,8 +91,8 @@ module SimplyVersioned
                extend: VersionsProxyMethods
       # INSTRUCTURE: Added to allow quick access to the most recent version
       # See 'current_version' below for the common use of current_version_unidirectional
-      has_one :current_version_unidirectional, -> { order('number DESC') },
-              class_name: 'SimplyVersioned::Version',
+      has_one :current_version_unidirectional, -> { order("number DESC") },
+              class_name: "SimplyVersioned::Version",
               as: :versionable
       # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
       before_save :check_if_changes_are_worth_versioning
@@ -128,7 +128,7 @@ module SimplyVersioned
     #
     def revert_to_version(version, options = {})
       options.reverse_merge!({
-                               :except => [:created_at, :updated_at]
+                               except: [:created_at, :updated_at]
                              })
 
       version = case version
@@ -236,7 +236,7 @@ module SimplyVersioned
             simply_versioned_options[:on_update].try(:call, self, version)
           end
         else
-          version = versions.create(:yaml => attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+          version = versions.create(yaml: attributes.except(*simply_versioned_options[:exclude]).to_yaml)
           if version.valid?
             simply_versioned_options[:on_create].try(:call, self, version)
             versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]
@@ -286,31 +286,31 @@ module SimplyVersioned
 
     # Get the first Version corresponding to this model.
     def first_version
-      populate_versionable reorder('number ASC').limit(1).to_a.first
+      populate_versionable reorder("number ASC").limit(1).to_a.first
     end
     alias_method :first, :first_version
 
     # Get the current Version corresponding to this model.
     def current_version
-      populate_versionable reorder('number DESC').limit(1).to_a.first
+      populate_versionable reorder("number DESC").limit(1).to_a.first
     end
     alias_method :current, :current_version
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where('number <= ?', maximum(:number) - versions_to_keep).each(&:destroy)
+      where("number <= ?", maximum(:number) - versions_to_keep).each(&:destroy)
     end
     alias_method :purge, :clean_old_versions
 
     # Return the Version for this model with the next higher version
     def next_version(number)
-      populate_versionable reorder('number ASC').where("number > ?", number).limit(1).to_a.first
+      populate_versionable reorder("number ASC").where("number > ?", number).limit(1).to_a.first
     end
     alias_method :next, :next_version
 
     # Return the Version for this model with the next lower version
     def previous_version(number = nil)
-      versions = reorder('number DESC')
+      versions = reorder("number DESC")
       versions = versions.where("number <= ?", number) if number
       versions = versions.limit(2).to_a
       populate_versionable versions.last if versions.length == 2

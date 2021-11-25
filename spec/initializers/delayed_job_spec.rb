@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'Delayed::Job' do
+describe "Delayed::Job" do
   it "defines job.account" do
     job = Delayed::Job.new
     expect(job).to respond_to(:account)

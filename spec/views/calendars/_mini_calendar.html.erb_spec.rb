@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/calendars/_mini_calendar" do
   it "renders" do
     today = Time.zone.today
-    render :partial => 'calendars/mini_calendar', :locals => { :current => today, :first_day => today - 3, :last_day => today + 30 }
+    render partial: "calendars/mini_calendar", locals: { current: today, first_day: today - 3, last_day: today + 30 }
     expect(response).not_to be_nil
   end
 end

@@ -45,22 +45,22 @@ describe Lti::ContentItemUtil do
       }')
     end
 
-    it 'makes a POST to confirm creation' do
+    it "makes a POST to confirm creation" do
       stub_request(:post, url)
-        .to_return(:status => 200, :body => "", :headers => {})
+        .to_return(status: 200, body: "", headers: {})
 
       subject.success_callback
       run_jobs
-      expect(WebMock).to have_requested(:post, url).with(:body => "")
+      expect(WebMock).to have_requested(:post, url).with(body: "")
     end
 
-    it 'makes a DELETE to signify Cancelation' do
+    it "makes a DELETE to signify Cancelation" do
       stub_request(:delete, url)
-        .to_return(:status => 200, :body => "", :headers => {})
+        .to_return(status: 200, body: "", headers: {})
 
       subject.failure_callback
       run_jobs
-      expect(WebMock).to have_requested(:delete, url).with(:body => "")
+      expect(WebMock).to have_requested(:delete, url).with(body: "")
     end
   end
 

@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/groups_common'
+require_relative "../common"
+require_relative "../helpers/groups_common"
 
 describe "student groups" do
   include_context "in-process server selenium tests"
   include GroupsCommon
 
-  let(:group_name) { 'Windfury' }
-  let(:group_category_name) { 'cat1' }
+  let(:group_name) { "Windfury" }
+  let(:group_category_name) { "cat1" }
 
   context "As a teacher" do
     before do
@@ -89,16 +89,16 @@ describe "student groups" do
         wait_for_animations
 
         # Sets user as group leader
-        f('.group-user-actions').click
+        f(".group-user-actions").click
         wait_for_ajaximations
-        fj('.set-as-leader:visible').click
+        fj(".set-as-leader:visible").click
         wait_for_ajaximations
 
         # Looks for student to have a group leader icon
-        expect(f('.group-leader .icon-user')).to be_displayed
+        expect(f(".group-leader .icon-user")).to be_displayed
         # Verifies group leader silhouette and leader's name appear in the group header
-        expect(f('.span3.ellipsis.group-leader')).to be_displayed
-        expect(f('.span3.ellipsis.group-leader')).to include_text("Test Student 1")
+        expect(f(".span3.ellipsis.group-leader")).to be_displayed
+        expect(f(".span3.ellipsis.group-leader")).to include_text("Test Student 1")
       end
     end
   end

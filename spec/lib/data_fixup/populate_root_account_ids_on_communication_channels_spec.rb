@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe DataFixup::PopulateRootAccountIdsOnCommunicationChannels do
-  describe 'populate' do
-    context 'when on the same shard as the user' do
-      it 'copies the root_account_ids from the users table' do
+  describe "populate" do
+    context "when on the same shard as the user" do
+      it "copies the root_account_ids from the users table" do
         user_record = user_model
         ra_ids = [account_model.id, account_model.id]
         user_record.update_columns(root_account_ids: ra_ids)
 
-        cc = CommunicationChannel.create!(user: user_record, path: 'canvas@instructure.com')
+        cc = CommunicationChannel.create!(user: user_record, path: "canvas@instructure.com")
         cc.update_columns(root_account_ids: nil)
 
         expect do

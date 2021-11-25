@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class LtiReports
@@ -38,9 +38,9 @@ module AccountReports
         courses = add_course_sub_account_scope(root_account.all_courses).joins(:account).select(:id)
 
         if @include_deleted
-          course_join_condition = account_join_condition = ''
+          course_join_condition = account_join_condition = ""
         else
-          courses = courses.active.where.not(accounts: { workflow_state: 'deleted' })
+          courses = courses.active.where.not(accounts: { workflow_state: "deleted" })
           course_join_condition = "AND courses.workflow_state<>'deleted'"
           account_join_condition = "AND accounts.workflow_state<>'deleted'"
         end

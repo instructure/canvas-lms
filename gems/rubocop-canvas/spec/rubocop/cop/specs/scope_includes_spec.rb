@@ -21,7 +21,7 @@ describe RuboCop::Cop::Specs::ScopeIncludes do
   subject(:cop) { described_class.new }
 
   context "within describe" do
-    it 'allows includes' do
+    it "allows includes" do
       inspect_source(%(
         describe JumpStick do
           include Foo
@@ -32,7 +32,7 @@ describe RuboCop::Cop::Specs::ScopeIncludes do
   end
 
   context "within module" do
-    it 'allows includes' do
+    it "allows includes" do
       inspect_source(%(
         module JumpStick
           include Foo

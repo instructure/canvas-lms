@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/callbacks/suspension/registry'
-require 'active_support/core_ext/array' # extract_options!
-require 'active_support/version'
+require "active_support/callbacks/suspension/registry"
+require "active_support/core_ext/array" # extract_options!
+require "active_support/version"
 
 module ActiveSupport::Callbacks
   module Suspension

@@ -23,13 +23,13 @@ class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
 
   belongs_to :context, polymorphic: [:account, :course]
-  has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }
+  has_many :assessment_questions, -> { order("assessment_questions.name, assessment_questions.position, assessment_questions.created_at") }
   has_many :assessment_question_bank_users
-  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
-  has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
+  has_many :quiz_groups, class_name: "Quizzes::QuizGroup"
   before_save :infer_defaults
   after_save :update_alignments
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
@@ -72,24 +72,24 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :read_question_banks) }
     can :read
 
-    given { |user| user && assessment_question_bank_users.where(:user_id => user).exists? }
+    given { |user| user && assessment_question_bank_users.where(user_id: user).exists? }
     can :read
   end
 
   def self.default_imported_title
-    t :default_imported_title, 'Imported Questions'
+    t :default_imported_title, "Imported Questions"
   end
 
   def self.default_unfiled_title
-    t :default_unfiled_title, 'Unfiled Questions'
+    t :default_unfiled_title, "Unfiled Questions"
   end
 
   def self.unfiled_for_context(context)
-    context.assessment_question_banks.where(title: default_unfiled_title, workflow_state: 'active').first_or_create rescue nil
+    context.assessment_question_banks.where(title: default_unfiled_title, workflow_state: "active").first_or_create rescue nil
   end
 
   def cached_context_short_name
-    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+    @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
       context.short_name rescue ""
     end
   end
@@ -103,7 +103,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.title = t(:default_title, "No Name - %{course}", :course => context.name) if title.blank?
+    self.title = t(:default_title, "No Name - %{course}", course: context.name) if title.blank?
   end
 
   def alignments=(alignments)
@@ -116,11 +116,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
     # delete alignments that aren't in the list anymore
     if outcomes.empty?
-      learning_outcome_alignments.update_all(:workflow_state => 'deleted')
+      learning_outcome_alignments.update_all(workflow_state: "deleted")
     else
       learning_outcome_alignments
         .where.not(learning_outcome_id: outcomes)
-        .update_all(:workflow_state => 'deleted')
+        .update_all(workflow_state: "deleted")
     end
 
     # add/update current alignments
@@ -129,7 +129,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
         matching_outcome = outcomes.detect { |outcome| outcome.id == outcome_id.to_i }
         next unless matching_outcome
 
-        matching_outcome.align(self, context, :mastery_score => mastery_score)
+        matching_outcome.align(self, context, mastery_score: mastery_score)
       end
     end
   end
@@ -144,7 +144,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     if do_bookmark
       assessment_question_bank_users.where(user: user).first_or_create!
     else
-      AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
+      AssessmentQuestionBankUser.where(user_id: user, assessment_question_bank_id: self).delete_all
     end
   end
 
@@ -166,7 +166,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save
   end

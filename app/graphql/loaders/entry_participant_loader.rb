@@ -36,7 +36,7 @@ class Loaders::EntryParticipantLoader < GraphQL::Batch::Loader
       participant = {}
       participant["rating"] = deps[object.id].rating
       participant["forced_read_state"] = deps[object.id].forced_read_state
-      participant["read"] = deps[object.id].workflow_state == 'read'
+      participant["read"] = deps[object.id].workflow_state == "read"
       participant["report_type"] = deps[object.id].report_type
       fulfill(object, participant)
     end

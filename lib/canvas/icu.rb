@@ -20,7 +20,7 @@
 module Canvas::ICU
   module NaiveCollator
     def self.rules
-      ''
+      ""
     end
 
     def self.collation_key(string)
@@ -37,8 +37,8 @@ module Canvas::ICU
   end
 
   begin
-    Bundler.require 'icu'
-    require 'ffi'
+    Bundler.require "icu"
+    require "ffi"
     suffix = ICU::Lib.figure_suffix(ICU::Lib.load_icu)
 
     unless ICU::Lib.respond_to?(:ucol_getSortKey)
@@ -97,21 +97,21 @@ module Canvas::ICU
 
         ATTRIBUTE_VALUES = {
           nil => -1,
-          primary: 0,
-          secondary: 1,
-          default_strength: 2,
-          tertiary: 2,
-          quaternary: 3,
-          identical: 15,
+          :primary => 0,
+          :secondary => 1,
+          :default_strength => 2,
+          :tertiary => 2,
+          :quaternary => 3,
+          :identical => 15,
 
           false => 16,
           true => 17,
 
-          shifted: 20,
-          non_ignorable: 21,
+          :shifted => 20,
+          :non_ignorable => 21,
 
-          lower_first: 24,
-          upper_first: 25,
+          :lower_first => 24,
+          :upper_first => 25,
         }.freeze
         ATTRIBUTE_VALUES_INVERSE = ATTRIBUTE_VALUES.map { |k, v| [v, k] }.to_h.freeze
       end
@@ -144,7 +144,7 @@ module Canvas::ICU
 
   def self.locale_for_collation
     I18n.set_locale_with_localizer
-    collator.rules.empty? ? 'root' : I18n.locale
+    collator.rules.empty? ? "root" : I18n.locale
   end
 
   def self.compare(a, b)
@@ -170,12 +170,12 @@ module Canvas::ICU
   end
 
   def self.untagged_locale
-    I18n.locale.to_s.sub(/-x-.+$/, '')
+    I18n.locale.to_s.sub(/-x-.+$/, "")
   end
 
   def self.icu_locale_name
     I18n.set_locale_with_localizer
-    collator.rules.empty? ? 'und-u-kn-true' : "#{untagged_locale}-u-kn-true"
+    collator.rules.empty? ? "und-u-kn-true" : "#{untagged_locale}-u-kn-true"
   end
 
   def self.choose_pg12_collation(available_collations)
@@ -183,7 +183,7 @@ module Canvas::ICU
     if !collation && !collator.rules.empty?
       # we don't have the proper collation for this language, but still try to use the root locale
       # if it exists
-      schema, collation = available_collations.find { |(_schema, locale)| locale == 'und-u-kn-true' }
+      schema, collation = available_collations.find { |(_schema, locale)| locale == "und-u-kn-true" }
     end
     return unless collation
 

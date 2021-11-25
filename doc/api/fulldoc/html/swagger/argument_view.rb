@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'canvas_api/deprecatable'
-require 'hash_view'
+require_relative "canvas_api/deprecatable"
+require "hash_view"
 
 class ArgumentView < HashView
   include CanvasAPI::Deprecatable
@@ -66,7 +66,7 @@ class ArgumentView < HashView
   end
 
   def name(json: true)
-    name = json ? @name.gsub('[]', '') : @name
+    name = json ? @name.gsub("[]", "") : @name
     format(name)
   end
 
@@ -75,12 +75,12 @@ class ArgumentView < HashView
   end
 
   def remove_outer_square_brackets(str)
-    str.sub(/^\[/, '').sub(/\]$/, '')
+    str.sub(/^\[/, "").sub(/\]$/, "")
   end
 
   def metadata_parts
     remove_outer_square_brackets(@type)
-      .split(/\s*[,|]\s*/).map { |t| t.force_encoding('UTF-8') }
+      .split(/\s*[,|]\s*/).map { |t| t.force_encoding("UTF-8") }
   end
 
   def enum_and_types
@@ -99,11 +99,11 @@ class ArgumentView < HashView
 
   def swagger_param_type
     if @path_variables.include? name
-      'path'
+      "path"
     else
       case @http_verb.downcase
-      when 'get', 'delete' then 'query'
-      when 'put', 'post', 'patch' then 'form'
+      when "get", "delete" then "query"
+      when "put", "post", "patch" then "form"
       else
         raise "Unknown HTTP verb: #{@http_verb}"
       end
@@ -111,13 +111,13 @@ class ArgumentView < HashView
   end
 
   def swagger_type
-    type = (types.first || 'string')
+    type = (types.first || "string")
     type = "number" if type.casecmp?("float")
     builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
-    type = (types.first || 'string')
+    type = (types.first || "string")
     return "int64" if swagger_type == "integer"
     return "float" if type.casecmp?("float")
   end
@@ -128,11 +128,11 @@ class ArgumentView < HashView
 
   def required?
     types = enum_and_types.last.map(&:downcase)
-    swagger_param_type == 'path' || types.include?('required')
+    swagger_param_type == "path" || types.include?("required")
   end
 
   def array?
-    @name.include?('[]')
+    @name.include?("[]")
   end
 
   def builtin?(type)
@@ -149,7 +149,7 @@ class ArgumentView < HashView
       "required" => required?,
       "deprecated" => deprecated?,
     }
-    swagger['enum'] = enums unless enums.empty?
+    swagger["enum"] = enums unless enums.empty?
     if array?
       swagger["type"] = "array"
       items = {}

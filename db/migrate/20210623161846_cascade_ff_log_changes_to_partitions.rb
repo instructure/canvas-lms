@@ -25,7 +25,7 @@ class CascadeFfLogChangesToPartitions < CanvasPartman::Migration
     Auditors::ActiveRecord::FeatureFlagRecord.where(user_id: 0).update_all(user_id: nil)
     with_each_partition do |partition|
       change_column_null partition, :user_id, true
-      add_foreign_key partition, :users, :delay_validation => true, if_not_exists: true
+      add_foreign_key partition, :users, delay_validation: true, if_not_exists: true
       add_index partition, :user_id, algorithm: :concurrently, if_not_exists: true
     end
   end

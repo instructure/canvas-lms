@@ -21,8 +21,8 @@
 describe PacePlanHardEndDateCompressor do
   before :once do
     course_with_student active_all: true
-    @course.update start_at: '2021-09-01'
-    @pace_plan = @course.pace_plans.create! workflow_state: 'active', end_date: '2021-09-10'
+    @course.update start_at: "2021-09-01"
+    @pace_plan = @course.pace_plans.create! workflow_state: "active", end_date: "2021-09-10"
     @module = @course.context_modules.create!
   end
 
@@ -30,13 +30,13 @@ describe PacePlanHardEndDateCompressor do
     context "compresses dates to fit within the end date" do
       before :once do
         assignment = @course.assignments.create!
-        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
         @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 10
         assignment = @course.assignments.create!
-        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
         @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 0
         assignment = @course.assignments.create!
-        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
         @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 6
       end
 
@@ -46,7 +46,7 @@ describe PacePlanHardEndDateCompressor do
       end
 
       it "does nothing if the duration of the pace plan is within the end date" do
-        @pace_plan.update(end_date: '2022-09-10')
+        @pace_plan.update(end_date: "2022-09-10")
         compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)
         expect(compressed.pluck(:duration)).to eq([10, 0, 6])
       end
@@ -55,7 +55,7 @@ describe PacePlanHardEndDateCompressor do
     it "paces assignments appropriately if there are too many" do
       20.times do |_i|
         assignment = @course.assignments.create!
-        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
+        tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
         @pace_plan.pace_plan_module_items.create! module_item: tag, duration: 1
       end
       compressed = PacePlanHardEndDateCompressor.compress(@pace_plan, @pace_plan.pace_plan_module_items)

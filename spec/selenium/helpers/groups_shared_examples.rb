@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'groups_common'
-require_relative 'shared_examples_common'
-require_relative '../rcs/pages/rce_next_page'
+require_relative "../common"
+require_relative "groups_common"
+require_relative "shared_examples_common"
+require_relative "../rcs/pages/rce_next_page"
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
-shared_examples 'home_page' do |context|
+shared_examples "home_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
   include RCENextPage
@@ -36,55 +36,55 @@ shared_examples 'home_page' do |context|
                                                   start_at: Time.zone.now + 1.day)
     get url
 
-    expect('.coming_up').to be_present
-    expect(ff('.coming_up .event a').size).to eq 1
-    expect(f('.coming_up .event a b')).to include_text(event.title)
+    expect(".coming_up").to be_present
+    expect(ff(".coming_up .event a").size).to eq 1
+    expect(f(".coming_up .event a b")).to include_text(event.title)
   end
 
   it "displays a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     get url
-    expect(f('.event-list-view-calendar')).to be_displayed
+    expect(f(".event-list-view-calendar")).to be_displayed
   end
 
   it "has a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     get url
-    expect_new_page_load { fln('Announcement').click }
+    expect_new_page_load { fln("Announcement").click }
     add_announcement_url = "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
     expect(f("a[href=\"#{add_announcement_url}\"]")).to be_displayed
   end
 
   it "displays recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
     DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                            title: 'Discussion Topic', message: 'test')
-    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
+                            title: "Discussion Topic", message: "test")
+    @testgroup.first.announcements.create!(title: "Test Announcement", message: "Message", user: @teacher)
 
     get url
-    expect(f('.recent-activity-header')).to be_displayed
-    activity = ff('.stream_header .title')
+    expect(f(".recent-activity-header")).to be_displayed
+    activity = ff(".stream_header .title")
     expect(activity.size).to eq 2
-    expect(activity[0]).to include_text('1 Announcement')
-    expect(activity[1]).to include_text('1 Discussion')
+    expect(activity[0]).to include_text("1 Announcement")
+    expect(activity[1]).to include_text("1 Discussion")
   end
 
   it "displays announcements on the group home page feed", priority: pick_priority(context, student: "1", teacher: "2") do
-    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
+    @testgroup.first.announcements.create!(title: "Test Announcement", message: "Message", user: @teacher)
     get url
-    expect(f('.title')).to include_text('1 Announcement')
-    f('.toggle-details').click
-    expect(f('.content_summary')).to include_text('Test Announcement')
+    expect(f(".title")).to include_text("1 Announcement")
+    f(".toggle-details").click
+    expect(f(".content_summary")).to include_text("Test Announcement")
   end
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'announcements_page' do |context|
+shared_examples "announcements_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
   include RCENextPage
 
   it "centers the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2") do
     get announcements_page
-    expect(f('#content div')).to have_attribute(:style, 'text-align: center;')
-    expect(f('.btn.btn-large.btn-primary')).to be_displayed
+    expect(f("#content div")).to have_attribute(:style, "text-align: center;")
+    expect(f(".btn.btn-large.btn-primary")).to be_displayed
   end
 
   it "lists all announcements", priority: pick_priority(context, student: "1", teacher: "2") do
@@ -95,43 +95,43 @@ shared_examples 'announcements_page' do |context|
     end
 
     get announcements_page
-    expect(ff('.discussion-topic').size).to eq 5
+    expect(ff(".discussion-topic").size).to eq 5
   end
 
   it "only lists in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
-    @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
+    @testgroup.first.announcements.create!(title: "Group Announcement", message: "Group", user: @teacher)
+    @course.announcements.create!(title: "Course Announcement", message: "Course", user: @teacher)
 
     get announcements_page
-    expect_new_page_load { f('.btn-primary').click }
-    expect(f('#editor_tabs')).to be_displayed
+    expect_new_page_load { f(".btn-primary").click }
+    expect(f("#editor_tabs")).to be_displayed
     fj(".ui-accordion-header a:contains('Announcements')").click
-    expect(fln('Group Announcement')).to be_displayed
-    expect(f("#content")).not_to contain_link('Course Announcement')
+    expect(fln("Group Announcement")).to be_displayed
+    expect(f("#content")).not_to contain_link("Course Announcement")
   end
 
   it "only accesses group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get announcements_page
-    expect_new_page_load { f('#add_announcement').click }
+    expect_new_page_load { f("#add_announcement").click }
     expand_files_on_content_pane
-    expect(ffj('.file .text:visible').size).to eq 1
+    expect(ffj(".file .text:visible").size).to eq 1
   end
 
   it "has an Add External Feed link on announcements", priority: "2" do
     get announcements_page
-    expect(fln('Add External Feed')).to be_displayed
+    expect(fln("Add External Feed")).to be_displayed
   end
 
   it "has an RSS feed button on announcements", priority: "2" do
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
+    @testgroup.first.announcements.create!(title: "Group Announcement", message: "Group", user: @teacher)
     get announcements_page
     expect(f('.btn[title="RSS feed"]')).to be_displayed
   end
 end
 
-shared_examples 'announcements_page_v2' do
+shared_examples "announcements_page_v2" do
   include GroupsCommon
   include SharedExamplesCommon
   include RCENextPage
@@ -142,7 +142,7 @@ shared_examples 'announcements_page_v2' do
 
   it "displays the announcement button" do
     get announcements_page
-    expect(f('#add_announcement')).to be_displayed
+    expect(f("#add_announcement")).to be_displayed
   end
 
   it "lists all announcements" do
@@ -157,16 +157,16 @@ shared_examples 'announcements_page_v2' do
     end
 
     get announcements_page
-    expect(ff('.ic-announcement-row').size).to eq 5
+    expect(ff(".ic-announcement-row").size).to eq 5
   end
 
   it "only lists in-group announcements in the content right pane" do
     # create group and course announcements
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
-    @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
+    @testgroup.first.announcements.create!(title: "Group Announcement", message: "Group", user: @teacher)
+    @course.announcements.create!(title: "Course Announcement", message: "Course", user: @teacher)
 
     get announcements_page
-    expect_new_page_load { f('#add_announcement').click }
+    expect_new_page_load { f("#add_announcement").click }
     click_links_toolbar_menu_button
     click_group_links
     wait_for_ajaximations
@@ -178,7 +178,7 @@ shared_examples 'announcements_page_v2' do
   it "only accesses group files in announcements right content pane" do
     add_test_files
     get announcements_page
-    expect_new_page_load { f('#add_announcement').click }
+    expect_new_page_load { f("#add_announcement").click }
     click_document_toolbar_menu_button
     click_group_documents
     wait_for_ajaximations
@@ -187,20 +187,20 @@ shared_examples 'announcements_page_v2' do
 
   it "has an Add External Feed link on announcements" do
     get announcements_page
-    f('#external_feed').click
-    f('#external-rss-feed__toggle-button').click
-    expect(f('#external-rss-feed__submit-button-group')).to be_displayed
+    f("#external_feed").click
+    f("#external-rss-feed__toggle-button").click
+    expect(f("#external-rss-feed__submit-button-group")).to be_displayed
   end
 
   it "has an RSS feed button on announcements" do
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
+    @testgroup.first.announcements.create!(title: "Group Announcement", message: "Group", user: @teacher)
     get announcements_page
     expect(f('button[id="external_feed"]')).to be_displayed
   end
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'pages_page' do |context|
+shared_examples "pages_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
@@ -212,21 +212,21 @@ shared_examples 'pages_page' do |context|
     @testgroup.first.wiki_pages.create!(title: "Page 1", user: @teacher)
     @testgroup.first.wiki_pages.create!(title: "Page 2", user: @teacher)
     get pages_page
-    expect(ff('.collectionViewItems .clickable').size).to eq 2
+    expect(ff(".collectionViewItems .clickable").size).to eq 2
   end
 
   it "only lists in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
     @testgroup.first.wiki_pages.create!(user: @teacher,
-                                        title: 'Group Page')
+                                        title: "Group Page")
     @course.wiki_pages.create!(user: @teacher,
-                               title: 'Course Page')
+                               title: "Course Page")
 
     get pages_page
 
     wait_for_ajaximations
-    expect(pages_list_item_exists?('Group Page')).to be_truthy
-    expect(pages_list_item_exists?('Course Page')).to be_falsey
+    expect(pages_list_item_exists?("Group Page")).to be_truthy
+    expect(pages_list_item_exists?("Course Page")).to be_falsey
   end
 
   it "only accesses group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2") do
@@ -243,7 +243,7 @@ shared_examples 'pages_page' do |context|
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'people_page' do |context|
+shared_examples "people_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
@@ -251,15 +251,15 @@ shared_examples 'people_page' do |context|
     get people_page
     expect_new_page_load do
       f("#people-options .Button").click
-      fln('View Registered Services').click
+      fln("View Registered Services").click
     end
     # Checks that we are on the Registered Services page
-    expect(f('.btn.button-sidebar-wide')).to be_displayed
+    expect(f(".btn.button-sidebar-wide")).to be_displayed
   end
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'discussions_page' do |context|
+shared_examples "discussions_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
   include RCENextPage
@@ -271,12 +271,12 @@ shared_examples 'discussions_page' do |context|
   it "only lists in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                       title: 'Group Discussion', message: 'Group')
+                                       title: "Group Discussion", message: "Group")
     course_dt = DiscussionTopic.create!(context: @course, user: @teacher,
-                                        title: 'Course Discussion', message: 'Course')
+                                        title: "Course Discussion", message: "Course")
 
     get discussions_page
-    expect_new_page_load { f('#add_discussion').click }
+    expect_new_page_load { f("#add_discussion").click }
 
     click_links_toolbar_menu_button
     click_group_links
@@ -291,7 +291,7 @@ shared_examples 'discussions_page' do |context|
   it "only accesses group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get discussions_page
-    expect_new_page_load { f('#add_discussion').click }
+    expect_new_page_load { f("#add_discussion").click }
     click_document_toolbar_menu_button
     click_group_documents
     wait_for_ajaximations
@@ -301,61 +301,61 @@ shared_examples 'discussions_page' do |context|
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'files_page' do |context|
+shared_examples "files_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
   it "allows group users to rename a file", priority: "2" do
     add_test_files
     get files_page
-    edit_name_from_cog_icon('cool new name')
+    edit_name_from_cog_icon("cool new name")
     wait_for_ajaximations
-    expect(fln('cool new name')).to be_present
+    expect(fln("cool new name")).to be_present
   end
 
   it "searches files only within the scope of a group", priority: pick_priority(context, student: "1", teacher: "2") do
     add_test_files
     get files_page
-    f('input[type="search"]').send_keys 'example.pdf'
+    f('input[type="search"]').send_keys "example.pdf"
     driver.action.send_keys(:return).perform
     refresh_page
     # This checks to make sure there is only one file and it is the group-level one
     expect(all_files_folders.count).to eq 1
-    expect(ff('.ef-name-col__text').first).to include_text('example.pdf')
+    expect(ff(".ef-name-col__text").first).to include_text("example.pdf")
   end
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples 'conferences_page' do |context|
+shared_examples "conferences_page" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
   it "allows group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_chrome('issue with invite_all_but_one_user method')
-    title = 'test conference'
+    skip_if_chrome("issue with invite_all_but_one_user method")
+    title = "test conference"
     get conferences_page
     create_conference(title: title)
-    expect(f('#new-conference-list .ig-title').text).to include(title)
+    expect(f("#new-conference-list .ig-title").text).to include(title)
   end
 
   it "allows group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    skip_if_chrome('delete_conference method is fragile')
+    skip_if_chrome("delete_conference method is fragile")
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
     get conferences_page
 
     delete_conference
-    expect(f('#new-conference-list')).to include_text('There are no new conferences')
+    expect(f("#new-conference-list")).to include_text("There are no new conferences")
   end
 
   it "allows group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    skip_if_chrome('delete_conference method is fragile')
+    skip_if_chrome("delete_conference method is fragile")
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
     conclude_conference(cc)
     get conferences_page
 
     delete_conference
-    expect(f('#concluded-conference-list')).to include_text('There are no concluded conferences')
+    expect(f("#concluded-conference-list")).to include_text("There are no concluded conferences")
   end
 end

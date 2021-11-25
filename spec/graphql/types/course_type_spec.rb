@@ -37,8 +37,8 @@ describe Types::CourseType do
     expect(course_type.resolve("name")).to eq course.name
   end
 
-  it 'works for root_outcome_group' do
-    expect(course_type.resolve('rootOutcomeGroup { _id }')).to eq course.root_outcome_group.id.to_s
+  it "works for root_outcome_group" do
+    expect(course_type.resolve("rootOutcomeGroup { _id }")).to eq course.root_outcome_group.id.to_s
   end
 
   context "top-level permissions" do
@@ -168,19 +168,19 @@ describe Types::CourseType do
   end
 
   describe "outcomeProficiency" do
-    it 'resolves to the account proficiency' do
+    it "resolves to the account proficiency" do
       outcome_proficiency_model(course.account)
       expect(
-        course_type.resolve('outcomeProficiency { _id }', current_user: @teacher)
+        course_type.resolve("outcomeProficiency { _id }", current_user: @teacher)
       ).to eq course.account.outcome_proficiency.id.to_s
     end
   end
 
   describe "outcomeCalculationMethod" do
-    it 'resolves to the account calculation method' do
+    it "resolves to the account calculation method" do
       outcome_calculation_method_model(course.account)
       expect(
-        course_type.resolve('outcomeCalculationMethod { _id }', current_user: @teacher)
+        course_type.resolve("outcomeCalculationMethod { _id }", current_user: @teacher)
       ).to eq course.account.outcome_calculation_method.id.to_s
     end
   end
@@ -459,7 +459,7 @@ describe Types::CourseType do
 
   describe "AssignmentGroupConnection" do
     it "returns assignment groups" do
-      ag = course.assignment_groups.create!(name: 'a group')
+      ag = course.assignment_groups.create!(name: "a group")
       expect(
         course_type.resolve("assignmentGroupsConnection { edges { node { _id } } }")
       ).to eq [ag.to_param]
@@ -576,37 +576,37 @@ describe Types::CourseType do
     end
   end
 
-  describe 'Account' do
-    it 'works' do
+  describe "Account" do
+    it "works" do
       expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s
     end
   end
 
-  describe 'imageUrl' do
-    it 'returns a url from an uploaded image' do
+  describe "imageUrl" do
+    it "returns a url from an uploaded image" do
       course.image_id = attachment_model(context: @course).id
       course.save!
       expect(course_type.resolve("imageUrl")).to_not be_nil
     end
 
-    it 'returns a url from id when url is blank' do
-      course.image_url = ''
+    it "returns a url from id when url is blank" do
+      course.image_url = ""
       course.image_id = attachment_model(context: @course).id
       course.save!
       expect(course_type.resolve("imageUrl")).to_not be_nil
       expect(course_type.resolve("imageUrl")).to_not eq ""
     end
 
-    it 'returns a url from settings' do
+    it "returns a url from settings" do
       course.image_url = "http://some.cool/gif.gif"
       course.save!
       expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
     end
   end
 
-  describe 'AssetString' do
-    it 'returns the asset string' do
-      result = course_type.resolve('assetString')
+  describe "AssetString" do
+    it "returns the asset string" do
+      result = course_type.resolve("assetString")
       expect(result).to eq @course.asset_string
     end
   end

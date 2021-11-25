@@ -55,7 +55,7 @@ module Quizzes::LogAuditing
                                                           attempt: event.attempt,
                                                           started_at: quiz_submission.started_at,
                                                           created_at: event.created_at
-                                                        }).order('created_at DESC')
+                                                        }).order("created_at DESC")
 
       if predecessors.any?
         optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new
@@ -76,7 +76,7 @@ module Quizzes::LogAuditing
         event.event_data = extract_answers(submission_data, quiz_submission.quiz_data)
         event.created_at = Time.now
         event.quiz_submission = quiz_submission
-        event.attempt = submission_data['attempt']
+        event.attempt = submission_data["attempt"]
       end
     end
 
@@ -91,7 +91,7 @@ module Quizzes::LogAuditing
         end.uniq
 
         quiz_data.select do |qq|
-          quiz_question_ids.include?(qq['id'].to_s)
+          quiz_question_ids.include?(qq["id"].to_s)
         end.map(&:symbolize_keys)
       end
 

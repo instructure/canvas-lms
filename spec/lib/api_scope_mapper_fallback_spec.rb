@@ -22,7 +22,7 @@ describe ApiScopeMapperFallback do
   let(:resource) { "users" }
 
   it "loads the ApiScopeMapper file if present" do
-    if Rails.root.join('lib/api_scope_mapper.rb').file?
+    if Rails.root.join("lib/api_scope_mapper.rb").file?
       expect(ApiScopeMapper.name).not_to eq(ApiScopeMapperFallback.name)
     else
       expect(ApiScopeMapper.name).to eq(ApiScopeMapperFallback.name)

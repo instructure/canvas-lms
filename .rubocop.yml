@@ -166,6 +166,8 @@ Style/FloatDivision:
   Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/FormatStringToken:
   Enabled: false # I18n requires template style, but ohter code uses annotated style, and there are some trivial unannotted that don't really need to be annotated
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
@@ -179,14 +181,16 @@ Style/PercentQLiterals:
   EnforcedStyle: upper_case_q
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
-Style/QuotedSymbols:
-  EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
 Style/RescueStandardError:
   EnforcedStyle: implicit
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
 Style/SymbolArray:
   MinSize: 3
 Style/TernaryParentheses:
@@ -426,10 +430,6 @@ Style/GuardClause:
 Style/HashAsLastArrayItem:
   Severity: convention
   AutoCorrect: false
-Style/HashSyntax:
-  EnforcedStyle: ruby19_no_mixed_keys
-  Enabled: false
-  AutoCorrect: false
 Style/InfiniteLoop:
   Severity: convention
   AutoCorrect: false
@@ -455,13 +455,6 @@ Style/RescueModifier:
   AutoCorrect: false
 Style/StringConcatenation:
   Enabled: false
-  AutoCorrect: false
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-  Enabled: false
-  AutoCorrect: false
-Style/StringLiteralsInInterpolation:
-  Severity: convention
   AutoCorrect: false
 Style/TrailingCommaInArrayLiteral:
   Enabled: false

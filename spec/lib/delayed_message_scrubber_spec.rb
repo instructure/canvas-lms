@@ -40,23 +40,23 @@ describe DelayedMessageScrubber do
     end
   end
 
-  describe '#scrub' do
+  describe "#scrub" do
     before do
       @context      = course_factory
-      @notification = Notification.create!(name: 'Test Notification', category: 'Test')
+      @notification = Notification.create!(name: "Test Notification", category: "Test")
       @recipient    = user_factory
 
-      communication_channel(@recipient, { username: 'user@example.com' })
+      communication_channel(@recipient, { username: "user@example.com" })
     end
 
-    it 'deletes delayed messages older than 90 days' do
+    it "deletes delayed messages older than 90 days" do
       messages = old_messages(2)
       scrubber = DelayedMessageScrubber.new
       scrubber.scrub
       expect(DelayedMessage.where(id: messages.map(&:id)).count).to eq 0
     end
 
-    it 'does not delete messages younger than 90 days' do
+    it "does not delete messages younger than 90 days" do
       messages = old_messages(1) + new_messages(1)
 
       scrubber = DelayedMessageScrubber.new
@@ -64,7 +64,7 @@ describe DelayedMessageScrubber do
       expect(DelayedMessage.where(id: messages.map(&:id)).count).to eq 1
     end
 
-    it 'logs predicted results if passed dry_run=true' do
+    it "logs predicted results if passed dry_run=true" do
       logger = double
       old_messages(2)
       scrubber = DelayedMessageScrubber.new(logger: logger)

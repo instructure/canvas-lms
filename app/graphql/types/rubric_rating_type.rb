@@ -20,7 +20,7 @@
 
 module Types
   class RubricRatingType < ApplicationObjectType
-    description 'Possible rating for a rubric criterion'
+    description "Possible rating for a rubric criterion"
 
     implements Interfaces::LegacyIDInterface
 

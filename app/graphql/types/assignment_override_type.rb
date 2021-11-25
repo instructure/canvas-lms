@@ -85,7 +85,7 @@ module Types
       case override.set_type
       when "ADHOC"
         override
-      when 'Noop'
+      when "Noop"
         Noop.new(override.set_id)
       else
         load_association(:set)

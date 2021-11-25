@@ -28,7 +28,7 @@ module SIS
         end
       end
       importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Account.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        Account.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
@@ -84,12 +84,12 @@ module SIS
         if status.present?
           case status
           when /active/i
-            account.workflow_state = 'active'
+            account.workflow_state = "active"
           when /deleted/i
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active sub accounts." if account.sub_accounts.active.exists?
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active courses." if account.courses.active.exists?
 
-            account.workflow_state = 'deleted'
+            account.workflow_state = "deleted"
           end
         end
 

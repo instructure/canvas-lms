@@ -50,7 +50,7 @@ module ActiveRecord
         #   symbols that match associations are expanded to match the foreign key (polymorphic associations
         #   are supported)
         def acts_as_list(options = {})
-          configuration = { :column => "position" }
+          configuration = { column: "position" }
           configuration.update(options) if options.is_a?(Hash)
 
           if configuration[:scope]
@@ -84,7 +84,7 @@ module ActiveRecord
 
             # build the conditions hash, using literal values or the attribute if it's self
             conditions = scope.map { |k, v| [k, v == self ? k : v.inspect] }.to_h
-            conditions = conditions.map { |c, v| "#{c}: #{v}" }.join(', ')
+            conditions = conditions.map { |c, v| "#{c}: #{v}" }.join(", ")
             # build the in_scope method, matching literals or requiring a foreign keys
             # to be non-nil
             in_scope_conditions = []
@@ -104,7 +104,7 @@ module ActiveRecord
               end
 
               def in_scope?
-                #{in_scope_conditions.join(' && ')}
+                #{in_scope_conditions.join(" && ")}
               end
 
               def list_scope_base
@@ -146,7 +146,7 @@ module ActiveRecord
 
           scope(:ordered, -> { order(position_column.to_sym, primary_key.to_sym) })
 
-          if position_column != 'position'
+          if position_column != "position"
             define_method(:position) { read_attribute(self.class.position_column.to_sym) }
           end
         end

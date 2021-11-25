@@ -25,60 +25,60 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Student ID: 5 || Student Name: Student1
     # Course ID: 1
     # Assignment ID: 1
-    provider_state 'a student in a course with an assignment' do
+    provider_state "a student in a course with an assignment" do
       set_up do
         course = Pact::Canvas.base_state.course
         course.assignments.create({
-                                    name: 'Assignment 1',
+                                    name: "Assignment 1",
                                     due_at: Time.zone.now + 1.day,
-                                    submission_types: 'online_text_entry'
+                                    submission_types: "online_text_entry"
                                   })
       end
     end
 
-    provider_state 'a migrated quiz assignment' do
+    provider_state "a migrated quiz assignment" do
       set_up do
         course = Pact::Canvas.base_state.course
-        assignment = assignment_model(context: course, title: 'Assignment1')
-        assignment.submission_types = 'external_tool'
+        assignment = assignment_model(context: course, title: "Assignment1")
+        assignment.submission_types = "external_tool"
         assignment.external_tool_tag_attributes = {
-          resource_link_id: '9b4ef1eea0eb4c3498983e09a6ef88f1'
+          resource_link_id: "9b4ef1eea0eb4c3498983e09a6ef88f1"
         }
         assignment.save!
       end
     end
 
-    provider_state 'a cloned quiz assignment' do
+    provider_state "a cloned quiz assignment" do
       set_up do
         course = Pact::Canvas.base_state.course
-        assignment = assignment_model(context: course, title: 'Assignment1')
-        assignment.submission_types = 'external_tool'
+        assignment = assignment_model(context: course, title: "Assignment1")
+        assignment.submission_types = "external_tool"
         assignment.external_tool_tag_attributes = {
-          resource_link_id: '9b4ef1eea0eb4c3498983e09a6ef88f1'
+          resource_link_id: "9b4ef1eea0eb4c3498983e09a6ef88f1"
         }
         assignment.save!
       end
     end
 
-    provider_state 'an assignment with overrides' do
+    provider_state "an assignment with overrides" do
       set_up do
         course = Pact::Canvas.base_state.course
         student = Pact::Canvas.base_state.students.first
         assignment = course.assignments.create({
-                                                 name: 'Assignment Override',
+                                                 name: "Assignment Override",
                                                  due_at: Time.zone.now + 1.day,
-                                                 submission_types: 'online_text_entry'
+                                                 submission_types: "online_text_entry"
                                                })
 
         override = assignment.assignment_overrides.create!
-        override.assignment_override_students.create!(:user => student)
+        override.assignment_override_students.create!(user: student)
       end
     end
 
     # Student ID 8
     # Course ID 3
     # Assignment IDs 1-3, submission types: online_text_entry, online_upload, online_url
-    provider_state 'mobile 3 assignments, 3 submissions' do
+    provider_state "mobile 3 assignments, 3 submissions" do
       set_up do
         mcourse = Pact::Canvas.base_state.mobile_courses[1]
         mstudent = Pact::Canvas.base_state.mobile_student
@@ -86,7 +86,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         test_submission_types = %w[online_text_entry online_upload online_url]
         # Create a category/group...
         cat = mcourse.group_categories.create!(name: "The Cool Kids")
-        g = cat.groups.create(:context => mcourse)
+        g = cat.groups.create(context: mcourse)
         g.users << mstudent
         g.save!
         # Create 3 assignments with different submission types
@@ -97,7 +97,7 @@ PactConfig::Consumers::ALL.each do |consumer|
             description: "Awesome!",
             due_at: 2.days.ago,
             points_possible: 10,
-            allowed_extensions: ['txt'],
+            allowed_extensions: ["txt"],
             submission_types: [test_submission_types[i]],
             group_category_id: cat.id
           )
@@ -106,16 +106,16 @@ PactConfig::Consumers::ALL.each do |consumer|
           submission_type = test_submission_types[i]
           submission =
             case submission_type
-            when 'online_upload'
+            when "online_upload"
               assignment.submit_homework(
                 mstudent, {
-                  submission_type: 'online_upload',
+                  submission_type: "online_upload",
                   attachments: [
-                    attachment_model(filename: 'attached.txt', context: mstudent, content_type: 'text/html')
+                    attachment_model(filename: "attached.txt", context: mstudent, content_type: "text/html")
                   ]
                 }
               )
-            when 'online_url'
+            when "online_url"
               assignment.submit_homework(mstudent, { submission_type: "online_url", url: "someurl" })
             else
               # assume online_text_entry by default
@@ -145,16 +145,16 @@ PactConfig::Consumers::ALL.each do |consumer|
             lock_at: 3.days.from_now,
             lock_at_overridden: true
           )
-          override.assignment_override_students.create!(:user => mstudent)
+          override.assignment_override_students.create!(user: mstudent)
           override.save!
           # Create a rubric for the assignment
           rubric = Rubric.create!(
-            :title => "rubric title",
-            :context => mcourse,
-            :context_id => mcourse.id,
-            :context_type => "Course",
-            :points_possible => 10,
-            :public => true
+            title: "rubric title",
+            context: mcourse,
+            context_id: mcourse.id,
+            context_type: "Course",
+            points_possible: 10,
+            public: true
           )
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was
@@ -162,7 +162,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           rubric_association = rubric.update_with_association(mteacher, {
                                                                 criteria: {
                                                                   "0" => {
-                                                                    ignore_for_scoring: '0',
+                                                                    ignore_for_scoring: "0",
                                                                     description: "standard",
                                                                     points: 10,
                                                                     ratings: {
@@ -173,19 +173,19 @@ PactConfig::Consumers::ALL.each do |consumer|
                                                                   },
                                                                 },
                                                               }, mcourse, {
-                                                                association_object: assignment, purpose: 'grading', update_if_existing: true, use_for_grading: "1", skip_updating_points_possible: true
+                                                                association_object: assignment, purpose: "grading", update_if_existing: true, use_for_grading: "1", skip_updating_points_possible: true
                                                               })
           rubric.save!
           assignment.save!
           # Grade the assignment
           RubricAssessment.create!({
                                      artifact: submission,
-                                     assessment_type: 'grading',
+                                     assessment_type: "grading",
                                      assessor: mteacher,
                                      rubric: rubric,
                                      user: mstudent,
                                      rubric_association: rubric_association,
-                                     data: [{ points: 10.0, comments: 'hey' }]
+                                     data: [{ points: 10.0, comments: "hey" }]
                                    })
           # Unfortunately, the rubric assessment above will not actually assign a grade
           assignment.grade_student(mstudent, grader: mteacher, score: 10, points_deducted: 0)

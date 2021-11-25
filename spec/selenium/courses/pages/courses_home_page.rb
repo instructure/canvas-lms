@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative './course_wizard_page_component'
+require_relative "../../common"
+require_relative "./course_wizard_page_component"
 
 module CoursesHomePage
   #------------------------- Sections ---------------------------
@@ -32,7 +32,7 @@ module CoursesHomePage
 
   #------------------------- Selectors --------------------------
   def secondary_content_selector
-    '.ic-app-main-content__secondary'
+    ".ic-app-main-content__secondary"
   end
 
   def choose_home_page_link_selector
@@ -73,7 +73,7 @@ module CoursesHomePage
   end
 
   def course_user_list
-    ff('.roster .rosterUser')
+    ff(".roster .rosterUser")
   end
 
   def accept_enrollment_button
@@ -85,7 +85,7 @@ module CoursesHomePage
   end
 
   def course_page_content
-    f('#content')
+    f("#content")
   end
 
   def course_pace_plan_link

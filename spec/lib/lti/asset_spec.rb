@@ -24,7 +24,7 @@ describe Lti::Asset do
   end
 
   describe "opaque_identifier_for" do
-    context 'when the asset is nil' do
+    context "when the asset is nil" do
       subject { described_class.opaque_identifier_for asset }
 
       let(:asset) { nil }
@@ -42,9 +42,9 @@ describe Lti::Asset do
     it "uses old_id when present" do
       user = user_model
       context_id = described_class.opaque_identifier_for(user)
-      UserPastLtiId.create!(user: user, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      UserPastLtiId.create!(user: user, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
       expect(described_class.opaque_identifier_for(user, context: @course)).to_not eq context_id
-      expect(described_class.opaque_identifier_for(user, context: @course)).to eq 'old_lti_id'
+      expect(described_class.opaque_identifier_for(user, context: @course)).to eq "old_lti_id"
     end
 
     it "does not use old_id when not present" do
@@ -54,11 +54,11 @@ describe Lti::Asset do
     end
 
     it "does not create new lti_context for asset if exists" do
-      @course.lti_context_id = 'dummy_context_id'
+      @course.lti_context_id = "dummy_context_id"
       @course.save!
       described_class.opaque_identifier_for(@course)
       @course.reload
-      expect(@course.lti_context_id).to eq 'dummy_context_id'
+      expect(@course.lti_context_id).to eq "dummy_context_id"
     end
   end
 end

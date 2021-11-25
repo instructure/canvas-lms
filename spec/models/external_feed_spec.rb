@@ -21,8 +21,8 @@
 describe ExternalFeed do
   it "adds rss entries" do
     @feed = external_feed_model
-    require 'rss/1.0'
-    require 'rss/2.0'
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
@@ -44,21 +44,21 @@ describe ExternalFeed do
   it "rss feed should be inactive for deleted accounts" do
     @feed = external_feed_model
     account1 = account_model
-    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    course_with_student(account: account1, course: @course).update!(workflow_state: :active)
     Account.default.update!(workflow_state: :deleted)
     expect(@feed.inactive?).to be(true)
   end
 
   it "rss feed should be active for concluded courses" do
     account1 = account_model
-    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    course_with_student(account: account1, course: @course).update!(workflow_state: :active)
     @feed = external_feed_model(context: @course)
     expect(@feed.inactive?).to be(false)
   end
 
   it "rss feed should be inactive for concluded courses" do
     account1 = account_model
-    course_with_student(:account => account1, :course => @course)
+    course_with_student(account: account1, course: @course)
     @feed = external_feed_model(context: @course)
     @course.complete!
     expect(@feed.inactive?).to be(true)
@@ -66,7 +66,7 @@ describe ExternalFeed do
 
   it "rss feed should be inactive for deleted courses" do
     account1 = account_model
-    course_with_student(:account => account1, :course => @course)
+    course_with_student(account: account1, course: @course)
     @feed = external_feed_model(context: @course)
     @course.destroy!
     expect(@feed.inactive?).to be(true)
@@ -74,18 +74,18 @@ describe ExternalFeed do
 
   it "rss feed should be active for groups with active courses" do
     account1 = account_model
-    course_with_student(:account => account1, :course => @course).update!(workflow_state: :active)
+    course_with_student(account: account1, course: @course).update!(workflow_state: :active)
     @feed = external_feed_model
-    @group = group_model(:is_public => true, :context => @course)
+    @group = group_model(is_public: true, context: @course)
     @feed.update!(context: @group)
     expect(@feed.inactive?).to be(false)
   end
 
   it "rss feed should be inactive for groups with active courses" do
     account1 = account_model
-    course_with_student(:account => account1, course: @course)
+    course_with_student(account: account1, course: @course)
     @feed = external_feed_model
-    @group = group_model(:is_public => true, :context => @course)
+    @group = group_model(is_public: true, context: @course)
     @feed.update!(context: @group)
     @course.complete!
     expect(@feed.inactive?).to be(true)
@@ -93,9 +93,9 @@ describe ExternalFeed do
 
   it "rss feed should be inactive for groups with deleted courses" do
     account1 = account_model
-    course_with_student(:account => account1, course: @course)
+    course_with_student(account: account1, course: @course)
     @feed = external_feed_model
-    group_model(:is_public => true, :context => @course)
+    group_model(is_public: true, context: @course)
     @feed.update!(context: @group)
     @course.destroy!
     expect(@feed.inactive?).to be(true)
@@ -103,9 +103,9 @@ describe ExternalFeed do
 
   it "adds rss entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:context => @course)
-    require 'rss/1.0'
-    require 'rss/2.0'
+    @feed = external_feed_model(context: @course)
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
@@ -120,7 +120,7 @@ describe ExternalFeed do
 
   it "adds atom entries" do
     @feed = external_feed_model
-    require 'atom'
+    require "atom"
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
@@ -131,8 +131,8 @@ describe ExternalFeed do
 
   it "adds atom entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:context => @course)
-    require 'atom'
+    @feed = external_feed_model(context: @course)
+    require "atom"
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
@@ -144,9 +144,9 @@ describe ExternalFeed do
 
   it "allows deleting" do
     @course = course_model
-    @feed = external_feed_model(:context => @course)
-    require 'rss/1.0'
-    require 'rss/2.0'
+    @feed = external_feed_model(context: @course)
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     @feed.add_rss_entries(rss)
 

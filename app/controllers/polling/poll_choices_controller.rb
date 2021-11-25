@@ -179,7 +179,7 @@ module Polling
       meta = {}
       json = if accepts_jsonapi?
                poll_choices, meta = Api.jsonapi_paginate(poll_choices, self, api_v1_poll_choices_url(@poll))
-               meta[:primaryCollection] = 'poll_choices'
+               meta[:primaryCollection] = "poll_choices"
                poll_choices
              else
                Api.paginate(poll_choices, self, api_v1_poll_choices_url(@poll))

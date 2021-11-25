@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 shared_context "Blueprint Sync History Context" do
   def verify_sync_history
-    second_migration = f('.bcs__history-item:nth-of-type(2)')
+    second_migration = f(".bcs__history-item:nth-of-type(2)")
     expect(fj("span:contains('Created')", second_migration)).to be_displayed
-    first_migration = f('.bcs__history-item:nth-of-type(1)')
+    first_migration = f(".bcs__history-item:nth-of-type(1)")
     expect(fj("span:contains('Updated')", first_migration)).to be_displayed
   end
 
   def open_sync_history
     get "/courses/#{@master.id}"
-    f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-    f('#mcSyncHistoryBtn').click
+    f(".blueprint__root .bcs__wrapper .bcs__trigger").click
+    f("#mcSyncHistoryBtn").click
   end
 
   def open_item_history
-    f('.bcs__history-item:nth-of-type(1) #exceptionPill').click
+    f(".bcs__history-item:nth-of-type(1) #exceptionPill").click
   end
 
   def exceptions_frame
-    f('.bcs__history-item__change-exceps')
+    f(".bcs__history-item__change-exceps")
   end
 end
 

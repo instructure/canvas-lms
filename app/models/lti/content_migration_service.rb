@@ -22,7 +22,7 @@ module Lti
     KEY_REGEX = /\Alti_(?<id>\d+)\z/.freeze
 
     def self.enabled?
-      Setting.get('enable_lti_content_migration', 'false') == 'true'
+      Setting.get("enable_lti_content_migration", "false") == "true"
     end
 
     def self.begin_exports(course, options = {})

@@ -22,12 +22,12 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   belongs_to :learning_outcome_result
   belongs_to :learning_outcome
   belongs_to :associated_asset, polymorphic: [:assessment_question]
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   simply_versioned
 
   scope :for_associated_asset, lambda { |associated_asset|
-    where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id)
+    where(associated_asset_type: associated_asset.class.to_s, associated_asset_id: associated_asset.id)
   }
 
   delegate :hide_points, to: :learning_outcome_result

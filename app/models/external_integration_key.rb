@@ -29,7 +29,7 @@ class ExternalIntegrationKey < ActiveRecord::Base
   validates :key_type, uniqueness: { scope: [:context_type, :context_id] }
 
   def key_type
-    attributes['key_type'].try(:to_sym)
+    attributes["key_type"].try(:to_sym)
   end
 
   scope :of_type, ->(type) { where(key_type: type) }

@@ -38,13 +38,13 @@ module Lti
           visibility: tool.extension_setting(placement, :visibility),
           href: "#{context.class.to_s.downcase}_external_tool_path".to_sym,
           external: true,
-          hidden: tool.extension_setting(placement, :default) == 'disabled',
+          hidden: tool.extension_setting(placement, :default) == "disabled",
           args: [context.id, tool.id]
         }
         target = tool.extension_setting(placement, :windowTarget)
-        if target && target == '_blank'
+        if target && target == "_blank"
           tab[:target] = target
-          tab[:args] << { display: 'borderless' }
+          tab[:args] << { display: "borderless" }
         end
         tab
       end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'selenium-webdriver'
+require "selenium-webdriver"
 
 module Selenium
   module WebDriver
@@ -25,14 +25,14 @@ module Selenium
       module W3C
         class Bridge
           COMMANDS = remove_const(:COMMANDS).dup
-          COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+          COMMANDS[:get_log] = [:post, "session/:session_id/log"]
           COMMANDS.freeze
 
           def log(type)
             data = execute :get_log, {}, { type: type.to_s }
 
             Array(data).map do |l|
-              LogEntry.new l.fetch('level', 'UNKNOWN'), l.fetch('timestamp'), l.fetch('message')
+              LogEntry.new l.fetch("level", "UNKNOWN"), l.fetch("timestamp"), l.fetch("message")
             rescue KeyError
               next
             end

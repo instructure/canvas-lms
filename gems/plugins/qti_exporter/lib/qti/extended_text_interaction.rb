@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 module Qti
   class ExtendedTextInteraction < AssessmentItemConverter
@@ -54,7 +54,7 @@ module Qti
           match_data = regex.match(match_data.post_match)
         end
         @question.delete :is_vista_fib
-      elsif @question[:question_type] == 'fill_in_multiple_blanks_question'
+      elsif @question[:question_type] == "fill_in_multiple_blanks_question"
         # the python tool "fixes" IDs that aren't quite legal QTI (e.g., "1a" becomes "RESPONSE_1a")
         # but does not update the question text, breaking fill-in-multiple-blanks questions.
         # fortunately it records what it does in an XML comment at the top of the doc, so we can undo it.
@@ -68,12 +68,12 @@ module Qti
         end
       end
 
-      @doc.search('responseProcessing responseCondition').each do |cond|
-        cond.css('stringMatch,match').each do |match|
-          text = get_node_val(match, 'baseValue[baseType=string]')
-          text ||= get_node_val(match, 'baseValue[baseType=identifier]')
+      @doc.search("responseProcessing responseCondition").each do |cond|
+        cond.css("stringMatch,match").each do |match|
+          text = get_node_val(match, "baseValue[baseType=string]")
+          text ||= get_node_val(match, "baseValue[baseType=identifier]")
           existing = false
-          if @question[:question_type] != 'fill_in_multiple_blanks_question' &&
+          if @question[:question_type] != "fill_in_multiple_blanks_question" &&
              (answer = @question[:answers].find { |a| a[:text] == text })
             existing = true
           else
@@ -83,12 +83,12 @@ module Qti
           if !answer[:feedback_id] && (f_id = get_feedback_id(cond))
             answer[:feedback_id] = f_id
           end
-          if @question[:question_type] == 'fill_in_multiple_blanks_question' &&
-             (id = get_node_att(match, 'variable', 'identifier'))
+          if @question[:question_type] == "fill_in_multiple_blanks_question" &&
+             (id = get_node_att(match, "variable", "identifier"))
             id = id.strip
             answer[:blank_id] = fib_map[id] || id
             # strip illegal characters from blank ids
-            cleaned = answer[:blank_id].gsub(/[^A-Za-z0-9\-._]/, '-')
+            cleaned = answer[:blank_id].gsub(/[^A-Za-z0-9\-._]/, "-")
             if answer[:blank_id] != cleaned
               @question[:question_text].gsub!("[#{answer[:blank_id]}]", "[#{cleaned}]")
               answer[:blank_id] = cleaned
@@ -102,12 +102,12 @@ module Qti
           @question[:answers] << answer
           answer[:weight] = 100
           answer[:comments] = ""
-          bv = match.at_css('baseValue')
-          answer[:id] = get_or_generate_answer_id(bv && bv['identifier'])
+          bv = match.at_css("baseValue")
+          answer[:id] = get_or_generate_answer_id(bv && bv["identifier"])
         end
       end
       # Check if there are correct answers explicitly specified
-      @doc.css('correctResponse value').each do |correct_id|
+      @doc.css("correctResponse value").each do |correct_id|
         answer = {}
         answer[:id] = unique_local_id
         answer[:weight] = DEFAULT_CORRECT_WEIGHT

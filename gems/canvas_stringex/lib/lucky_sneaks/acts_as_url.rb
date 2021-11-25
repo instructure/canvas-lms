@@ -62,7 +62,7 @@ module LuckySneaks
         if options[:sync_url]
           before_validation :ensure_unique_url
         else
-          before_validation(:ensure_unique_url, :on => :create)
+          before_validation(:ensure_unique_url, on: :create)
         end
 
         class_variable_set(:@@attribute_to_urlify, attribute)
@@ -92,7 +92,7 @@ module LuckySneaks
       url_attribute = self.class.url_attribute
       base_url = send(url_attribute)
       base_url = send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !only_when_blank
-      conditions = [+"#{url_attribute} LIKE ?", base_url + '%']
+      conditions = [+"#{url_attribute} LIKE ?", base_url + "%"]
       unless new_record?
         conditions.first << " and id != ?"
         conditions << id

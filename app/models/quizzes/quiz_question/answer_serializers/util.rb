@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'sanitize'
+require "sanitize"
 
 module Quizzes::QuizQuestion::AnswerSerializers
   module Util
@@ -42,20 +42,20 @@ module Quizzes::QuizQuestion::AnswerSerializers
       #
       # @return [BigDecimal]
       def i18n_to_decimal(value)
-        separator = I18n.t('number.format.separator')
-        delimiter = I18n.t('number.format.delimiter')
+        separator = I18n.t("number.format.separator")
+        delimiter = I18n.t("number.format.delimiter")
 
-        to_decimal(value.gsub(delimiter, '').gsub(separator, '.'))
+        to_decimal(value.gsub(delimiter, "").gsub(separator, "."))
       end
 
       # Cast a BigDecimal to a localized string
       #
       # @return [String]
       def decimal_to_i18n(value)
-        separator = I18n.t('number.format.separator')
-        delimiter = I18n.t('number.format.delimiter')
+        separator = I18n.t("number.format.separator")
+        delimiter = I18n.t("number.format.delimiter")
 
-        value.to_s.gsub(delimiter, '').gsub(separator, '.')
+        value.to_s.gsub(delimiter, "").gsub(separator, ".")
       end
 
       # Convert a value to a BigDecimal.
@@ -64,7 +64,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       def to_decimal(value)
         BigDecimal(value.to_s)
       rescue ArgumentError
-        BigDecimal('0.0')
+        BigDecimal("0.0")
       end
 
       def to_boolean(flag)
@@ -77,11 +77,11 @@ module Quizzes::QuizQuestion::AnswerSerializers
       end
 
       def sanitize_html(html)
-        Sanitize.clean((html || '').to_s, CanvasSanitize::SANITIZE)
+        Sanitize.clean((html || "").to_s, CanvasSanitize::SANITIZE)
       end
 
       def sanitize_text(text)
-        (text || '').to_s.strip.downcase
+        (text || "").to_s.strip.downcase
       end
     end
   end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class LearningOutcomeImporter < Importer
@@ -26,22 +26,22 @@ module Importers
     def self.process_migration(data, migration)
       selectable_outcomes = migration.context.respond_to?(:root_account) &&
                             migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
-      outcomes = data['learning_outcomes'] || []
+      outcomes = data["learning_outcomes"] || []
       migration.outcome_to_id_map = {}
       migration.copied_external_outcome_map = {}
       outcomes.each do |outcome|
-        import_item = migration.import_object?('learning_outcomes', outcome['migration_id'])
-        import_item ||= migration.import_object?('learning_outcome_groups', outcome['migration_id']) if selectable_outcomes
+        import_item = migration.import_object?("learning_outcomes", outcome["migration_id"])
+        import_item ||= migration.import_object?("learning_outcome_groups", outcome["migration_id"]) if selectable_outcomes
         next unless import_item || selectable_outcomes
 
         begin
-          if outcome[:type] == 'learning_outcome_group'
+          if outcome[:type] == "learning_outcome_group"
             Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration, nil, selectable_outcomes && !import_item)
           elsif !selectable_outcomes || import_item
             Importers::LearningOutcomeImporter.import_from_migration(outcome, migration)
           end
         rescue
-          migration.add_import_warning(t('#migration.learning_outcome_type', "Learning Outcome"), outcome[:title], $!)
+          migration.add_import_warning(t("#migration.learning_outcome_type", "Learning Outcome"), outcome[:title], $!)
         end
       end
     end
@@ -68,7 +68,7 @@ module Importers
         end
 
         unless outcome
-          migration.add_warning(t(:no_context_found, %(The external Learning Outcome couldn't be found for "%{title}", creating a copy.), :title => hash[:title]))
+          migration.add_warning(t(:no_context_found, %(The external Learning Outcome couldn't be found for "%{title}", creating a copy.), title: hash[:title]))
           migration.copied_external_outcome_map[hash[:external_identifier]] = hash[:migration_id]
         end
       end
@@ -96,7 +96,7 @@ module Importers
             item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
-            migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), :title => hash[:title]))
+            migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), title: hash[:title]))
             return
           end
         else
@@ -112,7 +112,7 @@ module Importers
         item.vendor_guid = hash[:vendor_guid]
         item.low_grade = hash[:low_grade]
         item.high_grade = hash[:high_grade]
-        item.workflow_state = 'active' if item.deleted?
+        item.workflow_state = "active" if item.deleted?
         item.short_description = hash[:title]
         item.description = hash[:description]
         assessed = item.assessed?
@@ -123,7 +123,7 @@ module Importers
 
         if hash[:ratings]
           unless assessed
-            item.data = { :rubric_criterion => {} }
+            item.data = { rubric_criterion: {} }
             item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
             item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
             item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
@@ -155,9 +155,9 @@ module Importers
           asset = nil
 
           case alignment[:content_type]
-          when 'Assignment'
+          when "Assignment"
             asset = Assignment.where(context_id: context, context_type: context.class.to_s, migration_id: alignment[:content_id]).first
-          when 'AssessmentQuestionBank'
+          when "AssessmentQuestionBank"
             asset = AssessmentQuestionBank.where(context_id: context, context_type: context.class.to_s, migration_id: alignment[:content_id]).first
           end
 
@@ -169,7 +169,7 @@ module Importers
       end
 
       # Create OutcomeFriendlyDescription from course import
-      if item && Account.site_admin.feature_enabled?(:outcomes_friendly_description) && item.context_type == 'Course' && hash[:friendly_description].present?
+      if item && Account.site_admin.feature_enabled?(:outcomes_friendly_description) && item.context_type == "Course" && hash[:friendly_description].present?
         OutcomeFriendlyDescription.find_or_create_by(context: item.context, learning_outcome: item).update(description: hash[:friendly_description])
       end
 

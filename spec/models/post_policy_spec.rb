@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe PostPolicy do
   describe "relationships" do
@@ -31,7 +31,7 @@ describe PostPolicy do
 
   describe "validation" do
     let(:course) { Course.create! }
-    let(:assignment) { course.assignments.create!(title: '!!!') }
+    let(:assignment) { course.assignments.create!(title: "!!!") }
 
     it "is valid if a valid course and assignment are specified" do
       post_policy = PostPolicy.new(course: course, assignment: assignment)
@@ -50,7 +50,7 @@ describe PostPolicy do
 
   describe "callbacks" do
     let(:course) { Course.create! }
-    let(:assignment) { course.assignments.create!(title: '!!!') }
+    let(:assignment) { course.assignments.create!(title: "!!!") }
 
     context "when the policy is for a specific assignment" do
       let(:policy) { assignment.post_policy }

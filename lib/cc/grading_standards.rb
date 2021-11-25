@@ -26,7 +26,7 @@ module CC
                     (assignment.discussion_topic && export_object?(assignment.discussion_topic))
 
         gs = assignment.grading_standard
-        add_item_to_export(gs) if gs && gs.context_type == 'Course' && gs.context_id == @course.id
+        add_item_to_export(gs) if gs && gs.context_type == "Course" && gs.context_id == @course.id
       end
     end
 
@@ -39,9 +39,9 @@ module CC
         standards_file = nil
         rel_path = nil
       else
-        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), 'w')
+        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
-        document = Builder::XmlMarkup.new(:target => standards_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: standards_file, indent: 2)
       end
 
       document.instruct!
@@ -52,7 +52,7 @@ module CC
       ) do |standards_node|
         standards_to_copy.each do |standard|
           migration_id = create_key(standard)
-          standards_node.gradingStandard(:identifier => migration_id, :version => standard.version) do |standard_node|
+          standards_node.gradingStandard(identifier: migration_id, version: standard.version) do |standard_node|
             standard_node.title standard.title unless standard.title.blank?
             standard_node.data standard.data.to_json
           end

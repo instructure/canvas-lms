@@ -24,7 +24,7 @@ shared_examples_for "question bank basic tests" do
     get url
   end
 
-  def add_question_bank(title = 'bank 1')
+  def add_question_bank(title = "bank 1")
     f(".add_bank_link").click
     wait_for_ajaximations
     question_bank_title = f("#assessment_question_bank_title")

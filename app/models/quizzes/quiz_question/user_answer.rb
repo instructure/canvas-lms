@@ -24,7 +24,7 @@ Quizzes::QuizQuestion::UserAnswer = Struct.new(:question_id, :points_possible, :
     super(question_id, points_possible, 1, 0, 0)
     @points = 0.0
     @answer_data = answer_data
-    self.answer_details = { :text => answer_text || "" }
+    self.answer_details = { text: answer_text || "" }
   end
 
   def [](k)

@@ -31,7 +31,7 @@ describe Types::RubricAssessmentType do
       context: course,
       rubric: rubric,
       association_object: assignment,
-      purpose: 'grading'
+      purpose: "grading"
     )
   end
   let!(:rubric_assessment) do
@@ -39,63 +39,63 @@ describe Types::RubricAssessmentType do
       user: student,
       assessor: teacher,
       rubric_association: rubric_association,
-      assessment_type: 'grading'
+      assessment_type: "grading"
     )
   end
   let(:submission) { assignment.submissions.where(user: student).first }
   let(:submission_type) { GraphQLTypeTester.new(submission, current_user: teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
     ).to eq [rubric_assessment.id.to_s]
   end
 
-  it 'requires permission to see the assessor' do
+  it "requires permission to see the assessor" do
     assignment.update(anonymous_peer_reviews: true)
-    rubric_assessment.update(assessment_type: 'no_reason')
+    rubric_assessment.update(assessment_type: "no_reason")
     expect(
       submission_type.resolve(
-        'rubricAssessmentsConnection { nodes { assessor { _id } } }',
+        "rubricAssessmentsConnection { nodes { assessor { _id } } }",
         current_user: student
       )
     ).to eq [nil]
   end
 
-  describe 'works for the field' do
-    it 'assessment_type' do
+  describe "works for the field" do
+    it "assessment_type" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentType } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentType } }")
       ).to eq [rubric_assessment.assessment_type]
     end
 
-    it 'score' do
+    it "score" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { score } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { score } }")
       ).to eq [rubric_assessment.score]
     end
 
-    it 'user' do
+    it "user" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { user { _id } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { user { _id } } }")
       ).to eq [student.id.to_s]
     end
 
-    it 'assessor' do
+    it "assessor" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessor { _id } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessor { _id } } }")
       ).to eq [teacher.id.to_s]
     end
 
-    it 'assessment_ratings' do
+    it "assessment_ratings" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }")
       ).to eq [rubric_assessment.data.map { |r| r[:id].to_s }]
     end
 
-    it 'rubric_association' do
+    it "rubric_association" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }")
       ).to eq [rubric_association.id.to_s]
     end
   end
@@ -106,14 +106,14 @@ describe Types::RubricAssessmentType do
       rubric_assessment.reload
       rubric_assessment.update!(artifact_attempt: 2)
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { artifactAttempt } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { artifactAttempt } }")
       ).to eq [2]
     end
 
     it "returns zero when artifact_attempt is nil" do
       rubric_assessment.update!(artifact_attempt: nil)
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { artifactAttempt } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { artifactAttempt } }")
       ).to eq [0]
     end
   end

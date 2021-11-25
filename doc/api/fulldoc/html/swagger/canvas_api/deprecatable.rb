@@ -35,7 +35,7 @@ module CanvasAPI
     end
 
     def line_without_deprecation_tags(line)
-      line.gsub(/NOTICE \S+\s?|\s?EFFECTIVE \S+\s?/, '')
+      line.gsub(/NOTICE \S+\s?|\s?EFFECTIVE \S+\s?/, "")
     end
 
     def extract_deprecation_dates(line)
@@ -67,19 +67,19 @@ module CanvasAPI
       if @description.blank?
         raise(
           ArgumentError,
-          "Expected a description for #{@description_key.present? ? "`#{@description_key}`" : 'the deprecation'}" \
+          "Expected a description for #{@description_key.present? ? "`#{@description_key}`" : "the deprecation"}" \
           ", but it was not provided.#{reference_line}"
         )
       end
     end
 
     def validate_line(text)
-      line_count = (text || '').split("\n", 2).length
+      line_count = (text || "").split("\n", 2).length
       if line_count < 2
         raise(
           ArgumentError,
           "Expected two lines: a tag declaration line with deprecation arguments, " \
-          "and a description line, but found #{line_count} #{'line'.pluralize(line_count)}.#{reference_line}"
+          "and a description line, but found #{line_count} #{"line".pluralize(line_count)}.#{reference_line}"
         )
       end
     end

@@ -27,7 +27,7 @@ describe SubmissionVersion do
 
   before do
     @submission = unversioned_submission
-    @version = Version.create(:versionable => @submission, :yaml => @submission.attributes.to_yaml)
+    @version = Version.create(versionable: @submission, yaml: @submission.attributes.to_yaml)
   end
 
   describe "index_version" do
@@ -44,7 +44,7 @@ describe SubmissionVersion do
 
     it "sets the index record's context" do
       index = SubmissionVersion.index_version(@version)
-      expect(index.context_type).to eq 'Course'
+      expect(index.context_type).to eq "Course"
       expect(index.context_id).to eq @course.id
     end
 
@@ -69,7 +69,7 @@ describe SubmissionVersion do
       n = 5
 
       submissions = Array.new(n) { unversioned_submission }
-      versions = submissions.map { |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
+      versions = submissions.map { |submission| Version.create(versionable: submission, yaml: submission.attributes.to_yaml) }
 
       expect do
         SubmissionVersion.index_versions(versions)
@@ -97,7 +97,7 @@ describe SubmissionVersion do
 
   it "skips submissions with no assignment" do
     attrs = YAML.load(@version.yaml)
-    attrs.delete('assignment_id')
+    attrs.delete("assignment_id")
     @version.update_attribute(:yaml, attrs.to_yaml)
     expect do
       SubmissionVersion.index_version(@version)
@@ -117,9 +117,9 @@ describe SubmissionVersion do
 
   it "lets you preload current_version in one query" do
     sub1 = unversioned_submission
-    3.times { Version.create(:versionable => sub1, :yaml => sub1.attributes.to_yaml) }
+    3.times { Version.create(versionable: sub1, yaml: sub1.attributes.to_yaml) }
     sub2 = unversioned_submission
-    2.times { Version.create(:versionable => sub2, :yaml => sub2.attributes.to_yaml) }
+    2.times { Version.create(versionable: sub2, yaml: sub2.attributes.to_yaml) }
 
     Version.preload_version_number([sub1, sub2])
 

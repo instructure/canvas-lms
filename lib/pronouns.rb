@@ -19,9 +19,9 @@
 
 module Pronouns
   DEFAULT_PRONOUNS = {
-    "she_her" => -> { I18n.t('She/Her') },
-    "he_him" => -> { I18n.t('He/Him') },
-    "they_them" => -> { I18n.t('They/Them') }
+    "she_her" => -> { I18n.t("She/Her") },
+    "he_him" => -> { I18n.t("He/Him") },
+    "they_them" => -> { I18n.t("They/Them") }
   }.freeze
 
   def self.default_pronouns

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'fileutils'
-require 'zlib'
+require "fileutils"
+require "zlib"
 
-require_relative 'configurable_timeout'
+require_relative "configurable_timeout"
 
 module IncomingMailProcessor
   class DirectoryMailbox

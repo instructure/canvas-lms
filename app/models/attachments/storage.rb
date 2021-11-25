@@ -52,11 +52,11 @@ class Attachments::Storage
       res ||= File.mime_type?(data.original_filename) if data.respond_to?(:original_filename)
       res ||= File.mime_type?(data)
       res ||= "text/plain" unless data.respond_to?(:path)
-      res || 'unknown/unknown'
+      res || "unknown/unknown"
     elsif data.respond_to?(:content_type)
       data.content_type
     else
-      'unknown/unknown'
+      "unknown/unknown"
     end
   end
 end

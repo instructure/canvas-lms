@@ -27,7 +27,7 @@ class LearningOutcome < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results
-  has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: 'ContentTag'
+  has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: "ContentTag"
 
   serialize :data
 
@@ -45,7 +45,7 @@ class LearningOutcome < ActiveRecord::Base
     message: lambda do
       t(
         "calculation_method must be one of the following: %{calc_methods}",
-        :calc_methods => OutcomeCalculationMethod::CALCULATION_METHODS.to_s
+        calc_methods: OutcomeCalculationMethod::CALCULATION_METHODS.to_s
       )
     end
   }
@@ -94,7 +94,7 @@ class LearningOutcome < ActiveRecord::Base
             else
               ContentTag.learning_outcome_links
                         .preload(:context)
-                        .where(content_id: self, context_type: ['Account', 'Course'])
+                        .where(content_id: self, context_type: ["Account", "Course"])
                         .select(:context_type, :context_id)
                         .distinct
             end
@@ -125,9 +125,9 @@ class LearningOutcome < ActiveRecord::Base
       else
         errors.add(:calculation_int, t(
                                        "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
-                                       :calculation_int => calculation_int,
-                                       :valid_calculation_ints_min => valid_ints.min,
-                                       :valid_calculation_ints_max => valid_ints.max
+                                       calculation_int: calculation_int,
+                                       valid_calculation_ints_min: valid_ints.min,
+                                       valid_calculation_ints_max: valid_ints.max
                                      ))
       end
     end
@@ -172,8 +172,8 @@ class LearningOutcome < ActiveRecord::Base
 
   def default_calculation_int(method = self.calculation_method)
     case method
-    when 'decaying_average' then 65
-    when 'n_mastery' then 5
+    when "decaying_average" then 65
+    when "n_mastery" then 5
     else nil
     end
   end
@@ -214,8 +214,8 @@ class LearningOutcome < ActiveRecord::Base
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
       asset.learning_outcome_alignments
-           .where(:learning_outcome_id => defunct_outcome_ids)
-           .update_all(:workflow_state => 'deleted')
+           .where(learning_outcome_id: defunct_outcome_ids)
+           .update_all(workflow_state: "deleted")
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
@@ -241,25 +241,25 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def cached_context_short_name
-    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+    @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
       context.short_name rescue ""
     end
   end
 
   def self.default_rubric_criterion
     {
-      description: t('No Description'),
+      description: t("No Description"),
       ratings: [
         {
-          description: I18n.t('Exceeds Expectations'),
+          description: I18n.t("Exceeds Expectations"),
           points: 5
         },
         {
-          description: I18n.t('Meets Expectations'),
+          description: I18n.t("Meets Expectations"),
           points: 3
         },
         {
-          description: I18n.t('Does Not Meet Expectations'),
+          description: I18n.t("Does Not Meet Expectations"),
           points: 0
         }
       ],
@@ -283,8 +283,8 @@ class LearningOutcome < ActiveRecord::Base
       ratings = hash[:enable] ? hash[:ratings].values : (hash[:ratings] || [])
       ratings.each do |rating|
         criterion[:ratings] << {
-          :description => rating[:description] || t(:no_comment, "No Comment"),
-          :points => rating[:points].to_f || 0
+          description: rating[:description] || t(:no_comment, "No Comment"),
+          points: rating[:points].to_f || 0
         }
       end
       criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
@@ -306,16 +306,16 @@ class LearningOutcome < ActiveRecord::Base
     # triggered by ContentTag#destroy and the checks have already run, we don't
     # need to do it again. in case of console, we don't care to force the
     # checks. so just an update_all of workflow_state will do.
-    ContentTag.learning_outcome_links.active.where(:content_id => self).update_all(:workflow_state => 'deleted')
+    ContentTag.learning_outcome_links.active.where(content_id: self).update_all(workflow_state: "deleted")
 
     # in case this got called in a console, delete the alignments also. the UI
     # won't (shouldn't) allow deleting the outcome if there are still
     # alignments, so this will be a no-op in that case. either way, these are
     # not outcome links, so ContentTag#destroy is just changing the
     # workflow_state; use update_all for efficiency.
-    ContentTag.learning_outcome_alignments.active.where(:learning_outcome_id => self).update_all(:workflow_state => 'deleted')
+    ContentTag.learning_outcome_alignments.active.where(learning_outcome_id: self).update_all(workflow_state: "deleted")
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 
@@ -360,12 +360,12 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.delete_if_unused(ids)
-    tags = ContentTag.active.where(content_id: ids, content_type: 'LearningOutcome').to_a
+    tags = ContentTag.active.where(content_id: ids, content_type: "LearningOutcome").to_a
     to_delete = []
     ids.each do |id|
       to_delete << id unless tags.any? { |t| t.content_id == id }
     end
-    LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+    LearningOutcome.where(id: to_delete).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
   end
 
   def self.ensure_presence_in_context(outcome_ids, context)
@@ -377,7 +377,7 @@ class LearningOutcome < ActiveRecord::Base
     missing_outcomes.each { |o| context.root_outcome_group.add_outcome(o) }
   end
 
-  scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
+  scope(:for_context_codes, ->(codes) { where(context_code: codes) })
   scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
   scope(:active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) })
   scope(:has_result_for_user,
@@ -388,10 +388,10 @@ class LearningOutcome < ActiveRecord::Base
               AND learning_outcome_results.workflow_state <> 'deleted'
               AND learning_outcome_results.user_id=?
             SQL
-            .order(best_unicode_collation_key('short_description'))
+            .order(best_unicode_collation_key("short_description"))
         end)
 
-  scope :global, -> { where(:context_id => nil) }
+  scope :global, -> { where(context_id: nil) }
 
   def propagate_changes_to_rubrics
     # exclude new outcomes
@@ -406,7 +406,7 @@ class LearningOutcome < ActiveRecord::Base
   def update_associated_rubrics
     updateable_rubrics.in_batches(of: 100).each do |relation|
       relation.transaction do
-        relation.lock('FOR UPDATE OF rubrics').each do |rubric|
+        relation.lock("FOR UPDATE OF rubrics").each do |rubric|
           rubric.update_learning_outcome_criteria(self)
         end
       end
@@ -414,7 +414,7 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def updateable_rubrics
-    conds = { learning_outcome_id: id, content_type: 'Rubric', workflow_state: 'active' }
+    conds = { learning_outcome_id: id, content_type: "Rubric", workflow_state: "active" }
     # Find all unassessed, active rubrics aligned to this outcome, referenced by no more than one assignment
     Rubric.where(
       id: Rubric
@@ -422,7 +422,7 @@ class LearningOutcome < ActiveRecord::Base
         .joins(:learning_outcome_alignments)
         .where(content_tags: conds)
         .with_at_most_one_association
-        .select('rubrics.id')
+        .select("rubrics.id")
     ).unassessed
   end
 
@@ -445,19 +445,19 @@ class LearningOutcome < ActiveRecord::Base
   def find_or_create_tag(asset, context)
     alignments.find_or_create_by(
       content: asset,
-      tag_type: 'learning_outcome',
+      tag_type: "learning_outcome",
       context: context
     ) do |_a|
-      InstStatsd::Statsd.increment('learning_outcome.align', tags: { type: asset.class.name })
+      InstStatsd::Statsd.increment("learning_outcome.align", tags: { type: asset.class.name })
     end
   end
 
   def determine_tag_type(mastery_type)
     case mastery_type
-    when 'points', 'points_mastery'
-      'points_mastery'
+    when "points", "points_mastery"
+      "points_mastery"
     else
-      'explicit_mastery'
+      "explicit_mastery"
     end
   end
 

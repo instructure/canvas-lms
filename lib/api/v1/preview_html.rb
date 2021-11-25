@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sanitize'
+require "sanitize"
 
 module Api::V1::PreviewHtml
   def render_preview_html
@@ -26,6 +26,6 @@ module Api::V1::PreviewHtml
     html = process_incoming_html_content(html)
     html = Sanitize.clean(html, CanvasSanitize::SANITIZE)
     html = api_user_content(html)
-    render :json => { :html => html }
+    render json: { html: html }
   end
 end

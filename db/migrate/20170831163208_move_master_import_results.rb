@@ -22,6 +22,6 @@ class MoveMasterImportResults < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::MoveMasterImportResults.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    DataFixup::MoveMasterImportResults.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 end

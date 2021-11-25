@@ -37,10 +37,10 @@ def init
     def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition rubocop bug?
     sections :layout, [:diskfile]
   elsif options[:all_resources]
-    sections :layout, [T('topic')]
-    sections[:layout].push(T('appendix')) if DOC_OPTIONS[:all_resource_appendixes]
+    sections :layout, [T("topic")]
+    sections[:layout].push(T("appendix")) if DOC_OPTIONS[:all_resource_appendixes]
   elsif options[:controllers]
-    sections :layout, [T('topic'), T('appendix')]
+    sections :layout, [T("topic"), T("appendix")]
   else
     sections :layout, [:contents]
   end
@@ -51,23 +51,23 @@ def contents # rubocop:disable Style/TrivialAccessors not a Class
 end
 
 def index
-  legitimate_objects = @objects.reject { |o| o.root? || !is_class?(o) || !o.meths.find { |m| !m.tags('API').empty? } }
+  legitimate_objects = @objects.reject { |o| o.root? || !is_class?(o) || !o.meths.find { |m| !m.tags("API").empty? } }
 
-  @resources = legitimate_objects.sort_by { |o| o.tags('API').first.text }
+  @resources = legitimate_objects.sort_by { |o| o.tags("API").first.text }
 
   erb(:index)
 end
 
 def diskfile
   content = "<div id='filecontents'>" +
-            case (File.extname(@file)[1..] || '').downcase
-            when 'htm', 'html'
+            case (File.extname(@file)[1..] || "").downcase
+            when "htm", "html"
               @contents
-            when 'txt'
+            when "txt"
               "<pre>#{@contents}</pre>"
-            when 'textile', 'txtile'
+            when "textile", "txtile"
               htmlify(@contents, :textile)
-            when 'markdown', 'md', 'mdown', 'mkd'
+            when "markdown", "md", "mdown", "mkd"
               htmlify(@contents, :markdown)
             else
               htmlify(@contents, diskfile_shebang_or_default)
