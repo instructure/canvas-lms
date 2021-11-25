@@ -21,7 +21,7 @@
 class PageComment < ActiveRecord::Base
   belongs_to :page, polymorphic: [:eportfolio_entry]
   belongs_to :user
-  validates :message, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :message, length: { maximum: maximum_text_length, allow_blank: true }
 
   scope :for_user, ->(user) { where(user_id: user) }
 

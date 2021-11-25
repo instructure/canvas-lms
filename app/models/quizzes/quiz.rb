@@ -52,7 +52,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
   has_many :ignores, as: :asset
 
-  validates :description, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   validates :context_id, presence: true
   validates :context_type, presence: true

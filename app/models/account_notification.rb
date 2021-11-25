@@ -24,7 +24,7 @@ class AccountNotification < ActiveRecord::Base
   belongs_to :account, touch: true
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
-  validates :message, length: { maximum: maximum_text_length, allow_nil: false, allow_blank: false }
+  validates :message, length: { maximum: maximum_text_length, allow_blank: false }
   validates :subject, length: { maximum: maximum_string_length }
   sanitize_field :message, CanvasSanitize::SANITIZE
 
