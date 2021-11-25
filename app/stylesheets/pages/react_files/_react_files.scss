@@ -338,7 +338,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   margin-#{direction(left)}: 5px;
 }
 
-.ef-links-col{
+.ef-links-col, 
+.ef-select-col {
   display: flex;
   flex: 2 0 63px;
   justify-content: flex-end;
