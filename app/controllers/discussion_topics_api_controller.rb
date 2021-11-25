@@ -61,9 +61,9 @@ class DiscussionTopicsApiController < ApplicationController
     render(json: discussion_topics_api_json([@topic], @context,
                                             @current_user, session,
                                             include_all_dates: include_params.include?('all_dates'),
-                                            :include_sections => include_params.include?('sections'),
-                                            :include_sections_user_count => include_params.include?('sections_user_count'),
-                                            :include_overrides => include_params.include?('overrides')).first)
+                                            include_sections: include_params.include?('sections'),
+                                            include_sections_user_count: include_params.include?('sections_user_count'),
+                                            include_overrides: include_params.include?('overrides')).first)
   end
 
   # @API Get the full topic
@@ -128,8 +128,8 @@ class DiscussionTopicsApiController < ApplicationController
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
-      :include_new_entries => value_to_boolean(params[:include_new_entries]),
-      :include_mobile_overrides => !!mobile_brand_config
+      include_new_entries: value_to_boolean(params[:include_new_entries]),
+      include_mobile_overrides: !!mobile_brand_config
     }
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(opts)
 
@@ -163,7 +163,7 @@ class DiscussionTopicsApiController < ApplicationController
                                  @context.grants_right?(@current_user, session, :read_as_admin)
       if include_enrollment_state || include_context_card_info
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
-        all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
+        all_enrollments = enrollment_context.enrollments.where(user_id: participants).to_a
         if include_enrollment_state
           Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
         end
@@ -202,15 +202,15 @@ class DiscussionTopicsApiController < ApplicationController
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
       fragments = {
-        :unread_entries => unread_entries.to_json,
-        :forced_entries => forced_entries.to_json,
-        :entry_ratings => entry_ratings.to_json,
-        :participants => json_cast(participant_info).to_json,
-        :view => structure,
-        :new_entries => json_cast(new_entries).to_json,
+        unread_entries: unread_entries.to_json,
+        forced_entries: forced_entries.to_json,
+        entry_ratings: entry_ratings.to_json,
+        participants: json_cast(participant_info).to_json,
+        view: structure,
+        new_entries: json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
-      render :json => "{ #{fragments.join(', ')} }"
+      render json: "{ #{fragments.join(', ')} }"
     else
       head :service_unavailable
     end
@@ -260,7 +260,7 @@ class DiscussionTopicsApiController < ApplicationController
 
     return unless authorized_action(@topic, @current_user, :duplicate)
 
-    new_topic = @topic.duplicate({ :user => @current_user })
+    new_topic = @topic.duplicate({ user: @current_user })
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end
@@ -271,22 +271,22 @@ class DiscussionTopicsApiController < ApplicationController
     end
     if new_topic.save!
       result = discussion_topic_api_json(new_topic, @context, @current_user, session,
-                                         :include_sections => true)
+                                         include_sections: true)
       # If pinned, make the new topic show up just below the old one
       if new_topic.pinned
         new_topic.insert_at(@topic.position + 1)
         # Pass the new positions to the backend so the frontend can stay consistent
         # with the backend.  Rails doesn't like topic.context.discussion_topics.select(...).
         # We only care about the id and position here, so don't pull everything else up
-        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context)
-                                         .active.where(:pinned => true).map { |t| [t.id, t.position] }
+        positions_array = DiscussionTopic.select(:id, :position).where(context: @context)
+                                         .active.where(pinned: true).map { |t| [t.id, t.position] }
         result[:new_positions] = positions_array.to_h
       end
       if new_topic.assignment
         new_topic.assignment.insert_at(@topic.assignment.position + 1)
         result[:set_assignment] = true
       end
-      render :json => result
+      render json: result
     else
       render json: { error: t('unable to save new discussion topic') }, status: :bad_request
     end
@@ -373,7 +373,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "has_more_replies": false } ]
   def entries
     @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
-    render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
+    render json: discussion_entry_api_json(@entries, @context, @current_user, session)
   end
 
   # @API Post a reply
@@ -452,7 +452,7 @@ class DiscussionTopicsApiController < ApplicationController
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
     @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@topic, @parent))
-    render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
+    render json: discussion_entry_api_json(@replies, @context, @current_user, session)
   end
 
   # @API List entries
@@ -499,7 +499,7 @@ class DiscussionTopicsApiController < ApplicationController
     ids = Array(params[:ids])
     entries = @topic.discussion_entries.order(:id).find(ids)
     @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
-    render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [:display_user])
+    render json: discussion_entry_api_json(@entries, @context, @current_user, session, [:display_user])
   end
 
   # @API Mark topic as read
@@ -634,7 +634,7 @@ class DiscussionTopicsApiController < ApplicationController
     require_entry
     rating = params[:rating].to_i
     unless [0, 1].include? rating
-      return render(:json => { :message => "Invalid rating given" }, :status => :bad_request)
+      return render(json: { message: "Invalid rating given" }, status: :bad_request)
     end
 
     if authorized_action(@entry, @current_user, :rate)
@@ -685,14 +685,14 @@ class DiscussionTopicsApiController < ApplicationController
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
-    render :json => 'require_initial_post', :status => :forbidden
+    render json: 'require_initial_post', status: :forbidden
     false
   end
 
   def build_entry(association)
     params[:message] = process_incoming_html_content(params[:message]) if params.key?(:message)
     @topic.save! if @topic.new_record?
-    association.build(:message => params[:message], :user => @current_user, :discussion_topic => @topic)
+    association.build(message: params[:message], user: @current_user, discussion_topic: @topic)
   end
 
   def save_entry
@@ -714,9 +714,9 @@ class DiscussionTopicsApiController < ApplicationController
         @entry.attachment = @attachment
         @entry.save
       end
-      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, :status => :created
+      render json: discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, status: :created
     else
-      render :json => @entry.errors, :status => :bad_request
+      render json: @entry.errors, status: :bad_request
     end
   end
 
@@ -771,7 +771,7 @@ class DiscussionTopicsApiController < ApplicationController
     opts = get_forced_option
 
     @topic.change_all_read_state(new_state, @current_user, opts)
-    render :json => {}, :status => :no_content
+    render json: {}, status: :no_content
   end
 
   def change_entry_read_state(new_state)
@@ -794,7 +794,7 @@ class DiscussionTopicsApiController < ApplicationController
     if result == true || result.try(:errors).blank?
       head :no_content
     else
-      render :json => result.try(:errors) || {}, :status => :bad_request
+      render json: result.try(:errors) || {}, status: :bad_request
     end
   end
 end

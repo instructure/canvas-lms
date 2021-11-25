@@ -30,7 +30,7 @@ def init
 end
 
 def method_details_list
-  @meths = options[:controllers].map { |c| c.meths(:inherited => false, :included => false) }.flatten
+  @meths = options[:controllers].map { |c| c.meths(inherited: false, included: false) }.flatten
   @meths = run_verifier(@meths)
   erb(:method_details_list)
 end

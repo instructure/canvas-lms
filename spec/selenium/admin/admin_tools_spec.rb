@@ -49,17 +49,17 @@ describe "admin_tools" do
 
   def setup_users
     # Setup a student (@student)
-    course_with_student(:active_all => true, :account => @account, :user => user_with_pseudonym(:name => 'Student TestUser'))
-    user_with_pseudonym(:user => @student, :account => @account)
+    course_with_student(active_all: true, account: @account, user: user_with_pseudonym(name: 'Student TestUser'))
+    user_with_pseudonym(user: @student, account: @account)
 
     setup_account_admin
   end
 
-  def setup_account_admin(permissions = { :view_notifications => true })
+  def setup_account_admin(permissions = { view_notifications: true })
     # Setup an account admin (@account_admin) and logged in.
-    account_admin_user_with_role_changes(:account => @account, :role_changes => permissions)
+    account_admin_user_with_role_changes(account: @account, role_changes: permissions)
     @account_admin = @admin
-    user_with_pseudonym(:user => @account_admin, :account => @account)
+    user_with_pseudonym(user: @account_admin, account: @account)
     user_session(@account_admin)
   end
 
@@ -111,9 +111,9 @@ describe "admin_tools" do
         @account.settings[:admins_can_view_notifications] = false
         @account.save!
         site_admin_user
-        user_with_pseudonym(:user => @admin, :account => @account)
+        user_with_pseudonym(user: @admin, account: @account)
         user_session(@admin)
-        message_model(:user_id => @student.id, :body => 'this is my message', :root_account_id => @account.id)
+        message_model(user_id: @student.id, body: 'this is my message', root_account_id: @account.id)
 
         load_admin_tools_page
         click_view_notifications_tab
@@ -127,7 +127,7 @@ describe "admin_tools" do
     context "as AccountAdmin" do
       context "with permissions" do
         it "performs search" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: 'foo bar', root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -137,7 +137,7 @@ describe "admin_tools" do
         end
 
         it "displays nothing found" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: 'foo bar', root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -149,7 +149,7 @@ describe "admin_tools" do
         end
 
         it "displays valid search params used" do
-          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
+          message_model(user_id: @student.id, body: 'foo bar', root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           # Search with no dates
@@ -198,7 +198,7 @@ describe "admin_tools" do
 
       context "without permissions" do
         it "does not see tab" do
-          setup_account_admin({ :view_notifications => false })
+          setup_account_admin({ view_notifications: false })
           load_admin_tools_page
           wait_for_ajaximations
           expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
@@ -336,8 +336,8 @@ describe "admin_tools" do
 
     before do
       Timecop.freeze(8.seconds.ago) do
-        course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
-        @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+        course_with_teacher(course: @course, user: user_with_pseudonym(name: 'Teacher TestUser'))
+        @assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
       end
 
       Timecop.freeze(5.seconds.ago) do
@@ -416,7 +416,7 @@ describe "admin_tools" do
     it_behaves_like "cassandra audit logs"
 
     before do
-      course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+      course_with_teacher(course: @course, user: user_with_pseudonym(name: 'Teacher TestUser'))
 
       load_admin_tools_page
       click_view_tab "logging"

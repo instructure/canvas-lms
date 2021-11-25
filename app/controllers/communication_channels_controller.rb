@@ -79,7 +79,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, :only => %i[create destroy re_send_confirmation delete_push_token]
+  before_action :require_user, only: %i[create destroy re_send_confirmation delete_push_token]
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -103,7 +103,7 @@ class CommunicationChannelsController < ApplicationController
       communication_channel_json(cc, @current_user, session)
     end
 
-    render :json => channels
+    render json: channels
   end
 
   # @API Create a communication channel
@@ -150,7 +150,7 @@ class CommunicationChannelsController < ApplicationController
     # up being wasted work.
     unless CommunicationChannel.user_can_have_more_channels?(@current_user, @domain_root_account)
       error = t 'Maximum number of communication channels reached'
-      return render :json => { errors: { type: error } }, status: :bad_request
+      return render json: { errors: { type: error } }, status: :bad_request
     end
 
     params[:build_pseudonym] = false if api_request?
@@ -160,10 +160,10 @@ class CommunicationChannelsController < ApplicationController
 
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
       unless @access_token
-        return render :json => { errors: { type: 'Push is only supported when using an access token' } }, status: :bad_request
+        return render json: { errors: { type: 'Push is only supported when using an access token' } }, status: :bad_request
       end
       unless @access_token.developer_key.try(:sns_arn)
-        return render :json => { errors: { type: 'SNS is not configured for this developer key' } }, status: :bad_request
+        return render json: { errors: { type: 'SNS is not configured for this developer key' } }, status: :bad_request
       end
 
       NotificationEndpoint.unique_constraint_retry do
@@ -181,12 +181,12 @@ class CommunicationChannelsController < ApplicationController
     # that the unique_id is valid. The pseudonym will be created on approval of the
     # communication channel.
     if params[:build_pseudonym]
-      @pseudonym = @domain_root_account.pseudonyms.build(:user => @user,
-                                                         :unique_id => params[:communication_channel][:address])
+      @pseudonym = @domain_root_account.pseudonyms.build(user: @user,
+                                                         unique_id: params[:communication_channel][:address])
       @pseudonym.generate_temporary_password
 
       unless @pseudonym.valid?
-        return render :json => @pseudonym.errors.as_json, :status => :bad_request
+        return render json: @pseudonym.errors.as_json, status: :bad_request
       end
     end
 
@@ -194,12 +194,12 @@ class CommunicationChannelsController < ApplicationController
     @cc ||= @user.communication_channels.by_path(params[:communication_channel][:address])
                  .where(path_type: params[:communication_channel][:type]).first
     @cc.path = params[:communication_channel][:address] if @cc
-    @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
-                                               :path_type => params[:communication_channel][:type])
+    @cc ||= @user.communication_channels.build(path: params[:communication_channel][:address],
+                                               path_type: params[:communication_channel][:type])
 
     if !@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH
       @cc.errors.add(:path, 'unique!')
-      return render :json => @cc.errors.as_json, :status => :bad_request
+      return render json: @cc.errors.as_json, status: :bad_request
     end
 
     @cc.user = @user
@@ -212,9 +212,9 @@ class CommunicationChannelsController < ApplicationController
       @cc.send_confirmation!(@domain_root_account) unless skip_confirmation
 
       flash[:notice] = t('profile.notices.contact_registered', 'Contact method registered!')
-      render :json => communication_channel_json(@cc, @current_user, session)
+      render json: communication_channel_json(@cc, @current_user, session)
     else
-      render :json => @cc.errors.as_json, :status => :bad_request
+      render json: @cc.errors.as_json, status: :bad_request
     end
   end
 
@@ -245,8 +245,8 @@ class CommunicationChannelsController < ApplicationController
       # now that we've retrieved a communication channel record with our
       # nonce we can set the locale based on the associated models
       I18n.localizer = lambda do
-        infer_locale :user => @user,
-                     :root_account => @root_account
+        infer_locale user: @user,
+                     root_account: @root_account
       end
 
       # logged in as an unconfirmed user?! someone's masquerading; just pretend we're not logged in at all
@@ -258,7 +258,7 @@ class CommunicationChannelsController < ApplicationController
         unless @current_user == @user
           session[:return_to] = request.url
           flash[:notice] = t 'notices.login_to_confirm', "Please log in to confirm your e-mail address"
-          return redirect_to login_url(:pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id)
+          return redirect_to login_url(pseudonym_session: { unique_id: @user.pseudonym.try(:unique_id) }, expected_user_id: @user.id)
         end
 
         cc.confirm
@@ -266,7 +266,7 @@ class CommunicationChannelsController < ApplicationController
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
           format.html { redirect_to redirect_back_or_default(user_profile_url(@current_user)) }
-          format.json { render :json => cc.as_json(:except => [:confirmation_code]) }
+          format.json { render json: cc.as_json(except: [:confirmation_code]) }
         end
       end
 
@@ -301,7 +301,7 @@ class CommunicationChannelsController < ApplicationController
         @merge_opportunities = []
       end
 
-      js_env :PASSWORD_POLICY => @domain_root_account.password_policy
+      js_env PASSWORD_POLICY: @domain_root_account.password_policy
 
       if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
         @user.transaction do
@@ -338,7 +338,7 @@ class CommunicationChannelsController < ApplicationController
 
         failed = true
       elsif cc.active?
-        pseudonym = @root_account.pseudonyms.active_only.where(:user_id => @user).exists?
+        pseudonym = @root_account.pseudonyms.active_only.where(user_id: @user).exists?
         if @user.pre_registered? && pseudonym
           @user.register
           return redirect_with_success_flash
@@ -348,9 +348,9 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active_only.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.active_only.where(password_auto_generated: true, user_id: @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
-        @pseudonym ||= @root_account.pseudonyms.build(:user => @user, :unique_id => cc.path) if @user.creation_pending?
+        @pseudonym ||= @root_account.pseudonyms.build(user: @user, unique_id: cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
         # up with something new
         @pseudonym.unique_id = '' if @pseudonym&.new_record? && @root_account.pseudonyms.active_only.by_unique_id(@pseudonym.unique_id).exists?
@@ -382,18 +382,18 @@ class CommunicationChannelsController < ApplicationController
           unless valid
             ps_errors = @pseudonym.errors.as_json[:errors]
             ps_errors.delete(:password_confirmation) unless params[:pseudonym][:password_confirmation]
-            return render :json => {
-              :errors => {
-                :user => @user.errors.as_json[:errors],
-                :pseudonym => ps_errors
+            return render json: {
+              errors: {
+                user: @user.errors.as_json[:errors],
+                pseudonym: ps_errors
               }
-            }, :status => :bad_request
+            }, status: :bad_request
           end
 
           # They may have switched e-mail address when they logged in; create a CC if so
           if @pseudonym.unique_id != cc.path && EmailAddressValidator.valid?(@pseudonym.unique_id)
             new_cc = @user.communication_channels.email.by_path(@pseudonym.unique_id).first
-            new_cc ||= @user.communication_channels.build(:path => @pseudonym.unique_id)
+            new_cc ||= @user.communication_channels.build(path: @pseudonym.unique_id)
             new_cc.user = @user
             new_cc.workflow_state = 'unconfirmed' if new_cc.retired?
             new_cc.send_confirmation!(@root_account) if new_cc.unconfirmed?
@@ -426,7 +426,7 @@ class CommunicationChannelsController < ApplicationController
     if failed
       respond_to do |format|
         format.html { render :confirm_failed, status: :bad_request }
-        format.json { render :json => {}, :status => :bad_request }
+        format.json { render json: {}, status: :bad_request }
       end
     else
       # make sure additions take the above use of
@@ -455,16 +455,16 @@ class CommunicationChannelsController < ApplicationController
       @cc = params[:id].present? ? @user.communication_channels.find(params[:id]) : @user.communication_channel
       @cc.send_confirmation!(@domain_root_account)
     end
-    render :json => { :re_sent => true }
+    render json: { re_sent: true }
   end
 
   def confirmation_limit_reached
     @user = User.find(params[:user_id])
     return render_unauthorized_action unless @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
-    return render :json => {}, :status => :bad_request unless params[:id].present?
+    return render json: {}, status: :bad_request unless params[:id].present?
 
     @cc = @user.communication_channels.find(params[:id])
-    render :json => { :confirmation_limit_reached => @cc.confirmation_limit_reached }
+    render json: { confirmation_limit_reached: @cc.confirmation_limit_reached }
   end
 
   def reset_bounce_count
@@ -483,7 +483,7 @@ class CommunicationChannelsController < ApplicationController
     default_url = confirmation_redirect_url(@communication_channel) || dashboard_url
     respond_to do |format|
       format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(default_url)) }
-      format.json { render :json => { :url => @enrollment ? course_url(@course) : default_url } }
+      format.json { render json: { url: @enrollment ? course_url(@course) : default_url } }
     end
   end
 
@@ -529,12 +529,12 @@ class CommunicationChannelsController < ApplicationController
     if @cc.destroy
       @user.touch
       if api_request?
-        render :json => communication_channel_json(@cc, @current_user, session)
+        render json: communication_channel_json(@cc, @current_user, session)
       else
-        render :json => @cc.as_json
+        render json: @cc.as_json
       end
     else
-      render :json => @cc.errors, :status => :bad_request
+      render json: @cc.errors, status: :bad_request
     end
   end
 

@@ -276,7 +276,7 @@ describe "groups" do
           get pages_page
           expect(f('.index-content')).to contain_css('.wiki-page-link')
 
-          category = @course.group_categories.create!(:name => "Group Category")
+          category = @course.group_categories.create!(name: "Group Category")
           @group_category.first.clone_groups_and_memberships(category)
           category.reload
           new_group = category.groups.first

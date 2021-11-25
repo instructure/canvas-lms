@@ -50,12 +50,12 @@ describe Api do
     end
 
     it 'finds an existing sis_id record' do
-      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user = user_with_pseudonym username: "sis_user_1@example.com"
       expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
     it 'looks for login ids case insensitively' do
-      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user = user_with_pseudonym username: "sis_user_1@example.com"
       expect(@api.api_find(User, "sis_login_id:SIS_USER_1@example.com")).to eq @user
     end
 
@@ -86,7 +86,7 @@ describe Api do
     end
 
     it 'does not find a missing sis_id record' do
-      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user = user_with_pseudonym username: "sis_user_1@example.com"
       expect(-> { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
@@ -152,10 +152,10 @@ describe Api do
       account2 = account_model
       api1 = TestApiInstance.new account1, nil
       api2 = TestApiInstance.new account2, nil
-      user1 = user_with_pseudonym :username => "sis_user_1@example.com", :account => account1
-      user2 = user_with_pseudonym :username => "sis_user_2@example.com", :account => account2
-      user3 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account1
-      user4 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account2
+      user1 = user_with_pseudonym username: "sis_user_1@example.com", account: account1
+      user2 = user_with_pseudonym username: "sis_user_2@example.com", account: account2
+      user3 = user_with_pseudonym username: "sis_user_3@example.com", account: account1
+      user4 = user_with_pseudonym username: "sis_user_3@example.com", account: account2
       expect(api1.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq user1
       expect(-> { api2.api_find(User, "sis_login_id:sis_user_1@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
       expect(-> { api1.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
@@ -260,23 +260,23 @@ describe Api do
     end
 
     it 'finds an existing sis_id record' do
-      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user = user_with_pseudonym username: "sis_user_1@example.com"
       expect(@api.api_find_all(User, ["sis_login_id:sis_user_1@example.com"])).to eq [@user]
     end
 
     it 'finds existing records with different lookup strategies' do
       @user1 = user_factory
-      @user2 = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user2 = user_with_pseudonym username: "sis_user_1@example.com"
       @user3 = user_with_pseudonym
       @pseudonym.sis_user_id = "sis_user_2"
       @pseudonym.save!
-      @user4 = user_with_pseudonym :username => "sis_user_3@example.com"
+      @user4 = user_with_pseudonym username: "sis_user_3@example.com"
       expect(@api.api_find_all(User, [@user1.id.to_s, "sis_login_id:sis_user_1@example.com", (User.all.map(&:id).max + 1), "sis_user_id:sis_user_2", "sis_login_id:nonexistent@example.com", "sis_login_id:sis_user_3@example.com", "sis_invalid_column:4", "a1"]).sort_by(&:id)).to eq [@user1, @user2, @user3, @user4].sort_by(&:id)
     end
 
     it 'filters out duplicates' do
       @other_user = user_factory
-      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      @user = user_with_pseudonym username: "sis_user_1@example.com"
       expect(@api.api_find_all(User, [@user.id, "sis_login_id:sis_user_1@example.com", @other_user.id, @user.id]).sort_by(&:id)).to eq [@user, @other_user].sort_by(&:id)
     end
 
@@ -297,12 +297,12 @@ describe Api do
       account2 = account_model
       api1 = TestApiInstance.new account1, nil
       api2 = TestApiInstance.new account2, nil
-      user1 = user_with_pseudonym :username => "sis_user_1@example.com", :account => account1
-      user2 = user_with_pseudonym :username => "sis_user_2@example.com", :account => account2
-      user3 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account1
-      user4 = user_with_pseudonym :username => "sis_user_3@example.com", :account => account2
-      user5 = user_factory :account => account1
-      user6 = user_factory :account => account2
+      user1 = user_with_pseudonym username: "sis_user_1@example.com", account: account1
+      user2 = user_with_pseudonym username: "sis_user_2@example.com", account: account2
+      user3 = user_with_pseudonym username: "sis_user_3@example.com", account: account1
+      user4 = user_with_pseudonym username: "sis_user_3@example.com", account: account2
+      user5 = user_factory account: account1
+      user6 = user_factory account: account2
       expect(api1.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user1, user3, user5, user6].sort_by(&:id)
       expect(api2.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user2, user4, user5, user6].sort_by(&:id)
     end
@@ -366,9 +366,9 @@ describe Api do
       @pseudonym.sis_user_id = "sisuser1"
       @pseudonym.save!
       @user1 = @user
-      user_with_pseudonym :username => "sisuser2@example.com"
+      user_with_pseudonym username: "sisuser2@example.com"
       @user2 = @user
-      user_with_pseudonym :username => "sisuser3@example.com"
+      user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
       expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
                           "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
@@ -382,9 +382,9 @@ describe Api do
       @pseudonym.sis_user_id = "sisuser1"
       @pseudonym.save!
       @user1 = @user
-      user_with_pseudonym :username => "sisuser2@example.com"
+      user_with_pseudonym username: "sisuser2@example.com"
       @user2 = @user
-      user_with_pseudonym :username => "sisuser3@example.com"
+      user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
       expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
                           "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4"], User, Account.default).sort).to eq [
@@ -395,12 +395,12 @@ describe Api do
     it "does not find sis ids in other accounts" do
       account1 = account_model
       account2 = account_model
-      user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
-      user_with_pseudonym :username => "sisuser2@example.com", :account => account2
-      user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
-      user_with_pseudonym :username => "sisuser3@example.com", :account => account2
-      user5 = user_factory :account => account1
-      user6 = user_factory :account => account2
+      user1 = user_with_pseudonym username: "sisuser1@example.com", account: account1
+      user_with_pseudonym username: "sisuser2@example.com", account: account2
+      user3 = user_with_pseudonym username: "sisuser3@example.com", account: account1
+      user_with_pseudonym username: "sisuser3@example.com", account: account2
+      user5 = user_factory account: account1
+      user6 = user_factory account: account2
       expect(Api.map_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id], User, account1).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
     end
 
@@ -408,10 +408,10 @@ describe Api do
       collection = double
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"] })
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { lookups: { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq %w[thing1 thing2 thing3]
     end
 
@@ -419,16 +419,16 @@ describe Api do
       collection = double
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "other-lookup" => ["thing2", "thing3"] })
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { :lookups => { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { lookups: { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
 
     it 'does not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = double
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"] })
       expect(Api).not_to receive(:relation_for_sis_mapping_and_columns)
@@ -437,7 +437,7 @@ describe Api do
 
     it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
       collection = double
-      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
+      expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})
       expect(Api).to receive(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
@@ -562,8 +562,8 @@ describe Api do
     it 'passes along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
       expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account: root_account).and_return({ "users.id" => [4, 5, 6] })
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { :lookups => "lookups" }, root_account).and_return("params")
-      expect(Api.relation_for_sis_mapping(User, { :lookups => "lookups" }, [1, 2, 3], root_account)).to eq "params"
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { lookups: "lookups" }, root_account).and_return("params")
+      expect(Api.relation_for_sis_mapping(User, { lookups: "lookups" }, [1, 2, 3], root_account)).to eq "params"
     end
   end
 
@@ -574,7 +574,7 @@ describe Api do
     end
 
     it 'properly generates an escaped arg string' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { scope: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
     it 'works with no columns' do
@@ -582,11 +582,11 @@ describe Api do
     end
 
     it 'adds in joins if the sis_mapping has some with columns' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope", :joins => 'some joins' }, Account.default).eager_load_values).to eq ['some joins']
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { scope: "scope", joins: 'some joins' }, Account.default).eager_load_values).to eq ['some joins']
     end
 
     it 'works with a few different column types and account scopings' do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { scope: "some_scope", is_not_scoped_to_account: ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "fails if we're scoping to an account and the scope isn't provided" do
@@ -826,7 +826,7 @@ describe Api do
 
     it "adds context to files and remove verifier parameters" do
       course_factory
-      attachment_model(:context => @course)
+      attachment_model(context: @course)
 
       html = <<~HTML
         <div>
@@ -980,23 +980,23 @@ describe Api do
 
     it "does not build links for empty pages" do
       expect(Api.build_links("www.example.com/", {
-                               :per_page => 10,
-                               :current => "",
-                               :next => "",
-                               :prev => "",
-                               :first => "",
-                               :last => "",
+                               per_page: 10,
+                               current: "",
+                               next: "",
+                               prev: "",
+                               first: "",
+                               last: "",
                              })).to be_empty
     end
 
     it "builds current, next, prev, first, and last links if provided" do
       links = Api.build_links("www.example.com/", {
-                                :per_page => 10,
-                                :current => 8,
-                                :next => 4,
-                                :prev => 2,
-                                :first => 1,
-                                :last => 10,
+                                per_page: 10,
+                                current: 8,
+                                next: 4,
+                                prev: 2,
+                                first: 1,
+                                last: 10,
                               })
       expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to match(/page=8&per_page=10>/)
@@ -1008,18 +1008,18 @@ describe Api do
 
     it "maintains query parameters" do
       links = Api.build_links("www.example.com/", {
-                                :query_parameters => { :search => "hihi" },
-                                :per_page => 10,
-                                :next => 2,
+                                query_parameters: { search: "hihi" },
+                                per_page: 10,
+                                next: 2,
                               })
       expect(links.first).to eq "<www.example.com/?search=hihi&page=2&per_page=10>; rel=\"next\""
     end
 
     it "maintains array query parameters" do
       links = Api.build_links("www.example.com/", {
-                                :query_parameters => { :include => ["enrollments"] },
-                                :per_page => 10,
-                                :next => 2,
+                                query_parameters: { include: ["enrollments"] },
+                                per_page: 10,
+                                next: 2,
                               })
       qs = "#{CGI.escape("include[]")}=enrollments"
       expect(links.first).to eq "<www.example.com/?#{qs}&page=2&per_page=10>; rel=\"next\""
@@ -1027,22 +1027,22 @@ describe Api do
 
     it "does not include certain sensitive params in the link headers" do
       links = Api.build_links("www.example.com/", {
-                                :query_parameters => { :access_token => "blah", :api_key => "xxx", :page => 3, :per_page => 10 },
-                                :per_page => 10,
-                                :next => 4,
+                                query_parameters: { access_token: "blah", api_key: "xxx", page: 3, per_page: 10 },
+                                per_page: 10,
+                                next: 4,
                               })
       expect(links.first).to eq "<www.example.com/?page=4&per_page=10>; rel=\"next\""
     end
 
     it "prevents link headers from consuming more than 6K of header space" do
       links = Api.build_links("www.example.com/", {
-                                :query_parameters => { :blah => 'a' * 2000 },
-                                :per_page => 10,
-                                :current => 8,
-                                :next => 4,
-                                :prev => 2,
-                                :first => 1,
-                                :last => 10,
+                                query_parameters: { blah: 'a' * 2000 },
+                                per_page: 10,
+                                current: 8,
+                                next: 4,
+                                prev: 2,
+                                first: 1,
+                                last: 10,
                               })
       expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to be_nil

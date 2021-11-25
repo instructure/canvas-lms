@@ -26,8 +26,8 @@ describe "quizzes questions" do
 
   before(:once) do
     course_with_teacher(active_all: true)
-    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+    @student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+    @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
   end
 
   before do
@@ -38,7 +38,7 @@ describe "quizzes questions" do
     it "edits a quiz question", priority: "1" do
       @context = @course
       q = quiz_model
-      quest1 = q.quiz_questions.create!(:question_data => { :name => "first question" })
+      quest1 = q.quiz_questions.create!(question_data: { name: "first question" })
       q.generate_quiz_data
       q.save!
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"

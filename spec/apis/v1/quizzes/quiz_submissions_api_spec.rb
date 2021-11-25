@@ -72,9 +72,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_index(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
-    params = { :controller => 'quizzes/quiz_submissions_api', :action => 'index', :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api', action: 'index', format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -84,11 +84,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_submission(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'submission',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'submission',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -98,12 +98,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_show(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'show',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'show',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -113,11 +113,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_create(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'create',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'create',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s }
     if raw
       raw_api_call(:post, url, params, data)
     else
@@ -127,12 +127,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_complete(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/complete"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'complete',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'complete',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     data = {
       validation_token: @quiz_submission.validation_token
     }.merge(data)
@@ -146,12 +146,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_update(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'update',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'update',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:put, url, params, data)
     else
@@ -161,12 +161,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_time(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'time',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
+    params = { controller: 'quizzes/quiz_submissions_api',
+               action: 'time',
+               format: 'json',
+               course_id: @course.id.to_s,
+               quiz_id: @quiz.id.to_s,
+               id: @quiz_submission.id.to_s }
     if raw
       raw_api_call(:get, url, params, data)
     else
@@ -175,9 +175,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   before :once do
-    course_with_teacher :active_all => true
+    course_with_teacher active_all: true
 
-    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(title: 'quiz', context: @course)
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
@@ -418,7 +418,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     context 'Links' do
       it 'includes its linked user' do
         json = qs_api_show(false, {
-                             :include => ['user']
+                             include: ['user']
                            })
 
         expect(json).to have_key('users')
@@ -429,7 +429,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'includes its linked quiz' do
         json = qs_api_show(false, {
-                             :include => ['quiz']
+                             include: ['quiz']
                            })
 
         expect(json).to have_key('quizzes')
@@ -440,7 +440,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'includes its linked submission' do
         json = qs_api_show(false, {
-                             :include => ['submission']
+                             include: ['submission']
                            })
 
         expect(json).to have_key('submissions')
@@ -451,7 +451,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'includes its linked user, quiz, and submission' do
         json = qs_api_show(false, {
-                             :include => %w[user quiz submission]
+                             include: %w[user quiz submission]
                            })
 
         expect(json).to have_key('users')
@@ -470,7 +470,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         includes = %w[user quiz submission]
 
         json = qs_api_show(false, {
-                             :include => includes
+                             include: includes
                            })
 
         assert_jsonapi_compliance(json, 'quiz_submissions', includes)
@@ -546,9 +546,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
             {
               question_data:
               {
-                name: 'question',
-                points_possible: 1,
-                question_type: 'multiple_choice_question',
+                :name => 'question',
+                :points_possible => 1,
+                :question_type => 'multiple_choice_question',
                 'answers' =>
                   [
                     { 'answer_text' => '1', 'weight' => '100' },
@@ -562,15 +562,15 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           @quiz.published_at = Time.zone.now
           @quiz.workflow_state = 'available'
           @quiz.save!
-          @pre_module = @course.context_modules.create!(:name => 'pre_module')
+          @pre_module = @course.context_modules.create!(name: 'pre_module')
           # No meaning in this URL
-          @tag = @pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+          @tag = @pre_module.add_item(type: 'external_url', url: 'http://example.com', title: 'example')
           @tag.publish! if @tag.unpublished?
-          @pre_module.completion_requirements = { @tag.id => { :type => 'must_view' } }
+          @pre_module.completion_requirements = { @tag.id => { type: 'must_view' } }
           @pre_module.save!
 
           locked_module = @course.context_modules.create!(name: 'locked_module', require_sequential_progress: true)
-          locked_module.add_item(:id => @quiz.id, :type => 'quiz')
+          locked_module.add_item(id: @quiz.id, type: 'quiz')
           locked_module.prerequisites = "module_#{@pre_module.id}"
           locked_module.save!
         end
@@ -763,7 +763,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.update_attribute(:end_at, now + 1.hour)
-      Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => now - 1.hour)
+      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: now - 1.hour)
     end
 
     it "gives times for the quiz" do

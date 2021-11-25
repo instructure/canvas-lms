@@ -9,7 +9,7 @@ task :remove_schema_signature do
   files.each { |file| remove_signature(file) }
 end
 
-task :remove_schema_sig => :remove_schema_signature
+task remove_schema_sig: :remove_schema_signature
 
 def remove_signature(filename)
   return false unless File.exist?(filename)

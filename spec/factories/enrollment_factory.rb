@@ -25,17 +25,17 @@ module Factories
 
   def valid_enrollment_attributes
     {
-      :user => @user,
-      :course => @course,
+      user: @user,
+      course: @course,
     }
   end
 
   def multiple_student_enrollment(user, section, opts = {})
     course = opts[:course] || @course || course(opts)
     @enrollment = course.enroll_student(user,
-                                        :enrollment_state => "active",
-                                        :section => section,
-                                        :allow_multiple_enrollments => true)
+                                        enrollment_state: "active",
+                                        section: section,
+                                        allow_multiple_enrollments: true)
   end
 
   def create_enrollment_states(enrollment_ids, options)

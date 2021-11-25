@@ -466,7 +466,7 @@ class GradebookImporter
       # backward compat
       assignment ||= @all_assignments.find { |_id, a| a.title == name_and_id }
                                      .try(:last)
-      assignment ||= Assignment.new(:title => title || name_and_id)
+      assignment ||= Assignment.new(title: title || name_and_id)
       assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
 
@@ -605,16 +605,16 @@ class GradebookImporter
 
   def as_json(_options = {})
     {
-      :students => @students.map { |s| student_to_hash(s) },
-      :assignments => @assignments.map { |a| assignment_to_hash(a) },
-      :missing_objects => {
-        :assignments => @missing_assignments.map { |a| assignment_to_hash(a) },
-        :students => @missing_students.map { |s| student_to_hash(s) }
+      students: @students.map { |s| student_to_hash(s) },
+      assignments: @assignments.map { |a| assignment_to_hash(a) },
+      missing_objects: {
+        assignments: @missing_assignments.map { |a| assignment_to_hash(a) },
+        students: @missing_students.map { |s| student_to_hash(s) }
       },
-      :original_submissions => @original_submissions,
-      :unchanged_assignments => @unchanged_assignments,
-      :warning_messages => @warning_messages,
-      :custom_columns => custom_gradebook_columns.map { |cc| custom_columns_to_hash(cc) },
+      original_submissions: @original_submissions,
+      unchanged_assignments: @unchanged_assignments,
+      warning_messages: @warning_messages,
+      custom_columns: custom_gradebook_columns.map { |cc| custom_columns_to_hash(cc) },
     }.tap do |hash|
       hash[:override_scores] = override_score_json if allow_override_scores?
     end
@@ -712,7 +712,7 @@ class GradebookImporter
       root_account.pseudonyms
                   .active
                   .select(%i[id unique_id sis_user_id user_id])
-                  .where(:user_id => @all_students.values).to_a
+                  .where(user_id: @all_students.values).to_a
     end
     pseudonyms.each do |pseudonym|
       @pseudonyms_by_sis_id[[root_account.id, pseudonym.sis_user_id]] = pseudonym
@@ -730,12 +730,12 @@ class GradebookImporter
 
   def student_to_hash(student)
     {
-      :last_name_first => student.last_name_first,
-      :name => student.name,
-      :previous_id => student.previous_id,
-      :id => student.id,
-      :submissions => @gradebook_importer_assignments[student.id],
-      :custom_column_data => @gradebook_importer_custom_columns[student.id]&.values
+      last_name_first: student.last_name_first,
+      name: student.name,
+      previous_id: student.previous_id,
+      id: student.id,
+      submissions: @gradebook_importer_assignments[student.id],
+      custom_column_data: @gradebook_importer_custom_columns[student.id]&.values
     }.tap do |hash|
       hash[:override_scores] = @gradebook_importer_override_scores[student.id]&.map(&:to_h) if allow_override_scores?
     end
@@ -743,11 +743,11 @@ class GradebookImporter
 
   def assignment_to_hash(assignment)
     {
-      :id => assignment.id,
-      :previous_id => assignment.previous_id,
-      :title => assignment.title,
-      :points_possible => assignment.points_possible,
-      :grading_type => assignment.grading_type
+      id: assignment.id,
+      previous_id: assignment.previous_id,
+      title: assignment.title,
+      points_possible: assignment.points_possible,
+      grading_type: assignment.grading_type
     }
   end
 

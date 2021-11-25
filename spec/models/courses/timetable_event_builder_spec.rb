@@ -24,14 +24,14 @@ describe Courses::TimetableEventBuilder do
     let(:builder) { described_class.new(course: course_factory) }
 
     it "requires valid start and end times" do
-      tt_hash = { :weekdays => 'monday', :start_time => "hoopyfrood", :end_time => "42 oclock",
-                  :course_start_at => 1.day.from_now, :course_end_at => 1.week.from_now }
+      tt_hash = { weekdays: 'monday', start_time: "hoopyfrood", end_time: "42 oclock",
+                  course_start_at: 1.day.from_now, course_end_at: 1.week.from_now }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["invalid start time(s)", "invalid end time(s)"])
     end
 
     it "requires a start and end date" do
-      tt_hash = { :weekdays => 'tuesday', :start_time => "11:30 am", :end_time => "12:30 pm" }
+      tt_hash = { weekdays: 'tuesday', start_time: "11:30 am", end_time: "12:30 pm" }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["no start date found", "no end date found"])
     end
@@ -42,7 +42,7 @@ describe Courses::TimetableEventBuilder do
         term.end_at = DateTime.parse("2016-05-19 9:00am -0600")
       end
 
-      tt_hash = { :weekdays => 'wednesday,humpday', :start_time => "11:30 am", :end_time => "12:30 pm" }
+      tt_hash = { weekdays: 'wednesday,humpday', start_time: "11:30 am", end_time: "12:30 pm" }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["weekdays are not valid"])
     end
@@ -58,14 +58,14 @@ describe Courses::TimetableEventBuilder do
         c.time_zone = 'America/Denver'
       end
 
-      tt_hash = { :weekdays => "T,Th", :start_time => "3 pm", :end_time => "4:30 pm" } # tuesdays and thursdays from 3:00-4:30pm
+      tt_hash = { weekdays: "T,Th", start_time: "3 pm", end_time: "4:30 pm" } # tuesdays and thursdays from 3:00-4:30pm
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to be_blank
 
       expected_events = [
-        { :start_at => DateTime.parse("2016-05-10 3:00 pm -0600"), :end_at => DateTime.parse("2016-05-10 4:30 pm -0600") },
-        { :start_at => DateTime.parse("2016-05-12 3:00 pm -0600"), :end_at => DateTime.parse("2016-05-12 4:30 pm -0600") },
-        { :start_at => DateTime.parse("2016-05-17 3:00 pm -0600"), :end_at => DateTime.parse("2016-05-17 4:30 pm -0600") }
+        { start_at: DateTime.parse("2016-05-10 3:00 pm -0600"), end_at: DateTime.parse("2016-05-10 4:30 pm -0600") },
+        { start_at: DateTime.parse("2016-05-12 3:00 pm -0600"), end_at: DateTime.parse("2016-05-12 4:30 pm -0600") },
+        { start_at: DateTime.parse("2016-05-17 3:00 pm -0600"), end_at: DateTime.parse("2016-05-17 4:30 pm -0600") }
       ]
       expect(builder.generate_event_hashes([tt_hash])).to match_array(expected_events)
     end
@@ -78,16 +78,16 @@ describe Courses::TimetableEventBuilder do
         c.time_zone = 'America/Denver'
       end
 
-      tt_hash = { :weekdays => "Monday,Friday", :start_time => "11:30", :end_time => "13:00" } # mondays and fridays from 11:30-1:00
+      tt_hash = { weekdays: "Monday,Friday", start_time: "11:30", end_time: "13:00" } # mondays and fridays from 11:30-1:00
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to be_blank
       # should convert :weekdays to a standard format
       expect(tt_hash[:weekdays]).to eq "Mon,Fri"
 
       expected_events = [
-        { :start_at => DateTime.parse("2016-03-11 11:30 am -0700"), :end_at => DateTime.parse("2016-03-11 1:00 pm -0700") },
-        { :start_at => DateTime.parse("2016-03-14 11:30 am -0600"), :end_at => DateTime.parse("2016-03-14 1:00 pm -0600") },
-        { :start_at => DateTime.parse("2016-03-18 11:30 am -0600"), :end_at => DateTime.parse("2016-03-18 1:00 pm -0600") }
+        { start_at: DateTime.parse("2016-03-11 11:30 am -0700"), end_at: DateTime.parse("2016-03-11 1:00 pm -0700") },
+        { start_at: DateTime.parse("2016-03-14 11:30 am -0600"), end_at: DateTime.parse("2016-03-14 1:00 pm -0600") },
+        { start_at: DateTime.parse("2016-03-18 11:30 am -0600"), end_at: DateTime.parse("2016-03-18 1:00 pm -0600") }
       ]
       expect(builder.generate_event_hashes([tt_hash])).to match_array(expected_events)
     end
@@ -106,8 +106,8 @@ describe Courses::TimetableEventBuilder do
       start_at = 1.day.from_now
       end_at = 1.day.from_now + 2.hours
       event_hashes = [
-        { :start_at => start_at, :end_at => end_at },
-        { :start_at => start_at, :end_at => end_at }
+        { start_at: start_at, end_at: end_at },
+        { start_at: start_at, end_at: end_at }
       ]
       builder.process_and_validate_event_hashes(event_hashes)
       expect(builder.errors).to eq ["events (or codes) are not unique"]
@@ -129,8 +129,8 @@ describe Courses::TimetableEventBuilder do
 
     it "generates timetable dates for a course" do
       event_hashes = [
-        { :start_at => @start_at, :end_at => @end_at },
-        { :start_at => @start_at2, :end_at => @end_at2 }
+        { start_at: @start_at, end_at: @end_at },
+        { start_at: @start_at2, end_at: @end_at2 }
       ]
       @course_builder.process_and_validate_event_hashes(event_hashes)
       expect(@course_builder.errors).to be_blank
@@ -143,8 +143,8 @@ describe Courses::TimetableEventBuilder do
 
     it "generates timetable dates for a course section" do
       event_hashes = [
-        { :start_at => @start_at, :end_at => @end_at },
-        { :start_at => @start_at2, :end_at => @end_at2 }
+        { start_at: @start_at, end_at: @end_at },
+        { start_at: @start_at2, end_at: @end_at2 }
       ]
       @section_builder.process_and_validate_event_hashes(event_hashes)
       expect(@section_builder.errors).to be_blank
@@ -159,8 +159,8 @@ describe Courses::TimetableEventBuilder do
 
     it "removes or update existing timetable dates" do
       event_hashes = [
-        { :start_at => @start_at, :end_at => @end_at },
-        { :start_at => @start_at2, :end_at => @end_at2 }
+        { start_at: @start_at, end_at: @end_at },
+        { start_at: @start_at2, end_at: @end_at2 }
       ]
       @course_builder.process_and_validate_event_hashes(event_hashes)
       expect(@course_builder.errors).to be_blank
@@ -170,7 +170,7 @@ describe Courses::TimetableEventBuilder do
       ce2 = @course.calendar_events.for_timetable.to_a.detect { |ce| ce.start_at == @start_at2 }
 
       location = "under the sea"
-      event_hashes2 = [{ :start_at => @start_at, :end_at => @end_at, :location_name => location }]
+      event_hashes2 = [{ start_at: @start_at, end_at: @end_at, location_name: location }]
       @course_builder.process_and_validate_event_hashes(event_hashes2)
       expect(@course_builder.errors).to be_blank
       @course_builder.create_or_update_events(event_hashes2)

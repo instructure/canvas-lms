@@ -209,7 +209,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
@@ -258,7 +258,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Phys101,Physics,A001,T001,active",
-      { :add_sis_stickiness => true }
+      { add_sis_stickiness: true }
     )
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -314,8 +314,8 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
-      { :override_sis_stickiness => true,
-        :clear_sis_stickiness => true }
+      { override_sis_stickiness: true,
+        clear_sis_stickiness: true }
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|

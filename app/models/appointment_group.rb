@@ -54,10 +54,10 @@ class AppointmentGroup < ActiveRecord::Base
   before_save :update_cached_values
   after_save :update_appointments
 
-  validates :title, length: { :maximum => maximum_string_length }
-  validates :location_name, length: { :maximum => maximum_string_length }
-  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :participant_visibility, inclusion: { :in => ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
+  validates :title, length: { maximum: maximum_string_length }
+  validates :location_name, length: { maximum: maximum_string_length }
+  validates :description, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :participant_visibility, inclusion: { in: ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
     next unless record.new_appointments.present? || record.validation_event_override
 
@@ -90,7 +90,7 @@ class AppointmentGroup < ActiveRecord::Base
     @new_appointments = appointments.map do |start_at, end_at|
       next unless start_at && end_at
 
-      a = self.appointments.build(:start_at => start_at, :end_at => end_at)
+      a = self.appointments.build(start_at: start_at, end_at: end_at)
       a.context = self
       a
     end
@@ -130,9 +130,9 @@ class AppointmentGroup < ActiveRecord::Base
         # appointment groups with one course
         gc = GroupCategory.where(id: $1).first
         self.appointment_group_sub_contexts = [
-          AppointmentGroupSubContext.new(:appointment_group => self,
-                                         :sub_context => gc,
-                                         :sub_context_code => @new_sub_context_codes.first)
+          AppointmentGroupSubContext.new(appointment_group: self,
+                                         sub_context: gc,
+                                         sub_context_code: @new_sub_context_codes.first)
         ]
       else
         # if new record and we have a course without sections, add all the sections
@@ -156,9 +156,9 @@ class AppointmentGroup < ActiveRecord::Base
           next unless code =~ /\Acourse_section_(.*)/
 
           cs = CourseSection.where(id: $1).first
-          AppointmentGroupSubContext.new(:appointment_group => self,
-                                         :sub_context => cs,
-                                         :sub_context_code => code)
+          AppointmentGroupSubContext.new(appointment_group: self,
+                                         sub_context: cs,
+                                         sub_context_code: code)
         end
       end
     end
@@ -169,7 +169,7 @@ class AppointmentGroup < ActiveRecord::Base
              (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
              !new_record?)
       self.appointment_group_contexts += @new_contexts.map do |c|
-        AppointmentGroupContext.new :context => c, :appointment_group => self
+        AppointmentGroupContext.new context: c, appointment_group: self
       end
       @contexts_changed = true
     end
@@ -295,7 +295,7 @@ class AppointmentGroup < ActiveRecord::Base
     dispatch :appointment_group_deleted
     to       { possible_users }
     whenever { contexts.any?(&:available?) && changed_state(:deleted, :active) }
-    data     { broadcast_data.merge({ :cancel_reason => @cancel_reason }) }
+    data     { broadcast_data.merge({ cancel_reason: @cancel_reason }) }
   end
 
   def possible_users
@@ -352,7 +352,7 @@ class AppointmentGroup < ActiveRecord::Base
   def participant_ids
     appointments_participants
       .except(:order)
-      .where(:context_type => participant_type)
+      .where(context_type: participant_type)
       .pluck(:context_id)
   end
 
@@ -486,7 +486,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   workflow do
     state :pending do
-      event :publish, :transitions_to => :active
+      event :publish, transitions_to: :active
     end
     state :active
     state :deleted
@@ -511,7 +511,7 @@ class AppointmentGroup < ActiveRecord::Base
     @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
       course_ids = appointment_group_contexts.select { |agc| context_codes.include? agc.context_code }.map(&:context_id)
-      Course.where(:id => course_ids).to_a
+      Course.where(id: course_ids).to_a
     end
   end
 

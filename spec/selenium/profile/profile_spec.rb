@@ -110,8 +110,8 @@ describe "profile" do
 
     it "adds a new email address on profile settings page" do
       @user.account.enable_feature!(:international_sms)
-      notification_model(:category => 'Grading')
-      notification_policy_model(:notification_id => @notification.id)
+      notification_model(category: 'Grading')
+      notification_policy_model(notification_id: @notification.id)
 
       get '/profile/settings'
       add_email_link
@@ -189,7 +189,7 @@ describe "profile" do
 
     context "when pronouns are enabled" do
       before do
-        @user.account.settings = { :can_add_pronouns => true }
+        @user.account.settings = { can_add_pronouns: true }
         @user.account.save!
       end
 
@@ -404,11 +404,11 @@ describe "profile" do
       Account.default.settings[:avatars] = 'enabled_pending'
       Account.default.save!
 
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @other_student = user_factory
       @other_student.avatar_state = "submitted"
       @other_student.save!
-      student_in_course(:course => @course, :user => @other_student, :active_all => true)
+      student_in_course(course: @course, user: @other_student, active_all: true)
     end
 
     it "is able to report inappropriate pictures without profiles enabled" do
@@ -455,11 +455,11 @@ describe "profile" do
       Account.default.settings[:avatars] = 'enabled_pending'
       Account.default.save!
 
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       @other_student = user_factory
       @other_student.avatar_state = "submitted"
       @other_student.save!
-      student_in_course(:course => @course, :user => @other_student, :active_all => true)
+      student_in_course(course: @course, user: @other_student, active_all: true)
     end
 
     it 'is able to remove inappropriate pictures without profiles enabled' do

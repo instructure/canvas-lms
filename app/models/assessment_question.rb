@@ -22,17 +22,17 @@ class AssessmentQuestion < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
-  has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
-  has_many :attachments, :as => :context, :inverse_of => :context
-  delegate :context, :context_id, :context_type, :to => :assessment_question_bank
+  has_many :quiz_questions, class_name: 'Quizzes::QuizQuestion'
+  has_many :attachments, as: :context, inverse_of: :context
+  delegate :context, :context_id, :context_type, to: :assessment_question_bank
   attr_accessor :initial_context
 
-  belongs_to :assessment_question_bank, :touch => true
-  simply_versioned :automatic => false
-  acts_as_list :scope => :assessment_question_bank
+  belongs_to :assessment_question_bank, touch: true
+  simply_versioned automatic: false
+  acts_as_list scope: :assessment_question_bank
   before_validation :infer_defaults
   after_save :translate_links_if_changed
-  validates :name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :name, length: { maximum: maximum_string_length, allow_nil: true }
   validates :workflow_state, :assessment_question_bank_id, presence: true
   resolves_root_account through: :context
 
@@ -71,8 +71,8 @@ class AssessmentQuestion < ActiveRecord::Base
   def user_can_see_through_quiz_question?(user, session = nil)
     shard.activate do
       quiz_ids = quiz_questions.distinct.pluck(:quiz_id)
-      quiz_ids.any? && Quizzes::Quiz.where(:id => quiz_ids, :context_type => "Course",
-                                           :context_id => Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
+      quiz_ids.any? && Quizzes::Quiz.where(id: quiz_ids, context_type: "Course",
+                                           context_id: Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
     end
   end
 

@@ -36,7 +36,7 @@ module Qti
     end
 
     def get_answer_values
-      answer = { :weight => 100, :comments => "", :id => unique_local_id }
+      answer = { weight: 100, comments: "", id: unique_local_id }
       if (gte = @doc.at_css('responseCondition gte baseValue'))
         answer[:start] = gte.text.to_f
       end
@@ -56,7 +56,7 @@ module Qti
 
     def get_canvas_answers
       @doc.css('responseIf, responseElseIf').each do |r_if|
-        answer = { :weight => 100, :text => 'answer_text' }
+        answer = { weight: 100, text: 'answer_text' }
         bv = r_if.at_css('baseValue')
         answer[:id] = get_or_generate_answer_id(bv && bv['identifier'])
         answer[:feedback_id] = get_feedback_id(r_if)

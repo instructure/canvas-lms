@@ -33,7 +33,7 @@ describe 'modules' do
     @other_teacher = @teacher
     course_with_teacher(active_all: true)
     @other_course.enroll_teacher(@teacher).accept!
-    @assignment1 = @course.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(title: 'Assignment First', points_possible: 10)
     @module1 = @course.context_modules.create!(name: 'Test Module1')
     @item1 = @module1.add_item(id: @assignment1.id, type: 'assignment')
   end

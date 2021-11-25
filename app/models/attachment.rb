@@ -76,11 +76,11 @@ class Attachment < ActiveRecord::Base
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
   has_many :attachment_associations
-  belongs_to :root_attachment, :class_name => 'Attachment'
-  belongs_to :replacement_attachment, :class_name => 'Attachment'
+  belongs_to :root_attachment, class_name: 'Attachment'
+  belongs_to :replacement_attachment, class_name: 'Attachment'
   has_one :sis_batch
   has_one :thumbnail, -> { where(thumbnail: 'thumb') }, foreign_key: "parent_id"
-  has_many :thumbnails, :foreign_key => "parent_id"
+  has_many :thumbnails, foreign_key: "parent_id"
   has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
   has_many :attachment_upload_statuses
   has_one :crocodoc_document
@@ -95,7 +95,7 @@ class Attachment < ActiveRecord::Base
   before_save :set_need_notify
 
   before_validation :assert_attachment
-  acts_as_list :scope => :folder
+  acts_as_list scope: :folder
 
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
@@ -141,11 +141,11 @@ class Attachment < ActiveRecord::Base
   # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
   # too, it cares about local vs s3 storage.
   has_attachment(
-    :storage => store_type.key,
-    :path_prefix => file_store_config['path_prefix'],
-    :s3_access => 'private',
-    :thumbnails => { :thumb => '128x128' },
-    :thumbnail_class => 'Thumbnail'
+    storage: store_type.key,
+    path_prefix: file_store_config['path_prefix'],
+    s3_access: 'private',
+    thumbnails: { thumb: '128x128' },
+    thumbnail_class: 'Thumbnail'
   )
 
   # These callbacks happen after the attachment data is saved to disk/s3, or
@@ -236,7 +236,7 @@ class Attachment < ActiveRecord::Base
     # directly update workflow_state so we don't trigger another save cycle
     if old_workflow_state != workflow_state
       shard.activate do
-        self.class.where(:id => self).update_all(:workflow_state => workflow_state)
+        self.class.where(id: self).update_all(workflow_state: workflow_state)
       end
     end
 
@@ -289,10 +289,10 @@ class Attachment < ActiveRecord::Base
     begin
       if self.class.valid_utf8?(self.open)
         self.encoding = 'UTF-8'
-        Attachment.where(:id => self).update_all(:encoding => 'UTF-8')
+        Attachment.where(id: self).update_all(encoding: 'UTF-8')
       else
         self.encoding = ''
-        Attachment.where(:id => self).update_all(:encoding => '')
+        Attachment.where(id: self).update_all(encoding: '')
       end
     rescue IOError => e
       logger.error("Error inferring encoding for attachment #{global_id}: #{e.message}")
@@ -308,16 +308,16 @@ class Attachment < ActiveRecord::Base
 
   def clone_for(context, dup = nil, options = {})
     if !cloned_item && !new_record?
-      self.cloned_item = ClonedItem.create(:original_item => self) # do we even use this for anything?
+      self.cloned_item = ClonedItem.create(original_item: self) # do we even use this for anything?
       shard.activate do
-        Attachment.where(:id => self).update_all(:cloned_item_id => cloned_item.id) # don't touch it for no reason
+        Attachment.where(id: self).update_all(cloned_item_id: cloned_item.id) # don't touch it for no reason
       end
     end
     existing = context.attachments.active.find_by(id: self)
 
     options[:cloned_item_id] ||= cloned_item_id
     options[:migration_id] ||= CC::CCHelper.create_key(self)
-    existing ||= Attachment.find_existing_attachment_for_clone(context, options.merge(:active_only => true))
+    existing ||= Attachment.find_existing_attachment_for_clone(context, options.merge(active_only: true))
     return existing if existing && !options[:overwrite] && !options[:force_copy]
 
     existing ||= Attachment.find_existing_attachment_for_clone(context, options)
@@ -398,7 +398,7 @@ class Attachment < ActiveRecord::Base
 
     if progress.new_record? || !progress.pending?
       progress.reset!
-      progress.process_job(MediaObject, :add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY, :preserve_method_args => true, :max_attempts => 5 }, self, false) && true
+      progress.process_job(MediaObject, :add_media_files, { run_at: delay.seconds.from_now, priority: Delayed::LOWER_PRIORITY, preserve_method_args: true, max_attempts: 5 }, self, false) && true
     else
       true
     end
@@ -415,7 +415,7 @@ class Attachment < ActiveRecord::Base
   attr_accessor :recently_created
 
   validates :context_id, :context_type, :workflow_state, presence: true
-  validates :content_type, length: { :maximum => maximum_string_length, :allow_blank => true }
+  validates :content_type, length: { maximum: maximum_string_length, allow_blank: true }
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment
@@ -424,7 +424,7 @@ class Attachment < ActiveRecord::Base
       Attachment.where("id=? OR root_attachment_id=? OR (root_attachment_id=? AND id<>?)",
                        root_attachment_id, id, root_attachment_id, id)
     else
-      Attachment.where(:root_attachment_id => id)
+      Attachment.where(root_attachment_id: id)
     end
   end
 
@@ -736,7 +736,7 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
-    { :quota => quota, :quota_used => quota_used }
+    { quota: quota, quota_used: quota_used }
   end
 
   # Returns a boolean indicating whether the given context is over quota
@@ -799,15 +799,15 @@ class Attachment < ActiveRecord::Base
       end
     elsif method == :overwrite && atts.any?
       shard.activate do
-        Attachment.where(:id => atts).update_all(replacement_attachment_id: id) # so we can find the new file in content links
+        Attachment.where(id: atts).update_all(replacement_attachment_id: id) # so we can find the new file in content links
         copy_access_attributes!(atts)
         atts.each do |a|
           # update content tags to refer to the new file
-          if ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: id, updated_at: Time.now.utc) > 0
-            ContextModule.where(:id => ContentTag.where(:content_id => id, :content_type => 'Attachment').select(:context_module_id)).touch_all
+          if ContentTag.where(content_id: a, content_type: 'Attachment').update_all(content_id: id, updated_at: Time.now.utc) > 0
+            ContextModule.where(id: ContentTag.where(content_id: id, content_type: 'Attachment').select(:context_module_id)).touch_all
           end
           # update replacement pointers pointing at the overwritten file
-          context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: id)
+          context.attachments.where(replacement_attachment_id: a).update_all(replacement_attachment_id: id)
           # delete the overwritten file (unless the caller is queueing them up)
           a.destroy unless opts[:caller_will_destroy]
           deleted_attachments << a
@@ -999,9 +999,9 @@ class Attachment < ActiveRecord::Base
       to_use.cached_s3_url
     elsif media_object&.media_id
       CanvasKaltura::ClientV3.new.thumbnail_url(media_object.media_id,
-                                                :width => options[:width] || 140,
-                                                :height => options[:height] || 100,
-                                                :vid_sec => options[:video_seconds] || 5)
+                                                width: options[:width] || 140,
+                                                height: options[:height] || 100,
+                                                vid_sec: options[:video_seconds] || 5)
     else
       nil # "still need to handle things that are not images with thumbnails or kaltura docs"
     end
@@ -1080,7 +1080,7 @@ class Attachment < ActiveRecord::Base
       file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
         # clear the need_notify flag for this batch
         Attachment.where("need_notify AND updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type)
-                  .update_all(:need_notify => nil)
+                  .update_all(need_notify: nil)
 
         # skip the notification if this batch is too old to be timely
         next if last_updated_at.to_time < discard_older_than
@@ -1099,7 +1099,7 @@ class Attachment < ActiveRecord::Base
         next if recipient_keys.empty?
 
         notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
-        data = { :count => count }
+        data = { count: count }
         DelayedNotification.delay_if_production(priority: 30).process(record, notification, recipient_keys, data)
       end
     end
@@ -1155,14 +1155,14 @@ class Attachment < ActiveRecord::Base
 
   def to_atom(opts = {})
     Atom::Entry.new do |entry|
-      entry.title     = t(:feed_title, "File: %{title}", :title => context.name) unless opts[:include_context]
-      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => context.name, :title => context.name) if opts[:include_context]
-      entry.authors << Atom::Person.new(:name => context.name)
+      entry.title     = t(:feed_title, "File: %{title}", title: context.name) unless opts[:include_context]
+      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", course_or_group: context.name, title: context.name) if opts[:include_context]
+      entry.authors << Atom::Person.new(name: context.name)
       entry.updated   = updated_at
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/files/#{feed_code}"
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}")
       entry.content = Atom::Content::Html.new(self.display_name.to_s)
     end
   end
@@ -1176,7 +1176,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def associate_with(context)
-    attachment_associations.create(:context => context)
+    attachment_associations.create(context: context)
   end
 
   def mime_class
@@ -1237,8 +1237,8 @@ class Attachment < ActiveRecord::Base
       "video/x-sgi-movie" => "video",
       "video/3gpp" => "video",
       "video/mp4" => "video",
-      "video/webm": "video",
-      "video/avi": "video",
+      :"video/webm" => "video",
+      :"video/avi" => "video",
       "application/x-shockwave-flash" => "flash"
     }[content_type] || "file"
   end
@@ -1282,7 +1282,7 @@ class Attachment < ActiveRecord::Base
     can :read_as_admin
 
     given do |user, session|
-      user_can_read_through_context?(user, session) && !locked_for?(user, :check_policies => true)
+      user_can_read_through_context?(user, session) && !locked_for?(user, check_policies: true)
     end
     can :read and can :download
 
@@ -1298,7 +1298,7 @@ class Attachment < ActiveRecord::Base
       (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||
           (context.respond_to?(:is_public_to_auth_users?) && context.is_public_to_auth_users?)) &&
-        !locked_for?(u, :check_policies => true) &&
+        !locked_for?(u, check_policies: true) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.zone.now.to_i
     end
     can :download
@@ -1323,7 +1323,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts = {})
     return false if opts[:check_policies] && grants_right?(user, :read_as_admin)
-    return { :asset_string => asset_string, :manually_locked => true } if locked || Folder.is_locked?(self.folder_id)
+    return { asset_string: asset_string, manually_locked: true } if locked || Folder.is_locked?(self.folder_id)
 
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
@@ -1333,11 +1333,11 @@ class Attachment < ActiveRecord::Base
         clear_permissions(next_clear_cache)
       end
       if unlock_at && Time.zone.now < unlock_at
-        locked = { :asset_string => asset_string, :unlock_at => unlock_at }
+        locked = { asset_string: asset_string, unlock_at: unlock_at }
       elsif lock_at && Time.now > lock_at
-        locked = { :asset_string => asset_string, :lock_at => lock_at }
+        locked = { asset_string: asset_string, lock_at: lock_at }
       elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-        locked = { :asset_string => asset_string, :context_module => item.context_module.attributes }
+        locked = { asset_string: asset_string, context_module: item.context_module.attributes }
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
       locked
@@ -1391,21 +1391,21 @@ class Attachment < ActiveRecord::Base
   # the state machine.
   workflow do
     state :pending_upload do
-      event :upload, :transitions_to => :processing
-      event :process, :transitions_to => :processed
-      event :mark_errored, :transitions_to => :errored
+      event :upload, transitions_to: :processing
+      event :process, transitions_to: :processed
+      event :mark_errored, transitions_to: :errored
     end
 
     state :processing do
-      event :process, :transitions_to => :processed
-      event :mark_errored, :transitions_to => :errored
+      event :process, transitions_to: :processed
+      event :mark_errored, transitions_to: :errored
     end
 
     state :processed do
-      event :recycle, :transitions_to => :pending_upload
+      event :recycle, transitions_to: :pending_upload
     end
     state :errored do
-      event :recycle, :transitions_to => :pending_upload
+      event :recycle, transitions_to: :pending_upload
     end
     state :deleted
     state :to_be_zipped
@@ -1441,7 +1441,7 @@ class Attachment < ActiveRecord::Base
       clauses << if type.include? '/'
                    sanitize_sql_array(["(attachments.content_type=?)", type])
                  else
-                   wildcard('attachments.content_type', type + '/', :type => :right)
+                   wildcard('attachments.content_type', type + '/', type: :right)
                  end
     end
     clauses.join(' OR ')
@@ -1472,7 +1472,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'deleted' # destroy
     self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
-    MediaObject.where(:attachment_id => id).update_all(:attachment_id => nil, :updated_at => Time.now.utc)
+    MediaObject.where(attachment_id: id).update_all(attachment_id: nil, updated_at: Time.now.utc)
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
@@ -1505,8 +1505,8 @@ class Attachment < ActiveRecord::Base
       att.content_type = "application/pdf"
       CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
       canvadoc_scope = Canvadoc.where(attachment_id: att.children_and_self.select(:id))
-      CanvadocsSubmission.where(:canvadoc_id => canvadoc_scope.select(:id)).delete_all
-      AnonymousOrModerationEvent.where(:canvadoc_id => canvadoc_scope.select(:id)).delete_all
+      CanvadocsSubmission.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
+      AnonymousOrModerationEvent.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
       canvadoc_scope.delete_all
       att.save!
     end
@@ -1661,14 +1661,14 @@ class Attachment < ActiveRecord::Base
       return if destination.store.exists? && open == destination.open
 
       old_content_type = self.content_type
-      scope = Attachment.where(:md5 => md5, :namespace => namespace, :root_attachment_id => nil)
-      scope.update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
+      scope = Attachment.where(md5: md5, namespace: namespace, root_attachment_id: nil)
+      scope.update_all(content_type: "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
 
       # TODO: when RECNVS-323 is complete, branch here to call an inst-fs
       # copy method to avoid sending object when it is not necessary
       Attachments::Storage.store_for_attachment(destination, open)
 
-      scope.where.not(:id => destination).update_all(:content_type => old_content_type)
+      scope.where.not(id: destination).update_all(content_type: old_content_type)
     end
     destination.save!
   end
@@ -1900,9 +1900,9 @@ class Attachment < ActiveRecord::Base
   end
   cattr_accessor :skip_thumbnails
 
-  scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
-  scope :active, -> { where(:file_state => 'available') }
-  scope :deleted, -> { where(:file_state => 'deleted') }
+  scope :uploadable, -> { where(workflow_state: 'pending_upload') }
+  scope :active, -> { where(file_state: 'available') }
+  scope :deleted, -> { where(file_state: 'deleted') }
   scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
   scope :by_position_then_display_name, -> { order(:position, display_name_order_by_clause('attachments')) }
   def self.serialization_excludes
@@ -2007,7 +2007,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def clone_url(url, duplicate_handling, check_quota, opts = {})
-    Attachment.clone_url_as_attachment(url, :attachment => self)
+    Attachment.clone_url_as_attachment(url, attachment: self)
 
     if check_quota
       save! # save to calculate attachment size, otherwise self.size is nil
@@ -2034,21 +2034,21 @@ class Attachment < ActiveRecord::Base
       self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
     when CanvasHttp::InvalidResponseCodeError
       failed_retryable = true
-      self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
+      self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", code: e.code, url: url
       Canvas::Errors.capture(e, clone_url_error_info(e, url))
     when CanvasHttp::RelativeUriError
-      self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
+      self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", url: url
     when URI::Error, ArgumentError
       # assigning all ArgumentError to InvalidUri may be incorrect
-      self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
+      self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", url: url
     when Timeout::Error
       failed_retryable = true
-      self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", :url => url
+      self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", url: url
     when OverQuotaError
-      self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => size
+      self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", bytes: size
     else
       failed_retryable = true
-      self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
+      self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", url: url
       Canvas::Errors.capture(e, clone_url_error_info(e, url))
     end
 
@@ -2153,7 +2153,7 @@ class Attachment < ActiveRecord::Base
         # CanvasHttp.get does)
         http_response.read_body(tmpfile)
         tmpfile.rewind
-        attachment = opts[:attachment] || Attachment.new(:filename => File.basename(uri.path))
+        attachment = opts[:attachment] || Attachment.new(filename: File.basename(uri.path))
         attachment.filename ||= File.basename(uri.path)
         Attachments::Storage.store_for_attachment(attachment, tmpfile)
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
@@ -2189,11 +2189,11 @@ class Attachment < ActiveRecord::Base
   def self.migrate_attachments(from_context, to_context, scope = nil)
     from_attachments = scope
     from_attachments ||= from_context.shard.activate do
-      Attachment.where(:context_type => from_context.class.name, :context_id => from_context).not_deleted.to_a
+      Attachment.where(context_type: from_context.class.name, context_id: from_context).not_deleted.to_a
     end
 
     to_context.shard.activate do
-      to_attachments = Attachment.where(:context_type => to_context.class.name, :context_id => to_context).not_deleted.to_a
+      to_attachments = Attachment.where(context_type: to_context.class.name, context_id: to_context).not_deleted.to_a
 
       from_attachments.each do |attachment|
         match = to_attachments.detect { |a| attachment.matches_full_display_path?(a.full_display_path) }

@@ -66,7 +66,7 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
 
       cm.migration_settings[:worker_class] = converter_class.name
       if !cm.migration_settings[:migration_ids_to_import] || !cm.migration_settings[:migration_ids_to_import][:copy]
-        cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }
+        cm.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
       end
       cm.workflow_state = :exported
       saved = cm.save
@@ -90,8 +90,8 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
 
   def self.enqueue(content_migration)
     Delayed::Job.enqueue(new(content_migration.id),
-                         :priority => Delayed::LOW_PRIORITY,
-                         :max_attempts => 1,
-                         :strand => content_migration.strand)
+                         priority: Delayed::LOW_PRIORITY,
+                         max_attempts: 1,
+                         strand: content_migration.strand)
   end
 end

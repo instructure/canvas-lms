@@ -45,7 +45,7 @@ describe 'appointment_reserved_by_user.twitter' do
       @course = course_model
       @cat = group_category
       user_model
-      @group = @cat.groups.create(:context => @course)
+      @group = @cat.groups.create(context: @course)
       @group.users << @user
       appointment_participant_model(participant: @group,
                                     course: @course,

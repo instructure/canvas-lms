@@ -29,14 +29,14 @@ describe "student groups" do
 
   describe "as a student" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
     end
 
     it "allows student group leaders to edit the group name", priority: "1" do
-      category1 = @course.group_categories.create!(:name => "category 1")
+      category1 = @course.group_categories.create!(name: "category 1")
       category1.configure_self_signup(true, false)
       category1.save!
-      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+      g1 = @course.groups.create!(name: "some group", group_category: category1)
 
       g1.add_user @student
       g1.leader = @student
@@ -51,7 +51,7 @@ describe "student groups" do
     end
 
     it "shows locked student organized, invite only groups", priority: "1" do
-      @course.groups.create!(:name => "my group")
+      @course.groups.create!(name: "my group")
       get "/courses/#{@course.id}/groups"
 
       expect(f(".icon-lock")).to be_displayed

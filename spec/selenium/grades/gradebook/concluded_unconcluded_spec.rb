@@ -27,20 +27,20 @@ describe "concluded/unconcluded" do
   before do
     username = "nobody@example.com"
     password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
+    u = user_with_pseudonym active_user: true,
+                            username: username,
+                            password: password
     u.save!
-    @e = course_with_teacher :active_course => true,
-                             :user => u,
-                             :active_enrollment => true
+    @e = course_with_teacher active_course: true,
+                             user: u,
+                             active_enrollment: true
     @e.save!
 
     user_model
     @student = @user
     @course.enroll_student(@student).accept
-    @group = @course.assignment_groups.create!(:name => "default")
-    @assignment = @course.assignments.create!(:submission_types => 'online_quiz', :title => 'quiz assignment', :assignment_group => @group)
+    @group = @course.assignment_groups.create!(name: "default")
+    @assignment = @course.assignments.create!(submission_types: 'online_quiz', title: 'quiz assignment', assignment_group: @group)
     create_session(u.pseudonym)
   end
 

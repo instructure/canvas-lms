@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'site-wide', :type => :request do
+describe 'site-wide', type: :request do
   context "web app manifest" do
     before(:once) do
       student_in_course
-      user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+      user_with_pseudonym(user: @student, username: 'student@example.com', password: 'password')
     end
 
     it "doesn't add link tag if setting is explicitly unset" do

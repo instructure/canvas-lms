@@ -22,12 +22,12 @@ require_relative '../views_helper'
 
 describe 'shared/_grading_standard' do
   let(:grading_standard) do
-    @course.grading_standards.create!(:title => 'My Grading Standard', :standard_data => {
-                                        :a => { :name => 'A', :value => '95' },
-                                        :b => { :name => 'B', :value => '80' },
-                                        :c => { :name => 'C', :value => '70' },
-                                        :d => { :name => 'D', :value => '60' },
-                                        :f => { :name => 'F', :value => '' }
+    @course.grading_standards.create!(title: 'My Grading Standard', standard_data: {
+                                        a: { name: 'A', value: '95' },
+                                        b: { name: 'B', value: '80' },
+                                        c: { name: 'C', value: '70' },
+                                        d: { name: 'D', value: '60' },
+                                        f: { name: 'F', value: '' }
                                       })
   end
 

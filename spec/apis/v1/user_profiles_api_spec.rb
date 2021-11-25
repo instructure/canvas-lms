@@ -49,28 +49,28 @@ describe "User Profile API", type: :request do
   before :once do
     @admin = account_admin_user
     @admin_lti_user_id = Lti::Asset.opaque_identifier_for(@admin)
-    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
+    course_with_student(user: user_with_pseudonym(name: 'Student', username: 'pvuser@example.com'))
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     Lti::Asset.opaque_identifier_for(@student)
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
-    user_with_pseudonym(:user => @user)
+    user_with_pseudonym(user: @user)
   end
 
   it "returns another user's avatars, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
-                    :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+                    controller: "profile", action: "profile_pics", user_id: @student.to_param, format: 'json')
     expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
   it "returns user info for users with no pseudonym" do
     @me = @user
-    new_user = user_factory(:name => 'new guy')
+    new_user = user_factory(name: 'new guy')
     @user = @me
     @course.enroll_user(new_user, 'ObserverEnrollment')
     Account.site_admin.account_users.create!(user: @user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
-                    :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
+                    controller: "profile", action: "settings", user_id: new_user.to_param, format: 'json')
     expect(json).to eq({
                          'id' => new_user.id,
                          'name' => 'new guy',
@@ -92,7 +92,7 @@ describe "User Profile API", type: :request do
 
   it "returns this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
-                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json')
+                    controller: "profile", action: "settings", user_id: 'self', format: 'json')
     expect(json).to eq({
                          'id' => @admin.id,
                          'name' => 'User',
@@ -119,7 +119,7 @@ describe "User Profile API", type: :request do
     @student.locale = 'es'
     @student.save!
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    controller: "profile", action: "settings", user_id: @student.to_param, format: 'json')
     expect(json).to eq({
                          'id' => @student.id,
                          'name' => 'Student',
@@ -143,7 +143,7 @@ describe "User Profile API", type: :request do
   it "returns this user's profile (non-admin)" do
     @user = @student
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    controller: "profile", action: "settings", user_id: @student.to_param, format: 'json')
     expect(json).to eq({
                          'id' => @student.id,
                          'name' => 'Student',
@@ -165,10 +165,10 @@ describe "User Profile API", type: :request do
   end
 
   it "respects :read_email_addresses permission" do
-    RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
-                         :role => admin_role, :enabled => false)
+    RoleOverride.create!(context: Account.default, permission: 'read_email_addresses',
+                         role: admin_role, enabled: false)
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    controller: "profile", action: "settings", user_id: @student.to_param, format: 'json')
     expect(json['id']).to eq @student.id
     expect(json['primary_email']).to be_nil
   end
@@ -177,34 +177,34 @@ describe "User Profile API", type: :request do
     @user = @student
     @student.register
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
-                    :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
+                    controller: "profile", action: "profile_pics", user_id: @student.to_param, format: 'json')
     expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
   it "does not return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
-                 :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
+                 controller: "profile", action: "settings", user_id: @admin.to_param, format: 'json')
     assert_status(401)
   end
 
   context "user_services" do
     before :once do
-      @student.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => false
-      @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => true
-      @student.user_services.create! :service => 'somethingthatdoesntexistanymore', :service_user_name => 'user', :service_user_id => 'user', :visible => true
+      @student.user_services.create! service: 'skype', service_user_name: 'user', service_user_id: 'user', visible: false
+      @student.user_services.create! service: 'twitter', service_user_name: 'user', service_user_id: 'user', visible: true
+      @student.user_services.create! service: 'somethingthatdoesntexistanymore', service_user_name: 'user', service_user_id: 'user', visible: true
     end
 
     before do
-      allow(Twitter::Connection).to receive(:config).and_return({ :some_hash => "fullofstuff" })
+      allow(Twitter::Connection).to receive(:config).and_return({ some_hash: "fullofstuff" })
     end
 
     it "returns user_services, if requested" do
       @user = @student
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
-                      :controller => "profile", :action => "settings",
-                      :user_id => @student.to_param, :format => "json",
-                      :include => ["user_services"])
+                      controller: "profile", action: "settings",
+                      user_id: @student.to_param, format: "json",
+                      include: ["user_services"])
       expect(json["user_services"]).to eq [
         { "service" => "skype", "visible" => false, "service_user_link" => "skype:user?add" },
         { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" }
@@ -214,9 +214,9 @@ describe "User Profile API", type: :request do
     it "only returns visible services for other users" do
       @user = @admin
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
-                      :controller => "profile", :action => "settings",
-                      :user_id => @student.to_param, :format => "json",
-                      :include => %w[user_services])
+                      controller: "profile", action: "settings",
+                      user_id: @student.to_param, format: "json",
+                      include: %w[user_services])
       expect(json["user_services"]).to eq [
         { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" },
       ]
@@ -224,13 +224,13 @@ describe "User Profile API", type: :request do
 
     it "returns profile links, if requested" do
       @student.profile.save
-      @student.profile.links.create! :url => "http://instructure.com",
-                                     :title => "Instructure"
+      @student.profile.links.create! url: "http://instructure.com",
+                                     title: "Instructure"
 
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=links",
-                      :controller => "profile", :action => "settings",
-                      :user_id => @student.to_param, :format => "json",
-                      :include => %w[links])
+                      controller: "profile", action: "settings",
+                      user_id: @student.to_param, format: "json",
+                      include: %w[links])
       expect(json["links"]).to eq [
         { "url" => "http://instructure.com", "title" => "Instructure" }
       ]

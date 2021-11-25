@@ -69,7 +69,7 @@ describe "Importing Groups" do
     course_with_teacher
     migration = @course.content_migrations.create!
     group = @course.groups.build
-    Importers::GroupImporter.import_from_migration({ :group_category => "random category" }, @course, migration, group)
+    Importers::GroupImporter.import_from_migration({ group_category: "random category" }, @course, migration, group)
     expect(group.group_category.name).to eq "random category"
   end
 

@@ -21,7 +21,7 @@
 describe 'MessageDispatcher' do
   describe ".dispatch" do
     before do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
     end
 
     it "reschedules on Mailer delivery error" do
@@ -48,7 +48,7 @@ describe 'MessageDispatcher' do
 
   describe ".batch_dispatch" do
     before do
-      @messages = (0...3).map { message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email') }
+      @messages = (0...3).map { message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email') }
     end
 
     it "reschedules on Mailer delivery error, but not on canceled Message" do

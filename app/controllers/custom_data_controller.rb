@@ -22,7 +22,7 @@
 # @subtopic Custom Data
 class CustomDataController < ApplicationController
   before_action :require_namespace, :get_scope, :get_context
-  before_action :require_custom_data, :except => :set_data
+  before_action :require_custom_data, except: :set_data
 
   # @API Store custom data
   # Store arbitrary user data as JSON.

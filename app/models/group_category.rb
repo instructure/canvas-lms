@@ -27,8 +27,8 @@ class GroupCategory < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch
   belongs_to :root_account, class_name: 'Account', inverse_of: :all_group_categories
-  has_many :groups, :dependent => :destroy
-  has_many :progresses, :as => 'context', :dependent => :destroy
+  has_many :groups, dependent: :destroy
+  has_many :progresses, as: 'context', dependent: :destroy
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :group_category
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
 
@@ -38,7 +38,7 @@ class GroupCategory < ActiveRecord::Base
   after_save :auto_create_groups
   after_update :update_groups_max_membership
 
-  delegate :time_zone, :to => :context
+  delegate :time_zone, to: :context
 
   validates_each :name do |record, attr, value|
     next unless record.name_changed? || value.blank?
@@ -96,7 +96,7 @@ class GroupCategory < ActiveRecord::Base
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(GroupCategory, :name, :id)
 
   scope :by_name, -> { order(Bookmarker.order_by) }
-  scope :active, -> { where(:deleted_at => nil) }
+  scope :active, -> { where(deleted_at: nil) }
   scope :other_than, ->(cat) { where("group_categories.id<>?", cat.id || 0) }
 
   class << self
@@ -399,17 +399,17 @@ class GroupCategory < ActiveRecord::Base
 
   def distribute_members_among_groups_by_section
     # trying to make this work for new group sets is hard enough - i'm not even going to bother with ones with existing stuff
-    if GroupMembership.active.where(:group_id => groups.active).exists?
+    if GroupMembership.active.where(group_id: groups.active).exists?
       errors.add(:group_by_section, t("Groups must be empty to assign by section"))
       return
     end
-    if groups.active.where.not(:max_membership => nil).exists?
+    if groups.active.where.not(max_membership: nil).exists?
       errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section"))
       return
     end
 
     group_count = groups.active.count
-    section_count = context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id)
+    section_count = context.enrollments.active_or_pending.where(type: "StudentEnrollment").distinct.count(:course_section_id)
     return unless group_count > 0 && section_count > 0
 
     if group_count < section_count
@@ -467,7 +467,7 @@ class GroupCategory < ActiveRecord::Base
     # TODO: i18n
     group_name = group_name.singularize if I18n.locale == :en
     num.times do |idx|
-      groups.create(name: "#{group_name} #{idx + 1}", :context => context)
+      groups.create(name: "#{group_name} #{idx + 1}", context: context)
     end
   end
 
@@ -548,9 +548,9 @@ class GroupCategory < ActiveRecord::Base
 
   def submission_ids_by_user_id(user_ids = nil)
     shard.activate do
-      assignments = Assignment.active.where(:context_type => context_type, :context_id => context_id, :group_category_id => id)
+      assignments = Assignment.active.where(context_type: context_type, context_id: context_id, group_category_id: id)
       submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted')
-      submissions = submissions.where(:user_id => user_ids) if user_ids
+      submissions = submissions.where(user_id: user_ids) if user_ids
       rows = submissions.pluck(:id, :user_id)
       rows.each_with_object({}) do |row, obj|
         id, user_id = row
@@ -562,7 +562,7 @@ class GroupCategory < ActiveRecord::Base
   protected
 
   def start_progress
-    self.current_progress ||= progresses.build(:tag => 'assign_unassigned_members', :completion => 0)
+    self.current_progress ||= progresses.build(tag: 'assign_unassigned_members', completion: 0)
     current_progress.start
   end
 
@@ -582,7 +582,7 @@ class GroupCategory < ActiveRecord::Base
 
   def update_groups_max_membership
     if saved_change_to_group_limit?
-      groups.update_all(:max_membership => group_limit)
+      groups.update_all(max_membership: group_limit)
     end
   end
 
@@ -607,7 +607,7 @@ class GroupCategory < ActiveRecord::Base
                      .pluck("users.id, enrollments.course_section_id").uniq(&:first) # not even going to try to deal with multi-section students
 
       @users_by_section_id = {}
-      all_users = User.where(:id => id_pairs.map(&:first)).index_by(&:id)
+      all_users = User.where(id: id_pairs.map(&:first)).index_by(&:id)
       @user_count = all_users.count
       id_pairs.each do |user_id, section_id|
         @users_by_section_id[section_id] ||= []

@@ -166,7 +166,7 @@ class BigBlueButtonConference < WebConference
   end
 
   def conference_status
-    if (result = send_request(:isMeetingRunning, :meetingID => conference_key)) && result[:running] == 'true'
+    if (result = send_request(:isMeetingRunning, meetingID: conference_key)) && result[:running] == 'true'
       :active
     else
       :closed
@@ -197,7 +197,7 @@ class BigBlueButtonConference < WebConference
   def recording_formats(recording)
     recording_formats = recording.fetch(:playback, []).map do |format|
       show_to_students = !!format[:length] || format[:type] == "notes" # either is an actual recording or shared notes
-      format.merge(:show_to_students => show_to_students)
+      format.merge(show_to_students: show_to_students)
     end
     {
       recording_id: recording[:recordID],
@@ -246,7 +246,7 @@ class BigBlueButtonConference < WebConference
     conferences.each_slice(limit) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
-                              { :meetingID => meeting_ids },
+                              { meetingID: meeting_ids },
                               use_fallback_config: use_fallback_config)
       result = response[:recordings] if response
       result = [] if result.is_a?(String)
@@ -281,17 +281,17 @@ class BigBlueButtonConference < WebConference
 
   def join_url(user, type = :user)
     generate_request :join,
-                     :fullName => user.short_name,
-                     :meetingID => conference_key,
-                     :password => settings[(type == :user ? :user_key : :admin_key)],
-                     :userID => user.id,
-                     :createTime => settings[:create_time]
+                     fullName: user.short_name,
+                     meetingID: conference_key,
+                     password: settings[(type == :user ? :user_key : :admin_key)],
+                     userID: user.id,
+                     createTime: settings[:create_time]
   end
 
   def end_meeting
     response = send_request(:end, {
-                              :meetingID => conference_key,
-                              :password => settings[(type == :user ? :user_key : :admin_key)],
+                              meetingID: conference_key,
+                              password: settings[(type == :user ? :user_key : :admin_key)],
                             })
     response[:ended] if response
   end
@@ -299,7 +299,7 @@ class BigBlueButtonConference < WebConference
   def fetch_recordings
     @loaded_recordings ||= if conference_key && settings[:record]
                              response = send_request(:getRecordings, {
-                                                       :meetingID => conference_key,
+                                                       meetingID: conference_key,
                                                      })
                              result = response[:recordings] if response
                              result = [] if result.is_a?(String)

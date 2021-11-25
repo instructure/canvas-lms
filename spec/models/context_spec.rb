@@ -30,7 +30,7 @@ describe Context do
     end
 
     it "finds a valid group" do
-      group = Group.create!(:context => Account.default)
+      group = Group.create!(context: Account.default)
       expect(Context.find_by_asset_string(group.asset_string)).to eql(group)
     end
 
@@ -39,7 +39,7 @@ describe Context do
     end
 
     it "finds a valid account" do
-      account = Account.create!(:name => "test")
+      account = Account.create!(name: "test")
       expect(Context.find_by_asset_string(account.asset_string)).to eql(account)
     end
 
@@ -79,14 +79,14 @@ describe Context do
 
     it "finds a valid wiki page" do
       course_model
-      page = @course.wiki_pages.create!(:title => 'test')
+      page = @course.wiki_pages.create!(title: 'test')
       expect(@course.find_asset(page.asset_string)).to eql(page)
       expect(@course.find_asset(page.asset_string, [:wiki_page])).to eql(page)
     end
 
     it "does not find a valid wiki page if told to ignore wiki pages" do
       course_model
-      page = @course.wiki_pages.create!(:title => 'test')
+      page = @course.wiki_pages.create!(title: 'test')
       expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
     end
 
@@ -170,13 +170,13 @@ describe Context do
     end
 
     it 'finds media objects' do
-      at = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
+      at = attachment_model(context: @course, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
-        :entries => [
-          { :entryId => "test", :originalId => at.id.to_s }
+        entries: [
+          { entryId: "test", originalId: at.id.to_s }
         ]
       }
-      mo = MediaObject.create!(:context => @course, :media_id => "test")
+      mo = MediaObject.create!(context: @course, media_id: "test")
       MediaObject.build_media_objects(data, Account.default.id)
       expect(Context.find_asset_by_url("/media_objects_iframe/test")).to eq mo
     end
@@ -190,11 +190,11 @@ describe Context do
   context "self.names_by_context_types_and_ids" do
     it "finds context names" do
       contexts = []
-      contexts << Course.create!(:name => "a course")
-      contexts << Course.create!(:name => "another course")
-      contexts << Account.default.groups.create!(:name => "a group")
-      contexts << Account.default.groups.create!(:name => "another group")
-      contexts << User.create!(:name => "a user")
+      contexts << Course.create!(name: "a course")
+      contexts << Course.create!(name: "another course")
+      contexts << Account.default.groups.create!(name: "a group")
+      contexts << Account.default.groups.create!(name: "another group")
+      contexts << User.create!(name: "a user")
       names = Context.names_by_context_types_and_ids(contexts.map { |c| [c.class.name, c.id] })
       contexts.each do |c|
         expect(names[[c.class.name, c.id]]).to eql(c.name)
@@ -230,18 +230,18 @@ describe Context do
     end
 
     it "finds names for outcomes" do
-      outcome1 = @course.created_learning_outcomes.create! :display_name => 'blah', :title => 'bleh'
+      outcome1 = @course.created_learning_outcomes.create! display_name: 'blah', title: 'bleh'
       expect(Context.asset_name(outcome1)).to eq 'blah'
 
-      outcome2 = @course.created_learning_outcomes.create! :title => 'bleh'
+      outcome2 = @course.created_learning_outcomes.create! title: 'bleh'
       expect(Context.asset_name(outcome2)).to eq 'bleh'
     end
 
     it "finds names for calendar events" do
-      event1 = @course.calendar_events.create! :title => 'thing'
+      event1 = @course.calendar_events.create! title: 'thing'
       expect(Context.asset_name(event1)).to eq 'thing'
 
-      event2 = @course.calendar_events.create! :title => ''
+      event2 = @course.calendar_events.create! title: ''
       expect(Context.asset_name(event2)).to eq ''
     end
   end
@@ -253,14 +253,14 @@ describe Context do
     end
 
     it 'returns rubric for concluded course enrollment' do
-      c1 = Course.create!(:name => 'c1')
-      c2 = Course.create!(:name => 'c1')
+      c1 = Course.create!(name: 'c1')
+      c2 = Course.create!(name: 'c1')
       r = Rubric.create!(context: c1, title: 'testing')
-      user = user_factory(:active_all => true)
+      user = user_factory(active_all: true)
       RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
-      enroll = c1.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      enroll = c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
       enroll.conclude
-      c2.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      c2.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
       expect(c2.rubric_contexts(user)).to eq([{
                                                rubrics: 1,
                                                context_code: c1.asset_string,
@@ -269,12 +269,12 @@ describe Context do
     end
 
     it 'excludes rubrics associated via soft-deleted rubric associations' do
-      c1 = Course.create!(:name => 'c1')
+      c1 = Course.create!(name: 'c1')
       r = Rubric.create!(context: c1, title: 'testing')
-      user = user_factory(:active_all => true)
+      user = user_factory(active_all: true)
       association = RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
       association.destroy
-      c1.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
       expect(c1.rubric_contexts(user)).to be_empty
     end
 
@@ -284,7 +284,7 @@ describe Context do
       add_rubric(grandparent)
       parent = Account.create!(name: 'ZZZ', parent_account: grandparent)
       add_rubric(parent)
-      course = Course.create!(:name => 'MMM', account: parent)
+      course = Course.create!(name: 'MMM', account: parent)
       add_rubric(course)
 
       contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
@@ -299,18 +299,18 @@ describe Context do
       specs_require_sharding
 
       it "retrieves rubrics from other shard courses the teacher belongs to" do
-        course1 = Course.create!(:name => 'c1')
-        course2 = Course.create!(:name => 'c2')
+        course1 = Course.create!(name: 'c1')
+        course2 = Course.create!(name: 'c2')
         course3 = @shard1.activate do
           a = Account.create!
-          Course.create!(:name => 'c3', :account => a)
+          Course.create!(name: 'c3', account: a)
         end
-        user = user_factory(:active_all => true)
+        user = user_factory(active_all: true)
         [course1, course2, course3].each do |c|
           c.shard.activate do
             r = Rubric.create!(context: c, title: 'testing')
             RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
-            c.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+            c.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
           end
         end
         expected = lambda do

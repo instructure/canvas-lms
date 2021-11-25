@@ -57,14 +57,14 @@ describe Wiki do
     end
 
     it "finds front_page by url" do
-      page = @course.wiki_pages.create!(:title => "stuff and stuff")
+      page = @course.wiki_pages.create!(title: "stuff and stuff")
 
       @wiki.set_front_page_url!(page.url)
       expect(page).to eq @wiki.front_page
     end
 
     it "finds front_page by default url (legacy support)" do
-      page = @course.wiki_pages.create!(:title => "front page")
+      page = @course.wiki_pages.create!(title: "front page")
       page.update_attribute(:url, Wiki::DEFAULT_FRONT_PAGE_URL)
       @wiki.update_attribute(:has_no_front_page, false)
 
@@ -75,7 +75,7 @@ describe Wiki do
   context 'set policy' do
     before :once do
       @course.offer!
-      user_factory :active_all => true
+      user_factory active_all: true
     end
 
     it 'gives read rights to public courses' do
@@ -118,7 +118,7 @@ describe Wiki do
 
     context 'allow student wiki edits' do
       before :once do
-        course_with_student :course => @course, :user => @user, :active_all => true
+        course_with_student course: @course, user: @user, active_all: true
         @course.default_wiki_editing_roles = 'teachers,students'
         @course.save!
       end

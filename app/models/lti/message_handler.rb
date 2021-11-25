@@ -64,14 +64,14 @@ module Lti
         args = { message_handler_id: app.id, resource_link_fragment: "nav" }
         args["#{context.class.name.downcase}_id".to_sym] = context.id
         {
-          :id => app.asset_string,
-          :label => app.resource_handler.name,
-          :css_class => app.asset_string,
-          :href => launch_path_helper,
-          :visibility => nil,
-          :external => true,
-          :hidden => false,
-          :args => args
+          id: app.asset_string,
+          label: app.resource_handler.name,
+          css_class: app.asset_string,
+          href: launch_path_helper,
+          visibility: nil,
+          external: true,
+          hidden: false,
+          args: args
         }
       end
     end

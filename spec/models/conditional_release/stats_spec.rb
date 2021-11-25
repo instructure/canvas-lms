@@ -23,8 +23,8 @@ require_dependency "conditional_release/stats"
 module ConditionalRelease
   describe Stats do
     before :once do
-      @course = course_factory(:active_all => true)
-      @students = n_students_in_course(4, :course => @course)
+      @course = course_factory(active_all: true)
+      @students = n_students_in_course(4, course: @course)
       @rule = create :rule, course: @course
       @sr1 = create :scoring_range_with_assignments, rule: @rule, upper_bound: nil, lower_bound: 0.7, assignment_set_count: 2, assignment_count: 5
       @sr2 = create :scoring_range_with_assignments, rule: @rule, upper_bound: 0.7, lower_bound: 0.4, assignment_set_count: 2, assignment_count: 5
@@ -59,8 +59,8 @@ module ConditionalRelease
         student.update_attribute(:short_name, user_name)
         submissions.map do |data|
           assignment, score, points_possible = data
-          Assignment.where(:id => assignment).update_all(:points_possible => points_possible)
-          Submission.where(:assignment_id => assignment, :user_id => student).update_all(:score => score)
+          Assignment.where(id: assignment).update_all(points_possible: points_possible)
+          Submission.where(assignment_id: assignment, user_id: student).update_all(score: score)
         end
       end
 
@@ -157,15 +157,15 @@ module ConditionalRelease
         ids.each do |id|
           points_possible = 100
           points_possible = points_possible_per_id[id] if points_possible_per_id
-          Assignment.where(:id => id).update_all(:title => "assn #{id}", :points_possible => points_possible)
+          Assignment.where(id: id).update_all(title: "assn #{id}", points_possible: points_possible)
         end
       end
 
       def set_submissions(submissions)
         submissions.map do |data|
           assignment, score, points_possible = data
-          Assignment.where(:id => assignment).update_all(:points_possible => points_possible)
-          Submission.where(:assignment_id => assignment, :user_id => @student_id).update_all(:score => score)
+          Assignment.where(id: assignment).update_all(points_possible: points_possible)
+          Submission.where(assignment_id: assignment, user_id: @student_id).update_all(score: score)
         end
       end
 

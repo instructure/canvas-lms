@@ -25,7 +25,7 @@ class StreamItem < ActiveRecord::Base
   serialize :data
 
   has_many :stream_item_instances
-  has_many :users, :through => :stream_item_instances
+  has_many :users, through: :stream_item_instances
   belongs_to :context, polymorphic: %i[course account group assignment_override assignment]
   belongs_to :asset, polymorphic: %i[
     collaboration conversation discussion_entry
@@ -132,7 +132,7 @@ class StreamItem < ActiveRecord::Base
       res['participants'] = conversation.participants.map { |u| prepare_user(u) }
     end
 
-    messages = conversation.conversation_messages.human.order(:created_at => :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
+    messages = conversation.conversation_messages.human.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
     res['latest_messages'] = messages.map do |message|
       {
         "id" => message.id,
@@ -160,7 +160,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.delete_all_for(root_asset, asset)
-    item = StreamItem.where(:asset_type => root_asset.first, :asset_id => root_asset.last).first
+    item = StreamItem.where(asset_type: root_asset.first, asset_id: root_asset.last).first
     # if this is a sub-message, regenerate instead of deleting
     if root_asset != asset
       item.try(:regenerate!)
@@ -186,7 +186,7 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.order(:created_at => :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
+      res[:root_discussion_entries] = object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
@@ -283,12 +283,12 @@ class StreamItem < ActiveRecord::Base
       user_ids_subset.each_slice(500) do |sliced_user_ids|
         inserts = sliced_user_ids.map do |user_id|
           {
-            :stream_item_id => stream_item_id,
-            :user_id => user_id,
-            :hidden => false,
-            :workflow_state => object_unread_for_user(object, user_id),
-            :context_type => l_context_type,
-            :context_id => l_context_id,
+            stream_item_id: stream_item_id,
+            user_id: user_id,
+            hidden: false,
+            workflow_state: object_unread_for_user(object, user_id),
+            context_type: l_context_type,
+            context_id: l_context_id,
           }
         end
         # set the hidden flag if this submission is not posted
@@ -297,7 +297,7 @@ class StreamItem < ActiveRecord::Base
         end
 
         StreamItemInstance.unique_constraint_retry do
-          StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => sliced_user_ids).delete_all
+          StreamItemInstance.where(stream_item_id: stream_item_id, user_id: sliced_user_ids).delete_all
           StreamItemInstance.bulk_insert(inserts)
         end
 
@@ -392,7 +392,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      User.where(:id => user_ids.to_a).touch_all
+      User.where(id: user_ids.to_a).touch_all
     end
 
     GuardRail.activate(:deploy) do

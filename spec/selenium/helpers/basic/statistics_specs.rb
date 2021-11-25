@@ -30,7 +30,7 @@ shared_examples_for "statistics basic tests" do
 
   context "with admin initially logged in" do
     before do
-      @course = Course.create!(:name => 'stats', :account => account)
+      @course = Course.create!(name: 'stats', account: account)
       @course.offer!
       admin_logged_in
     end
@@ -61,18 +61,18 @@ shared_examples_for "statistics basic tests" do
 
     it "validates recently ended courses display" do
       skip('spec is broken on sub account level') if account != Account.default
-      concluded_course = Course.create!(:name => 'concluded course', :account => account)
-      concluded_course.update(:conclude_at => 1.day.ago)
+      concluded_course = Course.create!(name: 'concluded course', account: account)
+      concluded_course.update(conclude_at: 1.day.ago)
       get url
       validate_item_list(list_css[:ended], concluded_course.name)
     end
   end
 
   it "validates recently logged-in courses display" do
-    course = Course.create!(:name => 'new course', :account => account)
+    course = Course.create!(name: 'new course', account: account)
     course.offer!
     student = user_factory(active_user: true)
-    pseudonym = student.pseudonyms.create!(:unique_id => 'student@example.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf')
+    pseudonym = student.pseudonyms.create!(unique_id: 'student@example.com', password: 'asdfasdf', password_confirmation: 'asdfasdf')
     course.enroll_user(student, 'StudentEnrollment').accept!
     login_as(pseudonym.unique_id, 'asdfasdf')
     admin_logged_in

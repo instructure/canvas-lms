@@ -32,7 +32,7 @@ module Canvas::Migration
       @manifest = nil
       @error_count = 0
       @errors = []
-      @course = { :file_map => {}, :wikis => [] }
+      @course = { file_map: {}, wikis: [] }
       @course[:name] = @settings[:course_name]
 
       if @settings[:unzipped_file_path]
@@ -95,7 +95,7 @@ module Canvas::Migration
           if File.exist?(file_path)
             zipfile.add(val[:path_name], file_path)
           else
-            add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', :file_path => val[:path_name]))
+            add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', file_path: val[:path_name]))
           end
         end
       end
@@ -107,7 +107,7 @@ module Canvas::Migration
       manifest.css('resource').each do |r_node|
         id = r_node['identifier']
         resource = @resources[id]
-        resource ||= { :migration_id => id }
+        resource ||= { migration_id: id }
         resource[:type] = r_node['type']
         resource[:href] = r_node['href']
         if resource[:href]
@@ -122,7 +122,7 @@ module Canvas::Migration
         resource[:intended_use] = r_node['intendeduse']
         resource[:files] = []
         r_node.css('file').each do |file_node|
-          resource[:files] << { :href => file_node[:href].tr('\\', '/') }
+          resource[:files] << { href: file_node[:href].tr('\\', '/') }
         end
         resource[:dependencies] = []
         r_node.css('dependency').each do |d_node|

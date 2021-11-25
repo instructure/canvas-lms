@@ -52,7 +52,7 @@ CanvasCache.settings_store = MemorySettings.new
 # we aren't initializing a full app in these specs
 Rails.logger = Logger.new($stdout)
 
-RSpec.shared_context "caching_helpers", :shared_context => :metadata do
+RSpec.shared_context "caching_helpers", shared_context: :metadata do
   # provide a way to temporarily replace the rails
   # cache with one constructed in a spec.
   def override_cache(new_cache = :memory_store)

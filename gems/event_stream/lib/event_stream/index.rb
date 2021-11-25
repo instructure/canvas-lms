@@ -25,13 +25,13 @@ class EventStream::Index
 
   attr_reader :event_stream
 
-  attr_config :table, :type => String
-  attr_config :id_column, :type => String, :default => 'id'
-  attr_config :key_column, :type => String, :default => 'key'
-  attr_config :bucket_size, :type => Integer, :default => 1.week
-  attr_config :scrollback_limit, :type => Integer, :default => 52.weeks
-  attr_config :entry_proc, :type => Proc
-  attr_config :key_proc, :type => Proc, :default => nil
+  attr_config :table, type: String
+  attr_config :id_column, type: String, default: 'id'
+  attr_config :key_column, type: String, default: 'key'
+  attr_config :bucket_size, type: Integer, default: 1.week
+  attr_config :scrollback_limit, type: Integer, default: 52.weeks
+  attr_config :entry_proc, type: Proc
+  attr_config :key_proc, type: Proc, default: nil
   # it's expected that this proc will return an AR Scope from the
   # associated AR type.  If it doesn't, there could be problems...
   attr_config :ar_scope_proc, type: Proc, default: nil

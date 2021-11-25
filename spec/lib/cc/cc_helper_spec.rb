@@ -42,7 +42,7 @@ describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before :once do
       course_with_teacher
-      @obj = @course.media_objects.create!(:media_id => 'abcde')
+      @obj = @course.media_objects.create!(media_id: 'abcde')
     end
 
     before do
@@ -51,23 +51,23 @@ describe CC::CCHelper do
       allow(@kaltura).to receive(:startSession)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with('abcde').and_return([
                                                                                       {
-                                                                                        :isOriginal => 1,
-                                                                                        :containerFormat => 'mp4',
-                                                                                        :fileExt => 'mp4',
-                                                                                        :id => 'one',
-                                                                                        :size => 15,
+                                                                                        isOriginal: 1,
+                                                                                        containerFormat: 'mp4',
+                                                                                        fileExt: 'mp4',
+                                                                                        id: 'one',
+                                                                                        size: 15,
                                                                                       },
                                                                                       {
-                                                                                        :containerFormat => 'flash video',
-                                                                                        :fileExt => 'flv',
-                                                                                        :id => 'smaller',
-                                                                                        :size => 3,
+                                                                                        containerFormat: 'flash video',
+                                                                                        fileExt: 'flv',
+                                                                                        id: 'smaller',
+                                                                                        size: 3,
                                                                                       },
                                                                                       {
-                                                                                        :containerFormat => 'flash video',
-                                                                                        :fileExt => 'flv',
-                                                                                        :id => 'two',
-                                                                                        :size => 5,
+                                                                                        containerFormat: 'flash video',
+                                                                                        fileExt: 'flv',
+                                                                                        id: 'two',
+                                                                                        size: 5,
                                                                                       },
                                                                                     ])
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId('abcde').first)
@@ -83,7 +83,7 @@ describe CC::CCHelper do
     end
 
     it "does not touch media links on course copy" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       orig = <<~HTML
         <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
@@ -103,7 +103,7 @@ describe CC::CCHelper do
     end
 
     it "translates media links using an alternate flavor" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
       @exporter.html_content(<<~HTML)
         <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
@@ -112,7 +112,7 @@ describe CC::CCHelper do
     end
 
     it "ignores media links with no media comment id" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
       html = %(<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>)
       translated = @exporter.html_content(html)
       expect(translated).to eq html
@@ -195,7 +195,7 @@ describe CC::CCHelper do
     end
 
     it "only translates course when trying to translate /cousers/x/users/y type links" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       orig = <<~HTML
         <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
       HTML
@@ -204,14 +204,14 @@ describe CC::CCHelper do
     end
 
     it "interprets links to the files page as normal course pages" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       html = %(<a href="/courses/#{@course.id}/files">File page index</a>)
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
 
     it "interprets links to the home page as normal course pages" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       html = %(<a href="/courses/#{@course.id}">Home page index</a>)
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
@@ -220,7 +220,7 @@ describe CC::CCHelper do
     it "prepends the domain to links outside the course" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       @othercourse = Course.create!
       html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/front-page">This course's front page</a>
@@ -235,8 +235,8 @@ describe CC::CCHelper do
     it "copies pages correctly when the title starts with a number" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
-      page = @course.wiki_pages.create(:title => '9000, the level is over')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
+      page = @course.wiki_pages.create(title: '9000, the level is over')
       html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
@@ -248,8 +248,8 @@ describe CC::CCHelper do
     it "copies pages correctly when the title consists only of a number" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
-      page = @course.wiki_pages.create(:title => '9000')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
+      page = @course.wiki_pages.create(title: '9000')
       html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
@@ -261,23 +261,23 @@ describe CC::CCHelper do
     it "uses the key_generator to translate links" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
-      @assignment = @course.assignments.create!(:name => "Thing")
+      @assignment = @course.assignments.create!(name: "Thing")
       html = <<~HTML
         <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>
       HTML
       keygen = double
       expect(keygen).to receive(:create_key).and_return("silly-migration-id")
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true, :key_generator => keygen)
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true, key_generator: keygen)
       doc = Nokogiri::HTML5(@exporter.html_content(html))
       expect(doc.at_css("a").attr('href')).to eq "$CANVAS_OBJECT_REFERENCE$/assignments/silly-migration-id"
     end
 
     it "preserves query parameters on links" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      @course.wiki_pages.create!(:title => "something")
-      other_page = @course.wiki_pages.create!(:title => "LinkByTitle")
-      assignment = @course.assignments.create!(:name => "Thing")
-      mod = @course.context_modules.create!(:name => "Stuff")
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
+      @course.wiki_pages.create!(title: "something")
+      other_page = @course.wiki_pages.create!(title: "LinkByTitle")
+      assignment = @course.assignments.create!(name: "Thing")
+      mod = @course.context_modules.create!(name: "Stuff")
       tag = mod.content_tags.create! content: assignment, context: @course
       html = <<~HTML
         <a href="/courses/#{@course.id}/pages/something?embedded=true">Something</a>
@@ -294,7 +294,7 @@ describe CC::CCHelper do
 
     it "deals with a missing media object on kaltura" do
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with('xyzzy').and_return(nil)
-      @course.media_objects.create!(:media_id => 'xyzzy')
+      @course.media_objects.create!(media_id: 'xyzzy')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
       expect do
         @exporter.html_content(<<~HTML)

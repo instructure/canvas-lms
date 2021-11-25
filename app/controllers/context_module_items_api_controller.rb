@@ -236,10 +236,10 @@
 #
 class ContextModuleItemsApiController < ApplicationController
   before_action :require_context
-  before_action :require_user, :only => [:select_mastery_path]
-  before_action :find_student, :only => %i[index show select_mastery_path]
-  before_action :disable_escape_html_entities, :only => [:index, :show]
-  after_action :enable_escape_html_entities, :only => [:index, :show]
+  before_action :require_user, only: [:select_mastery_path]
+  before_action :find_student, only: %i[index show select_mastery_path]
+  before_action :disable_escape_html_entities, only: [:index, :show]
+  after_action :enable_escape_html_entities, only: [:index, :show]
   include Api::V1::ContextModule
   include PlannerApiHelper
 
@@ -281,7 +281,7 @@ class ContextModuleItemsApiController < ApplicationController
       if includes.include?("mastery_paths")
         opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
-      render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
+      render json: items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
 
@@ -307,7 +307,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       get_module_item
       prog = @student ? @module.evaluate_for(@student) : nil
-      render :json => module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]))
+      render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]))
     end
   end
 
@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          render(:status => :bad_request, :json => { :message => "incorrect module item type" })
+          render(status: :bad_request, json: { message: "incorrect module item type" })
         end
       end
     end
@@ -388,7 +388,7 @@ class ContextModuleItemsApiController < ApplicationController
   def create
     @module = @context.context_modules.not_deleted.find(params[:module_id])
     if authorized_action(@module, @current_user, :update)
-      return render :json => { :message => "missing module item parameter" }, :status => :bad_request unless params[:module_item]
+      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
 
       item_params = params[:module_item].slice(:title, :type, :indent, :new_tab)
       item_params[:id] = params[:module_item][:content_id]
@@ -397,10 +397,10 @@ class ContextModuleItemsApiController < ApplicationController
           if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
             item_params[:id] = wiki_page.id
           else
-            return render :json => { :message => "invalid page_url parameter" }, :status => :bad_request
+            return render json: { message: "invalid page_url parameter" }, status: :bad_request
           end
         else
-          return render :json => { :message => "missing page_url parameter" }, :status => :bad_request
+          return render json: { message: "missing page_url parameter" }, status: :bad_request
         end
       end
 
@@ -408,11 +408,11 @@ class ContextModuleItemsApiController < ApplicationController
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
         @module.touch
-        render :json => module_item_json(@tag, @current_user, session, @module, nil)
+        render json: module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag
-        render :json => @tag.errors, :status => :bad_request
+        render json: @tag.errors, status: :bad_request
       else
-        render :status => :bad_request, :json => { :message => t(:invalid_content, "Could not find content") }
+        render status: :bad_request, json: { message: t(:invalid_content, "Could not find content") }
       end
     end
   end
@@ -469,7 +469,7 @@ class ContextModuleItemsApiController < ApplicationController
   def update
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
-      return render :json => { :message => "missing module item parameter" }, :status => :bad_request unless params[:module_item]
+      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
 
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
       @tag.url = params[:module_item][:external_url] if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:module_item][:external_url]
@@ -477,7 +477,7 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
       if (target_module_id = params[:module_item][:module_id]) && target_module_id.to_i != @tag.context_module_id
         target_module = @context.context_modules.where(id: target_module_id).first
-        return render :json => { :message => "invalid module_id" }, :status => :bad_request unless target_module
+        return render json: { message: "invalid module_id" }, status: :bad_request unless target_module
 
         old_module = @context.context_modules.find(@tag.context_module_id)
         @tag.remove_from_list
@@ -502,7 +502,7 @@ class ContextModuleItemsApiController < ApplicationController
         elsif module_item_unpublishable?(@tag)
           @tag.unpublish
         else
-          return render :json => { :message => "item can't be unpublished" }, :status => :forbidden
+          return render json: { message: "item can't be unpublished" }, status: :forbidden
         end
         @tag.save
         @tag.update_asset_workflow_state!
@@ -511,9 +511,9 @@ class ContextModuleItemsApiController < ApplicationController
 
       if @tag.save && set_position && set_completion_requirement
         @tag.update_asset_name!(@current_user) if params[:module_item][:title]
-        render :json => module_item_json(@tag, @current_user, session, @tag.context_module, nil)
+        render json: module_item_json(@tag, @current_user, session, @tag.context_module, nil)
       else
-        render :json => @tag.errors, :status => :bad_request
+        render json: @tag.errors, status: :bad_request
       end
     end
   end
@@ -588,7 +588,7 @@ class ContextModuleItemsApiController < ApplicationController
       @module = @tag.context_module
       @tag.destroy
       @module.touch
-      render :json => module_item_json(@tag, @current_user, session, @module, nil)
+      render json: module_item_json(@tag, @current_user, session, @module, nil)
     end
   end
 
@@ -607,7 +607,7 @@ class ContextModuleItemsApiController < ApplicationController
       get_module_item
       @item.context_module_action(@current_user, :done)
       sync_planner_completion(@item.content, @current_user, true) if planner_enabled?
-      render :json => { :message => t('OK') }
+      render json: { message: t('OK') }
     end
   end
 
@@ -619,7 +619,7 @@ class ContextModuleItemsApiController < ApplicationController
         progression.evaluate
         sync_planner_completion(@item.content, @current_user, false) if planner_enabled?
       end
-      render :json => { :message => t('OK') }
+      render json: { message: t('OK') }
     end
   end
 
@@ -652,13 +652,13 @@ class ContextModuleItemsApiController < ApplicationController
   def item_sequence
     if authorized_action(@context, @current_user, :read)
       asset_type = Api.api_type_to_canvas_name(params[:asset_type])
-      return render :json => { :message => 'invalid asset_type' }, :status => :bad_request unless asset_type
+      return render json: { message: 'invalid asset_type' }, status: :bad_request unless asset_type
 
       asset_id = params[:asset_id]
-      return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
+      return render json: { message: 'missing asset_id' }, status: :bad_request unless asset_id
 
       result = context_module_sequence_items_by_asset_id(asset_id, asset_type)
-      render :json => result
+      render json: result
     end
   end
 
@@ -680,10 +680,10 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       get_module_item
       content = @item.content.respond_to?(:locked_for?) ? @item.content : @item
-      return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
+      return render json: { message: t('The module item is locked.') }, status: :forbidden if content.locked_for?(@current_user)
 
       @item.context_module_action(@current_user, :read)
-      render :json => { :message => t('OK') }
+      render json: { message: t('OK') }
     end
   end
 
@@ -727,7 +727,7 @@ class ContextModuleItemsApiController < ApplicationController
         )
         render json: json
       else
-        render :status => :bad_request, :json => { :message => t("Item cannot be duplicated") }
+        render status: :bad_request, json: { message: t("Item cannot be duplicated") }
       end
     end
   end

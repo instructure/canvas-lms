@@ -94,7 +94,7 @@ describe SessionToken do
 
     # good json, extra field
     token = SessionToken.new(1)
-    data = token.as_json.merge(:extra => 1)
+    data = token.as_json.merge(extra: 1)
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     # good json, missing field
@@ -102,19 +102,19 @@ describe SessionToken do
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     # good json, wrong data types
-    data = token.as_json.merge(:created_at => 'invalid')
+    data = token.as_json.merge(created_at: 'invalid')
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(:pseudonym_id => 'invalid')
+    data = token.as_json.merge(pseudonym_id: 'invalid')
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(:current_user_id => 'invalid')
+    data = token.as_json.merge(current_user_id: 'invalid')
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(:used_remember_me_token => 'invalid')
+    data = token.as_json.merge(used_remember_me_token: 'invalid')
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(:signature => 1)
+    data = token.as_json.merge(signature: 1)
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
   end
 end

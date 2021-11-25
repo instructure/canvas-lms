@@ -33,19 +33,19 @@ describe "calendar2" do
 
   context "as a student" do
     before do
-      @student = course_with_student_logged_in(:active_all => true).user
+      @student = course_with_student_logged_in(active_all: true).user
     end
 
     describe "main calendar" do
       context "the event modal" do
         it "allows other users to see attendees after reservation" do
           create_appointment_group(
-            :contexts => [@course],
-            :title => "eh",
-            :max_appointments_per_participant => 1,
-            :min_appointments_per_participant => 1,
-            :participants_per_appointment => 2,
-            :participant_visibility => "protected"
+            contexts: [@course],
+            title: "eh",
+            max_appointments_per_participant: 1,
+            min_appointments_per_participant: 1,
+            participants_per_appointment: 2,
+            participant_visibility: "protected"
           )
           ag1 = AppointmentGroup.first
           # create and reserver two participants into appointmentgroup
@@ -62,12 +62,12 @@ describe "calendar2" do
 
         it "allows users to see all attendees on events up to 25 reservations" do
           create_appointment_group(
-            :contexts => [@course],
-            :title => "eh",
-            :max_appointments_per_participant => 1,
-            :min_appointments_per_participant => 1,
-            :participants_per_appointment => 15,
-            :participant_visibility => "protected"
+            contexts: [@course],
+            title: "eh",
+            max_appointments_per_participant: 1,
+            min_appointments_per_participant: 1,
+            participants_per_appointment: 15,
+            participant_visibility: "protected"
           )
           ag1 = AppointmentGroup.first
           ag1.appointments.first.reserve_for @student, @student
@@ -85,12 +85,12 @@ describe "calendar2" do
 
         it "shows dots indicating more users available if more than 25 reservations" do
           create_appointment_group(
-            :contexts => [@course],
-            :title => "eh",
-            :max_appointments_per_participant => 1,
-            :min_appointments_per_participant => 1,
-            :participants_per_appointment => 27,
-            :participant_visibility => "protected"
+            contexts: [@course],
+            title: "eh",
+            max_appointments_per_participant: 1,
+            min_appointments_per_participant: 1,
+            participants_per_appointment: 27,
+            participant_visibility: "protected"
           )
           ag1 = AppointmentGroup.first
           ag1.appointments.first.reserve_for @student, @student
@@ -108,12 +108,12 @@ describe "calendar2" do
 
         it "does not display attendees for reservation with no participants" do
           create_appointment_group(
-            :contexts => [@course],
-            :title => "eh",
-            :max_appointments_per_participant => 1,
-            :min_appointments_per_participant => 1,
-            :participants_per_appointment => 2,
-            :participant_visibility => "protected"
+            contexts: [@course],
+            title: "eh",
+            max_appointments_per_participant: 1,
+            min_appointments_per_participant: 1,
+            participants_per_appointment: 2,
+            participant_visibility: "protected"
           )
           ag1 = AppointmentGroup.first
           ag1.appointments.first.reserve_for @student, @student
@@ -130,12 +130,12 @@ describe "calendar2" do
 
       it "shows section-level events for the student's section" do
         @course.default_section.update_attribute(:name, "default section!")
-        s2 = @course.course_sections.create!(:name => "other section!")
+        s2 = @course.course_sections.create!(name: "other section!")
         date = Date.today
-        e1 = @course.calendar_events.build :title => "ohai",
-                                           :child_event_data => [
-                                             { :start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => s2.asset_string },
-                                             { :start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => @course.default_section.asset_string },
+        e1 = @course.calendar_events.build title: "ohai",
+                                           child_event_data: [
+                                             { start_at: "#{date} 12:00:00", end_at: "#{date} 13:00:00", context_code: s2.asset_string },
+                                             { start_at: "#{date} 13:00:00", end_at: "#{date} 14:00:00", context_code: @course.default_section.asset_string },
                                            ]
         e1.updating_user = @teacher
         e1.save!
@@ -153,7 +153,7 @@ describe "calendar2" do
       end
 
       it "displays title link and go to event details page" do
-        make_event(:context => @course, :start => 0.days.from_now, :title => "future event")
+        make_event(context: @course, start: 0.days.from_now, title: "future event")
         get "/calendar2"
 
         # click the event in the calendar
@@ -167,7 +167,7 @@ describe "calendar2" do
       end
 
       it "does not redirect but load the event details page" do
-        event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
+        event = make_event(context: @course, start: 2.months.from_now, title: "future event")
         get "/courses/#{@course.id}/calendar_events/#{event.id}"
         page_title = f('.title')
         expect(page_title).to be_displayed
@@ -199,7 +199,7 @@ describe "calendar2" do
   context "as a spanish student" do
     before do
       # Setup with spanish locale
-      @student = course_with_student_logged_in(:active_all => true).user
+      @student = course_with_student_logged_in(active_all: true).user
       @student.locale = 'es'
       @student.save!
     end
@@ -209,7 +209,7 @@ describe "calendar2" do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         date = Date.new(2012, 7, 12)
         # Use event to  open to a specific and testable month
-        event = calendar_event_model(:title => 'Test Event', :start_at => date, :end_at => (date + 1.hour))
+        event = calendar_event_model(title: 'Test Event', start_at: date, end_at: (date + 1.hour))
 
         get "/courses/#{@course.id}/calendar_events/#{event.id}?calendar=1"
         expect(fj('.calendar_header .navigation_title').text).to eq 'julio 2012'
@@ -229,7 +229,7 @@ describe "calendar2" do
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         get "/calendar2"
         # Get the spanish text for the current month/year
-        expect_month_year = I18n.l(Date.today, :format => '%B %Y', :locale => 'es')
+        expect_month_year = I18n.l(Date.today, format: '%B %Y', locale: 'es')
         expect(fj('#minical h2').text).to eq expect_month_year.downcase
       end
     end

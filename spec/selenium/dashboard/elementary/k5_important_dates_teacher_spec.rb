@@ -123,7 +123,7 @@ describe "teacher k5 dashboard important dates" do
       discussion_title = "Electricity Discussion"
       due_at = 2.days.from_now(Time.zone.now)
       discussion_assignment = create_dated_assignment(@subject_course, discussion_title, due_at, 10)
-      graded_discussion = @course.discussion_topics.create!(:title => discussion_title, :assignment => discussion_assignment)
+      graded_discussion = @course.discussion_topics.create!(title: discussion_title, assignment: discussion_assignment)
 
       get "/courses/#{@subject_course.id}/discussion_topics/#{graded_discussion.id}/edit"
 

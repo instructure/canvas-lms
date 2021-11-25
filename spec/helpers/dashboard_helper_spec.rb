@@ -29,7 +29,7 @@ describe DashboardHelper do
     end
 
     it "is false otherwise" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @current_user = @student
       expect(show_welcome_message?).to be_falsey
     end
@@ -37,7 +37,7 @@ describe DashboardHelper do
 
   context "user_dashboard_view" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @current_user = @student
     end
 

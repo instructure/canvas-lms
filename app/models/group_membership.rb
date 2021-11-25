@@ -47,7 +47,7 @@ class GroupMembership < ActiveRecord::Base
   scope :include_user, -> { preload(:user) }
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
-  scope :moderators, -> { where(:moderator => true) }
+  scope :moderators, -> { where(moderator: true) }
   scope :active_for_context_and_users, lambda { |context, users|
     joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available' })
   }
@@ -133,7 +133,7 @@ class GroupMembership < ActiveRecord::Base
     return if deleted?
 
     peer_groups = group.peer_groups.map(&:id)
-    GroupMembership.active.where(:group_id => peer_groups, :user_id => user_id).destroy_all
+    GroupMembership.active.where(group_id: peer_groups, user_id: user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
 
@@ -147,7 +147,7 @@ class GroupMembership < ActiveRecord::Base
 
   def verify_section_homogeneity_if_necessary
     if new_record? && restricted_self_signup? && !has_common_section_with_me?
-      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => user.name, :group => group.name))
+      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", student: user.name, group: group.name))
       throw :abort
     end
   end
@@ -182,7 +182,7 @@ class GroupMembership < ActiveRecord::Base
     assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id)
                             .where(group_category_id: group.group_category_id).pluck(:id)
     assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
-                                  .where.not(:assignment_id => nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+                                  .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
 
     DueDateCacher.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
   end
@@ -190,15 +190,15 @@ class GroupMembership < ActiveRecord::Base
   def touch_groups
     groups_to_touch = [group_id]
     groups_to_touch << old_group_id if old_group_id
-    Group.where(:id => groups_to_touch).touch_all
+    Group.where(id: groups_to_touch).touch_all
   end
   protected :touch_groups
 
   workflow do
     state :accepted
     state :invited do
-      event :reject, :transitions_to => :rejected
-      event :accept, :transitions_to => :accepted
+      event :reject, transitions_to: :rejected
+      event :accept, transitions_to: :accepted
     end
     state :requested
     state :rejected

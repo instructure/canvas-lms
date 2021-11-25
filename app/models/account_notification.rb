@@ -21,11 +21,11 @@ class AccountNotification < ActiveRecord::Base
   validates :start_at, :end_at, :subject, :message, :account_id, presence: true
   validate :validate_dates
   validate :send_message_not_set_for_site_admin
-  belongs_to :account, :touch => true
+  belongs_to :account, touch: true
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
-  validates :message, length: { :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false }
-  validates :subject, length: { :maximum => maximum_string_length }
+  validates :message, length: { maximum: maximum_text_length, allow_nil: false, allow_blank: false }
+  validates :subject, length: { maximum: maximum_string_length }
   sanitize_field :message, CanvasSanitize::SANITIZE
 
   after_save :create_alert
@@ -86,7 +86,7 @@ class AccountNotification < ActiveRecord::Base
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
-        all_account_ids = Course.where(:id => course_ids).not_deleted
+        all_account_ids = Course.where(id: course_ids).not_deleted
                                 .distinct.pluck(:account_id, :root_account_id).flatten.uniq
         all_account_ids += user.account_users.active.shard(user.in_region_associated_shards)
                                .joins(:account).where(accounts: { workflow_state: 'active' })
@@ -227,7 +227,7 @@ class AccountNotification < ActiveRecord::Base
         load_by_account = lambda do |slice_account_ids|
           scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at)
                                      .order('start_at DESC')
-                                     .preload({ :account => :root_account }, account_notification_roles: :role)
+                                     .preload({ account: :root_account }, account_notification_roles: :role)
           if Shard.current == root_account.shard
             if slice_account_ids != [root_account.id]
               scope = scope.joins(:account).where("domain_specific=? OR #{Account.resolved_root_account_id_sql}=?", false, root_account.id)
@@ -364,12 +364,12 @@ class AccountNotification < ActiveRecord::Base
       course_roles = roles.select(&:course_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || course_roles.any?
         Course.find_ids_in_ranges do |min_id, max_id|
-          course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
+          course_ids = Course.active.where(id: min_id..max_id, account_id: all_account_ids).pluck(:id)
           next unless course_ids.any?
 
           course_ids.each_slice(50) do |sliced_course_ids|
-            scope = Enrollment.active_or_pending_by_date.where(:course_id => sliced_course_ids)
-            scope = scope.where(:role_id => course_roles) unless get_everybody
+            scope = Enrollment.active_or_pending_by_date.where(course_id: sliced_course_ids)
+            scope = scope.where(role_id: course_roles) unless get_everybody
             user_ids += scope.distinct.pluck(:user_id)
           end
         end
@@ -378,8 +378,8 @@ class AccountNotification < ActiveRecord::Base
       account_roles = roles.select(&:account_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || account_roles.any?
         AccountUser.find_ids_in_ranges do |min_id, max_id|
-          scope = AccountUser.where(:id => min_id..max_id).active.where(:account_id => all_account_ids)
-          scope = scope.where(:role_id => account_roles) unless get_everybody
+          scope = AccountUser.where(id: min_id..max_id).active.where(account_id: all_account_ids)
+          scope = scope.where(role_id: account_roles) unless get_everybody
           user_ids += scope.distinct.pluck(:user_id)
         end
       end

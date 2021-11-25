@@ -21,7 +21,7 @@
 describe Role do
   context "without account" do
     it "requires an account" do
-      role = Role.create :name => "1337 Student"
+      role = Role.create name: "1337 Student"
       role.base_role_type = 'StudentEnrollment'
       expect(role).not_to be_valid
     end
@@ -33,7 +33,7 @@ describe Role do
     end
 
     it "accepts a valid Role" do
-      role = @account.roles.create :name => "1337 Student"
+      role = @account.roles.create name: "1337 Student"
       role.base_role_type = 'StudentEnrollment'
       expect(role).to be_valid
     end
@@ -45,12 +45,12 @@ describe Role do
     end
 
     it "requires a base role type" do
-      role = @account.roles.build :name => 'CustomRole'
+      role = @account.roles.build name: 'CustomRole'
       expect(role).not_to be_valid
     end
 
     it "enforces known base role types" do
-      role = @account.roles.create :name => 'CustomRole'
+      role = @account.roles.create name: 'CustomRole'
 
       role.base_role_type = 'TeacherEnrollment'
       expect(role).to be_valid
@@ -128,7 +128,7 @@ describe Role do
       @root_account_2 = account_model
       @sub_account_2 = @root_account_2.sub_accounts.create!
 
-      @role = custom_student_role('TestRole', :account => @sub_account_1a)
+      @role = custom_student_role('TestRole', account: @sub_account_1a)
     end
 
     it "infers the root account name" do
@@ -136,7 +136,7 @@ describe Role do
     end
 
     it "allows a role name to be reused with the same base role type within a root account" do
-      new_role = @sub_account_1b.roles.create :name => 'TestRole'
+      new_role = @sub_account_1b.roles.create name: 'TestRole'
       new_role.base_role_type = 'StudentEnrollment'
       expect(new_role).to be_valid
     end
@@ -150,7 +150,7 @@ describe Role do
     end
 
     it "does not allow a duplicate active role to be created in the same account" do
-      dup_role = @account.roles.new :name => "1337 Student"
+      dup_role = @account.roles.new name: "1337 Student"
       dup_role.base_role_type = 'StudentEnrollment'
       expect(dup_role).to be_invalid
       @role.destroy
@@ -200,7 +200,7 @@ describe Role do
       @custom_roles = {}
       @base_types.each do |bt|
         @custom_roles[bt] = if bt == 'DesignerEnrollment'
-                              custom_role(bt, "custom #{bt}", :account => @sub_account)
+                              custom_role(bt, "custom #{bt}", account: @sub_account)
                             else
                               custom_role(bt, "custom #{bt}")
                             end
@@ -221,11 +221,11 @@ describe Role do
     end
 
     it "gets counts for all roles" do
-      course_factory(:account => @sub_account)
+      course_factory(account: @sub_account)
 
       @base_types.each do |bt|
         @course.enroll_user(user_factory, bt)
-        @course.enroll_user(user_factory, bt, :role => @custom_roles[bt])
+        @course.enroll_user(user_factory, bt, role: @custom_roles[bt])
       end
 
       all = Role.custom_roles_and_counts_for_course(@course, @course.teachers.first)
@@ -239,11 +239,11 @@ describe Role do
 
     describe "Role.role_data" do
       it "returns the roles with custom roles flattened as siblings to the main roles" do
-        course_factory(:account => @sub_account)
+        course_factory(account: @sub_account)
 
         @base_types.each do |bt|
           @course.enroll_user(user_factory, bt)
-          @course.enroll_user(user_factory, bt, :role => @custom_roles[bt])
+          @course.enroll_user(user_factory, bt, role: @custom_roles[bt])
         end
 
         roles = Role.role_data(@course, @course.teachers.first)

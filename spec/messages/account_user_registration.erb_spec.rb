@@ -22,7 +22,7 @@ require_relative 'messages_helper'
 
 describe 'account_user_registration' do
   before :once do
-    @object = AccountUser.create(:account => account_model, :user => user_with_pseudonym)
+    @object = AccountUser.create(account: account_model, user: user_with_pseudonym)
   end
 
   let(:asset) { @object }

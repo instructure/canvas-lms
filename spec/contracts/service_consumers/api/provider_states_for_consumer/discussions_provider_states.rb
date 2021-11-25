@@ -39,7 +39,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @teacher = Pact::Canvas.base_state.teachers.first
         @student = Pact::Canvas.base_state.students.first
         @topic = @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
-        @entry = @topic.discussion_entries.create!(:user => @student, :message => "a comment")
+        @entry = @topic.discussion_entries.create!(user: @student, message: "a comment")
       end
     end
 
@@ -76,7 +76,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         topic1.is_section_specific = true
         topic1.course_sections = [section]
         topic1.save!
-        entry = topic1.discussion_entries.create!(:user => teacher, :message => "A discussion entry.")
+        entry = topic1.discussion_entries.create!(user: teacher, message: "A discussion entry.")
         entry.change_rating(1, teacher)
         entry.change_rating(2, student)
         entry.save!

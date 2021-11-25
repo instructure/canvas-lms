@@ -59,7 +59,7 @@ describe Auditors::FeatureFlag do
       end
 
       it "includes event for feature_flag index" do
-        expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(:per_page => 10))
+        expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(per_page: 10))
           .to include(@event)
       end
 

@@ -86,12 +86,12 @@ describe Canvas::LiveEvents do
 
       expect(amended_context).to eq(
         {
-          :context_id => context_id,
-          :context_type => context_type,
-          :root_account_id => root_account_id,
-          :root_account_uuid => root_account_uuid.to_s,
-          :root_account_lti_guid => root_account_lti_guid.to_s,
-          :compact_live_events => true
+          context_id: context_id,
+          context_type: context_type,
+          root_account_id: root_account_id,
+          root_account_uuid: root_account_uuid.to_s,
+          root_account_lti_guid: root_account_lti_guid.to_s,
+          compact_live_events: true
         }
       )
     end
@@ -219,7 +219,7 @@ describe Canvas::LiveEvents do
   describe ".wiki_page_updated" do
     before do
       course_with_teacher
-      @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
+      @page = @course.wiki_pages.create(title: "old title", body: "old body")
     end
 
     def wiki_page_updated
@@ -790,7 +790,7 @@ describe Canvas::LiveEvents do
 
     it 'asset_name is correctly accessed when title is used' do
       course_with_teacher
-      @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
+      @page = @course.wiki_pages.create(title: "old title", body: "old body")
 
       expect_event('asset_accessed', {
                      asset_name: "old title",
@@ -1179,11 +1179,11 @@ describe Canvas::LiveEvents do
         'quiz_export_complete',
         fake_export_context,
         hash_including({
-                         :context_type => "Course",
-                         :context_id => content_export.context.global_id.to_s,
-                         :root_account_id => content_export.context.root_account.global_id.to_s,
-                         :root_account_uuid => content_export.context.root_account.uuid,
-                         :root_account_lti_guid => content_export.context.root_account.lti_guid.to_s,
+                         context_type: "Course",
+                         context_id: content_export.context.global_id.to_s,
+                         root_account_id: content_export.context.root_account.global_id.to_s,
+                         root_account_uuid: content_export.context.root_account.uuid,
+                         root_account_lti_guid: content_export.context.root_account.lti_guid.to_s,
                        })
       ).once
 
@@ -1302,7 +1302,7 @@ describe Canvas::LiveEvents do
 
       expect_event(
         'logged_in',
-        { :redirect_url => 'http://www.canvaslms.com/' },
+        { redirect_url: 'http://www.canvaslms.com/' },
         hash_including(context)
       ).once
 
@@ -1935,7 +1935,7 @@ describe Canvas::LiveEvents do
   describe 'outcome friendly description' do
     before do
       @context = course_model
-      outcome = @context.created_learning_outcomes.create!({ :title => 'new outcome' })
+      outcome = @context.created_learning_outcomes.create!({ title: 'new outcome' })
       description = 'A friendly description'
       @friendlyDescription = OutcomeFriendlyDescription.create!(
         learning_outcome: outcome,

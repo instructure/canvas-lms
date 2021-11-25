@@ -35,7 +35,7 @@ describe "/groups/index" do
 
   it "shows context name under group name" do
     course_with_student
-    group_with_user(:user => @user, :group_context => @course)
+    group_with_user(user: @user, group_context: @course)
     view_context
     assign(:categories, [])
     assign(:students, [@user])

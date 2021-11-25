@@ -36,7 +36,7 @@ describe "assignments sync to sis" do
   context "as a teacher" do
     before(:once) do
       @teacher = user_with_pseudonym
-      course_with_teacher({ :user => @teacher, :active_course => true, :active_enrollment => true })
+      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
       @course.start_at = nil
       @course.save!
       @course.require_assignment_group
@@ -61,12 +61,12 @@ describe "assignments sync to sis" do
     let(:name_length_invalid) { false }
 
     def differentiate_assignment
-      @course.course_sections.create!(:name => 'Section A')
-      @course.course_sections.create!(:name => 'Section B')
+      @course.course_sections.create!(name: 'Section A')
+      @course.course_sections.create!(name: 'Section B')
     end
 
     def new_assignment
-      course_with_teacher_logged_in(:active_all => true, :account => @account)
+      course_with_teacher_logged_in(active_all: true, account: @account)
       differentiate_assignment if differentiate
       get "/courses/#{@course.id}/assignments/new"
       title_text = name_length_invalid ? invalid_name : valid_name
@@ -125,8 +125,8 @@ describe "assignments sync to sis" do
 
       def length_settings
         {
-          :sis_assignment_name_length => { :value => true },
-          :sis_assignment_name_length_input => { :value => name_length_limit.to_s }
+          sis_assignment_name_length: { value: true },
+          sis_assignment_name_length_input: { value: name_length_limit.to_s }
         }
       end
 
@@ -146,7 +146,7 @@ describe "assignments sync to sis" do
 
     context 'due date required' do
       let(:error) { "Please add a due date" }
-      let(:settings_enable) { { :sis_require_assignment_due_date => { :value => true } } }
+      let(:settings_enable) { { sis_require_assignment_due_date: { value: true } } }
 
       it 'validates due date while sis is on' do
         submit_blocked_with_errors
@@ -193,7 +193,7 @@ describe "assignments sync to sis" do
 
     context 'when on index page' do
       let(:assignment_name) { "Test Assignment" }
-      let(:settings_enable) { { :sis_require_assignment_due_date => { value: true } } }
+      let(:settings_enable) { { sis_require_assignment_due_date: { value: true } } }
       let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
       let(:assignment_id) { @assignment.id }
       let(:assignment_entry) { f("\#assignment_#{assignment_id}") }

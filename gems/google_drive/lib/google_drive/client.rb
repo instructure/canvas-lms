@@ -48,9 +48,9 @@ module GoogleDrive
       auth_client.update!
 
       request_data = {
-        :approval_prompt => :force,
-        :state => state,
-        :access_type => :offline
+        approval_prompt: :force,
+        state: state,
+        access_type: :offline
       }
 
       request_data[:login_hint] = login if login

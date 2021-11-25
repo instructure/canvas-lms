@@ -69,7 +69,7 @@ describe Canvas::LockExplanation do
               end
 
               it "uses the group's course in the link" do
-                expect(host).to receive(:course_context_modules_url).with(course, { :anchor => 'module_1' })
+                expect(host).to receive(:course_context_modules_url).with(course, { anchor: 'module_1' })
                 result
               end
 

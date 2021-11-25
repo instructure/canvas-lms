@@ -374,8 +374,8 @@ describe SIS::CSV::UserImporter do
   end
 
   it "leaves the name alone if no name is supplied for an existing user" do
-    user = User.create!(:name => 'Greeble')
-    user.pseudonyms.create!(:account => @account, :sis_user_id => 'greeble', :unique_id => 'greeble@example.com')
+    user = User.create!(name: 'Greeble')
+    user.pseudonyms.create!(account: @account, sis_user_id: 'greeble', unique_id: 'greeble@example.com')
     process_csv_data_cleanly(
       "user_id,login_id,status",
       "greeble,greeble@example.com,active"
@@ -406,7 +406,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,full_name,sortable_name,status",
       "user_1,user1,User One Two,\"One Two, User\",active"
     )
-    user = Pseudonym.where(:sis_user_id => "user_1").first.user
+    user = Pseudonym.where(sis_user_id: "user_1").first.user
     expect(user.name).to eql("User One Two")
     expect(user.sortable_name).to eql("One Two, User")
   end
@@ -665,7 +665,7 @@ describe SIS::CSV::UserImporter do
 
     batch1 = @account.sis_batches.create! do |sb|
       sb.options = {
-        :update_sis_id_if_login_claimed => true,
+        update_sis_id_if_login_claimed: true,
       }
     end
 
@@ -850,9 +850,9 @@ describe SIS::CSV::UserImporter do
   end
 
   it "adds two users with different user_ids, login_ids, but the same email" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
-    user1 = User.create!(:name => 'User Uno')
-    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
+    user1 = User.create!(name: 'User Uno')
+    user1.pseudonyms.create!(unique_id: 'user1', account: @account)
     communication_channel(user1, { username: 'user@example.com', active_cc: true })
 
     process_csv_data_cleanly(
@@ -865,13 +865,13 @@ describe SIS::CSV::UserImporter do
     expect(user2.pseudonyms.count).to eq 1
     expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).not_to be_nil
+    expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).not_to be_nil
   end
 
   it "does not send a merge notification email when self service merge is disabled" do
     @account.disable_feature!(:self_service_user_merge)
-    user1 = User.create!(:name => 'User Uno')
-    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    user1 = User.create!(name: 'User Uno')
+    user1.pseudonyms.create!(unique_id: 'user1', account: @account)
     communication_channel(user1, { username: 'user@example.com', active_cc: true })
 
     expect_any_instance_of(CommunicationChannel).not_to receive(:send_merge_notification!)
@@ -888,7 +888,7 @@ describe SIS::CSV::UserImporter do
   end
 
   it "does not notify about a merge opportunity to an SIS user in the same account" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
@@ -904,11 +904,11 @@ describe SIS::CSV::UserImporter do
     expect(user1.pseudonyms.first.communication_channel_id).not_to be_nil
     expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
+    expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).to be_nil
   end
 
   it "does not notify about merge opportunities for users that have no means of logging in" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted",
@@ -924,11 +924,11 @@ describe SIS::CSV::UserImporter do
     expect(user1.pseudonyms.first.communication_channel_id).not_to be_nil
     expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
 
-    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
+    expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).to be_nil
   end
 
   it "does not have problems updating a user to a conflicting email" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active",
@@ -953,7 +953,7 @@ describe SIS::CSV::UserImporter do
     expect(user2.email_channel).to be_active
     expect(user2.email).to eq 'user1@example.com'
 
-    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).to be_nil
+    expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).to be_nil
   end
 
   it "does not have a problem adding an existing e-mail that differs in case" do
@@ -992,9 +992,9 @@ describe SIS::CSV::UserImporter do
   end
 
   it "sends merge opportunity notifications when reactivating an email" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
-    user1 = User.create!(:name => 'User Uno')
-    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
+    user1 = User.create!(name: 'User Uno')
+    user1.pseudonyms.create!(unique_id: 'user1', account: @account)
     communication_channel(user1, { username: 'user1@example.com', active_cc: true })
 
     process_csv_data_cleanly(
@@ -1017,11 +1017,11 @@ describe SIS::CSV::UserImporter do
     )
     user2.reload
 
-    expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).not_to be_nil
+    expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).not_to be_nil
   end
 
   it "does not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
-    notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+    notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
     u1 = User.create! { |u| u.workflow_state = 'registered' }
     cc1 = communication_channel(u1, { username: 'user1@example.com', cc_state: 'retired' })
     u2 = User.create! { |u| u.workflow_state = 'registered' }
@@ -1035,7 +1035,7 @@ describe SIS::CSV::UserImporter do
     expect(user1.communication_channels.length).to eq 1
     expect(user1.email).to eq 'user1@example.com'
     expect([cc1, cc2]).not_to be_include(user1.email_channel)
-    expect(Message.where(:communication_channel_id => user1.email_channel, :notification_id => notification).first).to be_nil
+    expect(Message.where(communication_channel_id: user1.email_channel, notification_id: notification).first).to be_nil
   end
 
   it "creates everything in the deleted state when deleted initially" do
@@ -1101,7 +1101,7 @@ describe SIS::CSV::UserImporter do
     u = User.create!
     u.register!
     p_count = Pseudonym.count
-    p = u.pseudonyms.create!(:unique_id => "user2", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
+    p = u.pseudonyms.create!(unique_id: "user2", password: "validpassword", password_confirmation: "validpassword", account: @account)
     expect(Pseudonym.by_unique_id('user1').first).to be_nil
     expect(Pseudonym.by_unique_id('user2').first).not_to be_nil
     expect(p.sis_user_id).to be_nil
@@ -1218,7 +1218,7 @@ describe SIS::CSV::UserImporter do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user3,User,Uno,,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     p.reload
     expect(p.unique_id).to eq 'user3'
@@ -1243,7 +1243,7 @@ describe SIS::CSV::UserImporter do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,short_name,email,status",
       "user_1,user1,User,Uno,The Uno-Dos,,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     user.reload
     expect(user.short_name).to eq 'The Uno-Dos'
@@ -1266,7 +1266,7 @@ describe SIS::CSV::UserImporter do
     process_csv_data_cleanly(
       "user_id,login_id,full_name,email,status",
       "user_1,user1,User Uno,,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     user.reload
     expect(user.name).to eq 'User Uno'
@@ -1289,7 +1289,7 @@ describe SIS::CSV::UserImporter do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,sortable_name,email,status",
       "user_1,user1,User,Uno,\"Two, User\",,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     user.reload
     expect(user.sortable_name).to eq 'Two, User'
@@ -1491,8 +1491,8 @@ describe SIS::CSV::UserImporter do
 
   it 'removes account memberships when a user is deleted' do
     sis_user = user_model
-    @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @account, :sis_user_id => 'badmin')
-    tie_user_to_account(@badmin, :account => @account)
+    @badmin = user_with_managed_pseudonym(name: 'bad admin', account: @account, sis_user_id: 'badmin')
+    tie_user_to_account(@badmin, account: @account)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted",
@@ -1505,8 +1505,8 @@ describe SIS::CSV::UserImporter do
   it 'removes subaccount memberships when a user is deleted' do
     sis_user = user_model
     @subaccount = @account.sub_accounts.create! name: 'subbie'
-    @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @subaccount, :sis_user_id => 'badmin')
-    tie_user_to_account(@badmin, :account => @subaccount)
+    @badmin = user_with_managed_pseudonym(name: 'bad admin', account: @subaccount, sis_user_id: 'badmin')
+    tie_user_to_account(@badmin, account: @subaccount)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted",
@@ -1685,7 +1685,7 @@ describe SIS::CSV::UserImporter do
   end
 
   it "does not resurrect a non SIS user" do
-    @non_sis_user = user_with_pseudonym(:active_all => 1)
+    @non_sis_user = user_with_pseudonym(active_all: 1)
     @non_sis_user.remove_from_root_account(Account.default)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
@@ -1697,8 +1697,8 @@ describe SIS::CSV::UserImporter do
   end
 
   it "does not resurrect a non SIS pseudonym" do
-    @non_sis_user = user_with_pseudonym(:active_all => 1)
-    @pseudonym = @user.pseudonyms.create!(:unique_id => 'user1', :account => Account.default)
+    @non_sis_user = user_with_pseudonym(active_all: 1)
+    @pseudonym = @user.pseudonyms.create!(unique_id: 'user1', account: Account.default)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
@@ -1713,8 +1713,8 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,deleted"
     )
-    @non_sis_user = user_with_pseudonym(:active_all => 1)
-    @pseudonym = @non_sis_user.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    @non_sis_user = user_with_pseudonym(active_all: 1)
+    @pseudonym = @non_sis_user.pseudonyms.create!(unique_id: 'user1', account: @account)
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"

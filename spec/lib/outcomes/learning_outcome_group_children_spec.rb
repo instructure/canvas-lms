@@ -46,7 +46,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:o9) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.1', short_description: 'Outcome 7.1') }
   let!(:o10) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.2', short_description: 'Outcome 7.2') }
   let!(:o11) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
-  let!(:course) { course_model :name => 'course', :account => context, :workflow_state => 'created' }
+  let!(:course) { course_model name: 'course', account: context, workflow_state: 'created' }
   let!(:cg0) { course.root_outcome_group }
   let!(:cg1) { outcome_group_model(context: course, outcome_group_id: cg0, title: 'Course Group 1') }
   let!(:cg2) { outcome_group_model(context: course, outcome_group_id: cg1, title: 'Course Group 2') }

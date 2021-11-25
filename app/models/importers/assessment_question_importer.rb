@@ -36,7 +36,7 @@ module Importers
     def self.process_migration(data, migration)
       data = data.with_indifferent_access
       Importers::AssessmentQuestionImporter.preprocess_migration_data(data) # just in case
-      question_data = { :aq_data => {}, :qq_ids => {} }
+      question_data = { aq_data: {}, qq_ids: {} }
       questions = data['assessment_questions'] ? data['assessment_questions']['assessment_questions'] : []
       questions ||= []
 
@@ -67,7 +67,7 @@ module Importers
           next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
           aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.filter_map { |aq| aq["assessment_question_id"] }
-          bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
+          bank.assessment_questions.active.where.not(migration_id: aq_ids).update_all(workflow_state: 'deleted')
         end
       end
 
@@ -87,8 +87,8 @@ module Importers
           if (bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == bank_mig_id })
             question_bank.title = bank_hash['title']
             if question_bank.title && question_bank.title.length > ActiveRecord::Base.maximum_string_length
-              migration.add_warning(t("The title of the following question bank was truncated: \"%{title}\"", :title => question_bank.title))
-              question_bank.title = CanvasTextHelper.truncate_text(question_bank.title, :max_length => ActiveRecord::Base.maximum_string_length)
+              migration.add_warning(t("The title of the following question bank was truncated: \"%{title}\"", title: question_bank.title))
+              question_bank.title = CanvasTextHelper.truncate_text(question_bank.title, max_length: ActiveRecord::Base.maximum_string_length)
             end
           end
           question_bank.title ||= default_title
@@ -129,7 +129,7 @@ module Importers
       if migration.context.is_a?(Course)
         imported_aq_ids = question_data[:aq_data].values.filter_map { |aq| aq['assessment_question_id'] }
         imported_aq_ids.each_slice(100) do |sliced_aq_ids|
-          migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
+          migration.context.quiz_questions.generated.where(assessment_question_id: sliced_aq_ids).update_all(assessment_question_version: nil)
         end
       end
 
@@ -172,7 +172,7 @@ module Importers
 
       import_warnings&.each do |warning|
         migration.add_warning(warning, {
-                                :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+                                fix_issue_html_url: "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
                               })
       end
       hash
@@ -190,14 +190,14 @@ module Importers
         next unless hash[field].present?
 
         hash[field] = migration.convert_html(
-          hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
+          hash[field], item_type, hash[:migration_id], field, { remove_outer_nodes_if_one_child: true }
         )
       end
 
       if hash[:question_text]&.length&.> 16.kilobytes
         hash[:question_text] = t("The imported question text for this question was too long.")
         migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
-                                :question_name => hash[:question_name]))
+                                question_name: hash[:question_name]))
       end
 
       %i[correct_comments incorrect_comments neutral_comments more_comments].each do |field|
@@ -214,7 +214,7 @@ module Importers
           next unless answer[field].present?
 
           answer[field] = migration.convert_html(
-            answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
+            answer[field], item_type, hash[:migration_id], key, { remove_outer_nodes_if_one_child: true }
           )
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]

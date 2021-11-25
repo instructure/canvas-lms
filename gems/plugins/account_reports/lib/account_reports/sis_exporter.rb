@@ -48,7 +48,7 @@ module AccountReports
       add_extra_text(I18n.t(
                        'account_reports.sis_exporter.reports',
                        'Reports: %{files}',
-                       :files => files
+                       files: files
                      ))
 
       case @reports.length
@@ -215,7 +215,7 @@ module AccountReports
 
       if account != root_account
         # this does not give the full tree pf sub accounts, just the direct children.
-        accounts.where!(:accounts => { :parent_account_id => account })
+        accounts.where!(accounts: { parent_account_id: account })
       end
       accounts
     end
@@ -287,9 +287,9 @@ module AccountReports
         courses.find_in_batches do |batch|
           blueprint_map = {}
           root_account.shard.activate do
-            sub_data = MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id).to_h
-            template_data = MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
-            course_sis_data = Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id).to_h if template_data.present?
+            sub_data = MasterCourses::ChildSubscription.active.where(child_course_id: batch).pluck(:child_course_id, :master_template_id).to_h
+            template_data = MasterCourses::MasterTemplate.active.for_full_course.where(id: sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
+            course_sis_data = Course.where(id: template_data.values).where.not(sis_source_id: nil).pluck(:id, :sis_source_id).to_h if template_data.present?
             if course_sis_data.present?
               sub_data.each do |child_course_id, template_id|
                 sis_id = course_sis_data[template_data[template_id]]
@@ -909,7 +909,7 @@ module AccountReports
                               .joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id")
                               .where("p2.account_id=pseudonyms.account_id")
-                              .where(:user_observers => { :root_account_id => root_account })
+                              .where(user_observers: { root_account_id: root_account })
 
       observers = user_observer_query_options(observers)
       generate_and_run_report headers do |csv|

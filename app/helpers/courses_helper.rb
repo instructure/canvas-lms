@@ -59,10 +59,10 @@ module CoursesHelper
                     [t('#courses.recent_event.no_submissions', 'no submissions')] + event_type
                   # all received submissions graded (but not all turned in)
                   elsif recent_event.submitted_count < context.students.size &&
-                        !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
+                        !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
                     [t('#courses.recent_event.no_new_submissions', 'no new submissions')] + event_type
                   # all submissions turned in and graded
-                  elsif !current_user.assignments_needing_grading(:contexts => contexts).include?(recent_event)
+                  elsif !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
                     [t('#courses.recent_event.all_graded', 'all graded')] + event_type
                   # assignments need grading
                   else
@@ -76,11 +76,11 @@ module CoursesHelper
   def recent_event_url(recent_event)
     context = recent_event.context
     if recent_event.is_a?(Assignment)
-      context_url(context, :context_assignment_url, :id => recent_event.id)
+      context_url(context, :context_assignment_url, id: recent_event.id)
     else
       calendar_url_for(nil, {
-                         :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
-                         :anchor => "calendar_event_" + recent_event.id.to_s
+                         query: { month: recent_event.start_at.month, year: recent_event.start_at.year },
+                         anchor: "calendar_event_" + recent_event.id.to_s
                        })
     end
   end

@@ -192,9 +192,9 @@ class GradeSummaryPresenter
       ss = @context.submissions
                    .preload(
                      :visible_submission_comments,
-                     { :rubric_assessments => [:rubric, :rubric_association] },
+                     { rubric_assessments: [:rubric, :rubric_association] },
                      :content_participations,
-                     { :assignment => [:context, :post_policy] }
+                     { assignment: [:context, :post_policy] }
                    )
                    .joins(:assignment)
                    .where("assignments.workflow_state != 'deleted'")

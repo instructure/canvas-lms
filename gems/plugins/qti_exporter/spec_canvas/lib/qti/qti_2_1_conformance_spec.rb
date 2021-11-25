@@ -26,16 +26,16 @@ if Qti.migration_executable
       archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti2_conformance', filename)
       unzipped_file_path = create_temp_dir!
       @export_folder = create_temp_dir!
-      @course = Course.create!(:name => filename)
-      @migration = ContentMigration.create(:context => @course)
+      @course = Course.create!(name: filename)
+      @migration = ContentMigration.create(context: @course)
 
-      @converter = Qti::Converter.new(:export_archive_path => archive_file_path, :base_download_dir => unzipped_file_path, :content_migration => @migration)
+      @converter = Qti::Converter.new(export_archive_path: archive_file_path, base_download_dir: unzipped_file_path, content_migration: @migration)
       @converter.export
       @course_data = @converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 

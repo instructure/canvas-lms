@@ -246,7 +246,7 @@ module MasterCourses::Restrictor
     if @importing_migration
       @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(migration_id) # for extra speeds on import
     else
-      MasterCourses::MasterContentTag.where(:migration_id => migration_id).pluck(:restrictions).first
+      MasterCourses::MasterContentTag.where(migration_id: migration_id).pluck(:restrictions).first
     end
   end
 
@@ -262,7 +262,7 @@ module MasterCourses::Restrictor
     return unless migration_ids.any?
 
     objects_to_load.each_value { |obj| obj.child_content_restrictions = {} } # default if restrictions are missing
-    all_restrictions = MasterCourses::MasterContentTag.where(:migration_id => migration_ids).pluck(:migration_id, :restrictions)
+    all_restrictions = MasterCourses::MasterContentTag.where(migration_id: migration_ids).pluck(:migration_id, :restrictions)
     all_restrictions.each do |migration_id, restrictions|
       objects_to_load[migration_id].child_content_restrictions = restrictions
     end
@@ -280,7 +280,7 @@ module MasterCourses::Restrictor
     end
 
     objects_to_load.each_value { |obj| obj.current_master_template_restrictions = {} } # default if restrictions are missing
-    template.master_content_tags.where(:migration_id => objects_to_load.keys).pluck(:migration_id, :restrictions).each do |migration_id, restrictions|
+    template.master_content_tags.where(migration_id: objects_to_load.keys).pluck(:migration_id, :restrictions).each do |migration_id, restrictions|
       objects_to_load[migration_id].current_master_template_restrictions = restrictions
     end
   end

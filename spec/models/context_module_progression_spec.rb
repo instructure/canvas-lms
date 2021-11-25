@@ -21,9 +21,9 @@
 describe ContextModuleProgression do
   before do
     @course = course_factory(active_all: true)
-    @module = @course.context_modules.create!(:name => "some module")
+    @module = @course.context_modules.create!(name: "some module")
 
-    @user = User.create!(:name => "some name")
+    @user = User.create!(name: "some name")
     @course.enroll_student(@user).accept!
   end
 
@@ -33,18 +33,18 @@ describe ContextModuleProgression do
   end
 
   def setup_modules
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
-    @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
+    @assignment = @course.assignments.create!(title: "some assignment")
+    @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
+    @module.completion_requirements = { @tag.id => { type: 'must_view' } }
     @module.workflow_state = 'unpublished'
     @module.save!
 
-    @module2 = @course.context_modules.create!(:name => "another module")
+    @module2 = @course.context_modules.create!(name: "another module")
     @module2.publish
     @module2.prerequisites = "module_#{@module.id}"
     @module2.save!
 
-    @module3 = @course.context_modules.create!(:name => "another module again")
+    @module3 = @course.context_modules.create!(name: "another module again")
     @module3.publish
     @module3.save!
   end
@@ -55,10 +55,10 @@ describe ContextModuleProgression do
     end
 
     it "ignores already-calculated context_module_prerequisites correctly" do
-      mp = @user.context_module_progressions.create!(:context_module => @module2)
+      mp = @user.context_module_progressions.create!(context_module: @module2)
       mp.workflow_state = 'locked'
       mp.save!
-      mp2 = @user.context_module_progressions.create!(:context_module => @module)
+      mp2 = @user.context_module_progressions.create!(context_module: @module)
       mp2.workflow_state = 'locked'
       mp2.save!
 
@@ -81,7 +81,7 @@ describe ContextModuleProgression do
 
     it "is satisfied if dependent on both a published and unpublished module" do
       @module3.prerequisites = "module_#{@module.id}"
-      @module3.prerequisites = [{ :type => "context_module", :id => @module.id, :name => @module.name }, { :type => "context_module", :id => @module2.id, :name => @module2.name }]
+      @module3.prerequisites = [{ type: "context_module", id: @module.id, name: @module.name }, { type: "context_module", id: @module2.id, name: @module2.name }]
       @module3.save!
       @module3.reload
       expect(@module3.prerequisites.count).to eq 2
@@ -90,8 +90,8 @@ describe ContextModuleProgression do
     end
 
     it "skips incorrect prereq hashes" do
-      @module3.prerequisites = [{ :type => "context_module", :id => @module.id },
-                                { :type => "not_context_module", :id => @module2.id, :name => @module2.name }]
+      @module3.prerequisites = [{ type: "context_module", id: @module.id },
+                                { type: "not_context_module", id: @module2.id, name: @module2.name }]
       @module3.save!
 
       expect(@module3.prerequisites.count).to eq 0
@@ -188,7 +188,7 @@ describe ContextModuleProgression do
       end
 
       it "doesn't mark students that haven't submitted as in-progress" do
-        other_student = student_in_course(:course => @course, :active_all => true).user
+        other_student = student_in_course(course: @course, active_all: true).user
         progression = @module.evaluate_for(other_student)
         # yes technically the requirement is "incomplete" if they haven't done anything
         # and the jerk who named the column should feel bad
@@ -290,40 +290,40 @@ describe ContextModuleProgression do
 
   it "updates progressions when adding a must_contribute requirement on a topic" do
     @assignment = @course.assignments.create!
-    @tag1 = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+    @tag1 = @module.add_item({ id: @assignment.id, type: 'assignment' })
     @topic = @course.discussion_topics.create!
-    @topic.discussion_entries.create!(:user => @user)
-    @module.completion_requirements = { @tag1.id => { :type => 'must_view' } }
+    @topic.discussion_entries.create!(user: @user)
+    @module.completion_requirements = { @tag1.id => { type: 'must_view' } }
 
     progression = @module.evaluate_for(@user)
     expect(progression).to be_unlocked
 
-    @tag2 = @module.add_item({ :id => @topic.id, :type => 'discussion_topic' })
-    @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_view' }, @tag2.id => { :type => 'must_contribute' } })
+    @tag2 = @module.add_item({ id: @topic.id, type: 'discussion_topic' })
+    @module.update_attribute(:completion_requirements, { @tag1.id => { type: 'must_view' }, @tag2.id => { type: 'must_contribute' } })
 
     progression.reload
     expect(progression).to be_started
 
     expect_any_instantiation_of(@topic).not_to receive(:recalculate_context_module_actions!) # doesn't recalculate unless it's a new requirement
-    @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_submit' }, @tag2.id => { :type => 'must_contribute' } })
+    @module.update_attribute(:completion_requirements, { @tag1.id => { type: 'must_submit' }, @tag2.id => { type: 'must_contribute' } })
   end
 
   context "assignment muting" do
     it "works with muted assignments" do
-      assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
+      assignment = @course.assignments.create(title: "some assignment", points_possible: 100, submission_types: "online_text_entry")
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({ :id => assignment.id, :type => 'assignment' })
-      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
+      tag = @module.add_item({ id: assignment.id, type: 'assignment' })
+      @module.completion_requirements = { tag.id => { type: 'min_score', min_score: 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
       expect(progression).to be_unlocked
 
-      assignment.submit_homework(@user, :body => "blah")
-      assignment.grade_student(@user, :score => 85, :grader => @teacher)
+      assignment.submit_homework(@user, body: "blah")
+      assignment.grade_student(@user, score: 85, grader: @teacher)
       expect(progression.reload).to be_started
       expect(progression.requirements_met).to be_blank
-      assignment.grade_student(@user, :score => 95, :grader => @teacher)
+      assignment.grade_student(@user, score: 95, grader: @teacher)
       expect(progression.reload).to be_started
       expect(progression.requirements_met).to be_blank
 
@@ -332,17 +332,17 @@ describe ContextModuleProgression do
     end
 
     it "completes when the assignment is unmuted after a grade is assigned without a submission" do
-      assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
+      assignment = @course.assignments.create(title: "some assignment", points_possible: 100, submission_types: "online_text_entry")
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({ :id => assignment.id, :type => 'assignment' })
-      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
+      tag = @module.add_item({ id: assignment.id, type: 'assignment' })
+      @module.completion_requirements = { tag.id => { type: 'min_score', min_score: 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
       expect(progression).to be_unlocked
 
       # no submission here
-      assignment.grade_student(@user, :score => 100, :grader => @teacher)
+      assignment.grade_student(@user, score: 100, grader: @teacher)
       expect(progression.reload).to be_started
       expect(progression.requirements_met).to be_blank
 
@@ -351,17 +351,17 @@ describe ContextModuleProgression do
     end
 
     it "works with muted quiz assignments" do
-      quiz = @course.quizzes.create(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest', :workflow_state => 'available')
+      quiz = @course.quizzes.create(title: "some quiz", quiz_type: "assignment", scoring_policy: 'keep_highest', workflow_state: 'available')
       quiz.assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({ :id => quiz.id, :type => 'quiz' })
-      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
+      tag = @module.add_item({ id: quiz.id, type: 'quiz' })
+      @module.completion_requirements = { tag.id => { type: 'min_score', min_score: 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
       expect(progression).to be_unlocked
 
       quiz_sub = quiz.generate_submission(@user)
-      quiz_sub.update(:score => 100, :workflow_state => 'complete', :submission_data => nil)
+      quiz_sub.update(score: 100, workflow_state: 'complete', submission_data: nil)
       quiz_sub.with_versioning(&:save)
       expect(progression.reload).to be_started
 
@@ -370,23 +370,23 @@ describe ContextModuleProgression do
     end
 
     it "works with muted discussion assignments" do
-      topic = @course.discussion_topics.create(:title => "some topic")
-      assignment = assignment_model(:course => @course, :points_possible => 100)
+      topic = @course.discussion_topics.create(title: "some topic")
+      assignment = assignment_model(course: @course, points_possible: 100)
       topic.assignment = assignment
       topic.save!
       assignment.reload
 
       assignment.ensure_post_policy(post_manually: true)
-      tag = @module.add_item({ :id => topic.id, :type => 'discussion_topic' })
-      @module.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
+      tag = @module.add_item({ id: topic.id, type: 'discussion_topic' })
+      @module.completion_requirements = { tag.id => { type: 'min_score', min_score: 90 } }
       @module.save!
 
       progression = @module.evaluate_for(@user)
       expect(progression).to be_unlocked
 
-      topic.reply_from(:user => @user, :text => "entry")
+      topic.reply_from(user: @user, text: "entry")
       expect(progression.reload).to be_started
-      assignment.grade_student(@user, :score => 100, :grader => @teacher)
+      assignment.grade_student(@user, score: 100, grader: @teacher)
       expect(progression.reload).to be_started
 
       assignment.unmute!

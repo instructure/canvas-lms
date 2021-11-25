@@ -38,7 +38,7 @@ module SIS
       end
 
       i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
-        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        Enrollment.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
@@ -57,7 +57,7 @@ module SIS
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       i.incrementally_update_account_associations
-      User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
+      User.update_account_associations(i.update_account_association_user_ids.to_a, account_chain_cache: i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
         User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
@@ -195,7 +195,7 @@ module SIS
 
           # reset cached/inferred course and section if they don't match with the opposite piece that was
           # explicitly provided
-          @section = @course.default_section(:include_xlists => true) if @section.nil? || (enrollment_info.section_id.blank? && !@section.default_section)
+          @section = @course.default_section(include_xlists: true) if @section.nil? || (enrollment_info.section_id.blank? && !@section.default_section)
           @course = @section.course if @course.nil? ||
                                        (enrollment_info.course_id.blank? && @course.id != @section.course_id) ||
                                        (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
@@ -357,8 +357,8 @@ module SIS
           @update_account_association_user_ids.merge(@incrementally_update_account_associations_user_ids)
         else
           User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
-                                           :incremental => true,
-                                           :precalculated_associations => User.calculate_account_associations_from_accounts(
+                                           incremental: true,
+                                           precalculated_associations: User.calculate_account_associations_from_accounts(
                                              [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq, @account_chain_cache
                                            ))
         end

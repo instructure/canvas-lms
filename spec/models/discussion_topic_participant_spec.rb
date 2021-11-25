@@ -20,8 +20,8 @@
 describe DiscussionTopicParticipant do
   describe 'check_unread_count' do
     before(:once) do
-      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
-                                                        :discussion_topic => discussion_topic_model)
+      @participant = DiscussionTopicParticipant.create!(user: user_factory,
+                                                        discussion_topic: discussion_topic_model)
     end
 
     it 'sets negative unread_counts to zero on save' do
@@ -42,8 +42,8 @@ describe DiscussionTopicParticipant do
 
   describe 'create' do
     before(:once) do
-      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
-                                                        :discussion_topic => discussion_topic_model)
+      @participant = DiscussionTopicParticipant.create!(user: user_factory,
+                                                        discussion_topic: discussion_topic_model)
     end
 
     it 'sets the root_account_id using topic' do

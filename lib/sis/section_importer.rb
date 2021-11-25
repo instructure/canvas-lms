@@ -31,7 +31,7 @@ module SIS
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        CourseSection.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
       # that would order by id. So do it on the secondary, to force a cursor that avoids the sort so that
@@ -134,7 +134,7 @@ module SIS
           if section.workflow_state_changed? &&
              section.workflow_state_was == "deleted" &&
              section.default_section? &&
-             CourseSection.active.where(:course_id => section.course_id, :default_section => true).exists?
+             CourseSection.active.where(course_id: section.course_id, default_section: true).exists?
             # trying to restore a previously default section but there's one already so undefault the restored one
             section.default_section = false
           end

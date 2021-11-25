@@ -29,7 +29,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response).not_to be_nil
   end
 
@@ -43,7 +43,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).not_to match(/confirm_channel_link/)
   end
 
@@ -57,7 +57,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).to match(/confirm_channel_link/)
   end
 
@@ -71,7 +71,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).not_to match(/confirm_channel_link/)
   end
 
@@ -85,7 +85,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).to match(%r{<div.*>For All Devices</div>})
     expect(response.body).to_not match(%r{<a.*>For All Devices</a>})
   end
@@ -102,7 +102,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @user)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).to match(/channel default.*channel_#{email.id}/)
   end
 
@@ -117,7 +117,7 @@ describe "/profile/_ways_to_contact" do
     assign(:sms_channels, [])
     assign(:user, @student)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).to match(/confirm_channel_link/)
   end
 
@@ -130,7 +130,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
     assign(:domain_root_account, Account.create!)
 
-    render :partial => "profile/ways_to_contact"
+    render partial: "profile/ways_to_contact"
     expect(response.body).not_to match(/I want to log in to Canvas using this email address/)
   end
 end

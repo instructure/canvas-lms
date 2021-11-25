@@ -56,10 +56,10 @@ module Importers
               # if it's account-level they'd still be able to see it in the list to link to a new question group even though they can't directly view it... weird
               item.assessment_question_bank_id = bank.id
             else
-              migration.add_warning(t('#quizzes.quiz_group.errors.no_permissions', "User didn't have permission to reference question bank in quiz group %{group_name}", :group_name => item.name))
+              migration.add_warning(t('#quizzes.quiz_group.errors.no_permissions', "User didn't have permission to reference question bank in quiz group %{group_name}", group_name: item.name))
             end
           else
-            migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
+            migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", group_name: item.name))
           end
         elsif (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
           item.assessment_question_bank_id = bank.id

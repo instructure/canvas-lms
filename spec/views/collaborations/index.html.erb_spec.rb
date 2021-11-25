@@ -33,10 +33,10 @@ describe "/collaborations/index" do
   end
 
   it "provides labels for accessibility devices i.e. screen readers" do
-    render :partial => "collaborations/forms"
+    render partial: "collaborations/forms"
     expect(response).not_to be_nil
-    expect(response).to have_tag("label[for=collaboration_title]", :text => "Document name:")
-    expect(response).to have_tag("label[for=collaboration_description]", :text => "Description:")
-    expect(response).to have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
+    expect(response).to have_tag("label[for=collaboration_title]", text: "Document name:")
+    expect(response).to have_tag("label[for=collaboration_description]", text: "Description:")
+    expect(response).to have_tag("label[for=collaboration_collaboration_type]", text: "Collaborate using:")
   end
 end

@@ -66,7 +66,7 @@ module TurnitinApi
       @connection ||= Faraday.new do |conn|
         conn.request :multipart
         conn.request :url_encoded
-        conn.response :json, :content_type => /\bjson$/
+        conn.response :json, content_type: /\bjson$/
         conn.use FaradayMiddleware::FollowRedirects
         conn.adapter :net_http
       end

@@ -181,8 +181,8 @@ module Qti
       distractors = all_matches.delete_if { |m| @question[:matches].any? { |qm| qm[:text] == m } }
       distractors.uniq.each do |distractor|
         @question[:matches] << {
-          :text => distractor,
-          :match_id => unique_local_id,
+          text: distractor,
+          match_id: unique_local_id,
         }
       end
     end

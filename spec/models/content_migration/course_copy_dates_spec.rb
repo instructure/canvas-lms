@@ -48,25 +48,25 @@ describe ContentMigration do
                                        uploaded_data: StringIO.new('blah'),
                                        folder: folder)
 
-        @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
-                                   :unlock_at => @old_start + 1.day,
-                                   :lock_at => @old_start + 5.days,
-                                   :show_correct_answers_at => @old_start + 6.days,
-                                   :hide_correct_answers_at => @old_start + 7.days)
-        @copy_from.discussion_topics.create!(:title => "some topic",
-                                             :message => "<p>some text</p>",
-                                             :delayed_post_at => @old_start + 3.days,
-                                             :lock_at => @old_start + 7.days)
-        @copy_from.announcements.create!(:title => "hear ye",
-                                         :message => "<p>grades will henceforth be in Cyrillic letters</p>",
-                                         :delayed_post_at => @old_start + 10.days)
-        @copy_from.calendar_events.create!(:title => "an event",
-                                           :start_at => @old_start + 4.days,
-                                           :end_at => @old_start + 4.days + 1.hour)
-        cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.day)
+        @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00",
+                                   unlock_at: @old_start + 1.day,
+                                   lock_at: @old_start + 5.days,
+                                   show_correct_answers_at: @old_start + 6.days,
+                                   hide_correct_answers_at: @old_start + 7.days)
+        @copy_from.discussion_topics.create!(title: "some topic",
+                                             message: "<p>some text</p>",
+                                             delayed_post_at: @old_start + 3.days,
+                                             lock_at: @old_start + 7.days)
+        @copy_from.announcements.create!(title: "hear ye",
+                                         message: "<p>grades will henceforth be in Cyrillic letters</p>",
+                                         delayed_post_at: @old_start + 10.days)
+        @copy_from.calendar_events.create!(title: "an event",
+                                           start_at: @old_start + 4.days,
+                                           end_at: @old_start + 4.days + 1.hour)
+        cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
         cm.save!
 
-        cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.day)
+        cm2 = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
         cm2.save!
       end
 
@@ -244,7 +244,7 @@ describe ContentMigration do
         account.save!
 
         Time.use_zone('UTC') do
-          assignment = @copy_from.assignments.create! :title => 'Assignment', :due_at => old_date
+          assignment = @copy_from.assignments.create! title: 'Assignment', due_at: old_date
           assignment.save!
 
           opts = {
@@ -278,13 +278,13 @@ describe ContentMigration do
         let(:new_end_date) { 'Apr 15, 2012' }
 
         it "using an explicit time zone" do
-          expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
+          expect(new_date).to eq copy_assignment(time_zone: local_time_zone)
           expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 06:00:00 UTC')
           expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 06:00:00 UTC')
         end
 
         it "using the account time zone" do
-          expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
+          expect(new_date).to eq copy_assignment(account_time_zone: local_time_zone)
           expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 06:00:00 UTC')
           expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 06:00:00 UTC')
         end
@@ -299,13 +299,13 @@ describe ContentMigration do
         let(:new_end_date) { 'Dec 15, 2012' }
 
         it "using an explicit time zone" do
-          expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
+          expect(new_date).to eq copy_assignment(time_zone: local_time_zone)
           expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 07:00:00 UTC')
           expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 07:00:00 UTC')
         end
 
         it "using the account time zone" do
-          expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
+          expect(new_date).to eq copy_assignment(account_time_zone: local_time_zone)
           expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 07:00:00 UTC')
           expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 07:00:00 UTC')
         end
@@ -321,13 +321,13 @@ describe ContentMigration do
           let(:new_end_date) { '2012-04-15T01:00:00' }
 
           it "using an explicit time zone" do
-            expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 07:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 07:00:00 UTC')
           end
 
           it "using the account time zone" do
-            expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(account_time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 07:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 07:00:00 UTC')
           end
@@ -342,13 +342,13 @@ describe ContentMigration do
           let(:new_end_date) { '2012-12-15T01:00:00' }
 
           it "using an explicit time zone" do
-            expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
 
           it "using the account time zone" do
-            expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(account_time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
@@ -363,13 +363,13 @@ describe ContentMigration do
           let(:new_end_date) { '2012-12-15T08:00:00Z' }
 
           it "using an explicit time zone" do
-            expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
 
           it "using the account time zone" do
-            expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
+            expect(new_date).to eq copy_assignment(account_time_zone: local_time_zone)
             expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
@@ -401,8 +401,8 @@ describe ContentMigration do
       @copy_from.reload
 
       @cm.copy_options = @cm.copy_options.merge(
-        :shift_dates => true,
-        :day_substitutions => { today.wday.to_s => (today.wday + 1).to_s }
+        shift_dates: true,
+        day_substitutions: { today.wday.to_s => (today.wday + 1).to_s }
       )
       @cm.save!
 
@@ -417,12 +417,12 @@ describe ContentMigration do
     it "copies all day dates for assignments and events correctly" do
       date = "Jun 21 2012 11:59pm"
       date2 = "Jun 21 2012 00:00am"
-      asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
+      asmnt = @copy_from.assignments.create!(title: 'all day', due_at: date)
       expect(asmnt.all_day).to be_truthy
 
       cal = nil
       Time.use_zone('America/Denver') do
-        cal = @copy_from.calendar_events.create!(:title => "haha", :description => "oi", :start_at => date2, :end_at => date2)
+        cal = @copy_from.calendar_events.create!(title: "haha", description: "oi", start_at: date2, end_at: date2)
         expect(cal.start_at.strftime("%H:%M")).to eq "00:00"
       end
 
@@ -448,8 +448,8 @@ describe ContentMigration do
       @copy_to.conclude_at = conclude_at
       @copy_to.save!
       options = {
-        :everything => true,
-        :remove_dates => true,
+        everything: true,
+        remove_dates: true,
       }
       @cm.copy_options = options
       @cm.save!
@@ -549,12 +549,12 @@ describe ContentMigration do
     end
 
     it "triggers cached_due_date changes" do
-      assmt = @copy_from.assignments.create!(title: "an event", :due_at => 1.day.from_now)
+      assmt = @copy_from.assignments.create!(title: "an event", due_at: 1.day.from_now)
 
       run_course_copy
 
-      assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
-      student_in_course(:active_all => true, :course => @copy_to)
+      assmt_to = @copy_to.assignments.where(migration_id: mig_id(assmt)).first
+      student_in_course(active_all: true, course: @copy_to)
       sub_to = assmt_to.reload.submissions.first
       expect(sub_to.cached_due_date.to_i).to eq assmt.due_at.to_i
 

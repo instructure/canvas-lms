@@ -48,7 +48,7 @@ shared_examples_for 'a locked api item' do
   end
 
   before(:once) do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
   end
 
   it 'has the correct helpers' do
@@ -84,14 +84,14 @@ shared_examples_for 'a locked api item' do
     if respond_to?(:item_type)
       verify_unlocked
 
-      pre_module = @course.context_modules.create!(:name => 'pre_module')
-      external_url_tag = pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+      pre_module = @course.context_modules.create!(name: 'pre_module')
+      external_url_tag = pre_module.add_item(type: 'external_url', url: 'http://example.com', title: 'example')
       external_url_tag.publish! if external_url_tag.unpublished?
-      pre_module.completion_requirements = { external_url_tag.id => { :type => 'must_view' } }
+      pre_module.completion_requirements = { external_url_tag.id => { type: 'must_view' } }
       pre_module.save!
 
-      locked_module = @course.context_modules.create!(:name => 'locked_module', :require_sequential_progress => true)
-      item_tag = locked_module.add_item(:id => locked_item.id, :type => item_type)
+      locked_module = @course.context_modules.create!(name: 'locked_module', require_sequential_progress: true)
+      item_tag = locked_module.add_item(id: locked_item.id, type: item_type)
       item_tag.publish! if item_tag.unpublished?
       locked_module.prerequisites = "module_#{pre_module.id}"
       locked_module.save!
@@ -104,8 +104,8 @@ shared_examples_for 'a locked api item' do
     if respond_to?(:item_type)
       verify_unlocked
 
-      locked_module = @course.context_modules.create!(:name => 'locked_module', :unlock_at => 1.day.from_now)
-      locked_module.add_item(:id => locked_item.id, :type => item_type)
+      locked_module = @course.context_modules.create!(name: 'locked_module', unlock_at: 1.day.from_now)
+      locked_module.add_item(id: locked_item.id, type: item_type)
 
       verify_locked :context_module
     end

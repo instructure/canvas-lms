@@ -32,7 +32,7 @@ module Services
         @message.user.account.root_account.enable_feature!(:notification_service)
         @message.save!
         @message.to = "testing123"
-        @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
+        @at = AccessToken.create!(user: @user, developer_key: DeveloperKey.default)
       end
 
       before do

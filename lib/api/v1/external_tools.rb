@@ -33,8 +33,8 @@ module Api::V1::ExternalTools
     only = %w[id name description url domain consumer_key created_at updated_at description]
     only << 'allow_membership_service_access' if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     json = api_json(tool, user, session,
-                    :only => only,
-                    :methods => methods)
+                    only: only,
+                    methods: methods)
     json['is_rce_favorite'] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
     json['selection_width'] = tool.settings[:selection_width] if tool.settings.key? :selection_width
     json['selection_height'] = tool.settings[:selection_height] if tool.settings.key? :selection_height

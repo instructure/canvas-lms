@@ -30,15 +30,15 @@ class ConversationMessage < ActiveRecord::Base
   include SimpleTags::ReaderInstanceMethods
 
   belongs_to :conversation
-  belongs_to :author, :class_name => 'User'
+  belongs_to :author, class_name: 'User'
   belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
-  has_many :attachment_associations, :as => :context, :inverse_of => :context
+  has_many :attachment_associations, as: :context, inverse_of: :context
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
   belongs_to :asset, polymorphic: [:submission]
-  delegate :participants, :to => :conversation
-  delegate :subscribed_participants, :to => :conversation
+  delegate :participants, to: :conversation
+  delegate :subscribed_participants, to: :conversation
 
   before_create :set_root_account_ids
   after_create :generate_user_note!
@@ -47,7 +47,7 @@ class ConversationMessage < ActiveRecord::Base
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("has_attachments") }
   scope :with_media_comments, -> { where("has_media_objects") }
-  scope :by_user, ->(user_or_id) { where(:author_id => user_or_id) }
+  scope :by_user, ->(user_or_id) { where(author_id: user_or_id) }
 
   def self.preload_latest(conversation_participants, author = nil)
     return unless conversation_participants.present?
@@ -92,7 +92,7 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  validates :body, length: { :maximum => maximum_text_length }
+  validates :body, length: { maximum: maximum_text_length }
 
   has_a_broadcast_policy
   set_broadcast_policy do |p|
@@ -240,7 +240,7 @@ class ConversationMessage < ActiveRecord::Base
     valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?(&:enable_user_notes) }
     return unless valid_recipients.any?
 
-    valid_recipients = User.where(:id => valid_recipients) # need to reload to get all the attributes needed for User#save
+    valid_recipients = User.where(id: valid_recipients) # need to reload to get all the attributes needed for User#save
     valid_recipients.each do |recipient|
       title = if conversation.subject
                 t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
@@ -274,7 +274,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def formatted_body(truncate = nil)
     res = format_message(body).first
-    res = truncate_html(res, :max_length => truncate, :words => true) if truncate
+    res = truncate_html(res, max_length: truncate, words: true) if truncate
     res
   end
 
@@ -292,9 +292,9 @@ class ConversationMessage < ActiveRecord::Base
     recipients = [author]
     tags = conversation.conversation_participants.where(user_id: author.id).pluck(:tags)
     opts = opts.merge(
-      :root_account_id => root_account_id,
-      :only_users => recipients,
-      :tags => tags
+      root_account_id: root_account_id,
+      only_users: recipients,
+      tags: tags
     )
     conversation.reply_from(opts)
   end
@@ -315,7 +315,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def as_json(**)
-    super(:only => %i[id created_at body generated author_id])['conversation_message']
+    super(only: %i[id created_at body generated author_id])['conversation_message']
       .merge('forwarded_messages' => forwarded_messages,
              'attachments' => attachments,
              'media_comment' => media_comment)
@@ -325,7 +325,7 @@ class ConversationMessage < ActiveRecord::Base
     extend ApplicationHelper
     extend ConversationsHelper
 
-    title = ERB::Util.h(CanvasTextHelper.truncate_text(body, :max_words => 8, :max_length => 80))
+    title = ERB::Util.h(CanvasTextHelper.truncate_text(body, max_words: 8, max_length: 80))
 
     # build content, should be:
     # message body
@@ -336,10 +336,10 @@ class ConversationMessage < ActiveRecord::Base
     unless attachments.empty?
       content += "<ul>"
       attachments.each do |attachment|
-        href = file_download_url(attachment, :verifier => attachment.uuid,
-                                             :download => '1',
-                                             :download_frd => '1',
-                                             :host => HostUrl.context_host(context))
+        href = file_download_url(attachment, verifier: attachment.uuid,
+                                             download: '1',
+                                             download_frd: '1',
+                                             host: HostUrl.context_host(context))
         content += "<li><a href='#{href}'>#{ERB::Util.h(attachment.display_name)}</a></li>"
       end
       content += "</ul>"
@@ -349,18 +349,18 @@ class ConversationMessage < ActiveRecord::Base
 
     Atom::Entry.new do |entry|
       entry.title = title
-      entry.authors << Atom::Person.new(:name => author.name)
+      entry.authors << Atom::Person.new(name: author.name)
       entry.updated   = created_at.utc
       entry.published = created_at.utc
       entry.id        = "tag:#{HostUrl.context_host(context)},#{created_at.strftime("%Y-%m-%d")}:/conversations/#{feed_code}"
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
       attachments.each do |attachment|
-        entry.links << Atom::Link.new(:rel => 'enclosure',
-                                      :href => file_download_url(attachment, :verifier => attachment.uuid,
-                                                                             :download => '1',
-                                                                             :download_frd => '1',
-                                                                             :host => HostUrl.context_host(context)))
+        entry.links << Atom::Link.new(rel: 'enclosure',
+                                      href: file_download_url(attachment, verifier: attachment.uuid,
+                                                                          download: '1',
+                                                                          download_frd: '1',
+                                                                          host: HostUrl.context_host(context)))
       end
       entry.content = Atom::Content::Html.new(content)
     end
@@ -369,13 +369,13 @@ class ConversationMessage < ActiveRecord::Base
   class EventFormatter
     def self.users_added(author_name, user_names)
       I18n.t 'conversation_message.users_added', {
-        :one => "%{user} was added to the conversation by %{current_user}",
-        :other => "%{list_of_users} were added to the conversation by %{current_user}"
+        one: "%{user} was added to the conversation by %{current_user}",
+        other: "%{list_of_users} were added to the conversation by %{current_user}"
       },
-             :count => user_names.size,
-             :user => user_names.first,
-             :list_of_users => user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
-             :current_user => author_name
+             count: user_names.size,
+             user: user_names.first,
+             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
+             current_user: author_name
     end
   end
 end

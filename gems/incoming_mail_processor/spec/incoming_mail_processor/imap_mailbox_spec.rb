@@ -25,9 +25,9 @@ describe IncomingMailProcessor::ImapMailbox do
 
   def default_config
     {
-      :server => "mail.example.com",
-      :username => "user",
-      :password => "password",
+      server: "mail.example.com",
+      username: "user",
+      password: "password",
     }
   end
 
@@ -38,7 +38,7 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     expect(Net::IMAP).to receive(:new)
-      .with("mail.example.com", { :port => 993, :ssl => true })
+      .with("mail.example.com", { port: 993, ssl: true })
       .at_most(:once) # allow simple tests to not call #connect
       .and_return(@imap_mock)
   end
@@ -51,12 +51,12 @@ describe IncomingMailProcessor::ImapMailbox do
   describe "#initialize" do
     it "accepts existing mailman imap configuration" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new({
-                                                          :server => "imap.server.com",
-                                                          :port => 1234,
-                                                          :ssl => "truthy-value",
-                                                          :filter => ["ALL"],
-                                                          :username => "user@server.com",
-                                                          :password => "secret-user-password",
+                                                          server: "imap.server.com",
+                                                          port: 1234,
+                                                          ssl: "truthy-value",
+                                                          filter: ["ALL"],
+                                                          username: "user@server.com",
+                                                          password: "secret-user-password",
                                                         })
 
       expect(@mailbox.server).to eql "imap.server.com"
@@ -68,13 +68,13 @@ describe IncomingMailProcessor::ImapMailbox do
     end
 
     it "accepts non-array filter" do
-      @mailbox = IncomingMailProcessor::ImapMailbox.new(:filter => "BLAH")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(filter: "BLAH")
       expect(@mailbox.filter).to eql ["BLAH"]
     end
 
     it "accepts folder parameter" do
       # this isn't necessary for gmail, but just in case
-      @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(folder: "inbox")
       expect(@mailbox.folder).to eql "inbox"
     end
   end

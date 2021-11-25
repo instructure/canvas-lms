@@ -131,7 +131,7 @@ describe UserMerge do
     end
 
     it "moves access tokens to the new user" do
-      at = AccessToken.create!(:user => user2, :developer_key => DeveloperKey.default)
+      at = AccessToken.create!(user: user2, developer_key: DeveloperKey.default)
       UserMerge.from(user2).into(user1)
       at.reload
       expect(at.user_id).to eq user1.id
@@ -385,8 +385,8 @@ describe UserMerge do
       context_module2.save
 
       # have a conflicting module_progrssion
-      assignment2.grade_student(user1, :grade => "10", grader: @teacher)
-      assignment2.grade_student(user2, :grade => "4", grader: @teacher)
+      assignment2.grade_student(user1, grade: "10", grader: @teacher)
+      assignment2.grade_student(user2, grade: "4", grader: @teacher)
 
       # have a duplicate module_progression
       context_module.update_for(user1, :read, tag)
@@ -455,7 +455,7 @@ describe UserMerge do
       expect(data.records.where(context_type: 'UserObservationLink').count).to eq 2
       user1.reload
       expect(user1.linked_observers).to be_empty
-      expect(UserObservationLink.where(:student => user1).first.workflow_state).to eq 'deleted'
+      expect(UserObservationLink.where(student: user1).first.workflow_state).to eq 'deleted'
       user2.reload
       expect(user2.linked_observers.sort_by(&:id)).to eql [observer1, observer2]
     end
@@ -511,13 +511,13 @@ describe UserMerge do
     end
 
     it "moves appointments" do
-      course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
-      course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
-      ag = AppointmentGroup.create(:title => "test",
-                                   :contexts => [course1],
-                                   :participants_per_appointment => 1,
-                                   :min_appointments_per_participant => 1,
-                                   :new_appointments => [
+      course1.enroll_user(user1, 'StudentEnrollment', enrollment_state: 'active')
+      course1.enroll_user(user2, 'StudentEnrollment', enrollment_state: 'active')
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [course1],
+                                   participants_per_appointment: 1,
+                                   min_appointments_per_participant: 1,
+                                   new_appointments: [
                                      ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
                                      ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
                                    ])
@@ -530,9 +530,9 @@ describe UserMerge do
     end
 
     it "moves user attachments and handle duplicates" do
-      attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
-      attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("notfirst"))
-      attachment3 = Attachment.create!(:user => user2, :context => user2, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+      attachment1 = Attachment.create!(user: user1, context: user1, filename: "test.txt", uploaded_data: StringIO.new("first"))
+      attachment2 = Attachment.create!(user: user1, context: user1, filename: "test.txt", uploaded_data: StringIO.new("notfirst"))
+      attachment3 = Attachment.create!(user: user2, context: user2, filename: "test.txt", uploaded_data: StringIO.new("first"))
 
       UserMerge.from(user1).into(user2)
       run_jobs
@@ -579,12 +579,12 @@ describe UserMerge do
   it "updates account associations" do
     account1 = account_model
     account2 = account_model
-    pseudo1 = (user1 = user_with_pseudonym :account => account1).pseudonym
-    pseudo2 = (user2 = user_with_pseudonym :account => account2).pseudonym
+    pseudo1 = (user1 = user_with_pseudonym account: account1).pseudonym
+    pseudo2 = (user2 = user_with_pseudonym account: account2).pseudonym
     subsubaccount1 = (subaccount1 = account1.sub_accounts.create!).sub_accounts.create!
     subsubaccount2 = (subaccount2 = account2.sub_accounts.create!).sub_accounts.create!
-    course_with_student(:account => subsubaccount1, :user => user1)
-    course_with_student(:account => subsubaccount2, :user => user2)
+    course_with_student(account: subsubaccount1, user: user1)
+    course_with_student(account: subsubaccount2, user: user2)
 
     expect(user1.associated_accounts.map(&:id).sort).to eq [account1, subaccount1, subsubaccount1].map(&:id).sort
     expect(user2.associated_accounts.map(&:id).sort).to eq [account2, subaccount2, subsubaccount2].map(&:id).sort
@@ -612,18 +612,18 @@ describe UserMerge do
       it "updates the versions table" do
         other_user = user_model
 
-        a1 = assignment_model(:submission_types => 'online_text_entry')
+        a1 = assignment_model(submission_types: 'online_text_entry')
         a1.submit_homework(user2, {
-                             :submission_type => 'online_text_entry',
-                             :body => 'hi'
+                             submission_type: 'online_text_entry',
+                             body: 'hi'
                            })
         s1 = a1.submit_homework(user2, {
-                                  :submission_type => 'online_text_entry',
-                                  :body => 'hi again'
+                                  submission_type: 'online_text_entry',
+                                  body: 'hi again'
                                 })
         s_other = a1.submit_homework(other_user, {
-                                       :submission_type => 'online_text_entry',
-                                       :body => 'hi again'
+                                       submission_type: 'online_text_entry',
+                                       body: 'hi again'
                                      })
 
         expect(s1.versions.count).to eql(2)
@@ -685,8 +685,8 @@ describe UserMerge do
 
     it "updates other appropriate versions" do
       course_factory(active_all: true)
-      wiki_page = @course.wiki_pages.create(:title => "Hi", :user_id => user2.id)
-      ra = rubric_assessment_model(:context => @course, :user => user2)
+      wiki_page = @course.wiki_pages.create(title: "Hi", user_id: user2.id)
+      ra = rubric_assessment_model(context: @course, user: user2)
 
       expect(wiki_page.versions).to be_present
       wiki_page.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
@@ -851,12 +851,12 @@ describe UserMerge do
     end
 
     it "merges a user across shards" do
-      user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+      user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
       p1 = @pseudonym
       cc1 = @cc
       @shard1.activate do
         account = Account.create!
-        @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+        @user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1, account: account)
         @p2 = @pseudonym
       end
 
@@ -884,16 +884,16 @@ describe UserMerge do
     end
 
     it "associates the user with all shards" do
-      user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+      user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
       p1 = @pseudonym
       @shard1.activate do
         account = Account.create!
-        @p2 = account.pseudonyms.create!(:unique_id => 'user1@exmaple.com', :user => user1)
+        @p2 = account.pseudonyms.create!(unique_id: 'user1@exmaple.com', user: user1)
       end
 
       @shard2.activate do
         account = Account.create!
-        @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+        @user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1, account: account)
         @p3 = @pseudonym
         UserMerge.from(user1).into(@user2)
       end
@@ -995,7 +995,7 @@ describe UserMerge do
         @user2 = User.create!
       end
 
-      cc1 = @user2.communication_channels.sms.create!(:path => 'abc')
+      cc1 = @user2.communication_channels.sms.create!(path: 'abc')
       cc1.retire!
       @user2.reload
 
@@ -1012,34 +1012,34 @@ describe UserMerge do
       # different shards (e.g. root_attachment and its copy) can cause
       # :boom: ... set high ids for things that get copied, so their
       # copies' ids don't collide
-      root_attachment = Attachment.create(:id => 1_000_000, :context => @course, :filename => "unique_name1.txt",
-                                          :uploaded_data => StringIO.new("root_attachment_data"))
+      root_attachment = Attachment.create(id: 1_000_000, context: @course, filename: "unique_name1.txt",
+                                          uploaded_data: StringIO.new("root_attachment_data"))
       user1 = User.create!
       # should not copy because it's identical to @user2_attachment1
-      user1_attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
-                                             :uploaded_data => StringIO.new("shared_data"))
+      user1_attachment1 = Attachment.create!(user: user1, context: user1, filename: "shared_name1.txt",
+                                             uploaded_data: StringIO.new("shared_data"))
       # copy should have root_attachment directed to @user2_attachment2, and be renamed
-      user1_attachment2 = Attachment.create!(:id => 1_000_001, :user => user1, :context => user1, :filename => "shared_name2.txt",
-                                             :uploaded_data => StringIO.new("shared_data2"))
+      user1_attachment2 = Attachment.create!(id: 1_000_001, user: user1, context: user1, filename: "shared_name2.txt",
+                                             uploaded_data: StringIO.new("shared_data2"))
       # should copy as a root_attachment (even though it isn't one currently)
-      user1_attachment3 = Attachment.create!(:id => 1_000_002, :user => user1, :context => user1, :filename => "unique_name2.txt",
-                                             :uploaded_data => StringIO.new("root_attachment_data"))
+      user1_attachment3 = Attachment.create!(id: 1_000_002, user: user1, context: user1, filename: "unique_name2.txt",
+                                             uploaded_data: StringIO.new("root_attachment_data"))
       user1_attachment3.content_type = "text/plain"
       user1_attachment3.save!
       expect(user1_attachment3.root_attachment).to eq root_attachment
 
       @shard1.activate do
         new_account = Account.create!
-        @user2 = user_with_pseudonym(:account => new_account)
+        @user2 = user_with_pseudonym(account: new_account)
 
-        @user2_attachment1 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name1.txt",
-                                                :uploaded_data => StringIO.new("shared_data"))
+        @user2_attachment1 = Attachment.create!(user: @user2, context: @user2, filename: "shared_name1.txt",
+                                                uploaded_data: StringIO.new("shared_data"))
 
-        @user2_attachment2 = Attachment.create!(:user => @user2, :context => @user2, :filename => "unique_name3.txt",
-                                                :uploaded_data => StringIO.new("shared_data2"))
+        @user2_attachment2 = Attachment.create!(user: @user2, context: @user2, filename: "unique_name3.txt",
+                                                uploaded_data: StringIO.new("shared_data2"))
 
-        @user2_attachment3 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name2.txt",
-                                                :uploaded_data => StringIO.new("unique_data"))
+        @user2_attachment3 = Attachment.create!(user: @user2, context: @user2, filename: "shared_name2.txt",
+                                                uploaded_data: StringIO.new("unique_data"))
       end
 
       UserMerge.from(user1).into(@user2)
@@ -1060,15 +1060,15 @@ describe UserMerge do
 
     it "marks cross-shard user submission attachments so they're still visible" do
       user1 = User.create!
-      user1_attachment = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
-                                            :uploaded_data => StringIO.new("shared_data"))
+      user1_attachment = Attachment.create!(user: user1, context: user1, filename: "shared_name1.txt",
+                                            uploaded_data: StringIO.new("shared_data"))
       course_factory
-      a1 = assignment_model(:submission_types => "online_upload")
+      a1 = assignment_model(submission_types: "online_upload")
       submission = a1.submit_homework(user1, attachments: [user1_attachment])
 
       @shard1.activate do
         new_account = Account.create!
-        @user2 = user_with_pseudonym(:account => new_account)
+        @user2 = user_with_pseudonym(account: new_account)
       end
 
       UserMerge.from(user1).into(@user2)
@@ -1088,7 +1088,7 @@ describe UserMerge do
 
       @shard1.activate do
         new_account = Account.create!
-        @user2 = user_with_pseudonym(:account => new_account)
+        @user2 = user_with_pseudonym(account: new_account)
       end
 
       c3 = user1.initiate_conversation([user_factory, @user2]) # conversation where the target user already exists
@@ -1107,12 +1107,12 @@ describe UserMerge do
         @course.offer!
 
         # create an active enrollment (usually through an SIS import)
-        user1 = user_with_pseudonym(:username => email, :active_all => true)
+        user1 = user_with_pseudonym(username: email, active_all: true)
         @course.enroll_user(user1).accept!
 
         # manually invite the same email address into the course
         # if open_registration is set on the root account, this creates a new temporary user
-        user2 = user_with_communication_channel(:username => email, :user_state => "creation_pending")
+        user2 = user_with_communication_channel(username: email, user_state: "creation_pending")
         @course.enroll_user(user2)
 
         # cache the temporary invitations

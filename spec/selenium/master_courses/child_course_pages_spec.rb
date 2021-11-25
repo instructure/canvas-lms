@@ -25,15 +25,15 @@ describe "master courses - child courses - wiki page locking" do
   include_context "blueprint courses files context"
 
   before :once do
-    @copy_from = course_factory(:active_all => true)
+    @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_page = @copy_from.wiki_pages.create!(:title => "blah", :body => "bloo")
+    @original_page = @copy_from.wiki_pages.create!(title: "blah", body: "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @page_copy = @copy_to.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
+    @page_copy = @copy_to.wiki_pages.new(title: "bloo", body: "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
   end
@@ -52,7 +52,7 @@ describe "master courses - child courses - wiki page locking" do
     end
 
     it "does not show the edit/delete cog-menu options on the index when locked" do
-      @tag.update(restrictions: { :content => true })
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/pages"
 
@@ -76,7 +76,7 @@ describe "master courses - child courses - wiki page locking" do
 
   describe "on show page" do
     it "does not show the delete option when locked" do
-      @tag.update(restrictions: { :points => true })
+      @tag.update(restrictions: { points: true })
 
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 

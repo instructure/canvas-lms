@@ -23,12 +23,12 @@ require "active_support/core_ext/module/delegation"
 class EventStream::Stream
   include EventStream::AttrConfig
 
-  attr_config :database, :default => nil # only needed if backend_strategy evaluates to :cassandra
-  attr_config :table, :type => String
-  attr_config :id_column, :type => String, :default => 'id'
-  attr_config :record_type, :default => EventStream::Record
-  attr_config :time_to_live, :type => Integer, :default => 1.year # only honored for cassandra strategy
-  attr_config :read_consistency_level, :default => nil # only honored for cassandra strategy
+  attr_config :database, default: nil # only needed if backend_strategy evaluates to :cassandra
+  attr_config :table, type: String
+  attr_config :id_column, type: String, default: 'id'
+  attr_config :record_type, default: EventStream::Record
+  attr_config :time_to_live, type: Integer, default: 1.year # only honored for cassandra strategy
+  attr_config :read_consistency_level, default: nil # only honored for cassandra strategy
   attr_config :backend_strategy, default: -> { :cassandra } # one of [:cassandra, :active_record]
   attr_config :active_record_type, default: nil # only needed if backend_strategy evaluates to :active_record
 

@@ -54,10 +54,10 @@ module ActiveModel
         key  = keys.shift
 
         options = {
-          :default => keys,
-          :model => base.class.name.humanize,
-          :attribute => base.class.human_attribute_name(attribute),
-          :value => value
+          default: keys,
+          model: base.class.name.humanize,
+          attribute: base.class.human_attribute_name(attribute),
+          value: value
         }.merge(self.options)
         options[:default] ||= keys
 
@@ -67,7 +67,7 @@ module ActiveModel
         end
         if result.is_a?(I18n::MissingTranslation)
           # fallback on activerecord.errors scope if translation is missing for rails 3
-          result = I18n.send(:translate, key, options.merge(:scope => [:activerecord, :errors], :throw => false))
+          result = I18n.send(:translate, key, options.merge(scope: [:activerecord, :errors], throw: false))
         end
         result
       end

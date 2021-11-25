@@ -32,7 +32,7 @@ module SIS
           end
         end
       end
-      User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => { @root_account.id => 0 })
+      User.update_account_associations(importer.users_to_add_account_associations, incremental: true, precalculated_associations: { @root_account.id => 0 })
       User.update_account_associations(importer.users_to_update_account_associations)
       importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) { |ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id) }
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
@@ -285,7 +285,7 @@ module SIS
           user.sortable_name_explicitly_set = true if user_row.sortable_name.present?
 
           begin
-            User.transaction(:requires_new => true) do
+            User.transaction(requires_new: true) do
               if user.changed?
                 user_touched = true
                 if !user.save && !user.errors.empty?
@@ -339,7 +339,7 @@ module SIS
               limit = Setting.get("merge_candidate_search_limit", "100").to_i
               ccs = cc_scope.limit(limit + 1).to_a
               if ccs.count > limit
-                ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+                ccs = cc_scope.where(user_id: user).to_a # don't bother with merge candidates anymore
               end
             end
 

@@ -22,8 +22,8 @@ require 'nokogiri'
 
 describe ContextModule do
   def course_module
-    course_with_student_logged_in(:active_all => true)
-    @module = @course.context_modules.create!(:name => "some module")
+    course_with_student_logged_in(active_all: true)
+    @module = @course.context_modules.create!(name: "some module")
   end
 
   describe "index" do
@@ -44,14 +44,14 @@ describe ContextModule do
 
   it "clears the page cache on individual tag change" do
     enable_cache do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       context_module = @course.context_modules.create!
-      content_tag = context_module.add_item :type => 'context_module_sub_header', :title => "My Sub Header Title"
-      ContextModule.where(:id => context_module).update_all(:updated_at => 1.hour.ago)
+      content_tag = context_module.add_item type: 'context_module_sub_header', title: "My Sub Header Title"
+      ContextModule.where(id: context_module).update_all(updated_at: 1.hour.ago)
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My Sub Header Title/)
 
-      content_tag.update(:title => "My New Title")
+      content_tag.update(title: "My New Title")
 
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My New Title/)
@@ -66,7 +66,7 @@ describe ContextModule do
     end
 
     def before_after
-      @module.completion_requirements = { @tag.id => { :type => 'must_contribute' } }
+      @module.completion_requirements = { @tag.id => { type: 'must_contribute' } }
       @module.save!
 
       @progression = @module.evaluate_for(@user)
@@ -81,27 +81,27 @@ describe ContextModule do
     end
 
     it "progresses for discussions" do
-      @discussion = @course.discussion_topics.create!(:title => "talk")
-      @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
+      @discussion = @course.discussion_topics.create!(title: "talk")
+      @tag = @module.add_item(type: 'discussion_topic', id: @discussion.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id } }
+        post "/courses/#{@course.id}/discussion_entries", params: { discussion_entry: { message: 'ohai', discussion_topic_id: @discussion.id } }
         expect(response).to be_redirect
       end
     end
 
     it "progresses for wiki pages" do
-      @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
-      @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
+      @page = @course.wiki_pages.create!(title: "talk page", body: 'ohai', editing_roles: 'teachers,students')
+      @tag = @module.add_item(type: 'wiki_page', id: @page.id)
       before_after do
-        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { :wiki_page => { :body => 'i agree', :title => 'talk page' } }
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { wiki_page: { body: 'i agree', title: 'talk page' } }
       end
     end
 
     it "progresses for assignment discussions" do
-      @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
-      @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
+      @assignment = @course.assignments.create!(title: 'talk assn', submission_types: 'discussion_topic')
+      @tag = @module.add_item(type: 'assignment', id: @assignment.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id } }
+        post "/courses/#{@course.id}/discussion_entries", params: { discussion_entry: { message: 'ohai', discussion_topic_id: @assignment.discussion_topic.id } }
         expect(response).to be_redirect
       end
     end
@@ -111,22 +111,22 @@ describe ContextModule do
     def progression_testing(progress_by_item_link)
       enable_cache do
         @is_attachment = false
-        course_with_student_logged_in(:active_all => true)
-        @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+        course_with_student_logged_in(active_all: true)
+        @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true)
         @quiz.publish!
 
         # separate timestamps so touch_context will actually invalidate caches
         Timecop.freeze(4.seconds.ago) do
-          @mod1 = @course.context_modules.create!(:name => "some module")
+          @mod1 = @course.context_modules.create!(name: "some module")
           @mod1.require_sequential_progress = true
           @mod1.save!
-          @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
-          @mod1.completion_requirements = { @tag1.id => { :type => 'min_score', :min_score => 1 } }
+          @tag1 = @mod1.add_item(type: 'quiz', id: @quiz.id)
+          @mod1.completion_requirements = { @tag1.id => { type: 'min_score', min_score: 1 } }
           @mod1.save!
         end
 
         Timecop.freeze(2.seconds.ago) do
-          @mod2 = @course.context_modules.create!(:name => "dependant module")
+          @mod2 = @course.context_modules.create!(name: "dependant module")
           @mod2.prerequisites = "module_#{@mod1.id}"
           @mod2.save!
         end
@@ -188,9 +188,9 @@ describe ContextModule do
     it "progresses to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
+          asmnt = @course.assignments.create!(title: 'assignment', description: content)
           @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
-          @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+          @tag2 = @mod2.add_item(type: 'assignment', id: asmnt.id)
           expect(@tag2).to be_published
         end
       end
@@ -199,9 +199,9 @@ describe ContextModule do
     it "progresses to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
+          discussion = @course.discussion_topics.create!(title: "topic", message: content)
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
-          @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+          @tag2 = @mod2.add_item(type: 'discussion_topic', id: discussion.id)
           expect(@tag2).to be_published
         end
       end
@@ -210,10 +210,10 @@ describe ContextModule do
     it "progresses to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          quiz = @course.quizzes.create!(:title => "quiz", :description => content)
+          quiz = @course.quizzes.create!(title: "quiz", description: content)
           quiz.publish!
           @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
-          @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+          @tag2 = @mod2.add_item(type: 'quiz', id: quiz.id)
           expect(@tag2).to be_published
         end
       end
@@ -222,9 +222,9 @@ describe ContextModule do
     it "progresses to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          page = @course.wiki_pages.create!(:title => "wiki", :body => content)
+          page = @course.wiki_pages.create!(title: "wiki", body: content)
           @test_url = "/courses/#{@course.id}/pages/#{page.url}"
-          @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+          @tag2 = @mod2.add_item(type: 'wiki_page', id: page.id)
           expect(@tag2).to be_published
           @is_wiki_page = true
         end
@@ -235,9 +235,9 @@ describe ContextModule do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           @is_attachment = true
-          att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
+          att = Attachment.create!(filename: 'test.html', display_name: "test.html", uploaded_data: StringIO.new(content), folder: Folder.unfiled_folder(@course), context: @course)
           @test_url = "/courses/#{@course.id}/files/#{att.id}?fd_cookie_set=1"
-          @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+          @tag2 = @mod2.add_item(type: 'attachment', id: att.id)
           expect(@tag2).to be_published
         end
       end

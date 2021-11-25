@@ -35,7 +35,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :notification, inverse_of: :notification_policy_overrides
 
-  has_many :delayed_messages, inverse_of: :notification_policy_override, :dependent => :destroy
+  has_many :delayed_messages, inverse_of: :notification_policy_override, dependent: :destroy
 
   def self.enable_for_context(user, context, enable: true)
     user.shard.activate do

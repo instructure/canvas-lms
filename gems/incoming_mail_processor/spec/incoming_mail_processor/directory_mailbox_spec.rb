@@ -25,7 +25,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
   def default_config
     {
-      :folder => "/tmp/directory_mailbox",
+      folder: "/tmp/directory_mailbox",
     }
   end
 

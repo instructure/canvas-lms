@@ -29,10 +29,10 @@ class KalturaMediaFileHandler
     root_account_id = attachments.filter_map(&:root_account_id).first
     attachments.reject(&:media_object).each do |attachment|
       files << {
-        :name => attachment.display_name,
-        :url => attachment.public_download_url,
-        :media_type => attachment.content_type&.start_with?('video') ? 'video' : 'audio',
-        :partner_data => build_partner_data(attachment)
+        name: attachment.display_name,
+        url: attachment.public_download_url,
+        media_type: attachment.content_type&.start_with?('video') ? 'video' : 'audio',
+        partner_data: build_partner_data(attachment)
       }
     end
     return nil if files.empty?

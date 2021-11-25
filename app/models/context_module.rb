@@ -29,8 +29,8 @@ class ContextModule < ActiveRecord::Base
   restrict_columns :settings, %i[prerequisites completion_requirements requirement_count require_sequential_progress]
 
   belongs_to :context, polymorphic: [:course]
-  belongs_to :root_account, :class_name => 'Account'
-  has_many :context_module_progressions, :dependent => :destroy
+  belongs_to :root_account, class_name: 'Account'
+  has_many :context_module_progressions, dependent: :destroy
   has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
 
@@ -47,7 +47,7 @@ class ContextModule < ActiveRecord::Base
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
   validates :workflow_state, :context_id, :context_type, presence: true
-  validates :name, presence: { :if => :require_presence_of_name }
+  validates :name, presence: { if: :require_presence_of_name }
   attr_accessor :require_presence_of_name
 
   def relock_warning_check
@@ -88,8 +88,8 @@ class ContextModule < ActiveRecord::Base
 
     self.class.connection.after_transaction_commit do
       relocked_modules << self
-      progression_scope = context_module_progressions.where(:current => true).where.not(:workflow_state => 'locked')
-      progression_scope = progression_scope.where(:user_id => student_ids) if student_ids
+      progression_scope = context_module_progressions.where(current: true).where.not(workflow_state: 'locked')
+      progression_scope = progression_scope.where(user_id: student_ids) if student_ids
 
       if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
         delay_if_production(strand: "module_reeval_#{global_context_id}").evaluate_all_progressions
@@ -177,15 +177,15 @@ class ContextModule < ActiveRecord::Base
 
   def duplicate_base_model(copy_title)
     ContextModule.new({
-                        :context_id => context_id,
-                        :context_type => context_type,
-                        :name => copy_title,
-                        :position => ContextModule.not_deleted.where(context_id: context_id).maximum(:position) + 1,
-                        :completion_requirements => completion_requirements,
-                        :workflow_state => 'unpublished',
-                        :require_sequential_progress => require_sequential_progress,
-                        :completion_events => completion_events,
-                        :requirement_count => requirement_count
+                        context_id: context_id,
+                        context_type: context_type,
+                        name: copy_title,
+                        position: ContextModule.not_deleted.where(context_id: context_id).maximum(:position) + 1,
+                        completion_requirements: completion_requirements,
+                        workflow_state: 'unpublished',
+                        require_sequential_progress: require_sequential_progress,
+                        completion_events: completion_events,
+                        requirement_count: requirement_count
                       })
   end
 
@@ -217,20 +217,20 @@ class ContextModule < ActiveRecord::Base
   # Not intended for duplicating a content tag to keep in the original module
   def duplicate_content_tag_base_model(original_content_tag)
     ContentTag.new(
-      :content_id => original_content_tag.content_id,
-      :content_type => original_content_tag.content_type,
-      :context_id => original_content_tag.context_id,
-      :context_type => original_content_tag.context_type,
-      :url => original_content_tag.url,
-      :new_tab => original_content_tag.new_tab,
-      :title => original_content_tag.title,
-      :tag_type => original_content_tag.tag_type,
-      :position => original_content_tag.position,
-      :indent => original_content_tag.indent,
-      :learning_outcome_id => original_content_tag.learning_outcome_id,
-      :context_code => original_content_tag.context_code,
-      :mastery_score => original_content_tag.mastery_score,
-      :workflow_state => 'unpublished'
+      content_id: original_content_tag.content_id,
+      content_type: original_content_tag.content_type,
+      context_id: original_content_tag.context_id,
+      context_type: original_content_tag.context_type,
+      url: original_content_tag.url,
+      new_tab: original_content_tag.new_tab,
+      title: original_content_tag.title,
+      tag_type: original_content_tag.tag_type,
+      position: original_content_tag.position,
+      indent: original_content_tag.indent,
+      learning_outcome_id: original_content_tag.learning_outcome_id,
+      context_code: original_content_tag.context_code,
+      mastery_score: original_content_tag.mastery_score,
+      workflow_state: 'unpublished'
     )
   end
   private :duplicate_content_tag_base_model
@@ -285,7 +285,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => deleted_at)
+    ContentTag.where(context_module_id: self).where.not(workflow_state: 'deleted').update_all(workflow_state: 'deleted', updated_at: deleted_at)
     delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
     true
@@ -295,7 +295,7 @@ class ContextModule < ActiveRecord::Base
     if workflow_state == 'deleted' && deleted_at
       # only restore tags deleted (approximately) when the module was deleted
       # (tags are currently set to exactly deleted_at but older deleted modules used the current time on each tag)
-      tags_to_restore = content_tags.where(:workflow_state => 'deleted')
+      tags_to_restore = content_tags.where(workflow_state: 'deleted')
                                     .where('updated_at BETWEEN ? AND ?', deleted_at - 5.seconds, deleted_at + 5.seconds)
                                     .preload(:content)
       tags_to_restore.each do |tag|
@@ -328,16 +328,16 @@ class ContextModule < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :unpublish, :transitions_to => :unpublished
+      event :unpublish, transitions_to: :unpublished
     end
     state :unpublished do
-      event :publish, :transitions_to => :active
+      event :publish, transitions_to: :active
     end
     state :deleted
   end
 
-  scope :active, -> { where(:workflow_state => 'active') }
-  scope :unpublished, -> { where(:workflow_state => 'unpublished') }
+  scope :active, -> { where(workflow_state: 'active') }
+  scope :unpublished, -> { where(workflow_state: 'unpublished') }
   scope :not_deleted, -> { where("context_modules.workflow_state<>'deleted'") }
   scope :starting_with_name, lambda { |name|
     where('name ILIKE ?', "#{name}%")
@@ -445,7 +445,7 @@ class ContextModule < ActiveRecord::Base
     all_prereqs = read_attribute(:prerequisites)
     return [] unless all_prereqs&.any?
 
-    all_prereqs.select { |pre| module_names.key?(pre[:id]) }.map { |pre| pre.merge(:name => module_names[pre[:id]]) }
+    all_prereqs.select { |pre| module_names.key?(pre[:id]) }.map { |pre| pre.merge(name: module_names[pre[:id]]) }
   end
 
   def prerequisites=(prereqs)
@@ -466,7 +466,7 @@ class ContextModule < ActiveRecord::Base
 
         id = match[1].to_i
         if module_names.key?(id)
-          res << { :id => id, :type => 'context_module', :name => module_names[id] }
+          res << { id: id, type: 'context_module', name: module_names[id] }
         end
       end
       prereqs = res
@@ -651,14 +651,14 @@ class ContextModule < ActiveRecord::Base
     case params[:type]
     when 'external_url'
       title = params[:title]
-      added_item ||= content_tags.build(:context => context)
+      added_item ||= content_tags.build(context: context)
       added_item.attributes = {
-        :url => params[:url],
-        :new_tab => params[:new_tab],
-        :tag_type => 'context_module',
-        :title => title,
-        :indent => params[:indent],
-        :position => position
+        url: params[:url],
+        new_tab: params[:new_tab],
+        tag_type: 'context_module',
+        title: title,
+        indent: params[:indent],
+        position: position
       }
       added_item.content_id = 0
       added_item.content_type = 'ExternalUrl'
@@ -667,7 +667,7 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = 'unpublished' if added_item.new_record?
     when 'context_external_tool', 'external_tool', 'lti/message_handler'
       title = params[:title]
-      added_item ||= content_tags.build(:context => context)
+      added_item ||= content_tags.build(context: context)
 
       content = if params[:type] == 'lti/message_handler'
                   Lti::MessageHandler.for_context(context).where(id: params[:id]).first
@@ -676,12 +676,12 @@ class ContextModule < ActiveRecord::Base
                 end
       added_item.attributes = {
         content: content,
-        :url => params[:url],
-        :new_tab => params[:new_tab],
-        :tag_type => 'context_module',
-        :title => title,
-        :indent => params[:indent],
-        :position => position
+        url: params[:url],
+        new_tab: params[:new_tab],
+        tag_type: 'context_module',
+        title: title,
+        indent: params[:indent],
+        position: position
       }
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
@@ -704,12 +704,12 @@ class ContextModule < ActiveRecord::Base
       end
     when 'context_module_sub_header', 'sub_header'
       title = params[:title]
-      added_item ||= content_tags.build(:context => context)
+      added_item ||= content_tags.build(context: context)
       added_item.attributes = {
-        :tag_type => 'context_module',
-        :title => title,
-        :indent => params[:indent],
-        :position => position
+        tag_type: 'context_module',
+        title: title,
+        indent: params[:indent],
+        position: position
       }
       added_item.content_id = 0
       added_item.content_type = 'ContextModuleSubHeader'
@@ -720,13 +720,13 @@ class ContextModule < ActiveRecord::Base
       return nil unless item
 
       title = params[:title] || (item.title rescue item.name)
-      added_item ||= content_tags.build(:context => context)
+      added_item ||= content_tags.build(context: context)
       added_item.attributes = {
-        :content => item,
-        :tag_type => 'context_module',
-        :title => title,
-        :indent => params[:indent],
-        :position => position
+        content: item,
+        tag_type: 'context_module',
+        title: title,
+        indent: params[:indent],
+        position: position
       }
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
@@ -820,7 +820,7 @@ class ContextModule < ActiveRecord::Base
     when 'must_submit'
       t('requirements.must_submit', "must submit the assignment")
     when 'min_score'
-      t('requirements.min_score', "must score at least a %{score}", :score => req[:min_score])
+      t('requirements.min_score', "must score at least a %{score}", score: req[:min_score])
     else
       nil
     end

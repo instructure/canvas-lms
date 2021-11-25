@@ -94,7 +94,7 @@ describe "Alerts" do
   end
 
   it "deletes alerts" do
-    alert = @alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
+    alert = @alerts.create!(recipients: [:student], criteria: [criterion_type: 'Interaction', threshold: 7])
     get "/accounts/#{@context.id}/settings"
 
     find('#tab-alerts-link').click
@@ -181,7 +181,7 @@ describe "Alerts" do
     end
 
     it "does not show the add link when all recipients are already there" do
-      alert = @alerts.create!(:recipients => [:student, :teachers, { :role_id => admin_role.id }], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
+      alert = @alerts.create!(recipients: [:student, :teachers, { role_id: admin_role.id }], criteria: [{ criterion_type: 'Interaction', threshold: 7 }])
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click
@@ -210,10 +210,10 @@ describe "Alerts" do
     end
 
     it "works with custom roles" do
-      role1 = custom_account_role('these rolls are delicious', :account => @context)
-      role2 = custom_account_role('your just jelly', :account => @context)
+      role1 = custom_account_role('these rolls are delicious', account: @context)
+      role2 = custom_account_role('your just jelly', account: @context)
 
-      alert = @alerts.create!(:recipients => [{ :role_id => role1.id }], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
+      alert = @alerts.create!(recipients: [{ role_id: role1.id }], criteria: [{ criterion_type: 'Interaction', threshold: 7 }])
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click

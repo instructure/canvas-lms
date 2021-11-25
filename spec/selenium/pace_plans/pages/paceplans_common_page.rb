@@ -23,7 +23,7 @@ module PacePlansCommonPageObject
   def admin_setup
     feature_setup
     teacher_setup
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
   end
 
   def create_assignment(course, assignment_title, description, points_possible, publish_status)
@@ -37,7 +37,7 @@ module PacePlansCommonPageObject
   end
 
   def create_course_module(module_title, workflow_state = 'active')
-    @course.context_modules.create!(:name => module_title, :workflow_state => workflow_state)
+    @course.context_modules.create!(name: module_title, workflow_state: workflow_state)
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
@@ -92,7 +92,7 @@ module PacePlansCommonPageObject
     pace_plan_model(course: @course)
     pace_plan_module = create_course_module(module_title)
     pace_plan_assignment = create_assignment(@course, assignment_title, 'Assignment 1', 10, 'published')
-    pace_plan_module.add_item(:id => pace_plan_assignment.id, :type => 'assignment')
+    pace_plan_module.add_item(id: pace_plan_assignment.id, type: 'assignment')
     @pace_plan.pace_plan_module_items.create! module_item: @course.context_module_tags[0], duration: 2
     @pace_plan
   end

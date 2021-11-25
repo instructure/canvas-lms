@@ -27,7 +27,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     @student = @course.enroll_student(User.create!, enrollemnt_state: 'active').user
     communication_channel(@teacher, { username: 'two@example.com', active_cc: true })
-    @notification = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'Due Date')
+    @notification = Notification.create!(name: "Assignment Created", subject: "Test", category: 'Due Date')
   end
 
   def mutation_str(
@@ -147,7 +147,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
 
   context 'send observed names in notifications' do
     it 'sets the user preference' do
-      @course.enroll_user(@teacher, "ObserverEnrollment", :associated_user_id => @student.id, :enrollment_state => 'active')
+      @course.enroll_user(@teacher, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: 'active')
       result = run_mutation(
         user_id: @teacher.id,
         account_id: @account.id,

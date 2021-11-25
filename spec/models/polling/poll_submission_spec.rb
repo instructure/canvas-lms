@@ -40,7 +40,7 @@ describe Polling::PollSubmission do
                                         user: @student,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /Poll can't be blank/)
+                         /Poll can't be blank/)
     end
 
     it "requires an associated poll choice" do
@@ -49,7 +49,7 @@ describe Polling::PollSubmission do
                                         user: @student,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /Poll choice can't be blank/)
+                         /Poll choice can't be blank/)
     end
 
     it "requires a user" do
@@ -58,7 +58,7 @@ describe Polling::PollSubmission do
                                         poll_choice: @poll_choice,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /User can't be blank/)
+                         /User can't be blank/)
     end
 
     it "requires a poll session" do
@@ -85,7 +85,7 @@ describe Polling::PollSubmission do
                                         poll_choice: @poll_choice,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /can only submit one choice per poll session/)
+                         /can only submit one choice per poll session/)
     end
 
     it "allows multiple submissions across multiple sessions" do
@@ -107,7 +107,7 @@ describe Polling::PollSubmission do
                                         poll_choice: @poll_choice,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /This poll session is not open for submissions/)
+                         /This poll session is not open for submissions/)
     end
 
     it "insures the poll choice is associated to the submission's poll" do
@@ -122,7 +122,7 @@ describe Polling::PollSubmission do
                                         poll_choice: poll_choice,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
-                       /That poll choice does not belong to the existing poll/)
+                         /That poll choice does not belong to the existing poll/)
     end
   end
 end

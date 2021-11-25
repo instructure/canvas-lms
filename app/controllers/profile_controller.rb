@@ -144,11 +144,11 @@
 #     }
 #
 class ProfileController < ApplicationController
-  before_action :require_registered_user, :except => %i[show settings communication communication_update]
-  before_action :require_user, :only => %i[settings communication communication_update qr_mobile_login]
-  before_action :require_user_for_private_profile, :only => :show
+  before_action :require_registered_user, except: %i[show settings communication communication_update]
+  before_action :require_user, only: %i[settings communication communication_update qr_mobile_login]
+  before_action :require_user_for_private_profile, only: :show
   before_action :reject_student_view_student
-  before_action :require_password_session, :only => %i[communication communication_update update]
+  before_action :require_password_session, only: %i[communication communication_update update]
 
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel
@@ -177,8 +177,8 @@ class ProfileController < ApplicationController
     )
 
     if @user_data[:known_user] # if you can message them, you can see the profile
-      js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
-      add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", :user => @user.short_name), user_profile_path(@user))
+      js_env enable_gravatar: @domain_root_account&.enable_gravatar?
+      add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", user: @user.short_name), user_profile_path(@user))
       render
     else
       render :unauthorized
@@ -213,13 +213,13 @@ class ProfileController < ApplicationController
     @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
-    js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
+    js_env enable_gravatar: @domain_root_account&.enable_gravatar?
     respond_to do |format|
       format.html do
         @user.reload
         show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
                                    @user.participating_instructor_course_ids.any?
-        add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path)
+        add_crumb(t(:crumb, "%{user}'s settings", user: @user.short_name), settings_profile_path)
         js_env(
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
           CONTEXT_BASE_URL: "/users/#{@user.id}"
@@ -227,7 +227,7 @@ class ProfileController < ApplicationController
         render :profile
       end
       format.json do
-        render :json => user_profile_json(@user.profile, @current_user, session, params[:include])
+        render json: user_profile_json(@user.profile, @current_user, session, params[:include])
       end
     end
   end
@@ -248,7 +248,7 @@ class ProfileController < ApplicationController
       send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@user, @domain_root_account),
       daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
       weekly_notification_range: {
-        weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, :format => :weekday),
+        weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, format: :weekday),
         start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
         end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone)
       },
@@ -262,7 +262,7 @@ class ProfileController < ApplicationController
   def communication_update
     params[:root_account] = @domain_root_account
     NotificationPolicy.setup_for(@current_user, params)
-    render :json => {}, :status => :ok
+    render json: {}, status: :ok
   end
 
   # @API List avatar options
@@ -311,7 +311,7 @@ class ProfileController < ApplicationController
   def profile_pics
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     if authorized_action(@user, @current_user, :update_avatar)
-      render :json => avatars_json_for_user(@user)
+      render json: avatars_json_for_user(@user)
     end
   end
 
@@ -322,7 +322,7 @@ class ProfileController < ApplicationController
 
     email_channel_id = @current_user.email_channel.try(:id)
     if disable_inbox && !email_channel_id.nil?
-      params = { :channel_id => email_channel_id, :frequency => "immediately" }
+      params = { channel_id: email_channel_id, frequency: "immediately" }
 
       ["added_to_conversation", "conversation_message"].each do |category|
         params[:category] = category
@@ -330,7 +330,7 @@ class ProfileController < ApplicationController
       end
     end
 
-    render :json => {}
+    render json: {}
   end
 
   def update
@@ -377,11 +377,11 @@ class ProfileController < ApplicationController
             pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
           end
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
-            error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
+            error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
             pseudonymed = true
             flash[:error] = error_msg
             format.html { redirect_to user_profile_url(@current_user) }
-            format.json { render :json => { :errors => { :old_password => error_msg } }, :status => :bad_request }
+            format.json { render json: { errors: { old_password: error_msg } }, status: :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonym_params.delete :password
@@ -393,17 +393,17 @@ class ProfileController < ApplicationController
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
             format.html { redirect_to user_profile_url(@current_user) }
-            format.json { render :json => pseudonym_to_update.errors, :status => :bad_request }
+            format.json { render json: pseudonym_to_update.errors, status: :bad_request }
           end
         end
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => { :communication_channel => { :only => [:id, :path], :include_root => false }, :pseudonym => { :only => [:id, :unique_id], :include_root => false } }) }
+          format.json { render json: @user.as_json(methods: :avatar_url, include: { communication_channel: { only: [:id, :path], include_root: false }, pseudonym: { only: [:id, :unique_id], include_root: false } }) }
         end
       else
         format.html
-        format.json { render :json => @user.errors }
+        format.json { render json: @user.errors }
       end
     end
   end
@@ -435,7 +435,7 @@ class ProfileController < ApplicationController
       params[:link_urls].zip(params[:link_titles])
                         .reject { |url, title| url.blank? && title.blank? }
                         .each do |url, title|
-        new_link = @profile.links.build :url => url, :title => title
+        new_link = @profile.links.build url: url, title: title
         # since every time we update links, we delete and recreate everything,
         # deleting invalid link records will make sure the rest of the
         # valid ones still save
@@ -453,18 +453,18 @@ class ProfileController < ApplicationController
         visible, invisible = params[:user_services].to_unsafe_h.partition do |_service, bool|
           value_to_boolean(bool)
         end
-        @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
-        @user.user_services.where(:service => invisible.map(&:first)).update_all(:visible => false)
+        @user.user_services.where(service: visible.map(&:first)).update_all(visible: true)
+        @user.user_services.where(service: invisible.map(&:first)).update_all(visible: false)
       end
 
       respond_to do |format|
         format.html { redirect_to user_profile_path(@user) }
-        format.json { render :json => user_profile_json(@user.profile, @current_user, session, params[:includes]) }
+        format.json { render json: user_profile_json(@user.profile, @current_user, session, params[:includes]) }
       end
     else
       respond_to do |format|
         format.html { redirect_to user_profile_path(@user) } # FIXME: need to go to edit path
-        format.json { render :json => @profile.errors, :status => :bad_request }  # NOTE: won't send back @user validation errors (i.e. short_name)
+        format.json { render json: @profile.errors, status: :bad_request }  # NOTE: won't send back @user validation errors (i.e. short_name)
       end
     end
   end

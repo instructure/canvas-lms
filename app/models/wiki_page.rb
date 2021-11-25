@@ -27,7 +27,7 @@ class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by
 
-  validates :body, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :body, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
   validates :wiki_id, presence: true
   include Canvas::SoftDeletable
   include HasContentTags
@@ -47,13 +47,13 @@ class WikiPage < ActiveRecord::Base
 
   after_update :post_to_pandapub_when_revised
 
-  belongs_to :wiki, :touch => true
+  belongs_to :wiki, touch: true
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
-  acts_as_url :title, :sync_url => true
+  acts_as_url :title, sync_url: true
 
   validate :validate_front_page_visibility
 
@@ -78,9 +78,9 @@ class WikiPage < ActiveRecord::Base
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, lambda { |course_ids, group_ids|
     wiki_ids = []
-    wiki_ids += Course.where(:id => course_ids).pluck(:wiki_id) if course_ids.any?
-    wiki_ids += Group.where(:id => group_ids).pluck(:wiki_id) if group_ids.any?
-    where(:wiki_id => wiki_ids)
+    wiki_ids += Course.where(id: course_ids).pluck(:wiki_id) if course_ids.any?
+    wiki_ids += Group.where(id: group_ids).pluck(:wiki_id) if group_ids.any?
+    where(wiki_id: wiki_ids)
   }
 
   scope :visible_to_user, lambda { |user_id|
@@ -131,7 +131,7 @@ class WikiPage < ActiveRecord::Base
         p.save_without_broadcasting!
       end
     end
-    if context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => id).first
+    if context.wiki_pages.not_deleted.where(title: self.title).where.not(id: id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
       new_title = nil
@@ -156,7 +156,7 @@ class WikiPage < ActiveRecord::Base
     url_attribute = self.class.url_attribute
     base_url = send(url_attribute)
     base_url = send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !only_when_blank
-    conditions = [wildcard(url_attribute.to_s, base_url, :type => :right)]
+    conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
     unless new_record?
       conditions.first << " and id != ?"
       conditions << id
@@ -185,14 +185,14 @@ class WikiPage < ActiveRecord::Base
     if value.blank?
       record.errors.add(attr, t('errors.blank_title', "Title can't be blank"))
     elsif value.size > maximum_string_length
-      record.errors.add(attr, t('errors.title_too_long', "Title can't exceed %{max_characters} characters", :max_characters => maximum_string_length))
+      record.errors.add(attr, t('errors.title_too_long', "Title can't exceed %{max_characters} characters", max_characters: maximum_string_length))
     elsif value.to_url.blank?
       record.errors.add(attr, t('errors.title_characters', "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
     end
   end
 
   has_a_broadcast_policy
-  simply_versioned :exclude => SIMPLY_VERSIONED_EXCLUDE_FIELDS, :when => proc { |wp|
+  simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS, when: proc { |wp|
     # always create a version when restoring a deleted page
     next true if wp.workflow_state_changed? && wp.workflow_state_was == 'deleted'
 
@@ -204,13 +204,13 @@ class WikiPage < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :unpublish, :transitions_to => :unpublished
+      event :unpublish, transitions_to: :unpublished
     end
     state :unpublished do
-      event :publish, :transitions_to => :active
+      event :publish, transitions_to: :active
     end
     state :post_delayed do
-      event :delayed_post, :transitions_to => :active
+      event :delayed_post, transitions_to: :active
     end
   end
   alias_method :published?, :active?
@@ -260,7 +260,7 @@ class WikiPage < ActiveRecord::Base
     RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
       locked = false
       if (item = locked_by_module_item?(user, opts))
-        locked = { object: self, :module => item.context_module }
+        locked = { object: self, module: item.context_module }
         unlock_at = locked[:module].unlock_at
         locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
       end
@@ -346,7 +346,7 @@ class WikiPage < ActiveRecord::Base
     return true if wiki.grants_right?(user, session, :update)
 
     return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
-    return false if locked_for?(user, :deep_check_if_needed => true)
+    return false if locked_for?(user, deep_check_if_needed: true)
 
     true
   end
@@ -393,13 +393,13 @@ class WikiPage < ActiveRecord::Base
   def to_atom(opts = {})
     context = opts[:context]
     Atom::Entry.new do |entry|
-      entry.title = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => context.name, :page_title => self.title)
-      entry.authors << Atom::Person.new(:name => t(:atom_author, "Wiki Page"))
+      entry.title = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", course_or_group_name: context.name, page_title: self.title)
+      entry.authors << Atom::Person.new(name: t(:atom_author, "Wiki Page"))
       entry.updated   = updated_at
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}"
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}")
       entry.content = Atom::Content::Html.new(body || t('defaults.no_content', "no content"))
     end
   end
@@ -468,27 +468,26 @@ class WikiPage < ActiveRecord::Base
     return self if new_record?
 
     default_opts = {
-      :duplicate_assignment => true,
-      :copy_title => nil
+      duplicate_assignment: true,
+      copy_title: nil
     }
     opts_with_default = default_opts.merge(opts)
     result = WikiPage.new({
-                            :title =>
-                              opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
-                            :wiki_id => self.wiki_id,
-                            :context_id => context_id,
-                            :context_type => context_type,
-                            :body => body,
-                            :workflow_state => "unpublished",
-                            :user_id => user_id,
-                            :protected_editing => protected_editing,
-                            :editing_roles => editing_roles,
-                            :todo_date => todo_date
+                            title: opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
+                            wiki_id: self.wiki_id,
+                            context_id: context_id,
+                            context_type: context_type,
+                            body: body,
+                            workflow_state: "unpublished",
+                            user_id: user_id,
+                            protected_editing: protected_editing,
+                            editing_roles: editing_roles,
+                            todo_date: todo_date
                           })
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
-                                                 :duplicate_wiki_page => false,
-                                                 :copy_title => result.title
+                                                 duplicate_wiki_page: false,
+                                                 copy_title: result.title
                                                })
     end
     result

@@ -24,7 +24,7 @@ describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
     course_model(account: Account.default.manually_created_courses_account)
-    @page_view = PageView.new { |p| p.assign_attributes({ :created_at => Time.now, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }) }
+    @page_view = PageView.new { |p| p.assign_attributes({ created_at: Time.now, url: "http://test.one/", session_id: "phony", context: @course, controller: 'courses', action: 'show', user_request: true, render_time: 0.01, user_agent: 'None', account_id: Account.default.id, request_id: "abcde", interaction_seconds: 5, user: @user }) }
   end
 
   describe "sharding" do
@@ -60,7 +60,7 @@ describe PageView do
     end
 
     it "does not start a db transaction on save" do
-      PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }) }.store
+      PageView.new { |p| p.assign_attributes({ user: @user, url: "http://test.one/", session_id: "phony", context: @course, controller: 'courses', action: 'show', user_request: true, render_time: 0.01, user_agent: 'None', account_id: Account.default.id, request_id: "abcdef", interaction_seconds: 5 }) }.store
       expect(PageView.connection).not_to receive(:transaction)
       expect(PageView.find("abcdef")).to be_present
     end
@@ -110,39 +110,39 @@ describe PageView do
 
     it "paginates with a willpaginate-like array" do
       # some page views we shouldn't find
-      page_view_model(:user => user_model)
-      page_view_model(:user => user_model)
+      page_view_model(user: user_model)
+      page_view_model(user: user_model)
 
       user_model
       pvs = []
-      4.times { |i| pvs << page_view_model(:user => @user, :created_at => (5 - i).weeks.ago) }
+      4.times { |i| pvs << page_view_model(user: @user, created_at: (5 - i).weeks.ago) }
       pager = @user.page_views
       expect(pager).to be_a PaginatedCollection::Proxy
       expect { pager.paginate }.to raise_exception(ArgumentError)
-      full = pager.paginate(:per_page => 4)
+      full = pager.paginate(per_page: 4)
       expect(full.size).to eq 4
       expect(full.next_page).to be_nil
 
-      half = pager.paginate(:per_page => 2)
+      half = pager.paginate(per_page: 2)
       expect(half).to eq full[0, 2]
       expect(half.next_page).to be_present
 
-      second_half = pager.paginate(:per_page => 2, :page => half.next_page)
+      second_half = pager.paginate(per_page: 2, page: half.next_page)
       expect(second_half).to eq full[2, 2]
       expect(second_half.next_page).to be_nil
     end
 
     it "halts pagination after a set time period" do
-      p1 = page_view_model(:user => @user)
-      page_view_model(:user => @user, :created_at => 13.months.ago)
-      coll = @user.page_views.paginate(:per_page => 3)
+      p1 = page_view_model(user: @user)
+      page_view_model(user: @user, created_at: 13.months.ago)
+      coll = @user.page_views.paginate(per_page: 3)
       expect(coll).to eq [p1]
       expect(coll.next_page).to be_blank
     end
 
     it "ignores an invalid page" do
       @page_view.save!
-      expect(@user.page_views.paginate(:per_page => 2, :page => '3')).to eq [@page_view]
+      expect(@user.page_views.paginate(per_page: 2, page: '3')).to eq [@page_view]
     end
 
     context "filtering" do
@@ -173,15 +173,15 @@ describe PageView do
         a2 = account_model
         a3 = account_model
         Setting.set('enable_page_views', 'db')
-        moved = (0..1).map { page_view_model(:account => a1, :created_at => 1.day.ago) }
-        moved_a3 = page_view_model(:account => a3, :created_at => 4.hours.ago)
+        moved = (0..1).map { page_view_model(account: a1, created_at: 1.day.ago) }
+        moved_a3 = page_view_model(account: a3, created_at: 4.hours.ago)
         # this one is more recent in time and will be processed last
-        moved_later = page_view_model(:account => a1, :created_at => 2.hours.ago)
+        moved_later = page_view_model(account: a1, created_at: 2.hours.ago)
         # this one is in a deleted account
-        deleted = page_view_model(:account => a2, :created_at => 2.hours.ago)
+        deleted = page_view_model(account: a2, created_at: 2.hours.ago)
         a2.destroy
         # too far back
-        old = page_view_model(:account => a1, :created_at => 13.months.ago)
+        old = page_view_model(account: a1, created_at: 13.months.ago)
 
         Setting.set('enable_page_views', 'cassandra')
         migrator = PageView::CassandraMigrator.new
@@ -205,8 +205,8 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
         # shouldn't actually happen, but create an older page view to verify
         # we're not migrating old page views again
-        not_moved = page_view_model(:account => a1, :created_at => 1.day.ago)
-        newly_moved = page_view_model(:account => a1, :created_at => 1.hour.ago)
+        not_moved = page_view_model(account: a1, created_at: 1.day.ago)
+        newly_moved = page_view_model(account: a1, created_at: 1.hour.ago)
         Setting.set('enable_page_views', 'cassandra')
         migrator = PageView::CassandraMigrator.new
         migrator.run_once(2)
@@ -264,8 +264,8 @@ describe PageView do
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
         @user2 = user_model
-        pv2 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }) }
-        pv3 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }) }
+        pv2 = PageView.new { |p| p.assign_attributes({ user: @user2, url: "http://test.one/", session_id: "phony", context: @course, controller: 'courses', action: 'show', user_request: true, render_time: 0.01, user_agent: 'None', account_id: Account.default.id, request_id: "req1", interaction_seconds: 5 }) }
+        pv3 = PageView.new { |p| p.assign_attributes({ user: @user2, url: "http://test.one/", session_id: "phony", context: @course, controller: 'courses', action: 'show', user_request: true, render_time: 0.01, user_agent: 'None', account_id: Account.default.id, request_id: "req2", interaction_seconds: 5 }) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
         expect(pv2.store).to be_truthy
@@ -281,7 +281,7 @@ describe PageView do
     before :once do
       Setting.set('enable_page_views', 'db')
       course_model
-      @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }) }
+      @page_view = PageView.new { |p| p.assign_attributes({ url: "http://test.one/", session_id: "phony", context: @course, controller: 'courses', action: 'show', user_request: true, render_time: 0.01, user_agent: 'None', account_id: Account.default.id, request_id: "abcde", interaction_seconds: 5, user: @user }) }
       @page_view.save!
     end
 
@@ -303,13 +303,13 @@ describe PageView do
   describe '.generate' do
     subject { PageView.generate(request, attributes) }
 
-    let(:params) { { :action => 'path', :controller => 'some' } }
-    let(:session) { { :id => '42' } }
-    let(:request) { double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
+    let(:params) { { action: 'path', controller: 'some' } }
+    let(:session) { { id: '42' } }
+    let(:request) { double(url: (@url || 'host.com/some/path'), path_parameters: params, user_agent: 'Mozilla', session_options: session, method: :get, remote_ip: '0.0.0.0', request_method: 'GET') }
     let(:user) { User.new }
-    let(:attributes) { { :real_user => user, :user => user } }
+    let(:attributes) { { real_user: user, user: user } }
 
-    before { allow(RequestContextGenerator).to receive_messages(:request_id => 'xyz') }
+    before { allow(RequestContextGenerator).to receive_messages(request_id: 'xyz') }
 
     describe '#url' do
       subject { super().url }
@@ -397,7 +397,7 @@ describe PageView do
     end
 
     it "forces encoding on string fields" do
-      request = double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
+      request = double(url: (@url || 'host.com/some/path'), path_parameters: params, user_agent: 'Mozilla', session_options: session, method: :get, remote_ip: '0.0.0.0'.encode(Encoding::US_ASCII), request_method: 'GET')
       pv = PageView.generate(request, attributes)
 
       expect(pv.remote_ip.encoding).to eq Encoding::UTF_8

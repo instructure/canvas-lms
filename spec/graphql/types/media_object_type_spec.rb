@@ -56,8 +56,8 @@ describe Types::MediaObjectType do
         instance_double(
           CanvasKaltura::ClientV3,
           media_sources: [
-            { :url => random_url },
-            { :url => random_url2 },
+            { url: random_url },
+            { url: random_url2 },
           ]
         )
       }

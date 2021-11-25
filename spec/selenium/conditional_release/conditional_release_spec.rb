@@ -48,11 +48,11 @@ describe 'native canvas conditional release' do
 
     it 'is not included in the assignments page' do
       page_title = "MP Page to Verify"
-      @new_page = @course.wiki_pages.create!(:title => page_title)
+      @new_page = @course.wiki_pages.create!(title: page_title)
       page_assignment = @new_page.course.assignments.create!(
-        :wiki_page => @new_page,
-        :submission_types => 'wiki_page',
-        :title => @new_page.title
+        wiki_page: @new_page,
+        submission_types: 'wiki_page',
+        title: @new_page.title
       )
 
       get "/courses/#{@course.id}/assignments"
@@ -92,7 +92,7 @@ describe 'native canvas conditional release' do
 
   context 'Discussions as part of Mastery Paths' do
     it 'displays Mastery paths tab from (graded) Discussions edit page' do
-      discussion_topic_model(:context => @course)
+      discussion_topic_model(context: @course)
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
 
@@ -211,7 +211,7 @@ describe 'native canvas conditional release' do
 
   context 'Mastery Path Breakdowns' do
     before do
-      @trigger_assmt = @course.assignments.create!(:points_possible => 10, submission_types: "online_text_entry")
+      @trigger_assmt = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
       ranges = [
         FactoryBot.create(
           :scoring_range_with_assignments,
@@ -235,7 +235,7 @@ describe 'native canvas conditional release' do
           upper_bound: 0.4
         ),
       ]
-      @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
+      @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assmt, scoring_ranges: ranges)
     end
 
     it 'shows Mastery Path Breakdown for an Assignment' do

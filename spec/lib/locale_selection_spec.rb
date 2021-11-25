@@ -92,7 +92,7 @@ describe LocaleSelection do
       allow(I18n.config).to receive(:available_locales).and_return(%i[en it es fr de pt zh])
       I18n.config.clear_available_locales_set
       @root_account = Account.create
-      @account = Account.create(:parent_account => @root_account)
+      @account = Account.create(parent_account: @root_account)
       user_factory
       course_factory
       @course.account = @account
@@ -105,35 +105,35 @@ describe LocaleSelection do
 
     it "uses the default locale if there is no other context" do
       expect(ls.infer_locale).to eql('en')
-      expect(ls.infer_locale(:root_account => @root_account)).to eql('en')
-      expect(ls.infer_locale(:root_account => @root_account, :user => @user)).to eql('en')
-      expect(ls.infer_locale(:root_account => @root_account, :user => @user, :context => @course)).to eql('en')
+      expect(ls.infer_locale(root_account: @root_account)).to eql('en')
+      expect(ls.infer_locale(root_account: @root_account, user: @user)).to eql('en')
+      expect(ls.infer_locale(root_account: @root_account, user: @user, context: @course)).to eql('en')
     end
 
     it "infers the locale from the accept_language" do
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account)).to eql('it')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account)).to eql('it')
       expect(@user.browser_locale).to be_nil
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('it')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('it')
       expect(@user.browser_locale).to eql('it')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('it')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('it')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('it')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('it')
     end
 
     it "infers the locale from the root account" do
       @root_account.update_attribute(:default_locale, 'es')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('es')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('es')
     end
 
     it "infers the locale from the account" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('fr')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('fr')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('fr')
     end
 
     it "infers the locale from the user" do
@@ -141,9 +141,9 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('de')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('de')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('de')
     end
 
     it "ignores bogus locales" do
@@ -151,9 +151,9 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       allow(@user).to receive(:locale).and_return('bogus')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('fr')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('fr')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('fr')
     end
 
     it "infers the locale from the course" do
@@ -162,22 +162,22 @@ describe LocaleSelection do
       @user.update_attribute(:locale, 'de')
       @course.update_attribute(:locale, 'pt')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('de')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('de')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('pt')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user)).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @account)).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: @course)).to eql('pt')
     end
 
     it "infers the locale of a group from the group's context" do
       @course.update_attribute(:locale, 'es')
-      course_gc = @course.group_categories.create!(:name => "Discussion Groups")
-      course_gr = Group.create!(:name => "Group 1", :group_category => course_gc, :context => @course)
+      course_gc = @course.group_categories.create!(name: "Discussion Groups")
+      course_gr = Group.create!(name: "Group 1", group_category: course_gc, context: @course)
 
       @account.update_attribute(:default_locale, 'fr')
-      account_gc = @account.group_categories.create!(:name => "Other Groups")
-      account_gr = Group.create!(:name => "Group 1", :group_category => account_gc, :context => @account)
+      account_gc = @account.group_categories.create!(name: "Other Groups")
+      account_gr = Group.create!(name: "Group 1", group_category: account_gc, context: @account)
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => account_gr)).to eql('fr')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr)).to eql('es')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: account_gr)).to eql('fr')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, user: @user, context: course_gr)).to eql('es')
     end
 
     it "infers the locale from the session" do
@@ -185,8 +185,8 @@ describe LocaleSelection do
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
 
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :session_locale => 'zh')).to eql('zh')
-      expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :user => @user, :session_locale => 'zh')).to eql('de')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, context: @account, session_locale: 'zh')).to eql('zh')
+      expect(ls.infer_locale(accept_language: "it", root_account: @root_account, context: @account, user: @user, session_locale: 'zh')).to eql('de')
     end
   end
 

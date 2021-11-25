@@ -93,22 +93,22 @@ module ConditionalRelease
     end
 
     def self.release_mastery_paths_content_in_course(course)
-      overrides_scope = AssignmentOverride.where(:set_type => AssignmentOverride::SET_TYPE_NOOP, :set_id => AssignmentOverride::NOOP_MASTERY_PATHS).active
-      assignment_ids = overrides_scope.where.not(:assignment_id => nil).pluck(:assignment_id)
+      overrides_scope = AssignmentOverride.where(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).active
+      assignment_ids = overrides_scope.where.not(assignment_id: nil).pluck(:assignment_id)
       assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).where.not(submission_types: 'wiki_page').to_a.each do |assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true).where.not(submission_types: 'wiki_page').to_a.each do |assignment|
           assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
-      wp_assignment_ids = course.wiki_pages.not_deleted.where.not(:assignment_id => nil).pluck(:assignment_id)
+      wp_assignment_ids = course.wiki_pages.not_deleted.where.not(assignment_id: nil).pluck(:assignment_id)
       wp_assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true, :submission_types => 'wiki_page').each do |wp_assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true, submission_types: 'wiki_page').each do |wp_assignment|
           wp_assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
-      quiz_ids = overrides_scope.where(:assignment_id => nil).where.not(:quiz_id => nil).pluck(:quiz_id)
+      quiz_ids = overrides_scope.where(assignment_id: nil).where.not(quiz_id: nil).pluck(:quiz_id)
       quiz_ids.sort.each_slice(100) do |sliced_ids|
-        course.quizzes.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).to_a.each do |quiz|
+        course.quizzes.active.where(id: sliced_ids).where(only_visible_to_overrides: true).to_a.each do |quiz|
           quiz.update_attribute(:only_visible_to_overrides, false)
         end
       end
@@ -141,8 +141,8 @@ module ConditionalRelease
             # ignore functionally empty rules
             rules.reject! { |r| r.scoring_ranges.all? { |sr| sr.assignment_sets.all? { |s| s.assignment_set_associations.empty? } } }
 
-            trigger_assignments = course.assignments.where(:id => rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
-            trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys)
+            trigger_assignments = course.assignments.where(id: rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
+            trigger_submissions = course.submissions.where(assignment_id: trigger_assignments.keys)
                                         .for_user(student).in_workflow_state(:graded).posted.to_a.index_by(&:assignment_id)
 
             assigned_set_ids = ConditionalRelease::AssignmentSetAction.current_assignments(
@@ -179,7 +179,7 @@ module ConditionalRelease
             set_hash[:assignment_set_associations].pluck(:assignment_id)
           end
         end.flatten
-        referenced_assignments = course.assignments.where(:id => referenced_assignment_ids).to_a.index_by(&:id)
+        referenced_assignments = course.assignments.where(id: referenced_assignment_ids).to_a.index_by(&:id)
         rules_data.each do |rule_hash|
           rule_hash[:assignment_sets].each do |set_hash|
             set_hash[:assignment_set_associations].each do |assoc_hash|

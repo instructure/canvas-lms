@@ -74,7 +74,7 @@ module CC::Importer::Canvas
           end
           next unless (usage_rights = file.at_css("usage_rights"))
 
-          rights_hash = { :use_justification => usage_rights.attr('use_justification') }
+          rights_hash = { use_justification: usage_rights.attr('use_justification') }
           if (legal_copyright = usage_rights.at_css('legal_copyright'))
             rights_hash[:legal_copyright] = legal_copyright.text
           end

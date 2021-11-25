@@ -27,16 +27,16 @@ describe 'Student reports' do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @course1 = course_factory(:course_name => 'English 101', :account => @account,
-                              :active_course => true)
+    @course1 = course_factory(course_name: 'English 101', account: @account,
+                              active_course: true)
     @course1.sis_source_id = 'SIS_COURSE_ID_1'
     @course1.save!
     @course1.offer
-    @course2 = course_factory(:course_name => 'Math 101', :account => @account,
-                              :active_course => true)
+    @course2 = course_factory(course_name: 'Math 101', account: @account,
+                              active_course: true)
     @course2.offer
-    @course3 = Course.create(:name => 'Science 101', :course_code => 'SCI101',
-                             :account => @account)
+    @course3 = Course.create(name: 'Science 101', course_code: 'SCI101',
+                             account: @account)
     @course3.offer
 
     @teacher = User.create!
@@ -44,24 +44,24 @@ describe 'Student reports' do
     @course2.enroll_teacher(@teacher)
     @course3.enroll_teacher(@teacher)
 
-    @assignment1 = @course1.assignments.create!(:title => 'My Assignment')
-    @assignment2 = @course2.assignments.create!(:title => 'My Assignment')
-    @assignment3 = @course3.assignments.create!(:title => 'My Assignment')
-    @assignment4 = @course3.assignments.create!(:title => 'My Assignment')
+    @assignment1 = @course1.assignments.create!(title: 'My Assignment')
+    @assignment2 = @course2.assignments.create!(title: 'My Assignment')
+    @assignment3 = @course3.assignments.create!(title: 'My Assignment')
+    @assignment4 = @course3.assignments.create!(title: 'My Assignment')
     @user1 = user_with_managed_pseudonym(
-      :active_all => true, :account => @account, :name => 'John St. Clair',
-      :sortable_name => 'St. Clair, John', :username => 'john@stclair.com',
-      :sis_user_id => 'user_sis_id_01'
+      active_all: true, account: @account, name: 'John St. Clair',
+      sortable_name: 'St. Clair, John', username: 'john@stclair.com',
+      sis_user_id: 'user_sis_id_01'
     )
     @user2 = user_with_managed_pseudonym(
-      :active_all => true, :username => 'micheal@michaelbolton.com',
-      :name => 'Michael Bolton', :account => @account,
-      :sis_user_id => 'user_sis_id_02'
+      active_all: true, username: 'micheal@michaelbolton.com',
+      name: 'Michael Bolton', account: @account,
+      sis_user_id: 'user_sis_id_02'
     )
     @user3 = user_with_managed_pseudonym(
-      :active_all => true, :account => @account, :name => 'Rick Astley',
-      :sortable_name => 'Astley, Rick', :username => 'rick@roll.com',
-      :sis_user_id => 'user_sis_id_03'
+      active_all: true, account: @account, name: 'Rick Astley',
+      sortable_name: 'Astley, Rick', username: 'rick@roll.com',
+      sis_user_id: 'user_sis_id_03'
     )
 
     enrollment_params = { enrollment_state: 'active', type: 'StudentEnrollment', return_type: :record }
@@ -210,7 +210,7 @@ describe 'Student reports' do
     end
 
     it 'adjusts date range to 2 weeks' do
-      @term1 = @account.enrollment_terms.create(:name => 'Fall')
+      @term1 = @account.enrollment_terms.create(name: 'Fall')
       @term1.save!
       @course1.enrollment_term = @term1
       @course1.save
@@ -233,8 +233,8 @@ describe 'Student reports' do
     end
 
     it 'finds users that have not submitted under a sub account' do
-      sub_account = Account.create(:parent_account => @account,
-                                   :name => 'English')
+      sub_account = Account.create(parent_account: @account,
+                                   name: 'English')
       @course2.account = sub_account
       @course2.save
       parsed = read_report(@type, { account: sub_account, order: 1 })
@@ -273,7 +273,7 @@ describe 'Student reports' do
       @type = 'zero_activity_csv'
 
       @course1.enroll_user(@user3, 'StudentEnrollment', { enrollment_state: 'active' })
-      @course3.enroll_user(@user3, 'StudentEnrollment', { :enrollment_state => 'active' })
+      @course3.enroll_user(@user3, 'StudentEnrollment', { enrollment_state: 'active' })
 
       @user4 = user_with_managed_pseudonym(name: 'User 4', account: @account, sis_user_id: 'user_sis_id_04')
       @user5 = user_with_managed_pseudonym(name: 'User 5', account: @account, sis_user_id: 'user_sis_id_05')
@@ -285,7 +285,7 @@ describe 'Student reports' do
         user.enrollments.where(course_id: course).update_all(last_activity_at: Time.now.utc)
       end
 
-      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1 = EnrollmentTerm.create(name: 'Fall')
       @term1.root_account = @account
       @term1.sis_source_id = 'fall12'
       @term1.save!
@@ -485,7 +485,7 @@ describe 'Student reports' do
     end
 
     it 'does not include a user with a deleted enrollment' do
-      @course2.enroll_user(@user3, 'StudentEnrollment', { :enrollment_state => 'deleted' })
+      @course2.enroll_user(@user3, 'StudentEnrollment', { enrollment_state: 'deleted' })
       param = {}
       param['course'] = @course2.id
       param['include_deleted'] = false
@@ -497,7 +497,7 @@ describe 'Student reports' do
     end
 
     it 'includes a user with a deleted enrollment' do
-      @course2.enroll_user(@user3, 'StudentEnrollment', { :enrollment_state => 'deleted' })
+      @course2.enroll_user(@user3, 'StudentEnrollment', { enrollment_state: 'deleted' })
       param = {}
       param['course'] = @course2.id
       param['include_deleted'] = true

@@ -21,13 +21,13 @@ module GoogleDriveCommon
   def setup_google_drive(add_user_service = true, authorized = true)
     if add_user_service
       UserService.register(
-        :service => "google_drive",
-        :token => "token",
-        :secret => "secret",
-        :user => @user,
-        :service_domain => "drive.google.com",
-        :service_user_id => "service_user_id",
-        :service_user_name => "service_user_name"
+        service: "google_drive",
+        token: "token",
+        secret: "secret",
+        user: @user,
+        service_domain: "drive.google.com",
+        service_user_id: "service_user_id",
+        service_user_name: "service_user_name"
       )
     end
 

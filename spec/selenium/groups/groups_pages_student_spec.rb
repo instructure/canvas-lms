@@ -49,7 +49,7 @@ describe "groups" do
     before :once do
       @student = User.create!(name: "Student 1")
       @teacher = User.create!(name: "Teacher 1")
-      course_with_student({ user: @student, :active_course => true, :active_enrollment => true })
+      course_with_student({ user: @student, active_course: true, active_enrollment: true })
       @course.enroll_teacher(@teacher).accept!
       group_test_setup(4, 1, 1)
       # adds all students to the group
@@ -219,10 +219,10 @@ describe "groups" do
 
       it "does not allow group members to edit someone else's announcement via discussion page", priority: "1" do
         announcement = @testgroup.first.announcements.create!(
-          :title => "foobers",
-          :user => @students.first,
-          :message => "sup",
-          :workflow_state => "published"
+          title: "foobers",
+          user: @students.first,
+          message: "sup",
+          workflow_state: "published"
         )
         user_session(@student)
         get DiscussionsIndex.individual_discussion_url(announcement)

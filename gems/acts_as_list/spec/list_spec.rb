@@ -20,13 +20,13 @@
 require 'active_record'
 require 'acts_as_list'
 
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 
 class Mixin < ActiveRecord::Base
 end
 
 class ListMixin < Mixin
-  acts_as_list :column => "pos", :scope => :parent_id
+  acts_as_list column: "pos", scope: :parent_id
 end
 
 class ListMixinSub1 < ListMixin
@@ -36,7 +36,7 @@ class ListMixinSub2 < ListMixin
 end
 
 class UnscopedListMixin < Mixin
-  acts_as_list :column => "pos"
+  acts_as_list column: "pos"
 end
 
 describe "ListTest" do
@@ -47,7 +47,7 @@ describe "ListTest" do
   describe do
     before do
       setup_db
-      (1..4).each { |counter| ListMixin.create! :pos => counter, :parent_id => 5 }
+      (1..4).each { |counter| ListMixin.create! pos: counter, parent_id: 5 }
     end
 
     it 'reordering' do
@@ -72,44 +72,44 @@ describe "ListTest" do
     end
 
     it 'injection' do
-      item = ListMixin.new(:parent_id => 1)
+      item = ListMixin.new(parent_id: 1)
       expect(item.scope_condition).to eq parent_id: 1
       expect(item.class.position_column).to eq "pos"
     end
 
     it 'insert' do
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 1
       expect(new).to be_first
       expect(new).to be_last
 
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 2
       expect(new).to_not be_first
       expect(new).to be_last
 
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 3
       expect(new).to_not be_first
       expect(new).to be_last
 
-      new = ListMixin.create(:parent_id => 0)
+      new = ListMixin.create(parent_id: 0)
       expect(new.pos).to eq 1
       expect(new).to be_first
       expect(new).to be_last
     end
 
     it 'insert_at' do
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 1
 
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 2
 
-      new = ListMixin.create(:parent_id => 20)
+      new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 3
 
-      new4 = ListMixin.create(:parent_id => 20)
+      new4 = ListMixin.create(parent_id: 20)
       expect(new4.pos).to eq 4
 
       new4.insert_at(3)
@@ -124,7 +124,7 @@ describe "ListTest" do
       new4.reload
       expect(new4.pos).to eq 4
 
-      new5 = ListMixin.create(:parent_id => 20)
+      new5 = ListMixin.create(parent_id: 20)
       expect(new5.pos).to eq 5
 
       new5.insert_at(1)
@@ -191,7 +191,7 @@ describe "ListTest" do
   describe 'SubTest' do
     before do
       setup_db
-      (1..4).each { |i| (i.odd? ? ListMixinSub1 : ListMixinSub2).create! :pos => i, :parent_id => 5000 }
+      (1..4).each { |i| (i.odd? ? ListMixinSub1 : ListMixinSub2).create! pos: i, parent_id: 5000 }
     end
 
     it 'reordering' do
@@ -276,7 +276,7 @@ describe "ListTest" do
   end
 
   def setup_db
-    ActiveRecord::Schema.define(:version => 1) do
+    ActiveRecord::Schema.define(version: 1) do
       create_table :mixins do |t|
         t.column :pos, :integer
         t.column :parent_id, :integer

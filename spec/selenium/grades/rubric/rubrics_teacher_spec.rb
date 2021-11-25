@@ -67,8 +67,8 @@ describe "course rubrics" do
 
     it "ignores outcome rubric lines when calculating total" do
       outcome_with_rubric
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
-      @association = @rubric.associate_with(@assignment, @course, :use_for_grading => true, :purpose => 'grading')
+      @assignment = @course.assignments.create(name: 'assignment with rubric')
+      @association = @rubric.associate_with(@assignment, @course, use_for_grading: true, purpose: 'grading')
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
       @rubric.save!
@@ -119,7 +119,7 @@ describe "course rubrics" do
     end
 
     it "does not display the edit form more than once" do
-      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+      rubric_association_model(user: @user, context: @course, purpose: "grading")
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
@@ -128,8 +128,8 @@ describe "course rubrics" do
     end
 
     it "imports a rubric outcome row" do
-      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-      outcome_model(:context => @course)
+      rubric_association_model(user: @user, context: @course, purpose: "grading")
+      outcome_model(context: @course)
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
       wait_for_ajaximations
@@ -150,8 +150,8 @@ describe "course rubrics" do
     end
 
     it "does not allow editing a criterion row linked to an outcome" do
-      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-      outcome_model(:context => @course)
+      rubric_association_model(user: @user, context: @course, purpose: "grading")
+      outcome_model(context: @course)
       rubric = Rubric.last
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
@@ -192,8 +192,8 @@ describe "course rubrics" do
 
       it "uses the account outcome proficiency for mastery scales if one exists" do
         proficiency = outcome_proficiency_model(@course.account)
-        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-        outcome_model(:context => @course)
+        rubric_association_model(user: @user, context: @course, purpose: "grading")
+        outcome_model(context: @course)
 
         get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
         wait_for_ajaximations
@@ -203,8 +203,8 @@ describe "course rubrics" do
       end
 
       it "defaults to the the default account proficiency if no outcome proficiecy exists" do
-        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-        outcome_model(:context => @course)
+        rubric_association_model(user: @user, context: @course, purpose: "grading")
+        outcome_model(context: @course)
 
         get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
         wait_for_ajaximations
@@ -217,8 +217,8 @@ describe "course rubrics" do
 
       it "rubrics are updated after mastery scales are modified" do
         current_proficiency = OutcomeProficiency.find_or_create_default!(@course.account)
-        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-        outcome_model(:context => @course)
+        rubric_association_model(user: @user, context: @course, purpose: "grading")
+        outcome_model(context: @course)
 
         get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
         wait_for_ajaximations
@@ -248,24 +248,24 @@ describe "course rubrics" do
 
   it "displays free-form comments to the student" do
     assignment_model
-    rubric_model(:context => @course, :free_form_criterion_comments => true)
-    course_with_student(:course => @course, :active_all => true)
+    rubric_model(context: @course, free_form_criterion_comments: true)
+    course_with_student(course: @course, active_all: true)
     @course.offer!
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
     comment = "Hi, please see www.example.com"
     @assessment = @association.assess({
-                                        :user => @student,
-                                        :assessor => @teacher,
-                                        :artifact => @assignment.find_or_create_submission(@student),
-                                        :assessment => {
-                                          :assessment_type => 'grading',
-                                          :criterion_crit1 => {
-                                            :points => nil,
-                                            :comments => comment,
+                                        user: @student,
+                                        assessor: @teacher,
+                                        artifact: @assignment.find_or_create_submission(@student),
+                                        assessment: {
+                                          assessment_type: 'grading',
+                                          criterion_crit1: {
+                                            points: nil,
+                                            comments: comment,
                                           }
                                         }
                                       })
-    user_logged_in(:user => @student)
+    user_logged_in(user: @student)
 
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
@@ -280,21 +280,21 @@ describe "course rubrics" do
 
   it "highlights a criterion level if score is 0" do
     assignment_model
-    rubric_model(:context => @course)
-    course_with_student(:course => @course, :active_all => true)
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    rubric_model(context: @course)
+    course_with_student(course: @course, active_all: true)
+    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
     @assessment = @association.assess({
-                                        :user => @student,
-                                        :assessor => @teacher,
-                                        :artifact => @assignment.find_or_create_submission(@student),
-                                        :assessment => {
-                                          :assessment_type => 'grading',
-                                          :criterion_crit1 => {
-                                            :points => 0
+                                        user: @student,
+                                        assessor: @teacher,
+                                        artifact: @assignment.find_or_create_submission(@student),
+                                        assessment: {
+                                          assessment_type: 'grading',
+                                          criterion_crit1: {
+                                            points: 0
                                           }
                                         }
                                       })
-    user_logged_in(:user => @student)
+    user_logged_in(user: @student)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
@@ -304,21 +304,21 @@ describe "course rubrics" do
 
   it "does not highlight a criterion level if score is nil" do
     assignment_model
-    rubric_model(:context => @course)
-    course_with_student(:course => @course, :active_all => true)
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    rubric_model(context: @course)
+    course_with_student(course: @course, active_all: true)
+    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
     @assessment = @association.assess({
-                                        :user => @student,
-                                        :assessor => @teacher,
-                                        :artifact => @assignment.find_or_create_submission(@student),
-                                        :assessment => {
-                                          :assessment_type => 'grading',
-                                          :criterion_crit1 => {
-                                            :points => nil
+                                        user: @student,
+                                        assessor: @teacher,
+                                        artifact: @assignment.find_or_create_submission(@student),
+                                        assessment: {
+                                          assessment_type: 'grading',
+                                          criterion_crit1: {
+                                            points: nil
                                           }
                                         }
                                       })
-    user_logged_in(:user => @student)
+    user_logged_in(user: @student)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click

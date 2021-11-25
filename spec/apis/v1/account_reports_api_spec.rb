@@ -23,7 +23,7 @@ require_relative '../api_spec_helper'
 describe 'Account Reports API', type: :request do
   before :once do
     @admin = account_admin_user
-    user_with_pseudonym(:user => @admin)
+    user_with_pseudonym(user: @admin)
     @report = AccountReport.new
     @report.account = @admin.account
     @report.user = @admin
@@ -34,7 +34,7 @@ describe 'Account Reports API', type: :request do
     @report.parameters = HashWithIndifferentAccess['param' => 'test', 'error' => 'failed']
 
     folder = Folder.assert_path("test", @admin.account)
-    @report.attachment = Attachment.create!(:folder => folder, :context => @admin.account, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
+    @report.attachment = Attachment.create!(folder: folder, context: @admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
 
     @report.save!
   end
@@ -42,7 +42,7 @@ describe 'Account Reports API', type: :request do
   describe 'available_reports' do
     it 'lists all available reports' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports",
-                      { :controller => 'account_reports', :action => 'available_reports', :format => 'json', :account_id => @admin.account.id.to_s })
+                      { controller: 'account_reports', action: 'available_reports', format: 'json', account_id: @admin.account.id.to_s })
       json.each do |report|
         expect(report).to have_key('title')
         expect(report).to have_key('parameters')
@@ -68,14 +68,14 @@ describe 'Account Reports API', type: :request do
 
     it 'works with parameters' do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
-                        { :report => @report.report_type, :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s,
-                          :parameters => { 'some_param' => 1 } })
+                        { report: @report.report_type, controller: 'account_reports', action: 'create', format: 'json', account_id: @admin.account.id.to_s,
+                          parameters: { 'some_param' => 1 } })
       expect(report).to have_key('id')
     end
 
     it '404s for non existing reports' do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
-                   { :report => 'bad_report_csv', :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
+                   { report: 'bad_report_csv', controller: 'account_reports', action: 'create', format: 'json', account_id: @admin.account.id.to_s })
       assert_status(404)
     end
   end
@@ -83,7 +83,7 @@ describe 'Account Reports API', type: :request do
   describe 'index' do
     it 'lists all generated reports' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
-                      { :report => @report.report_type, :controller => 'account_reports', :action => 'index', :format => 'json', :account_id => @admin.account.id.to_s })
+                      { report: @report.report_type, controller: 'account_reports', action: 'index', format: 'json', account_id: @admin.account.id.to_s })
 
       expect(json.length).to be >= 0
       expect(json.length).to be <= 50
@@ -122,7 +122,7 @@ describe 'Account Reports API', type: :request do
   describe 'show' do
     it 'gets all info about a report' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}",
-                      { :report => @report.report_type, :controller => 'account_reports', :action => 'show', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
+                      { report: @report.report_type, controller: 'account_reports', action: 'show', format: 'json', account_id: @admin.account.id.to_s, id: @report.id.to_s })
 
       expect(json['id']).to eq @report.id
       expect(json['status']).to eq @report.workflow_state
@@ -140,7 +140,7 @@ describe 'Account Reports API', type: :request do
   describe 'destroy' do
     it 'delete a report' do
       json = api_call(:delete, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}",
-                      { :report => @report.report_type, :controller => 'account_reports', :action => 'destroy', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
+                      { report: @report.report_type, controller: 'account_reports', action: 'destroy', format: 'json', account_id: @admin.account.id.to_s, id: @report.id.to_s })
 
       expect(json['id']).to eq @report.id
       expect(json['status']).to eq @report.reload.workflow_state

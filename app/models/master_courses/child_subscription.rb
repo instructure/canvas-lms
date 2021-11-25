@@ -22,13 +22,13 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
   # also links the associated course to child_content_tags to keep track of changes
 
-  belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
-  belongs_to :child_course, :class_name => "Course"
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
+  belongs_to :child_course, class_name: "Course"
+  belongs_to :root_account, class_name: 'Account'
 
   before_create :set_root_account_id
 
-  has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
+  has_many :child_content_tags, class_name: "MasterCourses::ChildContentTag", inverse_of: :child_subscription
 
   validate :require_same_root_account
 
@@ -63,7 +63,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def self.is_child_course?(course_id)
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      where(:child_course_id => course_id).active.exists?
+      where(child_course_id: course_id).active.exists?
     end
   end
 

@@ -22,40 +22,40 @@ describe RoleOverridesController do
   let(:parent_account) { Account.default }
 
   before do
-    @account = account_model(:parent_account => parent_account)
-    account_admin_user(:account => @account)
+    @account = account_model(parent_account: parent_account)
+    account_admin_user(account: @account)
     user_session(@admin)
   end
 
   describe "add_role" do
     it "adds the role type to the account" do
       expect(@account.available_account_roles.map(&:name)).not_to include('NewRole')
-      post 'add_role', params: { :account_id => @account.id, :role_type => 'NewRole' }
+      post 'add_role', params: { account_id: @account.id, role_type: 'NewRole' }
       @account.reload
       expect(@account.available_account_roles.map(&:name)).to include('NewRole')
     end
 
     it "requires a role type" do
-      post 'add_role', params: { :account_id => @account.id }
+      post 'add_role', params: { account_id: @account.id }
       expect(flash[:error]).to eq 'Role creation failed'
     end
 
     it "fails when given an existing role type" do
-      role = @account.roles.build(:name => 'NewRole')
+      role = @account.roles.build(name: 'NewRole')
       role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       role.workflow_state = 'active'
       role.save!
-      post 'add_role', params: { :account_id => @account.id, :role_type => 'NewRole' }
+      post 'add_role', params: { account_id: @account.id, role_type: 'NewRole' }
       expect(flash[:error]).to eq 'Role creation failed'
     end
   end
 
   it "deactivates a role" do
-    role = @account.roles.build(:name => 'NewRole')
+    role = @account.roles.build(name: 'NewRole')
     role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
     role.workflow_state = 'active'
     role.save!
-    delete 'remove_role', params: { :account_id => @account.id, :id => role.id }
+    delete 'remove_role', params: { account_id: @account.id, id: role.id }
     expect(@account.roles.where(name: 'NewRole').first).to be_inactive
   end
 
@@ -63,7 +63,7 @@ describe RoleOverridesController do
     before do
       @role_name = 'NewRole'
       @permission = 'read_reports'
-      @role = @account.roles.build(:name => @role_name)
+      @role = @account.roles.build(name: @role_name)
       @role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       @role.workflow_state = 'active'
       @role.save!
@@ -166,21 +166,21 @@ describe RoleOverridesController do
     before do
       @role_name = 'NewRole'
       @permission = 'read_reports'
-      @role = @account.roles.build(:name => @role_name)
+      @role = @account.roles.build(name: @role_name)
       @role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
       @role.workflow_state = 'active'
       @role.save!
     end
 
     def post_with_settings(settings = {})
-      post 'create', params: { :account_id => @account.id, :account_roles => 1, :permissions => { @permission => { @role.id => settings } } }
+      post 'create', params: { account_id: @account.id, account_roles: 1, permissions: { @permission => { @role.id => settings } } }
     end
 
     describe "override already exists" do
       before do
         @existing_override = @account.role_overrides.build(
-          :permission => @permission,
-          :role => @role
+          permission: @permission,
+          role: @role
         )
         @existing_override.enabled = true
         @existing_override.locked = false
@@ -189,21 +189,21 @@ describe RoleOverridesController do
       end
 
       it "updates an existing override if override has a value" do
-        post_with_settings(:override => 'unchecked')
+        post_with_settings(override: 'unchecked')
         expect(@account.role_overrides.reload.size).to eq @initial_count
         @existing_override.reload
         expect(@existing_override.enabled).to be_falsey
       end
 
       it "updates an existing override if override is nil but locked is truthy" do
-        post_with_settings(:locked => 'true')
+        post_with_settings(locked: 'true')
         expect(@account.role_overrides.reload.size).to eq @initial_count
         @existing_override.reload
         expect(@existing_override.locked).to be_truthy
       end
 
       it "only updates unchecked" do
-        post_with_settings(:override => 'unchecked')
+        post_with_settings(override: 'unchecked')
         @existing_override.reload
         expect(@existing_override.locked).to be_falsey
       end
@@ -212,13 +212,13 @@ describe RoleOverridesController do
         @existing_override.enabled = true
         @existing_override.save
 
-        post_with_settings(:locked => 'true')
+        post_with_settings(locked: 'true')
         @existing_override.reload
         expect(@existing_override.enabled).to be_truthy
       end
 
       it "deletes an existing override if override is nil and locked is not truthy" do
-        post_with_settings(:locked => '0')
+        post_with_settings(locked: '0')
         expect(@account.role_overrides.reload.size).to eq @initial_count - 1
         expect(RoleOverride.where(id: @existing_override).first).to be_nil
       end
@@ -230,29 +230,29 @@ describe RoleOverridesController do
       end
 
       it "does not create an override if override is nil and locked is not truthy" do
-        post_with_settings(:locked => '0')
+        post_with_settings(locked: '0')
         expect(@account.role_overrides.reload.size).to eq @initial_count
       end
 
       it "creates the override if override has a value" do
-        post_with_settings(:override => 'unchecked')
+        post_with_settings(override: 'unchecked')
         expect(@account.role_overrides.reload.size).to eq @initial_count + 1
-        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
+        override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to be_falsey
       end
 
       it "creates the override if override is nil but locked is truthy" do
-        post_with_settings(:locked => 'true')
+        post_with_settings(locked: 'true')
         expect(@account.role_overrides.reload.size).to eq @initial_count + 1
-        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
+        override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
         expect(override.locked).to be_truthy
       end
 
       it "sets override as false when override is unchecked" do
-        post_with_settings(:override => 'unchecked')
-        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
+        post_with_settings(override: 'unchecked')
+        override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to eq false
         expect(override.locked).to eq false
@@ -260,8 +260,8 @@ describe RoleOverridesController do
       end
 
       it "sets the override to locked when specifiying locked" do
-        post_with_settings(:locked => 'true')
-        override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
+        post_with_settings(locked: 'true')
+        override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
         expect(override.enabled).to eq true
         expect(override.locked).to eq true
@@ -282,7 +282,7 @@ describe RoleOverridesController do
 
         context "for an admin" do
           it "is true" do
-            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
+            get 'check_account_permission', params: { account_id: @account.id, permission: 'manage_catalog' }
             expect(json['granted']).to eq(true)
           end
         end
@@ -290,7 +290,7 @@ describe RoleOverridesController do
         context "for a non-admin" do
           it "is false" do
             user_session(user_factory(account: @account))
-            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
+            get 'check_account_permission', params: { account_id: @account.id, permission: 'manage_catalog' }
             expect(json['granted']).to eq(false)
           end
         end
@@ -299,7 +299,7 @@ describe RoleOverridesController do
       context "when catalog is not enabled" do
         context "for an admin" do
           it "is false" do
-            get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_catalog' }
+            get 'check_account_permission', params: { account_id: @account.id, permission: 'manage_catalog' }
             expect(json['granted']).to eq(false)
           end
         end
@@ -308,7 +308,7 @@ describe RoleOverridesController do
 
     describe "other permissions" do
       it "returns 400 with an error message" do
-        get 'check_account_permission', params: { :account_id => @account.id, :permission => 'manage_content' }
+        get 'check_account_permission', params: { account_id: @account.id, permission: 'manage_content' }
         expect(response.code.to_i).to eq(400)
         expect(json['message']).to be
       end
@@ -316,14 +316,14 @@ describe RoleOverridesController do
 
     describe "GET index" do
       it "loads new bundle for new permissions flag" do
-        get 'index', params: { :account_id => @account.id }
+        get 'index', params: { account_id: @account.id }
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1
         expect(assigns[:js_bundles].first).to include :permissions
       end
 
       it 'does not load the manage_developer_keys role on sub account' do
-        get 'index', params: { :account_id => @account.id }
+        get 'index', params: { account_id: @account.id }
         expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to_not include(:manage_developer_keys)
         expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq false
       end
@@ -332,7 +332,7 @@ describe RoleOverridesController do
         let(:parent_account) { nil }
 
         it 'does load the manage_developer_keys role on root account' do
-          get 'index', params: { :account_id => @account.id }
+          get 'index', params: { account_id: @account.id }
           expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to include(:manage_developer_keys)
           expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq true
         end
@@ -345,7 +345,7 @@ describe RoleOverridesController do
         end
 
         it 'sets granular permissions information in the js_env' do
-          get 'index', params: { :account_id => @account.id }
+          get 'index', params: { account_id: @account.id }
 
           wiki_permissions = []
           [:ACCOUNT_PERMISSIONS, :COURSE_PERMISSIONS].each do |js_env_key|

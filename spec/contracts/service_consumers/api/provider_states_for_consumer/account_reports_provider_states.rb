@@ -35,7 +35,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.parameters = HashWithIndifferentAccess['param' => 'test', 'error' => 'failed']
         folder = Folder.assert_path("test", @account_admin.account)
         @report.attachment = Attachment.create!(
-          :folder => folder, :context => @account_admin.account, :filename => "test.txt", :uploaded_data => StringIO.new("test file")
+          folder: folder, context: @account_admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file")
         )
         @report.save!
       end
@@ -54,7 +54,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.report_type = "student_assignment_outcome_map_csv"
         @report.parameters = HashWithIndifferentAccess['purple' => 'test', 'lovely' => 'ears']
         folder = Folder.assert_path("test", @account_admin.account)
-        @report.attachment = Attachment.create!(:folder => folder, :context => @account_admin.account, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
+        @report.attachment = Attachment.create!(folder: folder, context: @account_admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
         @report.save!
       end
     end

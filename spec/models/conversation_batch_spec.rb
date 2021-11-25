@@ -20,12 +20,12 @@
 
 describe ConversationBatch do
   before :once do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     @user1 = @user
     @message = Conversation.build_message @user1, "hi all"
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     @user2 = @user
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     @user3 = @user
   end
 
@@ -70,7 +70,7 @@ describe ConversationBatch do
       start_count = ConversationMessage.count
       g = @course.groups.create
       g.users << @user1 << @user2
-      batch = ConversationBatch.generate(@message, [@user2, @user3], :async, :tags => [g.asset_string])
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :async, tags: [g.asset_string])
       batch.deliver
 
       expect(ConversationMessage.count - start_count).to eql 3 # the root message, plus the ones to each recipient
@@ -84,8 +84,8 @@ describe ConversationBatch do
 
     it "copies the attachment(s) to each conversation" do
       start_count = ConversationMessage.count
-      attachment = attachment_model(:context => @user1, :folder => @user1.conversation_attachments_folder)
-      @message = Conversation.build_message @user1, "hi all", :attachment_ids => [attachment.id]
+      attachment = attachment_model(context: @user1, folder: @user1.conversation_attachments_folder)
+      @message = Conversation.build_message @user1, "hi all", attachment_ids: [attachment.id]
 
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver

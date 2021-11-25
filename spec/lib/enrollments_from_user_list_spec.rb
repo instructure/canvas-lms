@@ -30,10 +30,10 @@ describe EnrollmentsFromUserList do
   end
 
   before do
-    course_model(:reusable => true)
+    course_model(reusable: true)
     @el = UserList.new(list_to_parse)
     account = Account.default
-    account.settings = { :open_registration => true }
+    account.settings = { open_registration: true }
     account.save!
   end
 
@@ -73,8 +73,8 @@ describe EnrollmentsFromUserList do
 
     it "touches only users whose enrollments were updated" do
       Timecop.freeze(1.hour.ago) do
-        @david_sr = user_with_pseudonym(:username => 'david_richards@example.com')
-        @david_jr = user_with_pseudonym(:username => 'david_richards_jr@example.com')
+        @david_sr = user_with_pseudonym(username: 'david_richards@example.com')
+        @david_jr = user_with_pseudonym(username: 'david_richards_jr@example.com')
         @course.enroll_student(@david_jr)
       end
       EnrollmentsFromUserList.process(UserList.new(list_to_parse), @course)

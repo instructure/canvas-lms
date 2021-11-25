@@ -24,12 +24,12 @@ require 'nokogiri'
 
 describe LtiApiController, type: :request do
   before :once do
-    user_with_pseudonym(:username => 'parajsa', :password => 'password1', :active_user => true)
-    course_with_student(:active_all => true, :user => @user)
-    @tool = @course.context_external_tools.create(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'logout service test tool', :domain => 'example.com')
+    user_with_pseudonym(username: 'parajsa', password: 'password1', active_user: true)
+    course_with_student(active_all: true, user: @user)
+    @tool = @course.context_external_tools.create(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'logout service test tool', domain: 'example.com')
     @tool.url = 'https://example.edu/tool-launch-url'
     @tool.course_navigation = {
-      :enabled => "true"
+      enabled: "true"
     }
     @tool.custom_fields = {
       "sub_logout_service_url" => "$Canvas.logoutService.url"
@@ -47,8 +47,8 @@ describe LtiApiController, type: :request do
     opts['path'] ||= api_path
     opts['key'] ||= @tool.consumer_key
     opts['secret'] ||= @tool.shared_secret
-    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "http://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
+    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], site: "http://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, opts['path'], nil, scheme: 'header', timestamp: opts['timestamp'], nonce: opts['nonce'])
     req.body = opts['body'] if opts['body']
     post "http://www.example.com#{req.path}",
          params: req.body,

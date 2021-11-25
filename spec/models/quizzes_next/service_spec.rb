@@ -19,8 +19,8 @@
 
 describe QuizzesNext::Service do
   describe '.enabled_in_context?' do
-    let(:root_account) { double "root_account", :feature_allowed? => true }
-    let(:context) { double("context", :root_account => root_account) }
+    let(:root_account) { double "root_account", feature_allowed?: true }
+    let(:context) { double("context", root_account: root_account) }
 
     context 'when the feature is enabled on the context' do
       it 'will return true' do
@@ -55,15 +55,15 @@ describe QuizzesNext::Service do
 
       lti_assignment_inactive.destroy
       tool = course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
-      lti_assignment_active1.external_tool_tag_attributes = { :content => tool }
+      lti_assignment_active1.external_tool_tag_attributes = { content: tool }
       lti_assignment_active1.save!
-      lti_assignment_active2.external_tool_tag_attributes = { :content => tool }
+      lti_assignment_active2.external_tool_tag_attributes = { content: tool }
       lti_assignment_active2.save!
 
       active_lti_assignments = described_class.active_lti_assignments_for_course(course)

@@ -342,7 +342,7 @@ class ContextModuleProgression < ActiveRecord::Base
         save!
       end
     else
-      self.class.where(:id => self).update_all(:current => false)
+      self.class.where(id: self).update_all(current: false)
       touch_user
     end
   end
@@ -472,8 +472,8 @@ class ContextModuleProgression < ActiveRecord::Base
 
     # invalidate all, then re-evaluate each
     GuardRail.activate(:primary) do
-      ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
-      User.where(:id => progressions.map(&:user_id)).touch_all
+      ContextModuleProgression.where(id: progressions, current: true).update_all(current: false)
+      User.where(id: progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
         progression.delay_if_production(n_strand: ["dependent_progression_reevaluation", context_module.global_context_id])
@@ -490,8 +490,8 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :trigger_completion_events
 
-  scope :for_user, ->(user) { where(:user_id => user) }
-  scope :for_modules, ->(mods) { where(:context_module_id => mods) }
+  scope :for_user, ->(user) { where(user_id: user) }
+  scope :for_modules, ->(mods) { where(context_module_id: mods) }
 
   workflow do
     state :locked

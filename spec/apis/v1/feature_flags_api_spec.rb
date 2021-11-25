@@ -439,7 +439,7 @@ describe "Feature Flags API", type: :request do
 
       context "AccountManager" do
         before :once do
-          role = custom_account_role('AccountManager', :account => t_site_admin)
+          role = custom_account_role('AccountManager', account: t_site_admin)
           t_site_admin.role_overrides.create!(permission: 'manage_feature_flags',
                                               role: role,
                                               enabled: true,

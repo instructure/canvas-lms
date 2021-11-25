@@ -36,13 +36,13 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log.add_outcome(lo)
 
       @cm.copy_options = {
-        :all_learning_outcomes => "1"
+        all_learning_outcomes: "1"
       }
       @cm.save!
 
@@ -59,14 +59,14 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
       default.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: 'bank')
+      bank.assessment_questions.create!(question_data: { 'name' => 'test question', 'question_type' => 'essay_question' })
 
-      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: 'points', mastery_score: 50.0 })
 
       run_course_copy
 
@@ -181,7 +181,7 @@ describe ContentMigration do
       account = @copy_from.account
       a_group = account.root_outcome_group
 
-      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      root_group = LearningOutcomeGroup.create!(title: "contextless group")
 
       lo = create_outcome(nil, root_group)
 
@@ -205,18 +205,18 @@ describe ContentMigration do
       lo = create_outcome(account, a_group)
 
       root = @copy_from.root_outcome_group
-      log = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      log = @copy_from.learning_outcome_groups.create!(title: "some group")
       root.adopt_outcome_group(log)
       log.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: 'bank')
+      bank.assessment_questions.create!(question_data: { 'name' => 'test question', 'question_type' => 'essay_question' })
 
-      lo.align(bank, @copy_from, { :mastery_type => 'points', :mastery_score => 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: 'points', mastery_score: 50.0 })
 
       run_course_copy
 
-      to_log = @copy_to.learning_outcome_groups.where(:migration_id => mig_id(log)).first
+      to_log = @copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first
       expect(to_log.child_outcome_links.where(content_id: lo.id).first).not_to be_nil
 
       to_root = @copy_to.root_outcome_group
@@ -281,7 +281,7 @@ describe ContentMigration do
     end
 
     it "links rubric (and assignments) to outcomes" do
-      root_group = LearningOutcomeGroup.create!(:title => "contextless group")
+      root_group = LearningOutcomeGroup.create!(title: "contextless group")
 
       lo = create_outcome(nil, root_group)
       lo2 = create_outcome(@copy_from)
@@ -290,29 +290,29 @@ describe ContentMigration do
       from_root.add_outcome(lo)
       from_root.add_outcome(lo2)
 
-      rub = Rubric.new(:context => @copy_from)
+      rub = Rubric.new(context: @copy_from)
       rub.data = [
         {
-          :points => 3,
-          :description => "Outcome row",
-          :id => 1,
-          :ratings => [{ :points => 3, :description => "Rockin'", :criterion_id => 1, :id => 2 }],
-          :learning_outcome_id => lo.id
+          points: 3,
+          description: "Outcome row",
+          id: 1,
+          ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }],
+          learning_outcome_id: lo.id
         },
         {
-          :points => 3,
-          :description => "Outcome row 2",
-          :id => 2,
-          :ratings => [{ :points => 3, :description => "lame'", :criterion_id => 2, :id => 3 }],
-          :ignore_for_scoring => true,
-          :learning_outcome_id => lo2.id
+          points: 3,
+          description: "Outcome row 2",
+          id: 2,
+          ratings: [{ points: 3, description: "lame'", criterion_id: 2, id: 3 }],
+          ignore_for_scoring: true,
+          learning_outcome_id: lo2.id
         }
       ]
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
 
-      from_assign = @copy_from.assignments.create!(:title => "some assignment")
-      rub.associate_with(from_assign, @copy_from, :purpose => "grading")
+      from_assign = @copy_from.assignments.create!(title: "some assignment")
+      rub.associate_with(from_assign, @copy_from, purpose: "grading")
 
       run_course_copy
 
@@ -333,14 +333,14 @@ describe ContentMigration do
       @copy_from.save!
 
       lo = create_outcome(sub1)
-      rub = Rubric.new(:context => @copy_from)
+      rub = Rubric.new(context: @copy_from)
       rub.data = [
         {
-          :points => 3,
-          :description => "foo",
-          :id => 1,
-          :ratings => [{ :points => 3, :description => "Expeeds Excitations", :criterion_id => 1, :id => 2 }],
-          :learning_outcome_id => lo.id
+          points: 3,
+          description: "foo",
+          id: 1,
+          ratings: [{ points: 3, description: "Expeeds Excitations", criterion_id: 1, id: 2 }],
+          learning_outcome_id: lo.id
         }
       ]
       rub.save!
@@ -362,7 +362,7 @@ describe ContentMigration do
 
     it "still associates rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
-      @assoc.summary_data = { :saved_comments => { "309_6312" => ["what the comment", "hey"] } }
+      @assoc.summary_data = { saved_comments: { "309_6312" => ["what the comment", "hey"] } }
       @assoc.save!
 
       run_course_copy
@@ -389,7 +389,7 @@ describe ContentMigration do
     it "copies rubrics associated with assignments when rubric isn't selected" do
       create_rubric_asmnt
       @cm.copy_options = {
-        :assignments => { mig_id(@assignment) => "1" },
+        assignments: { mig_id(@assignment) => "1" },
       }
       @cm.save!
       run_course_copy
@@ -413,7 +413,7 @@ describe ContentMigration do
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log.add_outcome(lo)
@@ -430,13 +430,13 @@ describe ContentMigration do
 
     it "still works when copying the same outcome twice" do
       default = @copy_from.root_outcome_group
-      log1 = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      log1 = @copy_from.learning_outcome_groups.create!(title: "some group")
       default.adopt_outcome_group(log1)
-      log2 = @copy_from.learning_outcome_groups.create!(:title => "some other group")
+      log2 = @copy_from.learning_outcome_groups.create!(title: "some other group")
       default.adopt_outcome_group(log2)
 
-      lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "outcome1", :workflow_state => "active")
-      lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 }, { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } }
+      lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "outcome1", workflow_state: "active")
+      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
       log1.add_outcome(lo)

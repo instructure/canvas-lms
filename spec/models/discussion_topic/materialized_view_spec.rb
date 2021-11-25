@@ -49,7 +49,7 @@ describe DiscussionTopic::MaterializedView do
     it "returns the view if it exists but is out of date" do
       @view.update_materialized_view(synchronous: true)
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
-      reply = @topic.reply_from(:user => @user, :text => "new message!")
+      reply = @topic.reply_from(user: @user, text: "new message!")
       Delayed::Job.find_available(100).each(&:destroy)
       json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
@@ -124,7 +124,7 @@ describe DiscussionTopic::MaterializedView do
     obj = @course.media_objects.create! media_id: '0_deadbeef'
     track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
 
-    @topic.reply_from(:user => @student, :html => '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>')
+    @topic.reply_from(user: @student, html: '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>')
 
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view(synchronous: true)

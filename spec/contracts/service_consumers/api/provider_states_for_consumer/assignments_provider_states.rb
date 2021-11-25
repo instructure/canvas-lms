@@ -71,7 +71,7 @@ PactConfig::Consumers::ALL.each do |consumer|
                                                })
 
         override = assignment.assignment_overrides.create!
-        override.assignment_override_students.create!(:user => student)
+        override.assignment_override_students.create!(user: student)
       end
     end
 
@@ -86,7 +86,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         test_submission_types = %w[online_text_entry online_upload online_url]
         # Create a category/group...
         cat = mcourse.group_categories.create!(name: "The Cool Kids")
-        g = cat.groups.create(:context => mcourse)
+        g = cat.groups.create(context: mcourse)
         g.users << mstudent
         g.save!
         # Create 3 assignments with different submission types
@@ -145,16 +145,16 @@ PactConfig::Consumers::ALL.each do |consumer|
             lock_at: 3.days.from_now,
             lock_at_overridden: true
           )
-          override.assignment_override_students.create!(:user => mstudent)
+          override.assignment_override_students.create!(user: mstudent)
           override.save!
           # Create a rubric for the assignment
           rubric = Rubric.create!(
-            :title => "rubric title",
-            :context => mcourse,
-            :context_id => mcourse.id,
-            :context_type => "Course",
-            :points_possible => 10,
-            :public => true
+            title: "rubric title",
+            context: mcourse,
+            context_id: mcourse.id,
+            context_type: "Course",
+            points_possible: 10,
+            public: true
           )
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was

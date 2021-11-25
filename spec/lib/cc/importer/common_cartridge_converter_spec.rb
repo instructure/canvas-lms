@@ -26,15 +26,15 @@ describe "Standard Common Cartridge importing" do
   before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_full_test.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration = ContentMigration.create(context: @course)
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
@@ -47,8 +47,8 @@ describe "Standard Common Cartridge importing" do
   end
 
   it "imports files as assignments with intended_use set" do
-    assignment = @course.assignments.where(:migration_id => "f5").first
-    att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
+    assignment = @course.assignments.where(migration_id: "f5").first
+    att = @course.attachments.where(migration_id: "8612e3db71e452d5d2952ff64647c0d8").first
     expect(assignment.description).to match_ignoring_whitespace(%(<img src="/courses/#{@course.id}/files/#{att.id}/preview">))
     expect(assignment.title).to eq "Assignment 2"
   end
@@ -152,7 +152,7 @@ describe "Standard Common Cartridge importing" do
     expect(et.name).to eq "BLTI Test"
     expect(et.url).to eq 'http://www.imsglobal.org/developers/BLTI/tool.php'
     expect(et.settings[:custom_fields]).to eq({ "key1" => "value1", "key2" => "value2" })
-    expect(et.settings[:vendor_extensions]).to eq [{ :platform => "my.lms.com", :custom_fields => { "key" => "value" } }, { :platform => "your.lms.com", :custom_fields => { "key" => "value", "key2" => "value2" } }].map(&:with_indifferent_access)
+    expect(et.settings[:vendor_extensions]).to eq [{ platform: "my.lms.com", custom_fields: { "key" => "value" } }, { platform: "your.lms.com", custom_fields: { "key" => "value", "key2" => "value2" } }].map(&:with_indifferent_access)
     expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
 
     et = @course.context_external_tools.where(migration_id: "I_00011_R").first
@@ -198,8 +198,8 @@ describe "Standard Common Cartridge importing" do
       bank.reload
       expect(bank.workflow_state).to eq "deleted"
 
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       bank = @course.assessment_question_banks.active.where(migration_id: "I_00004_R_QDB_1").first
@@ -225,8 +225,8 @@ describe "Standard Common Cartridge importing" do
 
   context "re-importing the cartridge" do
     append_before do
-      @migration2 = ContentMigration.create(:context => @course)
-      @migration2.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration2 = ContentMigration.create(context: @course)
+      @migration2.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
 
@@ -255,36 +255,36 @@ describe "Standard Common Cartridge importing" do
   context "selective import" do
     it "selectively imports files" do
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "discussion_topics" => { "I_00006_R" => true },
-                   "everything" => "0",
-                   "folders" =>
+        copy: { "discussion_topics" => { "I_00006_R" => true },
+                "everything" => "0",
+                "folders" =>
                           { "I_00006_Media" => true,
                             "6a35b0974f59819404dc86d48fe39fc3" => true,
                             "I_00001_R" => true },
-                   "all_quizzes" => "1",
-                   "all_context_external_tools" => "0",
-                   "all_groups" => "0",
-                   "all_context_modules" => "0",
-                   "all_rubrics" => "0",
-                   "assessment_questions" => "1",
-                   "all_wiki_pages" => "0",
-                   "all_attachments" => "0",
-                   "all_assignments" => "1",
-                   "topic_entries" => { "undefined" => true },
-                   "context_external_tools" => { "I_00011_R" => true },
-                   "shift_dates" => "0",
-                   "all_discussion_topics" => "0",
-                   "all_announcements" => "0",
-                   "attachments" =>
+                "all_quizzes" => "1",
+                "all_context_external_tools" => "0",
+                "all_groups" => "0",
+                "all_context_modules" => "0",
+                "all_rubrics" => "0",
+                "assessment_questions" => "1",
+                "all_wiki_pages" => "0",
+                "all_attachments" => "0",
+                "all_assignments" => "1",
+                "topic_entries" => { "undefined" => true },
+                "context_external_tools" => { "I_00011_R" => true },
+                "shift_dates" => "0",
+                "all_discussion_topics" => "0",
+                "all_announcements" => "0",
+                "attachments" =>
                           { "I_00006_Media" => true,
                             "7acb90d1653008e73753aa2cafb16298" => true,
                             "6a35b0974f59819404dc86d48fe39fc3" => true,
                             "I_00003_R_IMAGERESOURCE" => true,
                             "I_00001_R" => true },
-                   "context_modules" => { "I_00000" => true },
-                   "all_assignment_groups" => "0" }
+                "context_modules" => { "I_00000" => true },
+                "all_assignment_groups" => "0" }
       }.with_indifferent_access
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -301,9 +301,9 @@ describe "Standard Common Cartridge importing" do
 
     it "does not import all attachments if :files does not exist" do
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "everything" => "0" }
+        copy: { "everything" => "0" }
       }.with_indifferent_access
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -356,19 +356,19 @@ describe "Standard Common Cartridge importing" do
     it "fixes position conflicts for modules" do
       @course = course_factory
 
-      mod1 = @course.context_modules.create :name => "ponies"
+      mod1 = @course.context_modules.create name: "ponies"
       mod1.position = 1
       mod1.migration_id = 'm_ponies'
       mod1.save!
 
-      mod2 = @course.context_modules.create :name => "monsters"
+      mod2 = @course.context_modules.create name: "monsters"
       mod2.migration_id = 'm_monsters'
       mod2.position = 2
       mod2.save!
 
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => {
+        copy: {
           "everything" => "0",
           "all_context_modules" => "1"
         }
@@ -383,19 +383,19 @@ describe "Standard Common Cartridge importing" do
     it "fixes position conflicts for assignment groups" do
       @course = course_factory
 
-      ag1 = @course.assignment_groups.create :name => "ponies"
+      ag1 = @course.assignment_groups.create name: "ponies"
       ag1.position = 1
       ag1.migration_id = 'ag_ponies'
       ag1.save!
 
-      ag2 = @course.assignment_groups.create :name => "monsters"
+      ag2 = @course.assignment_groups.create name: "monsters"
       ag2.position = 2
       ag2.migration_id = 'ag_monsters'
       ag2.save!
 
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => {
+        copy: {
           "everything" => "0",
           "all_assignment_groups" => "1"
         }
@@ -423,9 +423,9 @@ describe "Standard Common Cartridge importing" do
 
     it "imports submodules individually if selected" do
       course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "context_modules" => { "sf2" => "1" } }
+        copy: { "context_modules" => { "sf2" => "1" } }
       }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
@@ -486,22 +486,22 @@ describe "More Standard Common Cartridge importing" do
 
     # convert to json
     # pretend there were resources for the referenced items
-    @converter.resources = { 'w1' => { :type => "webcontent" }, 'f3' => { :type => "webcontent" }, 'f4' => { :type => "webcontent" }, 'f5' => { :type => "webcontent" }, }
+    @converter.resources = { 'w1' => { type: "webcontent" }, 'f3' => { type: "webcontent" }, 'f4' => { type: "webcontent" }, 'f5' => { type: "webcontent" }, }
     doc = Nokogiri::XML(orgs)
     hash = @converter.convert_organizations(doc)
 
     # make all the fake attachments for the module items to link to
     unfiled_folder = Folder.unfiled_folder(@copy_to)
-    w1 = Attachment.create!(:filename => 'w1.html', :uploaded_data => StringIO.new('w1'), :folder => unfiled_folder, :context => @copy_to)
+    w1 = Attachment.create!(filename: 'w1.html', uploaded_data: StringIO.new('w1'), folder: unfiled_folder, context: @copy_to)
     w1.migration_id = "w1"
     w1.save
-    f3 = Attachment.create!(:filename => 'f3.html', :uploaded_data => StringIO.new('f3'), :folder => unfiled_folder, :context => @copy_to)
+    f3 = Attachment.create!(filename: 'f3.html', uploaded_data: StringIO.new('f3'), folder: unfiled_folder, context: @copy_to)
     f3.migration_id = "f3"
     f3.save
-    f4 = Attachment.create!(:filename => 'f4.html', :uploaded_data => StringIO.new('f4'), :folder => unfiled_folder, :context => @copy_to)
+    f4 = Attachment.create!(filename: 'f4.html', uploaded_data: StringIO.new('f4'), folder: unfiled_folder, context: @copy_to)
     f4.migration_id = "f4"
     f4.save
-    f5 = Attachment.create!(:filename => 'f5.html', :uploaded_data => StringIO.new('f5'), :folder => unfiled_folder, :context => @copy_to)
+    f5 = Attachment.create!(filename: 'f5.html', uploaded_data: StringIO.new('f5'), folder: unfiled_folder, context: @copy_to)
     f5.migration_id = "f5"
     f5.save
 
@@ -572,7 +572,7 @@ end
 describe "non-ASCII attachment names" do
   it "does not fail to create all_files.zip" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
-    @converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path)
+    @converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path)
     expect { @converter.export }.not_to raise_error
     contents = ["course_settings/assignment_groups.xml",
                 "course_settings/canvas_export.txt",
@@ -595,16 +595,16 @@ describe "LTI tool combination" do
   before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
+    @migration = ContentMigration.create(context: @course)
     @migration.migration_type = "common_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
@@ -635,12 +635,12 @@ describe "other cc files" do
     unzipped_file_path = create_temp_dir!
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
+    @migration = ContentMigration.create(context: @course)
     @migration.migration_type = "common_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
 
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi',
-                                                      :base_download_dir => unzipped_file_path, :content_migration => @migration)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi',
+                                                      base_download_dir: unzipped_file_path, content_migration: @migration)
     converter.export
     @course_data = converter.course.with_indifferent_access
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -675,9 +675,9 @@ describe "other cc files" do
     it "does some possibly broken converting" do
       Account.default.enable_feature!(:common_cartridge_page_conversion)
       import_cc_file("cc_file_to_page_test.zip")
-      img = @course.attachments.where(:migration_id => "I_00001_R_1").first
+      img = @course.attachments.where(migration_id: "I_00001_R_1").first
 
-      page = @course.wiki_pages.where(:migration_id => "I_00001_R").first
+      page = @course.wiki_pages.where(migration_id: "I_00001_R").first
       expect(page.title).to eq "Some kind of file or page thingy"
       expect(page.body).to match_ignoring_whitespace("<p>THis is an image or something <img src=\"/courses/#{@course.id}/files/#{img.id}/preview\"></p>")
 
@@ -689,7 +689,7 @@ describe "other cc files" do
       import_cc_file("cc_file_to_page_test.zip")
       expect(@course.wiki_pages.count).to eq 0
 
-      att = @course.attachments.where(:migration_id => "I_00001_R").first
+      att = @course.attachments.where(migration_id: "I_00001_R").first
       tag = @course.context_module_tags.first
       expect(tag.content).to eq att
     end
@@ -726,8 +726,8 @@ describe "other cc files" do
   describe "empty file link name inference" do
     it "adds the file name to empty links in html content" do
       import_cc_file("cc_empty_link.zip")
-      assmt = @course.assignments.where(:migration_id => "assignment1").first
-      file = @course.attachments.where(:migration_id => "file1").first
+      assmt = @course.assignments.where(migration_id: "assignment1").first
+      file = @course.attachments.where(migration_id: "file1").first
       doc = Nokogiri::HTML::DocumentFragment.parse(assmt.description)
       link = doc.at_css("a")
       expect(link.attr('href')).to include("courses/#{@course.id}/files/#{file.id}")

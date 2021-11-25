@@ -22,9 +22,9 @@ require_relative 'messages_helper'
 
 describe 'new_context_group_membership_invitation' do
   before :once do
-    course_model(:reusable => true)
+    course_model(reusable: true)
     user_model
-    @group = @course.groups.create!(:name => "student group")
+    @group = @course.groups.create!(name: "student group")
     @object = @group.add_user(@user)
   end
 

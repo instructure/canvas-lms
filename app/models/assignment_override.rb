@@ -26,7 +26,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   SET_TYPE_NOOP = 'Noop'
 
-  simply_versioned :keep => 10
+  simply_versioned keep: 10
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
@@ -34,22 +34,22 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment, inverse_of: :assignment_overrides
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
-  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
-  validates :assignment_version, presence: { :if => :assignment }
+  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, inverse_of: :assignment_override, dependent: :destroy, validate: false
+  validates :assignment_version, presence: { if: :assignment }
   validates :title, :workflow_state, presence: true
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   concrete_set = ->(override) { ['CourseSection', 'Group'].include?(override.set_type) }
 
-  validates :set, :set_id, presence: { :if => concrete_set }
-  validates :set_id, uniqueness: { :scope => %i[assignment_id set_type workflow_state],
-                                   :if => ->(override) { override.assignment? && override.active? && concrete_set.call(override) } }
-  validates :set_id, uniqueness: { :scope => %i[quiz_id set_type workflow_state],
-                                   :if => ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
+  validates :set, :set_id, presence: { if: concrete_set }
+  validates :set_id, uniqueness: { scope: %i[assignment_id set_type workflow_state],
+                                   if: ->(override) { override.assignment? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[quiz_id set_type workflow_state],
+                                   if: ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
-  validate :if => concrete_set do |record|
+  validate if: concrete_set do |record|
     if record.set && record.assignment && record.active?
       case record.set
       when CourseSection
@@ -61,7 +61,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  validate :set_id, :unless => concrete_set do |record|
+  validate :set_id, unless: concrete_set do |record|
     if record.set_type == 'ADHOC' && !record.set_id.nil?
       record.errors.add :set_id, "must be nil with set_type ADHOC"
     end
@@ -84,7 +84,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  after_save :touch_assignment, :if => :assignment
+  after_save :touch_assignment, if: :assignment
   after_save :update_grading_period_grades
   after_save :update_due_date_smart_alerts, if: :update_cached_due_dates?
   after_commit :update_cached_due_dates
@@ -197,7 +197,7 @@ class AssignmentOverride < ActiveRecord::Base
     ScheduledSmartAlert.where(context_type: self.class.name, context_id: id).destroy_all
   end
 
-  scope :active, -> { where(:workflow_state => 'active') }
+  scope :active, -> { where(workflow_state: 'active') }
 
   scope :visible_students_only, lambda { |visible_ids|
     scope = select("assignment_overrides.*")
@@ -275,7 +275,7 @@ class AssignmentOverride < ActiveRecord::Base
       send("#{field}=", nil)
     end
 
-    validates "#{field}_overridden", inclusion: { :in => [false, true] }
+    validates "#{field}_overridden", inclusion: { in: [false, true] }
     before_validation do |override|
       if override.send("#{field}_overridden").nil?
         override.send("#{field}_overridden=", false)
@@ -310,10 +310,10 @@ class AssignmentOverride < ActiveRecord::Base
     new_due_at = self.class.type_for_attribute(:due_at).cast(new_due_at) if new_due_at.is_a?(String)
     new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
-      :due_at => new_due_at,
-      :due_at_was => read_attribute(:due_at),
-      :all_day_was => read_attribute(:all_day),
-      :all_day_date_was => read_attribute(:all_day_date)
+      due_at: new_due_at,
+      due_at_was: read_attribute(:due_at),
+      all_day_was: read_attribute(:all_day),
+      all_day_date_was: read_attribute(:all_day_date)
     )
 
     write_attribute(:due_at, new_due_at)
@@ -333,16 +333,16 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def as_hash
-    { :title => title,
-      :due_at => due_at,
-      :id => id,
-      :all_day => all_day,
-      :set_type => set_type,
-      :set_id => set_id,
-      :all_day_date => all_day_date,
-      :lock_at => lock_at,
-      :unlock_at => unlock_at,
-      :override => self }
+    { title: title,
+      due_at: due_at,
+      id: id,
+      all_day: all_day,
+      set_type: set_type,
+      set_id: set_id,
+      all_day_date: all_day_date,
+      lock_at: lock_at,
+      unlock_at: unlock_at,
+      override: self }
   end
 
   def applies_to_students

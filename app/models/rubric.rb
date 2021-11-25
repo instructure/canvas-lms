@@ -31,12 +31,12 @@ class Rubric < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_associations, -> { where(workflow_state: "active") }, class_name: 'RubricAssociation', inverse_of: :rubric, dependent: :destroy
   has_many :rubric_associations_with_deleted, class_name: 'RubricAssociation', inverse_of: :rubric
-  has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
+  has_many :rubric_assessments, through: :rubric_associations, dependent: :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
   validates :context_id, :context_type, :workflow_state, presence: true
-  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
+  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: false, allow_blank: false }
 
   before_validation :default_values
   before_create :set_root_account_id
@@ -46,7 +46,7 @@ class Rubric < ActiveRecord::Base
   serialize :data
   simply_versioned
 
-  scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }
+  scope :publicly_reusable, -> { where(reusable: true).order(best_unicode_collation_key('title')) }
   scope :matching, ->(search) { where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, ->(date) { where("rubrics.created_at<?", date) }
   scope :active, -> { where.not(workflow_state: 'deleted') }
@@ -162,7 +162,7 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context, current_user: nil)
-    ras = rubric_associations.where(:context_id => context, :context_type => context.class.to_s)
+    ras = rubric_associations.where(context_id: context, context_type: context.class.to_s)
     if context.class.to_s == 'Course'
       # if rubric is removed at the course level, we want to destroy any
       # assignment associations found in the context of the course
@@ -225,10 +225,10 @@ class Rubric < ActiveRecord::Base
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
-    ra = rubric_associations.build :association_object => association,
-                                   :context => context,
-                                   :use_for_grading => !!opts[:use_for_grading],
-                                   :purpose => purpose
+    ra = rubric_associations.build association_object: association,
+                                   context: context,
+                                   use_for_grading: !!opts[:use_for_grading],
+                                   purpose: purpose
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
     ra.updating_user = opts[:current_user]
     if ra.save && association.is_a?(Assignment)
@@ -352,13 +352,13 @@ class Rubric < ActiveRecord::Base
   end
 
   def populate_rubric_title
-    self.title ||= context && t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
+    self.title ||= context && t('context_name_rubric', "%{course_name} Rubric", course_name: context.name)
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
   def generate_criteria(params)
     @used_ids = {}
-    title = params[:title] || t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
+    title = params[:title] || t('context_name_rubric', "%{course_name} Rubric", course_name: context.name)
     criteria = []
     (params[:criteria] || {}).each do |idx, criterion_data|
       criterion = {}

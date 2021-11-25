@@ -98,9 +98,9 @@ describe GoogleDrive::Connection do
     before do
       stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/drive/v2/rest")
         .to_return(
-          :status => 200,
-          :body => load_fixture('discovered_api.json'),
-          :headers => { 'Content-Type' => 'application/json' }
+          status: 200,
+          body: load_fixture('discovered_api.json'),
+          headers: { 'Content-Type' => 'application/json' }
         )
     end
 
@@ -172,7 +172,7 @@ describe GoogleDrive::Connection do
 
       before do
         stub_request(:get, files_url).to_return(
-          :status => http_status,
+          status: http_status,
           body: load_fixture('file_data.json'),
           headers: { 'Content-Type' => 'application/json' }
         )
@@ -203,7 +203,7 @@ describe GoogleDrive::Connection do
 
       it "won't try to download a nil url" do
         stub_request(:get, files_url).to_return(
-          :status => http_status,
+          status: http_status,
           body: load_fixture('bad_file_data.json'),
           headers: { 'Content-Type' => 'application/json' }
         )
@@ -301,7 +301,7 @@ describe GoogleDrive::Connection do
 
       it "returns true when response is 200" do
         stub_request(:get, "https://www.googleapis.com/drive/v2/about")
-          .to_return(:status => 200, :body => "", :headers => {})
+          .to_return(status: 200, body: "", headers: {})
 
         expect(connection.authorized?).to be true
       end

@@ -153,7 +153,7 @@ class Login::CanvasController < ApplicationController
 
   def unsuccessful_login(message)
     if request.format.json?
-      return render :json => { :errors => [message] }, :status => :bad_request
+      return render json: { errors: [message] }, status: :bad_request
     end
 
     flash[:error] = if mobile_device?

@@ -54,14 +54,14 @@ module Lti
       let(:tabs_with_item_banks) do
         [
           {
-            :id => "context_external_tool_1",
-            :label => "Item Banks",
-            :css_class => "context_external_tool_1",
-            :visibility => nil,
-            :href => :course_external_tool_path,
-            :external => true,
-            :hidden => false,
-            :args => [2, 1]
+            id: "context_external_tool_1",
+            label: "Item Banks",
+            css_class: "context_external_tool_1",
+            visibility: nil,
+            href: :course_external_tool_path,
+            external: true,
+            hidden: false,
+            args: [2, 1]
           }
         ]
       end
@@ -69,14 +69,14 @@ module Lti
       let(:tabs_without_item_banks) do
         [
           {
-            :id => "context_external_tool_1",
-            :label => "Another",
-            :css_class => "context_external_tool_1",
-            :visibility => nil,
-            :href => :course_external_tool_path,
-            :external => true,
-            :hidden => false,
-            :args => [2, 1]
+            id: "context_external_tool_1",
+            label: "Another",
+            css_class: "context_external_tool_1",
+            visibility: nil,
+            href: :course_external_tool_path,
+            external: true,
+            hidden: false,
+            args: [2, 1]
           }
         ]
       end

@@ -24,8 +24,8 @@ describe "/gradebooks/_grading_box" do
   it "renders" do
     course_with_student
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
-    render :partial => "gradebooks/grading_box", :object => a
+    a = @course.assignments.create!(title: "some assignment")
+    render partial: "gradebooks/grading_box", object: a
     expect(response).not_to be_nil
   end
 end

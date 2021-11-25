@@ -27,48 +27,48 @@ class Account::HelpLinks
   def default_links(filter = true)
     defaults = [
       {
-        :available_to => ['student'],
-        :text => -> { I18n.t('#help_dialog.instructor_question', 'Ask Your Instructor a Question') },
-        :subtext => -> { I18n.t('#help_dialog.instructor_question_sub', 'Questions are submitted to your instructor') },
-        :url => '#teacher_feedback',
-        :type => 'default',
-        :id => :instructor_question,
-        :is_featured => false,
-        :is_new => false,
-        :feature_headline => -> { '' }
+        available_to: ['student'],
+        text: -> { I18n.t('#help_dialog.instructor_question', 'Ask Your Instructor a Question') },
+        subtext: -> { I18n.t('#help_dialog.instructor_question_sub', 'Questions are submitted to your instructor') },
+        url: '#teacher_feedback',
+        type: 'default',
+        id: :instructor_question,
+        is_featured: false,
+        is_new: false,
+        feature_headline: -> { '' }
       }.freeze,
       {
-        :available_to => %w[user student teacher admin observer unenrolled],
-        :text => -> { I18n.t('#help_dialog.search_the_canvas_guides', 'Search the Canvas Guides') },
-        :subtext => -> { I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions') },
-        :url => Setting.get('help_dialog_canvas_guide_url', I18n.t(:"community.guides_home")),
-        :type => 'default',
-        :id => :search_the_canvas_guides,
-        :is_featured => true,
-        :is_new => false,
-        :feature_headline => -> { I18n.t('Little lost? Try here first!') }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t('#help_dialog.search_the_canvas_guides', 'Search the Canvas Guides') },
+        subtext: -> { I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions') },
+        url: Setting.get('help_dialog_canvas_guide_url', I18n.t(:"community.guides_home")),
+        type: 'default',
+        id: :search_the_canvas_guides,
+        is_featured: true,
+        is_new: false,
+        feature_headline: -> { I18n.t('Little lost? Try here first!') }
       }.freeze,
       {
-        :available_to => %w[user student teacher admin observer unenrolled],
-        :text => -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
-        :subtext => -> { I18n.t('#help_dialog.report_problem_sub', 'If Canvas misbehaves, tell us about it') },
-        :url => '#create_ticket',
-        :type => 'default',
-        :id => :report_a_problem,
-        :is_featured => false,
-        :is_new => false,
-        :feature_headline => -> { '' }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
+        subtext: -> { I18n.t('#help_dialog.report_problem_sub', 'If Canvas misbehaves, tell us about it') },
+        url: '#create_ticket',
+        type: 'default',
+        id: :report_a_problem,
+        is_featured: false,
+        is_new: false,
+        feature_headline: -> { '' }
       }.freeze,
       {
-        :available_to => %w[user student teacher admin observer unenrolled],
-        :text => -> { I18n.t('#help_dialog.covid', 'COVID-19 Canvas Resources') },
-        :subtext => -> { I18n.t('#help_dialog.covid_sub', 'Tips for teaching and learning online') },
-        :url => Setting.get('help_dialog_covid_url', I18n.t(:"community.contingency_covid")),
-        :type => 'default',
-        :id => :covid,
-        :is_new => true,
-        :is_featured => false,
-        :feature_headline => -> { '' }
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t('#help_dialog.covid', 'COVID-19 Canvas Resources') },
+        subtext: -> { I18n.t('#help_dialog.covid_sub', 'Tips for teaching and learning online') },
+        url: Setting.get('help_dialog_covid_url', I18n.t(:"community.contingency_covid")),
+        type: 'default',
+        id: :covid,
+        is_new: true,
+        is_featured: false,
+        feature_headline: -> { '' }
       }.freeze
     ]
     filter ? filtered_links(defaults) : defaults

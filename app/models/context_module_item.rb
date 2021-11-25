@@ -50,7 +50,7 @@ module ContextModuleItem
     objs_to_search.each do |obj|
       next unless obj.present?
 
-      tag = obj.context_module_tags.where(:id => preferred_id).first
+      tag = obj.context_module_tags.where(id: preferred_id).first
       return tag if tag
     end
     objs_to_search.each do |obj|

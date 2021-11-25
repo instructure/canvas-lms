@@ -59,7 +59,7 @@ module CC
 
         if aq
           ref = create_key(aq)
-          node.itemref(:linkrefid => ref)
+          node.itemref(linkrefid: ref)
         else
           add_question(node, question)
         end
@@ -105,8 +105,8 @@ module CC
           change_missing_word(question)
         end
         node.item(
-          :ident => question['migration_id'],
-          :title => question['name'].presence || question['question_name']
+          ident: question['migration_id'],
+          title: question['name'].presence || question['question_name']
         ) do |item_node|
           item_node.itemmetadata do |meta_node|
             meta_node.qtimetadata do |qm_node|
@@ -137,10 +137,10 @@ module CC
             item_node.resprocessing do |res_node|
               res_node.outcomes do |out_node|
                 out_node.decvar(
-                  :maxvalue => '100',
-                  :minvalue => '0',
-                  :varname => 'SCORE',
-                  :vartype => 'Decimal'
+                  maxvalue: '100',
+                  minvalue: '0',
+                  varname: 'SCORE',
+                  vartype: 'Decimal'
                 )
               end
               resprocessing(res_node, question)
@@ -177,13 +177,13 @@ module CC
       def multiple_choice_response_str(node, question)
         card = question['question_type'] == 'multiple_answers_question' ? 'Multiple' : 'Single'
         node.response_lid(
-          :ident => "response1",
-          :rcardinality => card
+          ident: "response1",
+          rcardinality: card
         ) do |r_node|
           r_node.render_choice do |rc_node|
             question['answers'].each do |answer|
               rc_node.response_label(
-                :ident => answer['id']
+                ident: answer['id']
               ) do |rl_node|
                 rl_node.material do |mat_node|
                   html_mat_text(mat_node, answer['html'], answer['text'])
@@ -196,7 +196,7 @@ module CC
 
       def matching_response_lid(node, question)
         question['answers'].each do |answer|
-          node.response_lid(:ident => "response_#{answer['id']}") do |lid_node|
+          node.response_lid(ident: "response_#{answer['id']}") do |lid_node|
             lid_node.material do |mat_node|
               html_mat_text(mat_node, answer['html'], answer['text'])
             end
@@ -205,7 +205,7 @@ module CC
               next unless question['matches']
 
               question['matches'].each do |match|
-                rc_node.response_label(:ident => match['match_id']) do |r_node|
+                rc_node.response_label(ident: match['match_id']) do |r_node|
                   r_node.material do |mat_node|
                     mat_node.mattext match['text']
                   end
@@ -218,10 +218,10 @@ module CC
 
       def short_answer_response_str(node, _question)
         node.response_str(
-          :ident => "response1",
-          :rcardinality => 'Single'
+          ident: "response1",
+          rcardinality: 'Single'
         ) do |r_node|
-          r_node.render_fib { |n| n.response_label(:ident => 'answer1', :rshuffle => 'No') }
+          r_node.render_fib { |n| n.response_label(ident: 'answer1', rshuffle: 'No') }
         end
       end
 
@@ -238,13 +238,13 @@ module CC
         groups = question['answers'].group_by { |a| a[:blank_id] }
 
         groups.each_pair do |id, answers|
-          node.response_lid(:ident => "response_#{id}") do |lid_node|
+          node.response_lid(ident: "response_#{id}") do |lid_node|
             lid_node.material do |mat_node|
               mat_node.mattext id
             end
             lid_node.render_choice do |rc_node|
               answers.each do |answer|
-                rc_node.response_label(:ident => answer['id']) do |r_node|
+                rc_node.response_label(ident: answer['id']) do |r_node|
                   r_node.material do |mat_node|
                     html_mat_text(mat_node, answer['html'], answer['text'])
                   end
@@ -257,10 +257,10 @@ module CC
 
       def calculated_response_str(node, _question)
         node.response_str(
-          :ident => 'response1',
-          :rcardinality => 'Single'
+          ident: 'response1',
+          rcardinality: 'Single'
         ) do |r_node|
-          r_node.render_fib(:fibtype => 'Decimal') { |n| n.response_label(:ident => 'answer1') }
+          r_node.render_fib(fibtype: 'Decimal') { |n| n.response_label(ident: 'answer1') }
         end
       end
 
@@ -303,63 +303,63 @@ module CC
         correct_id = nil
         correct_answer = question['answers'].find { |a| a['weight'].to_i > 0 }
         correct_id = correct_answer['id'] if correct_answer
-        node.respcondition(:continue => 'No') do |res_node|
+        node.respcondition(continue: 'No') do |res_node|
           res_node.conditionvar do |c_node|
-            c_node.varequal correct_id, :respident => "response1"
+            c_node.varequal correct_id, respident: "response1"
           end # c_node
-          res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
+          res_node.setvar '100', action: 'Set', varname: 'SCORE'
           correct_feedback_ref(res_node, question)
         end # res_node
       end
 
       def multiple_answers_resprocessing(node, question)
-        node.respcondition(:continue => 'No') do |res_node|
+        node.respcondition(continue: 'No') do |res_node|
           res_node.conditionvar do |c_node|
             c_node.and do |and_node|
               # The CC implementation guide says the 'and' isn't needed but it doesn't validate without it.
               question['answers'].each do |answer|
                 if answer['weight'].to_i > 0
-                  and_node.varequal answer['id'], :respident => "response1"
+                  and_node.varequal answer['id'], respident: "response1"
                 else
                   and_node.not do |not_node|
-                    not_node.varequal answer['id'], :respident => "response1"
+                    not_node.varequal answer['id'], respident: "response1"
                   end
                 end
               end
             end
           end # c_node
-          res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
+          res_node.setvar '100', action: 'Set', varname: 'SCORE'
           correct_feedback_ref(res_node, question)
         end # res_node
       end
 
       def short_answer_resprocessing(node, question)
-        node.respcondition(:continue => 'No') do |res_node|
+        node.respcondition(continue: 'No') do |res_node|
           res_node.conditionvar do |c_node|
             question['answers'].each do |answer|
-              c_node.varequal answer['text'], :respident => 'response1'
+              c_node.varequal answer['text'], respident: 'response1'
             end
           end # c_node
-          res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
+          res_node.setvar '100', action: 'Set', varname: 'SCORE'
           correct_feedback_ref(res_node, question)
         end # res_node
       end
 
       def numerical_resprocessing(node, question)
         question['answers'].each do |answer|
-          node.respcondition(:continue => 'No') do |res_node|
+          node.respcondition(continue: 'No') do |res_node|
             res_node.conditionvar do |c_node|
               if answer['exact']
                 # exact answer
                 c_node.or do |or_node|
                   exact = answer['exact'].to_f
-                  or_node.varequal exact, :respident => 'response1'
+                  or_node.varequal exact, respident: 'response1'
                   unless answer['margin'].blank?
                     or_node.and do |and_node|
                       exact = BigDecimal(answer['exact'].to_s)
                       margin = BigDecimal(answer['margin'].to_s)
-                      and_node.vargte((exact - margin).to_f, :respident => 'response1')
-                      and_node.varlte((exact + margin).to_f, :respident => 'response1')
+                      and_node.vargte((exact - margin).to_f, respident: 'response1')
+                      and_node.varlte((exact + margin).to_f, respident: 'response1')
                     end
                   end
                 end
@@ -367,7 +367,7 @@ module CC
                 # this might be one of the worst hacks i've ever done
                 c_node.or do |or_node|
                   approx = answer['approximate'].to_d
-                  or_node.varequal approx, :respident => 'response1'
+                  or_node.varequal approx, respident: 'response1'
 
                   precision = answer['precision'].to_i
                   if precision > 0
@@ -379,20 +379,20 @@ module CC
                     ceil = "#{prefix.to_d + range}E#{exp}".to_d # 1.3405E+01
 
                     or_node.and do |and_node|
-                      and_node.vargt(floor, :respident => 'response1')
-                      and_node.varlte(ceil, :respident => 'response1')
+                      and_node.vargt(floor, respident: 'response1')
+                      and_node.varlte(ceil, respident: 'response1')
                     end
                   end
                 end
               else
                 # answer in range
-                c_node.vargte(answer['start'], :respident => 'response1')
-                c_node.varlte(answer['end'], :respident => 'response1')
+                c_node.vargte(answer['start'], respident: 'response1')
+                c_node.varlte(answer['end'], respident: 'response1')
               end
             end # c_node
 
-            res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
-            res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb") unless answer['comments'].blank? && answer['comments_html'].blank?
+            res_node.setvar '100', action: 'Set', varname: 'SCORE'
+            res_node.displayfeedback(feedbacktype: 'Response', linkrefid: "#{answer['id']}_fb") unless answer['comments'].blank? && answer['comments_html'].blank?
             correct_feedback_ref(res_node, question)
           end # res_node
         end
@@ -411,9 +411,9 @@ module CC
         question['answers'].each do |answer|
           node.respcondition do |r_node|
             r_node.conditionvar do |c_node|
-              c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
+              c_node.varequal(answer['match_id'], respident: "response_#{answer['id']}")
             end
-            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
+            r_node.setvar(correct_points, varname: 'SCORE', action: 'Add')
           end
 
           next if answer['comments'].blank? && answer['comments_html'].blank?
@@ -421,10 +421,10 @@ module CC
           node.respcondition do |r_node|
             r_node.conditionvar do |c_node|
               c_node.not do
-                c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
+                c_node.varequal(answer['match_id'], respident: "response_#{answer['id']}")
               end
             end
-            r_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
+            r_node.displayfeedback(feedbacktype: 'Response', linkrefid: "#{answer['id']}_fb")
           end
         end
       end
@@ -439,27 +439,27 @@ module CC
 
           node.respcondition do |r_node|
             r_node.conditionvar do |c_node|
-              c_node.varequal(answer['id'], :respident => "response_#{id}")
+              c_node.varequal(answer['id'], respident: "response_#{id}")
             end
-            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
+            r_node.setvar(correct_points, varname: 'SCORE', action: 'Add')
           end
         end
       end
 
       def calculated_resprocessing(node, _question)
-        node.respcondition(:title => 'correct') do |r_node|
+        node.respcondition(title: 'correct') do |r_node|
           r_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end
-          r_node.setvar(100, :varname => 'SCORE', :action => 'Set')
+          r_node.setvar(100, varname: 'SCORE', action: 'Set')
         end
-        node.respcondition(:title => 'incorrect') do |r_node|
+        node.respcondition(title: 'incorrect') do |r_node|
           r_node.conditionvar do |c_node|
             c_node.not do |n_node| # rubocop:disable Style/SymbolProc
               n_node.other
             end
           end
-          r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
+          r_node.setvar(0, varname: 'SCORE', action: 'Set')
         end
       end
 
@@ -473,38 +473,38 @@ module CC
           if MULTI_ANSWER_TYPES.member? question['question_type']
             respident = "response_#{answer['blank_id']}"
           end
-          node.respcondition(:continue => 'Yes') do |res_node|
+          node.respcondition(continue: 'Yes') do |res_node|
             res_node.conditionvar do |c_node|
               if question[:question_type] == 'short_answer_question'
-                c_node.varequal answer['text'], :respident => respident
+                c_node.varequal answer['text'], respident: respident
               else
-                c_node.varequal answer['id'], :respident => respident
+                c_node.varequal answer['id'], respident: respident
               end
             end # c_node
-            node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb")
+            node.displayfeedback(feedbacktype: 'Response', linkrefid: "#{answer['id']}_fb")
           end
         end
       end
 
       def other_respcondition(node, continue = 'No', feedback_ref = nil)
-        node.respcondition(:continue => continue) do |res_node|
+        node.respcondition(continue: continue) do |res_node|
           res_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end # c_node
-          res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => feedback_ref) if feedback_ref
+          res_node.displayfeedback(feedbacktype: 'Response', linkrefid: feedback_ref) if feedback_ref
         end # res_node
       end
 
       def correct_feedback_ref(node, question)
         unless question['correct_comments'].blank? && question['correct_comments_html'].blank?
-          node.displayfeedback(:feedbacktype => 'Response', :linkrefid => 'correct_fb')
+          node.displayfeedback(feedbacktype: 'Response', linkrefid: 'correct_fb')
         end
       end
 
       def item_feedback(node, id, question, key)
         return unless question[key].present? || question[key + "_html"].present?
 
-        node.itemfeedback(:ident => id) do |f_node|
+        node.itemfeedback(ident: id) do |f_node|
           f_node.flow_mat do |flow_node|
             flow_node.material do |mat_node|
               html_mat_text(mat_node, question[key + "_html"], question[key])
@@ -526,7 +526,7 @@ module CC
           ext_node.calculated do |calc_node|
             calc_node.answer_tolerance question['answer_tolerance']
 
-            calc_node.formulas(:decimal_places => question['formula_decimal_places']) do |forms_node|
+            calc_node.formulas(decimal_places: question['formula_decimal_places']) do |forms_node|
               question['formulas'].try(:each) do |f|
                 forms_node.formula f['formula']
               end
@@ -534,7 +534,7 @@ module CC
 
             calc_node.vars do |vars_node|
               question['variables'].try(:each) do |var|
-                vars_node.var(:name => var['name'], :scale => var['scale']) do |var_node|
+                vars_node.var(name: var['name'], scale: var['scale']) do |var_node|
                   var_node.min var['min']
                   var_node.max var['max']
                 end
@@ -543,9 +543,9 @@ module CC
 
             calc_node.var_sets do |sets_node|
               question['answers'].try(:each) do |answer|
-                sets_node.var_set(:ident => answer['id']) do |set_node|
+                sets_node.var_set(ident: answer['id']) do |set_node|
                   answer['variables'].try(:each) do |var|
-                    set_node.var(var['value'], :name => var['name'])
+                    set_node.var(var['value'], name: var['name'])
                   end
                   set_node.answer answer[:answer]
                 end
@@ -558,9 +558,9 @@ module CC
       def html_mat_text(mat_node, html_val, text_val)
         if html_val.present?
           html = @html_exporter.html_content(html_val)
-          mat_node.mattext html, :texttype => 'text/html'
+          mat_node.mattext html, texttype: 'text/html'
         else
-          mat_node.mattext text_val, :texttype => 'text/plain'
+          mat_node.mattext text_val, texttype: 'text/plain'
         end
       end
     end

@@ -276,7 +276,7 @@ describe "outcome gradebook" do
           end
 
           it 'correctly displays unassessed students when the filter option is selected' do
-            student_4 = User.create!(:name => 'Unassessed Student')
+            student_4 = User.create!(name: 'Unassessed Student')
             student_4.register!
             @course.enroll_student(student_4)
 
@@ -298,7 +298,7 @@ describe "outcome gradebook" do
           end
 
           it 'retains focus on filter button after a filter is chosen' do
-            student_4 = User.create!(:name => 'Unassessed Student')
+            student_4 = User.create!(name: 'Unassessed Student')
             student_4.register!
             @course.enroll_student(student_4)
 
@@ -479,7 +479,7 @@ describe "outcome gradebook" do
       end
 
       it "handles multiple enrollments correctly" do
-        @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
+        @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
         Gradebook.visit(@course)
 

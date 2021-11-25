@@ -36,7 +36,7 @@ module Importers
       end
       migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|
         if (tool.consumer_key == 'fake' || tool.shared_secret == 'fake') && !tool.use_1_3?
-          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => tool.name))
+          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', tool_name: tool.name))
         end
       end
     end
@@ -101,7 +101,7 @@ module Importers
             existing[:custom_fields] ||= {}
             existing[:custom_fields].merge! ext[:custom_fields]
           else
-            settings[:vendor_extensions] << { :platform => ext[:platform], :custom_fields => ext[:custom_fields] }
+            settings[:vendor_extensions] << { platform: ext[:platform], custom_fields: ext[:custom_fields] }
           end
         end
       end
@@ -205,7 +205,7 @@ module Importers
 
     def self.generalize_tool_name(tool)
       if tool.domain
-        tool.name = CanvasTextHelper.truncate_text(tool.domain, :max_length => 100)
+        tool.name = CanvasTextHelper.truncate_text(tool.domain, max_length: 100)
         tool.description = "A combined configuration for all tools with the domain: #{tool.domain}"
         tool.save! if tool.changed?
       end

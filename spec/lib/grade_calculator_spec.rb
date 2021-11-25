@@ -25,9 +25,9 @@ describe GradeCalculator do
 
   context "computing grades" do
     it "computes grades without dying" do
-      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-      @assignment2 = @course.assignments.create!(:title => "Some Assignment2", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
+      @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
       @submission = @assignment2.grade_student(@user, grade: "5", grader: @teacher)
       expect(@user.enrollments.first.computed_current_score).to equal(50.0)
       expect(@user.enrollments.first.computed_final_score).to equal(25.0)
@@ -283,8 +283,8 @@ describe GradeCalculator do
     end
 
     it "recomputes when an assignment's points_possible changes'" do
-      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
       @submission = @assignment.grade_student(@user, grade: "5", grader: @teacher)
       expect(@user.enrollments.first.computed_current_score).to equal(50.0)
       expect(@user.enrollments.first.computed_final_score).to equal(50.0)
@@ -299,12 +299,12 @@ describe GradeCalculator do
     it "recomputes when an assignment group's weight changes'" do
       @course.group_weighting_scheme = "percent"
       @course.save
-      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50)
-      @group2 = @course.assignment_groups.create!(:name => "some group2", :group_weight => 50)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: 50)
+      @group2 = @course.assignment_groups.create!(name: "some group2", group_weight: 50)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
       @assignment.grade_student(@user, grade: "10", grader: @teacher)
-      @course.assignments.create! :points_possible => 1,
-                                  :assignment_group => @group2
+      @course.assignments.create! points_possible: 1,
+                                  assignment_group: @group2
       expect(@user.enrollments.first.computed_current_score).to equal(100.0)
       expect(@user.enrollments.first.computed_final_score).to equal(50.0)
 
@@ -412,12 +412,12 @@ describe GradeCalculator do
     end
 
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)
-      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => g1_weight)
-      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => a1_possible)
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: g1_weight)
+      @assignment = @group.assignments.build(title: "some assignments", points_possible: a1_possible)
       @assignment.context = @course
       @assignment.save!
-      @group2 = @course.assignment_groups.create!(:name => "some other group", :group_weight => g2_weight)
-      @assignment2 = @group2.assignments.build(:title => "some assignments", :points_possible => a2_possible)
+      @group2 = @course.assignment_groups.create!(name: "some other group", group_weight: g2_weight)
+      @assignment2 = @group2.assignments.build(title: "some assignments", points_possible: a2_possible)
       @assignment2.context = @course
       @assignment2.save!
     end
@@ -686,11 +686,11 @@ describe GradeCalculator do
     end
 
     it "properly calculates the grade when there are 'not graded' assignments with scores" do
-      @group = @course.assignment_groups.create!(:name => "some group")
-      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
+      @group = @course.assignment_groups.create!(name: "some group")
+      @assignment = @group.assignments.build(title: "some assignments", points_possible: 10)
       @assignment.context = @course
       @assignment.save!
-      @assignment2 = @group.assignments.build(:title => "Not graded assignment", :submission_types => 'not_graded')
+      @assignment2 = @group.assignments.build(title: "Not graded assignment", submission_types: 'not_graded')
       @assignment2.context = @course
       @assignment2.save!
       @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
@@ -702,11 +702,11 @@ describe GradeCalculator do
     end
 
     def two_graded_assignments
-      @group = @course.assignment_groups.create!(:name => "some group")
-      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 5)
+      @group = @course.assignment_groups.create!(name: "some group")
+      @assignment = @group.assignments.build(title: "some assignments", points_possible: 5)
       @assignment.context = @course
       @assignment.save!
-      @assignment2 = @group.assignments.build(:title => "yet another", :points_possible => 5)
+      @assignment2 = @group.assignments.build(title: "yet another", points_possible: 5)
       @assignment2.context = @course
       @assignment2.save!
       @submission = @assignment.grade_student(@user, grade: "2", grader: @teacher)
@@ -745,15 +745,15 @@ describe GradeCalculator do
     end
 
     def nil_graded_assignment
-      @group = @course.assignment_groups.create!(:name => "group2", :group_weight => 50)
-      @assignment_1 = @group.assignments.build(:title => "some assignments", :points_possible => 10)
+      @group = @course.assignment_groups.create!(name: "group2", group_weight: 50)
+      @assignment_1 = @group.assignments.build(title: "some assignments", points_possible: 10)
       @assignment_1.context = @course
       @assignment_1.save!
-      @assignment_2 = @group.assignments.build(:title => "some assignments", :points_possible => 4)
+      @assignment_2 = @group.assignments.build(title: "some assignments", points_possible: 4)
       @assignment_2.context = @course
       @assignment_2.save!
-      @group2 = @course.assignment_groups.create!(:name => "assignments", :group_weight => 40)
-      @assignment2_1 = @group2.assignments.build(:title => "some assignments", :points_possible => 40)
+      @group2 = @course.assignment_groups.create!(name: "assignments", group_weight: 40)
+      @assignment2_1 = @group2.assignments.build(title: "some assignments", points_possible: 40)
       @assignment2_1.context = @course
       @assignment2_1.save!
 
@@ -801,7 +801,7 @@ describe GradeCalculator do
       a2 = @course.assignments.create! name: "assignment", points_possible: 50
 
       s1 = a1.grade_student(@student, grade: 25, grader: @teacher).first
-      Submission.where(:id => s1.id).update_all(workflow_state: "pending_review")
+      Submission.where(id: s1.id).update_all(workflow_state: "pending_review")
 
       a2.grade_student(@student, grade: 50, grader: @teacher)
 
@@ -886,7 +886,7 @@ describe GradeCalculator do
     end
 
     it 'fetches assignments for GradeCalculator' do
-      expect(@course).to receive_message_chain(:assignments, :published, :gradeable, :to_a => [5, 6])
+      expect(@course).to receive_message_chain(:assignments, :published, :gradeable, to_a: [5, 6])
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5, 6]))
                                               .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
@@ -900,7 +900,7 @@ describe GradeCalculator do
     end
 
     it 'fetches groups for GradeCalculator' do
-      expect(@course).to receive_message_chain(:assignment_groups, :active, :to_a => [5, 6])
+      expect(@course).to receive_message_chain(:assignment_groups, :active, to_a: [5, 6])
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5, 6]))
                                               .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
@@ -1867,7 +1867,7 @@ describe GradeCalculator do
     student_in_course
     @student2 = @student
 
-    a = @course.assignments.create! :points_possible => 100
+    a = @course.assignments.create! points_possible: 100
     a.grade_student @student1, grade: 50, grader: @teacher
     a.grade_student @student2, grade: 100, grader: @teacher
 
@@ -1881,7 +1881,7 @@ describe GradeCalculator do
   end
 
   it "returns point information for unweighted courses" do
-    a = @course.assignments.create! :points_possible => 50
+    a = @course.assignments.create! points_possible: 50
     a.grade_student @student, grade: 25, grader: @teacher
     calc = GradeCalculator.new([@student.id], @course)
     grade_info = calc.compute_scores.first[:current]

@@ -21,7 +21,7 @@
 require_relative '../../api_spec_helper'
 require 'quiz_spec_helper'
 
-describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
+describe Quizzes::QuizSubmissionQuestionsController, type: :request do
   def create_question(type, factory_options = {}, quiz = @quiz)
     factory = method(:"#{type}_question_data")
 
@@ -56,11 +56,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_index(data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'index',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s,
-               :quiz_submission_attempt => options[:quiz_submission_attempt] }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'index',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s,
+               quiz_submission_attempt: options[:quiz_submission_attempt] }
     if options[:raw]
       raw_api_call(:get, url, params, data)
     else
@@ -70,11 +70,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_show(data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'show',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s,
-               :id => @question[:id].to_s }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'show',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s,
+               id: @question[:id].to_s }
     if options[:raw]
       raw_api_call(:get, url, params, data)
     else
@@ -84,10 +84,10 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_answer(data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'answer',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'answer',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s }
     data = {
       validation_token: @quiz_submission.validation_token,
       attempt: @quiz_submission.attempt
@@ -102,11 +102,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_flag(data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'flag',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s,
-               :id => @question[:id].to_s }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'flag',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s,
+               id: @question[:id].to_s }
     data = {
       validation_token: @quiz_submission.validation_token,
       attempt: @quiz_submission.attempt
@@ -121,11 +121,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_formatted_answer(question, data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{question[:id]}/formatted_answer"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'formatted_answer',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s,
-               :id => question[:id].to_s }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'formatted_answer',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s,
+               id: question[:id].to_s }
     data = {
       validation_token: @quiz_submission.validation_token,
       attempt: @quiz_submission.attempt
@@ -140,11 +140,11 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   def api_unflag(data = {}, options = {})
     url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag"
-    params = { :controller => 'quizzes/quiz_submission_questions',
-               :action => 'unflag',
-               :format => 'json',
-               :quiz_submission_id => @quiz_submission.id.to_s,
-               :id => @question[:id].to_s }
+    params = { controller: 'quizzes/quiz_submission_questions',
+               action: 'unflag',
+               format: 'json',
+               quiz_submission_id: @quiz_submission.id.to_s,
+               id: @question[:id].to_s }
     data = {
       validation_token: @quiz_submission.validation_token,
       attempt: @quiz_submission.attempt
@@ -159,7 +159,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @quiz = @course.quizzes.create!({
                                         title: 'test quiz',
                                         show_correct_answers: true,
@@ -250,7 +250,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions/:id [show]' do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
 
@@ -301,7 +301,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       it 'includes its linked quiz_question' do
         skip
         json = api_show({
-                          :include => %w[quiz_question]
+                          include: %w[quiz_question]
                         })
 
         expect(json).to have_key('quiz_submission_questions')
@@ -327,7 +327,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         includables = Api::V1::QuizSubmissionQuestion::Includables
 
         json = api_show({
-                          :include => includables
+                          include: includables
                         })
 
         assert_jsonapi_compliance(json, 'quiz_submission_questions', includables)
@@ -339,7 +339,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     let(:question) { create_question 'numerical' }
 
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
     end
@@ -388,7 +388,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   describe 'POST /quiz_submissions/:quiz_submission_id/questions [answer]' do
     context 'access policy' do
       it 'grants access to the teacher' do
-        course_with_teacher_logged_in(:active_all => true)
+        course_with_teacher_logged_in(active_all: true)
         @quiz = quiz_model(course: @course)
         @quiz_submission = @quiz.generate_submission(@teacher)
 
@@ -398,7 +398,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
 
       it 'grants access to its student' do
-        course_with_student_logged_in(:active_all => true)
+        course_with_student_logged_in(active_all: true)
         @quiz = quiz_model(course: @course)
         @quiz_submission = @quiz.generate_submission(@student)
 
@@ -410,7 +410,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     context 'as a student' do
       before :once do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @quiz = quiz_model(course: @course)
       end
 
@@ -780,7 +780,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id/flag [flag]' do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
     end
@@ -805,7 +805,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id/unflag [unflag]' do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
     end

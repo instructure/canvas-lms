@@ -28,12 +28,12 @@ module DataFixup::DeleteExtraPlaceholderSubmissions
 
   def self.run_for_course_range(min_id, max_id)
     assignment_ids_by_course_id = {}
-    Assignment.where(:context_type => "Course", :context_id => min_id..max_id).pluck(:context_id, :id).each do |c_id, a_id|
+    Assignment.where(context_type: "Course", context_id: min_id..max_id).pluck(:context_id, :id).each do |c_id, a_id|
       (assignment_ids_by_course_id[c_id] ||= []) << a_id
     end
     return unless assignment_ids_by_course_id.present?
 
-    Course.where(:id => assignment_ids_by_course_id.keys).to_a.each do |course|
+    Course.where(id: assignment_ids_by_course_id.keys).to_a.each do |course|
       course_assignment_ids = assignment_ids_by_course_id[course.id]
       StudentEnrollment.where(course: course).select(:user_id).in_batches(strategy: :cursor) do |relation|
         batch_student_ids = relation.pluck(:user_id)

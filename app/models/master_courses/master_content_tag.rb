@@ -25,7 +25,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
   # and makes for easy restriction lookup from the associated course side via matching migration_id columns
   # NOTE: this fact means that locking/unlocking an object takes immediate effect (and is independent of syncs)
 
-  belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
+  belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
   belongs_to :content, polymorphic: [:assessment_question_bank,
                                      :assignment,
                                      :assignment_group,
@@ -38,7 +38,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :rubric,
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz']
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
   validates_with MasterCourses::TagValidator
 
   serialize :restrictions, Hash
@@ -88,7 +88,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
       .joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{MasterCourses::ChildContentTag.table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id")
-      .where(:content_tags => { :id => item_ids })
+      .where(content_tags: { id: item_ids })
       .pluck('content_tags.id', :restrictions)
     data.to_h
   end
@@ -98,7 +98,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
       joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{table_name}.content_id=#{ContentTag.table_name}.content_id")
-      .where(:content_tags => { :id => item_ids })
+      .where(content_tags: { id: item_ids })
       .pluck('content_tags.id', :restrictions)
     hash = data.to_h
     (item_ids - hash.keys).each do |missing_id| # populate blank restrictions for all items without mastercontenttags created yet

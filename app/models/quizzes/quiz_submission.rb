@@ -42,10 +42,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
                                                    allow_nil: true }
 
   before_validation :update_quiz_points_possible
-  before_validation :rectify_finished_at_drift, :if => :end_at?
+  before_validation :rectify_finished_at_drift, if: :end_at?
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
-  belongs_to :submission, :touch => true
+  belongs_to :submission, touch: true
   before_save :update_kept_score
   before_save :sanitize_responses
   before_save :update_assignment_submission
@@ -54,7 +54,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_create :assign_validation_token
   after_save :delete_ignores
 
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
 
   resolves_root_account through: :quiz
@@ -84,21 +84,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   serialize :quiz_data
   serialize :submission_data
 
-  simply_versioned :automatic => false
+  simply_versioned automatic: false
 
   workflow do
     state :untaken do
-      event :start_grading, :transitions_to => :pending_review
+      event :start_grading, transitions_to: :pending_review
     end
     state :pending_review do
-      event :complete, :transitions_to => :complete
-      event :retake, :transitions_to => :untaken
+      event :complete, transitions_to: :complete
+      event :retake, transitions_to: :untaken
     end
     state :complete do
-      event :retake, :transitions_to => :untaken
+      event :retake, transitions_to: :untaken
     end
     state :settings_only do
-      event :retake, :transitions_to => :untaken
+      event :retake, transitions_to: :untaken
     end
     state :preview
   end
@@ -329,7 +329,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     # if the submission has already been graded
     if graded?
-      return params.merge({ :_already_graded => true })
+      return params.merge({ _already_graded: true })
     end
 
     if quiz.cant_go_back?
@@ -628,10 +628,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def mark_completed
-    Quizzes::QuizSubmission.where(:id => self).update_all({
-                                                            workflow_state: 'complete',
-                                                            has_seen_results: false
-                                                          })
+    Quizzes::QuizSubmission.where(id: self).update_all({
+                                                         workflow_state: 'complete',
+                                                         has_seen_results: false
+                                                       })
   end
 
   # Complete (e.g, turn-in) the quiz submission by doing the following:
@@ -796,10 +796,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   scope :updated_after, lambda { |date|
     date ? where("quiz_submissions.updated_at>?", date) : all
   }
-  scope :for_user_ids, ->(user_ids) { where(:user_id => user_ids) }
+  scope :for_user_ids, ->(user_ids) { where(user_id: user_ids) }
   scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
-  scope :completed, -> { where(:workflow_state => %w[complete pending_review]) }
+  scope :completed, -> { where(workflow_state: %w[complete pending_review]) }
 
   # Excludes teacher preview submissions.
   #
@@ -874,9 +874,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # templates designed for regular submissions.  Any additional functionality
   # put into those templates will need to be provided in both submissions and
   # quiz_submissions
-  delegate :assignment_id, :assignment, :to => :quiz
-  delegate :graded_at, :to => :submission
-  delegate :context, :to => :quiz
+  delegate :assignment_id, :assignment, to: :quiz
+  delegate :graded_at, to: :submission
+  delegate :context, to: :quiz
   delegate :excused?, to: :submission, allow_nil: true
 
   # Determine whether the QS can be retried (ie, re-generated).

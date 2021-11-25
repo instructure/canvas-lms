@@ -147,7 +147,7 @@ describe Lti::DataServicesController do
 
       it 'adds UpdatedBy and UpdatedByType if passed in for a person' do
         expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
-                                                                                 hash_including('UpdatedBy' => user.global_id.to_s, UpdatedByType: 'person', Id: subId))
+                                                                                 hash_including('UpdatedBy' => user.global_id.to_s, :UpdatedByType => 'person', :Id => subId))
         send_request
       end
 

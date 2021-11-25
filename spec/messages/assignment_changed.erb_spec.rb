@@ -24,7 +24,7 @@ describe 'assignment_changed' do
   include MessagesCommon
 
   before :once do
-    assignment_model(:title => "Quiz 1")
+    assignment_model(title: "Quiz 1")
   end
 
   let(:notification_name) { :assignment_changed }

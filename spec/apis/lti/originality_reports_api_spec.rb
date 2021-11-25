@@ -39,7 +39,7 @@ module Lti
                                                     domain: "google.com",
                                                     consumer_key: '12345',
                                                     shared_secret: 'secret')
-      @tool.settings[:assignment_configuration] = { :url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100 }.with_indifferent_access
+      @tool.settings[:assignment_configuration] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       @tool.save!
       @assignment = @course.assignments.create!(title: "some assignment",
                                                 assignment_group: @group,

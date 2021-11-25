@@ -93,8 +93,8 @@ class ContentSharesController < ApplicationController
 
   before_action :require_user
   before_action :get_user_param
-  before_action :require_current_user, :except => %w[show index unread_count]
-  before_action :get_receivers, :only => %w[create add_users]
+  before_action :require_current_user, except: %w[show index unread_count]
+  before_action :get_receivers, only: %w[create add_users]
 
   def get_user_param
     @user = api_find(User, params[:user_id])
@@ -264,7 +264,7 @@ class ContentSharesController < ApplicationController
     if @content_share.update(update_params)
       render json: content_share_json(@content_share, @current_user, session)
     else
-      render json: @content_share.errors.to_json, :status => :bad_request
+      render json: @content_share.errors.to_json, status: :bad_request
     end
   end
 

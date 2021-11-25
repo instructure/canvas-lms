@@ -93,7 +93,7 @@ class GradebookSettingsController < ApplicationController
     {
       gradebook_settings: {
         @context.id => @course_settings,
-        colors: @color_settings
+        :colors => @color_settings
       }
     }
   end

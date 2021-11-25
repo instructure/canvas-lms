@@ -72,7 +72,7 @@ class SubmissionsBaseController < ApplicationController
 
         @submission.limit_comments(@current_user, session)
 
-        render :json => @submission.as_json(
+        render json: @submission.as_json(
           Submission.json_serialization_full_parameters(
             except: %i[quiz_submission submission_history]
           ).merge({
@@ -129,18 +129,18 @@ class SubmissionsBaseController < ApplicationController
       unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
         params[:submission] = {
-          :attempt => params[:submission][:attempt],
-          :comment => params[:submission][:comment],
-          :comment_attachments => params[:submission][:comment_attachments],
-          :media_comment_id => params[:submission][:media_comment_id],
-          :media_comment_type => params[:submission][:media_comment_type],
-          :commenter => @current_user,
-          :assessment_request => @request,
-          :group_comment => params[:submission][:group_comment],
-          :hidden => @submission.hide_grade_from_student? && admin_in_context,
-          :provisional => provisional,
-          :final => params[:submission][:final],
-          :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
+          attempt: params[:submission][:attempt],
+          comment: params[:submission][:comment],
+          comment_attachments: params[:submission][:comment_attachments],
+          media_comment_id: params[:submission][:media_comment_id],
+          media_comment_type: params[:submission][:media_comment_type],
+          commenter: @current_user,
+          assessment_request: @request,
+          group_comment: params[:submission][:group_comment],
+          hidden: @submission.hide_grade_from_student? && admin_in_context,
+          provisional: provisional,
+          final: params[:submission][:final],
+          draft_comment: Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
         params[:submission].delete(:attempt) unless @context.feature_enabled?(:assignments_2_student)
       end

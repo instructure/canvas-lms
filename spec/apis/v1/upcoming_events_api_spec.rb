@@ -36,30 +36,30 @@ describe UsersController, type: :request do
 
   context "with current_user" do
     before :once do
-      course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
+      course_with_teacher(active_all: true, user: user_with_pseudonym(active_user: true))
       @me = @user
       # course_with_student(:active_all => true)
     end
 
     it "gets an empty list of upcoming events" do
       json = api_call(:get, "/api/v1/users/self/upcoming_events",
-                      :controller => "users", :action => "upcoming_events",
-                      :format => "json")
+                      controller: "users", action: "upcoming_events",
+                      format: "json")
       expect(json).to eq []
     end
 
     context "having a calendar event on the user" do
       before do
         @user.calendar_events.create!(
-          :title => "Upcoming Event",
-          :start_at => 1.day.from_now
+          title: "Upcoming Event",
+          start_at: 1.day.from_now
         ) { |c| c.context = @user }
       end
 
       it "gets the event" do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
-                        :controller => "users", :action => "upcoming_events",
-                        :format => "json")
+                        controller: "users", action: "upcoming_events",
+                        format: "json")
         expect(json.map { |e| e['title'] }).to eq ["Upcoming Event"]
       end
     end
@@ -67,20 +67,20 @@ describe UsersController, type: :request do
     context "having a calendar event and assignment on the course" do
       before do
         @course.calendar_events.create!(
-          :title => "Upcoming Course Event",
-          :start_at => 1.day.from_now
+          title: "Upcoming Course Event",
+          start_at: 1.day.from_now
         ) { |c| c.context = @course }
         @course.assignments.create!(
-          :title => "Upcoming Assignment",
-          :points_possible => 10,
-          :due_at => 2.days.from_now
+          title: "Upcoming Assignment",
+          points_possible: 10,
+          due_at: 2.days.from_now
         )
       end
 
       it "gets the events" do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
-                        :controller => "users", :action => "upcoming_events",
-                        :format => "json")
+                        controller: "users", action: "upcoming_events",
+                        format: "json")
         expect(json.map { |e| e['title'] }).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
@@ -90,8 +90,8 @@ describe UsersController, type: :request do
       it "doesn't gets the events if the course is unpublished and the user is a teacher" do
         @course.claim!
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
-                        :controller => "users", :action => "upcoming_events",
-                        :format => "json")
+                        controller: "users", action: "upcoming_events",
+                        format: "json")
         expect(json.map { |e| e['title'] }).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
@@ -99,11 +99,11 @@ describe UsersController, type: :request do
       end
 
       it "doesn't gets the events if the course is unpublished and the user is a student" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         @course.claim!
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
-                        :controller => "users", :action => "upcoming_events",
-                        :format => "json")
+                        controller: "users", action: "upcoming_events",
+                        format: "json")
         expect(json).to be_blank
       end
     end

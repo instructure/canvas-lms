@@ -24,9 +24,9 @@ describe "course statistics" do
 
   before do
     course_with_teacher_logged_in
-    @student1 = student_in_course(:active_all => true, :name => "Sheldon Cooper").user
-    @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
-    @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
+    @student1 = student_in_course(active_all: true, name: "Sheldon Cooper").user
+    @student2 = student_in_course(active_all: true, name: "Leonard Hofstadter").user
+    @student3 = student_in_course(active_all: true, name: "Howard Wolowitz").user
   end
 
   it "shows most recent logged in users" do
@@ -60,10 +60,10 @@ describe "course statistics" do
 
   it "shows a deduped count" do
     section2 = @course.course_sections.create!
-    student_in_course(:active_all => true, :user => @student1, :section => section2, :allow_multiple_enrollments => true)
-    invited_student = user_factory(:active_all => true)
-    student_in_course(:user => invited_student)
-    student_in_course(:user => invited_student, :section => section2, :allow_multiple_enrollments => true)
+    student_in_course(active_all: true, user: @student1, section: section2, allow_multiple_enrollments: true)
+    invited_student = user_factory(active_all: true)
+    student_in_course(user: invited_student)
+    student_in_course(user: invited_student, section: section2, allow_multiple_enrollments: true)
 
     get "/courses/#{@course.id}/statistics"
     wait_for_ajaximations

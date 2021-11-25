@@ -24,12 +24,12 @@ require 'nokogiri'
 
 describe LtiApiController, type: :request do
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @student = @user
-    @course.enroll_teacher(user_with_pseudonym(:active_all => true))
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    assignment_model(:course => @course, :name => 'tool assignment', :submission_types => 'external_tool', :points_possible => 20, :grading_type => 'points')
-    tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+    @course.enroll_teacher(user_with_pseudonym(active_all: true))
+    @tool = @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my grade passback test tool', domain: 'example.com')
+    assignment_model(course: @course, name: 'tool assignment', submission_types: 'external_tool', points_possible: 20, grading_type: 'points')
+    tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
   end
@@ -74,8 +74,8 @@ describe LtiApiController, type: :request do
     opts['key'] ||= @tool.consumer_key
     opts['secret'] ||= @tool.shared_secret
     opts['content-type'] ||= 'application/xml'
-    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
+    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], site: "https://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, opts['path'], nil, scheme: 'header', timestamp: opts['timestamp'], nonce: opts['nonce'])
 
     auth = req['Authorization']
     if opts['override_signature_method']
@@ -313,7 +313,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets the submission data text" do
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "oioi" }))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { text: "oioi" }))
       check_success
 
       verify_xml(response)
@@ -324,7 +324,7 @@ describe LtiApiController, type: :request do
 
     it "sets complex submission text" do
       text = CGI.escapeHTML("<p>stuff</p>")
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "<![CDATA[#{text}]]>" }))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { text: "<![CDATA[#{text}]]>" }))
       check_success
 
       verify_xml(response)
@@ -334,7 +334,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets the submission data url" do
-      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :url => "http://www.example.com/lti" }))
+      make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { url: "http://www.example.com/lti" }))
       check_success
 
       verify_xml(response)
@@ -345,7 +345,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets the submission data text even with no score" do
-      make_call('body' => replace_result(score: nil, sourceid: nil, result_data: { :text => "oioi" }))
+      make_call('body' => replace_result(score: nil, sourceid: nil, result_data: { text: "oioi" }))
       check_success
 
       verify_xml(response)
@@ -375,7 +375,7 @@ describe LtiApiController, type: :request do
     end
 
     it "fails if assignment has no points possible" do
-      @assignment.update(:points_possible => nil, :grading_type => 'percent')
+      @assignment.update(points_possible: nil, grading_type: 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
@@ -384,7 +384,7 @@ describe LtiApiController, type: :request do
     end
 
     it "passes if assignment has 0 points possible" do
-      @assignment.update(:points_possible => 0, :grading_type => 'percent')
+      @assignment.update(points_possible: 0, grading_type: 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       check_success
 
@@ -397,7 +397,7 @@ describe LtiApiController, type: :request do
     end
 
     it "notifies users if it fails because the assignment has no points" do
-      @assignment.update(:points_possible => nil, :grading_type => 'percent')
+      @assignment.update(points_possible: nil, grading_type: 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response.code.to_i).to eq 422
       submissions = @assignment.submissions.where(user_id: @student).to_a
@@ -438,7 +438,7 @@ describe LtiApiController, type: :request do
 
     context "pass_fail zero point assignments" do
       it "succeeds with incomplete grade when score = 0" do
-        @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
+        @assignment.update(points_possible: 10, grading_type: 'pass_fail')
         make_call('body' => replace_result(score: '0', sourceid: nil))
         check_success
 
@@ -454,7 +454,7 @@ describe LtiApiController, type: :request do
       end
 
       it "succeeds with complete grade when score < 1 for a 0 point assignment" do
-        @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
+        @assignment.update(points_possible: 0, grading_type: 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
 
@@ -470,7 +470,7 @@ describe LtiApiController, type: :request do
       end
 
       it "succeeds with complete grade when score = 1" do
-        @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
+        @assignment.update(points_possible: 0, grading_type: 'pass_fail')
         make_call('body' => replace_result(score: '1', sourceid: nil))
         check_success
 
@@ -577,10 +577,10 @@ describe LtiApiController, type: :request do
   end
 
   it "rejects if the assignment doesn't use this tool" do
-    @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+    @course.context_external_tools.create!(shared_secret: 'test_secret_2', consumer_key: 'test_key_2', name: 'new tool', domain: 'example.net')
     @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
-    tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+    tag = @assignment.build_external_tool_tag(url: "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
     make_call('body' => replace_result(score: '0.5'))
@@ -588,10 +588,10 @@ describe LtiApiController, type: :request do
   end
 
   it "is unsupported if the assignment switched to a new tool with the same shared secret" do
-    @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+    @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'new tool', domain: 'example.net')
     @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
-    tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+    tag = @assignment.build_external_tool_tag(url: "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
     make_call('body' => replace_result(score: '0.5'))
@@ -599,7 +599,7 @@ describe LtiApiController, type: :request do
   end
 
   it "rejects if the assignment is no longer a tool assignment" do
-    @assignment.update(:submission_types => 'online_upload')
+    @assignment.update(submission_types: 'online_upload')
     @assignment.reload.external_tool_tag.destroy_permanently!
     make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
@@ -647,8 +647,8 @@ describe LtiApiController, type: :request do
       opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/ext_grade_passback"
       opts['key'] ||= @tool.consumer_key
       opts['secret'] ||= @tool.shared_secret
-      consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
-      req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
+      consumer = OAuth::Consumer.new(opts['key'], opts['secret'], site: "https://www.example.com", signature_method: "HMAC-SHA1")
+      req = consumer.create_signed_request(:post, opts['path'], nil, { scheme: 'header', timestamp: opts['timestamp'], nonce: opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
            params: req.body,
            headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
@@ -789,10 +789,10 @@ describe LtiApiController, type: :request do
     end
 
     it "rejects if the assignment doesn't use this tool" do
-      @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+      @course.context_external_tools.create!(shared_secret: 'test_secret_2', consumer_key: 'test_key_2', name: 'new tool', domain: 'example.net')
       @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
-      tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+      tag = @assignment.build_external_tool_tag(url: "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
       tag.save!
       make_call('body' => update_result('0.5'))
@@ -800,10 +800,10 @@ describe LtiApiController, type: :request do
     end
 
     it "is unsupported if the assignment switched to a new tool with the same shared secret" do
-      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+      @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'new tool', domain: 'example.net')
       @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
-      tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
+      tag = @assignment.build_external_tool_tag(url: "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
       tag.save!
       make_call('body' => update_result('0.5'))
@@ -811,7 +811,7 @@ describe LtiApiController, type: :request do
     end
 
     it "rejects if the assignment is no longer a tool assignment" do
-      @assignment.update(:submission_types => 'online_upload')
+      @assignment.update(submission_types: 'online_upload')
       @assignment.reload.external_tool_tag.destroy_permanently!
       make_call('body' => update_result('0.5'))
       check_failure

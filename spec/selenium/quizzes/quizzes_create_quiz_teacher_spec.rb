@@ -163,11 +163,11 @@ describe 'creating a quiz' do
     before do
       account_model
       @account.set_feature_flag! 'post_grades', 'on'
-      course_with_teacher_logged_in(:active_all => true, :account => @account)
+      course_with_teacher_logged_in(active_all: true, account: @account)
     end
 
     it "defaults to post grades if account setting is enabled", custom_timeout: 30 do
-      @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
+      @account.settings[:sis_default_grade_export] = { locked: false, value: true }
       @account.save!
 
       get "/courses/#{@course.id}/quizzes"

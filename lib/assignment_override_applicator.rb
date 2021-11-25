@@ -201,16 +201,16 @@ module AssignmentOverrideApplicator
     return nil unless group_category_id
 
     group = if assignment_or_quiz.context.user_has_been_student?(user)
-              user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
+              user.current_groups.shard(assignment_or_quiz.shard).where(group_category_id: group_category_id).first
             else
-              assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
+              assignment_or_quiz.context.groups.where(group_category_id: group_category_id).first
             end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
         assignment_or_quiz.assignment_overrides.select { |o| o.set_type == 'Group' && o.set_id == group.id }
       else
-        assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).to_a
+        assignment_or_quiz.assignment_overrides.where(set_type: 'Group', set_id: group.id).to_a
       end
     end
   end
@@ -243,7 +243,7 @@ module AssignmentOverrideApplicator
     if assignment_or_quiz.assignment_overrides.loaded?
       assignment_or_quiz.assignment_overrides.select { |o| o.set_type == 'CourseSection' && section_ids.include?(o.set_id) }
     else
-      assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section_ids)
+      assignment_or_quiz.assignment_overrides.where(set_type: 'CourseSection', set_id: section_ids)
     end
   end
 

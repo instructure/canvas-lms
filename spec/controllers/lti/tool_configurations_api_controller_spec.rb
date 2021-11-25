@@ -96,8 +96,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   shared_examples_for 'an endpoint that accepts a settings_url' do
     let(:ok_response) do
       double(
-        body: settings.to_json,
-        is_a?: true,
+        :body => settings.to_json,
+        :is_a? => true,
         '[]' => 'application/json'
       )
     end

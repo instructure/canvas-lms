@@ -23,9 +23,9 @@ require 'uri'
 
 class WimbaConference < WebConference
   external_url :archive,
-               :name => -> { t('external_urls.archive', "Archive") },
-               :link_text => -> { t('external_urls.archive_link', "View archive(s)") },
-               :restricted_to => ->(conf) { conf.active? || conf.finished? }
+               name: -> { t('external_urls.archive', "Archive") },
+               link_text: -> { t('external_urls.archive_link', "View archive(s)") },
+               restricted_to: ->(conf) { conf.active? || conf.finished? }
 
   def archive_external_url(user, url_id)
     urls = []
@@ -49,7 +49,7 @@ class WimbaConference < WebConference
 
           data[:longname].sub!(date_info[1], new_date)
         end
-        urls << { :id => data[:class_id], :name => data[:longname] } unless url_id && data[:class_id] != url_id
+        urls << { id: data[:class_id], name: data[:longname] } unless url_id && data[:class_id] != url_id
       end
       urls.first[:url] = join_url(user, urls.first[:id]) if urls.size == 1 && touch_user(user)
     end

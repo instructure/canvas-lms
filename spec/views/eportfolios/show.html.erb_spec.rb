@@ -25,12 +25,12 @@ describe "/eportfolios/show" do
     assign(:domain_root_account, Account.default)
     eportfolio_with_user
     view_portfolio
-    category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
+    category = assign(:category, @portfolio.eportfolio_categories.create!(name: "some category"))
     assign(:categories, [category])
     assign(:recent_submissions, @portfolio.user.submissions.in_workflow_state(['submitted', 'graded']))
     assign(:folders, [])
     assign(:files, [])
-    assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))
+    assign(:page, @portfolio.eportfolio_entries.create!(name: "some entry", eportfolio_category: category))
   end
 
   it "renders" do
@@ -45,7 +45,7 @@ describe "/eportfolios/show" do
   end
 
   it "links the user name if @owner_url is set" do
-    owner_url = assign(:owner_url, user_url(@portfolio.user, :host => "test.host"))
+    owner_url = assign(:owner_url, user_url(@portfolio.user, host: "test.host"))
     render "eportfolios/show"
     expect(view.content_for(:left_side)[owner_url]).not_to be_nil
     expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil

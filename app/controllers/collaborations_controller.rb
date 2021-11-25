@@ -124,8 +124,8 @@
 #     }
 #
 class CollaborationsController < ApplicationController
-  before_action :require_context, :except => [:members]
-  before_action :require_collaboration_and_context, :only => [:members]
+  before_action :require_context, except: [:members]
+  before_action :require_collaboration_and_context, only: [:members]
   before_action :require_collaborations_configured
   before_action :reject_student_view_student
 
@@ -206,7 +206,7 @@ class CollaborationsController < ApplicationController
       url
     )
 
-    render :json => collaborations.map { |c| collaboration_json(c, @current_user, session) }
+    render json: collaborations.map { |c| collaboration_json(c, @current_user, session) }
   end
 
   def show
@@ -228,7 +228,7 @@ class CollaborationsController < ApplicationController
 
           redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
-          redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
+          redirect_to oauth_url(service: :google_drive, return_to: request.url)
         else
           flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
@@ -254,16 +254,16 @@ class CollaborationsController < ApplicationController
 
     if @context.instance_of? Group
       parent_context = @context.context
-      js_env :PARENT_CONTEXT => {
-        :context_asset_string => parent_context.try(:asset_string)
+      js_env PARENT_CONTEXT: {
+        context_asset_string: parent_context.try(:asset_string)
       }
     end
 
-    js_env :CREATE_PERMISSION => @context.grants_right?(@current_user, :create_collaborations)
+    js_env CREATE_PERMISSION: @context.grants_right?(@current_user, :create_collaborations)
 
     set_tutorial_js_env
 
-    render :html => "".html_safe, :layout => true
+    render html: "".html_safe, layout: true
   end
 
   def create
@@ -274,7 +274,7 @@ class CollaborationsController < ApplicationController
       @collaboration = collaboration_from_content_item(content_item)
       users, group_ids = content_item_visibility(content_item)
     else
-      users     = User.where(:id => Array(params[:user])).to_a
+      users     = User.where(id: Array(params[:user])).to_a
       group_ids = Array(params[:group])
       collaboration_params = params.require(:collaboration).permit(:title, :description, :url)
       collaboration_params[:user] = @current_user
@@ -289,12 +289,12 @@ class CollaborationsController < ApplicationController
         # After saved, update the members
         @collaboration.update_members(users, group_ids)
         format.html { redirect_to @collaboration.url }
-        format.json { render :json => @collaboration.as_json(:methods => [:collaborator_ids], :permissions => { :user => @current_user, :session => session }) }
+        format.json { render json: @collaboration.as_json(methods: [:collaborator_ids], permissions: { user: @current_user, session: session }) }
       else
         Lti::ContentItemUtil.new(content_item).failure_callback if content_item
         flash[:error] = t 'errors.create_failed', "Collaboration creation failed"
         format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-        format.json { render :json => @collaboration.errors, :status => :bad_request }
+        format.json { render json: @collaboration.errors, status: :bad_request }
       end
     end
   rescue Collaboration::InvalidCollaborationType
@@ -311,7 +311,7 @@ class CollaborationsController < ApplicationController
         @collaboration = collaboration_from_content_item(content_item, @collaboration)
         users, group_ids = content_item_visibility(content_item)
       else
-        users     = User.where(:id => Array(params[:user])).to_a
+        users     = User.where(id: Array(params[:user])).to_a
         group_ids = Array(params[:group])
         @collaboration.attributes = params.require(:collaboration).permit(:title, :description, :url)
       end
@@ -321,11 +321,11 @@ class CollaborationsController < ApplicationController
           Lti::ContentItemUtil.new(content_item).success_callback if content_item
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json do
-            render :json => @collaboration.as_json(
-              :methods => [:collaborator_ids],
-              :permissions => {
-                :user => @current_user,
-                :session => session
+            render json: @collaboration.as_json(
+              methods: [:collaborator_ids],
+              permissions: {
+                user: @current_user,
+                session: session
               }
             )
           end
@@ -333,7 +333,7 @@ class CollaborationsController < ApplicationController
           Lti::ContentItemUtil.new(content_item).failure_callback if content_item
           flash[:error] = t 'errors.update_failed', "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-          format.json { render :json => @collaboration.errors, :status => :bad_request }
+          format.json { render json: @collaboration.errors, status: :bad_request }
         end
       end
     rescue GoogleDrive::ConnectionException => e
@@ -355,7 +355,7 @@ class CollaborationsController < ApplicationController
       @collaboration.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :collaborations_url) }
-        format.json { render :json => @collaboration }
+        format.json { render json: @collaboration }
       end
     end
   end
@@ -386,7 +386,7 @@ class CollaborationsController < ApplicationController
                                  api_v1_collaboration_members_url)
 
     UserPastLtiId.manual_preload_past_lti_ids(collaborators, @context) if includes.include? 'collaborator_lti_id'
-    render(:json => collaborators.map { |c| collaborator_json(c, @current_user, session, options, context: @context) })
+    render(json: collaborators.map { |c| collaborator_json(c, @current_user, session, options, context: @context) })
   end
 
   # @API List potential members
@@ -405,7 +405,7 @@ class CollaborationsController < ApplicationController
     scope = scope.order(:sortable_name)
 
     users = Api.paginate(scope, self, polymorphic_url([:api_v1, @context, :potential_collaborators]))
-    render :json => users.map { |u| user_json(u, @current_user, session) }
+    render json: users.map { |u| user_json(u, @current_user, session) }
   end
 
   private

@@ -107,7 +107,7 @@ describe "quizzes log auditing" do
         wait_for_ajax_requests
         submit_quiz
 
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
         resize_screen_to_standard
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
@@ -118,7 +118,7 @@ describe "quizzes log auditing" do
       it 'shows that a question had been answered', priority: "2" do
         answer_questions_and_submit(@quiz, 1)
 
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
@@ -127,7 +127,7 @@ describe "quizzes log auditing" do
 
       it 'takes you to a question when you click on the question number', priority: "2" do
         answer_questions_and_submit(@quiz, 1)
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"

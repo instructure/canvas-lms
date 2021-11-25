@@ -34,7 +34,7 @@ describe Twitter::Messenger do
 
   describe '#deliver' do
     let(:user) { double(:user_services) }
-    let(:message) { double(:body => 'body', :url => 'url', :user => user, :id => 0, :main_link => '') }
+    let(:message) { double(body: 'body', url: 'url', user: user, id: 0, main_link: '') }
     let(:connection_mock) { double }
 
     context "with a twitter service" do
@@ -61,7 +61,7 @@ describe Twitter::Messenger do
   describe '#url' do
     subject { messenger.url }
 
-    let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
+    let(:message) { double(id: 42, main_link: nil, url: nil) }
 
     it { is_expected.to match(/host/) }
     it { is_expected.to match(/#{id}$/) }
@@ -69,7 +69,7 @@ describe Twitter::Messenger do
   end
 
   describe '#body' do
-    let(:message) { double(:body => @body, :id => 0, :main_link => @link) }
+    let(:message) { double(body: @body, id: 0, main_link: @link) }
 
     it 'leaves the body intact when it does not overrun the twitter length limit' do
       @body = "no need to alter"

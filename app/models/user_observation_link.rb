@@ -25,13 +25,13 @@
 class UserObservationLink < ActiveRecord::Base
   self.table_name = "user_observers"
 
-  belongs_to :student, :class_name => 'User', inverse_of: :as_student_observation_links, :foreign_key => :user_id
-  belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observation_links
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :student, class_name: 'User', inverse_of: :as_student_observation_links, foreign_key: :user_id
+  belongs_to :observer, class_name: 'User', inverse_of: :as_observer_observation_links
+  belongs_to :root_account, class_name: 'Account'
 
   after_create :create_linked_enrollments
 
-  validate :not_same_user, :if => ->(uo) { uo.changed? }
+  validate :not_same_user, if: ->(uo) { uo.changed? }
   validates :user_id, :observer_id, :root_account_id, presence: true
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
@@ -39,7 +39,7 @@ class UserObservationLink < ActiveRecord::Base
   scope :for_root_accounts, lambda { |root_accounts|
     root_accounts = Array(root_accounts)
     root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled
-    where(:root_account_id => root_accounts)
+    where(root_account_id: root_accounts)
   }
 
   attr_accessor :skip_destroy_other_record

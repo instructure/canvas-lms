@@ -22,9 +22,9 @@ require_relative '../api_spec_helper'
 
 describe ContentMigrationsController, type: :request do
   before :once do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(active_all: true, user: user_with_pseudonym)
     @migration_url = "/api/v1/courses/#{@course.id}/content_migrations"
-    @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param }
+    @params = { controller: 'content_migrations', format: 'json', course_id: @course.id.to_param }
 
     @migration = @course.content_migrations.create
     @migration.migration_type = 'common_cartridge_importer'
@@ -41,7 +41,7 @@ describe ContentMigrationsController, type: :request do
 
   describe 'index' do
     before do
-      @params = @params.merge(:action => 'index')
+      @params = @params.merge(action: 'index')
     end
 
     it "returns list" do
@@ -52,17 +52,17 @@ describe ContentMigrationsController, type: :request do
 
     it "paginates" do
       migration = @course.content_migrations.create!
-      json = api_call(:get, @migration_url + "?per_page=1", @params.merge({ :per_page => '1' }))
+      json = api_call(:get, @migration_url + "?per_page=1", @params.merge({ per_page: '1' }))
       expect(json.length).to eq 1
       expect(json.first['id']).to eq migration.id
-      json = api_call(:get, @migration_url + "?per_page=1&page=2", @params.merge({ :per_page => '1', :page => '2' }))
+      json = api_call(:get, @migration_url + "?per_page=1&page=2", @params.merge({ per_page: '1', page: '2' }))
       expect(json.length).to eq 1
       expect(json.first['id']).to eq @migration.id
     end
 
     it "401s" do
-      course_with_student_logged_in(:course => @course, :active_all => true)
-      api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
+      course_with_student_logged_in(course: @course, active_all: true)
+      api_call(:get, @migration_url, @params, {}, {}, expected_status: 401)
     end
 
     it "creates the course root folder" do
@@ -108,7 +108,7 @@ describe ContentMigrationsController, type: :request do
 
     context "Account" do
       before do
-        @account = Account.create!(:name => 'name')
+        @account = Account.create!(name: 'name')
         @account.account_users.create!(user: @user)
         @migration = @account.content_migrations.create
         @migration.migration_type = 'qti_converter'
@@ -147,13 +147,13 @@ describe ContentMigrationsController, type: :request do
   describe 'show' do
     before :once do
       @migration_url += "/#{@migration.id}"
-      @params = @params.merge(:action => 'show', :id => @migration.id.to_param)
+      @params = @params.merge(action: 'show', id: @migration.id.to_param)
     end
 
     it "returns migration" do
-      @migration.attachment = Attachment.create!(:context => @migration, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
+      @migration.attachment = Attachment.create!(context: @migration, filename: "test.txt", uploaded_data: StringIO.new("test file"))
       @migration.save!
-      progress = Progress.create!(:tag => "content_migration", :context => @migration)
+      progress = Progress.create!(tag: "content_migration", context: @migration)
       json = api_call(:get, @migration_url, @params)
 
       expect(json['id']).to eq @migration.id
@@ -178,19 +178,19 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "404s" do
-      api_call(:get, @migration_url + "000", @params.merge({ :id => @migration.id.to_param + "000" }), {}, {}, :expected_status => 404)
+      api_call(:get, @migration_url + "000", @params.merge({ id: @migration.id.to_param + "000" }), {}, {}, expected_status: 404)
     end
 
     it "401s" do
-      course_with_student_logged_in(:course => @course, :active_all => true)
-      api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
+      course_with_student_logged_in(course: @course, active_all: true)
+      api_call(:get, @migration_url, @params, {}, {}, expected_status: 401)
     end
 
     it "does not return attachment for course copies" do
       @migration.migration_type = 'course_copy_importer'
       @migration.source_course_id = @course.id
       @migration.source_course = @course
-      @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+      @attachment = Attachment.create!(context: @migration, filename: "test.zip", uploaded_data: StringIO.new("test file"))
       @attachment.file_state = "deleted"
       @attachment.workflow_state = "unattached"
       @attachment.save
@@ -215,7 +215,7 @@ describe ContentMigrationsController, type: :request do
     it "marks as failed if stuck in pre_processing" do
       @migration.workflow_state = 'pre_processing'
       @migration.save!
-      ContentMigration.where(:id => @migration.id).update_all(:updated_at => Time.now.utc - 2.hours)
+      ContentMigration.where(id: @migration.id).update_all(updated_at: Time.now.utc - 2.hours)
 
       json = api_call(:get, @migration_url, @params)
       expect(json['workflow_state']).to eq 'failed'
@@ -227,13 +227,13 @@ describe ContentMigrationsController, type: :request do
 
     context "Site Admin" do
       it "contains additional auditing information for site admins" do
-        course_with_teacher_logged_in(:course => @course, :active_all => true, :user => site_admin_user)
+        course_with_teacher_logged_in(course: @course, active_all: true, user: site_admin_user)
         json = api_call(:get, @migration_url, @params)
         expect(json['audit_info']).not_to be_falsey
       end
 
       it "does not contain additional auditing information if not site admin" do
-        course_with_teacher_logged_in(:course => @course, :active_all => true, :user => user_with_pseudonym)
+        course_with_teacher_logged_in(course: @course, active_all: true, user: user_with_pseudonym)
         json = api_call(:get, @migration_url, @params)
         expect(json['audit_info']).to be_falsey
       end
@@ -274,7 +274,7 @@ describe ContentMigrationsController, type: :request do
 
     context "Account" do
       before do
-        @account = Account.create!(:name => 'name')
+        @account = Account.create!(name: 'name')
         @account.account_users.create!(user: @user)
         @migration = @account.content_migrations.create
         @migration.migration_type = 'qti_converter'
@@ -293,12 +293,12 @@ describe ContentMigrationsController, type: :request do
 
   describe 'create' do
     before :once do
-      @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'create' }
-      @post_params = { :migration_type => 'common_cartridge_importer', :pre_attachment => { :name => "test.zip" } }
+      @params = { controller: 'content_migrations', format: 'json', course_id: @course.id.to_param, action: 'create' }
+      @post_params = { migration_type: 'common_cartridge_importer', pre_attachment: { name: "test.zip" } }
     end
 
     it "errors for unknown type" do
-      json = api_call(:post, @migration_url, @params, { :migration_type => 'jerk' }, {}, :expected_status => 400)
+      json = api_call(:post, @migration_url, @params, { migration_type: 'jerk' }, {}, expected_status: 400)
       expect(json).to eq({ "message" => "Invalid migration_type" })
     end
 
@@ -321,7 +321,7 @@ describe ContentMigrationsController, type: :request do
       p = Canvas::Plugin.new("hi")
       allow(p).to receive(:default_settings).and_return({ 'worker' => 'CCWorker', 'valid_contexts' => ['Course'] }.with_indifferent_access)
       allow(Canvas::Plugin).to receive(:find).and_return(p)
-      json = api_call(:post, @migration_url, @params, @post_params.merge(:do_not_run => true))
+      json = api_call(:post, @migration_url, @params, @post_params.merge(do_not_run: true))
       expect(json["workflow_state"]).to eq 'pre_processing'
       migration = ContentMigration.find json['id']
       expect(migration.workflow_state).to eq "created"
@@ -329,17 +329,17 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "errors if expected setting isn't set" do
-      json = api_call(:post, @migration_url, @params, { :migration_type => 'course_copy_importer' }, {}, :expected_status => 400)
+      json = api_call(:post, @migration_url, @params, { migration_type: 'course_copy_importer' }, {}, expected_status: 400)
       expect(json).to eq({ "message" => 'A course copy requires a source course.' })
     end
 
     it "queues if correct settings set" do
       # implicitly tests that the response was a 200
-      api_call(:post, @migration_url, @params, { :migration_type => 'course_copy_importer', :settings => { :source_course_id => @course.id.to_param } })
+      api_call(:post, @migration_url, @params, { migration_type: 'course_copy_importer', settings: { source_course_id: @course.id.to_param } })
     end
 
     it "does not queue for course copy and selective_import" do
-      json = api_call(:post, @migration_url, @params, { :migration_type => 'course_copy_importer', :selective_import => '1', :settings => { :source_course_id => @course.id.to_param } })
+      json = api_call(:post, @migration_url, @params, { migration_type: 'course_copy_importer', selective_import: '1', settings: { source_course_id: @course.id.to_param } })
       expect(json["workflow_state"]).to eq 'waiting_for_select'
       migration = ContentMigration.find json['id']
       expect(migration.workflow_state).to eq "exported"
@@ -348,7 +348,7 @@ describe ContentMigrationsController, type: :request do
 
     it "queues a course copy with immediate select" do
       assignment = @course.assignments.create! title: 'test'
-      json = api_call(:post, @migration_url, @params, { :migration_type => 'course_copy_importer', :select => { :assignments => [assignment.to_param] }, :settings => { :source_course_id => @course.to_param } })
+      json = api_call(:post, @migration_url, @params, { migration_type: 'course_copy_importer', select: { assignments: [assignment.to_param] }, settings: { source_course_id: @course.to_param } })
       expect(json["workflow_state"]).to eq 'running'
       migration = ContentMigration.find json['id']
       expect(migration.workflow_state).to eq "exporting"
@@ -363,9 +363,9 @@ describe ContentMigrationsController, type: :request do
                       @migration_url,
                       @params,
                       {
-                        :migration_type => 'canvas_cartridge_importer',
-                        :selective_import => '1',
-                        :pre_attachment => { :name => 'example.imscc' }
+                        migration_type: 'canvas_cartridge_importer',
+                        selective_import: '1',
+                        pre_attachment: { name: 'example.imscc' }
                       })
       expect(json['workflow_state']).to eq 'pre_processing'
 
@@ -385,8 +385,8 @@ describe ContentMigrationsController, type: :request do
       # update the migration with the selection
       json = api_call(:put,
                       "#{@migration_url}/#{cm.id}",
-                      @params.merge(:action => 'update', :id => cm.to_param),
-                      { :copy => { 'everything' => '1' } })
+                      @params.merge(action: 'update', id: cm.to_param),
+                      { copy: { 'everything' => '1' } })
       expect(json['workflow_state']).to eq 'running'
       allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 456))
       run_jobs
@@ -406,11 +406,11 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "translates a sis source_course_id" do
-      course_with_teacher(:active_all => true, :user => @user)
+      course_with_teacher(active_all: true, user: @user)
       @course.sis_source_id = "booga"
       @course.save!
       json = api_call(:post, @migration_url + "?settings[source_course_id]=sis_course_id:booga&migration_type=course_copy_importer",
-                      @params.merge(:migration_type => 'course_copy_importer', :settings => { 'source_course_id' => 'sis_course_id:booga' }))
+                      @params.merge(migration_type: 'course_copy_importer', settings: { 'source_course_id' => 'sis_course_id:booga' }))
       migration = ContentMigration.find json['id']
       expect(migration.migration_settings[:source_course_id]).to eql @course.id
     end
@@ -422,10 +422,10 @@ describe ContentMigrationsController, type: :request do
         @shard1.activate do
           @other_account = Account.create
           @copy_from = @other_account.courses.create!
-          @copy_from.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+          @copy_from.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
         end
         json = api_call(:post, @migration_url + "?settings[source_course_id]=#{@copy_from.global_id}&migration_type=course_copy_importer",
-                        @params.merge(:migration_type => 'course_copy_importer', :settings => { 'source_course_id' => @copy_from.global_id.to_s }))
+                        @params.merge(migration_type: 'course_copy_importer', settings: { 'source_course_id' => @copy_from.global_id.to_s }))
 
         migration = ContentMigration.find json['id']
         expect(migration.source_course).to eq @copy_from
@@ -435,14 +435,14 @@ describe ContentMigrationsController, type: :request do
         @shard1.activate do
           @other_account = Account.create
           @copy_to = @other_account.courses.create!
-          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+          @copy_to.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
         end
 
         @copy_from = @course
         json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer",
-                        @params.merge(:course_id => @copy_to.global_id.to_s,
-                                      :migration_type => 'course_copy_importer',
-                                      :settings => { 'source_course_id' => @copy_from.local_id.to_s }))
+                        @params.merge(course_id: @copy_to.global_id.to_s,
+                                      migration_type: 'course_copy_importer',
+                                      settings: { 'source_course_id' => @copy_from.local_id.to_s }))
 
         migration = @copy_to.content_migrations.find(json['id'])
         expect(migration.source_course).to eq @copy_from
@@ -452,18 +452,18 @@ describe ContentMigrationsController, type: :request do
         @shard1.activate do
           @other_account = Account.create
           @copy_to = @other_account.courses.create!
-          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+          @copy_to.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
         end
 
         @copy_from = @course
-        @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
-        @page = @copy_from.wiki_pages.create!(:title => "aaaa")
+        @copy_from.content_exports.create!(global_identifiers: false) # turns out this is important to repro-ing a certain terrible bug
+        @page = @copy_from.wiki_pages.create!(title: "aaaa")
         json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" \
                                "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&select[pages][]=#{@page.id}",
-                        @params.merge(:course_id => @copy_to.global_id.to_s,
-                                      :migration_type => 'course_copy_importer',
-                                      :settings => { 'source_course_id' => @copy_from.local_id.to_s },
-                                      :select => { 'pages' => [@page.id.to_s] }))
+                        @params.merge(course_id: @copy_to.global_id.to_s,
+                                      migration_type: 'course_copy_importer',
+                                      settings: { 'source_course_id' => @copy_from.local_id.to_s },
+                                      select: { 'pages' => [@page.id.to_s] }))
 
         migration = @copy_to.content_migrations.find(json['id'])
         expect(migration.source_course).to eq @copy_from
@@ -475,19 +475,19 @@ describe ContentMigrationsController, type: :request do
         @shard1.activate do
           @other_account = Account.create
           @copy_to = @other_account.courses.create!
-          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+          @copy_to.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
           @mod = @copy_to.context_modules.create!
         end
 
         @copy_from = @course
-        @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
-        @page = @copy_from.wiki_pages.create!(:title => "aaaa")
+        @copy_from.content_exports.create!(global_identifiers: false) # turns out this is important to repro-ing a certain terrible bug
+        @page = @copy_from.wiki_pages.create!(title: "aaaa")
         json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" \
                                "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&settings[insert_into_module_id]=#{@mod.global_id}&select[pages][]=#{@page.id}",
-                        @params.merge(:course_id => @copy_to.global_id.to_s,
-                                      :migration_type => 'course_copy_importer',
-                                      :settings => { 'source_course_id' => @copy_from.local_id.to_s, 'insert_into_module_id' => @mod.global_id.to_s },
-                                      :select => { 'pages' => [@page.id.to_s] }))
+                        @params.merge(course_id: @copy_to.global_id.to_s,
+                                      migration_type: 'course_copy_importer',
+                                      settings: { 'source_course_id' => @copy_from.local_id.to_s, 'insert_into_module_id' => @mod.global_id.to_s },
+                                      select: { 'pages' => [@page.id.to_s] }))
 
         migration = @copy_to.content_migrations.find(json['id'])
         expect(migration.source_course).to eq @copy_from
@@ -514,13 +514,13 @@ describe ContentMigrationsController, type: :request do
 
       it "errors if upload file required but not provided" do
         @post_params.delete :pre_attachment
-        json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
+        json = api_call(:post, @migration_url, @params, @post_params, {}, expected_status: 400)
         expect(json).to eq({ "message" => "File upload, file_url, or content_export_id is required" })
       end
 
       it "queues the migration when file finishes uploading" do
         local_storage!
-        @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+        @attachment = Attachment.create!(context: @migration, filename: "test.zip", uploaded_data: StringIO.new("test file"))
         @attachment.file_state = "deleted"
         @attachment.workflow_state = "unattached"
         @attachment.save
@@ -536,7 +536,7 @@ describe ContentMigrationsController, type: :request do
         @attachment.uploaded_data = @content
         @attachment.save!
         api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
-                 { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
+                 { controller: "files", action: "api_create_success", format: "json", id: @attachment.to_param, uuid: @attachment.uuid })
 
         @migration.reload
         expect(@migration.attachment).not_to be_nil
@@ -545,7 +545,7 @@ describe ContentMigrationsController, type: :request do
       end
 
       it "errors if course quota exceeded" do
-        @post_params[:pre_attachment] = { :name => "test.zip", :size => 1.gigabyte }
+        @post_params[:pre_attachment] = { name: "test.zip", size: 1.gigabyte }
         json = api_call(:post, @migration_url, @params, @post_params)
         expect(json['pre_attachment']).to eq({ "message" => "file size exceeds quota", "error" => true })
         expect(json["workflow_state"]).to eq 'failed'
@@ -629,28 +629,28 @@ describe ContentMigrationsController, type: :request do
 
       it "requires a file upload" do
         post_params = { migration_type: "context_external_tool", settings: { course_course_id: 42 } }
-        api_call(:post, @migration_url, @params, post_params, {}, :expected_status => 400)
+        api_call(:post, @migration_url, @params, post_params, {}, expected_status: 400)
       end
     end
 
     context "User" do
       before :once do
         @migration_url = "/api/v1/users/#{@user.id}/content_migrations"
-        @params = @params.reject { |k| k == :course_id }.merge(:user_id => @user.to_param)
+        @params = @params.reject { |k| k == :course_id }.merge(user_id: @user.to_param)
         @folder = Folder.root_folders(@user).first
       end
 
       it "errors for an unsupported type" do
-        json = api_call(:post, @migration_url, @params, { :migration_type => 'common_cartridge_importer' },
-                        {}, :expected_status => 400)
+        json = api_call(:post, @migration_url, @params, { migration_type: 'common_cartridge_importer' },
+                        {}, expected_status: 400)
         expect(json).to eq({ "message" => "Unsupported migration_type for context" })
       end
 
       it "queues a migration" do
         json = api_call(:post, @migration_url, @params,
-                        { :migration_type => 'zip_file_importer',
-                          :settings => { :file_url => 'http://example.com/oi.zip',
-                                         :folder_id => @folder.id } })
+                        { migration_type: 'zip_file_importer',
+                          settings: { file_url: 'http://example.com/oi.zip',
+                                      folder_id: @folder.id } })
         migration = ContentMigration.find json['id']
         expect(migration.context).to eql @user
       end
@@ -660,15 +660,15 @@ describe ContentMigrationsController, type: :request do
       before do
         group_with_user user: @user
         @migration_url = "/api/v1/groups/#{@group.id}/content_migrations"
-        @params = @params.reject { |k| k == :course_id }.merge(:group_id => @group.to_param)
+        @params = @params.reject { |k| k == :course_id }.merge(group_id: @group.to_param)
         @folder = Folder.root_folders(@group).first
       end
 
       it "queues a migration" do
         json = api_call(:post, @migration_url, @params,
-                        { :migration_type => 'zip_file_importer',
-                          :settings => { :file_url => 'http://example.com/oi.zip',
-                                         :folder_id => @folder.id } })
+                        { migration_type: 'zip_file_importer',
+                          settings: { file_url: 'http://example.com/oi.zip',
+                                      folder_id: @folder.id } })
         migration = ContentMigration.find json['id']
         expect(migration.context).to eql @group
       end
@@ -676,16 +676,16 @@ describe ContentMigrationsController, type: :request do
 
     context "Account" do
       before do
-        @account = Account.create!(:name => 'migration account')
+        @account = Account.create!(name: 'migration account')
         @account.account_users.create!(user: @user)
         @migration_url = "/api/v1/accounts/#{@account.id}/content_migrations"
-        @params = @params.reject { |k| k == :course_id }.merge(:account_id => @account.to_param)
+        @params = @params.reject { |k| k == :course_id }.merge(account_id: @account.to_param)
       end
 
       it "queues a migration" do
         json = api_call(:post, @migration_url, @params,
-                        { :migration_type => 'qti_converter',
-                          :settings => { :file_url => 'http://example.com/oi.zip' } })
+                        { migration_type: 'qti_converter',
+                          settings: { file_url: 'http://example.com/oi.zip' } })
         migration = ContentMigration.find json['id']
         expect(migration.context).to eql @account
       end
@@ -695,7 +695,7 @@ describe ContentMigrationsController, type: :request do
   describe 'update' do
     before do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}"
-      @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'update', :id => @migration.id.to_param }
+      @params = { controller: 'content_migrations', format: 'json', course_id: @course.id.to_param, action: 'update', id: @migration.id.to_param }
       @post_params = {}
     end
 
@@ -708,7 +708,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "does not queue a migration if do_not_run flag is set" do
-      json = api_call(:put, @migration_url, @params, @post_params.merge(:do_not_run => true))
+      json = api_call(:put, @migration_url, @params, @post_params.merge(do_not_run: true))
       expect(json["workflow_state"]).to eq 'pre_processing'
       migration = ContentMigration.find json['id']
       expect(migration.workflow_state).to eq "created"
@@ -716,7 +716,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "does not change migration_type" do
-      json = api_call(:put, @migration_url, @params, @post_params.merge(:migration_type => "oioioi"))
+      json = api_call(:put, @migration_url, @params, @post_params.merge(migration_type: "oioioi"))
       expect(json['migration_type']).to eq 'common_cartridge_importer'
     end
 
@@ -736,7 +736,7 @@ describe ContentMigrationsController, type: :request do
         @migration.workflow_state = 'exported'
         @migration.migration_settings[:import_immediately] = false
         @migration.save!
-        @post_params = { :copy => { :all_assignments => true, :context_modules => { 'id_9000' => true } } }
+        @post_params = { copy: { all_assignments: true, context_modules: { 'id_9000' => true } } }
       end
 
       it "sets the selective data" do
@@ -771,7 +771,7 @@ describe ContentMigrationsController, type: :request do
       p = Canvas::Plugin.find('common_cartridge_importer')
       allow(Canvas::Plugin).to receive(:all_for_tag).and_return([p])
       json = api_call(:get, "/api/v1/courses/#{@course.id}/content_migrations/migrators",
-                      { :controller => "content_migrations", :action => "available_migrators", :format => "json", :course_id => @course.id.to_param })
+                      { controller: "content_migrations", action: "available_migrators", format: "json", course_id: @course.id.to_param })
       expect(json).to eq [{
         "type" => "common_cartridge_importer",
         "requires_file_upload" => true,
@@ -784,7 +784,7 @@ describe ContentMigrationsController, type: :request do
       allow(Canvas::Plugin).to receive(:all_for_tag).and_return([Canvas::Plugin.find('common_cartridge_importer'),
                                                                  Canvas::Plugin.find('zip_file_importer')])
       json = api_call(:get, "/api/v1/users/#{@user.id}/content_migrations/migrators",
-                      { :controller => "content_migrations", :action => "available_migrators", :format => "json", :user_id => @user.to_param })
+                      { controller: "content_migrations", action: "available_migrators", format: "json", user_id: @user.to_param })
       expect(json).to eq [{
         "type" => "zip_file_importer",
         "requires_file_upload" => true,
@@ -797,14 +797,14 @@ describe ContentMigrationsController, type: :request do
   describe 'content selection' do
     before :once do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
-      @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param }
+      @params = { controller: 'content_migrations', format: 'json', course_id: @course.id.to_param, action: 'content_list', id: @migration.id.to_param }
       @orig_course = @course
 
       course_factory
-      @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
-      @cm = @course.context_modules.create!(:name => "some module")
-      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @dt1 = @course.discussion_topics.create!(message: "hi", title: "discussion title")
+      @cm = @course.context_modules.create!(name: "some module")
+      @att = Attachment.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@course), context: @course)
+      @wiki = @course.wiki_pages.create!(title: "wiki", body: "ohai")
       @migration.migration_type = 'course_copy_importer'
       @migration.migration_settings[:source_course_id] = @course.id
       @migration.source_course = @course
@@ -836,7 +836,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "returns local identifiers if needed" do
-      prev_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
       json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({ type: 'discussion_topics' }))
       key = CC::CCHelper.create_key(@dt1, global: false)
@@ -850,19 +850,19 @@ describe ContentMigrationsController, type: :request do
 
     it "actually returns local identifiers created from the correct shard if needed" do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
-      @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param }
+      @params = { controller: 'content_migrations', format: 'json', course_id: @course.id.to_param, action: 'content_list', id: @migration.id.to_param }
 
       @shard1.activate do
         account = Account.create!
-        @cs_course = Course.create!(:account => account)
-        @dt1 = @cs_course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+        @cs_course = Course.create!(account: account)
+        @dt1 = @cs_course.discussion_topics.create!(message: "hi", title: "discussion title")
       end
       @migration.migration_type = 'course_copy_importer'
       @migration.migration_settings[:source_course_id] = @cs_course.id
       @migration.source_course = @cs_course
       @migration.save!
 
-      prev_export = @cs_course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export = @cs_course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
       json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({ type: 'discussion_topics' }))
       key = @shard1.activate { CC::CCHelper.create_key(@dt1, global: false) }

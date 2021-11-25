@@ -46,7 +46,7 @@ describe "terms of use test" do
 
   context "editing terms_of_use" do
     before :once do
-      account_admin_user(:account => Account.site_admin)
+      account_admin_user(account: Account.site_admin)
       @account = Account.default
     end
 
@@ -66,7 +66,7 @@ describe "terms of use test" do
     end
 
     it "populates the custom terms in the text area" do
-      @account.update_terms_of_service(:terms_type => "custom", :content => "other stuff")
+      @account.update_terms_of_service(terms_type: "custom", content: "other stuff")
 
       get "/accounts/#{@account.id}/settings"
 

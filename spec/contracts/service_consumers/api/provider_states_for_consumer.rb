@@ -311,7 +311,7 @@ module Pact::Canvas
         # So just favorite the last one.
         if i == 1
           # puts "Favoriting #{mcourse.id}"
-          mstudent.favorites.create!(:context_type => "Course", :context => mcourse)
+          mstudent.favorites.create!(context_type: "Course", context: mcourse)
           mstudent.favorites.first.save
           mstudent.save!
         end

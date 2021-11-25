@@ -63,10 +63,10 @@ describe "submissions" do
 
     it "allows a student view student to view/submit assignments", priority: "1" do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_text_entry",
-        :due_at => Time.now.utc + 2.days
+        title: 'Cool Assignment',
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        due_at: Time.now.utc + 2.days
       )
 
       enter_student_view
@@ -88,10 +88,10 @@ describe "submissions" do
 
     it "allows a student view student to submit file upload assignments", priority: "1" do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_upload",
-        :due_at => Time.now.utc + 2.days
+        title: 'Cool Assignment',
+        points_possible: 10,
+        submission_types: "online_upload",
+        due_at: Time.now.utc + 2.days
       )
 
       enter_student_view

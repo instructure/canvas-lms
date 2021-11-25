@@ -19,7 +19,7 @@
 #
 
 API_MEDIA_OBJECT_JSON_OPTS = {
-  :only => %w[media_id created_at media_type].freeze,
+  only: %w[media_id created_at media_type].freeze,
 }.freeze
 
 module Api::V1::MediaObject
@@ -32,7 +32,7 @@ module Api::V1::MediaObject
 
       unless exclude.include?('tracks')
         json['media_tracks'] = media_object.media_tracks.map do |track|
-          api_json(track, current_user, session, :only => %w[kind created_at updated_at id locale]).tap do |json2|
+          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale]).tap do |json2|
             json2[:url] = show_media_tracks_url(media_object.media_id, track.id)
           end
         end

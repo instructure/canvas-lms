@@ -93,7 +93,7 @@ shared_examples_for 'k5 important dates' do
     discussion_title = "Electricity Discussion"
     due_at = 2.days.from_now(Time.zone.now)
     discussion_assignment = create_dated_assignment(@subject_course, discussion_title, due_at, 10)
-    @course.discussion_topics.create!(:title => discussion_title, :assignment => discussion_assignment)
+    @course.discussion_topics.create!(title: discussion_title, assignment: discussion_assignment)
     discussion_assignment.update!(important_dates: true)
 
     get "/"

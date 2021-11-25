@@ -40,7 +40,7 @@ describe "/context_modules/index" do
   it "shows content_tags" do
     course_factory
     context_module = @course.context_modules.create!
-    module_item = context_module.add_item :type => 'context_module_sub_header'
+    module_item = context_module.add_item type: 'context_module_sub_header'
     module_item.publish! if module_item.unpublished?
     view_context(@course, @user)
     assign(:modules, @course.context_modules.active)
@@ -51,13 +51,13 @@ describe "/context_modules/index" do
   end
 
   it "shows unpublished content_tags" do
-    course_with_teacher(:active_all => true)
-    wiki_page = wiki_page_model(:course => @course)
+    course_with_teacher(active_all: true)
+    wiki_page = wiki_page_model(course: @course)
     wiki_page.workflow_state = 'unpublished'
     wiki_page.save!
 
     context_module = @course.context_modules.create!
-    module_item = context_module.add_item(:type => 'wiki_page', :id => wiki_page.id)
+    module_item = context_module.add_item(type: 'wiki_page', id: wiki_page.id)
     expect(module_item.workflow_state).to eq 'unpublished'
 
     view_context(@course, @user)
@@ -72,7 +72,7 @@ describe "/context_modules/index" do
   it "does not show deleted content_tags" do
     course_factory
     context_module = @course.context_modules.create!
-    module_item = context_module.add_item :type => 'context_module_sub_header'
+    module_item = context_module.add_item type: 'context_module_sub_header'
     module_item.destroy
     view_context(@course, @user)
     assign(:modules, @course.context_modules.active)

@@ -156,12 +156,12 @@
 #   }
 
 class PageViewsController < ApplicationController
-  before_action :require_user, :only => [:index]
+  before_action :require_user, only: [:index]
 
   include Api::V1::PageView
 
   def update
-    render :json => { :ok => true }
+    render json: { ok: true }
     # page view update happens in log_page_view after_action
   end
 
@@ -204,8 +204,8 @@ class PageViewsController < ApplicationController
       format.json do
         page_views = @user.page_views(date_options)
         url = api_v1_user_page_views_url(url_options)
-        @page_views = Api.paginate(page_views, self, url, :total_entries => nil)
-        render :json => page_views_json(@page_views, @current_user, session)
+        @page_views = Api.paginate(page_views, self, url, total_entries: nil)
+        render json: page_views_json(@page_views, @current_user, session)
       end
       format.csv do
         cancel_cache_buster

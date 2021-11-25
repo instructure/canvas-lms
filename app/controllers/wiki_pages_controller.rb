@@ -23,8 +23,8 @@ class WikiPagesController < ApplicationController
   include SubmittableHelper
 
   before_action :require_context
-  before_action :get_wiki_page, :except => [:front_page]
-  before_action :set_front_page, :only => [:front_page]
+  before_action :get_wiki_page, except: [:front_page]
+  before_action :set_front_page, only: [:front_page]
   before_action :set_pandapub_read_token
   before_action :set_js_rights
   before_action :set_js_wiki_data
@@ -48,9 +48,9 @@ class WikiPagesController < ApplicationController
   def set_pandapub_read_token
     if @page&.grants_right?(@current_user, session, :read) && CanvasPandaPub.enabled?
       channel = "/private/wiki_page/#{@page.global_id}/update"
-      js_env :WIKI_PAGE_PANDAPUB => {
-        :CHANNEL => channel,
-        :TOKEN => CanvasPandaPub.generate_token(channel, true)
+      js_env WIKI_PAGE_PANDAPUB: {
+        CHANNEL: channel,
+        TOKEN: CanvasPandaPub.generate_token(channel, true)
       }
     end
   end
@@ -90,15 +90,15 @@ class WikiPagesController < ApplicationController
     GuardRail.activate(:secondary) do
       if @page.new_record?
         if @page.grants_any_right?(@current_user, session, :update, :update_content)
-          flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
+          flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', title: @page.title)
           encoded_name = @page_name && CGI.escape(@page_name).tr("+", " ")
           redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
           wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
           flash[:warning] = if wiki_page && wiki_page.deleted?
-                              t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+                              t('notices.page_deleted', 'The page "%{title}" has been deleted.', title: @page.title)
                             else
-                              t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+                              t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', title: @page.title)
                             end
           redirect_to polymorphic_url([@context, :wiki_pages])
         end
@@ -130,7 +130,7 @@ class WikiPagesController < ApplicationController
         @padless = true
       end
     elsif authorized_action(@page, @current_user, :read)
-      flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
+      flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', title: @page.title)
       redirect_to polymorphic_url([@context, @page])
     end
   end
@@ -144,14 +144,14 @@ class WikiPagesController < ApplicationController
         @padless = true
       end
     elsif authorized_action(@page, @current_user, :read)
-      flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', :title => @page.title)
+      flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', title: @page.title)
       redirect_to polymorphic_url([@context, @page])
     end
   end
 
   def show_redirect
-    redirect_to polymorphic_url([@context, @page], :titleize => params[:titleize],
-                                                   :module_item_id => params[:module_item_id]), status: :moved_permanently
+    redirect_to polymorphic_url([@context, @page], titleize: params[:titleize],
+                                                   module_item_id: params[:module_item_id]), status: :moved_permanently
   end
 
   def revisions_redirect
@@ -164,10 +164,10 @@ class WikiPagesController < ApplicationController
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
     wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
-      :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
-      :wiki_index_menu_tools => wiki_index_menu_tools,
-      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, { no_render: true }) && !@k5_details_view,
-      :CAN_SET_TODO_DATE => context.grants_right?(@current_user, session, :manage_content)
+      wiki_page_menu_tools: external_tools_display_hashes(:wiki_page_menu),
+      wiki_index_menu_tools: wiki_index_menu_tools,
+      DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, { no_render: true }) && !@k5_details_view,
+      CAN_SET_TODO_DATE: context.grants_right?(@current_user, session, :manage_content)
     }
     js_env(@wiki_pages_env)
     @wiki_pages_env

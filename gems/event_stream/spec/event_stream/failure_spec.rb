@@ -24,19 +24,19 @@ describe EventStream::Failure do
   describe "log!" do
     before do
       @record = double('record',
-                       :id => double('record_id', :to_s => 'record_id_string'),
-                       :attributes => { 'attribute' => 'attribute_value' },
-                       :changes => { 'changed_attribute' => 'changed_value' })
+                       id: double('record_id', to_s: 'record_id_string'),
+                       attributes: { 'attribute' => 'attribute_value' },
+                       changes: { 'changed_attribute' => 'changed_value' })
 
       @stream = double('stream',
-                       :identifier => 'stream_identifier',
-                       :raise_on_error => false)
+                       identifier: 'stream_identifier',
+                       raise_on_error: false)
 
       allow(@stream).to receive(:operation_payload).with(:insert, @record).and_return(@record.attributes)
       allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
       @exception = StandardError.new
-      allow(@exception).to receive(:message).and_return(double('exception_message', :to_s => 'exception_message_string'))
+      allow(@exception).to receive(:message).and_return(double('exception_message', to_s: 'exception_message_string'))
       allow(@exception).to receive(:backtrace).and_return([42])
     end
 

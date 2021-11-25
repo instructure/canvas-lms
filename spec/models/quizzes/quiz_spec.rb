@@ -128,7 +128,7 @@ describe Quizzes::Quiz do
     it "marks a quiz as having unpublished changes" do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
-        quiz = @course.quizzes.create! :title => "hello"
+        quiz = @course.quizzes.create! title: "hello"
         quiz.published_at = Time.now
         quiz.publish!
         expect(quiz.unpublished_changes?).to be_falsey
@@ -143,7 +143,7 @@ describe Quizzes::Quiz do
     it "marks a quiz as having unpublished changes" do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
-        quiz = @course.quizzes.create! :title => "hello"
+        quiz = @course.quizzes.create! title: "hello"
         quiz.published_at = Time.now
         quiz.publish!
         expect(quiz.unpublished_changes?).to be_falsey
@@ -156,7 +156,7 @@ describe Quizzes::Quiz do
 
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
-      quiz = @course.quizzes.build :title => "hello"
+      quiz = @course.quizzes.build title: "hello"
       expect(quiz).to receive(:generate_quiz_data).once
       quiz.publish!
       expect(quiz.workflow_state).to eq 'available'
@@ -188,7 +188,7 @@ describe Quizzes::Quiz do
 
   describe "#unpublish!" do
     it "sets the workflow state to unpublished and save!s the quiz" do
-      quiz = @course.quizzes.build :title => "hello"
+      quiz = @course.quizzes.build title: "hello"
       expect(quiz).to receive(:save!).once
       quiz.publish!
       expect(quiz.workflow_state).to eq 'available'
@@ -270,12 +270,12 @@ describe Quizzes::Quiz do
 
   it "infers the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,
-                                          :title => "new quiz",
-                                          :due_at => "Sep 3 2008 12:00am",
-                                          :lock_at => "Sep 3 2008 12:00am",
-                                          :unlock_at => "Sep 3 2008 12:00am",
-                                          :quiz_type => 'assignment',
-                                          :workflow_state => 'available')
+                                          title: "new quiz",
+                                          due_at: "Sep 3 2008 12:00am",
+                                          lock_at: "Sep 3 2008 12:00am",
+                                          unlock_at: "Sep 3 2008 12:00am",
+                                          quiz_type: 'assignment',
+                                          workflow_state: 'available')
     due_at = q.due_at
     expect(q.due_at).to eq Time.parse("Sep 3 2008 12:00am UTC")
     lock_at = q.lock_at
@@ -295,11 +295,11 @@ describe Quizzes::Quiz do
   end
 
   it "sets the due time to 11:59pm if only given a date" do
-    params = { :quiz => {
-      :title => "Test Quiz",
-      :due_at => Time.zone.today.to_s,
-      :lock_at => Time.zone.today.to_s,
-      :unlock_at => Time.zone.today.to_s
+    params = { quiz: {
+      title: "Test Quiz",
+      due_at: Time.zone.today.to_s,
+      lock_at: Time.zone.today.to_s,
+      unlock_at: Time.zone.today.to_s
     } }
     q = @course.quizzes.create!(params[:quiz])
     q.infer_times
@@ -318,7 +318,7 @@ describe Quizzes::Quiz do
   end
 
   it "does not set the due time to 11:59pm if passed a time of midnight" do
-    params = { :quiz => { :title => "Test Quiz", :due_at => "Jan 1 2011 12:00am" } }
+    params = { quiz: { title: "Test Quiz", due_at: "Jan 1 2011 12:00am" } }
     q = @course.quizzes.create!(params[:quiz])
     expect(q.due_at.hour).to eql 0
     expect(q.due_at.min).to eql 0
@@ -326,7 +326,7 @@ describe Quizzes::Quiz do
 
   it "converts a date object to a time and set the time to 11:59pm" do
     Time.zone = 'Alaska'
-    params = { :quiz => { :title => 'Test Quiz', :due_at => Time.zone.today } }
+    params = { quiz: { title: 'Test Quiz', due_at: Time.zone.today } }
     quiz = @course.quizzes.create!(params[:quiz])
     expect(quiz.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
     expect(quiz.due_at.zone).to eql Time.zone.now.dst? ? 'AKDT' : 'AKST'
@@ -338,7 +338,7 @@ describe Quizzes::Quiz do
     time_string = "Dec 30, 2011 12:00 pm"
     expected = "2011-12-30 19:00:00 #{Time.now.utc.strftime("%Z")}"
     Time.zone = "Mountain Time (US & Canada)"
-    quiz = @course.quizzes.create(:title => "sad quiz", :due_at => time_string, :lock_at => time_string, :unlock_at => time_string)
+    quiz = @course.quizzes.create(title: "sad quiz", due_at: time_string, lock_at: time_string, unlock_at: time_string)
     expect(quiz.due_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
     expect(quiz.lock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
     expect(quiz.unlock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
@@ -346,7 +346,7 @@ describe Quizzes::Quiz do
   end
 
   it "initializes with default settings" do
-    q = @course.quizzes.create!(:title => "new quiz")
+    q = @course.quizzes.create!(title: "new quiz")
     expect(q.shuffle_answers).to eql(false)
     expect(q.show_correct_answers).to eql(true)
     expect(q.allowed_attempts).to eql(1)
@@ -354,10 +354,10 @@ describe Quizzes::Quiz do
   end
 
   it "updates the assignment it is associated with" do
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :only_visible_to_overrides => false)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 5, only_visible_to_overrides: false)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10, :only_visible_to_overrides => true)
+    q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10, only_visible_to_overrides: true)
     q.workflow_state = 'available'
     q.save
     expect(q).to be_available
@@ -369,7 +369,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.submission_types).to eql("online_quiz")
     expect(q.assignment.title).to eq "some quiz"
 
-    g = @course.assignment_groups.create!(:name => "new group")
+    g = @course.assignment_groups.create!(name: "new group")
     q.assignment_group_id = g.id
     q.save
     q.reload
@@ -377,7 +377,7 @@ describe Quizzes::Quiz do
     expect(a.assignment_group).to eql(g)
     expect(q.assignment_group_id).to eql(g.id)
 
-    g2 = @course.assignment_groups.create!(:name => "new group2")
+    g2 = @course.assignment_groups.create!(name: "new group2")
     a.assignment_group = g2
     a.save
     a.reload
@@ -388,9 +388,9 @@ describe Quizzes::Quiz do
 
   it "does not create a new assignment on every edit" do
     a_count = Assignment.count
-    a = @course.assignments.create!(:title => "some assignment")
+    a = @course.assignments.create!(title: "some assignment")
     expect(a.submission_types).not_to eql("online_quiz")
-    q = @course.quizzes.build(:title => "some quiz")
+    q = @course.quizzes.build(title: "some quiz")
     q.workflow_state = 'available'
     q.assignment_id = a.id
     q.save
@@ -408,13 +408,13 @@ describe Quizzes::Quiz do
   end
 
   it "does not send a message if notify_of_update is blank" do
-    Notification.create!(:name => 'Assignment Changed')
+    Notification.create!(name: 'Assignment Changed')
     @course.offer
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 5)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     a.update_attribute(:created_at, Time.now - (40 * 60))
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = 'available'
     expect(q.assignment).to receive(:save_without_broadcasting!).at_least(:once)
     q.save
@@ -422,15 +422,15 @@ describe Quizzes::Quiz do
   end
 
   it "sends a message if notify_of_update is set and grades are posted" do
-    Notification.create!(:name => 'Assignment Changed')
+    Notification.create!(name: 'Assignment Changed')
     @course.offer
     student_in_course(active_all: true)
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 5)
     a.unmute!
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     a.update_attribute(:created_at, Time.now - (40 * 60))
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = 'available'
     q.notify_of_update = 1
     expect(q.assignment).not_to receive(:save_without_broadcasting!)
@@ -439,10 +439,10 @@ describe Quizzes::Quiz do
   end
 
   it "deletes the assignment if the quiz is no longer graded" do
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 5)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = 'available'
     q.save
     expect(q).to be_available
@@ -466,8 +466,8 @@ describe Quizzes::Quiz do
   end
 
   it "does not create an assignment for ungraded quizzes" do
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "survey", :assignment_group_id => g.id)
+    g = @course.assignment_groups.create!(name: "new group")
+    q = @course.quizzes.build(title: "some quiz", quiz_type: "survey", assignment_group_id: g.id)
     q.workflow_state = 'available'
     q.save!
     expect(q).to be_available
@@ -475,8 +475,8 @@ describe Quizzes::Quiz do
   end
 
   it "always has an assignment" do
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+    g = @course.assignment_groups.create!(name: "new group")
+    q = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", assignment_group_id: g.id)
     q.save!
     expect(q).not_to be_available
     expect(q.assignment_id).not_to be_nil
@@ -484,8 +484,8 @@ describe Quizzes::Quiz do
   end
 
   it "updates assignment published?" do
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+    g = @course.assignment_groups.create!(name: "new group")
+    q = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", assignment_group_id: g.id)
     q.save!
     expect(q).not_to be_available
     expect(q.assignment_id).not_to be_nil
@@ -496,11 +496,11 @@ describe Quizzes::Quiz do
   end
 
   it "sends a message when quiz is published" do
-    Notification.create!(:name => 'Assignment Created')
+    Notification.create!(name: 'Assignment Created')
     @course.offer
     student_in_course(active_all: true)
 
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+    q = @course.quizzes.build(title: "some quiz", quiz_type: "assignment")
     q.save!
     expect(q).not_to be_available
 
@@ -516,8 +516,8 @@ describe Quizzes::Quiz do
   end
 
   it "creates the assignment if created in published state" do
-    g = @course.assignment_groups.create!(:name => "new group")
-    q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+    g = @course.assignment_groups.create!(name: "new group")
+    q = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", assignment_group_id: g.id)
     q.workflow_state = 'available'
     q.save!
     expect(q).to be_available
@@ -527,13 +527,13 @@ describe Quizzes::Quiz do
   end
 
   it "returns a zero question count but valid unpublished question count until the quiz is generated" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
-    q.quiz_questions.create!(:quiz_group => g)
-    q.quiz_questions.create!(:quiz_group => g)
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "group 1", pick_count: 1)
+    q.quiz_questions.create!(quiz_group: g)
+    q.quiz_questions.create!(quiz_group: g)
     q.quiz_questions.create!
     q.quiz_questions.create!
-    q.quiz_questions.create!(:question_data => { :question_type => "text_only_question" })
+    q.quiz_questions.create!(question_data: { question_type: "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
     q.save
@@ -542,7 +542,7 @@ describe Quizzes::Quiz do
   end
 
   it "returns an available question count for unpublished questions" do
-    q = @course.quizzes.create!(:title => "new quiz")
+    q = @course.quizzes.create!(title: "new quiz")
     q.quiz_questions.create!
     q.quiz_questions.create!
     q.save
@@ -551,7 +551,7 @@ describe Quizzes::Quiz do
   end
 
   it "returns an available question count for published questions" do
-    q = @course.quizzes.create!(:title => "new quiz")
+    q = @course.quizzes.create!(title: "new quiz")
     q.quiz_questions.create!
     q.quiz_questions.create!
     q.publish!
@@ -560,16 +560,16 @@ describe Quizzes::Quiz do
   end
 
   it "returns processed root entries for each question/group" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "group 1", pick_count: 1, question_points: 2)
 
-    qq1 = q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
+    qq1 = q.quiz_questions.create!(question_data: { name: "test 1" }, quiz_group: g)
     # make sure we handle sorting with nil positions
-    Quizzes::QuizQuestion.where(:id => qq1).update_all(:position => nil)
+    Quizzes::QuizQuestion.where(id: qq1).update_all(position: nil)
 
-    q.quiz_questions.create!(:question_data => { :name => "test 2" }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3" })
-    q.quiz_questions.create!(:question_data => { :name => "test 4" })
+    q.quiz_questions.create!(question_data: { name: "test 2" }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 3" })
+    q.quiz_questions.create!(question_data: { name: "test 4" })
     q.save
     expect(q.active_quiz_questions.size).to eql(4)
     expect(q.quiz_groups.length).to eql(1)
@@ -583,12 +583,12 @@ describe Quizzes::Quiz do
   end
 
   it "generates valid quiz data" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-    q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2" }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3" })
-    q.quiz_questions.create!(:question_data => { :name => "test 4" })
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "group 1", pick_count: 1, question_points: 2)
+    q.quiz_questions.create!(question_data: { name: "test 1" }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 2" }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 3" })
+    q.quiz_questions.create!(question_data: { name: "test 4" })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
@@ -598,12 +598,12 @@ describe Quizzes::Quiz do
   end
 
   it "returns quiz data once the quiz is generated" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-    q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3", })
-    q.quiz_questions.create!(:question_data => { :name => "test 4", })
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "group 1", pick_count: 1, question_points: 2)
+    q.quiz_questions.create!(question_data: { name: "test 1", }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 2", }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 3", })
+    q.quiz_questions.create!(question_data: { name: "test 4", })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
@@ -616,11 +616,11 @@ describe Quizzes::Quiz do
   end
 
   it "shuffles answers for the questions" do
-    q = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    q.quiz_questions.create!(:question_data => { :name => 'test 3', 'question_type' => 'multiple_choice_question',
-                                                 'answers' => [{ 'answer_text' => '1' }, { 'answer_text' => '2' }, { 'answer_text' => '3' }, { 'answer_text' => '4' },
-                                                               { 'answer_text' => '5' }, { 'answer_text' => '6' }, { 'answer_text' => '7' }, { 'answer_text' => '8' },
-                                                               { 'answer_text' => '9' }, { 'answer_text' => '10' }] })
+    q = @course.quizzes.create!(title: "new quiz", shuffle_answers: true)
+    q.quiz_questions.create!(question_data: { :name => 'test 3', 'question_type' => 'multiple_choice_question',
+                                              'answers' => [{ 'answer_text' => '1' }, { 'answer_text' => '2' }, { 'answer_text' => '3' }, { 'answer_text' => '4' },
+                                                            { 'answer_text' => '5' }, { 'answer_text' => '6' }, { 'answer_text' => '7' }, { 'answer_text' => '8' },
+                                                            { 'answer_text' => '9' }, { 'answer_text' => '10' }] })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
@@ -646,18 +646,18 @@ describe Quizzes::Quiz do
   end
 
   it "shuffles questions for the quiz groups" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "some group", :pick_count => 10, :question_points => 10)
-    q.quiz_questions.create!(:question_data => { :name => "test 1", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 4", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 5", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 6", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 7", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 8", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 9", 'answers' => [] }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 10", 'answers' => [] }, :quiz_group => g)
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "some group", pick_count: 10, question_points: 10)
+    q.quiz_questions.create!(question_data: { :name => "test 1", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 2", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 3", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 4", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 5", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 6", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 7", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 8", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 9", 'answers' => [] }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { :name => "test 10", 'answers' => [] }, quiz_group: g)
     expect(q.quiz_data).to be_nil
     q.reload
     q.generate_quiz_data
@@ -681,12 +681,12 @@ describe Quizzes::Quiz do
   end
 
   it "considers the number of questions in a group when determining the question count" do
-    q = @course.quizzes.create!(:title => "new quiz")
-    g = q.quiz_groups.create!(:name => "group 1", :pick_count => 10, :question_points => 2)
-    q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3", })
-    q.quiz_questions.create!(:question_data => { :name => "test 4", })
+    q = @course.quizzes.create!(title: "new quiz")
+    g = q.quiz_groups.create!(name: "group 1", pick_count: 10, question_points: 2)
+    q.quiz_questions.create!(question_data: { name: "test 1", }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 2", }, quiz_group: g)
+    q.quiz_questions.create!(question_data: { name: "test 3", })
+    q.quiz_questions.create!(question_data: { name: "test 4", })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
@@ -744,19 +744,19 @@ describe Quizzes::Quiz do
 
   describe "#generate_submission" do
     it "generates a valid submission for a given user" do
-      u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "new quiz")
-      g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-      q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 3", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 4", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 5", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 6", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 7", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 8", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 9", })
-      q.quiz_questions.create!(:question_data => { :name => "test 10", })
+      u = User.create!(name: "some user")
+      q = @course.quizzes.create!(title: "new quiz")
+      g = q.quiz_groups.create!(name: "group 1", pick_count: 1, question_points: 2)
+      q.quiz_questions.create!(question_data: { name: "test 1", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 2", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 3", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 4", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 5", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 6", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 7", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 8", }, quiz_group: g)
+      q.quiz_questions.create!(question_data: { name: "test 9", })
+      q.quiz_questions.create!(question_data: { name: "test 10", })
       expect(q.quiz_data).to be_nil
       q.generate_quiz_data
       q.save
@@ -772,8 +772,8 @@ describe Quizzes::Quiz do
 
     it "sets end_at to lock_at when end_at is nil or after lock_at" do
       lock_at = 1.minute.from_now
-      u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "some quiz", :lock_at => lock_at)
+      u = User.create!(name: "some user")
+      q = @course.quizzes.create!(title: "some quiz", lock_at: lock_at)
       # [nil, after lock_at]
       [1.minute.ago, 2.minutes.from_now].each do |due_at|
         q.due_at = due_at
@@ -786,8 +786,8 @@ describe Quizzes::Quiz do
 
     it "does not set end_at to lock_at if a submission is manually unlocked" do
       lock_at = 1.day.ago
-      u = User.create!(:name => "Fred Colon")
-      q = @course.quizzes.create!(:title => "locked yesterday", :lock_at => lock_at)
+      u = User.create!(name: "Fred Colon")
+      q = @course.quizzes.create!(title: "locked yesterday", lock_at: lock_at)
       sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, 'settings_only')
       sub.manually_unlocked = true
       sub.save!
@@ -797,8 +797,8 @@ describe Quizzes::Quiz do
 
     it 'does not set end_at to due_at' do
       due_at = 1.day.from_now
-      u = User.create!(:name => "Fred Colon")
-      q = @course.quizzes.create!(:title => "locked tomorrow", :due_at => due_at)
+      u = User.create!(name: "Fred Colon")
+      q = @course.quizzes.create!(title: "locked tomorrow", due_at: due_at)
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
@@ -809,7 +809,7 @@ describe Quizzes::Quiz do
       @course.conclude_at = deadline
       @course.save!
       student_in_course(course: @course, active_all: true)
-      q = @course.quizzes.create!(:title => "locked tomorrow")
+      q = @course.quizzes.create!(title: "locked tomorrow")
       sub2 = q.generate_submission(@user)
       expect(sub2.end_at).to eq deadline
     end
@@ -822,7 +822,7 @@ describe Quizzes::Quiz do
       @course.enrollment_term.end_at = deadline
       @course.enrollment_term.save!
       student_in_course(course: @course, active_all: true)
-      q = @course.quizzes.create!(:title => "locked tomorrow")
+      q = @course.quizzes.create!(title: "locked tomorrow")
       sub2 = q.generate_submission(@user)
       expect(sub2.end_at).to be_nil
     end
@@ -839,7 +839,7 @@ describe Quizzes::Quiz do
         section = @course.course_sections.create!(end_at: 1.day.from_now)
         student_in_course(course: @course, active_all: true, section: section)
 
-        @q = @course.quizzes.create!(:title => "locked tomorrow")
+        @q = @course.quizzes.create!(title: "locked tomorrow")
       end
 
       it "sets end_at to the term end dates" do
@@ -860,7 +860,7 @@ describe Quizzes::Quiz do
 
         student_in_course(course: @course, active_all: true)
 
-        @q = @course.quizzes.create!(:title => "locked tomorrow")
+        @q = @course.quizzes.create!(title: "locked tomorrow")
       end
 
       it "sets end_at to the course end dates" do
@@ -892,7 +892,7 @@ describe Quizzes::Quiz do
         section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline, start_at: @start_at)
         student_in_course(course: @course, active_all: true, section: section)
 
-        @q = @course.quizzes.create!(:title => "locked tomorrow")
+        @q = @course.quizzes.create!(title: "locked tomorrow")
       end
 
       it "sets end_at to section end dates" do
@@ -912,24 +912,24 @@ describe Quizzes::Quiz do
     end
 
     it "shuffles submission questions" do
-      u1 = User.create!(:name => "user 1")
-      u2 = User.create!(:name => "user 2")
-      User.create!(:name => "user 3")
+      u1 = User.create!(name: "user 1")
+      u2 = User.create!(name: "user 2")
+      User.create!(name: "user 3")
 
-      quiz = @course.quizzes.create!(:title => "some quiz")
+      quiz = @course.quizzes.create!(title: "some quiz")
 
       # create a bunch of questions to make it more likely that they'll shuffle randomly
-      group = quiz.quiz_groups.create!(:name => "group 1", :pick_count => 4, :question_points => 2)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 1" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 2" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 3" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 4" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 5" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 6" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 7" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 8" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 9" }, :quiz_group => group)
-      quiz.quiz_questions.create!(:question_data => { :question_text => "test 10" }, :quiz_group => group)
+      group = quiz.quiz_groups.create!(name: "group 1", pick_count: 4, question_points: 2)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 1" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 2" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 3" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 4" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 5" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 6" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 7" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 8" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 9" }, quiz_group: group)
+      quiz.quiz_questions.create!(question_data: { question_text: "test 10" }, quiz_group: group)
       expect(quiz.quiz_data).to be_nil
       quiz.generate_quiz_data
       quiz.save
@@ -954,15 +954,15 @@ describe Quizzes::Quiz do
   end
 
   it "returns the assignment title if the quiz is linked to an assignment" do
-    a = @course.assignments.create!(:title => "some assignment")
-    q = @course.quizzes.create!(:assignment_id => a.id)
+    a = @course.assignments.create!(title: "some assignment")
+    q = @course.quizzes.create!(assignment_id: a.id)
     a.reload
     expect(q.quiz_title).to eql(a.title)
   end
 
   it "deletes the associated assignment if it is deleted" do
-    a = @course.assignments.create!(:title => "some assignment")
-    q = @course.quizzes.create!(:assignment_id => a.id, :quiz_type => "assignment")
+    a = @course.assignments.create!(title: "some assignment")
+    q = @course.quizzes.create!(assignment_id: a.id, quiz_type: "assignment")
     expect(q.assignment_id).to eql(a.id)
     q.reload
     q.assignment_id = nil
@@ -1009,12 +1009,12 @@ describe Quizzes::Quiz do
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
     before(:once) do
       course_with_student
-      @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-      @bank.assessment_questions.create!(:question_data => { 'name' => 'Group Question 1', :question_type => 'essay_question', :question_text => 'gq1', 'answers' => [] })
-      @bank.assessment_questions.create!(:question_data => { 'name' => 'Group Question 2', :question_type => 'essay_question', :question_text => 'gq2', 'answers' => [] })
-      @quiz = @course.quizzes.create!(:title => "i'm tired quiz")
-      @quiz.quiz_questions.create!(:question_data => { :name => "Quiz Question 1", :question_type => 'essay_question', :question_text => 'qq1', 'answers' => [], :points_possible => 5.0 })
-      @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
+      @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+      @bank.assessment_questions.create!(question_data: { 'name' => 'Group Question 1', :question_type => 'essay_question', :question_text => 'gq1', 'answers' => [] })
+      @bank.assessment_questions.create!(question_data: { 'name' => 'Group Question 2', :question_type => 'essay_question', :question_text => 'gq2', 'answers' => [] })
+      @quiz = @course.quizzes.create!(title: "i'm tired quiz")
+      @quiz.quiz_questions.create!(question_data: { :name => "Quiz Question 1", :question_type => 'essay_question', :question_text => 'qq1', 'answers' => [], :points_possible => 5.0 })
+      @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
       @group.assessment_question_bank = @bank
       @group.save!
       @quiz.generate_quiz_data
@@ -1041,7 +1041,7 @@ describe Quizzes::Quiz do
     it "omits top level questions when selecting from a question bank" do
       questions = @bank.assessment_questions
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
-      linked_question = @quiz.quiz_questions.build(:question_data => questions[0].question_data)
+      linked_question = @quiz.quiz_questions.build(question_data: questions[0].question_data)
       linked_question.assessment_question_id = questions[0].id
       linked_question.save!
       @group.update_attribute(:pick_count, 1)
@@ -1059,9 +1059,9 @@ describe Quizzes::Quiz do
   end
 
   it "ignores lockdown-browser setting if that plugin is not enabled" do
-    q = @course.quizzes.build(:title => "some quiz")
-    q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false, :require_lockdown_browser_monitor => false)
-    q2 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => true, :require_lockdown_browser_monitor => true)
+    q = @course.quizzes.build(title: "some quiz")
+    q1 = @course.quizzes.build(title: "some quiz", require_lockdown_browser: true, require_lockdown_browser_for_results: false, require_lockdown_browser_monitor: false)
+    q2 = @course.quizzes.build(title: "some quiz", require_lockdown_browser: true, require_lockdown_browser_for_results: true, require_lockdown_browser_monitor: true)
 
     # first, disable any lockdown browsers that might be configured already
     Canvas::Plugin.all_for_tag(:lockdown_browser).each { |p| p.settings[:enabled] = false }
@@ -1073,7 +1073,7 @@ describe Quizzes::Quiz do
 
     # register a plugin
     Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
-                              :settings => { :enabled => false }
+                              settings: { enabled: false }
                             })
 
     # nothing should change yet
@@ -1083,7 +1083,7 @@ describe Quizzes::Quiz do
 
     # now actually enable the plugin
     setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
-    setting.settings = { :enabled => true }
+    setting.settings = { enabled: true }
     setting.save!
 
     # now the restrictions should take effect
@@ -1125,7 +1125,7 @@ describe Quizzes::Quiz do
 
   describe "shuffle_answers_for_user?" do
     before do
-      @quiz = Quizzes::Quiz.create!(:context => @course, :shuffle_answers => true)
+      @quiz = Quizzes::Quiz.create!(context: @course, shuffle_answers: true)
     end
 
     it "returns false for teachers" do
@@ -1173,11 +1173,11 @@ describe Quizzes::Quiz do
   describe '#has_student_submissions?' do
     before :once do
       course = Course.create!
-      @quiz = Quizzes::Quiz.create!(:context => course)
+      @quiz = Quizzes::Quiz.create!(context: course)
       @user = User.create!
-      @enrollment = @user.student_enrollments.create!(:course => course)
+      @enrollment = @user.student_enrollments.create!(course: course)
       @enrollment.update_attribute(:workflow_state, 'active')
-      @submission = Quizzes::QuizSubmission.create!(:quiz => @quiz, :user => @user)
+      @submission = Quizzes::QuizSubmission.create!(quiz: @quiz, user: @user)
       @submission.update_attribute(:workflow_state, 'untaken')
     end
 
@@ -1198,35 +1198,35 @@ describe Quizzes::Quiz do
     end
 
     it 'is true if only one submission of many matches the conditions' do
-      Quizzes::QuizSubmission.create!(:quiz => @quiz, :user => User.create!)
+      Quizzes::QuizSubmission.create!(quiz: @quiz, user: User.create!)
       expect(@quiz.has_student_submissions?).to be_truthy
     end
   end
 
   describe "#group_category_id" do
     it "returns the assignment's group category id if it has an assignment" do
-      quiz = Quizzes::Quiz.new(:title => "Assignment Group Category Quizzes::Quiz")
-      expect(quiz).to receive(:assignment).and_return double(:group_category_id => 1)
+      quiz = Quizzes::Quiz.new(title: "Assignment Group Category Quizzes::Quiz")
+      expect(quiz).to receive(:assignment).and_return double(group_category_id: 1)
       expect(quiz.group_category_id).to eq 1
     end
 
     it "returns nil if it doesn't have an assignment" do
-      quiz = Quizzes::Quiz.new(:title => "Quizzes::Quiz w/o assignment")
+      quiz = Quizzes::Quiz.new(title: "Quizzes::Quiz w/o assignment")
       expect(quiz.group_category_id).to be_nil
     end
   end
 
   describe "linking overrides with assignments" do
     let_once(:course) { course_model }
-    let_once(:quiz) { quiz_model(:course => course, :due_at => 5.days.from_now).reload }
+    let_once(:quiz) { quiz_model(course: course, due_at: 5.days.from_now).reload }
     let_once(:override) do
-      override = assignment_override_model(:quiz => quiz)
+      override = assignment_override_model(quiz: quiz)
       override.override_due_at(7.days.from_now)
       override.save!
       override
     end
     let_once(:override_student) do
-      student_in_course(:course => course)
+      student_in_course(course: course)
       override_student = override.assignment_override_students.build
       override_student.user = @student
       override_student.save!
@@ -1321,7 +1321,7 @@ describe Quizzes::Quiz do
   context "custom validations" do
     context "changinging quiz points" do
       it "does not allow quiz points higher than allowable by postgres" do
-        q = Quizzes::Quiz.new(:points_possible => 2_000_000_001)
+        q = Quizzes::Quiz.new(points_possible: 2_000_000_001)
         expect(q.valid?).to eq false
         expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
@@ -1329,16 +1329,16 @@ describe Quizzes::Quiz do
 
     context "quiz_type" do
       it "does not save an invalid quiz_type" do
-        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz = @course.quizzes.create! title: "test quiz"
         quiz.quiz_type = "totally_invalid_quiz_type"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_quiz_type"]).to be_present
       end
 
       it "does not validate quiz_type if not changed" do
-        quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
+        quiz = @course.quizzes.build title: "test quiz", quiz_type: 'invalid'
         quiz.workflow_state = 'created'
-        expect(quiz.save(:validate => false)).to be_truthy  # save without validation
+        expect(quiz.save(validate: false)).to be_truthy  # save without validation
         quiz.reload
         expect(quiz.save).to be_truthy
         expect(quiz.errors).to be_blank
@@ -1348,16 +1348,16 @@ describe Quizzes::Quiz do
 
     context "ip_filter" do
       it "does not save an invalid ip_filter" do
-        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz = @course.quizzes.create! title: "test quiz"
         quiz.ip_filter = "999.999.1942.489"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_ip_filter"]).to be_present
       end
 
       it "does not validate ip_filter if not changed" do
-        quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
+        quiz = @course.quizzes.build title: "test quiz", ip_filter: '123.fourfivesix'
         quiz.workflow_state = 'created'
-        expect(quiz.save(:validate => false)).to be_truthy  # save without validation
+        expect(quiz.save(validate: false)).to be_truthy  # save without validation
         quiz.reload
         expect(quiz.save).to be_truthy
         expect(quiz.errors).to be_blank
@@ -1389,16 +1389,16 @@ describe Quizzes::Quiz do
 
     context "hide_results" do
       it "does not save an invalid hide_results" do
-        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz = @course.quizzes.create! title: "test quiz"
         quiz.hide_results = "totally_invalid_value"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_hide_results"]).to be_present
       end
 
       it "does not validate hide_results if not changed" do
-        quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+        quiz = @course.quizzes.build title: "test quiz", hide_results: 'invalid'
         quiz.workflow_state = 'created'
-        expect(quiz.save(:validate => false)).to be_truthy  # save without validation
+        expect(quiz.save(validate: false)).to be_truthy  # save without validation
         quiz.reload
         expect(quiz.save).to be_truthy
         expect(quiz.errors).to be_blank
@@ -1409,7 +1409,7 @@ describe Quizzes::Quiz do
 
   describe "#question_types" do
     before :once do
-      @quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+      @quiz = @course.quizzes.build title: "test quiz", hide_results: 'invalid'
     end
 
     it "returns an empty array when no quiz data" do
@@ -1591,13 +1591,13 @@ describe Quizzes::Quiz do
       Timecop.freeze(first_regrade_time) do
         # regrade once
         regrade1 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
-        regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+        regrade1.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'current_correct_only')
       end
 
       # regrade twice
       regrade2 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number - 1, user: @teacher)
-      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
-      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      regrade2.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'current_correct_only')
+      regrade2.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'current_correct_only')
 
       # find all
       count = @quiz.questions_regraded_since(first_regrade_time - 10.minutes)
@@ -1613,13 +1613,13 @@ describe Quizzes::Quiz do
       Timecop.freeze(first_regrade_time) do
         # regrade once
         regrade1 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
-        regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+        regrade1.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'current_correct_only')
       end
 
       # regrade twice
       regrade2 = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number - 1, user: @teacher)
-      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'disabled')
-      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      regrade2.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'disabled')
+      regrade2.quiz_question_regrades.create(quiz_question_id: @quiz.quiz_questions.create.id, regrade_option: 'current_correct_only')
 
       # find all
       count = @quiz.questions_regraded_since(first_regrade_time - 10.minutes)
@@ -1634,9 +1634,9 @@ describe Quizzes::Quiz do
   describe "#destroy" do
     it "logicals delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      allow(quiz).to receive_messages(:has_student_submissions? => true)
+      allow(quiz).to receive_messages(has_student_submissions?: true)
       quiz.publish!
-      allow(quiz.assignment).to receive_messages(:has_student_submissions? => true)
+      allow(quiz.assignment).to receive_messages(has_student_submissions?: true)
 
       quiz.destroy
       expect(quiz.deleted?).to be_truthy
@@ -1932,8 +1932,8 @@ describe Quizzes::Quiz do
 
     it "lets admins read quizzes that are unpublished even without management rights" do
       @quiz.unpublish!.reload
-      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_assignments", :enabled => false)
-      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_grades", :enabled => false)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "manage_assignments", enabled: false)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "manage_grades", enabled: false)
       expect(@quiz.grants_right?(@teacher, :read)).to eq true
     end
 
@@ -1955,7 +1955,7 @@ describe Quizzes::Quiz do
     before(:once) do
       quiz_model(course: @course)
       @admin = account_admin_user
-      teacher_in_course(:course => @course)
+      teacher_in_course(course: @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
       @course.enrollment_term.save!
@@ -2335,7 +2335,7 @@ describe Quizzes::Quiz do
         @quiz.publish
         @quiz.save!
         @assignment = @quiz.assignment
-        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @course.enroll_student(@student2, enrollment_state: 'active')
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
@@ -2380,7 +2380,7 @@ describe Quizzes::Quiz do
       context 'observer' do
         before do
           @observer = User.create
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active', allow_multiple_enrollments: true)
         end
 
         context 'with students' do
@@ -2419,7 +2419,7 @@ describe Quizzes::Quiz do
 
   context "due_between_with_overrides" do
     before :once do
-      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      @quiz = @course.quizzes.create!(title: "some quiz", quiz_type: "survey", due_at: 1.day.ago)
 
       override = @quiz.assignment_overrides.build
       override.due_at = 1.day.from_now
@@ -2555,11 +2555,11 @@ describe Quizzes::Quiz do
       @quiz1 = @course.quizzes.create!
       @quiz2 = @course.quizzes.create!
       @quiz3 = @course.quizzes.create!
-      student_in_course :active_all => true
-      sub2 = @quiz2.quiz_submissions.build(:user => @student)
+      student_in_course active_all: true
+      sub2 = @quiz2.quiz_submissions.build(user: @student)
       sub2.workflow_state = 'preview'
       sub2.save!
-      sub3 = @quiz3.quiz_submissions.build(:user => @student)
+      sub3 = @quiz3.quiz_submissions.build(user: @student)
       sub3.workflow_state = 'complete'
       sub3.save!
     end

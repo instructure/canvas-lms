@@ -32,15 +32,15 @@ describe "course syllabus" do
   def add_assignment(title, points)
     # assignment data
     assignment = assignment_model({
-                                    :course => @course,
-                                    :title => title,
-                                    :due_at => nil,
-                                    :points_possible => points,
-                                    :submission_types => 'online_text_entry',
-                                    :assignment_group => @group
+                                    course: @course,
+                                    title: title,
+                                    due_at: nil,
+                                    points_possible: points,
+                                    submission_types: 'online_text_entry',
+                                    assignment_group: @group
                                   })
     rubric_model
-    @association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
+    @association = @rubric.associate_with(assignment, @course, purpose: 'grading')
     assignment.reload
   end
 
@@ -48,7 +48,7 @@ describe "course syllabus" do
     before do
       stub_rcs_config
       course_with_teacher_logged_in
-      @group = @course.assignment_groups.create!(:name => 'first assignment group')
+      @group = @course.assignment_groups.create!(name: 'first assignment group')
       @assignment_1 = add_assignment('first assignment title', 50)
       @assignment_2 = add_assignment('second assignment title', 100)
 

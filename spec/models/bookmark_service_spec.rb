@@ -46,15 +46,15 @@ describe BookmarkService do
       ).and_return(true)
 
       @bookmark_service.post_bookmark(
-        :title => 'some title',
-        :url => 'google.com',
-        :comments => 'some comments',
-        :tags => %w[some tags]
+        title: 'some title',
+        url: 'google.com',
+        comments: 'some comments',
+        tags: %w[some tags]
       )
     end
 
     it "is able to post a bookmark for delicious" do
-      bookmark_service_model(:service => 'delicious')
+      bookmark_service_model(service: 'delicious')
 
       expect(@bookmark_service.service).to eql('delicious')
 
@@ -67,10 +67,10 @@ describe BookmarkService do
       ).and_return(true)
 
       @bookmark_service.post_bookmark(
-        :title => 'some title',
-        :url => 'google.com',
-        :comments => 'some comments',
-        :tags => %w[some tags]
+        title: 'some title',
+        url: 'google.com',
+        comments: 'some comments',
+        tags: %w[some tags]
       )
     end
 
@@ -79,10 +79,10 @@ describe BookmarkService do
 
       expect do
         @bookmark_service.post_bookmark(
-          :title => 'some title',
-          :url => 'google.com',
-          :comments => 'some comments',
-          :tags => %w[some tags]
+          title: 'some title',
+          url: 'google.com',
+          comments: 'some comments',
+          tags: %w[some tags]
         )
       end.not_to raise_error
     end

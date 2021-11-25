@@ -74,9 +74,9 @@ describe "calendar2" do
         # lock to a particular day (the 13th because why not)
         # otherwise it turns out this spec will break on almost every 31st
         date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
-        assignment_model(:course => @course,
-                         :title => "ricochet",
-                         :due_at => date.to_time)
+        assignment_model(course: @course,
+                         title: "ricochet",
+                         due_at: date.to_time)
         get "/calendar2"
         wait_for_ajax_requests
 
@@ -93,7 +93,7 @@ describe "calendar2" do
 
       describe "contexts list" do
         it "toggles event display when context is clicked" do
-          make_event :context => @course, :start => Time.now
+          make_event context: @course, start: Time.now
           get "/calendar2"
 
           f('.context_list_context .context-list-toggle-box').click
@@ -136,7 +136,7 @@ describe "calendar2" do
 
         it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
-          make_event :context => @course, :start => Time.now, :title => title
+          make_event context: @course, start: Time.now, title: title
           load_month_view
 
           # expect event to be on the calendar
@@ -154,7 +154,7 @@ describe "calendar2" do
 
       describe "undated calendar items" do
         it "shows undated events after clicking link", priority: "1" do
-          e = make_event :start => nil, :title => "pizza party"
+          e = make_event start: nil, title: "pizza party"
           get "/calendar2"
 
           f("#undated-events-button").click
@@ -165,7 +165,7 @@ describe "calendar2" do
         end
 
         it "truncates very long undated event titles" do
-          make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
+          make_event start: nil, title: "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
           get "/calendar2"
 
           f("#undated-events-button").click

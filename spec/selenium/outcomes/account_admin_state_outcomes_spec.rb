@@ -31,8 +31,8 @@ describe "account admin outcomes" do
     before do
       course_with_admin_logged_in
       @root_account = Account.site_admin
-      account_admin_user(:account => @root_account, :active_all => true)
-      @cm = ContentMigration.create(:context => @root_account)
+      account_admin_user(account: @root_account, active_all: true)
+      @cm = ContentMigration.create(context: @root_account)
       @plugin = Canvas::Plugin.find('academic_benchmark_importer')
       @cm.converter_class = @plugin.settings['converter_class']
       @cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
@@ -43,7 +43,7 @@ describe "account admin outcomes" do
 
       @level_0_browse = File.join(File.dirname(__FILE__) + "/../../../gems/plugins/academic_benchmark/spec_canvas/fixtures", 'api_all_standards_response.json')
       File.open(@level_0_browse, 'r') do |file|
-        @att = Attachment.create!(:filename => 'standards.json', :display_name => 'standards.json', :uploaded_data => file, :context => @cm)
+        @att = Attachment.create!(filename: 'standards.json', display_name: 'standards.json', uploaded_data: file, context: @cm)
       end
       @cm.attachment = @att
       @cm.save!
@@ -169,9 +169,9 @@ describe "account admin outcomes" do
       it "does not fail while filtering the common core group", priority: "2" do
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
-        root_group.child_outcome_groups.create!(:title => "Fake Common Core")
-        11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
-        root_group.child_outcome_groups.create!(:title => "Z is last")
+        root_group.child_outcome_groups.create!(title: "Fake Common Core")
+        11.times { root_group.child_outcome_groups.create!(title: "G is after F") }
+        root_group.child_outcome_groups.create!(title: "Z is last")
 
         # go to the find panel
         get outcome_url

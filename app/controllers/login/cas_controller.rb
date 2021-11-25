@@ -84,7 +84,7 @@ class Login::CasController < ApplicationController
       else
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
         logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
-        flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => st.user
+        flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: st.user
         redirect_to unknown_user_url
       end
     else

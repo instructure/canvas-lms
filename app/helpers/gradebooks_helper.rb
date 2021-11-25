@@ -41,33 +41,33 @@ module GradebooksHelper
     case submission_type
     when 'online_url'
       {
-        :icon_class => 'icon-link',
-        :screenreader_text => I18n.t('icons.online_url_submission', 'Online Url Submission')
+        icon_class: 'icon-link',
+        screenreader_text: I18n.t('icons.online_url_submission', 'Online Url Submission')
       }
     when 'online_text_entry'
       {
-        :icon_class => 'icon-text',
-        :screenreader_text => I18n.t('icons.text_entry_submission', 'Text Entry Submission')
+        icon_class: 'icon-text',
+        screenreader_text: I18n.t('icons.text_entry_submission', 'Text Entry Submission')
       }
     when 'online_upload'
       {
-        :icon_class => 'icon-document',
-        :screenreader_text => I18n.t('icons.file_upload_submission', 'File Upload Submission')
+        icon_class: 'icon-document',
+        screenreader_text: I18n.t('icons.file_upload_submission', 'File Upload Submission')
       }
     when 'discussion_topic'
       {
-        :icon_class => 'icon-discussion',
-        :screenreader_text => I18n.t('icons.discussion_submission', 'Discussion Submission')
+        icon_class: 'icon-discussion',
+        screenreader_text: I18n.t('icons.discussion_submission', 'Discussion Submission')
       }
     when 'online_quiz'
       {
-        :icon_class => 'icon-quiz',
-        :screenreader_text => I18n.t('icons.quiz_submission', 'Quiz Submission')
+        icon_class: 'icon-quiz',
+        screenreader_text: I18n.t('icons.quiz_submission', 'Quiz Submission')
       }
     when 'media_recording'
       {
-        :icon_class => 'icon-filmstrip',
-        :screenreader_text => I18n.t('icons.media_submission', 'Media Submission')
+        icon_class: 'icon-filmstrip',
+        screenreader_text: I18n.t('icons.media_submission', 'Media Submission')
       }
     when 'student_annotation'
       {

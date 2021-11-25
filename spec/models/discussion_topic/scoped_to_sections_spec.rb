@@ -51,7 +51,7 @@ describe DiscussionTopic::ScopedToSections do
 
   describe '#scope' do
     let_once(:announcement) do
-      context.announcements.create!(:user => @teacher, message: 'hello')
+      context.announcements.create!(user: @teacher, message: 'hello')
     end
     let_once(:scope) { context.active_announcements }
 

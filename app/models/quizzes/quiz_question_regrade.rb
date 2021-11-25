@@ -20,7 +20,7 @@
 class Quizzes::QuizQuestionRegrade < ActiveRecord::Base
   self.table_name = 'quiz_question_regrades'
 
-  belongs_to :quiz_question, :class_name => 'Quizzes::QuizQuestion'
+  belongs_to :quiz_question, class_name: 'Quizzes::QuizQuestion'
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
 
   validates :quiz_question_id, presence: true

@@ -431,9 +431,9 @@ module Lti
         let(:url) { 'https://www.mytool.com/config/json' }
         let(:stubbed_response) do
           double(
-            body: settings.to_json,
+            :body => settings.to_json,
             '[]' => 'application/json;',
-            is_a?: true
+            :is_a? => true
           )
         end
 

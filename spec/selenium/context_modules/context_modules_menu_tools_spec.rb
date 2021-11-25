@@ -29,12 +29,12 @@ describe "context modules" do
     before do
       course_with_teacher_logged_in
 
-      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.module_index_menu = { :url => "http://www.example.com", :text => "Import Stuff" }
-      @tool.module_group_menu = { :url => "http://www.example.com", :text => "Import Stuff Here" }
+      @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @tool.module_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
+      @tool.module_group_menu = { url: "http://www.example.com", text: "Import Stuff Here" }
       @tool.save!
-      @module1 = @course.context_modules.create!(:name => "module1")
-      @module2 = @course.context_modules.create!(:name => "module2")
+      @module1 = @course.context_modules.create!(name: "module1")
+      @module2 = @course.context_modules.create!(name: "module2")
 
       Account.default.enable_feature!(:commons_favorites)
     end
@@ -88,24 +88,24 @@ describe "context modules" do
     before do
       course_with_teacher_logged_in
 
-      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.assignment_menu = { :url => "http://www.example.com", :text => "Export Assignment" }
-      @tool.module_menu = { :url => "http://www.example.com", :text => "Export Module" }
-      @tool.quiz_menu = { :url => "http://www.example.com", :text => "Export Quiz" }
-      @tool.wiki_page_menu = { :url => "http://www.example.com", :text => "Export Wiki Page" }
+      @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @tool.assignment_menu = { url: "http://www.example.com", text: "Export Assignment" }
+      @tool.module_menu = { url: "http://www.example.com", text: "Export Module" }
+      @tool.quiz_menu = { url: "http://www.example.com", text: "Export Quiz" }
+      @tool.wiki_page_menu = { url: "http://www.example.com", text: "Export Wiki Page" }
       @tool.save!
 
-      @module1 = @course.context_modules.create!(:name => "module1")
-      @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
-      @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
-      @quiz = @course.quizzes.create!(:title => "score 10")
+      @module1 = @course.context_modules.create!(name: "module1")
+      @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 20)
+      @assignment_tag = @module1.add_item(id: @assignment.id, type: 'assignment')
+      @quiz = @course.quizzes.create!(title: "score 10")
       @quiz.publish!
-      @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
-      @wiki_page = @course.wiki_pages.create!(:title => 'title', :body => '')
+      @quiz_tag = @module1.add_item(id: @quiz.id, type: 'quiz')
+      @wiki_page = @course.wiki_pages.create!(title: 'title', body: '')
       @wiki_page.workflow_state = 'active'
       @wiki_page.save!
-      @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
-      @subheader_tag = @module1.add_item(:type => 'context_module_sub_header', :title => 'subheader')
+      @wiki_page_tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
+      @subheader_tag = @module1.add_item(type: 'context_module_sub_header', title: 'subheader')
     end
 
     def should_have_menu_tool_link_in_gear
@@ -114,7 +114,7 @@ describe "context modules" do
       link = f("#context_module_#{@module1.id} .header li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:module_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', :modules => [@module1.id])
+      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', modules: [@module1.id])
     end
 
     it "shows tool launch links in the gear for modules" do
@@ -133,9 +133,9 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
 
       type_to_tag = {
-        :assignment_menu => @assignment_tag,
-        :quiz_menu => @quiz_tag,
-        :wiki_page_menu => @wiki_page_tag
+        assignment_menu: @assignment_tag,
+        quiz_menu: @quiz_tag,
+        wiki_page_menu: @wiki_page_tag
       }
       type_to_tag.each do |type, tag|
         gear = f("#context_module_item_#{tag.id} .al-trigger")
@@ -150,7 +150,7 @@ describe "context modules" do
         link = f("#context_module_item_#{tag.id} li.#{type} a.menu_tool_link")
         expect(link).to be_displayed
         expect(link.text).to match_ignoring_whitespace(@tool.label_for(type))
-        expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: type, :module_items => [tag.id])
+        expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: type, module_items: [tag.id])
         # need to close gear menu
         gear.click
       end
@@ -178,7 +178,7 @@ describe "context modules" do
       link = f("#context_module_#{new_module.id} .header li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:module_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', :modules => [new_module.id])
+      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', modules: [new_module.id])
     end
 
     it "adds links to newly created module items" do
@@ -209,7 +209,7 @@ describe "context modules" do
       link = f("#context_module_item_#{new_tag.id} li.wiki_page_menu a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'wiki_page_menu', :module_items => [new_tag.id])
+      expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'wiki_page_menu', module_items: [new_tag.id])
     end
 
     it "does not show add links to newly created module items if not exportable" do

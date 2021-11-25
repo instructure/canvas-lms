@@ -21,7 +21,7 @@ require 'nokogiri'
 
 describe Quizzes::QuizzesController do
   def create_section_override(section, due_at)
-    override = assignment_override_model(:quiz => @quiz)
+    override = assignment_override_model(quiz: @quiz)
     override.set = section
     override.override_due_at(due_at)
     override.save!
@@ -29,9 +29,9 @@ describe Quizzes::QuizzesController do
 
   context "#show" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
-      assignment_model(:course => @course)
-      quiz_model(:course => @course, :assignment_id => @assignment.id)
+      course_with_teacher_logged_in(active_all: true)
+      assignment_model(course: @course)
+      quiz_model(course: @course, assignment_id: @assignment.id)
       @quiz.update_attribute :due_at, 5.days.from_now
       @cs1 = @course.default_section
       @cs2 = @course.course_sections.create!
@@ -124,7 +124,7 @@ describe Quizzes::QuizzesController do
 
   context "show_student" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       course_quiz true
       post "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@student.id}"
 
@@ -153,15 +153,15 @@ describe Quizzes::QuizzesController do
   context "#history" do
     context "pending_review" do
       def mkquiz
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                     { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
-        course_with_teacher_logged_in(:active_all => true, :course => @course)
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                     { question_data: { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
+        course_with_teacher_logged_in(active_all: true, course: @course)
       end
 
       def mksurvey
-        survey_with_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
-        course_with_teacher_logged_in(:active_all => true, :course => @course)
+        survey_with_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                { question_data: { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }])
+        course_with_teacher_logged_in(active_all: true, course: @course)
       end
 
       it "lists the questions needing review" do
@@ -205,7 +205,7 @@ describe Quizzes::QuizzesController do
         crazy_unlikely_to_be_matched_name = "1p3h5Yns[y>s^*:]zi^1|h,M"
         @student.name = crazy_unlikely_to_be_matched_name
         @student.sortable_name = crazy_unlikely_to_be_matched_name
-        pseudonym @student, :username => '1p3h5Ynsyszi1hM@1p3h5Ynsyszi1hM.com'
+        pseudonym @student, username: '1p3h5Ynsyszi1hM@1p3h5Ynsyszi1hM.com'
         @student.save!
         @student.reload
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"

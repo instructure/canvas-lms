@@ -28,10 +28,10 @@ class Collaboration < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :user
-  has_many :collaborators, :dependent => :destroy
-  has_many :users, :through => :collaborators
+  has_many :collaborators, dependent: :destroy
+  has_many :users, through: :collaborators
 
-  before_destroy { |record| Collaborator.where(:collaboration_id => record).destroy_all }
+  before_destroy { |record| Collaborator.where(collaboration_id: record).destroy_all }
 
   before_save :assign_uuid
   before_save :set_context_code
@@ -42,8 +42,8 @@ class Collaboration < ActiveRecord::Base
 
   TITLE_MAX_LENGTH = 255
   validates :title, :workflow_state, :context_id, :context_type, presence: true
-  validates :title, length: { :maximum => TITLE_MAX_LENGTH }
-  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { maximum: TITLE_MAX_LENGTH }
+  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
 
   serialize :data
 
@@ -89,7 +89,7 @@ class Collaboration < ActiveRecord::Base
 
   scope :after, ->(date) { where("collaborations.updated_at>?", date) }
 
-  scope :for_context_codes, ->(context_codes) { where(:context_code => context_codes) }
+  scope :for_context_codes, ->(context_codes) { where(context_code: context_codes) }
   scope :for_context, ->(context) { where(context_type: context.class.reflection_type_name, context_id: context) }
 
   # These methods should be implemented in child classes.
@@ -214,10 +214,10 @@ class Collaboration < ActiveRecord::Base
   def include_author_as_collaborator
     return unless user.present?
 
-    author = collaborators.where(:user_id => user_id).first
+    author = collaborators.where(user_id: user_id).first
 
     unless author
-      collaborator = Collaborator.new(:collaboration => self)
+      collaborator = Collaborator.new(collaboration: self)
       collaborator.user_id = user_id
       collaborator.authorized_service_user_id = authorized_service_user_id_for(user)
       collaborator.save
@@ -372,8 +372,8 @@ class Collaboration < ActiveRecord::Base
     return unless context.respond_to?(:groups)
 
     unless group_ids.empty?
-      existing_groups = collaborators.where(:group_id => group_ids).select(:group_id)
-      context.groups.where(:id => group_ids).where.not(:id => existing_groups).each do |g|
+      existing_groups = collaborators.where(group_id: group_ids).select(:group_id)
+      context.groups.where(id: group_ids).where.not(id: existing_groups).each do |g|
         collaborator = collaborators.build
         collaborator.group_id = g
         collaborator.save
@@ -389,9 +389,9 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def add_users_to_collaborators(users)
     unless users.empty?
-      existing_users = collaborators.where(:user_id => users).select(:user_id)
-      context.potential_collaborators.where(:id => users).where.not(:id => existing_users).each do |u|
-        collaborators.create(:user => u, :authorized_service_user_id => authorized_service_user_id_for(u))
+      existing_users = collaborators.where(user_id: users).select(:user_id)
+      context.potential_collaborators.where(id: users).where.not(id: existing_users).each do |u|
+        collaborators.create(user: u, authorized_service_user_id: authorized_service_user_id_for(u))
       end
     end
   end

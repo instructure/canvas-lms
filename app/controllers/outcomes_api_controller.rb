@@ -176,7 +176,7 @@ class OutcomesApiController < ApplicationController
   #
   def show
     if authorized_action(@outcome, @current_user, :read)
-      render :json => outcome_json(@outcome, @current_user, session)
+      render json: outcome_json(@outcome, @current_user, session)
     end
   end
 
@@ -285,9 +285,9 @@ class OutcomesApiController < ApplicationController
 
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
     if @outcome.update(params.permit(*DIRECT_PARAMS))
-      render :json => outcome_json(@outcome, @current_user, session)
+      render json: outcome_json(@outcome, @current_user, session)
     else
-      render :json => @outcome.errors, :status => :bad_request
+      render json: @outcome.errors, status: :bad_request
     end
   end
 
@@ -356,7 +356,7 @@ class OutcomesApiController < ApplicationController
       end.flatten
       alignments.concat(quiz_alignments, magic_marker_alignments)
 
-      render :json => alignments
+      render json: alignments
     else
       render json: { message: "student_id is required" }, status: :bad_request
     end

@@ -24,7 +24,7 @@ describe CourseLinkValidator do
 
     course_factory
     attachment_model
-    @ua = assignment_model(:workflow_state => 'unpublished', :name => 'Unpublished assignment eh')
+    @ua = assignment_model(workflow_state: 'unpublished', name: 'Unpublished assignment eh')
 
     bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
     bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
@@ -41,19 +41,19 @@ describe CourseLinkValidator do
     @course.syllabus_body = html
     @course.save!
 
-    bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
-                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    bank = @course.assessment_question_banks.create!(title: 'bank')
+    aq = bank.assessment_questions.create!(question_data: { 'name' => 'test question',
+                                                            'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
-    assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
-    event = @course.calendar_events.create!(:title => "event", :description => html)
-    topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
-    mod = @course.context_modules.create!(:name => "some module")
-    mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
-    page = @course.wiki_pages.create!(:title => "wiki", :body => html)
-    quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
+    assmnt = @course.assignments.create!(title: 'assignment', description: html)
+    event = @course.calendar_events.create!(title: "event", description: html)
+    topic = @course.discussion_topics.create!(title: "discussion title", message: html)
+    mod = @course.context_modules.create!(name: "some module")
+    mod.add_item(type: 'external_url', url: bad_url, title: 'pls view')
+    page = @course.wiki_pages.create!(title: "wiki", body: html)
+    quiz = @course.quizzes.create!(title: 'quiz1', description: html)
 
-    qq = quiz.quiz_questions.create!(:question_data => aq.question_data)
+    qq = quiz.quiz_questions.create!(question_data: aq.question_data)
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -63,29 +63,29 @@ describe CourseLinkValidator do
       case issue[:type]
       when :course_card_image
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/settings"
-        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :image => true })
+        expect(issue[:invalid_links]).to include({ reason: :unreachable, url: bad_url, image: true })
       when :module
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/modules#module_#{mod.id}"
-        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :link_text => 'pls view', :url => bad_url })
+        expect(issue[:invalid_links]).to include({ reason: :unreachable, link_text: 'pls view', url: bad_url })
       else
-        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link' })
-        expect(issue[:invalid_links]).to include({ :reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing" })
-        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_url2, :image => true })
-        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_media_object_url })
+        expect(issue[:invalid_links]).to include({ reason: :unreachable, url: bad_url, link_text: 'Bad absolute link' })
+        expect(issue[:invalid_links]).to include({ reason: :unpublished_item, url: "/courses/#{@course.id}/assignments/#{@ua.id}", link_text: "Unpublished thing" })
+        expect(issue[:invalid_links]).to include({ reason: :missing_item, url: bad_url2, image: true })
+        expect(issue[:invalid_links]).to include({ reason: :missing_item, url: bad_media_object_url })
       end
     end
 
     type_names = {
-      :syllabus => 'Course Syllabus',
-      :course_card_image => 'Course Card Image',
-      :assessment_question => aq.question_data[:question_name],
-      :quiz_question => qq.question_data[:question_name],
-      :assignment => assmnt.title,
-      :calendar_event => event.title,
-      :discussion_topic => topic.title,
-      :module => mod.name,
-      :quiz => quiz.title,
-      :wiki_page => page.title
+      syllabus: 'Course Syllabus',
+      course_card_image: 'Course Card Image',
+      assessment_question: aq.question_data[:question_name],
+      quiz_question: qq.question_data[:question_name],
+      assignment: assmnt.title,
+      calendar_event: event.title,
+      discussion_topic: topic.title,
+      module: mod.name,
+      quiz: quiz.title,
+      wiki_page: page.title
     }
     type_names.each do |type, name|
       expect(issues.count { |issue| issue[:type] == type }).to eq(1)
@@ -98,9 +98,9 @@ describe CourseLinkValidator do
     html = %(<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>)
 
     course_factory
-    bank = @course.assessment_question_banks.create!(:title => 'bank')
-    bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
-                                                          'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    bank = @course.assessment_question_banks.create!(title: 'bank')
+    bank.assessment_questions.create!(question_data: { 'name' => 'test question',
+                                                       'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -122,9 +122,9 @@ describe CourseLinkValidator do
     html = %(<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>)
 
     course_factory
-    quiz = @course.quizzes.create!(:title => 'quiz1', :description => "desc")
-    qq = quiz.quiz_questions.create!(:question_data => { 'name' => 'test question',
-                                                         'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    quiz = @course.quizzes.create!(title: 'quiz1', description: "desc")
+    qq = quiz.quiz_questions.create!(question_data: { 'name' => 'test question',
+                                                      'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
     qq.destroy!
 
     CourseLinkValidator.queue_course(@course)
@@ -138,7 +138,7 @@ describe CourseLinkValidator do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(true)
 
     course_factory
-    @course.discussion_topics.create!(:message => %(<a href="http://www.www.www">pretend this is real</a>), :title => "title")
+    @course.discussion_topics.create!(message: %(<a href="http://www.www.www">pretend this is real</a>), title: "title")
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -168,10 +168,10 @@ describe CourseLinkValidator do
 
   it "checks for deleted/unpublished objects" do
     course_factory
-    active = @course.assignments.create!(:title => "blah")
-    unpublished = @course.assignments.create!(:title => "blah")
+    active = @course.assignments.create!(title: "blah")
+    unpublished = @course.assignments.create!(title: "blah")
     unpublished.unpublish!
-    deleted = @course.assignments.create!(:title => "blah")
+    deleted = @course.assignments.create!(title: "blah")
     deleted.destroy
 
     active_link = "/courses/#{@course.id}/assignments/#{active.id}"
@@ -216,7 +216,7 @@ describe CourseLinkValidator do
 
   it "works with absolute links to local objects" do
     course_factory
-    deleted = @course.assignments.create!(:title => "blah")
+    deleted = @course.assignments.create!(title: "blah")
     deleted.destroy
 
     deleted_link = "http://#{HostUrl.default_host}/courses/#{@course.id}/assignments/#{deleted.id}"
@@ -253,10 +253,10 @@ describe CourseLinkValidator do
 
   it "finds links to wiki pages" do
     course_factory
-    active = @course.wiki_pages.create!(:title => "active and stuff")
-    unpublished = @course.wiki_pages.create!(:title => "unpub")
+    active = @course.wiki_pages.create!(title: "active and stuff")
+    unpublished = @course.wiki_pages.create!(title: "unpub")
     unpublished.unpublish!
-    deleted = @course.wiki_pages.create!(:title => "baleeted")
+    deleted = @course.wiki_pages.create!(title: "baleeted")
     deleted.destroy
 
     active_link = "/courses/#{@course.id}/pages/#{active.url}"
@@ -282,9 +282,9 @@ describe CourseLinkValidator do
 
   it "ignores links to replaced wiki pages" do
     course_factory
-    deleted = @course.wiki_pages.create!(:title => "baleeted")
+    deleted = @course.wiki_pages.create!(title: "baleeted")
     deleted.destroy
-    not_really_deleted = @course.wiki_pages.create!(:title => "baleeted")
+    not_really_deleted = @course.wiki_pages.create!(title: "baleeted")
     not_really_deleted_link = "/courses/#{@course.id}/pages/#{not_really_deleted.url}"
 
     message = <<~HTML
@@ -323,7 +323,7 @@ describe CourseLinkValidator do
 
   it "does not flag valid replaced attachments" do
     course_factory
-    att1 = attachment_with_context(@course, :display_name => "name")
+    att1 = attachment_with_context(@course, display_name: "name")
     att2 = attachment_with_context(@course)
 
     att2.display_name = "name"
@@ -379,7 +379,7 @@ describe CourseLinkValidator do
 
   it "does not flag wiki pages with url encoding" do
     course_factory
-    page = @course.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
+    page = @course.wiki_pages.create!(title: "semi;colon", body: 'sutff')
 
     @course.syllabus_body = %(<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>)
     @course.save!

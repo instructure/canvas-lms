@@ -163,7 +163,7 @@ class PlannerNotesController < ApplicationController
     notes = notes.after(start_at) if start_at
     notes = notes.before(end_at) if end_at
 
-    render :json => planner_notes_json(notes, @current_user, session)
+    render json: planner_notes_json(notes, @current_user, session)
   rescue InvalidDates => e
     render json: { errors: e.message.as_json }, status: :bad_request
   end

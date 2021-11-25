@@ -26,15 +26,15 @@ module Factories
     unless pseudonym
       pseudonym = double(
         'Pseudonym',
-        :record => user,
-        :user_id => user.id,
-        :user => user,
-        :login_count => 1,
-        :global_account_id => '10000000000001',
-        :sis_user_id => 'U001',
-        :shard => Shard.default,
-        :works_for_account? => true,
-        :suspended? => false
+        record: user,
+        user_id: user.id,
+        user: user,
+        login_count: 1,
+        global_account_id: '10000000000001',
+        sis_user_id: 'U001',
+        shard: Shard.default,
+        works_for_account?: true,
+        suspended?: false
       )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
@@ -45,7 +45,7 @@ module Factories
     end
 
     session = double('PseudonymSession',
-                     :record => pseudonym)
+                     record: pseudonym)
     allow(session).to receive(:[]).with(anything).and_return(nil)
 
     @session_stubbed = true

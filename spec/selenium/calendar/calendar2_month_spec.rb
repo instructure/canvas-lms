@@ -355,12 +355,12 @@ describe "calendar2" do
 
       it "shows section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
-        s2 = @course.course_sections.create!(:name => "other section!")
+        s2 = @course.course_sections.create!(name: "other section!")
         date = Date.today
-        e1 = @course.calendar_events.build :title => "ohai",
-                                           :child_event_data => [
-                                             { :start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string },
-                                             { :start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string },
+        e1 = @course.calendar_events.build title: "ohai",
+                                           child_event_data: [
+                                             { start_at: "#{date} 12:00:00", end_at: "#{date} 13:00:00", context_code: @course.default_section.asset_string },
+                                             { start_at: "#{date} 13:00:00", end_at: "#{date} 14:00:00", context_code: s2.asset_string },
                                            ]
         e1.updating_user = @user
         e1.save!
@@ -399,7 +399,7 @@ describe "calendar2" do
       it "shows the location when clicking on a calendar event" do
         location_name = "brighton"
         location_address = "cottonwood"
-        make_event(:location_name => location_name, :location_address => location_address)
+        make_event(location_name: location_name, location_address: location_address)
         load_month_view
 
         # Click calendar item to bring up event summary
@@ -453,7 +453,7 @@ describe "calendar2" do
       end
 
       it "returns back to the original calendar view after editing a section child event" do
-        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        calendar_event_model(start_at: "Sep 3 2008", title: "some event")
         child = @event.child_events.build
         child.context = @course.course_sections.create!
         child.start_at = Time.zone.now.utc

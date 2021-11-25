@@ -22,7 +22,7 @@ require_relative 'api_spec_helper'
 
 describe "API Error Handling", type: :request do
   before :once do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
     enable_default_developer_key!
     @token = @user.access_tokens.create!
   end

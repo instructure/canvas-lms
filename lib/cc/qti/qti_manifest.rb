@@ -24,8 +24,8 @@ module CC
 
       attr_accessor :exporter
 
-      delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, :to => :exporter
-      delegate :referenced_files, :to => :@html_exporter
+      delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, to: :exporter
+      delegate :referenced_files, to: :@html_exporter
 
       def initialize(exporter)
         @exporter = exporter
@@ -33,9 +33,9 @@ module CC
         @document = nil
         @html_exporter = CCHelper::HtmlContentExporter.new(@exporter.course,
                                                            @exporter.user,
-                                                           :key_generator => @exporter,
-                                                           :track_referenced_files => true,
-                                                           :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
+                                                           key_generator: @exporter,
+                                                           track_referenced_files: true,
+                                                           media_object_flavor: Setting.get('exporter_media_object_flavor', nil).presence)
       end
 
       def export_dir
@@ -54,7 +54,7 @@ module CC
 
       def create_document
         @file = File.new(File.join(export_dir, MANIFEST), 'w')
-        @document = Builder::XmlMarkup.new(:target => @file, :indent => 2)
+        @document = Builder::XmlMarkup.new(target: @file, indent: 2)
         @document.instruct!
         # noinspection RubyArgCount
         @document.manifest("identifier" => create_key(course, "qti_export_"),
@@ -79,7 +79,7 @@ module CC
             end
             set_progress(60)
 
-            zipper = ContentZipper.new(:check_user => false)
+            zipper = ContentZipper.new(check_user: false)
             @html_exporter.referenced_files.each_key do |file_id|
               att = course.attachments.find_by(id: file_id)
               next unless att
@@ -88,11 +88,11 @@ module CC
               zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 
               resources.resource(
-                :identifier => create_key(att),
-                :type => WEBCONTENT,
-                :href => path
+                identifier: create_key(att),
+                type: WEBCONTENT,
+                href: path
               ) do |res|
-                res.file(:href => path)
+                res.file(href: path)
               end
             end
 
@@ -106,7 +106,7 @@ module CC
 
         # write any errors to the manifest file
         unless @exporter.errors.empty?
-          @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
+          @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", export_id: @exporter.export_id)
           @exporter.errors.each do |error|
             @document.comment! error.first
           end

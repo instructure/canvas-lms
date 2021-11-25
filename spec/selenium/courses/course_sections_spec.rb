@@ -23,7 +23,7 @@ describe "course sections" do
   include_context "in-process server selenium tests"
 
   def add_enrollment(enrollment_state, section)
-    enrollment = student_in_course(:workflow_state => enrollment_state, :course_section => section)
+    enrollment = student_in_course(workflow_state: enrollment_state, course_section: section)
     enrollment.accept! if enrollment_state == 'active' || enrollment_state == 'completed'
   end
 

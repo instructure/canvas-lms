@@ -52,10 +52,10 @@ module PermissionsHelper
       all_applicable_enrollments = []
       enrollment_scope = Enrollment.not_inactive_by_date.for_user(self).select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
       if unpublished.any?
-        all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished)
-                                                      .where(:type => %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]).to_a
+        all_applicable_enrollments += enrollment_scope.where(course_id: unpublished)
+                                                      .where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]).to_a
       end
-      all_applicable_enrollments += enrollment_scope.where(:course_id => published).to_a if published.any?
+      all_applicable_enrollments += enrollment_scope.where(course_id: published).to_a if published.any?
 
       grouped_enrollments = all_applicable_enrollments.group_by(&:course_id)
       sharded_courses.each do |course|
@@ -65,7 +65,7 @@ module PermissionsHelper
 
       root_account_ids = sharded_courses.map(&:root_account_id).uniq
       unloaded_ra_ids = root_account_ids - loaded_root_accounts.map(&:id)
-      root_accounts = loaded_root_accounts + (unloaded_ra_ids.any? ? Account.where(:id => unloaded_ra_ids).to_a : [])
+      root_accounts = loaded_root_accounts + (unloaded_ra_ids.any? ? Account.where(id: unloaded_ra_ids).to_a : [])
 
       roles = root_accounts.map { |ra| self.roles(ra) }.flatten.uniq
       return nil if roles.include?('consortium_admin') # cross-shard precalculation doesn't work - just fallback to the usual calculations

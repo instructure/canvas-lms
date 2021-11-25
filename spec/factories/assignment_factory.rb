@@ -77,15 +77,15 @@ module Factories
   end
 
   def new_quizzes_assignment(opts = {})
-    assignment_model({ :submission_types => "external_tool" }.merge(opts))
+    assignment_model({ submission_types: "external_tool" }.merge(opts))
     tool = @c.context_external_tools.create!(
-      :name => 'Quizzes.Next',
-      :consumer_key => 'test_key',
-      :shared_secret => 'test_secret',
-      :tool_id => 'Quizzes 2',
-      :url => 'http://example.com/launch'
+      name: 'Quizzes.Next',
+      consumer_key: 'test_key',
+      shared_secret: 'test_secret',
+      tool_id: 'Quizzes 2',
+      url: 'http://example.com/launch'
     )
-    @a.external_tool_tag_attributes = { :content => tool }
+    @a.external_tool_tag_attributes = { content: tool }
     @a.save!
     @a
   end

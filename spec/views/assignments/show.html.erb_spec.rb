@@ -27,8 +27,8 @@ describe "/assignments/show" do
   it "renders" do
     course_with_teacher(active_all: true)
     view_context(@course, @user)
-    g = @course.assignment_groups.create!(:name => "some group")
-    a = @course.assignments.create!(:title => "some assignment")
+    g = @course.assignment_groups.create!(name: "some group")
+    a = @course.assignments.create!(title: "some assignment")
     a.assignment_group_id = g.id
     a.save!
     assign(:assignment, a)
@@ -44,8 +44,8 @@ describe "/assignments/show" do
   it "renders webcam wrapper" do
     course_with_student(active_all: true)
     view_context(@course, @student)
-    g = @course.assignment_groups.create!(:name => "some group")
-    a = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+    g = @course.assignment_groups.create!(name: "some group")
+    a = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
     a.assignment_group_id = g.id
     a.save!
     assign(:assignment, a.overridden_for(@student))
@@ -111,7 +111,7 @@ describe "/assignments/show" do
       course_with_student(active_all: true)
       view_context(@course, @student)
 
-      a = @course.assignments.create!(:title => "some assignment", :submission_types => 'online_upload')
+      a = @course.assignments.create!(title: "some assignment", submission_types: 'online_upload')
       allow(a).to receive(:tool_settings_tool) { message_handler }
       assign(:assignment, a)
       assign(:current_user_rubrics, [])
@@ -135,7 +135,7 @@ describe "/assignments/show" do
       allow(view).to receive(:show_confetti).and_return(true)
       allow(view).to receive(:show_moderation_link).and_return(false)
       render 'assignments/show'
-      expect(response).to render_template :partial => "_confetti"
+      expect(response).to render_template partial: "_confetti"
     end
   end
 end

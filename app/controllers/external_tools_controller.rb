@@ -31,8 +31,8 @@ class ExternalToolsController < ApplicationController
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
   before_action :require_access_to_context, except: %i[index sessionless_launch all_visible_nav_tools]
   before_action :require_user, only: [:generate_sessionless_launch]
-  before_action :get_context, :only => %i[retrieve show resource_selection]
-  before_action :parse_context_codes, :only => [:all_visible_nav_tools]
+  before_action :get_context, only: %i[retrieve show resource_selection]
+  before_action :parse_context_codes, only: [:all_visible_nav_tools]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
   include Api::V1::ExternalTools
@@ -118,7 +118,7 @@ class ExternalToolsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @tools = if params[:include_parents]
-                 ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
+                 ContextExternalTool.all_tools_for(@context, user: (params[:include_personal] ? @current_user : nil))
                else
                  @context.context_external_tools.active
                end
@@ -132,15 +132,15 @@ class ExternalToolsController < ApplicationController
       end
       respond_to do |format|
         @tools = Api.paginate(@tools, self, tool_pagination_url)
-        format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
+        format.json { render json: external_tools_json(@tools, @context, @current_user, session) }
       end
     end
   end
 
   def homework_submissions
-    @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :has_homework_submission)
+    @tools = ContextExternalTool.all_tools_for(@context, user: @current_user, type: :has_homework_submission)
     respond_to do |format|
-      format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
+      format.json { render json: external_tools_json(@tools, @context, @current_user, session) }
     end
   end
 
@@ -263,7 +263,7 @@ class ExternalToolsController < ApplicationController
       )
     end
     unless launch_settings
-      render :plain => t(:cannot_locate_launch_request, 'Cannot locate launch request, please try again.'), :status => :not_found
+      render plain: t(:cannot_locate_launch_request, 'Cannot locate launch request, please try again.'), status: :not_found
       return
     end
 
@@ -377,7 +377,7 @@ class ExternalToolsController < ApplicationController
   def show
     if api_request?
       tool = @context.context_external_tools.active.find(params[:external_tool_id])
-      render :json => external_tool_json(tool, @context, @current_user, session)
+      render json: external_tool_json(tool, @context, @current_user, session)
     else
       placement = placement_from_params
       return unless find_tool(params[:id], placement)
@@ -389,9 +389,9 @@ class ExternalToolsController < ApplicationController
 
       success_url = tool_return_success_url(placement)
       cancel_url = tool_return_cancel_url(placement) || success_url
-      js_env(:redirect_return_success_url => success_url,
-             :redirect_return_cancel_url => cancel_url)
-      js_env(:course_id => @context.id) if @context.is_a?(Course)
+      js_env(redirect_return_success_url: success_url,
+             redirect_return_cancel_url: cancel_url)
+      js_env(course_id: @context.id) if @context.is_a?(Course)
 
       set_active_tab @tool.asset_string
       @show_embedded_chat = false if @tool.tool_id == 'chat'
@@ -401,7 +401,7 @@ class ExternalToolsController < ApplicationController
       return unless @lti_launch
 
       # Some LTI apps have tutorial trays. Provide some details to the client to know what tray, if any, to show
-      js_env(:LTI_LAUNCH_RESOURCE_URL => @lti_launch.resource_url)
+      js_env(LTI_LAUNCH_RESOURCE_URL: @lti_launch.resource_url)
       set_tutorial_js_env
 
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
@@ -509,7 +509,7 @@ class ExternalToolsController < ApplicationController
         flash[:error] = err
         redirect_to named_context_url(@context, :context_url)
       end
-      format.json { render :json => { error: err } }
+      format.json { render json: { error: err } }
     end
     nil
   end
@@ -998,12 +998,12 @@ class ExternalToolsController < ApplicationController
       @tool.prepare_for_ags_if_needed!
       invalidate_nav_tabs_cache(@tool)
       if api_request?
-        render :json => external_tool_json(@tool, @context, @current_user, session)
+        render json: external_tool_json(@tool, @context, @current_user, session)
       else
-        render :json => @tool.as_json(:methods => %i[readable_state custom_fields_string vendor_help_link], :include_root => false)
+        render json: @tool.as_json(methods: %i[readable_state custom_fields_string vendor_help_link], include_root: false)
       end
     else
-      render :json => @tool.errors, :status => :bad_request
+      render json: @tool.errors, status: :bad_request
       @tool.destroy if @tool.persisted?
     end
   end
@@ -1046,9 +1046,9 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
-          format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
+          format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
         else
-          format.json { render :json => @tool.errors, :status => :bad_request }
+          format.json { render json: @tool.errors, status: :bad_request }
         end
       end
     end
@@ -1077,12 +1077,12 @@ class ExternalToolsController < ApplicationController
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
           if api_request?
-            format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
+            format.json { render json: external_tool_json(@tool, @context, @current_user, session) }
           else
-            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+            format.json { render json: @tool.as_json(methods: [:readable_state, :custom_fields_string], include_root: false) }
           end
         else
-          format.json { render :json => @tool.errors, :status => :bad_request }
+          format.json { render json: @tool.errors, status: :bad_request }
         end
       end
     end
@@ -1143,7 +1143,7 @@ class ExternalToolsController < ApplicationController
       if favorite_ids.length > 2
         render json: { message: "Cannot have more than 2 favorited tools" }, status: :bad_request
       else
-        @context.settings[:rce_favorite_tool_ids] = { :value => favorite_ids }
+        @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }
         @context.save!
         render json: { rce_favorite_tool_ids: favorite_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) } }
       end
@@ -1162,7 +1162,7 @@ class ExternalToolsController < ApplicationController
     if authorized_action(@context, @current_user, :lti_add_edit)
       favorite_ids = @context.get_rce_favorite_tool_ids
       if favorite_ids.delete(Shard.global_id_for(params[:id]))
-        @context.settings[:rce_favorite_tool_ids] = { :value => favorite_ids }
+        @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }
         @context.save!
       end
       render json: { rce_favorite_tool_ids: favorite_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) } }
@@ -1204,7 +1204,7 @@ class ExternalToolsController < ApplicationController
       courses = api_find_all(Course, @course_ids)
       return unless courses.all? { |course| authorized_action(course, @current_user, :read) }
 
-      render :json => external_tools_json_for_courses(courses)
+      render json: external_tools_json_for_courses(courses)
     end
   end
 
@@ -1222,9 +1222,9 @@ class ExternalToolsController < ApplicationController
   def visible_course_nav_tools
     GuardRail.activate(:secondary) do
       return unless authorized_action(@context, @current_user, :read)
-      return render :json => { :message => 'Only course context is supported' }, :status => :bad_request unless context.is_a?(Course)
+      return render json: { message: 'Only course context is supported' }, status: :bad_request unless context.is_a?(Course)
 
-      render :json => external_tools_json_for_courses([@context])
+      render json: external_tools_json_for_courses([@context])
     end
   end
 
@@ -1237,7 +1237,7 @@ class ExternalToolsController < ApplicationController
       tabs.select { |t| t[:external] }.each do |t|
         tool_ids << t[:args][1] if t[:args] && t[:args][1]
       end
-      @tools = ContextExternalTool.where(:id => tool_ids)
+      @tools = ContextExternalTool.where(id: tool_ids)
       @tools = tool_ids.filter_map { |id| @tools.find { |t| t[:id] == id } }
       results = external_tools_json(@tools, course, @current_user, session).map do |result|
         # add some identifying information here to simplify grouping by context for the consumer
@@ -1252,14 +1252,14 @@ class ExternalToolsController < ApplicationController
   def parse_context_codes
     context_codes = Array(params[:context_codes])
     if context_codes.empty?
-      return render :json => { :message => 'Missing context_codes' }, :status => :bad_request
+      return render json: { message: 'Missing context_codes' }, status: :bad_request
     end
 
     @course_ids = context_codes.inject([]) do |ids, context_code|
       klass, id = ActiveRecord::Base.parse_asset_string(context_code)
       unless klass == 'Course'
-        return render :json => { :message => 'Invalid context_codes; only `course` codes are supported' },
-                      :status => :bad_request
+        return render json: { message: 'Invalid context_codes; only `course` codes are supported' },
+                      status: :bad_request
       end
       ids << id
     end
@@ -1318,7 +1318,7 @@ class ExternalToolsController < ApplicationController
       @context.errors.add(:id, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:url, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:module_item_id, 'A tool id, tool url, or module item id must be provided')
-      return render :json => @context.errors, :status => :bad_request
+      return render json: @context.errors, status: :bad_request
     end
 
     if launch_url && module_item.blank?
@@ -1358,7 +1358,7 @@ class ExternalToolsController < ApplicationController
           @tool,
           generate_session_token
         )
-        render :json => { id: @tool.id, name: @tool.name, url: launch_link }
+        render json: { id: @tool.id, name: @tool.name, url: launch_link }
       rescue UnauthorizedClient
         render_unauthorized_action
       end
@@ -1412,9 +1412,9 @@ class ExternalToolsController < ApplicationController
             else
               URI(course_external_tools_sessionless_launch_url(@context))
             end
-      uri.query = { :verifier => verifier }.to_query
+      uri.query = { verifier: verifier }.to_query
 
-      render :json => { :id => @tool.id, :name => @tool.name, :url => uri.to_s }
+      render json: { id: @tool.id, name: @tool.name, url: uri.to_s }
     end
   end
 
@@ -1475,12 +1475,12 @@ class ExternalToolsController < ApplicationController
         if tool.destroy
           if api_request?
             invalidate_nav_tabs_cache(tool)
-            format.json { render :json => external_tool_json(tool, @context, @current_user, session) }
+            format.json { render json: external_tool_json(tool, @context, @current_user, session) }
           else
-            format.json { render :json => tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+            format.json { render json: tool.as_json(methods: [:readable_state, :custom_fields_string], include_root: false) }
           end
         else
-          format.json { render :json => tool.errors, :status => :bad_request }
+          format.json { render json: tool.errors, status: :bad_request }
         end
       end
     end

@@ -46,7 +46,7 @@ describe "courses/_to_do_list.html.erb" do
 
         2.times do
           @course.enroll_student(user_factory).accept!
-          @assignment.submit_homework(@user, { :submission_type => 'online_text_entry', :body => 'blah' })
+          @assignment.submit_homework(@user, { submission_type: 'online_text_entry', body: 'blah' })
         end
 
         @user = @teacher

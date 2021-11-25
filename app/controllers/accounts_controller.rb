@@ -293,7 +293,7 @@ require 'csv'
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, :only => %i[index help_links manually_created_courses_account]
+  before_action :require_user, only: %i[index help_links manually_created_courses_account]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -334,7 +334,7 @@ class AccountsController < ApplicationController
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
-        render :json => @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
       end
     end
   end
@@ -355,7 +355,7 @@ class AccountsController < ApplicationController
       end
     end
     @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
-    render :json => @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+    render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
   end
 
   # @API List accounts for course admins
@@ -367,7 +367,7 @@ class AccountsController < ApplicationController
   def course_accounts
     if @current_user
       account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
-        Account.joins(:courses => :enrollments).merge(
+        Account.joins(courses: :enrollments).merge(
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map { |id| Shard.global_id_for(id) }
       end
@@ -377,7 +377,7 @@ class AccountsController < ApplicationController
       @accounts = []
     end
     ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
-    render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
   end
 
   # @API Get a single account
@@ -394,8 +394,8 @@ class AccountsController < ApplicationController
         return course_user_search
       end
       format.json do
-        render :json => account_json(@account, @current_user, session, params[:includes] || [],
-                                     !@account.grants_right?(@current_user, session, :manage))
+        render json: account_json(@account, @current_user, session, params[:includes] || [],
+                                  !@account.grants_right?(@current_user, session, :manage))
       end
     end
   end
@@ -413,7 +413,7 @@ class AccountsController < ApplicationController
   def show_settings
     return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
 
-    render :json => @account.settings
+    render json: @account.settings
   end
 
   # @API Permissions
@@ -479,10 +479,10 @@ class AccountsController < ApplicationController
                 end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
-                             :total_entries => recursive ? nil : @accounts.count)
+                             total_entries: recursive ? nil : @accounts.count)
 
     ActiveRecord::Associations::Preloader.new.preload(@accounts, [:root_account, :parent_account])
-    render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   # @API Get the Terms of Service
@@ -496,7 +496,7 @@ class AccountsController < ApplicationController
     res = tos.attributes.slice(*keys)
     res['content'] = tos.terms_of_service_content&.content
     res['self_registration_type'] = @account.self_registration_type
-    render :json => res
+    render json: res
   end
 
   # @API Get help links
@@ -505,7 +505,7 @@ class AccountsController < ApplicationController
   #
   # @returns HelpLinks
   def help_links
-    render :json => {} unless @account == @domain_root_account
+    render json: {} unless @account == @domain_root_account
     help_links = edit_help_links_env
     links = {
       help_link_name: help_links[:help_link_name],
@@ -513,7 +513,7 @@ class AccountsController < ApplicationController
       custom_help_links: help_links[:CUSTOM_HELP_LINKS],
       default_help_links: help_links[:DEFAULT_HELP_LINKS],
     }
-    render :json => links
+    render json: links
   end
 
   # @API Get the manually-created courses sub-account for the domain root account
@@ -522,7 +522,7 @@ class AccountsController < ApplicationController
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
     read_only = !account.grants_right?(@current_user, session, :read)
-    render :json => account_json(account, @current_user, session, [], read_only)
+    render json: account_json(account, @current_user, session, [], read_only)
   end
 
   include Api::V1::Course
@@ -652,8 +652,8 @@ class AccountsController < ApplicationController
       order += (params[:order] == "desc" ? " DESC, id DESC" : ", id")
     end
 
-    opts = { :include_crosslisted_courses => value_to_boolean(params[:include_crosslisted_courses]) }
-    @courses = @account.associated_courses(opts).order(Arel.sql(order)).where(:workflow_state => params[:state])
+    opts = { include_crosslisted_courses: value_to_boolean(params[:include_crosslisted_courses]) }
+    @courses = @account.associated_courses(opts).order(Arel.sql(order)).where(workflow_state: params[:state])
 
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
@@ -736,7 +736,7 @@ class AccountsController < ApplicationController
         or_clause = Course.where(code).or(Course.where(name))
 
         if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
-          or_clause = Course.where(:id => search_term).or(or_clause)
+          or_clause = Course.where(id: search_term).or(or_clause)
         end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
@@ -770,17 +770,17 @@ class AccountsController < ApplicationController
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
-                                          .where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
+                                          .where(course_id: @courses).group(:course_id).distinct.count(:user_id)
         @courses.each { |c| c.student_count = student_counts[c.id] || 0 }
       end
       all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
     end
 
-    render :json => @courses.map { |c|
-                      course_json(c, @current_user, session, includes, nil,
-                                  precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
-                                  prefer_friendly_name: false)
-                    }
+    render json: @courses.map { |c|
+                   course_json(c, @current_user, session, includes, nil,
+                               precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
+                               prefer_friendly_name: false)
+                 }
   end
 
   # Delegated to by the update action (when the request is an api_request?)
@@ -825,7 +825,7 @@ class AccountsController < ApplicationController
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.key?(:name) && account_params[:name].blank?
-          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
+          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", timezone: account_params[:default_time_zone])) if account_params.key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
           account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
           unauthorized = true
@@ -860,7 +860,7 @@ class AccountsController < ApplicationController
 
       if unauthorized
         # Attempt to modify something without sufficient permissions
-        render :json => @account.errors, :status => :unauthorized
+        render json: @account.errors, status: :unauthorized
       else
         success = @account.errors.empty?
         success &&= @account.update(account_settings.merge(quota_settings)) rescue false
@@ -868,10 +868,10 @@ class AccountsController < ApplicationController
         if success
           # Successfully completed
           update_user_dashboards
-          render :json => account_json(@account, @current_user, session, includes)
+          render json: account_json(@account, @current_user, session, includes)
         else
           # Failed (hopefully with errors)
-          render :json => @account.errors, :status => :bad_request
+          render json: @account.errors, status: :bad_request
         end
       end
     end
@@ -1139,11 +1139,11 @@ class AccountsController < ApplicationController
         if @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
-          format.json { render :json => @account }
+          format.json { render json: @account }
         else
           flash[:error] = t(:update_failed_notice, "Account settings update failed")
           format.html { redirect_to account_settings_url(@account) }
-          format.json { render :json => @account.errors, :status => :bad_request }
+          format.json { render json: @account.errors, status: :bad_request }
         end
       end
     end
@@ -1165,7 +1165,7 @@ class AccountsController < ApplicationController
                                      .order("report_types.name")
                                      .index_by(&:report_type)
       end
-      render :layout => false
+      render layout: false
     end
   end
 
@@ -1186,8 +1186,8 @@ class AccountsController < ApplicationController
       @account_users = @account_users.select(&:user).sort_by { |au| [order_hash[au.role_id] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
 
-      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map { |role| { :id => role.id, :label => role.label } }
-      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map { |role| { :id => role.id, :label => role.label } }
+      @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
+      @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
 
       @announcements = @account.announcements.order(created_at: 'desc').paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
@@ -1212,13 +1212,13 @@ class AccountsController < ApplicationController
                CONTEXT_BASE_URL: "/accounts/#{@context.id}",
                MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
                PERMISSIONS: {
-                 :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
-                 :manage_feature_flags => @account.grants_right?(@current_user, session, :manage_feature_flags)
+                 create_tool_manually: @account.grants_right?(@current_user, session, :create_tool_manually),
+                 manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags)
                },
                CSP: {
-                 :enabled => @account.csp_enabled?,
-                 :inherited => @account.csp_inherited?,
-                 :settings_locked => @account.csp_locked?,
+                 enabled: @account.csp_enabled?,
+                 inherited: @account.csp_inherited?,
+                 settings_locked: @account.csp_locked?,
                },
                MICROSOFT_SYNC: {
                  CLIENT_ID: MicrosoftSync::LoginService.client_id,
@@ -1255,8 +1255,8 @@ class AccountsController < ApplicationController
     end
     logging ||= false
 
-    js_env :ACCOUNT_ID => @account.id
-    js_env :PERMISSIONS => {
+    js_env ACCOUNT_ID: @account.id
+    js_env PERMISSIONS: {
       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
       # Permission caching issue makes explicitly checking the account setting
       # an easier option.
@@ -1308,10 +1308,10 @@ class AccountsController < ApplicationController
 
     if @user.allows_user_to_remove_from_account?(@account, @current_user)
       @user.remove_from_root_account(@account, updating_user: @current_user)
-      flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
+      flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", username: @user.name)
       respond_to do |format|
         format.html { redirect_to account_users_url(@account) }
-        format.json { render :json => @user || {} }
+        format.json { render json: @user || {} }
       end
     else
       render_unauthorized_action
@@ -1378,9 +1378,9 @@ class AccountsController < ApplicationController
           params[:turnitin_shared_secret],
           host
         )
-        render :json => { :success => turnitin.testSettings }
+        render json: { success: turnitin.testSettings }
       rescue
-        render :json => { :success => false }
+        render json: { success: false }
       end
     end
   end
@@ -1406,7 +1406,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :view_statistics)
       @items = @account.report_snapshots.progressive.last.try(:report_value_over_time, params[:attribute])
       respond_to do |format|
-        format.json { render :json => @items }
+        format.json { render json: @items }
         format.csv do
           res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
@@ -1418,9 +1418,9 @@ class AccountsController < ApplicationController
           # TODO: i18n
           send_data(
             res,
-            :type => "text/csv",
-            :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv",
-            :disposition => "attachment"
+            type: "text/csv",
+            filename: "#{params[:attribute].titleize} Report for #{@account.name}.csv",
+            disposition: "attachment"
           )
         end
       end
@@ -1437,10 +1437,10 @@ class AccountsController < ApplicationController
     if is_authorized
       @users = @account.all_users(nil)
       @avatar_counts = {
-        :all => format_avatar_count(@users.with_avatar_state('any').count),
-        :reported => format_avatar_count(@users.with_avatar_state('reported').count),
-        :re_reported => format_avatar_count(@users.with_avatar_state('re_reported').count),
-        :submitted => format_avatar_count(@users.with_avatar_state('submitted').count)
+        all: format_avatar_count(@users.with_avatar_state('any').count),
+        reported: format_avatar_count(@users.with_avatar_state('reported').count),
+        re_reported: format_avatar_count(@users.with_avatar_state('re_reported').count),
+        submitted: format_avatar_count(@users.with_avatar_state('submitted').count)
       }
       if params[:avatar_state]
         @users = @users.with_avatar_state(params[:avatar_state])
@@ -1465,7 +1465,7 @@ class AccountsController < ApplicationController
       @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
-        format.json { render :json => @current_batch }
+        format.json { render json: @current_batch }
       end
     end
   end
@@ -1542,26 +1542,26 @@ class AccountsController < ApplicationController
     @query = params[:term]
     GuardRail.activate(:secondary) do
       @users = @context.users_name_like(@query)
-      @users = @users.paginate(:page => params[:page])
+      @users = @users.paginate(page: params[:page])
 
       cancel_cache_buster
       expires_in 30.minutes
-      render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+      render(json: @users.map { |u| { label: u.name, id: u.id } })
     end
   end
 
   def build_course_stats
     courses_to_fetch_users_for = @courses
 
-    templates = MasterCourses::MasterTemplate.active.for_full_course.where(:course_id => @courses).to_a
+    templates = MasterCourses::MasterTemplate.active.for_full_course.where(course_id: @courses).to_a
     if templates.any?
       MasterCourses::MasterTemplate.preload_index_data(templates)
       @master_template_index = templates.index_by(&:course_id)
       courses_to_fetch_users_for = courses_to_fetch_users_for.reject { |c| @master_template_index[c.id] } # don't fetch the counts for the master/blueprint courses
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => { :workflow_state => %w[rejected deleted] })
-    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(enrollments: { workflow_state: %w[rejected deleted] })
+    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(course_id: courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.each_with_object({}) do |teacher, result|
       result[teacher.course_id] ||= []
       result[teacher.course_id] << teacher
@@ -1608,18 +1608,18 @@ class AccountsController < ApplicationController
         end
       end
 
-      { :enrollment => {
-        :id => admin.id,
-        :name => admin.user.name,
-        :role_id => admin.role_id,
-        :membership_type => AccountUser.readable_type(admin.role.name),
-        :workflow_state => 'active',
-        :user_id => admin.user.id,
-        :type => 'admin',
-        :email => admin.user.email
+      { enrollment: {
+        id: admin.id,
+        name: admin.user.name,
+        role_id: admin.role_id,
+        membership_type: AccountUser.readable_type(admin.role.name),
+        workflow_state: 'active',
+        user_id: admin.user.id,
+        type: 'admin',
+        email: admin.user.email
       } }
     end
-    render :json => account_users
+    render json: account_users
   end
 
   def remove_account_user
@@ -1627,8 +1627,8 @@ class AccountsController < ApplicationController
     if authorized_action(admin, @current_user, :destroy)
       admin.destroy
       respond_to do |format|
-        format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
-        format.json { render :json => admin }
+        format.html { redirect_to account_settings_url(@context, anchor: "tab-users") }
+        format.json { render json: admin }
       end
     end
   end
@@ -1714,37 +1714,37 @@ class AccountsController < ApplicationController
                                    :disable_post_to_sis_when_grading_period_closed,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
                                    :limit_parent_app_web_access, :allow_gradebook_show_first_last_names,
-                                   { :enable_offline_web_export => [:value] }.freeze,
-                                   { :disable_rce_media_uploads => [:value] }.freeze,
+                                   { enable_offline_web_export: [:value] }.freeze,
+                                   { disable_rce_media_uploads: [:value] }.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
                                    :google_docs_domain, :help_link_icon, :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
                                    :include_students_in_global_survey, :license_type,
-                                   { :lock_all_announcements => [:value, :locked] }.freeze,
+                                   { lock_all_announcements: [:value, :locked] }.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
                                    :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
                                    :microsoft_sync_login_attribute_suffix, :microsoft_sync_remote_attribute,
                                    :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
-                                   { :restrict_student_future_listing => [:value, :locked] }.freeze,
-                                   { :restrict_student_future_view => [:value, :locked] }.freeze,
-                                   { :restrict_student_past_view => [:value, :locked] }.freeze,
+                                   { restrict_student_future_listing: [:value, :locked] }.freeze,
+                                   { restrict_student_future_view: [:value, :locked] }.freeze,
+                                   { restrict_student_past_view: [:value, :locked] }.freeze,
                                    :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,
-                                   { :sis_assignment_name_length => [:value] }.freeze,
-                                   { :sis_assignment_name_length_input => [:value] }.freeze,
-                                   { :sis_default_grade_export => [:value, :locked] }.freeze,
+                                   { sis_assignment_name_length: [:value] }.freeze,
+                                   { sis_assignment_name_length_input: [:value] }.freeze,
+                                   { sis_default_grade_export: [:value, :locked] }.freeze,
                                    :sis_name,
-                                   { :sis_require_assignment_due_date => [:value] }.freeze,
-                                   { :sis_syncing => [:value, :locked] }.freeze,
+                                   { sis_require_assignment_due_date: [:value] }.freeze,
+                                   { sis_syncing: [:value, :locked] }.freeze,
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   { :usage_rights_required => [:value, :locked] }.freeze,
+                                   { usage_rights_required: [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
-                                   { :enable_as_k5_account => [:value, :locked] }.freeze,
+                                   { enable_as_k5_account: [:value, :locked] }.freeze,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere].freeze
 
@@ -1754,7 +1754,7 @@ class AccountsController < ApplicationController
      :default_time_zone, :parent_account, :default_storage_quota,
      :default_storage_quota_mb, :storage_quota, :default_locale,
      :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
-     :settings => PERMITTED_SETTINGS_FOR_UPDATE, :ip_filters => strong_anything]
+     settings: PERMITTED_SETTINGS_FOR_UPDATE, ip_filters: strong_anything]
   end
 
   def permitted_api_account_settings

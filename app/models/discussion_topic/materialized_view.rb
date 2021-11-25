@@ -49,7 +49,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         # transaction loop on master.
         unique_constraint_retry do
           view = where(discussion_topic_id: discussion_topic).first ||
-                 create!(:discussion_topic => discussion_topic)
+                 create!(discussion_topic: discussion_topic)
         end
       end
       view
@@ -125,7 +125,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       if opts[:include_new_entries]
         @for_mobile = true if opts[:include_mobile_overrides]
 
-        new_entries = all_entries.count == entry_ids.count ? [] : all_entries.where.not(:id => entry_ids).to_a
+        new_entries = all_entries.count == entry_ids.count ? [] : all_entries.where.not(id: entry_ids).to_a
         participant_ids = (Set.new(participant_ids) + new_entries.filter_map(&:user_id) + new_entries.filter_map(&:editor_id)).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
         new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, [])

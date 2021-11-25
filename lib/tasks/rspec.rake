@@ -34,8 +34,8 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
 
   Rake.application.instance_variable_get('@tasks').delete('default')
 
-  task :default => :spec
-  task :stats => "spec:statsetup"
+  task default: :spec
+  task stats: "spec:statsetup"
 
   spec_files_attr = :pattern=
   klass = RSpec::Core::RakeTask
@@ -151,7 +151,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     namespace :db do
       namespace :fixtures do
         desc "Load fixtures (from spec/fixtures) into the current environment's database.  Load specific fixtures using FIXTURES=x,y. Load from subdirectory in test/fixtures using FIXTURES_DIR=z."
-        task :load => :environment do
+        task load: :environment do
           ActiveRecord::Base.establish_connection(Rails.env)
           base_dir = Rails.root.join('spec,fixtures')
           fixtures_dir = ENV['FIXTURES_DIR'] ? base_dir.join(ENV['FIXTURES_DIR']) : base_dir
@@ -190,7 +190,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       end
 
       desc "restart spec_server."
-      task :restart => [:stop, :start]
+      task restart: [:stop, :start]
 
       desc "check if spec server is running"
       task :status do

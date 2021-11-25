@@ -30,7 +30,7 @@ describe "AuthenticationAudit API", type: :request do
     end
 
     it "404s" do
-      raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
+      raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", login_id: @pseudonym.id.to_s, format: 'json')
       assert_status(404)
     end
   end
@@ -41,12 +41,12 @@ describe "AuthenticationAudit API", type: :request do
     before do
       Setting.set('enable_page_views', 'cassandra')
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
+      allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
       @account = Account.default
-      @custom_role = custom_account_role('CustomAdmin', :account => @account)
-      @custom_sa_role = custom_account_role('CustomAdmin', :account => Account.site_admin)
+      @custom_role = custom_account_role('CustomAdmin', account: @account)
+      @custom_sa_role = custom_account_role('CustomAdmin', account: Account.site_admin)
       user_with_pseudonym(active_all: true)
 
       @page_view = PageView.new
@@ -64,7 +64,7 @@ describe "AuthenticationAudit API", type: :request do
       type = context.class.to_s.downcase unless (type = options.delete(:type))
       id = context.id.to_s
 
-      arguments = { controller: 'authentication_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
+      arguments = { controller: 'authentication_audit_api', action: "for_#{type}", "#{type}_id": id, format: 'json' }
       query_string = []
 
       if (per_page = options.delete(:per_page))
@@ -369,9 +369,9 @@ describe "AuthenticationAudit API", type: :request do
       context "with :view_statistics permission on account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => @custom_role,
-            :role_changes => { :view_statistics => true }
+            account: @account, user: @viewing_user,
+            role: @custom_role,
+            role_changes: { view_statistics: true }
           )
         end
 
@@ -391,9 +391,9 @@ describe "AuthenticationAudit API", type: :request do
       context "with :manage_user_logins permission on account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => @custom_role,
-            :role_changes => { :manage_user_logins => true }
+            account: @account, user: @viewing_user,
+            role: @custom_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
@@ -413,9 +413,9 @@ describe "AuthenticationAudit API", type: :request do
       context "with :view_statistics permission on site admin account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => Account.site_admin, :user => @viewing_user,
-            :role => @custom_sa_role,
-            :role_changes => { :view_statistics => true }
+            account: Account.site_admin, user: @viewing_user,
+            role: @custom_sa_role,
+            role_changes: { view_statistics: true }
           )
         end
 
@@ -435,9 +435,9 @@ describe "AuthenticationAudit API", type: :request do
       context "with :manage_user_logins permission on site admin account" do
         before do
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => Account.site_admin, :user => @viewing_user,
-            :role => @custom_sa_role,
-            :role_changes => { :manage_user_logins => true }
+            account: Account.site_admin, user: @viewing_user,
+            role: @custom_sa_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
@@ -458,11 +458,11 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @account = account_model
           user_with_pseudonym(user: @user, account: @account, active_all: true)
-          custom_role = custom_account_role('CustomAdmin', :account => @account)
+          custom_role = custom_account_role('CustomAdmin', account: @account)
           @user, _ = @user, account_admin_user_with_role_changes(
-            :account => @account, :user => @viewing_user,
-            :role => custom_role,
-            :role_changes => { :manage_user_logins => true }
+            account: @account, user: @viewing_user,
+            role: custom_role,
+            role_changes: { manage_user_logins: true }
           )
         end
 
@@ -475,9 +475,9 @@ describe "AuthenticationAudit API", type: :request do
         context "with permission on the site admin account" do
           before do
             @user, _ = @user, account_admin_user_with_role_changes(
-              :account => Account.site_admin, :user => @viewing_user,
-              :role => @custom_sa_role,
-              :role_changes => { :manage_user_logins => true }
+              account: Account.site_admin, user: @viewing_user,
+              role: @custom_sa_role,
+              role_changes: { manage_user_logins: true }
             )
           end
 
@@ -518,11 +518,11 @@ describe "AuthenticationAudit API", type: :request do
         before do
           @user, @viewing_user = @user, @shard2.activate { user_model }
           @user, _ = @user, @shard2.activate do
-            custom_role = custom_account_role("CustomAdmin", :account => @account)
+            custom_role = custom_account_role("CustomAdmin", account: @account)
             account_admin_user_with_role_changes(
-              :account => @account, :user => @viewing_user,
-              :role => custom_role,
-              :role_changes => { :manage_user_logins => true }
+              account: @account, user: @viewing_user,
+              role: custom_role,
+              role_changes: { manage_user_logins: true }
             )
           end
         end
@@ -542,7 +542,7 @@ describe "AuthenticationAudit API", type: :request do
         # 3 events total
         Auditors::Authentication.record(@pseudonym, 'logout')
         Auditors::Authentication.record(@pseudonym, 'login')
-        @json = fetch_for_context(@user, :per_page => 2)
+        @json = fetch_for_context(@user, per_page: 2)
       end
 
       it "only returns one page of results" do

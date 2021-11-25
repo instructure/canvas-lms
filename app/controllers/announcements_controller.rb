@@ -23,7 +23,7 @@ require 'atom'
 class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
-  before_action :require_context, :except => :public_feed
+  before_action :require_context, except: :public_feed
   before_action { |c| c.active_tab = "announcements" }
 
   include K5Mode
@@ -37,7 +37,7 @@ class AnnouncementsController < ApplicationController
 
     def load_announcements
       can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
-      js_env :permissions => {
+      js_env permissions: {
         create: can_create,
         manage_content: @context.grants_right?(@current_user, session, :manage_content),
         moderate: can_create
@@ -79,11 +79,11 @@ class AnnouncementsController < ApplicationController
         if feed_key
           case @context
           when Course
-            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_course, "Course Announcements Atom Feed") })
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_course, "Course Announcements Podcast Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { title: t(:feed_title_course, "Course Announcements Atom Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { title: t(:podcast_title_course, "Course Announcements Podcast Feed") })
           when Group
-            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { :title => t(:feed_title_group, "Group Announcements Atom Feed") })
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { :title => t(:podcast_title_group, "Group Announcements Podcast Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), { title: t(:feed_title_group, "Group Announcements Atom Feed") })
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), { title: t(:podcast_title_group, "Group Announcements Podcast Feed") })
           end
         end
       end
@@ -103,15 +103,15 @@ class AnnouncementsController < ApplicationController
     respond_to do |format|
       format.atom do
         feed = Atom::Feed.new do |f|
-          f.title = t(:feed_name, "%{course} Announcements Feed", :course => @context.name)
-          f.links << Atom::Link.new(:href => polymorphic_url([@context, :announcements]), :rel => 'self')
+          f.title = t(:feed_name, "%{course} Announcements Feed", course: @context.name)
+          f.links << Atom::Link.new(href: polymorphic_url([@context, :announcements]), rel: 'self')
           f.updated = Time.now
           f.id = polymorphic_url([@context, :announcements])
         end
         announcements.each do |e|
           feed.entries << e.to_atom
         end
-        render :plain => feed.to_xml
+        render plain: feed.to_xml
       end
 
       format.rss do
@@ -119,12 +119,12 @@ class AnnouncementsController < ApplicationController
         require 'rss/2.0'
         rss = RSS::Rss.new("2.0")
         channel = RSS::Rss::Channel.new
-        channel.title = t(:podcast_feed_name, "%{course} Announcements Podcast Feed", :course => @context.name)
+        channel.title = t(:podcast_feed_name, "%{course} Announcements Podcast Feed", course: @context.name)
         case @context
         when Course
-          channel.description = t(:podcast_feed_description_course, "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed.", :course => @context.name)
+          channel.description = t(:podcast_feed_description_course, "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed.", course: @context.name)
         when Group
-          channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", :group => @context.name)
+          channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", group: @context.name)
         end
         channel.link = polymorphic_url([@context, :announcements])
         channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
@@ -133,7 +133,7 @@ class AnnouncementsController < ApplicationController
           channel.items << item
         end
         rss.channel = channel
-        render :plain => rss.to_s
+        render plain: rss.to_s
       end
     end
   end

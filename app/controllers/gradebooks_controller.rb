@@ -36,7 +36,7 @@ class GradebooksController < ApplicationController
 
   include K5Mode
 
-  batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
+  batch_jobs_in_actions only: :update_submission, batch: { priority: Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_action { |c| c.active_tab = "grades" }
@@ -221,15 +221,15 @@ class GradebooksController < ApplicationController
       end
       @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@rubric_context) }
       data = @rubric_associations.map do |ra|
-        json = ra.as_json(methods: [:context_name], include: { :rubric => { :include_root => false } })
+        json = ra.as_json(methods: [:context_name], include: { rubric: { include_root: false } })
         # return shard-aware context codes
         json["rubric_association"]["context_code"] = ra.context.asset_string
         json["rubric_association"]["rubric"]["context_code"] = ra.rubric.context.asset_string
         json
       end
-      render :json => StringifyIds.recursively_stringify_ids(data)
+      render json: StringifyIds.recursively_stringify_ids(data)
     else
-      render :json => @rubric_contexts
+      render json: @rubric_contexts
     end
   end
 
@@ -910,7 +910,7 @@ class GradebooksController < ApplicationController
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
                                                             @assignment.quiz.id,
-                                                            :user_id => "{{user_id}}"
+                                                            user_id: "{{user_id}}"
         end
 
         env[:filter_speed_grader_by_student_group_feature_enabled] =

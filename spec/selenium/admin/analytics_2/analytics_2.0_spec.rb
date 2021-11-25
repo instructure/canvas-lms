@@ -30,7 +30,7 @@ describe "analytics in Canvas" do
 
   context "account nav menu" do
     before do
-      @admin = account_admin_user(:active_all => true)
+      @admin = account_admin_user(active_all: true)
       user_session(@admin)
     end
 
@@ -55,7 +55,7 @@ describe "analytics in Canvas" do
 
   context "Analytics 2.0 LTI installed" do
     before :once do
-      @admin = account_admin_user(:active_all => true)
+      @admin = account_admin_user(active_all: true)
       # Analytics1.0 is enabled for all tests by default
       @admin.account.update(allowed_services: "+analytics")
       # add the analytics 2 LTI to the account
@@ -63,15 +63,15 @@ describe "analytics in Canvas" do
       @tool_id = @admin.account.context_external_tools.first.id
       # create a course, @teacher and student in course
       @course = course_with_teacher(
-        :account => @admin.account,
-        :course_name => "A New Course",
+        account: @admin.account,
+        course_name: "A New Course",
         name: 'Teacher1',
-        :active_all => true
+        active_all: true
       ).course
       @student = student_in_course(
-        :course => @course,
-        :name => "First Student",
-        :active_all => true
+        course: @course,
+        name: "First Student",
+        active_all: true
       ).user
     end
 

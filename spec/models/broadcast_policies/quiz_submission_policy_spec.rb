@@ -65,7 +65,7 @@ module BroadcastPolicies
       before do
         allow(quiz_submission).to receive(:changed_state_to).with(:complete).and_return true
         allow(quiz_submission).to receive(:changed_in_state)
-          .with(:pending_review, { :fields => [:fudge_points] }).and_return false
+          .with(:pending_review, { fields: [:fudge_points] }).and_return false
       end
 
       it 'is true when the dependent inputs are true' do
@@ -130,7 +130,7 @@ module BroadcastPolicies
 
       before do
         allow(quiz_submission).to receive(:changed_in_state)
-          .with(:complete, :fields => [:score]).and_return true
+          .with(:complete, fields: [:score]).and_return true
       end
 
       it 'is true when the necessary inputs are true' do
@@ -147,7 +147,7 @@ module BroadcastPolicies
       specify do
         wont_send_when do
           allow(quiz_submission).to receive(:changed_in_state)
-            .with(:complete, :fields => [:score]).and_return false
+            .with(:complete, fields: [:score]).and_return false
         end
       end
 

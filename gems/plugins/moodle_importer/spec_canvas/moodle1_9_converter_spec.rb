@@ -24,12 +24,12 @@ describe Moodle::Converter do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_1_9.zip')
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = Moodle::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
     converter.export
 
     @course_data = converter.course.with_indifferent_access
-    @course = Course.create(:name => "test course")
-    @cm = ContentMigration.create(:context => @course)
+    @course = Course.create(name: "test course")
+    @cm = ContentMigration.create(context: @course)
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
@@ -48,8 +48,8 @@ describe Moodle::Converter do
   end
 
   it "adds at most 2 warnings per bank for problematic questions" do
-    converter = Moodle::Converter.new({ :no_archive_file => true })
-    test_course = { :assessment_questions => { :assessment_questions => [
+    converter = Moodle::Converter.new({ no_archive_file: true })
+    test_course = { assessment_questions: { assessment_questions: [
       { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1' },
       { 'question_type' => 'calculated_question', 'question_bank_id' => '1' },
       { 'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '2' },
@@ -93,7 +93,7 @@ describe Moodle::Converter do
 
   context "assignments" do
     it "converts assignments" do
-      expect(@course.assignments.where.not(:migration_id => nil).count).to eq 6
+      expect(@course.assignments.where.not(migration_id: nil).count).to eq 6
 
       assignment = @course.assignments.where(title: 'Create a Rails site').first
       expect(assignment).not_to be_nil

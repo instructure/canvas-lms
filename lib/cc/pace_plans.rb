@@ -28,7 +28,7 @@ module CC
       else
         meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::PACE_PLANS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::PACE_PLANS)
-        document = Builder::XmlMarkup.new(:target => meta_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       end
 
       document.instruct!

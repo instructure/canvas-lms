@@ -54,7 +54,7 @@ class CrocodocDocument < ActiveRecord::Base
     end
 
     if response && response['uuid']
-      update :uuid => response['uuid'], :process_state => 'QUEUED'
+      update uuid: response['uuid'], process_state: 'QUEUED'
     elsif response.nil?
       raise "no response received"
     else
@@ -88,8 +88,8 @@ class CrocodocDocument < ActiveRecord::Base
     return canvadocs_session_url opts.merge(canvadoc_options) if should_migrate_to_canvadocs?
 
     defaults = {
-      :annotations => true,
-      :downloadable => true,
+      annotations: true,
+      downloadable: true,
     }.with_indifferent_access
 
     opts = defaults.merge(opts)
@@ -118,9 +118,9 @@ class CrocodocDocument < ActiveRecord::Base
 
   def permissions_for_user(user, allow_list = nil)
     opts = {
-      :filter => 'none',
-      :admin => false,
-      :editable => false,
+      filter: 'none',
+      admin: false,
+      editable: false,
     }
 
     if user.blank?
@@ -188,13 +188,13 @@ class CrocodocDocument < ActiveRecord::Base
   private :crocodoc_api
 
   def self.crocodoc_api
-    Crocodoc::API.new(:token => Canvas::Crocodoc.config['api_key'])
+    Crocodoc::API.new(token: Canvas::Crocodoc.config['api_key'])
   end
 
   def self.update_process_states
     bs = Setting.get('crocodoc_status_check_batch_size', '45').to_i
     GuardRail.activate(:secondary) do
-      CrocodocDocument.where(:process_state => %w[QUEUED PROCESSING]).find_in_batches do |docs|
+      CrocodocDocument.where(process_state: %w[QUEUED PROCESSING]).find_in_batches do |docs|
         GuardRail.activate(:primary) do
           statuses = []
           docs.each_slice(bs) do |sub_docs|
@@ -217,12 +217,12 @@ class CrocodocDocument < ActiveRecord::Base
 
           bulk_updates.each do |status, uuids|
             CrocodocDocument
-              .where(:uuid => uuids)
-              .update_all(:process_state => status)
+              .where(uuid: uuids)
+              .update_all(process_state: status)
           end
 
           if error_uuids.present?
-            error_docs = CrocodocDocument.where(:uuid => error_uuids)
+            error_docs = CrocodocDocument.where(uuid: error_uuids)
             attachment_ids = error_docs.pluck(:attachment_id)
             if Canvadocs.enabled?
               Attachment.delay(n_strand: "canvadocs").submit_to_canvadocs(attachment_ids)

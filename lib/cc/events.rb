@@ -29,7 +29,7 @@ module CC
       else
         events_file = File.new(File.join(@canvas_resource_dir, CCHelper::EVENTS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EVENTS)
-        document = Builder::XmlMarkup.new(:target => events_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: events_file, indent: 2)
       end
 
       document.instruct!
@@ -43,7 +43,7 @@ module CC
 
           add_exported_asset(event)
           migration_id = create_key(event)
-          events_node.event(:identifier => migration_id) do |event_node|
+          events_node.event(identifier: migration_id) do |event_node|
             event_node.title event.title unless event.title.blank?
             event_node.description @html_exporter.html_content(event.description)
             event_node.start_at ims_datetime(event.start_at) if event.start_at

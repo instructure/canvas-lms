@@ -40,9 +40,9 @@ class Attachments::LocalStorage
 
   def initialize_ajax_upload_params(local_upload_url, _s3_success_url, options)
     {
-      :upload_url => local_upload_url,
-      :file_param => options[:file_param] || 'attachment[uploaded_data]', # uploadify ignores this and uses 'file'
-      :upload_params => options[:upload_params] || {}
+      upload_url: local_upload_url,
+      file_param: options[:file_param] || 'attachment[uploaded_data]', # uploadify ignores this and uses 'file'
+      upload_params: options[:upload_params] || {}
     }
   end
 

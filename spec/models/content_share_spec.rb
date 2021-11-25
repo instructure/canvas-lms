@@ -34,7 +34,7 @@ describe ContentShare do
       it "works when sharing from a course on different shard" do
         @shard1.activate do
           acc = Account.create!
-          user_factory(:account => acc)
+          user_factory(account: acc)
         end
         course_factory active_all: true
         export = factory_with_protected_attributes(@course.content_exports, user: @user, export_type: 'common_cartridge')
@@ -51,7 +51,7 @@ describe ContentShare do
 
         @shard1.activate do
           acc = Account.create!
-          user_factory(:account => acc)
+          user_factory(account: acc)
           @receiving_user = @user
         end
         received_share = share.clone_for(@receiving_user)

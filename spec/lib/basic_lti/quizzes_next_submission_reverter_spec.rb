@@ -24,9 +24,9 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
   before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -66,7 +66,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         s.submitted_at = d[:submitted_at]
         s.grader_id = -1
         s.url = d[:url]
-        s.with_versioning(:explicit => true) { s.save! }
+        s.with_versioning(explicit: true) { s.save! }
       end
       s
     end
@@ -176,13 +176,13 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     let(:submission) do
       s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
 
-      s.with_versioning(:explicit => true) { s.save! }
+      s.with_versioning(explicit: true) { s.save! }
       submission_version_data.each do |d|
         s.score = d[:score]
         s.submitted_at = d[:submitted_at]
         s.grader_id = -1
         s.url = d[:url]
-        s.with_versioning(:explicit => true) { s.save! }
+        s.with_versioning(explicit: true) { s.save! }
       end
       s
     end

@@ -24,7 +24,7 @@ MAIL_FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures/'
 RSpec::Matchers.define :imap_account_with_creds do |user, pass|
   match do |account|
     account.protocol == :imap &&
-      account.config == { :server => 'fake', :username => user, :password => pass }
+      account.config == { server: 'fake', username: user, password: pass }
   end
 end
 RSpec::Matchers.define :imap_account_with_config do |config|
@@ -364,10 +364,10 @@ module IncomingMailProcessor
         }
 
         expect(IncomingMailProcessor::MailboxAccount).to receive(:new).with({
-                                                                              :protocol => :imap,
-                                                                              :address => 'user@fake.fake',
-                                                                              :error_folder => 'broken',
-                                                                              :config => config['imap'].except('error_folder').symbolize_keys,
+                                                                              protocol: :imap,
+                                                                              address: 'user@fake.fake',
+                                                                              error_folder: 'broken',
+                                                                              config: config['imap'].except('error_folder').symbolize_keys,
                                                                             })
         IncomingMessageProcessor.configure(config)
       end
@@ -417,7 +417,7 @@ module IncomingMailProcessor
         expect(@mock_mailbox).to receive(:disconnect)
         expect_no_errors
 
-        IncomingMessageProcessor.new(message_handler, error_reporter).process(:mailbox_account_address => 'user2@fake.fake')
+        IncomingMessageProcessor.new(message_handler, error_reporter).process(mailbox_account_address: 'user2@fake.fake')
       end
 
       describe "message processing" do

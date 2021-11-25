@@ -239,13 +239,13 @@ class UserMerge
       if (existing_record = target_values[[key, sub_key]])
         existing_record_updates[existing_record] = value
       else
-        new_record_hashes << { :user_id => target_user.id, :key => key, :sub_key => sub_key&.to_json, :value => value.to_yaml }
+        new_record_hashes << { user_id: target_user.id, key: key, sub_key: sub_key&.to_json, value: value.to_yaml }
       end
     end
     target_user.shard.activate do
       UserPreferenceValue.bulk_insert(new_record_hashes)
       existing_record_updates.each do |record, new_value|
-        UserPreferenceValue.where(:id => record).update_all(:value => new_value)
+        UserPreferenceValue.where(id: record).update_all(value: new_value)
       end
     end
   end
@@ -530,7 +530,7 @@ class UserMerge
   def update_enrollment_state(scope, keeper)
     # update the record on the target user to the better state of the from users enrollment
     enrollment_ids = Enrollment.where(id: scope).where.not(id: keeper).pluck(:id)
-    Enrollment.where(:id => enrollment_ids).update_all(workflow_state: keeper.workflow_state)
+    Enrollment.where(id: enrollment_ids).update_all(workflow_state: keeper.workflow_state)
     EnrollmentState.force_recalculation(enrollment_ids)
 
     # mark the would be keeper from the from_user as deleted so it will not be moved later
@@ -587,7 +587,7 @@ class UserMerge
           # upgrade to strong association if there are any enrollments
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
           merge_data.build_more_data(to_move, data: data)
-          to_move.update_all(column => target_user.id, updated_at: Time.now.utc)
+          to_move.update_all(column => target_user.id, :updated_at => Time.now.utc)
         end
       end
     end
@@ -605,8 +605,8 @@ class UserMerge
       # have a submission for the same assignment there will be
       # a conflict.
       model = table.to_s.classify.constantize
-      already_scope = model.where(:user_id => target_user)
-      scope = model.where(:user_id => from_user)
+      already_scope = model.where(user_id: target_user)
+      scope = model.where(user_id: from_user)
       case model.name
       when "Submission"
         # we prefer submissions that have grades then submissions that have
@@ -668,7 +668,7 @@ class UserMerge
       # TODO: This is a hack to support namespacing
       versionable_type = ['QuizSubmission', 'Quizzes::QuizSubmission'] if table.to_s == 'quizzes/quiz_submissions'
       version_ids = []
-      Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_in_batches(strategy: :cursor) do |versions|
+      Version.where(versionable_type: versionable_type, versionable_id: ids).find_in_batches(strategy: :cursor) do |versions|
         versions.each do |version|
           version_attrs = YAML.load(version.yaml)
           if version_attrs[column.to_s] == from_user.id

@@ -28,16 +28,16 @@ describe ApplicationHelper do
   context "folders_as_options" do
     before(:once) do
       course_model
-      @f = Folder.create!(:name => 'f', :context => @course)
-      @f_1 = Folder.create!(:name => 'f_1', :parent_folder => @f, :context => @course)
-      @f_2 = Folder.create!(:name => 'f_2', :parent_folder => @f, :context => @course)
-      @f_2_1 = Folder.create!(:name => 'f_2_1', :parent_folder => @f_2, :context => @course)
-      @f_2_1_1 = Folder.create!(:name => 'f_2_1_1', :parent_folder => @f_2_1, :context => @course)
+      @f = Folder.create!(name: 'f', context: @course)
+      @f_1 = Folder.create!(name: 'f_1', parent_folder: @f, context: @course)
+      @f_2 = Folder.create!(name: 'f_2', parent_folder: @f, context: @course)
+      @f_2_1 = Folder.create!(name: 'f_2_1', parent_folder: @f_2, context: @course)
+      @f_2_1_1 = Folder.create!(name: 'f_2_1_1', parent_folder: @f_2_1, context: @course)
       @all_folders = [@f, @f_1, @f_2, @f_2_1, @f_2_1_1]
     end
 
     it "works work recursively" do
-      option_string = folders_as_options([@f], :all_folders => @all_folders)
+      option_string = folders_as_options([@f], all_folders: @all_folders)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
@@ -47,7 +47,7 @@ describe ApplicationHelper do
     end
 
     it "limits depth" do
-      option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
+      option_string = folders_as_options([@f], all_folders: @all_folders, max_depth: 1)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
@@ -486,7 +486,7 @@ describe ApplicationHelper do
 
     it "overrides default help link with the configured support url" do
       support_url = 'http://instructure.com'
-      Account.default.update_attribute(:settings, { :support_url => support_url })
+      Account.default.update_attribute(:settings, { support_url: support_url })
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.support_url).to eq support_url
@@ -497,7 +497,7 @@ describe ApplicationHelper do
 
     it "returns the configured icon" do
       icon = 'inbox'
-      Account.default.update_attribute(:settings, { :help_link_icon => icon })
+      Account.default.update_attribute(:settings, { help_link_icon: icon })
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.help_link_icon).to eq icon
@@ -505,7 +505,7 @@ describe ApplicationHelper do
 
     it "returns the configured help link name" do
       link_name = 'Links'
-      Account.default.update_attribute(:settings, { :help_link_name => link_name })
+      Account.default.update_attribute(:settings, { help_link_name: link_name })
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.help_link_name).to eq link_name
@@ -521,7 +521,7 @@ describe ApplicationHelper do
       # verify it's not overly long
       expect(key1.length).to be <= 40
 
-      User.where(:id => collection[1]).update_all(:updated_at => 1.hour.ago)
+      User.where(id: collection[1]).update_all(updated_at: 1.hour.ago)
       collection[1].reload
       key3 = collection_cache_key(collection)
       expect(key1).not_to eq key3
@@ -548,13 +548,13 @@ describe ApplicationHelper do
 
       context "with login_success=1" do
         it "returns a regular canvas dashboard url" do
-          expect(dashboard_url(:login_success => '1')).to eq "http://test.host/?login_success=1"
+          expect(dashboard_url(login_success: '1')).to eq "http://test.host/?login_success=1"
         end
       end
 
       context "with become_user_id=1" do
         it "returns a regular canvas dashboard url for masquerading" do
-          expect(dashboard_url(:become_user_id => '1')).to eq "http://test.host/?become_user_id=1"
+          expect(dashboard_url(become_user_id: '1')).to eq "http://test.host/?become_user_id=1"
         end
       end
 
@@ -576,7 +576,7 @@ describe ApplicationHelper do
     end
 
     it "includes tags if present" do
-      @meta_tags = [{ :name => "hi", :content => "there" }]
+      @meta_tags = [{ name: "hi", content: "there" }]
       result = include_custom_meta_tags
       expect(result).to match(/meta/)
       expect(result).to match(/name="hi"/)
@@ -584,7 +584,7 @@ describe ApplicationHelper do
     end
 
     it "html_safe-ifies them" do
-      @meta_tags = [{ :name => "hi", :content => "there" }]
+      @meta_tags = [{ name: "hi", content: "there" }]
       expect(include_custom_meta_tags).to be_html_safe
     end
   end
@@ -592,51 +592,51 @@ describe ApplicationHelper do
   describe "editor_buttons" do
     it "returns hash of tools if in group" do
       @course = course_model
-      @group = @course.groups.create!(:name => "some group")
+      @group = @course.groups.create!(name: "some group")
       tool = @course.context_external_tools.new(
-        :name => "bob",
-        :consumer_key => "test",
-        :shared_secret => "secret",
-        :url => "http://example.com",
-        :description => "the description."
+        name: "bob",
+        consumer_key: "test",
+        shared_secret: "secret",
+        url: "http://example.com",
+        description: "the description."
       )
-      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }
+      tool.editor_button = { url: "http://example.com", icon_url: "http://example.com", canvas_icon_class: 'icon-commons' }
       tool.save!
       @context = @group
 
       expect(editor_buttons).to eq([{
-                                     :name => "bob",
-                                     :id => tool.id,
-                                     :url => "http://example.com",
-                                     :icon_url => "http://example.com",
-                                     :canvas_icon_class => 'icon-commons',
-                                     :width => 800,
-                                     :height => 400,
-                                     :use_tray => false,
-                                     :description => "<p>the description.</p>\n",
-                                     :favorite => false
+                                     name: "bob",
+                                     id: tool.id,
+                                     url: "http://example.com",
+                                     icon_url: "http://example.com",
+                                     canvas_icon_class: 'icon-commons',
+                                     width: 800,
+                                     height: 400,
+                                     use_tray: false,
+                                     description: "<p>the description.</p>\n",
+                                     favorite: false
                                    }])
     end
 
     it "returns hash of tools if in course" do
       @course = course_model
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
+      tool.editor_button = { url: "http://example.com", icon_url: "http://example.com", canvas_icon_class: 'icon-commons' }
       tool.save!
       allow(controller).to receive(:group_external_tool_path).and_return('http://dummy')
       @context = @course
 
       expect(editor_buttons).to eq([{
-                                     :name => "bob",
-                                     :id => tool.id,
-                                     :url => "http://example.com",
-                                     :icon_url => "http://example.com",
-                                     :canvas_icon_class => 'icon-commons',
-                                     :width => 800,
-                                     :height => 400,
-                                     :use_tray => false,
-                                     :description => "",
-                                     :favorite => false
+                                     name: "bob",
+                                     id: tool.id,
+                                     url: "http://example.com",
+                                     icon_url: "http://example.com",
+                                     canvas_icon_class: 'icon-commons',
+                                     width: 800,
+                                     height: 400,
+                                     use_tray: false,
+                                     description: "",
+                                     favorite: false
                                    }])
     end
 
@@ -644,12 +644,12 @@ describe ApplicationHelper do
       @domain_root_account = Account.default
       account_admin_user
       tool = @domain_root_account.context_external_tools.new(
-        :name => "bob",
-        :consumer_key => "test",
-        :shared_secret => "secret",
-        :url => "http://example.com"
+        name: "bob",
+        consumer_key: "test",
+        shared_secret: "secret",
+        url: "http://example.com"
       )
-      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com" }
+      tool.editor_button = { url: "http://example.com", icon_url: "http://example.com" }
       tool.save!
       @context = @admin
 
@@ -660,7 +660,7 @@ describe ApplicationHelper do
   describe "UI path checking" do
     describe "#active_path?" do
       context "when the request path is the course show page" do
-        let(:request) { double('request', :fullpath => '/courses/2') }
+        let(:request) { double('request', fullpath: '/courses/2') }
 
         it "returns true for paths that match" do
           expect(active_path?('/courses')).to be_truthy
@@ -676,7 +676,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the account external tools path" do
-        let(:request) { double('request', :fullpath => '/accounts/2/external_tools/27') }
+        let(:request) { double('request', fullpath: '/accounts/2/external_tools/27') }
 
         before do
           @context = Account.default
@@ -689,7 +689,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the course external tools path" do
-        let(:request) { double('request', :fullpath => '/courses/2/external_tools/27') }
+        let(:request) { double('request', fullpath: '/courses/2/external_tools/27') }
 
         before do
           @context = Account.default.courses.create!
@@ -747,10 +747,10 @@ describe ApplicationHelper do
 
       it "returns the list of groups the user belongs to" do
         user = user_model
-        group1 = @account.groups.create! :name => 'Account group'
+        group1 = @account.groups.create! name: 'Account group'
         course1 = @account.courses.create!
-        group2 = course1.groups.create! :name => 'Course group'
-        group3 = @account.groups.create! :name => 'Another account group'
+        group2 = course1.groups.create! name: 'Course group'
+        group3 = @account.groups.create! name: 'Another account group'
         groups = [group1, group2, group3]
 
         @current_user = user
@@ -791,13 +791,13 @@ describe ApplicationHelper do
     end
 
     it "returns false when a user has no student enrollments" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @current_user = @user
       expect(planner_enabled?).to be false
     end
 
     it "returns true when there is at least one student enrollment" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @current_user = @user
       expect(planner_enabled?).to be true
     end

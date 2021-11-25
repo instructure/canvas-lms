@@ -21,8 +21,8 @@ require_relative '../api_spec_helper'
 describe DiscussionTopicUsersController, type: :request do
   describe 'search for users,' do
     before :once do
-      course_with_student :active_all => true
-      @topic = @course.discussion_topics.create!(:title => 'discussion')
+      course_with_student active_all: true
+      @topic = @course.discussion_topics.create!(title: 'discussion')
     end
 
     it 'all messageble users' do

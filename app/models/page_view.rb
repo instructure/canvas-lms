@@ -24,7 +24,7 @@ class PageView < ActiveRecord::Base
   belongs_to :developer_key
   belongs_to :user
   belongs_to :account
-  belongs_to :real_user, :class_name => 'User'
+  belongs_to :real_user, class_name: 'User'
   belongs_to :asset_user_access
 
   before_save :ensure_account
@@ -288,7 +288,7 @@ class PageView < ActiveRecord::Base
   end
 
   scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
-  scope :for_users, ->(users) { where(:user_id => users) }
+  scope :for_users, ->(users) { where(user_id: users) }
 
   def self.pv4_client
     ConfigFile.cache_object('pv4') do |config|
@@ -313,7 +313,7 @@ class PageView < ActiveRecord::Base
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
-        scope = where(:user_id => user).order('created_at desc')
+        scope = where(user_id: user).order('created_at desc')
         scope = scope.where("created_at >= ?", options[:oldest]) if options[:oldest]
         scope = scope.where("created_at <= ?", options[:newest]) if options[:newest]
         if viewer
@@ -448,7 +448,7 @@ class PageView < ActiveRecord::Base
       # this could run into problems if one account gets more than
       # batch_size page views created in the second on this boundary
       finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at)
-                           .order(:created_at => :asc).limit(batch_size).to_sql
+                           .order(created_at: :asc).limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.select_all(finder_sql).to_a

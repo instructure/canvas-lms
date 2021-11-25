@@ -59,8 +59,8 @@ describe GradesPresenter do
   describe '#student_enrollments' do
     let(:course1) { double }
     let(:course2) { double }
-    let(:student) { double(:student? => true, :course => course1, :state_based_on_date => :active) }
-    let(:nonstudent) { double(:student? => false, :course => course2, :state_based_on_date => :active) }
+    let(:student) { double(student?: true, course: course1, state_based_on_date: :active) }
+    let(:nonstudent) { double(student?: false, course: course2, state_based_on_date: :active) }
     let(:enrollments) { [student, nonstudent] }
     let(:student_enrollments) { presenter.student_enrollments }
 
@@ -81,8 +81,8 @@ describe GradesPresenter do
   end
 
   describe '#observed_enrollments' do
-    let(:enrollment) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 1, :course_id => 1) }
-    let(:enrollment2) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 2, :course_id => 2) }
+    let(:enrollment) { double(state_based_on_date: :active, is_a?: true, associated_user_id: 1, course_id: 1) }
+    let(:enrollment2) { double(state_based_on_date: :active, is_a?: true, associated_user_id: 2, course_id: 2) }
     let(:enrollments) { [enrollment, enrollment2] }
     let(:presenter) { GradesPresenter.new(enrollments) }
 
@@ -106,11 +106,11 @@ describe GradesPresenter do
       before do
         active_enrollments = double('active_enrollments')
         allow(active_enrollments).to receive(:where).and_return([1], [2], [3])
-        allow(StudentEnrollment).to receive_messages(:active => active_enrollments)
+        allow(StudentEnrollment).to receive_messages(active: active_enrollments)
       end
 
       it 'only selects ObserverEnrollments' do
-        student_enrollment = double(:state_based_on_date => :active)
+        student_enrollment = double(state_based_on_date: :active)
         expect(student_enrollment).to receive(:is_a?).with(ObserverEnrollment).and_return(false)
         allow(student_enrollment).to receive(:shard).and_return(shard)
         enrollments << student_enrollment
@@ -118,7 +118,7 @@ describe GradesPresenter do
       end
 
       it 'excludes enrollments without an associated user id' do
-        unassociated_enrollment = double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => nil)
+        unassociated_enrollment = double(state_based_on_date: :active, is_a?: true, associated_user_id: nil)
         allow(unassociated_enrollment).to receive(:shard).and_return(shard)
         enrollments << unassociated_enrollment
         expect(presenter.observed_enrollments).to eq [1, 2]
@@ -139,7 +139,7 @@ describe GradesPresenter do
         end
         student_enrollment = course.enroll_student(@student)
         student_enrollment.accept!
-        observer_enrollment = course.observer_enrollments.build(:user => @observer)
+        observer_enrollment = course.observer_enrollments.build(user: @observer)
         observer_enrollment.associated_user = @student
         observer_enrollment.save!
         enrollments << observer_enrollment
@@ -154,9 +154,9 @@ describe GradesPresenter do
   describe '#teacher_enrollments' do
     let(:course1) { double }
     let(:course2) { double }
-    let(:instructor2) { double(:instructor? => true, :course => course1, :course_section_id => 3, :state_based_on_date => :active) }
-    let(:instructor) { double(:instructor? => true, :course => course1, :course_section_id => 1, :state_based_on_date => :active) }
-    let(:noninstructor) { double(:instructor? => false, :course => course2, :state_based_on_date => :active) }
+    let(:instructor2) { double(instructor?: true, course: course1, course_section_id: 3, state_based_on_date: :active) }
+    let(:instructor) { double(instructor?: true, course: course1, course_section_id: 1, state_based_on_date: :active) }
+    let(:noninstructor) { double(instructor?: false, course: course2, state_based_on_date: :active) }
     let(:enrollments) { [instructor, instructor2, noninstructor] }
     let(:teacher_enrollments) { presenter.teacher_enrollments }
 
@@ -177,12 +177,12 @@ describe GradesPresenter do
     let(:course) { double('course') }
 
     let(:attrs) do
-      { :student? => false, :instructor? => false, :course_id => 1, :state_based_on_date => :active, :course => course, :is_a? => false }
+      { student?: false, instructor?: false, course_id: 1, state_based_on_date: :active, course: course, is_a?: false }
     end
 
-    let(:observed_enrollment) { double('observerd_enrollment', attrs.merge(:is_a? => true, :associated_user_id => 1)) }
-    let(:teacher_enrollment) { double('teacher_enrollment', attrs.merge(:instructor? => true)) }
-    let(:student_enrollment) { double('student_enrollment', attrs.merge(:student? => true)) }
+    let(:observed_enrollment) { double('observerd_enrollment', attrs.merge(is_a?: true, associated_user_id: 1)) }
+    let(:teacher_enrollment) { double('teacher_enrollment', attrs.merge(instructor?: true)) }
+    let(:student_enrollment) { double('student_enrollment', attrs.merge(student?: true)) }
 
     before do
       allow(StudentEnrollment).to receive_messages(active: double(where: [double]))

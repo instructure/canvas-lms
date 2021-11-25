@@ -22,13 +22,13 @@ require_relative '../spec_helper'
 
 describe DueDateCacher do
   before(:once) do
-    course_with_student(:active_all => true)
-    assignment_model(:course => @course)
+    course_with_student(active_all: true)
+    assignment_model(course: @course)
   end
 
   describe ".recompute" do
     before do
-      @instance = double('instance', :recompute => nil)
+      @instance = double('instance', recompute: nil)
     end
 
     it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
@@ -99,8 +99,8 @@ describe DueDateCacher do
   describe ".recompute_course" do
     before do
       @assignments = [@assignment]
-      @assignments << assignment_model(:course => @course)
-      @instance = double('instance', :recompute => nil)
+      @assignments << assignment_model(course: @course)
+      @instance = double('instance', recompute: nil)
     end
 
     it "passes along the whole array" do
@@ -600,8 +600,8 @@ describe DueDateCacher do
       context "one applicable override" do
         before do
           assignment_override_model(
-            :assignment => @assignment,
-            :set => @course.default_section
+            assignment: @assignment,
+            set: @course.default_section
           )
         end
 
@@ -656,17 +656,17 @@ describe DueDateCacher do
         before do
           @student1 = @student
           @student2 = user_factory
-          @course.enroll_student(@student2, :enrollment_state => 'active')
+          @course.enroll_student(@student2, enrollment_state: 'active')
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day
           )
-          @override.assignment_override_students.create!(:user => @student2)
+          @override.assignment_override_students.create!(user: @student2)
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "applies to students in the adhoc set" do
@@ -692,17 +692,17 @@ describe DueDateCacher do
           @student2 = user_factory
 
           add_section('second section')
-          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
+          @course.enroll_student(@student2, enrollment_state: 'active', section: @course_section)
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course_section
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
 
           cacher.recompute
         end
@@ -717,9 +717,9 @@ describe DueDateCacher do
 
         it "does not apply to non-active enrollments in that section" do
           @course.enroll_student(@student1,
-                                 :enrollment_state => 'deleted',
-                                 :section => @course_section,
-                                 :allow_multiple_enrollments => true)
+                                 enrollment_state: 'deleted',
+                                 section: @course_section,
+                                 allow_multiple_enrollments: true)
           expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
         end
       end
@@ -728,27 +728,27 @@ describe DueDateCacher do
         before do
           @student1 = @student
           @student2 = user_factory
-          @course.enroll_student(@student2, :enrollment_state => 'active')
+          @course.enroll_student(@student2, enrollment_state: 'active')
 
           @assignment.group_category = group_category
           @assignment.save!
 
           group_with_user(
-            :group_context => @course,
-            :group_category => @assignment.group_category,
-            :user => @student2,
-            :active_all => true
+            group_context: @course,
+            group_category: @assignment.group_category,
+            user: @student2,
+            active_all: true
           )
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @group
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @group
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "applies to students in that group" do
@@ -780,15 +780,15 @@ describe DueDateCacher do
           multiple_student_enrollment(@student, @course_section)
 
           @override1 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course.default_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course.default_section
           )
 
           @override2 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course_section
           )
         end
 
@@ -832,26 +832,26 @@ describe DueDateCacher do
           @student3 = user_factory
 
           add_section('second section')
-          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
-          @course.enroll_student(@student3, :enrollment_state => 'active')
+          @course.enroll_student(@student2, enrollment_state: 'active', section: @course_section)
+          @course.enroll_student(@student3, enrollment_state: 'active')
           multiple_student_enrollment(@student3, @course_section)
 
           @override1 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 2.days,
-            :set => @course.default_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 2.days,
+            set: @course.default_section
           )
 
           @override2 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 2.days,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 2.days,
+            set: @course_section
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          @submission3 = submission_model(:assignment => @assignment, :user => @student3)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          @submission3 = submission_model(assignment: @assignment, user: @student3)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "uses first override where second doesn't apply" do
@@ -882,17 +882,17 @@ describe DueDateCacher do
       context "multiple assignments, only one overridden" do
         before do
           @assignment1 = @assignment
-          @assignment2 = assignment_model(:course => @course)
+          @assignment2 = assignment_model(course: @course)
 
           assignment_override_model(
-            :assignment => @assignment1,
-            :due_at => @assignment1.due_at + 1.day
+            assignment: @assignment1,
+            due_at: @assignment1.due_at + 1.day
           )
-          @override.assignment_override_students.create!(:user => @student)
+          @override.assignment_override_students.create!(user: @student)
 
-          @submission1 = submission_model(:assignment => @assignment1, :user => @student)
-          @submission2 = submission_model(:assignment => @assignment2, :user => @student)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment1, user: @student)
+          @submission2 = submission_model(assignment: @assignment2, user: @student)
+          Submission.update_all(cached_due_date: nil)
 
           DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
         end

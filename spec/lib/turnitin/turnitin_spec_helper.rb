@@ -19,7 +19,7 @@
 
 require 'spec_helper'
 
-RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
+RSpec.shared_context "shared_tii_lti", shared_context: :metadata do
   before do
     allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
@@ -37,9 +37,9 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
     )
     tool.url = "http://www.example.com/basic_lti"
     tool.resource_selection = {
-      :url => "http://#{HostUrl.default_host}/selection_test",
-      :selection_width => 400,
-      :selection_height => 400
+      url: "http://#{HostUrl.default_host}/selection_test",
+      selection_width: 400,
+      selection_height: 400
     }
     tool.save!
     tool

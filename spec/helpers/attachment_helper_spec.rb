@@ -24,7 +24,7 @@ describe AttachmentHelper do
 
   before :once do
     course_with_student
-    @att = attachment_model(:context => @user)
+    @att = attachment_model(context: @user)
   end
 
   it "returns a valid crocodoc session url" do

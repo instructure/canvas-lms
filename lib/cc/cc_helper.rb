@@ -316,7 +316,7 @@ module CC
 
         original_param = query.sub("?", "").split("&").detect { |p| p.include?("module_item_id=") }
         tag_id = original_param.split("=").last
-        new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(:id => tag_id))}"
+        new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(id: tag_id))}"
         query.sub(original_param, new_param)
       end
 
@@ -413,7 +413,7 @@ module CC
                filename += ".#{asset[:fileExt]}" if asset
                File.join(MEDIA_OBJECTS_FOLDER, filename)
              end
-      { :asset => asset, :path => path }
+      { asset: asset, path: path }
     end
 
     # sub_path is the last part of a file url: /courses/1/files/1(/download)

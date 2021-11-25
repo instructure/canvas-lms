@@ -22,7 +22,7 @@ module Api::V1::QuizGroup
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_GROUP_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       id
       quiz_id
       name
@@ -34,7 +34,7 @@ module Api::V1::QuizGroup
   }.freeze
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       name
       pick_count
       question_points

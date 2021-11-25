@@ -68,16 +68,16 @@ describe 'pace plan page' do
     before :once do
       @course_module = create_course_module(module_title, 'active')
       @assignment = create_assignment(@course, module_assignment_title, "Module Assignment Description", 10, 'published')
-      @module_item = @course_module.add_item(:id => @assignment.id, :type => 'assignment')
+      @module_item = @course_module.add_item(id: @assignment.id, type: 'assignment')
     end
 
     it 'shows the module and module items in the pace plan' do
       discussion_title = "Module Discussion"
       discussion_assignment = create_graded_discussion(@course, discussion_title, 'published')
-      @course_module.add_item(:id => discussion_assignment.id, :type => 'discussion_topic')
+      @course_module.add_item(id: discussion_assignment.id, type: 'discussion_topic')
       quiz_title = "Quiz Title"
       quiz = create_quiz(@course, quiz_title)
-      @course_module.add_item(:id => quiz.id, :type => 'quiz')
+      @course_module.add_item(id: quiz.id, type: 'quiz')
 
       visit_pace_plans_page
 
@@ -89,7 +89,7 @@ describe 'pace plan page' do
 
     it 'shows the published status for items' do
       unpublished_assignment = create_assignment(@course, 'unpub assignment', "unpub descrition", 10, 'unpublished')
-      @course_module.add_item(:id => unpublished_assignment.id, :type => 'assignment')
+      @course_module.add_item(id: unpublished_assignment.id, type: 'assignment')
 
       visit_pace_plans_page
 
@@ -115,10 +115,10 @@ describe 'pace plan page' do
     it 'does not show a module item that is not an assignment' do
       page = @course.wiki_pages.create!(title: "New Page Title")
       @course_module.add_item(id: page.id, type: 'wiki_page')
-      @course_module.add_item(:type => 'external_url',
-                              :url => 'http://example.com/lolcats',
-                              :title => 'pls view')
-      @course_module.add_item(:type => "sub_header", :title => "silly tag")
+      @course_module.add_item(type: 'external_url',
+                              url: 'http://example.com/lolcats',
+                              title: 'pls view')
+      @course_module.add_item(type: "sub_header", title: "silly tag")
 
       visit_pace_plans_page
 

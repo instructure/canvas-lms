@@ -26,16 +26,16 @@ describe "dashboard" do
 
   context "as a teacher" do
     before do
-      course_with_teacher_logged_in(:active_cc => true)
+      course_with_teacher_logged_in(active_cc: true)
     end
 
     it "validates the functionality of soft concluded courses on courses page", priority: "1" do
-      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
+      term = EnrollmentTerm.new(name: "Super Term", start_at: 1.month.ago, end_at: 1.week.ago)
       term.root_account_id = @course.root_account_id
       term.save!
       c1 = @course
       c1.name = 'a_soft_concluded_course'
-      c1.update!(:enrollment_term => term)
+      c1.update!(enrollment_term: term)
       c1.reload
 
       get "/courses"
@@ -43,11 +43,11 @@ describe "dashboard" do
     end
 
     it "displays assignment to grade in to do list for a teacher", priority: "1" do
-      assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+      student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+      @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
       assignment.reload
-      assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+      assignment.submit_homework(student, { submission_type: 'online_text_entry', body: 'ABC' })
       assignment.reload
       enable_cache do
         get "/"
@@ -58,13 +58,13 @@ describe "dashboard" do
     end
 
     it "is able to ignore an assignment until the next submission", priority: "1" do
-      assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwertyuiop')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-      @course.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
+      assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+      student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+      student2 = user_with_pseudonym(active_user: true, username: 'student2@example.com', password: 'qwertyuiop')
+      @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
+      @course.enroll_user(student2, "StudentEnrollment", enrollment_state: 'active')
       assignment.reload
-      assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+      assignment.submit_homework(student, { submission_type: 'online_text_entry', body: 'ABC' })
       assignment.reload
       enable_cache do
         get "/"
@@ -81,7 +81,7 @@ describe "dashboard" do
       end
 
       assignment.reload
-      assignment.submit_homework(student2, { :submission_type => 'online_text_entry', :body => 'ABC' })
+      assignment.submit_homework(student2, { submission_type: 'online_text_entry', body: 'ABC' })
       assignment.reload
       enable_cache do
         get "/"
@@ -96,7 +96,7 @@ describe "dashboard" do
       end
 
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1" do
-        assignment_model({ :submission_types => ['online_text_entry'], :course => @course })
+        assignment_model({ submission_types: ['online_text_entry'], course: @course })
         get "/"
         f('#DashboardOptionsMenu_Container button').click
         fj('span[role="menuitemradio"]:contains("Recent Activity")').click
@@ -129,7 +129,7 @@ describe "dashboard" do
     context "moderation to do" do
       before do
         @teacher = @user
-        @student = student_in_course(:course => @course, :active_all => true).user
+        @student = student_in_course(course: @course, active_all: true).user
         @assignment = @course.assignments.create!(
           title: "some assignment",
           submission_types: ['online_text_entry'],
@@ -137,7 +137,7 @@ describe "dashboard" do
           grader_count: 2,
           final_grader: @teacher
         )
-        @assignment.submit_homework(@student, :body => "submission")
+        @assignment.submit_homework(@student, body: "submission")
       end
 
       it "shows assignments needing moderation" do
@@ -149,7 +149,7 @@ describe "dashboard" do
 
           Timecop.freeze(2.minutes.from_now) do
             # create a provisional grade
-            @assignment.grade_student(@student, :grade => "1", :grader => @teacher, :provisional => true)
+            @assignment.grade_student(@student, grade: "1", grader: @teacher, provisional: true)
 
             run_jobs # touching admins is done in a delayed job
 
@@ -168,7 +168,7 @@ describe "dashboard" do
       end
 
       it "is able to ignore assignments needing moderation until next provisional grade change" do
-        @assignment.grade_student(@student, :grade => "1", :grader => @teacher, :provisional => true)
+        @assignment.grade_student(@student, grade: "1", grader: @teacher, provisional: true)
         pg = @assignment.provisional_grades.first
 
         enable_cache do
@@ -198,15 +198,15 @@ describe "dashboard" do
 
     describe "Todo Ignore Options Focus Management" do
       before do
-        assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-        @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
-        assignment.submit_homework(@student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+        assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+        @student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+        @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
+        assignment.submit_homework(@student, { submission_type: 'online_text_entry', body: 'ABC' })
       end
 
       it "focuses on the previous ignore link after ignoring a todo item", priority: "1" do
-        assignment2 = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-        assignment2.submit_homework(@student, { :submission_type => 'online_text_entry', :body => 'Number2' })
+        assignment2 = assignment_model({ submission_types: 'online_text_entry', course: @course })
+        assignment2.submit_homework(@student, { submission_type: 'online_text_entry', body: 'Number2' })
         enable_cache do
           get "/"
 
@@ -231,12 +231,12 @@ describe "dashboard" do
     end
 
     it "does not display assignment to grade in to do list for a designer", priority: "1" do
-      course_with_designer_logged_in(:active_all => true)
-      assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      course_with_designer_logged_in(active_all: true)
+      assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+      student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+      @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
       assignment.reload
-      assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+      assignment.submit_homework(student, { submission_type: 'online_text_entry', body: 'ABC' })
       assignment.reload
       enable_cache do
         get "/"
@@ -247,9 +247,9 @@ describe "dashboard" do
 
     it "shows submitted essay quizzes in the todo list", priority: "1" do
       quiz_title = 'new quiz'
-      student_in_course(:active_all => true)
-      q = @course.quizzes.create!(:title => quiz_title)
-      q.quiz_questions.create!(:question_data => { :id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10 })
+      student_in_course(active_all: true)
+      q = @course.quizzes.create!(title: quiz_title)
+      q.quiz_questions.create!(question_data: { id: 31, name: "Quiz Essay Question 1", question_type: 'essay_question', question_text: 'qq1', points_possible: 10 })
       q.generate_quiz_data
       q.workflow_state = 'available'
       q.save
@@ -267,11 +267,11 @@ describe "dashboard" do
 
     context "todo link" do
       before do
-        assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-        student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-        @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+        assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+        student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+        @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
         assignment.reload
-        assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+        assignment.submit_homework(student, { submission_type: 'online_text_entry', body: 'ABC' })
         assignment.reload
       end
 
@@ -296,7 +296,7 @@ describe "dashboard" do
 
     context "course menu customization" do
       it "always has a link to the courses page (with customizations)", priority: "1" do
-        course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
+        course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
 
         get "/"
 
@@ -308,7 +308,7 @@ describe "dashboard" do
 
   context 'as a teacher in an unpublished course' do
     before do
-      course_with_teacher_logged_in(:active_course => false)
+      course_with_teacher_logged_in(active_course: false)
     end
 
     it 'does not show an unpublished assignment for an unpublished course', priority: "2" do

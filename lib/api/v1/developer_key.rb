@@ -41,7 +41,7 @@ module Api::V1::DeveloperKey
 
     keys_to_show += ['test_cluster_only'] if DeveloperKey.test_cluster_checks_enabled?
 
-    api_json(key, user, session, :only => keys_to_show).tap do |hash|
+    api_json(key, user, session, only: keys_to_show).tap do |hash|
       if (context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id) && !inherited
         hash['api_key'] = key.api_key
         hash['redirect_uri'] = key.redirect_uri

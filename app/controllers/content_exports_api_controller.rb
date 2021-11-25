@@ -178,10 +178,10 @@ class ContentExportsApiController < ApplicationController
                                                                             global_identifiers: @context.content_exports.temp_record.can_use_global_identifiers?)
 
       unless formatter.valid_type?(params[:type])
-        return render :json => { :message => "unsupported migration type" }, :status => :bad_request
+        return render json: { message: "unsupported migration type" }, status: :bad_request
       end
 
-      render :json => formatter.get_content_list(params[:type], @context)
+      render json: formatter.get_content_list(params[:type], @context)
     end
   end
 end

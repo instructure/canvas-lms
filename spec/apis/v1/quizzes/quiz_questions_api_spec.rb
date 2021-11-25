@@ -27,18 +27,18 @@ describe Quizzes::QuizQuestionsController, type: :request do
     before :once do
       @course = course_factory
       teacher_in_course active_all: true
-      @quiz = @course.quizzes.create!(:title => "A Sample Quiz")
+      @quiz = @course.quizzes.create!(title: "A Sample Quiz")
     end
 
     describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
       it "returns a list of questions" do
         questions = (1..10).map do |n|
-          @quiz.quiz_questions.create!(:question_data => { :question_name => "Question #{n}" })
+          @quiz.quiz_questions.create!(question_data: { question_name: "Question #{n}" })
         end
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+                        controller: "quizzes/quiz_questions", action: "index", format: "json",
+                        course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
 
         question_ids = json.collect { |q| q['id'] }
         expect(question_ids).to eq questions.map(&:id)
@@ -46,7 +46,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
       it "calls api_user_content for each question and answer text" do
         (1..3).map do |n|
-          @quiz.quiz_questions.create!(:question_data => {
+          @quiz.quiz_questions.create!(question_data: {
                                          :question_name => "Question #{n}",
                                          "answers" => [{ "id" => 1, "html" => "foo foo" }, { "id" => 2 }]
                                        })
@@ -57,25 +57,25 @@ describe Quizzes::QuizQuestionsController, type: :request do
           .exactly(6).times
 
         api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                 :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                 :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+                 controller: "quizzes/quiz_questions", action: "index", format: "json",
+                 course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
       end
 
       it "returns a list of questions which do not include previously deleted questions" do
-        question1 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 1" })
-        question2 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 2" })
+        question1 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 1" })
+        question2 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 2" })
         question1.destroy
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+                        controller: "quizzes/quiz_questions", action: "index", format: "json",
+                        course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
         question_ids = json.collect { |q| q['id'] }
         expect(question_ids).to eq [question2.id]
       end
 
       context 'given a submission id and attempt' do
         it 'returns the list of questions that were used for the submission' do
-          question1 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 1" })
-          question2 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 2" })
+          question1 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 1" })
+          question2 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 2" })
 
           @quiz.generate_quiz_data
           @quiz.save
@@ -88,11 +88,11 @@ describe Quizzes::QuizQuestionsController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
             {
-              :controller => "quizzes/quiz_questions",
-              :action => "index",
-              :format => "json",
-              :course_id => @course.id.to_s,
-              :quiz_id => @quiz.id.to_s
+              controller: "quizzes/quiz_questions",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              quiz_id: @quiz.id.to_s
             },
             {
               quiz_submission_id: qs.id,
@@ -166,7 +166,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
     describe "GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)" do
       context "existing question" do
         before do
-          @question = @quiz.quiz_questions.create!(:question_data => {
+          @question = @quiz.quiz_questions.create!(question_data: {
                                                      "question_name" => "Example Question", "assessment_question_id" => "",
                                                      "question_type" => "multiple_choice_question", "points_possible" => "1",
                                                      "correct_comments" => "", "incorrect_comments" => "", "neutral_comments" => "",
@@ -176,8 +176,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                    })
 
           @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                           :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                           :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id.to_s)
+                           controller: "quizzes/quiz_questions", action: "show", format: "json",
+                           course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
 
           @json.symbolize_keys!
         end
@@ -206,7 +206,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       context "api content translation" do
         it "translates question text" do
           should_translate_user_content(@course) do |content|
-            @question = @quiz.quiz_questions.create!(:question_data => {
+            @question = @quiz.quiz_questions.create!(question_data: {
                                                        "question_name" => "Example Question",
                                                        "question_type" => "multiple_choice_question",
                                                        "points_possible" => "1",
@@ -215,8 +215,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                      })
 
             json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                            :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                            :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id.to_s)
+                            controller: "quizzes/quiz_questions", action: "show", format: "json",
+                            course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
 
             json['question_text']
           end
@@ -225,7 +225,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         it "translates answer html" do
           should_translate_user_content(@course) do |content|
             plain_answer_txt = "plz don't & escape me"
-            @question = @quiz.quiz_questions.create!(:question_data => {
+            @question = @quiz.quiz_questions.create!(question_data: {
                                                        "question_name" => "Example Question",
                                                        "question_type" => "multiple_choice_question",
                                                        "points_possible" => "1",
@@ -234,8 +234,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                      })
 
             json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                            :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                            :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id.to_s)
+                            controller: "quizzes/quiz_questions", action: "show", format: "json",
+                            course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
 
             expect(json['answers'][0]['text']).to eq plain_answer_txt
             json['answers'][1]['html']
@@ -246,8 +246,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
       context "non-existent question" do
         it "returns a not found error message" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
-                          { :controller => "quizzes/quiz_questions", :action => "show", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => "9034831" },
-                          {}, {}, { :expected_status => 404 })
+                          { controller: "quizzes/quiz_questions", action: "show", format: "json", course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: "9034831" },
+                          {}, {}, { expected_status: 404 })
           expect(json.inspect).to include "does not exist"
         end
       end
@@ -256,9 +256,9 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
   context 'as a student' do
     before :once do
-      course_with_student :active_all => true
+      course_with_student active_all: true
 
-      @quiz = @course.quizzes.create!(:title => 'quiz')
+      @quiz = @course.quizzes.create!(title: 'quiz')
       @quiz.published_at = Time.now
       @quiz.workflow_state = 'available'
       @quiz.save!
@@ -268,19 +268,19 @@ describe Quizzes::QuizQuestionsController, type: :request do
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
         it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                       :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+                       controller: "quizzes/quiz_questions", action: "index", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
           assert_status(401)
         end
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
         it "is unauthorized" do
-          @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+          @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                       :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id)
+                       controller: "quizzes/quiz_questions", action: "show", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id)
           assert_status(401)
         end
       end
@@ -294,28 +294,28 @@ describe Quizzes::QuizQuestionsController, type: :request do
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
         it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                       :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+                       controller: "quizzes/quiz_questions", action: "index", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
           assert_status(401)
         end
 
         it 'is authorized with quiz_submission_id & attempt' do
           url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions?quiz_submission_id=#{@submission.id}&quiz_submission_attempt=1"
           raw_api_call(:get, url,
-                       :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s,
-                       :quiz_submission_id => @submission.id, :quiz_submission_attempt => 1)
+                       controller: "quizzes/quiz_questions", action: "index", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s,
+                       quiz_submission_id: @submission.id, quiz_submission_attempt: 1)
           assert_status(200)
         end
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
         it "is unauthorized" do
-          @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+          @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                       :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id)
+                       controller: "quizzes/quiz_questions", action: "show", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id)
           assert_status(401)
         end
       end

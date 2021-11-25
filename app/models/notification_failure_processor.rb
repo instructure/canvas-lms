@@ -80,7 +80,7 @@ class NotificationFailureProcessor
     error_context = summary['error_context']
 
     message_id, timestamp = Message.parse_notification_service_id(global_id)
-    scope = Message.where(:id => message_id)
+    scope = Message.where(id: message_id)
     scope = scope.at_timestamp(timestamp) if timestamp
     message = scope.take
     if message

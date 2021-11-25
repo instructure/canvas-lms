@@ -67,7 +67,7 @@ module Api::V1::OutcomeResults
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
-      ContentTag.learning_outcome_alignments.not_deleted.where(:learning_outcome_id => outcomes_slice)
+      ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: outcomes_slice)
                 .pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
         (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"
       end
@@ -203,7 +203,7 @@ module Api::V1::OutcomeResults
     section_ids_func = if @section
                          ->(_user) { [@section.id] }
                        else
-                         enrollments = @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map { |pair| pair[0].context.id }).to_a
+                         enrollments = @context.all_accepted_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair[0].context.id }).to_a
                          ->(user) { enrollments.select { |e| e.user_id == user.id }.map(&:course_section_id) }
                        end
 
@@ -240,8 +240,8 @@ module Api::V1::OutcomeResults
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
         path = pathParts.pluck(:name).join(' > ')
-        row << I18n.t(:outcome_path_result, "%{path} result", :path => path)
-        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
+        row << I18n.t(:outcome_path_result, "%{path} result", path: path)
+        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", path: path)
       end
       csv << row
       mastery_points = @context.root_account.feature_enabled?(:account_level_mastery_scales) && @context.resolved_outcome_proficiency&.mastery_points

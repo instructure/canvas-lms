@@ -24,13 +24,13 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w[id name created_at].freeze,
-    :methods => %w[sortable_name short_name].freeze
+    only: %w[id name created_at].freeze,
+    methods: %w[sortable_name short_name].freeze
   }.freeze
 
   def user_json_preloads(users, preload_email = false, opts = {})
     # for User#account
-    ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym => :account) if opts.fetch(:accounts, true)
+    ActiveRecord::Associations::Preloader.new.preload(users, pseudonym: :account) if opts.fetch(:accounts, true)
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
@@ -141,9 +141,9 @@ module Api::V1::User
 
       if includes.include?('permissions')
         json[:permissions] = {
-          :can_update_name => user.user_can_edit_name?,
-          :can_update_avatar => service_enabled?(:avatars) && !user.avatar_locked?,
-          :limit_parent_app_web_access => user.limit_parent_app_web_access?,
+          can_update_name: user.user_can_edit_name?,
+          can_update_avatar: service_enabled?(:avatars) && !user.avatar_locked?,
+          limit_parent_app_web_access: user.limit_parent_app_web_access?,
         }
       end
 
@@ -307,7 +307,7 @@ module Api::V1::User
         json[:locked] = lockedbysis
       end
       if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
-        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id), grading_period: opts[:grading_period])
+        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(course_id: enrollment.course_id), grading_period: opts[:grading_period])
       end
       if includes.include?('can_be_removed')
         json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&

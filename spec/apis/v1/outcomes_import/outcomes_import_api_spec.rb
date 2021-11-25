@@ -101,7 +101,7 @@ describe "Outcomes Import API", type: :request do
       account_user.account,
       account_user.role,
       permission.to_s,
-      :override => false
+      override: false
     )
   end
 
@@ -110,9 +110,9 @@ describe "Outcomes Import API", type: :request do
   end
 
   before :once do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
     @account = Account.default
-    @account_user = @user.account_users.create(:account => Account.site_admin)
+    @account_user = @user.account_users.create(account: Account.site_admin)
   end
 
   shared_examples "academic benchmark config" do

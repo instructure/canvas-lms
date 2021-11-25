@@ -25,8 +25,8 @@ require 'csv'
 describe PageViewsController do
   # Factory-like thing for page views.
   def page_view(user, url, options = {})
-    options.reverse_merge!(:request_id => 'req' + rand(100_000_000).to_s,
-                           :user_agent => 'Firefox/12.0')
+    options.reverse_merge!(request_id: 'req' + rand(100_000_000).to_s,
+                           user_agent: 'Firefox/12.0')
     options[:url] = url
 
     user_req = options.delete(:user_request)
@@ -53,18 +53,18 @@ describe PageViewsController do
     end
 
     it "succeeds" do
-      page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
-      get 'index', params: { :user_id => @user.id }, format: 'csv'
+      page_view(@user, '/somewhere/in/app', created_at: 2.days.ago)
+      get 'index', params: { user_id: @user.id }, format: 'csv'
       expect(response).to be_successful
     end
 
     it "orders rows by created_at in DESC order" do
-      pv2 = page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago) # 2nd day
-      pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago) # 1st day
-      pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
-      get 'index', params: { :user_id => @user.id }, format: 'csv'
+      pv2 = page_view(@user, '/somewhere/in/app', created_at: 2.days.ago) # 2nd day
+      pv1 = page_view(@user, '/somewhere/in/app/1', created_at: 1.day.ago) # 1st day
+      pv3 = page_view(@user, '/somewhere/in/app/2', created_at: 3.days.ago)  # 3rd day
+      get 'index', params: { user_id: @user.id }, format: 'csv'
       expect(response).to be_successful
-      dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
+      dates = CSV.parse(response.body, headers: true).map { |row| row['created_at'] }
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
     end
 
@@ -90,7 +90,7 @@ describe PageViewsController do
     context "POST 'update'" do
       it "catches a cassandra error" do
         allow(PageView).to receive(:find_for_update).and_raise(CassandraCQL::Error::InvalidRequestException)
-        pv = page_view(@student, '/somewhere/in/app/1', :created_at => 1.day.ago)
+        pv = page_view(@student, '/somewhere/in/app/1', created_at: 1.day.ago)
 
         user_session(@student)
         put 'update', params: { id: pv.token, interaction_seconds: '5', page_view_token: pv.token }, xhr: true

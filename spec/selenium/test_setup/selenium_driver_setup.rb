@@ -244,7 +244,7 @@ module SeleniumDriverSetup
     # see https://github.com/SeleniumHQ/selenium/issues/2435#issuecomment-245458210
     def with_vanilla_json
       orig_options = Oj.default_options
-      Oj.default_options = { :escape_mode => :json }
+      Oj.default_options = { escape_mode: :json }
       yield
     ensure
       Oj.default_options = orig_options
@@ -289,8 +289,8 @@ module SeleniumDriverSetup
       puts "Thread: provisioning remote #{browser} driver"
       driver = Selenium::WebDriver.for(
         :remote,
-        :url => selenium_url,
-        :desired_capabilities => desired_capabilities
+        url: selenium_url,
+        desired_capabilities: desired_capabilities
       )
 
       driver.file_detector = lambda do |args|

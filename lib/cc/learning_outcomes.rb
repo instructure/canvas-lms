@@ -35,7 +35,7 @@ module CC
       else
         outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LEARNING_OUTCOMES)
-        document = Builder::XmlMarkup.new(:target => outcomes_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: outcomes_file, indent: 2)
       end
 
       document.instruct!
@@ -50,7 +50,7 @@ module CC
 
         if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, 'learning_outcomes')
           # copy straggler outcomes that should be brought in implicitly
-          @course.linked_learning_outcomes.where.not(:id => @exported_outcome_ids).each do |item|
+          @course.linked_learning_outcomes.where.not(id: @exported_outcome_ids).each do |item|
             if export_object?(item, 'learning_outcomes')
               process_learning_outcome(outs_node, item)
             end
@@ -64,7 +64,7 @@ module CC
 
     def process_outcome_group(node, group, force_export = false)
       migration_id = create_key(group)
-      node.learningOutcomeGroup(:identifier => migration_id) do |group_node|
+      node.learningOutcomeGroup(identifier: migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
         group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
@@ -101,7 +101,7 @@ module CC
       add_exported_asset(item)
 
       migration_id = create_key(item)
-      node.learningOutcome(:identifier => migration_id) do |out_node|
+      node.learningOutcome(identifier: migration_id) do |out_node|
         out_node.title item.short_description if item.short_description.present?
         out_node.description @html_exporter.html_content(item.description) if item.description.present?
         out_node.calculation_method item.calculation_method if item.calculation_method.present?

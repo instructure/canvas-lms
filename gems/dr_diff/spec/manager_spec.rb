@@ -71,11 +71,10 @@ spec/dr_diff_spec.rb)
 
       let(:command_capture_comments) do
         [
-          { :path => "gems/plugins/custom_reports/lib/custom_reports.rb",
-            :message =>
-             "[rubocop] Avoid using sleep.\n\n       sleep 1\n       ^^^^^^^\n",
-            :position => 5,
-            :severity => "convention" }
+          { path: "gems/plugins/custom_reports/lib/custom_reports.rb",
+            message: "[rubocop] Avoid using sleep.\n\n       sleep 1\n       ^^^^^^^\n",
+            position: 5,
+            severity: "convention" }
         ]
       end
 

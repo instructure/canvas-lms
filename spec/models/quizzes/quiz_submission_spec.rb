@@ -55,7 +55,7 @@ describe Quizzes::QuizSubmission do
 
       it "validates quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
-        qs.quiz = Quizzes::Quiz.new(:points_possible => 2_000_000_001)
+        qs.quiz = Quizzes::Quiz.new(points_possible: 2_000_000_001)
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
@@ -108,12 +108,12 @@ describe Quizzes::QuizSubmission do
     end
 
     it "copies the quiz's points_possible whenever it's saved" do
-      Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
+      Quizzes::Quiz.where(id: @quiz).update_all(points_possible: 1.1)
       @quiz.reload
       q = @quiz.quiz_submissions.create!
       expect(q.reload.quiz_points_possible).to eql 1.1
 
-      Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
+      Quizzes::Quiz.where(id: @quiz).update_all(points_possible: 1.9)
       expect(q.reload.quiz_points_possible).to eql 1.1
 
       q.save!
@@ -153,7 +153,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.score).to eq 50
         expect(qs.kept_score).to eq 50
 
-        qs.update_scores({ :fudge_points => -5, :question_score_1 => 50 })
+        qs.update_scores({ fudge_points: -5, question_score_1: 50 })
         expect(qs.score).to eq 45
         expect(qs.fudge_points).to eq(-5)
         expect(qs.kept_score).to eq 45
@@ -176,7 +176,7 @@ describe Quizzes::QuizSubmission do
           expect(qs.score).to eq 42
           expect(qs.kept_score).to eq 42
 
-          qs.update_scores({ :fudge_points => -5, :question_score_1 => 50 })
+          qs.update_scores({ fudge_points: -5, question_score_1: 50 })
           expect(qs.score).to eq 42
           expect(qs.fudge_points).to eq(-5)
           expect(qs.kept_score).to eq 42
@@ -206,7 +206,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.kept_score).to eq 0
         expect(qs.versions.count).to eq 2
 
-        qs.update_scores({ :submission_version_number => 1, :fudge_points => 10, :question_score_1 => 0 })
+        qs.update_scores({ submission_version_number: 1, fudge_points: 10, question_score_1: 0 })
         expect(qs.score).to eq 0
         expect(qs.kept_score).to eq 10
         expect(qs.versions.get(1).model.score).to eq 10
@@ -223,7 +223,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.reload.attempt).to eq 2
 
         expect { qs.update_scores({}) }.to raise_error("Can't update submission scores unless it's completed")
-        expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 1, :question_score_1 => 0) }.not_to raise_error
+        expect { qs.update_scores(submission_version_number: 1, fudge_points: 1, question_score_1: 0) }.not_to raise_error
 
         expect(qs).to be_untaken
         expect(qs.score).to be_nil
@@ -244,7 +244,7 @@ describe Quizzes::QuizSubmission do
         qs.backup_submission_data({ "foo" => "bar2" }) # simulate k/v pairs we store for quizzes in progress
         qs.reload
 
-        qs.update_scores(:submission_version_number => 1, :fudge_points => 3)
+        qs.update_scores(submission_version_number: 1, fudge_points: 3)
         qs.reload
 
         expect(qs).to be_untaken
@@ -262,7 +262,7 @@ describe Quizzes::QuizSubmission do
         # the default value for grader is a negative quiz_id... since forever
         expect(qs.submission.grader_id).to eq "-#{qs.quiz_id}".to_i
 
-        qs.update_scores(:grader_id => @user.id, :fudge_points => 1, :question_score_1 => 0)
+        qs.update_scores(grader_id: @user.id, fudge_points: 1, question_score_1: 0)
 
         # now when a score is updated we have a real grader associated!
         expect(qs.submission.reload.grader_id).to eq @user.id
@@ -274,7 +274,7 @@ describe Quizzes::QuizSubmission do
         Quizzes::SubmissionGrader.new(qs).grade_submission
 
         qs.reload
-        expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 3) }
+        expect { qs.update_scores(submission_version_number: 1, fudge_points: 3) }
           .to change { qs.submission.versions.count }.by 1
       end
 
@@ -425,7 +425,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.reload
         expect(@quiz_sub.manually_scored).to be_truthy
 
-        @quiz_sub.update_scores(:fudge_points => 2)
+        @quiz_sub.update_scores(fudge_points: 2)
 
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 2
@@ -480,7 +480,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "calculates score based on quiz scoring policy" do
-      q = @course.quizzes.create!(:scoring_policy => "keep_latest")
+      q = @course.quizzes.create!(scoring_policy: "keep_latest")
       s = q.quiz_submissions.new
       s.workflow_state = "complete"
       s.score = 5.0
@@ -495,7 +495,7 @@ describe Quizzes::QuizSubmission do
       expect(s.version_number).to eql(2)
       expect(s.kept_score).to eql(4.0)
 
-      q.update!(:scoring_policy => "keep_highest")
+      q.update!(scoring_policy: "keep_highest")
       s.reload
       s.score = 3.0
       s.attempt = 3
@@ -507,8 +507,8 @@ describe Quizzes::QuizSubmission do
       s.with_versioning(true, &:save!)
       expect(s.kept_score).to eql(4.0)
 
-      q.update!(:scoring_policy => "keep_highest")
-      s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
+      q.update!(scoring_policy: "keep_highest")
+      s.update_scores(submission_version_number: 2, fudge_points: 6.0)
       expect(s.kept_score).to eql(6.0)
     end
 
@@ -549,7 +549,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "calculates highest score based on most recent version of an attempt" do
-      q = @course.quizzes.create!(:scoring_policy => "keep_highest")
+      q = @course.quizzes.create!(scoring_policy: "keep_highest")
       s = q.quiz_submissions.new
 
       s.workflow_state = "complete"
@@ -578,7 +578,7 @@ describe Quizzes::QuizSubmission do
 
     describe "with an essay question" do
       before(:once) do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer.</p>",
@@ -658,8 +658,8 @@ describe Quizzes::QuizSubmission do
 
     describe "with multiple essay questions" do
       before(:once) do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                     { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                     { question_data: { :name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
@@ -699,8 +699,8 @@ describe Quizzes::QuizSubmission do
       end
 
       it "marks a submission complete if all essay questions have been graded, even if a text_only_question is present" do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
-                                     { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'text_only_question' } }]) do
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
+                                     { question_data: { :name => 'question 2', :points_possible => 1, 'question_type' => 'text_only_question' } }]) do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
@@ -875,9 +875,9 @@ describe Quizzes::QuizSubmission do
 
     context "permissions" do
       it "allows read to observers" do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @observer = user_factory
-        oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+        oe = @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')
         oe.update_attribute(:associated_user, @user)
         @quiz = @course.quizzes.create!
         qs = @quiz.generate_submission(@user)
@@ -900,14 +900,14 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not take events from an anonymous user" do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @quiz = @course.quizzes.create!
         qs = @quiz.generate_submission(@user)
         expect(qs.grants_right?(nil, :record_events)).to be_falsey
       end
 
       it "can take events for any users for a ungraded quiz in a public course" do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @course.is_public = true
         @course.is_public_to_auth_users = true
         @course.save!
@@ -919,8 +919,8 @@ describe Quizzes::QuizSubmission do
 
     describe "#question" do
       let(:submission) { @quiz.quiz_submissions.build }
-      let(:question1) { { :id => 1 } }
-      let(:question2) { { :id => 2 } }
+      let(:question1) { { id: 1 } }
+      let(:question2) { { id: 2 } }
       let(:questions) { [question1, question2] }
 
       before do
@@ -1184,12 +1184,12 @@ describe Quizzes::QuizSubmission do
       before do
         submission.with_versioning(true) do |s|
           s.score = 10
-          s.save(:validate => false)
+          s.save(validate: false)
         end
 
         submission.with_versioning(true) do |s|
           s.score = 15
-          s.save(:validate => false)
+          s.save(validate: false)
         end
       end
 
@@ -1253,7 +1253,7 @@ describe Quizzes::QuizSubmission do
 
     describe "#has_regrade?" do
       it "is true if score before regrade is present" do
-        expect(Quizzes::QuizSubmission.new(:score_before_regrade => 10).has_regrade?).to be_truthy
+        expect(Quizzes::QuizSubmission.new(score_before_regrade: 10).has_regrade?).to be_truthy
       end
 
       it "is false if score before regrade is absent" do
@@ -1263,13 +1263,13 @@ describe Quizzes::QuizSubmission do
 
     describe "#score_affected_by_regrade?" do
       it "is true if score before regrade differs from current score" do
-        submission = Quizzes::QuizSubmission.new(:score_before_regrade => 10)
+        submission = Quizzes::QuizSubmission.new(score_before_regrade: 10)
         submission.kept_score = 5
         expect(submission.score_affected_by_regrade?).to be_truthy
       end
 
       it "is false if score before regrade is the same as current score" do
-        submission = Quizzes::QuizSubmission.new(:score_before_regrade => 10)
+        submission = Quizzes::QuizSubmission.new(score_before_regrade: 10)
         submission.kept_score = 10
         expect(submission.score_affected_by_regrade?).to be_falsey
       end
@@ -1278,7 +1278,7 @@ describe Quizzes::QuizSubmission do
     describe "set_final_score" do
       it "marks a quiz_submission as complete" do
         quiz_with_graded_submission([
-                                      { :question_data => {
+                                      { question_data: {
                                         :name => 'question 1',
                                         :points_possible => 1,
                                         'question_type' => 'essay_question'
@@ -1459,9 +1459,9 @@ describe Quizzes::QuizSubmission do
 
     describe 'broadcast policy' do
       before :once do
-        Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
-        Notification.create(:name => 'Submission Grade Changed', :category => 'TestImmediately')
-        Notification.create(:name => 'Submission Needs Grading', :category => 'TestImmediately')
+        Notification.create(name: 'Submission Graded', category: 'TestImmediately')
+        Notification.create(name: 'Submission Grade Changed', category: 'TestImmediately')
+        Notification.create(name: 'Submission Needs Grading', category: 'TestImmediately')
         @course.offer
         student_in_course(active_all: true, active_cc: true)
         teacher_in_course(active_all: true)
@@ -1524,19 +1524,19 @@ describe Quizzes::QuizSubmission do
       end
 
       it 'does not send any "graded" or "grade changed" notifications for a submission with essay questions before they have been graded' do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }])
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }])
         expect(@quiz_submission.reload.messages_sent).not_to include 'Submission Graded'
         expect(@quiz_submission.reload.messages_sent).not_to include 'Submission Grade Changed'
       end
 
       it 'sends a notifications for a submission with essay questions before they have been graded if manually graded' do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }])
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }])
         @quiz_submission.set_final_score(2)
         expect(@quiz_submission.reload.messages_sent.keys).to include 'Submission Graded'
       end
 
       it 'sends a notification if the submission needs manual review' do
-        quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }], course: @course)
+        quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }], course: @course)
         expect(@quiz_submission.reload.messages_sent.keys).to include 'Submission Needs Grading'
       end
 
@@ -1580,8 +1580,8 @@ describe Quizzes::QuizSubmission do
 
     describe '#teachers' do
       before(:once) do
-        student_in_course(:active_all => true, :course => @course)
-        @quiz_submission = @quiz.quiz_submissions.create!(:user => @student)
+        student_in_course(active_all: true, course: @course)
+        @quiz_submission = @quiz.quiz_submissions.create!(user: @student)
         @active_teacher = User.create!
         @active_enrollment = @course.enroll_teacher(@active_teacher)
         @active_enrollment.accept
@@ -1623,7 +1623,7 @@ describe Quizzes::QuizSubmission do
       it "doesn't include section-restricted teachers from other sections" do
         other_section = @course.course_sections.create!
         other_teacher = User.create!
-        other_enrollment = @course.enroll_teacher(other_teacher, :section => other_section, :limit_privileges_to_course_section => true)
+        other_enrollment = @course.enroll_teacher(other_teacher, section: other_section, limit_privileges_to_course_section: true)
         other_enrollment.accept
         expect(@quiz_submission.teachers).to_not include other_teacher
       end

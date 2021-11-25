@@ -23,7 +23,7 @@ describe "SummaryMessageConsolidator" do
     Setting.set('summary_message_consolidator_batch_size', '2')
     users = (0..3).map { user_with_communication_channel }
     messages = []
-    users.each { |u| 3.times { messages << delayed_message_model(:cc => u.communication_channels.first, :send_at => 1.day.ago) } }
+    users.each { |u| 3.times { messages << delayed_message_model(cc: u.communication_channels.first, send_at: 1.day.ago) } }
 
     expects_job_with_tag('Delayed::Batch.serial', 2) do
       SummaryMessageConsolidator.process
@@ -39,7 +39,7 @@ describe "SummaryMessageConsolidator" do
   it "does not double-send messages" do
     all_messages = []
     u = user_with_communication_channel
-    2.times { all_messages << delayed_message_model(:cc => u.communication_channels.first, :send_at => 1.day.ago) }
+    2.times { all_messages << delayed_message_model(cc: u.communication_channels.first, send_at: 1.day.ago) }
 
     allow_any_instance_of(SummaryMessageConsolidator).to receive(:delayed_message_ids_for_batch).and_return(all_messages.map(&:id)) # search grabs all the ids
     already_sent_message, message_to_send = all_messages
@@ -58,9 +58,9 @@ describe "SummaryMessageConsolidator" do
     users.each do |u|
       account_id_iter.each do |rai|
         dms << delayed_message_model(
-          :cc => u.communication_channels.first,
-          :root_account_id => rai,
-          :send_at => 1.day.ago
+          cc: u.communication_channels.first,
+          root_account_id: rai,
+          send_at: 1.day.ago
         )
       end
     end

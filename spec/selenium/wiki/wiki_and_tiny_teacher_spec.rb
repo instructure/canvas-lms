@@ -56,7 +56,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       p = create_wiki_page(title, unpublished, edit_roles)
       # sets body
-      p.update(:body => "test")
+      p.update(body: "test")
 
       get "/courses/#{@course.id}/pages/#{p.title}"
 
@@ -76,8 +76,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       p = create_wiki_page(title, unpublished, edit_roles)
       # sets body and then resets it for history verification
-      p.update(:body => body)
-      p.update(:body => "sample")
+      p.update(body: body)
+      p.update(body: "sample")
 
       get "/courses/#{@course.id}/pages/#{p.title}/revisions"
       wait_for_ajaximations

@@ -292,7 +292,7 @@ module Canvas::LiveEvents
   end
 
   def self.assignments_bulk_updated(assignment_ids)
-    Assignment.where(:id => assignment_ids).each { |a| assignment_updated(a) }
+    Assignment.where(id: assignment_ids).each { |a| assignment_updated(a) }
   end
 
   def self.submissions_bulk_updated(submissions)

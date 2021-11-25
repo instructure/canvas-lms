@@ -42,20 +42,20 @@ describe SubmissionList do
     Timecop.travel(Time.utc(2011, 12, 31, 23, 0)) do
       Auditors::ActiveRecord::Partitioner.process
     end
-    course_with_teacher(:active_all => true)
-    course_with_student(:course => @course, :active_all => true)
+    course_with_teacher(active_all: true)
+    course_with_student(course: @course, active_all: true)
 
-    @assignment1 = @course.assignments.create!(:title => 'one', :points_possible => 10)
-    @assignment2 = @course.assignments.create!(:title => 'two', :points_possible => 10)
-    @assignment3 = @course.assignments.create!(:title => 'three', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(title: 'one', points_possible: 10)
+    @assignment2 = @course.assignments.create!(title: 'two', points_possible: 10)
+    @assignment3 = @course.assignments.create!(title: 'three', points_possible: 10)
 
     Time.zone = 'Alaska'
     allow(Time).to receive(:now).and_return(Time.utc(2011, 12, 31, 23, 0))   # 12/31 14:00 local time
-    @assignment1.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment1.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 1, 0))      # 12/31 16:00 local time
-    @assignment2.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment2.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 10, 0))     #  1/01 01:00 local time
-    @assignment3.grade_student(@student, { :grade => 10, :grader => @teacher })
+    @assignment3.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_call_original
 
     @days = SubmissionList.new(@course).days
@@ -67,10 +67,10 @@ describe SubmissionList do
   end
 
   it "handles excused assignments" do
-    course_with_teacher(:active_all => true)
-    course_with_student(:course => @course, :active_all => true)
+    course_with_teacher(active_all: true)
+    course_with_student(course: @course, active_all: true)
 
-    @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
+    @some_assignment = @course.assignments.create!(title: 'one', points_possible: 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
     subs.each do |s|
       s.created_at = 3.days.ago
@@ -188,7 +188,7 @@ describe SubmissionList do
       # Figure out how to manually regrade a test piece of data
       interesting_submission_data
       @assignment = @course.assignments.create!(title: 'some_assignment')
-      @quiz = Quizzes::Quiz.create!({ :context => @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment" })
+      @quiz = Quizzes::Quiz.create!({ context: @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment" })
       @quiz.workflow_state = 'published'
       @quiz.quiz_data = [multiple_choice_question_data]
       @quiz.save!
@@ -196,15 +196,15 @@ describe SubmissionList do
 
       @points = 15.0
 
-      @question = double(:id => 1, :question_data => { :id => 1,
-                                                       :regrade_option => 'full_credit',
-                                                       :points_possible => @points },
-                         :quiz_group => nil)
+      @question = double(id: 1, question_data: { id: 1,
+                                                 regrade_option: 'full_credit',
+                                                 points_possible: @points },
+                         quiz_group: nil)
 
-      @question_regrade = double(:quiz_question => @question,
-                                 :regrade_option => "full_credit")
+      @question_regrade = double(quiz_question: @question,
+                                 regrade_option: "full_credit")
 
-      @answer = { :question_id => 1, :points => @points, :text => "" }
+      @answer = { question_id: 1, points: @points, text: "" }
 
       @wrapper = Quizzes::QuizRegrader::Answer.new(@answer, @question_regrade)
       Quizzes::SubmissionGrader.new(@qs).grade_submission
@@ -311,37 +311,37 @@ def interesting_submission_data(opts = {})
   opts[:assignment] ||= {}
   opts[:submission] ||= {}
 
-  @grader = user_model({ :name => 'some_grader' }.merge(opts[:grader]))
-  @grader2 = user_model({ :name => 'another_grader' }.merge(opts[:grader]))
-  @student = factory_with_protected_attributes(User, { :name => "studeñt", :workflow_state => "registered" }.merge(opts[:user]))
-  @course = factory_with_protected_attributes(Course, { :name => "some course", :workflow_state => "available" }.merge(opts[:course]))
+  @grader = user_model({ name: 'some_grader' }.merge(opts[:grader]))
+  @grader2 = user_model({ name: 'another_grader' }.merge(opts[:grader]))
+  @student = factory_with_protected_attributes(User, { name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
+  @course = factory_with_protected_attributes(Course, { name: "some course", workflow_state: "available" }.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
     e = @course.enroll_teacher(grader)
     e.accept
   end
   @course.enroll_student(@student)
   @assignment = @course.assignments.new({
-    :title => "some assignment",
-    :points_possible => 10
+    title: "some assignment",
+    points_possible: 10
   }.merge(opts[:assignment]))
   @assignment.workflow_state = "published"
   @assignment.save!
-  @assignment.grade_student(@student, { :grade => 1.5, :grader => @grader }.merge(opts[:submission]))
-  @assignment.grade_student(@student, { :grade => 3, :grader => @grader }.merge(opts[:submission]))
-  @assignment.grade_student(@student, { :grade => 5, :grader => @grader2 }.merge(opts[:submission]))
-  @student = user_model(:name => 'studeЖt')
+  @assignment.grade_student(@student, { grade: 1.5, grader: @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 3, grader: @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 5, grader: @grader2 }.merge(opts[:submission]))
+  @student = user_model(name: 'studeЖt')
   @course.enroll_student(@student)
   @assignment.reload
-  @assignment.grade_student(@student, { :grade => 8, :grader => @grader }.merge(opts[:submission]))
-  @student = user_model(:name => 'student')
+  @assignment.grade_student(@student, { grade: 8, grader: @grader }.merge(opts[:submission]))
+  @student = user_model(name: 'student')
   @course.enroll_student(@student)
   @assignment.reload
-  @assignment.grade_student(@student, { :grade => 10, :grader => @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 10, grader: @grader }.merge(opts[:submission]))
   @assignment = @course.assignments.create({
-                                             :title => "another assignment",
-                                             :points_possible => 10
+                                             title: "another assignment",
+                                             points_possible: 10
                                            })
   @assignment.workflow_state = "published"
   @assignment.save!
-  @assignment.grade_student(@student, { :grade => 10, :grader => @grader }.merge(opts[:submission]))
+  @assignment.grade_student(@student, { grade: 10, grader: @grader }.merge(opts[:submission]))
 end

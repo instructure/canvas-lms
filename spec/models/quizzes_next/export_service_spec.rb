@@ -52,7 +52,7 @@ describe QuizzesNext::ExportService do
     end
 
     it "filters to selected assignments with selective exports" do
-      export_opts = { :selective => true, :exported_assets => ['assignment_42', 'wiki_page_84'] }
+      export_opts = { selective: true, exported_assets: ['assignment_42', 'wiki_page_84'] }
       expect(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).with(course, selected_assignment_ids: ["42"]).and_return([])
       described_class.begin_export(course, export_opts)
     end
@@ -93,7 +93,7 @@ describe QuizzesNext::ExportService do
   describe '.send_imported_content' do
     let(:new_course) { double('course') }
     let(:root_account) { double('account') }
-    let(:content_migration) { double(:started_at => 1.hour.ago) }
+    let(:content_migration) { double(started_at: 1.hour.ago) }
     let(:new_assignment1) { assignment_model(id: 1) }
     let(:new_assignment2) { assignment_model(id: 2) }
     let(:old_assignment1) { assignment_model(id: 3) }
@@ -150,7 +150,7 @@ describe QuizzesNext::ExportService do
     end
 
     it 'skips assignments created prior to the current migration' do
-      Assignment.where(:id => new_assignment1).update_all(:created_at => 1.day.ago)
+      Assignment.where(id: new_assignment1).update_all(created_at: 1.day.ago)
       expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
     end

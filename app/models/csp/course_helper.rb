@@ -19,7 +19,7 @@
 #
 module Csp::CourseHelper
   def self.included(course_class)
-    course_class.add_setting :csp_disabled, :boolean => true, :default => false
+    course_class.add_setting :csp_disabled, boolean: true, default: false
   end
 
   def csp_enabled?

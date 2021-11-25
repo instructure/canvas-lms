@@ -36,8 +36,8 @@ describe 'quizzes observers' do
   context "when 'show correct answers after last attempt setting' is on" do
     before do
       quiz_with_submission
-      @quiz.update(:show_correct_answers => true,
-                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+      @quiz.update(show_correct_answers: true,
+                   show_correct_answers_last_attempt: true, allowed_attempts: 2)
       @quiz.save!
     end
 

@@ -156,12 +156,12 @@ module Api::V1
 
     def default_enrollment_attributes(enrollment)
       {
-        :type => enrollment.sis_type,
-        :role => enrollment.role.name,
-        :role_id => enrollment.role.id,
-        :user_id => enrollment.user_id,
-        :enrollment_state => enrollment.workflow_state,
-        :limit_privileges_to_course_section => enrollment.limit_privileges_to_course_section
+        type: enrollment.sis_type,
+        role: enrollment.role.name,
+        role_id: enrollment.role.id,
+        user_id: enrollment.user_id,
+        enrollment_state: enrollment.workflow_state,
+        limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section
       }
     end
 

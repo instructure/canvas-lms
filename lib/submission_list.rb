@@ -123,7 +123,7 @@ class SubmissionList
     list.map do |day, _value|
       # puts "-----------------------------------------------item #{Time.now - current}----------------------------"
       # current = Time.now
-      OpenObject.new(:date => day, :graders => graders_for_day(day))
+      OpenObject.new(date: day, graders: graders_for_day(day))
     end
     # puts "----------------------------------------------"
     # puts Time.now - start
@@ -159,9 +159,9 @@ class SubmissionList
     hsh = list[day].each_with_object({}) do |submission, h|
       grader = submission[:grader]
       h[grader] ||= OpenObject.new(
-        :assignments => assignments_for_grader_and_day(grader, day),
-        :name => grader,
-        :grader_id => submission[:grader_id]
+        assignments: assignments_for_grader_and_day(grader, day),
+        name: grader,
+        grader_id: submission[:grader_id]
       )
     end
     hsh.values
@@ -172,9 +172,9 @@ class SubmissionList
     hsh = submission_entries.find_all { |e| e[:grader] == grader and e[:graded_on] == day }.each_with_object({}) do |submission, h|
       assignment = submission[:assignment_name]
       h[assignment] ||= OpenObject.new(
-        :name => assignment,
-        :assignment_id => submission[:assignment_id],
-        :submissions => []
+        name: assignment,
+        assignment_id: submission[:assignment_id],
+        submissions: []
       )
 
       h[assignment].submissions << OpenObject.new(submission)
@@ -206,9 +206,9 @@ class SubmissionList
                end
       grader ||= I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
 
-      hash[submission.id] = OpenObject.new(:grade => translate_grade(submission),
-                                           :graded_at => submission.graded_at,
-                                           :grader => grader)
+      hash[submission.id] = OpenObject.new(grade: translate_grade(submission),
+                                           graded_at: submission.graded_at,
+                                           grader: grader)
     end
   end
 
@@ -351,7 +351,7 @@ class SubmissionList
   # A complete list of all graders that have graded submissions for this
   # course as User models
   def graders
-    @graders ||= User.where(:id => all_grader_ids).to_a
+    @graders ||= User.where(id: all_grader_ids).to_a
   end
 
   # A hash of graders by their ids, for easy lookup in full_hash_list
@@ -367,7 +367,7 @@ class SubmissionList
   # A complete list of all students that have submissions for this course
   # as User models
   def students
-    @students ||= User.where(:id => all_student_ids).to_a
+    @students ||= User.where(id: all_student_ids).to_a
   end
 
   # A hash of students by their ids, for easy lookup in full_hash_list
@@ -382,7 +382,7 @@ class SubmissionList
 
   # A complete list of assignments that have submissions for this course
   def assignments
-    @assignments ||= Assignment.where(:id => all_assignment_ids).to_a
+    @assignments ||= Assignment.where(id: all_assignment_ids).to_a
   end
 
   # A hash of assignments by their ids, for easy lookup in full_hash_list

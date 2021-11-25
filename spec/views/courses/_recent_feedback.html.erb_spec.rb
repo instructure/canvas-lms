@@ -58,7 +58,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 5_782_394, grader: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to include("5,782,394 out of 5,782,394")
   end
@@ -69,7 +69,7 @@ describe "/courses/_recent_feedback" do
     @assignment.update_submission(@user, comment: 'something different', commenter: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to include("25,734 out of 25,734")
     expect(response.body).to include('something different')
@@ -81,7 +81,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 25_734, grader: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
     url = context_url(@assignment.context, :context_assignment_url, id: @assignment.id)
     expect(response.body).to include("\"#{url}\"")
   end
@@ -93,7 +93,7 @@ describe "/courses/_recent_feedback" do
 
     assign(:current_user, @user)
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
     url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id: @user.id)
     expect(response.body).to include("\"#{url}\"")
   end

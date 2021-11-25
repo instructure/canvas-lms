@@ -69,7 +69,7 @@ describe "student k5 course dashboard" do
 
     it 'has front page displayed if there is one' do
       wiki_page_data = "Here's where we have content"
-      @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+      @subject_course.wiki_pages.create!(title: "K5 Course Front Page", body: wiki_page_data).set_as_front_page!
 
       get "/courses/#{@subject_course.id}#home"
 

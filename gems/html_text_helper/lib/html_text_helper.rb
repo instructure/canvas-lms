@@ -187,7 +187,7 @@ module HtmlTextHelper
         given_attributes = options[:attributes][element] || []
         final_attributes[element] = basic_attributes | given_attributes
       end
-      output = Sanitize.clean(html, :elements => elements, :attributes => final_attributes)
+      output = Sanitize.clean(html, elements: elements, attributes: final_attributes)
     else
       output = Sanitize.clean(html, config)
     end
@@ -252,7 +252,7 @@ module HtmlTextHelper
   }xi.freeze
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
-  def format_message(message, opts = { :url => nil, :notification_id => nil })
+  def format_message(message, opts = { url: nil, notification_id: nil })
     return '' unless message
 
     # insert placeholders for the links we're going to generate, before we go and escape all the html

@@ -24,7 +24,7 @@ describe 'session token', type: :request do
     enable_default_developer_key!
   end
 
-  let(:access_token) { @user.access_tokens.create!(:purpose => "test").full_token }
+  let(:access_token) { @user.access_tokens.create!(purpose: "test").full_token }
 
   it "works" do
     get 'https://www.example.com/login/session_token?return_to=https://www.example.com/courses',

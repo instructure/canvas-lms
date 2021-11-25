@@ -24,9 +24,9 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -101,7 +101,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         submission.submitted_at = Time.zone.now
         submission.url = h[:url]
         submission.grader_id = -1
-        submission.with_versioning(:explicit => true) { submission.save! }
+        submission.with_versioning(explicit: true) { submission.save! }
       end
     end
 
@@ -250,7 +250,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
             s.submitted_at = d[:submitted_at]
             s.grader_id = -1
             s.url = d[:url]
-            s.with_versioning(:explicit => true) { s.save! }
+            s.with_versioning(explicit: true) { s.save! }
           end
           s
         end

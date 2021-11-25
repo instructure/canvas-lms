@@ -27,19 +27,19 @@ module Factories
   # Re-generate these because I need a Unique ID
   def valid_pseudonym_attributes
     {
-      :unique_id => "#{SecureRandom.uuid}@example.com",
-      :password => "password",
-      :password_confirmation => "password",
-      :persistence_token => "pt_#{SecureRandom.uuid}",
-      :perishable_token => "value for perishable_token",
-      :login_count => 1,
-      :failed_login_count => 0,
-      :last_request_at => Time.now,
-      :last_login_at => Time.now,
-      :current_login_at => Time.now,
-      :last_login_ip => "value for last_login_ip",
-      :current_login_ip => "value for current_login_ip",
-      :user => @user
+      unique_id: "#{SecureRandom.uuid}@example.com",
+      password: "password",
+      password_confirmation: "password",
+      persistence_token: "pt_#{SecureRandom.uuid}",
+      perishable_token: "value for perishable_token",
+      login_count: 1,
+      failed_login_count: 0,
+      last_request_at: Time.now,
+      last_login_at: Time.now,
+      current_login_at: Time.now,
+      last_login_ip: "value for last_login_ip",
+      current_login_ip: "value for current_login_ip",
+      user: @user
     }
   end
 
@@ -51,7 +51,7 @@ module Factories
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = (opts[:account] ? opts[:account].root_account : Account.default)
-    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym = account.pseudonyms.build(user: user, unique_id: username, password: password, password_confirmation: password)
     @pseudonym.sis_user_id = opts[:sis_user_id]
     @pseudonym.integration_id = opts[:integration_id]
     @pseudonym.save_without_session_maintenance

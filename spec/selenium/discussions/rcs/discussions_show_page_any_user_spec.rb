@@ -93,7 +93,7 @@ describe "discussions" do
         it "edits a side comment", priority: "1" do
           edit_text = 'this has been edited'
           text = "new side comment from somebody"
-          entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
+          entry = topic.discussion_entries.create!(user: somebody, message: text, parent_entry: entry)
           expect(topic.discussion_entries.last.message).to eq text
           get url
           validate_entry_text(entry, text)

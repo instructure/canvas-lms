@@ -25,7 +25,7 @@ describe 'Submissions::ShowHelper' do
 
       def show
         @context = Course.find(params[:context_id])
-        @assignment = Assignment.where(:id => params[:assignment_id]).first
+        @assignment = Assignment.where(id: params[:assignment_id]).first
         render_user_not_found
       end
     end

@@ -21,23 +21,23 @@
 describe DataFixup::BackfillNewDefaultHelpLink do
   let(:new_default_link) do
     {
-      :available_to => ['student'],
-      :text => -> { I18n.t('#help_dialog.stuff', 'Stuff') },
-      :subtext => -> { I18n.t('#help_dialog.things', 'Things') },
-      :url => '#teacher_feedback',
-      :type => 'default',
-      :id => :covid
+      available_to: ['student'],
+      text: -> { I18n.t('#help_dialog.stuff', 'Stuff') },
+      subtext: -> { I18n.t('#help_dialog.things', 'Things') },
+      url: '#teacher_feedback',
+      type: 'default',
+      id: :covid
     }.freeze
   end
 
   let(:existing_default_link) do
     {
-      :available_to => ['student'],
-      :text => -> { I18n.t('#help_dialog.hi', 'Hi') },
-      :subtext => -> { I18n.t('#help_dialog.hello', 'Hello') },
-      :url => '#teacher_feedback',
-      :type => 'default',
-      :id => :hi_and_hello
+      available_to: ['student'],
+      text: -> { I18n.t('#help_dialog.hi', 'Hi') },
+      subtext: -> { I18n.t('#help_dialog.hello', 'Hello') },
+      url: '#teacher_feedback',
+      type: 'default',
+      id: :hi_and_hello
     }.freeze
   end
 

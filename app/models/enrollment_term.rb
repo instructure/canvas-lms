@@ -23,12 +23,12 @@ class EnrollmentTerm < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :grading_period_group, inverse_of: :enrollment_terms
   has_many :grading_periods, through: :grading_period_group
   has_many :enrollment_dates_overrides
   has_many :courses
-  has_many :enrollments, :through => :courses
+  has_many :enrollments, through: :courses
   has_many :course_sections
 
   validates :root_account_id, :workflow_state, presence: true
@@ -147,7 +147,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", :sis_source_id => sis_source_id))
+    errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: sis_source_id))
     throw :abort
   end
 

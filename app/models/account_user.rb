@@ -25,7 +25,7 @@ class AccountUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :role
 
-  has_many :role_overrides, :as => :context, :inverse_of => :context
+  has_many :role_overrides, as: :context, inverse_of: :context
   has_a_broadcast_policy
   before_validation :infer_defaults
   after_save :clear_user_cache
@@ -33,7 +33,7 @@ class AccountUser < ActiveRecord::Base
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
 
-  validate :valid_role?, :unless => :deleted?
+  validate :valid_role?, unless: :deleted?
   validates :account_id, :user_id, :role_id, presence: true
 
   resolves_root_account through: :account
@@ -76,7 +76,7 @@ class AccountUser < ActiveRecord::Base
         account_chain = account.account_chain
         associations = {}
         account_chain.each_with_index { |account, idx| associations[account.id] = idx }
-        user.update_account_associations(:incremental => true, :precalculated_associations => associations)
+        user.update_account_associations(incremental: true, precalculated_associations: associations)
       else
         user.update_account_associations_later
       end
@@ -216,5 +216,5 @@ class AccountUser < ActiveRecord::Base
     account_ids_for_user(user).include?(account_id)
   end
 
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
 end

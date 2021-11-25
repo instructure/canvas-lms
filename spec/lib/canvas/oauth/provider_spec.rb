@@ -79,19 +79,19 @@ module Canvas::OAuth
       end
 
       it 'is true when the redirect url is kosher for the developerKey' do
-        stub_dev_key(double(:redirect_domain_matches? => true))
+        stub_dev_key(double(redirect_domain_matches?: true))
         expect(provider.has_valid_redirect?).to be_truthy
       end
 
       it 'is false otherwise' do
-        stub_dev_key(double(:redirect_domain_matches? => false))
+        stub_dev_key(double(redirect_domain_matches?: false))
         expect(provider.has_valid_redirect?).to be_falsey
       end
     end
 
     describe '#icon_url' do
       it 'delegates to the key' do
-        stub_dev_key(double(:icon_url => 'unique_url'))
+        stub_dev_key(double(icon_url: 'unique_url'))
         expect(provider.icon_url).to eq 'unique_url'
       end
     end
@@ -113,23 +113,23 @@ module Canvas::OAuth
       let(:user) { User.create! }
 
       it 'finds a pre existing token with the same scope' do
-        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
+        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
         expect(Provider.new(developer_key.id, "", ['userinfo']).authorized_token?(user)).to eq true
       end
 
       it 'ignores tokens unless access is remembered' do
-        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"])
+        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"])
         expect(Provider.new(developer_key.id, "", ['userinfo']).authorized_token?(user)).to eq false
       end
 
       it 'ignores tokens for out of band requests' do
-        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
+        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
         expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ['userinfo']).authorized_token?(user)).to eq false
       end
     end
 
     describe '#app_name' do
-      let(:key_attrs) { { :name => 'some app', :user_name => 'some user', :email => 'some email' } }
+      let(:key_attrs) { { name: 'some app', user_name: 'some user', email: 'some email' } }
       let(:key) { double(key_attrs) }
 
       it 'prefers the key name' do
@@ -160,7 +160,7 @@ module Canvas::OAuth
     end
 
     describe '#session_hash' do
-      before { stub_dev_key(double(:id => 123)) }
+      before { stub_dev_key(double(id: 123)) }
 
       it 'uses the key id for a client id' do
         expect(provider.session_hash[:client_id]).to eq 123

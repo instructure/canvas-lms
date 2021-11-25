@@ -21,10 +21,10 @@
 # @API Logins
 # API for creating and viewing user logins under an account
 class PseudonymsController < ApplicationController
-  before_action :get_context, :only => [:index, :create]
-  before_action :require_user, :only => %i[create show edit update]
-  before_action :reject_student_view_student, :only => %i[create show edit update]
-  protect_from_forgery :except => %i[registration_confirmation change_password forgot_password], with: :exception
+  before_action :get_context, only: [:index, :create]
+  before_action :require_user, only: %i[create show edit update]
+  before_action :reject_student_view_student, only: %i[create show edit update]
+  protect_from_forgery except: %i[registration_confirmation change_password forgot_password], with: :exception
 
   include Api::V1::Pseudonym
 
@@ -64,7 +64,7 @@ class PseudonymsController < ApplicationController
     if @context.is_a?(Account)
       return unless context_is_root_account?
 
-      scope = @context.pseudonyms.active.where(:user_id => @user)
+      scope = @context.pseudonyms.active.where(user_id: @user)
       @pseudonyms = Api.paginate(
         scope,
         self, api_v1_account_pseudonyms_url
@@ -75,7 +75,7 @@ class PseudonymsController < ApplicationController
       @pseudonyms = Api.paginate(@pseudonyms, self, api_v1_user_pseudonyms_url)
     end
 
-    render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
+    render json: @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
   end
 
   def forgot_password
@@ -121,11 +121,11 @@ class PseudonymsController < ApplicationController
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
-      flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", :email => email
+      flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", email: email
       @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
-      format.json { render :json => { :requested => true } }
-      format.js { render :json => { :requested => true } }
+      format.json { render json: { requested: true } }
+      format.js { render json: { requested: true } }
     end
   end
 
@@ -145,8 +145,8 @@ class PseudonymsController < ApplicationController
         redirect_to canvas_login_url
       end
       @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
-      js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
-             :PASSWORD_POLICIES => @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
+      js_env PASSWORD_POLICY: @domain_root_account.password_policy,
+             PASSWORD_POLICIES: @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
     end
   end
 
@@ -170,12 +170,12 @@ class PseudonymsController < ApplicationController
         reset_session
 
         @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-        render :json => @pseudonym, :status => :ok # -> dashboard
+        render json: @pseudonym, status: :ok # -> dashboard
       else
-        render :json => { :pseudonym => @pseudonym.errors.as_json[:errors] }, :status => :bad_request
+        render json: { pseudonym: @pseudonym.errors.as_json[:errors] }, status: :bad_request
       end
     else
-      render :json => { :errors => { :nonce => 'expired' } }, :status => :bad_request # -> login url
+      render json: { errors: { nonce: 'expired' } }, status: :bad_request # -> login url
     end
   end
 
@@ -185,7 +185,7 @@ class PseudonymsController < ApplicationController
   end
 
   def new
-    @pseudonym = @domain_root_account.pseudonyms.build(:user => @current_user)
+    @pseudonym = @domain_root_account.pseudonyms.build(user: @current_user)
   end
 
   # @API Create a user login
@@ -267,12 +267,12 @@ class PseudonymsController < ApplicationController
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to user_profile_url(@current_user) }
-        format.json { render :json => pseudonym_json(@pseudonym, @current_user, session) }
+        format.json { render json: pseudonym_json(@pseudonym, @current_user, session) }
       end
     else
       respond_to do |format|
         format.html { render :new }
-        format.json { render :json => @pseudonym.errors, :status => :bad_request }
+        format.json { render json: @pseudonym.errors, status: :bad_request }
       end
     end
   end
@@ -376,12 +376,12 @@ class PseudonymsController < ApplicationController
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
         format.html { redirect_to user_profile_url(@current_user) }
-        format.json { render :json => pseudonym_json(@pseudonym, @current_user, session) }
+        format.json { render json: pseudonym_json(@pseudonym, @current_user, session) }
       end
     else
       respond_to do |format|
         format.html { render :edit }
-        format.json { render :json => @pseudonym.errors, :status => :bad_request }
+        format.json { render json: @pseudonym.errors, status: :bad_request }
       end
     end
   end
@@ -411,15 +411,15 @@ class PseudonymsController < ApplicationController
 
     if @user.all_active_pseudonyms.length < 2
       @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
-      render :json => @pseudonym.errors, :status => :bad_request
+      render json: @pseudonym.errors, status: :bad_request
     elsif @pseudonym.destroy
       if api_request?
-        render(:json => pseudonym_json(@pseudonym, @current_user, session))
+        render(json: pseudonym_json(@pseudonym, @current_user, session))
       else
-        render(:json => @pseudonym)
+        render(json: @pseudonym)
       end
     else
-      render :json => @pseudonym.errors, :status => :bad_request
+      render json: @pseudonym.errors, status: :bad_request
     end
   end
 
@@ -429,7 +429,7 @@ class PseudonymsController < ApplicationController
     if @context.root_account?
       true
     else
-      render(:json => { 'message' => 'Action must be called on a root account.' }, :status => :bad_request)
+      render(json: { 'message' => 'Action must be called on a root account.' }, status: :bad_request)
       false
     end
   end

@@ -51,9 +51,9 @@ class SisBatch < ActiveRecord::Base
   def self.valid_import_types
     @valid_import_types ||= {
       "instructure_csv" => {
-        :name => -> { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
-        :callback => ->(batch) { batch.process_instructure_csv_zip },
-        :default => true
+        name: -> { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
+        callback: ->(batch) { batch.process_instructure_csv_zip },
+        default: true
       }
     }
   end
@@ -72,7 +72,7 @@ class SisBatch < ActiveRecord::Base
       batch.account = account
       batch.progress = 0
       batch.workflow_state = :initializing
-      batch.data = { :import_type => import_type }
+      batch.data = { import_type: import_type }
       batch.user = user
       batch.save
 
@@ -148,8 +148,8 @@ class SisBatch < ActiveRecord::Base
   class Aborted < RuntimeError; end
 
   def self.queue_job_for_account(account, run_at = nil)
-    job_args = { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
-                 :singleton => strand_for_account(account) }
+    job_args = { priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+                 singleton: strand_for_account(account) }
 
     if run_at
       job_args[:run_at] = run_at
@@ -236,10 +236,10 @@ class SisBatch < ActiveRecord::Base
   end
 
   scope :not_started, -> { where(workflow_state: ['initializing', 'created']) }
-  scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
+  scope :needs_processing, -> { where(workflow_state: 'created').order(:created_at) }
   scope :importing, -> { where(workflow_state: ['importing', 'cleanup_batch']) }
   scope :not_completed, -> { where(workflow_state: %w[initializing created importing cleanup_batch]) }
-  scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
+  scope :succeeded, -> { where(workflow_state: %w[imported imported_with_messages]) }
 
   def self.strand_for_account(account)
     "sis_batch:account:#{Shard.birth.activate { account.id }}"
@@ -351,7 +351,7 @@ class SisBatch < ActiveRecord::Base
     self.generated_diff = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
-      t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => id)
+      t(:diff_filename, "sis_upload_diffed_%{id}.zip", id: id)
     )
     save!
     # Success, swap out the original update for this new diff and continue.
@@ -375,7 +375,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = if self.data[:file_path]
                    File.open(self.data[:file_path], 'rb')
                  else
-                   attachment.open(:need_local_file => true)
+                   attachment.open(need_local_file: true)
                  end
     @data_file
   end
@@ -931,7 +931,7 @@ class SisBatch < ActiveRecord::Base
   def self.load_downloadable_attachments(batches)
     batches = Array(batches)
     all_ids = batches.map { |sb| sb.data&.dig(:downloadable_attachment_ids) || [] }.flatten
-    all_attachments = all_ids.any? ? Attachment.where(:context_type => name, :context_id => batches, :id => all_ids).to_a.group_by(&:context_id) : {}
+    all_attachments = all_ids.any? ? Attachment.where(context_type: name, context_id: batches, id: all_ids).to_a.group_by(&:context_id) : {}
     batches.each do |b|
       b.downloadable_attachments = all_attachments[b.id] || []
     end

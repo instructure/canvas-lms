@@ -52,9 +52,9 @@ class AppCenterController < ApplicationController
         pager.next_page = response['meta']['next_page'] if response['meta']
         pager
       end
-      render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
+      render json: Api.paginate(collection, self, base_url, per_page: per_page.to_i)
     else
-      render :json => response
+      render json: response
     end
   end
 end

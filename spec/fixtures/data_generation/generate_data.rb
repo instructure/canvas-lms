@@ -40,7 +40,7 @@ include Factories
 
 # rubocop:disable Specs/ScopeHelperModules
 def toggle_k5_setting(account, enable = true)
-  account.settings[:enable_as_k5_account] = { :value => enable, :locked => enable }
+  account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
   account.save!
 end
@@ -173,17 +173,17 @@ def create_announcement(course, announcement_title, announcement_message)
 end
 
 def create_wiki_page(course)
-  course.wiki_pages.create!(:title => "New Wiki Page #{SecureRandom.alphanumeric(10)}", :body => "Here's where we have content")
+  course.wiki_pages.create!(title: "New Wiki Page #{SecureRandom.alphanumeric(10)}", body: "Here's where we have content")
 end
 
 def create_module(course, workflow_state = 'active')
-  course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}", :workflow_state => workflow_state)
+  course.context_modules.create!(name: "Module #{SecureRandom.alphanumeric(10)}", workflow_state: workflow_state)
 end
 
 def create_outcome(course, outcome_description, outcome__short_description = "Another Outcome")
   outcome = course.created_learning_outcomes.create!(
-    :description => outcome_description,
-    :short_description => outcome__short_description
+    description: outcome_description,
+    short_description: outcome__short_description
   )
   course.root_outcome_group.add_outcome(outcome)
   course.root_outcome_group.save!
@@ -210,7 +210,7 @@ def generate_fully_loaded_course(number_of_items = 2)
     create_wiki_page(@course)
     course_module1 = create_module(@course)
     assignment = create_assignment(@course, "Module Assignment")
-    course_module1.add_item(:id => assignment.id, :type => 'assignment')
+    course_module1.add_item(id: assignment.id, type: 'assignment')
   end
 
   puts "Course ID is #{@course.id}"
@@ -279,42 +279,42 @@ def generate_mastery_path_course
 
   graded_discussion = create_discussion(@course, @teacher)
 
-  course_module = @course.context_modules.create!(:name => "Mastery Path Module")
-  course_module.add_item(:id => @trigger_assignment.id, :type => 'assignment')
-  course_module.add_item(:id => @set1_assmt1.id, :type => 'assignment')
-  course_module.add_item(:id => graded_discussion.id, :type => 'discussion_topic')
-  course_module.add_item(:id => @set2_assmt1.id, :type => 'assignment')
-  course_module.add_item(:id => @set2_assmt2.id, :type => 'assignment')
-  course_module.add_item(:id => @set3a_assmt.id, :type => 'assignment')
-  course_module.add_item(:id => @set3b_assmt.id, :type => 'assignment')
+  course_module = @course.context_modules.create!(name: "Mastery Path Module")
+  course_module.add_item(id: @trigger_assignment.id, type: 'assignment')
+  course_module.add_item(id: @set1_assmt1.id, type: 'assignment')
+  course_module.add_item(id: graded_discussion.id, type: 'discussion_topic')
+  course_module.add_item(id: @set2_assmt1.id, type: 'assignment')
+  course_module.add_item(id: @set2_assmt2.id, type: 'assignment')
+  course_module.add_item(id: @set3a_assmt.id, type: 'assignment')
+  course_module.add_item(id: @set3b_assmt.id, type: 'assignment')
 
   ranges = [
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
-                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => graded_discussion.assignment_id)
+    ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
+                                           ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
                                                                                  ])
                                          ]),
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
-                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
+    ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
+                                           ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
                                                                                  ])
                                          ]),
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0, :upper_bound => 0.4, :assignment_sets => [
+    ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(
-                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-                                               :assignment_id => @set3a_assmt.id
+                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                               assignment_id: @set3a_assmt.id
                                              )]
                                            ),
                                            ConditionalRelease::AssignmentSet.new(
-                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-                                               :assignment_id => @set3b_assmt.id
+                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                               assignment_id: @set3b_assmt.id
                                              )]
                                            )
                                          ])
   ]
-  @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assignment, :scoring_ranges => ranges)
+  @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
 
   puts "Course ID is #{@course.id}"
   puts "Teacher ID is #{@teacher.id}"
@@ -325,7 +325,7 @@ def generate_sections(number_of_sections = 2)
   puts "Generate Course with Students in Sections"
   course_with_teacher_enrolled
   number_of_sections.times do |iteration|
-    section = @course.course_sections.create!(:name => "Section #{iteration + 1}")
+    section = @course.course_sections.create!(name: "Section #{iteration + 1}")
     course_with_students_enrolled
     @enrollment_list.each do |student_enrollment|
       student_enrollment.course_section = section
@@ -399,10 +399,10 @@ def generate_pace_plan_course
   assignment2 = create_assignment(@course, "Assignment 2")
   discussion1 = create_discussion(@course, @teacher)
   quiz1 = create_quiz(@course)
-  module1.add_item(:id => assignment1.id, :type => 'assignment')
-  module1.add_item(:id => assignment2.id, :type => 'assignment')
-  module1.add_item(:id => discussion1.id, :type => 'discussion_topic')
-  module1.add_item(:id => quiz1.id, :type => 'quiz')
+  module1.add_item(id: assignment1.id, type: 'assignment')
+  module1.add_item(id: assignment2.id, type: 'assignment')
+  module1.add_item(id: discussion1.id, type: 'discussion_topic')
+  module1.add_item(id: quiz1.id, type: 'quiz')
 
   puts "Course ID is #{@course.id}"
   puts "Teacher ID is #{@teacher.id}"

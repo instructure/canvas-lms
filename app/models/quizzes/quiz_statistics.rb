@@ -25,15 +25,15 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   self.table_name = :quiz_statistics
 
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
-  has_one :csv_attachment, :class_name => 'Attachment', :as => 'context',
-                           :dependent => :destroy
-  has_one :progress, :as => 'context', :dependent => :destroy
+  has_one :csv_attachment, class_name: 'Attachment', as: 'context',
+                           dependent: :destroy
+  has_one :progress, as: 'context', dependent: :destroy
 
-  scope :report_type, ->(type) { where(:report_type => type) }
+  scope :report_type, ->(type) { where(report_type: type) }
 
   REPORTS = %w[student_analysis item_analysis].freeze
 
-  validates :report_type, inclusion: { :in => REPORTS }
+  validates :report_type, inclusion: { in: REPORTS }
 
   after_initialize do
     self.includes_all_versions ||= false

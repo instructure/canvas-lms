@@ -44,8 +44,8 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'is present with the includes' do
-        allow(category).to receive_messages(:groups => double(active: double(size: 3)), :is_member? => false)
-        json = CategoryHarness.new.group_category_json(category, nil, nil, { :include => ['groups_count'] })
+        allow(category).to receive_messages(groups: double(active: double(size: 3)), is_member?: false)
+        json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ['groups_count'] })
         expect(json["groups_count"]).to eq(3)
       end
     end
@@ -57,21 +57,21 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'is present with the includes' do
-        allow(category).to receive_messages(current_progress: double(:pending? => true))
-        json = CategoryHarness.new.group_category_json(category, nil, nil, { :include => ['progress_url'] })
+        allow(category).to receive_messages(current_progress: double(pending?: true))
+        json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ['progress_url'] })
         expect(json["progress"]['url']).to match(%r{example.com/api/api_v1})
       end
     end
 
     describe 'group_category_data' do
       it 'sets protected with the category value' do
-        allow(category).to receive_messages(:protected? => true)
+        allow(category).to receive_messages(protected?: true)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["protected"]).to eq(true)
       end
 
       it 'passes through "allows_multiple_memberships"' do
-        allow(category).to receive_messages(:allows_multiple_memberships? => false)
+        allow(category).to receive_messages(allows_multiple_memberships?: false)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["allows_multiple_memberships"]).to eq(false)
       end

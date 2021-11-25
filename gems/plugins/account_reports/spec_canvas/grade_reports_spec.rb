@@ -40,27 +40,27 @@ describe "Default Account Reports" do
     @account.enable_feature!(:final_grades_override)
     @default_term = @account.default_enrollment_term
 
-    @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
+    @term1 = EnrollmentTerm.create(name: 'Fall', start_at: 6.months.ago, end_at: 1.year.from_now)
     @term1.root_account = @account
     @term1.sis_source_id = 'fall12'
     @term1.save!
-    @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-                                         :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-                                         :sis_user_id => "user_sis_id_01", integration_id: 'int1')
-    @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
-                                         :name => 'Michael Bolton', :account => @account,
-                                         :sis_user_id => "user_sis_id_02")
-    @user3 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
-                                         :sortable_name => "Astley, Rick", :username => 'rick@roll.com',
-                                         :sis_user_id => "user_sis_id_03")
-    @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
-                                         :name => 'Jason Donovan', :account => @account,
-                                         :sis_user_id => "user_sis_id_04", integration_id: 'int2')
-    @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
-                                         :name => 'John Smith', :sis_user_id => "user_sis_id_05",
-                                         :account => @account)
+    @user1 = user_with_managed_pseudonym(active_all: true, account: @account, name: "John St. Clair",
+                                         sortable_name: "St. Clair, John", username: 'john@stclair.com',
+                                         sis_user_id: "user_sis_id_01", integration_id: 'int1')
+    @user2 = user_with_managed_pseudonym(active_all: true, username: 'micheal@michaelbolton.com',
+                                         name: 'Michael Bolton', account: @account,
+                                         sis_user_id: "user_sis_id_02")
+    @user3 = user_with_managed_pseudonym(active_all: true, account: @account, name: "Rick Astley",
+                                         sortable_name: "Astley, Rick", username: 'rick@roll.com',
+                                         sis_user_id: "user_sis_id_03")
+    @user4 = user_with_managed_pseudonym(active_all: true, username: 'jason@donovan.com',
+                                         name: 'Jason Donovan', account: @account,
+                                         sis_user_id: "user_sis_id_04", integration_id: 'int2')
+    @user5 = user_with_managed_pseudonym(active_all: true, username: 'john@smith.com',
+                                         name: 'John Smith', sis_user_id: "user_sis_id_05",
+                                         account: @account)
 
-    @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+    @course1 = Course.new(name: 'English 101', course_code: 'ENG101', account: @account)
     @course1.workflow_state = 'available'
     @course1.enrollment_term_id = @term1.id
     @course1.sis_source_id = "SIS_COURSE_ID_1"
@@ -71,18 +71,18 @@ describe "Default Account Reports" do
     )
     @course1.update!(default_grading_standard: grading_standard)
 
-    @course2 = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
+    @course2 = course_factory(course_name: 'Math 101', account: @account, active_course: true)
 
     @course1.default_post_policy.update!(post_manually: false)
     @course2.default_post_policy.update!(post_manually: false)
 
-    @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
-    @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
-    @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
-    @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
+    @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', enrollment_state: :active)
+    @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', enrollment_state: :completed)
+    @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', enrollment_state: :active)
+    @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', enrollment_state: :active)
+    @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', enrollment_state: :active)
+    @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', enrollment_state: :active)
+    @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', enrollment_state: :active)
 
     # create some default course scores for these enrollments
     @enrollment1.scores.create!
@@ -222,7 +222,7 @@ describe "Default Account Reports" do
     end
 
     it "runs grade export on a sub account" do
-      sub_account = Account.create(:parent_account => @account, :name => 'English')
+      sub_account = Account.create(parent_account: @account, name: 'English')
       @course2.account = sub_account
       @course2.save!
 
@@ -426,9 +426,9 @@ describe "Default Account Reports" do
         )
         @course2.update!(default_grading_standard: grading_standard)
 
-        @course3 = course_factory(:course_name => 'Fun 404', :account => @account, :active_course => true)
-        @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
-        @course3.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
+        @course3 = course_factory(course_name: 'Fun 404', account: @account, active_course: true)
+        @course3.enroll_user(@user2, 'StudentEnrollment', enrollment_state: :active)
+        @course3.enroll_user(@user4, 'StudentEnrollment', enrollment_state: :active)
         @course3.default_post_policy.update!(post_manually: false)
 
         teacher = User.create!

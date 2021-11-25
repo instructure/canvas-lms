@@ -33,7 +33,7 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     @concluded_student_enrollment = student_in_course(course: @course, active_all: true)
     @concluded_student = @student
 
-    @assignment_group_one = @course.assignment_groups.create!(:name => "some group")
+    @assignment_group_one = @course.assignment_groups.create!(name: "some group")
     @assignment1 = @course.assignments.create!(
       title: "Some Assignment",
       points_possible: 10,
@@ -52,11 +52,11 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     Score.where(enrollment: @concluded_student_enrollment).where.not(assignment_group_id: nil).delete_all
     Score.where(enrollment: @concluded_student_enrollment).preload(:enrollment).update(unposted_current_score: nil, unposted_final_score: nil)
 
-    @assignment_group_two = @course.assignment_groups.create!(:name => "some other group")
+    @assignment_group_two = @course.assignment_groups.create!(name: "some other group")
     @assignment2 = @course.assignments.create!(
-      :title => "Some Assignment2",
-      :points_possible => 10,
-      :assignment_group => @assignment_group_two,
+      title: "Some Assignment2",
+      points_possible: 10,
+      assignment_group: @assignment_group_two,
       due_at: 2.days.from_now
     )
     @assignment2.grade_student(@active_student, grade: "5", grader: @teacher)

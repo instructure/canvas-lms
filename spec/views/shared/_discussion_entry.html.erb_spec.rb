@@ -24,7 +24,7 @@ describe "shared/_discussion_entry" do
   it "renders" do
     course_with_student
     view_context
-    render :partial => "shared/discussion_entry"
+    render partial: "shared/discussion_entry"
     expect(response).not_to be_nil
   end
 end

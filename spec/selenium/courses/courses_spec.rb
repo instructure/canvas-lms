@@ -27,7 +27,7 @@ describe "courses" do
   context "as a teacher" do
     before do
       account = Account.default
-      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+      account.settings = { open_registration: true, no_enrollments_can_create_courses: true, teachers_can_create_courses: true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
@@ -65,8 +65,8 @@ describe "courses" do
 
   context "as a student" do
     before do
-      course_with_teacher(:active_all => true, :name => 'discussion course')
-      @student = User.create!(:name => "First Student")
+      course_with_teacher(active_all: true, name: 'discussion course')
+      @student = User.create!(name: "First Student")
       @course.enroll_student(@student)
       user_session(@student)
     end

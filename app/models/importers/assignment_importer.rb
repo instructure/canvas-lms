@@ -60,8 +60,8 @@ module Importers
       end
 
       if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
-        context.assignments.active.where.not(:migration_id => nil)
-               .where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
+        context.assignments.active.where.not(migration_id: nil)
+               .where(assignment_group_id: context.assignment_group_no_drop_assignments.values).each do |item|
           if (group = context.assignment_group_no_drop_assignments[item.migration_id])
             AssignmentGroup.add_never_drop_assignment(group, item)
           end
@@ -203,7 +203,7 @@ module Importers
 
       if !new_record && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
         # is a date-restricted master course item - clear their old overrides because we're mean
-        item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all
+        item.assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
@@ -217,7 +217,7 @@ module Importers
         rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
         rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
         if rubric
-          assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
+          assoc = rubric.associate_with(item, context, purpose: 'grading', skip_updating_points_possible: true)
           assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
           assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
           assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
@@ -272,7 +272,7 @@ module Importers
         if gs
           item.grading_standard = gs if gs
         else
-          migration.add_warning(t('errors.import.grading_standard_not_found', %(The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.), :title => hash[:title]))
+          migration.add_warning(t('errors.import.grading_standard_not_found', %(The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.), title: hash[:title]))
         end
       end
       if quiz
@@ -299,8 +299,8 @@ module Importers
       end
 
       if hash[:has_group_category]
-        item.group_category = context.group_categories.active.where(:name => hash[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
+        item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
+        item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
       end
 
       if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
@@ -329,7 +329,7 @@ module Importers
           # either because the date is already nil or we're going to remove it later
           migration.add_warning(
             t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
-              :assignment_name => item.title)
+              assignment_name: item.title)
           )
         elsif !hash[:post_to_sis].nil?
           item.post_to_sis = hash[:post_to_sis]
@@ -433,7 +433,7 @@ module Importers
 
         if needs_new_tag
           tag = current_tag || item.build_external_tool_tag
-          tag.update(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          tag.update(url: hash[:external_tool_url], new_tab: hash[:external_tool_new_tab])
           if hash[:external_tool_id] && migration && !migration.cross_institution?
             tool_id = hash[:external_tool_id].to_i
 
@@ -464,7 +464,7 @@ module Importers
             if tag.errors["url"]
               migration.add_warning(t('errors.import.external_tool_url',
                                       "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
-                                      :assignment_name => item.title))
+                                      assignment_name: item.title))
             end
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end

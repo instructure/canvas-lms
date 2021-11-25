@@ -873,24 +873,24 @@ class AuthenticationProvidersController < ApplicationController
     results = []
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_connection_test => config.test_ldap_connection
+        account_authorization_config_id: config.id,
+        ldap_connection_test: config.test_ldap_connection
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_bind
     results = []
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_bind_test => config.test_ldap_bind
+        account_authorization_config_id: config.id,
+        ldap_bind_test: config.test_ldap_bind
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_search
@@ -898,47 +898,47 @@ class AuthenticationProvidersController < ApplicationController
     ldap_providers(@account).each do |config|
       res = config.test_ldap_search
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_search_test => res
+        account_authorization_config_id: config.id,
+        ldap_search_test: res
       }
-      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
     end
-    render :json => results
+    render json: results
   end
 
   def test_ldap_login
     results = []
     unless params[:username]
       return render(
-        :json => { :errors => { :login => t(:login_required, 'must be supplied') } },
-        :status_code => 400
+        json: { errors: { login: t(:login_required, 'must be supplied') } },
+        status_code: 400
       )
     end
     unless params[:password]
       return render(
-        :json => { :errors => { :password => t(:password_required, 'must be supplied') } },
-        :status_code => 400
+        json: { errors: { password: t(:password_required, 'must be supplied') } },
+        status_code: 400
       )
     end
 
     ldap_providers(@account).each do |config|
       h = {
-        :account_authorization_config_id => config.id,
-        :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
+        account_authorization_config_id: config.id,
+        ldap_login_test: config.test_ldap_login(params[:username], params[:password])
       }
-      results << h.merge({ :errors => config.errors.map { |attr, msg| { attr => msg } } })
+      results << h.merge({ errors: config.errors.map { |attr, msg| { attr => msg } } })
     end
 
     if results.empty?
       return render(
-        :json => { :errors => { :account => t(:account_required, 'must be LDAP-authenticated') } },
-        :status_code => 400
+        json: { errors: { account: t(:account_required, 'must be LDAP-authenticated') } },
+        status_code: 400
       )
     end
 
     render(
-      :json => results,
-      :status_code => 200
+      json: results,
+      status_code: 200
     )
   end
 

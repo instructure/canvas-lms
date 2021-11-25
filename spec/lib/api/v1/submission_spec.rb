@@ -463,7 +463,7 @@ describe Api::V1::Submission do
           submission.submitted_at = Time.zone.now
           submission.url = h[:url]
           submission.grader_id = -1
-          submission.with_versioning(:explicit => true) { submission.save! }
+          submission.with_versioning(explicit: true) { submission.save! }
         end
       end
 

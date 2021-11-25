@@ -70,9 +70,9 @@ module AcademicBenchmarks
       end
 
       def set_default_ratings(hash, overrides = {})
-        hash[:ratings] = [{ :description => "Exceeds Expectations", :points => 5 },
-                          { :description => "Meets Expectations", :points => 3 },
-                          { :description => "Does Not Meet Expectations", :points => 0 }]
+        hash[:ratings] = [{ description: "Exceeds Expectations", points: 5 },
+                          { description: "Meets Expectations", points: 3 },
+                          { description: "Does Not Meet Expectations", points: 0 }]
         hash[:mastery_points] = 3
         hash[:points_possible] = 5
         hash.merge!(overrides)

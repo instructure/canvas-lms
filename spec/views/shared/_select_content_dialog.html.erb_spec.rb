@@ -40,7 +40,7 @@ describe "shared/_select_content_dialog" do
     it "only renders classic quizzes when Quiz is selected" do
       @course.quizzes.create!(title: 'A')
       @course.quizzes.create!(title: 'C')
-      new_quizzes_assignment(:course => @course, :title => 'B')
+      new_quizzes_assignment(course: @course, title: 'B')
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map(&:text)
@@ -48,7 +48,7 @@ describe "shared/_select_content_dialog" do
     end
 
     it "renders New Quizzes as Assignments" do
-      new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      new_quizzes_assignment(course: @course, title: 'Some New Quiz')
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#assignments_select .module_item_select option').map(&:text)
@@ -102,7 +102,7 @@ describe "shared/_select_content_dialog" do
 
     it "does not render New Quizzes as Assignments" do
       assign(:combined_active_quizzes, [])
-      new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      new_quizzes_assignment(course: @course, title: 'Some New Quiz')
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#assignments_select .module_item_select option').map(&:text)

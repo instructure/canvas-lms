@@ -53,7 +53,7 @@ class ServicesApiController < ApplicationController
         response['rtmp_domain'] = @kal['rtmp_domain']
         response['partner_id'] = @kal['partner_id']
       end
-      render :json => response
+      render json: response
     else
       render_unauthorized_action
     end
@@ -83,11 +83,11 @@ class ServicesApiController < ApplicationController
     raise "Kaltura session failed to generate" if res.include?('START_SESSION_ERROR')
 
     hash = {
-      :ks => res,
-      :subp_id => CanvasKaltura::ClientV3.config['subpartner_id'],
-      :partner_id => CanvasKaltura::ClientV3.config['partner_id'],
-      :uid => uid,
-      :serverTime => Time.zone.now.to_i
+      ks: res,
+      subp_id: CanvasKaltura::ClientV3.config['subpartner_id'],
+      partner_id: CanvasKaltura::ClientV3.config['partner_id'],
+      uid: uid,
+      serverTime: Time.zone.now.to_i
     }
     if value_to_boolean(params[:include_upload_config])
       pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
@@ -100,9 +100,9 @@ class ServicesApiController < ApplicationController
       hash[:kaltura_setting][:entryUrl] = "#{request.protocol}#{hash[:kaltura_setting][:domain]}/index.php/partnerservices2/addEntry"
       hash[:kaltura_setting][:uiconfUrl] = "#{request.protocol}#{hash[:kaltura_setting][:domain]}/index.php/partnerservices2/getuiconf"
       hash[:kaltura_setting][:partner_data] = {
-        :root_account_id => @domain_root_account.id,
-        :sis_user_id => pseudonym&.sis_user_id,
-        :sis_source_id => @context&.sis_source_id
+        root_account_id: @domain_root_account.id,
+        sis_user_id: pseudonym&.sis_user_id,
+        sis_source_id: @context&.sis_source_id
       }
     end
     render json: hash

@@ -26,20 +26,20 @@ describe 'assignments index menu tool placement' do
   before do
     course_with_teacher_logged_in
 
-    @tool1 = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool1 = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
     # tool1 is on index and group menus
-    @tool1.assignment_index_menu = { :url => "http://www.example.com", :text => "Import Stuff" }
-    @tool1.assignment_group_menu = { :url => "http://www.example.com", :text => "Import Stuff Here" }
+    @tool1.assignment_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
+    @tool1.assignment_group_menu = { url: "http://www.example.com", text: "Import Stuff Here" }
     @tool1.save!
-    @tool2 = Account.default.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @tool2 = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
     # tool2 is on assignment menu
-    @tool2.assignment_menu = { :url => "http://www.example.com", :text => "Second Tool" }
+    @tool2.assignment_menu = { url: "http://www.example.com", text: "Second Tool" }
     @tool2.save!
     # assignments groups
-    @agroup1 = @course.assignment_groups.create!(:name => "assignments group1")
+    @agroup1 = @course.assignment_groups.create!(name: "assignments group1")
     @course.assignments.create(name: "test assignment", assignment_group: @agroup1)
     @assignment1 = @course.assignments.first
-    @agroup2 = @course.assignment_groups.create!(:name => "assignments group2")
+    @agroup2 = @course.assignment_groups.create!(name: "assignments group2")
 
     Account.default.enable_feature!(:commons_favorites)
   end

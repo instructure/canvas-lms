@@ -38,8 +38,8 @@ describe "global announcements" do
   end
 
   it 'shows notifications' do
-    account_notification(:start_at => 2.days.ago, :end_at => 5.days.from_now, :send_message => true)
-    account_notification(:message => 'from the past', :start_at => 6.days.ago, :end_at => 5.days.ago, :send_message => true)
+    account_notification(start_at: 2.days.ago, end_at: 5.days.from_now, send_message: true)
+    account_notification(message: 'from the past', start_at: 6.days.ago, end_at: 5.days.ago, send_message: true)
     get '/account_notifications'
     expect(fj("h2:contains('this is a subject')")).to be_displayed
     expect(fj("span:contains('hi there')")).to be_displayed

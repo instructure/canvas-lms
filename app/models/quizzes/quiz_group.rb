@@ -26,7 +26,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
 
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assessment_question_bank
-  has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :dependent => :destroy
+  has_many :quiz_questions, class_name: 'Quizzes::QuizQuestion', dependent: :destroy
 
   validates :quiz_id, presence: true
   validates :name, length: { maximum: maximum_string_length, allow_nil: true }
@@ -78,7 +78,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
       "WHEN id=#{group.id.to_i} THEN #{group.position.to_i}"
     end
     set = "position=CASE #{updates.join(" ")} ELSE NULL END"
-    where(:id => groups).update_all(set)
+    where(id: groups).update_all(set)
   end
 
   private

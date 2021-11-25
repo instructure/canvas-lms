@@ -39,11 +39,11 @@ module ConversationsCommon
   def conversation_setup
     course_with_teacher_logged_in
 
-    term = EnrollmentTerm.new :name => "Super Term"
+    term = EnrollmentTerm.new name: "Super Term"
     term.root_account_id = @course.root_account_id
     term.save!
 
-    @course.update! :enrollment_term => term
+    @course.update! enrollment_term: term
   end
 
   def conversation_elements
@@ -257,7 +257,7 @@ module ConversationsCommon
   def add_students(count)
     @s = []
     count.times do |n|
-      @s << User.create!(:name => "Test Student #{n + 1}")
+      @s << User.create!(name: "Test Student #{n + 1}")
       @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
     end
   end

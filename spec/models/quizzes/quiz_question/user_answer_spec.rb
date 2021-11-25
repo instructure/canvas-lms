@@ -19,7 +19,7 @@
 
 describe Quizzes::QuizQuestion::UserAnswer do
   let(:answer_data) do
-    { :question_1 => ["1"] }
+    { question_1: ["1"] }
   end
   let(:question_id) { 1 }
   let(:points_possible) { 100 }

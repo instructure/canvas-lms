@@ -39,10 +39,10 @@ class PlannerOverride < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :unpublish, :transitions_to => :unpublished
+      event :unpublish, transitions_to: :unpublished
     end
     state :unpublished do
-      event :publish, :transitions_to => :active
+      event :publish, transitions_to: :active
     end
     state :deleted
   end

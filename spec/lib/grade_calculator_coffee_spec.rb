@@ -26,7 +26,7 @@ describe GradeCalculator do
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
     before do
-      @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
+      @group = @group1 = @course.assignment_groups.create!(name: 'group 1')
     end
 
     def set_default_grades
@@ -36,9 +36,9 @@ describe GradeCalculator do
     def set_grades(grades, group = @group1)
       @grades = grades
       @assignments = @grades.map do |_score, possible|
-        @course.assignments.create! :title => 'homework',
-                                    :points_possible => possible,
-                                    :assignment_group => group
+        @course.assignments.create! title: 'homework',
+                                    points_possible: possible,
+                                    assignment_group: group
       end
       @assignments.each_with_index do |a, i|
         score = @grades[i].first
@@ -83,9 +83,9 @@ describe GradeCalculator do
     end
 
     it "works without submissions" do
-      @course.assignments.create! :title => 'asdf',
-                                  :points_possible => 1,
-                                  :assignment_group => @group
+      @course.assignments.create! title: 'asdf',
+                                  points_possible: 1,
+                                  assignment_group: @group
       check_grades(nil, 0.0)
     end
 
@@ -280,12 +280,12 @@ describe GradeCalculator do
       before do
         @group1.group_weight = 50
         @group1.save!
-        @group2 = @course.assignment_groups.create! :name => 'group 2',
-                                                    :group_weight => 25
-        @group3 = @course.assignment_groups.create! :name => 'empty group',
-                                                    :group_weight => 25
-        @group4 = @course.assignment_groups.create! :name => 'extra credit',
-                                                    :group_weight => 10
+        @group2 = @course.assignment_groups.create! name: 'group 2',
+                                                    group_weight: 25
+        @group3 = @course.assignment_groups.create! name: 'empty group',
+                                                    group_weight: 25
+        @group4 = @course.assignment_groups.create! name: 'extra credit',
+                                                    group_weight: 10
 
         set_grades [[9, 10]], @group1
         set_grades [[5, 10]], @group2

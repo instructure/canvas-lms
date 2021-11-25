@@ -43,7 +43,7 @@ describe "/quizzes/quizzes/new" do
 
   context "with course and quiz" do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @quiz = course_quiz
       assign(:quiz, @quiz)
       assign(:js_env, { quiz_max_combination_count: 200 })

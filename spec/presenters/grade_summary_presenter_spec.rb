@@ -22,7 +22,7 @@ describe GradeSummaryPresenter do
     describe 'all on one shard' do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
-      let(:assignment) { assignment_model(:course => course) }
+      let(:assignment) { assignment_model(course: course) }
       let(:enrollment) { course.enroll_student(@user, enrollment_state: 'active') }
 
       before do
@@ -76,7 +76,7 @@ describe GradeSummaryPresenter do
           user = User.create!
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(:course => course, :user => user)
+          enrollment = StudentEnrollment.create!(course: course, user: user)
           enrollment.update_attribute(:workflow_state, 'active')
           course.update_attribute(:workflow_state, 'available')
         end
@@ -94,7 +94,7 @@ describe GradeSummaryPresenter do
         @shard2.activate do
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(:course => course, :user => user)
+          enrollment = StudentEnrollment.create!(course: course, user: user)
           enrollment.update_attribute(:workflow_state, 'active')
           course.update_attribute(:workflow_state, 'available')
         end
@@ -105,15 +105,15 @@ describe GradeSummaryPresenter do
 
       describe 'courses for an observer across shards' do
         before do
-          course_with_student(:active_all => true)
-          @observer = user_factory(:active_all => true)
-          @course.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+          course_with_student(active_all: true)
+          @observer = user_factory(active_all: true)
+          @course.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
 
           @shard1.activate do
             account = Account.create!
-            @course2 = account.courses.create!(:workflow_state => "available")
-            StudentEnrollment.create!(:course => @course2, :user => @student, :workflow_state => 'active')
-            @course2.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+            @course2 = account.courses.create!(workflow_state: "available")
+            StudentEnrollment.create!(course: @course2, user: @student, workflow_state: 'active')
+            @course2.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
           end
 
           @presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
@@ -198,7 +198,7 @@ describe GradeSummaryPresenter do
     it 'filters out test students and inactive enrollments' do
       s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
+      fake_student = course_with_user('StudentViewEnrollment', { course: @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -246,7 +246,7 @@ describe GradeSummaryPresenter do
       teacher_in_course
       s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
+      fake_student = course_with_user('StudentViewEnrollment', { course: @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10

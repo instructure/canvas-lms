@@ -20,14 +20,14 @@
 
 describe Turnitin::Client do
   def turnitin_assignment
-    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment = @course.assignments.new(title: "some assignment")
     @assignment.workflow_state = "published"
     @assignment.turnitin_enabled = true
     @assignment.save!
   end
 
   def turnitin_submission
-    @submission = @assignment.submit_homework(@user, :submission_type => 'online_upload', :attachments => [attachment_model(:context => @user, :content_type => 'text/plain')])
+    @submission = @assignment.submit_homework(@user, submission_type: 'online_upload', attachments: [attachment_model(context: @user, content_type: 'text/plain')])
     @submission.reload
   end
 
@@ -71,15 +71,15 @@ describe Turnitin::Client do
   describe 'class methods' do
     before do
       @default_settings = {
-        :originality_report_visibility => 'immediate',
-        :s_paper_check => '1',
-        :internet_check => '1',
-        :journal_check => '1',
-        :exclude_biblio => '1',
-        :exclude_quoted => '1',
-        :exclude_type => '0',
-        :exclude_value => '',
-        :submit_papers_to => '1'
+        originality_report_visibility: 'immediate',
+        s_paper_check: '1',
+        internet_check: '1',
+        journal_check: '1',
+        exclude_biblio: '1',
+        exclude_quoted: '1',
+        exclude_type: '0',
+        exclude_value: '',
+        submit_papers_to: '1'
       }
     end
 
@@ -93,16 +93,16 @@ describe Turnitin::Client do
       @default_settings[:exclude_value] = '50'
       normalized_settings = Turnitin::Client.normalize_assignment_turnitin_settings(@default_settings)
       expect(normalized_settings).to eq({
-                                          :originality_report_visibility => "never",
-                                          :s_paper_check => "1",
-                                          :internet_check => "1",
-                                          :journal_check => "1",
-                                          :exclude_biblio => "1",
-                                          :exclude_quoted => "1",
-                                          :exclude_type => "1",
-                                          :exclude_value => "50",
-                                          :submit_papers_to => "1",
-                                          :s_view_report => "0"
+                                          originality_report_visibility: "never",
+                                          s_paper_check: "1",
+                                          internet_check: "1",
+                                          journal_check: "1",
+                                          exclude_biblio: "1",
+                                          exclude_quoted: "1",
+                                          exclude_type: "1",
+                                          exclude_value: "50",
+                                          submit_papers_to: "1",
+                                          s_view_report: "0"
                                         })
     end
 
@@ -114,23 +114,23 @@ describe Turnitin::Client do
 
   describe "create assignment" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
       expect(@assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(Turnitin::Client).to receive(:new).with(:placeholder).and_return(@turnitin_api)
 
       @sample_turnitin_settings = {
-        :originality_report_visibility => 'after_grading',
-        :s_paper_check => '0',
-        :internet_check => '0',
-        :journal_check => '0',
-        :exclude_biblio => '0',
-        :exclude_quoted => '0',
-        :exclude_type => '1',
-        :exclude_value => '5'
+        originality_report_visibility: 'after_grading',
+        s_paper_check: '0',
+        internet_check: '0',
+        journal_check: '0',
+        exclude_biblio: '0',
+        exclude_quoted: '0',
+        exclude_type: '1',
+        exclude_value: '5'
       }
-      @assignment.update(:turnitin_settings => @sample_turnitin_settings)
+      @assignment.update(turnitin_settings: @sample_turnitin_settings)
     end
 
     it "marks assignment as created and current on success" do
@@ -139,7 +139,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: "1", submit_papers_to: '0' })
     end
 
     it "stores error code and message on failure" do
@@ -149,12 +149,12 @@ describe Turnitin::Client do
 
       expect(status).to be_falsey
       expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({
-                                                                                            :s_view_report => "1",
-                                                                                            :submit_papers_to => '0',
-                                                                                            :error => {
-                                                                                              :error_code => 123,
-                                                                                              :error_message => 'You cannot create this assignment right now',
-                                                                                              :public_error_message => 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+                                                                                            s_view_report: "1",
+                                                                                            submit_papers_to: '0',
+                                                                                            error: {
+                                                                                              error_code: 123,
+                                                                                              error_message: 'You cannot create this assignment right now',
+                                                                                              public_error_message: 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
                                                                                             }
                                                                                           })
     end
@@ -165,22 +165,22 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: "1", submit_papers_to: '0' })
     end
 
     it "sets s_view_report to 0 if originality_report_visibility is 'never'" do
       @sample_turnitin_settings[:originality_report_visibility] = 'never'
-      @assignment.update(:turnitin_settings => @sample_turnitin_settings)
+      @assignment.update(turnitin_settings: @sample_turnitin_settings)
       stub_net_http_to_return('<assignmentid>12345</assignmentid>')
       @assignment.create_in_turnitin
 
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0' })
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ created: true, current: true, s_view_report: '0', submit_papers_to: '0' })
     end
   end
 
   describe "submit paper" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
       turnitin_submission
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
@@ -188,8 +188,8 @@ describe Turnitin::Client do
       expect(@submission.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(@submission.assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(Turnitin::Client).to receive(:new).at_least(1).with(:placeholder).and_return(@turnitin_api)
-      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(:success? => true))
-      expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
+      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(success?: true))
+      expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
       expect_any_instantiation_of(@attachment).to receive(:open).and_return(:my_stub)
     end
 
@@ -215,7 +215,7 @@ describe Turnitin::Client do
 
   describe "#prepare_params" do
     before do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       turnitin_assignment
       turnitin_submission
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
@@ -223,14 +223,14 @@ describe Turnitin::Client do
 
     let(:turnitin_submit_args) do
       {
-        :post => true,
-        :utp => '1',
-        :ptl => @attachment.display_name,
-        :ptype => "2",
-        :user => @student,
-        :course => @course,
-        :assignment => @assignment,
-        :tem => "spec@null.instructure.example.com"
+        post: true,
+        utp: '1',
+        ptl: @attachment.display_name,
+        ptype: "2",
+        user: @student,
+        course: @course,
+        assignment: @assignment,
+        tem: "spec@null.instructure.example.com"
       }
     end
 
@@ -337,17 +337,17 @@ describe Turnitin::Client do
       doc_sample_account_id = "100"
       doc_sample_shared_secret = "hothouse123"
       doc_sample_params = {
-        :gmtime => "200310311",
-        :fid => "1",
-        :fcmd => "1",
-        :encrypt => "0",
-        :aid => doc_sample_account_id,
-        :diagnostic => "0",
-        :uem => "john.doe@myschool.edu",
-        :upw => "john123",
-        :ufn => "John",
-        :uln => "Doe",
-        :utp => "2"
+        gmtime: "200310311",
+        fid: "1",
+        fcmd: "1",
+        encrypt: "0",
+        aid: doc_sample_account_id,
+        diagnostic: "0",
+        uem: "john.doe@myschool.edu",
+        upw: "john123",
+        ufn: "John",
+        uln: "Doe",
+        utp: "2"
       }
       doc_sample_md5 = "12a4e7b0bfc5f55b4b1ef252b1b05919"
 

@@ -25,12 +25,12 @@ class OutcomeGroupsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_outcomes)
       parent_id = params[:learning_outcome_group].delete(:learning_outcome_group_id)
       parent_outcome_group = parent_id ? @context.learning_outcome_groups.find(parent_id) : @context.root_outcome_group
-      @outcome_group = parent_outcome_group.child_outcome_groups.build(params[:learning_outcome_group].merge(:context => @context))
+      @outcome_group = parent_outcome_group.child_outcome_groups.build(params[:learning_outcome_group].merge(context: @context))
       respond_to do |format|
         if @outcome_group.save
-          format.json { render :json => @outcome_group }
+          format.json { render json: @outcome_group }
         else
-          format.json { render :json => @outcome_group.errors, :status => :bad_request }
+          format.json { render json: @outcome_group.errors, status: :bad_request }
         end
       end
     end
@@ -44,12 +44,12 @@ class OutcomeGroupsController < ApplicationController
         data[:outcomes].each do
           group.learning_outcomes.create
         end
-        render :json => group.as_json(:include => :learning_outcomes),
-               :as_text => true
+        render json: group.as_json(include: :learning_outcomes),
+               as_text: true
       else
-        render :json => { :errors => { :base => t(:invalid_file, "Invalid outcome group file") } },
-               :status => :bad_request,
-               :as_text => true
+        render json: { errors: { base: t(:invalid_file, "Invalid outcome group file") } },
+               status: :bad_request,
+               as_text: true
       end
     end
   end
@@ -62,9 +62,9 @@ class OutcomeGroupsController < ApplicationController
         @outcome_group.attributes = params[:learning_outcome_group]
         @outcome_group.learning_outcome_group = @context.learning_outcome_groups.find(parent_id) if parent_id
         if @outcome_group.save
-          format.json { render :json => @outcome_group }
+          format.json { render json: @outcome_group }
         else
-          format.json { render :json => @outcome_group.errors, :status => :bad_request }
+          format.json { render json: @outcome_group.errors, status: :bad_request }
         end
       end
     end
@@ -76,7 +76,7 @@ class OutcomeGroupsController < ApplicationController
       @outcome_group.skip_tag_touch = true
       @outcome_group.destroy
       @context.touch
-      render :json => @outcome_group
+      render json: @outcome_group
     end
   end
 end

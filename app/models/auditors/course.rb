@@ -213,7 +213,7 @@ class Auditors::Course
 
     data.each do |k, change|
       if change.is_a?(Array) && change.any? { |v| v.is_a?(String) && v.length > 1000 }
-        data[k] = change.map { |v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v }
+        data[k] = change.map { |v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, max_length: 1000) : v }
       end
     end
     event_record = nil

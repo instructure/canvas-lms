@@ -22,7 +22,7 @@ require_relative '../../conditional_release_spec_helper'
 require_dependency "conditional_release/assignment_set_association"
 
 module ConditionalRelease
-  describe AssignmentSetAssociation, :type => :model do
+  describe AssignmentSetAssociation, type: :model do
     it_behaves_like 'a soft-deletable model'
 
     it 'must have an assignment_id' do

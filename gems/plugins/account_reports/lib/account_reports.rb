@@ -111,7 +111,7 @@ module AccountReports
     begin
       REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
-      error_report_id = report_on_exception(e, { :user => account_report.user })
+      error_report_id = report_on_exception(e, { user: account_report.user })
       title = account_report.report_type.to_s.titleize
       error_message = "Generating the report, #{title}, failed."
       error_message += if error_report_id
@@ -202,10 +202,10 @@ module AccountReports
         attachment.save!
       else
         attachment = account_report.account.attachments.create!(
-          :uploaded_data => data,
-          :display_name => filename,
-          :filename => filename,
-          :user => account_report.user
+          uploaded_data: data,
+          display_name: filename,
+          filename: filename,
+          user: account_report.user
         )
       end
     end

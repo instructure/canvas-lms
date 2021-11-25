@@ -30,9 +30,9 @@ module RequestContext
       session_id = (env['rack.session.options'] || {})[:id]
       if session_id
         ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = {
-          :value => session_id,
-          :secure => Rails.application.config.session_options[:secure],
-          :httponly => true
+          value: session_id,
+          secure: Rails.application.config.session_options[:secure],
+          httponly: true
         }
       end
 

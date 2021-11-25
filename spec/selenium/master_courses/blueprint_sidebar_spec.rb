@@ -213,7 +213,7 @@ describe "master courses sidebar" do
       alert_text = '127 of 140 maximum characters'
       # the screenreader message is displayed after a 600ms delay
       # not waiting leads to a flakey spec
-      wait = Selenium::WebDriver::Wait.new(:timeout => 0.7)
+      wait = Selenium::WebDriver::Wait.new(timeout: 0.7)
       wait.until { expect(fj("#flash_screenreader_holder:contains(#{alert_text})")).to be_present }
     end
 

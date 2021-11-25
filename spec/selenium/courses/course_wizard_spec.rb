@@ -80,8 +80,8 @@ describe 'course wizard' do
 
   it "completes 'Add Students to the Course' checklist item" do
     skip('ADMIN-3018')
-    student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-    student_in_course(:user => student, :active_all => 1)
+    student = user_with_pseudonym(username: 'student@example.com', active_all: 1)
+    student_in_course(user: student, active_all: 1)
     go_to_checklist
     expect(completed_checklist_item('add_students')).to be_displayed
   end

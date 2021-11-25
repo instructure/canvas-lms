@@ -28,11 +28,11 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :rubric
   belongs_to :rubric_association
   belongs_to :user
-  belongs_to :assessor, :class_name => 'User'
+  belongs_to :assessor, class_name: 'User'
   belongs_to :artifact, touch: true,
                         polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
-  has_many :assessment_requests, :dependent => :destroy
-  has_many :learning_outcome_results, as: :artifact, :dependent => :destroy
+  has_many :assessment_requests, dependent: :destroy
+  has_many :learning_outcome_results, as: :artifact, dependent: :destroy
   serialize :data
 
   simply_versioned
@@ -165,7 +165,7 @@ class RubricAssessment < ActiveRecord::Base
                                                                })
     end
     requests.each do |a|
-      a.attributes = { :rubric_assessment => self, :assessor => assessor }
+      a.attributes = { rubric_assessment: self, assessor: assessor }
       a.complete
     end
   end
@@ -235,10 +235,10 @@ class RubricAssessment < ActiveRecord::Base
     can :read_assessor
   end
 
-  scope :of_type, ->(type) { where(:assessment_type => type.to_s) }
+  scope :of_type, ->(type) { where(assessment_type: type.to_s) }
 
-  scope :for_submissions, -> { where(:artifact_type => "Submission") }
-  scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade") }
+  scope :for_submissions, -> { where(artifact_type: "Submission") }
+  scope :for_provisional_grades, -> { where(artifact_type: "ModeratedGrading::ProvisionalGrade") }
 
   scope :for_course_context, lambda { |course_id|
     joins(:rubric_association).where(rubric_associations: { context_id: course_id, context_type: "Course" })

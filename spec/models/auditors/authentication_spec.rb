@@ -49,17 +49,17 @@ describe Auditors::Authentication do
       end
 
       it "includes event for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
           .to include(@event)
       end
 
       it "includes event for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
           .to include(@event)
       end
 
       it "includes event at user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
           .to include(@event)
       end
 
@@ -82,17 +82,17 @@ describe Auditors::Authentication do
       end
 
       it "does not include cross-account events for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
           .not_to include(@event)
       end
 
       it "does not include cross-account events for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
           .not_to include(@event)
       end
 
       it "includes cross-account events for user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
           .to include(@event)
       end
     end
@@ -103,17 +103,17 @@ describe Auditors::Authentication do
       end
 
       it "does not include cross-user events for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
           .not_to include(@event)
       end
 
       it "includes cross-user events for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
           .to include(@event)
       end
 
       it "does not include cross-user events for user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 1))
+        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
           .not_to include(@event)
       end
     end
@@ -134,7 +134,7 @@ describe Auditors::Authentication do
       it "recognizes :oldest for pseudonyms" do
         page = Auditors::Authentication
                .for_pseudonym(@pseudonym, oldest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
       end
@@ -142,7 +142,7 @@ describe Auditors::Authentication do
       it "recognizes :newest for pseudonyms" do
         page = Auditors::Authentication
                .for_pseudonym(@pseudonym, newest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
       end
@@ -150,7 +150,7 @@ describe Auditors::Authentication do
       it "recognizes :oldest for accounts" do
         page = Auditors::Authentication
                .for_account(@account, oldest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
       end
@@ -158,7 +158,7 @@ describe Auditors::Authentication do
       it "recognizes :newest for accounts" do
         page = Auditors::Authentication
                .for_account(@account, newest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
       end
@@ -166,7 +166,7 @@ describe Auditors::Authentication do
       it "recognizes :oldest for users" do
         page = Auditors::Authentication
                .for_user(@user, oldest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
       end
@@ -174,7 +174,7 @@ describe Auditors::Authentication do
       it "recognizes :newest for users" do
         page = Auditors::Authentication
                .for_user(@user, newest: 12.hours.ago)
-               .paginate(:per_page => 1)
+               .paginate(per_page: 1)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
       end
@@ -201,17 +201,17 @@ describe Auditors::Authentication do
         end
 
         it "includes events from the user's native shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 2))
+          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
             .to include(@event1)
         end
 
         it "includes events from the other pseudonym's shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 2))
+          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
             .to include(@event2)
         end
 
         it "does not include duplicate events" do
-          expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 4)
+          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 4)
             .size).to eq 2
         end
       end
@@ -228,12 +228,12 @@ describe Auditors::Authentication do
         end
 
         it "includes events from the user's native shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 2))
+          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
             .to include(@event1)
         end
 
         it "includes events from the other pseudonym's shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 2))
+          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
             .to include(@event2)
         end
       end
@@ -254,13 +254,13 @@ describe Auditors::Authentication do
         end
 
         it "includes events from the user's native shard" do
-          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
           uuids = records.map(&:uuid)
           expect(uuids).to include(@event1.id)
         end
 
         it "includes events from the other pseudonym's shard" do
-          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
           uuids = records.map(&:uuid)
           expect(uuids).to include(@event2.id)
         end

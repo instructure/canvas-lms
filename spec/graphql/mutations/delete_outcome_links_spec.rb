@@ -30,10 +30,10 @@ describe Mutations::DeleteOutcomeLinks do
     @global_group = LearningOutcomeGroup.create(title: 'global group')
     @global_outcome = outcome_model(outcome_group: @global_group, title: 'global outcome')
     @global_outcome_link = ContentTag.find_by(content_id: @global_outcome.id)
-    @group = @course.learning_outcome_groups.create!(:title => 'group')
-    outcome1 = @course.created_learning_outcomes.create!(:title => 'outcome')
-    outcome2 = @course.created_learning_outcomes.create!(:title => 'aligned outcome')
-    outcome2.align(@course.assessment_question_banks.create!, @course, :mastery_type => 'none')
+    @group = @course.learning_outcome_groups.create!(title: 'group')
+    outcome1 = @course.created_learning_outcomes.create!(title: 'outcome')
+    outcome2 = @course.created_learning_outcomes.create!(title: 'aligned outcome')
+    outcome2.align(@course.assessment_question_banks.create!, @course, mastery_type: 'none')
     @group.add_outcome outcome1
     @group.add_outcome outcome2
     @outcome_link1 = @group.child_outcome_links.find_by(content_id: outcome1.id)

@@ -31,33 +31,33 @@ describe "account admin question bank" do
   end
 
   def create_question_bank(title = "question bank 1")
-    Account.default.assessment_question_banks.create!(:title => title)
+    Account.default.assessment_question_banks.create!(title: title)
   end
 
   def create_question(name = "question 1", bank = @question_bank)
-    answers = [{ :text => "correct answer", :weight => 100 }]
+    answers = [{ text: "correct answer", weight: 100 }]
     3.times do
-      answer = { :text => "incorrect answer", :weight => 0 }
+      answer = { text: "incorrect answer", weight: 0 }
       answers.push answer
     end
-    data = { :question_text => "what is the answer to #{name}?", :question_type => 'multiple_choice_question', :answers => answers }
+    data = { question_text: "what is the answer to #{name}?", question_type: 'multiple_choice_question', answers: answers }
     data[:question_name] = name
-    question = AssessmentQuestion.create(:question_data => data)
+    question = AssessmentQuestion.create(question_data: data)
     bank.assessment_questions << question
     question
   end
 
   def create_outcome(short_description = "good student")
     outcome = Account.default.learning_outcomes.create!(
-      :short_description => short_description,
-      :rubric_criterion => {
-        :description => "test description",
-        :points_possible => 10,
-        :mastery_points => 9,
-        :ratings => [
-          { :description => "Exceeds Expectations", :points => 5 },
-          { :description => "Meets Expectations", :points => 3 },
-          { :description => "Does Not Meet Expectations", :points => 0 }
+      short_description: short_description,
+      rubric_criterion: {
+        description: "test description",
+        points_possible: 10,
+        mastery_points: 9,
+        ratings: [
+          { description: "Exceeds Expectations", points: 5 },
+          { description: "Meets Expectations", points: 3 },
+          { description: "Does Not Meet Expectations", points: 0 }
         ]
       }
     )
@@ -205,7 +205,7 @@ describe "account admin question bank" do
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.where(title: bank_name).first
       expect(new_question_bank).to be_present
-      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).to_a
+      new_questions = AssessmentQuestion.where(assessment_question_bank_id: new_question_bank).to_a
       expect(new_questions).to be_present
       expect(new_questions).to match_array questions
     end

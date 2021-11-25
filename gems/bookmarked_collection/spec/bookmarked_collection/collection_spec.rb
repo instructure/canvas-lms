@@ -23,7 +23,7 @@ require 'spec_helper'
 describe "BookmarkedCollection::Collection" do
   before do
     @bookmark = double('bookmark')
-    @bookmarker = double('bookmarker', :validate => true, :bookmark_for => @bookmark)
+    @bookmarker = double('bookmarker', validate: true, bookmark_for: @bookmark)
     @collection = BookmarkedCollection::Collection.new(@bookmarker)
   end
 

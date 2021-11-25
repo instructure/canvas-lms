@@ -41,7 +41,7 @@ class LoginController < ApplicationController
 
     if params[:needs_cookies] == '1'
       @needs_cookies = true
-      return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
+      return render 'shared/unauthorized', layout: 'application', status: :unauthorized
     end
 
     session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
@@ -156,6 +156,6 @@ class LoginController < ApplicationController
     session.delete('file_access_expiration')
     session[:permissions_key] = SecureRandom.uuid
 
-    render :plain => "ok"
+    render plain: "ok"
   end
 end

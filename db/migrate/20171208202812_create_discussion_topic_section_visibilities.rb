@@ -42,11 +42,11 @@ class CreateDiscussionTopicSectionVisibilities < ActiveRecord::Migration[5.0]
   def down
     remove_column :discussion_topics, :is_section_specific
     remove_index(:discussion_topic_section_visibilities,
-                 { :name => "idx_discussion_topic_section_visibility_on_section" })
+                 { name: "idx_discussion_topic_section_visibility_on_section" })
     remove_index(:discussion_topic_section_visibilities,
-                 { :name => "idx_discussion_topic_section_visibility_on_topic" })
+                 { name: "idx_discussion_topic_section_visibility_on_topic" })
     remove_foreign_key(:discussion_topic_section_visibilities, :course_sections)
     remove_foreign_key(:discussion_topic_section_visibilities, :discussion_topics)
-    drop_table(:discussion_topic_section_visibilities, { :id => :bigserial })
+    drop_table(:discussion_topic_section_visibilities, { id: :bigserial })
   end
 end

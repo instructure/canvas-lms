@@ -63,10 +63,10 @@ describe CyoeHelper do
 
     it 'returns rules for the mastery path for a matched assignment' do
       set1 = @set1_assmt1.conditional_release_associations.first.assignment_set
-      expect(helper.conditional_release_rule_for_module_item(@tag, :context => @course, :user => @student)[:selected_set_id]).to eq(set1.id)
+      expect(helper.conditional_release_rule_for_module_item(@tag, context: @course, user: @student)[:selected_set_id]).to eq(set1.id)
 
       @tag2 = @mod.add_item(type: 'assignment', id: @set1_assmt1.id)
-      expect(helper.conditional_release_rule_for_module_item(@tag2, :context => @course, :user => @student)).to be_nil
+      expect(helper.conditional_release_rule_for_module_item(@tag2, context: @course, user: @student)).to be_nil
     end
 
     describe 'path data for student' do
@@ -78,8 +78,8 @@ describe CyoeHelper do
 
       it 'returns url data for the mastery path even if one of the unlocked items is unpublished' do
         set1 = @set1_assmt1.conditional_release_associations.first.assignment_set
-        unpublised_assmt = @course.assignments.create!(:only_visible_to_overrides => true, :workflow_state => "unpublished")
-        set1.assignment_set_associations.create!(:assignment => unpublised_assmt)
+        unpublised_assmt = @course.assignments.create!(only_visible_to_overrides: true, workflow_state: "unpublished")
+        set1.assignment_set_associations.create!(assignment: unpublised_assmt)
 
         mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: @student })
         expect(mastery_path[:still_processing]).to be false # old code would have blown up because the unpublished assmt isn't visible

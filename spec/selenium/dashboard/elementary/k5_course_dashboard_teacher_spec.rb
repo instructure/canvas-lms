@@ -74,7 +74,7 @@ describe "teacher k5 course dashboard" do
   context 'home tab' do
     it 'has front page displayed if there is one' do
       wiki_page_data = "Here's where we have content"
-      @course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+      @course.wiki_pages.create!(title: "K5 Course Front Page", body: wiki_page_data).set_as_front_page!
 
       get "/courses/#{@subject_course.id}#home"
 

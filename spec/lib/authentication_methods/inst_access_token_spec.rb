@@ -47,7 +47,7 @@ describe AuthenticationMethods::InstAccessToken do
   describe ".load_user_and_pseudonym_context" do
     it "finds the user who created the token" do
       account = Account.default
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       token_obj = ::InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: account.uuid)
       ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
       expect(ctx[:current_user]).to eq(@user)
@@ -57,7 +57,7 @@ describe AuthenticationMethods::InstAccessToken do
     it "chooses the local user when a local and shadow user share the same UUID" do
       user_model(id: (10_000_000_000_000 + (rand * 10_000_000).to_i), uuid: 'a-shared-uuid-between-users')
       account = Account.default
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       @user.uuid = 'a-shared-uuid-between-users'
       @user.save!
       token_obj = ::InstAccess::Token.for_user(user_uuid: 'a-shared-uuid-between-users', account_uuid: account.uuid)

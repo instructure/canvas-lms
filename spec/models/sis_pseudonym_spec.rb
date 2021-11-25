@@ -143,7 +143,7 @@ describe SisPseudonym do
   end
 
   it "finds the right root account for a group" do
-    @group = group :group_context => course2
+    @group = group group_context: course2
     pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
     expect(SisPseudonym.for(u, @group)).to eq(pseudonym)
   end

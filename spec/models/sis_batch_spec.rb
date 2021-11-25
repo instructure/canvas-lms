@@ -110,7 +110,7 @@ describe SisBatch do
     observer = user_with_managed_pseudonym(account: @account)
     UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
     student_enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
-    observer_enrollment = course.observer_enrollments.where(:user_id => observer).take
+    observer_enrollment = course.observer_enrollments.where(user_id: observer).take
 
     batch = process_csv_data([%(course_id,user_id,role,status,section_id
                                 c1,u1,student,deleted,)])
@@ -134,11 +134,11 @@ describe SisBatch do
                                 c1,u1,student,deleted,)])
     expect(student_enrollment.reload.workflow_state).to eq 'deleted'
     UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
-    expect(course.observer_enrollments.where(:user_id => observer).take).to be_nil # doesn't make a new enrollment
+    expect(course.observer_enrollments.where(user_id: observer).take).to be_nil # doesn't make a new enrollment
     batch.restore_states_for_batch
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq 'active'
-    observer_enrollment = course.observer_enrollments.where(:user_id => observer).take # until now
+    observer_enrollment = course.observer_enrollments.where(user_id: observer).take # until now
     expect(observer_enrollment.workflow_state).to eq 'active'
   end
 
@@ -175,7 +175,7 @@ describe SisBatch do
     expect(atts.count).to eq 1
 
     atts.first.open do |file|
-      @row = ::CSV.new(file, :headers => true).first.to_h
+      @row = ::CSV.new(file, headers: true).first.to_h
     end
     expect(@row).to eq({ "user_id" => "user_1", "login_id" => "user_1", "status" => "active" })
   end
@@ -198,7 +198,7 @@ describe SisBatch do
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |b|
       expect(b.attachment).not_to be_new_record
       expect(b.workflow_state).to eq 'initializing'
-      b.options = { :override_sis_stickiness => true }
+      b.options = { override_sis_stickiness: true }
     end
 
     expect(batch.workflow_state).to eq 'created'
@@ -227,9 +227,9 @@ describe SisBatch do
       expect(batch.parallel_importers.order(:id).pluck(:importer_type, :rows_processed)).to eq [
         ['course', 4], ['user', 3]
       ]
-      expect(Pseudonym.where(:sis_user_id => %w[user_1 user_2 user_3]).count).to eq 3
-      expect(Course.where(:sis_source_id => %w[course_1 course_2 course_3 course_4]).count).to eq 4
-      expect(batch.reload.data[:counts].slice(:users, :courses)).to eq({ :users => 3, :courses => 4 })
+      expect(Pseudonym.where(sis_user_id: %w[user_1 user_2 user_3]).count).to eq 3
+      expect(Course.where(sis_source_id: %w[course_1 course_2 course_3 course_4]).count).to eq 4
+      expect(batch.reload.data[:counts].slice(:users, :courses)).to eq({ users: 3, courses: 4 })
     end
 
     describe 'intermittent failures' do
@@ -362,15 +362,15 @@ test_1,TC 101,Test Course 101,,term1,deleted
     describe "with non-standard batches" do
       it "only queues one 'process_all_for_account' job and run together" do
         SisBatch.valid_import_types["silly_sis_batch"] = {
-          :callback => lambda do |batch|
-                         batch.data[:silliness_complete] = true
-                         batch.finish(true)
-                       end
+          callback: lambda do |batch|
+                      batch.data[:silliness_complete] = true
+                      batch.finish(true)
+                    end
         }
         enable_cache do
-          batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
+          batch1 = @account.sis_batches.create!(workflow_state: "created", data: { import_type: "silly_sis_batch" })
           batch1.process
-          batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
+          batch2 = @account.sis_batches.create!(workflow_state: "created", data: { import_type: "silly_sis_batch" })
           batch2.process
           expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
                                     singleton: SisBatch.strand_for_account(@account)).count).to eq 1
@@ -438,18 +438,18 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
   describe "batch mode" do
     it "does not remove anything if no term is given" do
-      @subacct = @account.sub_accounts.create(:name => 'sub1')
+      @subacct = @account.sub_accounts.create(name: 'sub1')
       @term1 = @account.enrollment_terms.first
       @term1.update_attribute(:sis_source_id, 'term1')
-      @term2 = @account.enrollment_terms.create!(:name => 'term2')
+      @term2 = @account.enrollment_terms.create!(name: 'term2')
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@subacct.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => @previous_batch.id)
+      @c1 = factory_with_protected_attributes(@subacct.courses, name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
       @c1.offer!
-      @c2 = factory_with_protected_attributes(@account.courses, :name => "don't delete me", :enrollment_term => @term1, :sis_source_id => 'my_course', :root_account => @account)
+      @c2 = factory_with_protected_attributes(@account.courses, name: "don't delete me", enrollment_term: @term1, sis_source_id: 'my_course', root_account: @account)
       @c2.offer!
-      @c3 = factory_with_protected_attributes(@account.courses, :name => "delete me if terms", :enrollment_term => @term2, :sis_batch_id => @previous_batch.id)
+      @c3 = factory_with_protected_attributes(@account.courses, name: "delete me if terms", enrollment_term: @term2, sis_batch_id: @previous_batch.id)
       @c3.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
@@ -460,17 +460,17 @@ test_1,TC 101,Test Course 101,,term1,deleted
       @c4 = @account.courses.where(course_code: 'not-delete').first
 
       # sections are keyed off what term their course is in
-      @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id)
-      @s2 = factory_with_protected_attributes(@c2.course_sections, :name => "don't delete me", :sis_source_id => 'my_section')
-      @s3 = factory_with_protected_attributes(@c3.course_sections, :name => "delete me if terms", :sis_batch_id => @old_batch.id)
-      @s4 = factory_with_protected_attributes(@c2.course_sections, :name => "delete me", :sis_batch_id => @old_batch.id) # c2 won't be deleted, but this section should still be
+      @s1 = factory_with_protected_attributes(@c1.course_sections, name: "delete me", sis_batch_id: @old_batch.id)
+      @s2 = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me", sis_source_id: 'my_section')
+      @s3 = factory_with_protected_attributes(@c3.course_sections, name: "delete me if terms", sis_batch_id: @old_batch.id)
+      @s4 = factory_with_protected_attributes(@c2.course_sections, name: "delete me", sis_batch_id: @old_batch.id) # c2 won't be deleted, but this section should still be
 
       # enrollments are keyed off what term their course is in
-      @e1 = factory_with_protected_attributes(@c1.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
-      @e2 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_factory, :type => 'StudentEnrollment')
-      @e3 = factory_with_protected_attributes(@c3.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
-      @e4 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment') # c2 won't be deleted, but this enrollment should still be
-      @e5 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_with_pseudonym, :sis_batch_id => @old_batch.id, :course_section => @s2, :type => 'StudentEnrollment') # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
+      @e1 = factory_with_protected_attributes(@c1.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+      @e2 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_factory, type: 'StudentEnrollment')
+      @e3 = factory_with_protected_attributes(@c3.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+      @e4 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment') # c2 won't be deleted, but this enrollment should still be
+      @e5 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: 'StudentEnrollment') # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
       @e5.user.pseudonym.update_attribute(:sis_user_id, 'my_user')
       @e5.user.pseudonym.update_attribute(:account_id, @account.id)
 
@@ -486,7 +486,7 @@ my_course,my_user,student,active,my_section),
           %(section_id,course_id,name,status
 s2,test_1,section2,active),
         ],
-        :batch_mode => true
+        batch_mode: true
       )
 
       expect(@c1.reload).to be_available
@@ -513,10 +513,10 @@ s2,test_1,section2,active),
     end
 
     def test_remove_specific_term
-      @subacct = @account.sub_accounts.create(:name => 'sub1')
+      @subacct = @account.sub_accounts.create(name: 'sub1')
       @term1 = @account.enrollment_terms.first
       @term1.update_attribute(:sis_source_id, 'term1')
-      @term2 = @account.enrollment_terms.create!(:name => 'term2')
+      @term2 = @account.enrollment_terms.create!(name: 'term2')
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
@@ -554,11 +554,11 @@ another_course,not-delete,not deleted not changed,,term1,active)
                                                                    sis_source_id: nil, sis_batch_id: @old_batch.id)
 
       # enrollments are keyed off what term their course is in
-      @e1 = factory_with_protected_attributes(@c1.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
-      @e2 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_factory, :type => 'StudentEnrollment')
-      @e3 = factory_with_protected_attributes(@c3.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment')
-      @e4 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_factory, :sis_batch_id => @old_batch.id, :type => 'StudentEnrollment') # c2 won't be deleted, but this enrollment should still be
-      @e5 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_with_pseudonym, :sis_batch_id => @old_batch.id, :course_section => @s2, :type => 'StudentEnrollment') # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
+      @e1 = factory_with_protected_attributes(@c1.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+      @e2 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_factory, type: 'StudentEnrollment')
+      @e3 = factory_with_protected_attributes(@c3.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+      @e4 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_factory, sis_batch_id: @old_batch.id, type: 'StudentEnrollment') # c2 won't be deleted, but this enrollment should still be
+      @e5 = factory_with_protected_attributes(@c2.enrollments, workflow_state: 'active', user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: 'StudentEnrollment') # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
       @e5.user.pseudonym.update_attribute(:sis_user_id, 'my_user')
       @e5.user.pseudonym.update_attribute(:account_id, @account.id)
 
@@ -574,8 +574,8 @@ my_course,my_user,student,active,my_section),
           %(section_id,course_id,name,status
 s2,test_1,section2,active),
         ],
-        :batch_mode => true,
-        :batch_mode_term => @term1
+        batch_mode: true,
+        batch_mode_term: @term1
       )
 
       expect(@batch.data[:stack_trace]).to be_nil
@@ -622,17 +622,17 @@ s2,test_1,section2,active),
 
     it "does not do batch mode removals if not in batch mode" do
       @term1 = @account.enrollment_terms.first
-      @term2 = @account.enrollment_terms.create!(:name => 'term2')
+      @term2 = @account.enrollment_terms.create!(name: 'term2')
       @previous_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@account.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => @previous_batch.id)
+      @c1 = factory_with_protected_attributes(@account.courses, name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
       @c1.offer!
 
       @batch = process_csv_data([
                                   %(course_id,short_name,long_name,account_id,term_id,status
           test_1,TC 101,Test Course 101,,,active)
                                 ],
-                                :batch_mode => false)
+                                batch_mode: false)
       expect(@c1.reload).to be_available
     end
 
@@ -713,7 +713,7 @@ s2,test_1,section2,active),
       b = process_csv_data(
         [%(section_id,user_id,role,status
            section_1,user_1,teacher,active)],
-        :batch_mode => true, :batch_mode_term => @term
+        batch_mode: true, batch_mode_term: @term
       )
 
       expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
@@ -727,7 +727,7 @@ s2,test_1,section2,active),
       # only supply sections; course left alone
       b = process_csv_data(
         [%(section_id,course_id,name)],
-        :batch_mode => true, :batch_mode_term => @term
+        batch_mode: true, batch_mode_term: @term
       )
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
@@ -741,7 +741,7 @@ s2,test_1,section2,active),
       # only supply courses
       b = process_csv_data(
         [%(course_id,short_name,long_name,term_id)],
-        :batch_mode => true, :batch_mode_term => @term
+        batch_mode: true, batch_mode_term: @term
       )
       expect(b.data[:counts][:batch_courses_deleted]).to eq 1
       expect(@course.reload).to be_deleted
@@ -789,7 +789,7 @@ s2,test_1,section2,active),
 
     it "treats crosslisted sections as belonging to their original course" do
       @term1 = @account.enrollment_terms.first
-      @term2 = @account.enrollment_terms.create!(:name => 'term2')
+      @term2 = @account.enrollment_terms.create!(name: 'term2')
       @term2.sis_source_id = 'term2'
       @term2.save!
       @previous_batch = @account.sis_batches.create!
@@ -813,7 +813,7 @@ s2,test_1,section2,active),
 
       process_csv_data(
         ['section_id,course_id,name,status}'],
-        :batch_mode => true, :batch_mode_term => @term1
+        batch_mode: true, batch_mode_term: @term1
       )
       expect(@section1.reload).to be_deleted
       expect(@section2.reload).not_to be_deleted
@@ -1095,10 +1095,10 @@ test_4,TC 104,Test Course 104,,term1,active
     end
 
     it "treats role_id as an identifying field for diffs" do
-      course_model(:account => @account, :sis_source_id => 'c1')
-      user_with_managed_pseudonym(:account => @account, :sis_user_id => 'u1')
-      role1 = @account.roles.create!(:base_role_type => "TeacherEnrollment", :name => "some role")
-      role2 = @account.roles.create!(:base_role_type => "TeacherEnrollment", :name => "some other role")
+      course_model(account: @account, sis_source_id: 'c1')
+      user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+      role1 = @account.roles.create!(base_role_type: "TeacherEnrollment", name: "some role")
+      role2 = @account.roles.create!(base_role_type: "TeacherEnrollment", name: "some other role")
 
       process_csv_data([%(course_id,user_id,role_id,status)], diffing_data_set_identifier: 'default')
       process_csv_data(

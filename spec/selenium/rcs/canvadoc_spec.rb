@@ -29,11 +29,11 @@ describe 'Canvadoc' do
   include RCENextPage
 
   before :once do
-    PluginSetting.create! :name => 'canvadocs',
-                          :settings => { "api_key" => "blahblahblahblahblah",
-                                         "base_url" => "http://example.com",
-                                         "annotations_supported" => "1",
-                                         "account" => "Account.default" }
+    PluginSetting.create! name: 'canvadocs',
+                          settings: { "api_key" => "blahblahblahblahblah",
+                                      "base_url" => "http://example.com",
+                                      "annotations_supported" => "1",
+                                      "account" => "Account.default" }
   end
 
   def turn_on_plugin_settings
@@ -71,7 +71,7 @@ describe 'Canvadoc' do
     end
 
     it "embed canvadocs in wiki page", priority: "1" do
-      course_with_teacher_logged_in :account => @account, :active_all => true
+      course_with_teacher_logged_in account: @account, active_all: true
       @course.wiki_pages.create!(title: 'Page1')
       file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
       file.context = @course

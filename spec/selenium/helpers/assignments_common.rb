@@ -111,10 +111,10 @@ module AssignmentsCommon
   def frozen_assignment(group)
     group ||= @course.assignment_groups.first
     assign = @course.assignments.create!(
-      :name => "frozen",
-      :due_at => Time.zone.now.utc + 2.days,
-      :assignment_group => group,
-      :freeze_on_copy => true
+      name: "frozen",
+      due_at: Time.zone.now.utc + 2.days,
+      assignment_group: group,
+      freeze_on_copy: true
     )
     assign.copied = true
     assign.save!
@@ -151,18 +151,18 @@ module AssignmentsCommon
     @assignment.lock_at   = @lock_at
     @assignment.save!
     # 2 course sections, student in second section.
-    @section1 = @course.course_sections.create!(:name => 'Section A')
-    @section2 = @course.course_sections.create!(:name => 'Section B')
+    @section1 = @course.course_sections.create!(name: 'Section A')
+    @section2 = @course.course_sections.create!(name: 'Section B')
     @course.student_enrollments.each do |enrollment|
       Score.where(enrollment_id: enrollment).each(&:destroy_permanently!)
       enrollment.destroy_permanently! # get rid of existing student enrollments, mess up section enrollment
     end
     # Overridden lock dates for 2nd section - different dates, but still in future
     @override = assignment_override_model(
-      :assignment => @assignment,
-      :set => @section2,
-      :lock_at => @lock_at + 12.days,
-      :unlock_at => Time.zone.now.utc + 3.days
+      assignment: @assignment,
+      set: @section2,
+      lock_at: @lock_at + 12.days,
+      unlock_at: Time.zone.now.utc + 3.days
     )
   end
 

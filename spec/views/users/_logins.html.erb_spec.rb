@@ -30,7 +30,7 @@ describe "users/_logins.html.erb" do
       @pseudo.sis_user_id = "why_is_this_one_user_id_lame"
       @pseudo.integration_id = "and_this_one_even_lamer"
       @pseudo.save
-      @pseudo2 = @user.pseudonyms.create!(:unique_id => 'someone@somewhere.com') { |p| p.sis_user_id = 'more' }
+      @pseudo2 = @user.pseudonyms.create!(unique_id: 'someone@somewhere.com') { |p| p.sis_user_id = 'more' }
       assign(:context, @account)
       assign(:context_account, @account)
       assign(:account, @account)
@@ -61,7 +61,7 @@ describe "users/_logins.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false }, :account => @account)
+      admin = account_admin_user_with_role_changes(role_changes: { 'manage_sis' => false }, account: @account)
       view_context(@account, admin)
       assign(:current_user, admin)
       render

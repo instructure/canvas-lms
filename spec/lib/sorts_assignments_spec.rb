@@ -23,12 +23,12 @@ describe SortsAssignments do
     allow(Time).to receive(:now).and_return(@time_now)
   end
 
-  let(:due_yesterday) { double({ :id => 1, :due_at => 1.day.ago }) }
-  let(:due_today) { double({ :id => 2, :due_at => @time_now }) }
-  let(:due_tomorrow) { double({ :id => 3, :due_at => 1.day.from_now }) }
-  let(:no_due_date) { double({ :id => 4, :due_at => nil }) }
-  let(:due_in_one_week) { double({ :id => 5, :due_at => 1.week.from_now }) }
-  let(:due_in_two_weeks) { double({ :id => 6, :due_at => 2.weeks.from_now }) }
+  let(:due_yesterday) { double({ id: 1, due_at: 1.day.ago }) }
+  let(:due_today) { double({ id: 2, due_at: @time_now }) }
+  let(:due_tomorrow) { double({ id: 3, due_at: 1.day.from_now }) }
+  let(:no_due_date) { double({ id: 4, due_at: nil }) }
+  let(:due_in_one_week) { double({ id: 5, due_at: 1.week.from_now }) }
+  let(:due_in_two_weeks) { double({ id: 6, due_at: 2.weeks.from_now }) }
   let(:assignments) do
     [
       due_yesterday,
@@ -131,8 +131,8 @@ describe SortsAssignments do
     before do
       assignments.each do |assignment|
         allow(assignment).to receive_messages(
-          :grants_right? => true,
-          :expects_submission? => true
+          grants_right?: true,
+          expects_submission?: true
         )
       end
 
@@ -166,20 +166,20 @@ describe SortsAssignments do
     let(:submissions) { [] }
     let(:sorted_assignments) do
       SortsAssignments.by_due_date({
-                                     :assignments => assignments,
-                                     :user => user,
-                                     :session => session,
-                                     :upcoming_limit => 1.week.from_now,
-                                     :submissions => []
+                                     assignments: assignments,
+                                     user: user,
+                                     session: session,
+                                     upcoming_limit: 1.week.from_now,
+                                     submissions: []
                                    })
     end
 
     before do
       assignments.each do |assignment|
         allow(assignment).to receive_messages(
-          :grants_right? => true,
-          :expects_submission? => true,
-          :submission_for_student => { id: nil }
+          grants_right?: true,
+          expects_submission?: true,
+          submission_for_student: { id: nil }
         )
       end
     end
@@ -235,18 +235,18 @@ describe SortsAssignments do
 
   describe "without_graded_submission" do
     let(:submission1) do
-      double(:assignment_id => due_yesterday.id,
-             :without_graded_submission? => false)
+      double(assignment_id: due_yesterday.id,
+             without_graded_submission?: false)
     end
     let(:submission2) do
-      double(:assignment_id => due_today.id,
-             :without_graded_submission? => false)
+      double(assignment_id: due_today.id,
+             without_graded_submission?: false)
     end
     let(:submissions) { [submission1, submission2] }
     let(:assignments) { [due_yesterday, due_today] }
 
     it "and_return assignments that don't have a matching submission in the passed submissions collection" do
-      allow(submission1).to receive_messages(:assignment_id => nil)
+      allow(submission1).to receive_messages(assignment_id: nil)
       expect(SortsAssignments.without_graded_submission(assignments, submissions))
         .to match_array [due_yesterday]
     end
@@ -301,11 +301,11 @@ describe SortsAssignments do
     let(:assignments) { [assignment1, assignment2, assignment3] }
 
     before do
-      allow(course).to receive_messages(:grants_right? => true)
+      allow(course).to receive_messages(grants_right?: true)
       assignments.each do |assignment|
         allow(assignment).to receive_messages(
-          :expects_submission? => true,
-          :submission_for_student => { id: nil }
+          expects_submission?: true,
+          submission_for_student: { id: nil }
         )
       end
     end
@@ -317,13 +317,13 @@ describe SortsAssignments do
     end
 
     it "only includes assignments that are expecting a submission" do
-      allow(assignment2).to receive_messages({ :expects_submission? => false })
+      allow(assignment2).to receive_messages({ expects_submission?: false })
       expect(SortsAssignments.unsubmitted_for_user_and_session(course, assignments, user, current_user, session))
         .to match_array [assignment1, assignment3]
     end
 
     it "only includes assignments that do not have a saved submission for the user" do
-      allow(assignment3).to receive_messages(:submission_for_student => { id: 1 })
+      allow(assignment3).to receive_messages(submission_for_student: { id: 1 })
       expect(SortsAssignments.unsubmitted_for_user_and_session(course, assignments, user, current_user, session))
         .to match_array [assignment1, assignment2]
     end

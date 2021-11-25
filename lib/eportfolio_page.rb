@@ -51,8 +51,8 @@ module EportfolioPage
       add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug)) if @category.slug.present? && @page.slug.present?
     end
     if @current_user
-      js_env :folder_id => Folder.unfiled_folder(@current_user).id,
-             :context_code => @current_user.asset_string
+      js_env folder_id: Folder.unfiled_folder(@current_user).id,
+             context_code: @current_user.asset_string
     end
 
     js_env({ SKIP_ENHANCING_USER_CONTENT: true, SECTION_COUNT_IDX: @page.content_sections.count })

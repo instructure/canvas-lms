@@ -96,7 +96,7 @@ class AccountNotificationsController < ApplicationController
   def user_index
     include_past = value_to_boolean(params[:include_past])
     notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
-    render :json => account_notifications_json(notifications, @current_user, session)
+    render json: account_notifications_json(notifications, @current_user, session)
   end
 
   def user_index_deprecated
@@ -119,7 +119,7 @@ class AccountNotificationsController < ApplicationController
     # to allow for paination on the front end.
     html_strings = { current: [], past: [] }
     @for_display = true
-    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, :include_past => true)
+    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: true)
     [:current, :past].each do |time|
       coll.select(&time).in_groups_of(5, false) { |a| html_strings[time] << html_string_from_announcements(a) }
     end
@@ -164,7 +164,7 @@ class AccountNotificationsController < ApplicationController
   def user_close_notification
     notification = AccountNotification.find(params[:id])
     @current_user.close_announcement(notification)
-    render :json => account_notification_json(notification, @current_user, session)
+    render json: account_notification_json(notification, @current_user, session)
   end
 
   def user_close_notification_deprecated
@@ -228,21 +228,21 @@ class AccountNotificationsController < ApplicationController
         end
       end
 
-      @notification.account_notification_roles.build(roles.map { |role| { :role => role } })
+      @notification.account_notification_roles.build(roles.map { |role| { role: role } })
     end
     respond_to do |format|
       if @notification.save
         if api_request?
-          format.json { render :json => account_notification_json(@notification, @current_user, session) }
+          format.json { render json: account_notification_json(@notification, @current_user, session) }
         else
           flash[:notice] = t("Announcement successfully created")
-          format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-          format.json { render :json => @notification }
+          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+          format.json { render json: @notification }
         end
       else
         flash[:error] = t("Announcement creation failed")
-        format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') } unless api_request?
-        format.json { render :json => @notification.errors, :status => :bad_request }
+        format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') } unless api_request?
+        format.json { render json: @notification.errors, status: :bad_request }
       end
     end
   end
@@ -310,19 +310,19 @@ class AccountNotificationsController < ApplicationController
       respond_to do |format|
         if updated
           flash[:notice] = t("Announcement successfully updated")
-          format.json { render :json => account_notification_json(account_notification, @current_user, session) }
-          format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
+          format.json { render json: account_notification_json(account_notification, @current_user, session) }
+          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
         else
           flash[:error] = t("Announcement update failed")
-          format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-          format.json { render :json => account_notification.errors, :status => :bad_request }
+          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+          format.json { render json: account_notification.errors, status: :bad_request }
         end
       end
     else
       respond_to do |format|
         flash[:error] = t("Announcement not found")
-        format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-        format.json { render :json => { :message => "announcement not found" } }
+        format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+        format.json { render json: { message: "announcement not found" } }
       end
     end
   end
@@ -332,8 +332,8 @@ class AccountNotificationsController < ApplicationController
     @notification.destroy
     respond_to do |format|
       flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
-      format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-      format.json { render :json => @notification }
+      format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+      format.json { render json: @notification }
     end
   end
 

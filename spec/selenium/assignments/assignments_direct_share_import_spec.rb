@@ -33,31 +33,31 @@ describe 'assignments' do
 
   let(:setup) do
     # Two Courses
-    @course1 = Course.create!(:name => "First Course1")
-    @course2 = Course.create!(:name => "Second Course2")
+    @course1 = Course.create!(name: "First Course1")
+    @course2 = Course.create!(name: "Second Course2")
     # Two teachers
-    @teacher1 = User.create!(:name => "First Teacher")
-    @teacher2 = User.create!(:name => "Second Teacher")
+    @teacher1 = User.create!(name: "First Teacher")
+    @teacher2 = User.create!(name: "Second Teacher")
     @teacher2.accept_terms
     @teacher2.register!
     # Teacher1 is enrolled in both courses, Teacher2 is in Course2 only
-    @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
-    @course2.enroll_teacher(@teacher1, :enrollment_state => 'active')
-    @course2.enroll_teacher(@teacher2, :enrollment_state => 'active')
+    @course1.enroll_teacher(@teacher1, enrollment_state: 'active')
+    @course2.enroll_teacher(@teacher1, enrollment_state: 'active')
+    @course2.enroll_teacher(@teacher2, enrollment_state: 'active')
     # Assignment1 in Course1
-    @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+    @assignment1 = @course1.assignments.create!(title: 'Assignment First', points_possible: 10)
     # add a module to course2
-    @module1 = @course2.context_modules.create!(:name => "My Module1")
-    @item_before = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment BEFORE this one').id
-    @item_after = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment AFTER this one').id
-    @module2 = @course2.context_modules.create!(:name => "My Module2")
+    @module1 = @course2.context_modules.create!(name: "My Module1")
+    @item_before = @module1.add_item type: 'assignment', id: @course1.assignments.create!(title: 'assignment BEFORE this one').id
+    @item_after = @module1.add_item type: 'assignment', id: @course1.assignments.create!(title: 'assignment AFTER this one').id
+    @module2 = @course2.context_modules.create!(name: "My Module2")
     # Third course has already concluded, but should still show up in Direct Share
-    @term = EnrollmentTerm.new(:name => "Term Over", :start_at => 1.month.ago, :end_at => 1.week.ago)
+    @term = EnrollmentTerm.new(name: "Term Over", start_at: 1.month.ago, end_at: 1.week.ago)
     @term.root_account_id = Account.default.id
     @term.save!
-    @course3 = Course.create!(:name => "Third Course3", :start_at => 1.month.ago, :conclude_at => 1.week.ago, :enrollment_term => @term)
-    @course3.enroll_teacher(@teacher1, :enrollment_state => 'active')
-    @course3.enroll_teacher(@teacher2, :enrollment_state => 'active')
+    @course3 = Course.create!(name: "Third Course3", start_at: 1.month.ago, conclude_at: 1.week.ago, enrollment_term: @term)
+    @course3.enroll_teacher(@teacher1, enrollment_state: 'active')
+    @course3.enroll_teacher(@teacher2, enrollment_state: 'active')
   end
 
   let(:copy_assignment_to_course2) do

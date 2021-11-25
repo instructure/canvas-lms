@@ -172,7 +172,7 @@ module Api::V1::Submission
     end
 
     attempt.assignment = assignment
-    hash = api_json(attempt, user, session, :only => json_fields, :methods => json_methods)
+    hash = api_json(attempt, user, session, only: json_fields, methods: json_methods)
     if hash['body'].present?
       hash['body'] = api_user_content(hash['body'], context, user)
     end
@@ -189,7 +189,7 @@ module Api::V1::Submission
     end
 
     unless attempt.media_comment_id.blank?
-      hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
+      hash['media_comment'] = media_comment_json(media_id: attempt.media_comment_id, media_type: attempt.media_comment_type)
     end
 
     if show_originality_reports?(attempt)
@@ -239,13 +239,13 @@ module Api::V1::Submission
 
       entries = if assignment.discussion_topic.has_group_category?
                   assignment.shard.activate do
-                    DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id))
+                    DiscussionEntry.active.where(discussion_topic_id: assignment.discussion_topic.child_topics.select(:id))
                                    .for_user(attempt.user_id).to_a.sort_by(&:created_at)
                   end
                 else
                   assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
                 end
-      ActiveRecord::Associations::Preloader.new.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(:user_id => user))
+      ActiveRecord::Associations::Preloader.new.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(user_id: user))
       hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 
@@ -326,7 +326,7 @@ module Api::V1::Submission
     end
 
     unless attachment
-      attachment = assignment.attachments.build(:display_name => 'submissions.zip')
+      attachment = assignment.attachments.build(display_name: 'submissions.zip')
       attachment.workflow_state = 'to_be_zipped'
       attachment.file_state = '0'
       attachment.user = @current_user
@@ -357,7 +357,7 @@ module Api::V1::Submission
     if assignment.can_view_other_grader_identities?(current_user)
       if includes.include?('rubric_assessment')
         json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
-          ra.as_json(:methods => [:assessor_name], :include_root => false)
+          ra.as_json(methods: [:assessor_name], include_root: false)
         end
       end
     else

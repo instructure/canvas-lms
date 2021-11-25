@@ -77,17 +77,17 @@ class ProgressRunner
   # @param [Integer] completed_count The number of items that were processed successfully.
   def default_completed_message(completed_count)
     I18n.t('lib.progress_runner.completed_message', {
-             :one => "1 item processed",
-             :other => "%{count} items processed"
+             one: "1 item processed",
+             other: "%{count} items processed"
            },
-           :count => completed_count)
+           count: completed_count)
   end
 
   # The default error message formatter.
   # @param message [String] The error message that was encountered for the specified elements.
   # @param elements [Array] A list of elements this error message applies to.
   def default_error_message(message, elements)
-    I18n.t('lib.progress_runner.error_message', "%{error}: %{ids}", :error => message, :ids => elements.join(', '))
+    I18n.t('lib.progress_runner.error_message', "%{error}: %{ids}", error: message, ids: elements.join(', '))
   end
 
   private

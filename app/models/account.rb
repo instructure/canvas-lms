@@ -31,41 +31,41 @@ class Account < ActiveRecord::Base
 
   include Workflow
   include BrandConfigHelpers
-  belongs_to :root_account, :class_name => 'Account'
-  belongs_to :parent_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
+  belongs_to :parent_account, class_name: 'Account'
 
   has_many :courses
   has_many :favorites, inverse_of: :root_account
-  has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
-  has_one :terms_of_service, :dependent => :destroy
-  has_one :terms_of_service_content, :dependent => :destroy
+  has_many :all_courses, class_name: 'Course', foreign_key: 'root_account_id'
+  has_one :terms_of_service, dependent: :destroy
+  has_one :terms_of_service_content, dependent: :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, :class_name => 'GroupCategory', foreign_key: 'root_account_id', inverse_of: :root_account
-  has_many :groups, :as => :context, :inverse_of => :context
+  has_many :all_group_categories, class_name: 'GroupCategory', foreign_key: 'root_account_id', inverse_of: :root_account
+  has_many :groups, as: :context, inverse_of: :context
   has_many :all_groups, class_name: 'Group', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
-  has_many :enrollment_terms, :foreign_key => 'root_account_id'
+  has_many :enrollment_terms, foreign_key: 'root_account_id'
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
   has_many :grading_periods, through: :grading_period_groups
   has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: 'root_account_id'
-  has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
+  has_many :all_enrollments, class_name: 'Enrollment', foreign_key: 'root_account_id'
   has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
   has_many :all_accounts, -> { order(:name) }, class_name: 'Account', foreign_key: 'root_account_id'
-  has_many :account_users, :dependent => :destroy
+  has_many :account_users, dependent: :destroy
   has_many :active_account_users, -> { active }, class_name: 'AccountUser'
-  has_many :course_sections, :foreign_key => 'root_account_id'
+  has_many :course_sections, foreign_key: 'root_account_id'
   has_many :sis_batches
-  has_many :abstract_courses, :class_name => 'AbstractCourse'
-  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
+  has_many :abstract_courses, class_name: 'AbstractCourse'
+  has_many :root_abstract_courses, class_name: 'AbstractCourse', foreign_key: 'root_account_id'
   has_many :all_users, -> { distinct }, through: :user_account_associations, source: :user
-  has_many :users, :through => :active_account_users
+  has_many :users, through: :active_account_users
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
-  has_many :role_overrides, :as => :context, :inverse_of => :context
+  has_many :role_overrides, as: :context, inverse_of: :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
@@ -79,11 +79,11 @@ class Account < ActiveRecord::Base
   has_many :account_reports, inverse_of: :account
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
-  has_many :assessment_questions, :through => :assessment_question_banks
+  has_many :assessment_questions, through: :assessment_question_banks
   has_many :roles
-  has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
-  has_many :progresses, :as => :context, :inverse_of => :context
-  has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :all_roles, class_name: 'Role', foreign_key: 'root_account_id'
+  has_many :progresses, as: :context, inverse_of: :context
+  has_many :content_migrations, as: :context, inverse_of: :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
   has_many :canvadocs_annotation_contexts
   has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
@@ -135,11 +135,11 @@ class Account < ActiveRecord::Base
 
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :error_reports
-  has_many :announcements, :class_name => 'AccountNotification'
+  has_many :announcements, class_name: 'AccountNotification'
   has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
   has_many :user_account_associations
   has_many :report_snapshots
-  has_many :external_integration_keys, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
   has_many :shared_brand_configs
   belongs_to :brand_config, foreign_key: "brand_config_md5"
   has_many :blackout_dates, as: :context, inverse_of: :context
@@ -154,7 +154,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
-  after_update :clear_cached_short_name, :if => :saved_change_to_name?
+  after_update :clear_cached_short_name, if: :saved_change_to_name?
 
   after_create :create_default_objects
 
@@ -173,9 +173,9 @@ class Account < ActiveRecord::Base
   end
   alias_method :time_zone, :default_time_zone
 
-  validates_locale :default_locale, :allow_nil => true
-  validates :name, length: { :maximum => maximum_string_length, :allow_blank => true }
-  validate :account_chain_loop, :if => :parent_account_id_changed?
+  validates_locale :default_locale, allow_nil: true
+  validates :name, length: { maximum: maximum_string_length, allow_blank: true }
+  validate :account_chain_loop, if: :parent_account_id_changed?
   validate :validate_auth_discovery_url
   validates :workflow_state, presence: true
   validate :no_active_courses, if: ->(a) { a.workflow_state_changed? && !a.active? }
@@ -244,84 +244,84 @@ class Account < ActiveRecord::Base
 
   # these settings either are or could be easily added to
   # the account settings page
-  add_setting :sis_app_token, :root_only => true
-  add_setting :sis_app_url, :root_only => true
-  add_setting :sis_name, :root_only => true
-  add_setting :sis_syncing, :boolean => true, :default => false, :inheritable => true
-  add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
-  add_setting :include_integration_ids_in_gradebook_exports, :boolean => true, :default => false, :root_only => true
-  add_setting :sis_require_assignment_due_date, :boolean => true, :default => false, :inheritable => true
-  add_setting :sis_assignment_name_length, :boolean => true, :default => false, :inheritable => true
-  add_setting :sis_assignment_name_length_input, :inheritable => true
+  add_setting :sis_app_token, root_only: true
+  add_setting :sis_app_url, root_only: true
+  add_setting :sis_name, root_only: true
+  add_setting :sis_syncing, boolean: true, default: false, inheritable: true
+  add_setting :sis_default_grade_export, boolean: true, default: false, inheritable: true
+  add_setting :include_integration_ids_in_gradebook_exports, boolean: true, default: false, root_only: true
+  add_setting :sis_require_assignment_due_date, boolean: true, default: false, inheritable: true
+  add_setting :sis_assignment_name_length, boolean: true, default: false, inheritable: true
+  add_setting :sis_assignment_name_length_input, inheritable: true
 
-  add_setting :global_includes, :root_only => true, :boolean => true, :default => false
-  add_setting :sub_account_includes, :boolean => true, :default => false
+  add_setting :global_includes, root_only: true, boolean: true, default: false
+  add_setting :sub_account_includes, boolean: true, default: false
 
   # Microsoft Sync Account Settings
-  add_setting :microsoft_sync_enabled, :root_only => true, :boolean => true, :default => false
-  add_setting :microsoft_sync_tenant, :root_only => true
-  add_setting :microsoft_sync_login_attribute, :root_only => true
-  add_setting :microsoft_sync_login_attribute_suffix, :root_only => true
-  add_setting :microsoft_sync_remote_attribute, :root_only => true
+  add_setting :microsoft_sync_enabled, root_only: true, boolean: true, default: false
+  add_setting :microsoft_sync_tenant, root_only: true
+  add_setting :microsoft_sync_login_attribute, root_only: true
+  add_setting :microsoft_sync_login_attribute_suffix, root_only: true
+  add_setting :microsoft_sync_remote_attribute, root_only: true
 
   # Help link settings
-  add_setting :custom_help_links, :root_only => true
-  add_setting :help_link_icon, :root_only => true
-  add_setting :help_link_name, :root_only => true
-  add_setting :support_url, :root_only => true
+  add_setting :custom_help_links, root_only: true
+  add_setting :help_link_icon, root_only: true
+  add_setting :help_link_name, root_only: true
+  add_setting :support_url, root_only: true
 
-  add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
-  add_setting :prevent_course_availability_editing_by_teachers, :boolean => true, :root_only => true
+  add_setting :prevent_course_renaming_by_teachers, boolean: true, root_only: true
+  add_setting :prevent_course_availability_editing_by_teachers, boolean: true, root_only: true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
   add_setting :fft_registration_url, root_only: true
 
-  add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
-  add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
-  add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
+  add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
+  add_setting :restrict_student_future_listing, boolean: true, default: false, inheritable: true
+  add_setting :restrict_student_past_view, boolean: true, default: false, inheritable: true
 
-  add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
-  add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
-  add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
-  add_setting :teachers_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
-  add_setting :students_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
+  add_setting :teachers_can_create_courses, boolean: true, root_only: true, default: false
+  add_setting :students_can_create_courses, boolean: true, root_only: true, default: false
+  add_setting :no_enrollments_can_create_courses, boolean: true, root_only: true, default: false
+  add_setting :teachers_can_create_courses_anywhere, boolean: true, root_only: true, default: true
+  add_setting :students_can_create_courses_anywhere, boolean: true, root_only: true, default: true
 
-  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
-  add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
-  add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
-  add_setting :can_change_pronouns, :boolean => true, :root_only => true, :default => true
+  add_setting :restrict_quiz_questions, boolean: true, root_only: true, default: false
+  add_setting :allow_sending_scores_in_emails, boolean: true, root_only: true
+  add_setting :can_add_pronouns, boolean: true, root_only: true, default: false
+  add_setting :can_change_pronouns, boolean: true, root_only: true, default: true
   add_setting :enable_sis_export_pronouns, boolean: true, root_only: true, default: true
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
-  add_setting :enable_alerts, :boolean => true, :root_only => true
-  add_setting :enable_eportfolios, :boolean => true, :root_only => true
-  add_setting :users_can_edit_name, :boolean => true, :root_only => true, :default => true
-  add_setting :open_registration, :boolean => true, :root_only => true
-  add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_turnitin, :boolean => true, :default => false
-  add_setting :mfa_settings, :root_only => true
-  add_setting :mobile_qr_login_is_enabled, :boolean => true, :root_only => true, :default => true
-  add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
-  add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
-  add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_alerts, boolean: true, root_only: true
+  add_setting :enable_eportfolios, boolean: true, root_only: true
+  add_setting :users_can_edit_name, boolean: true, root_only: true, default: true
+  add_setting :open_registration, boolean: true, root_only: true
+  add_setting :show_scheduler, boolean: true, root_only: true, default: false
+  add_setting :enable_profiles, boolean: true, root_only: true, default: false
+  add_setting :enable_turnitin, boolean: true, default: false
+  add_setting :mfa_settings, root_only: true
+  add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
+  add_setting :admins_can_change_passwords, boolean: true, root_only: true, default: false
+  add_setting :admins_can_view_notifications, boolean: true, root_only: true, default: false
+  add_setting :canvadocs_prefer_office_online, boolean: true, root_only: true, default: false
   add_setting :outgoing_email_default_name
-  add_setting :external_notification_warning, :boolean => true, :default => false
+  add_setting :external_notification_warning, boolean: true, default: false
   # Terms of Use and Privacy Policy settings for the root account
-  add_setting :terms_changed_at, :root_only => true
-  add_setting :account_terms_required, :root_only => true, :boolean => true, :default => true
+  add_setting :terms_changed_at, root_only: true
+  add_setting :account_terms_required, root_only: true, boolean: true, default: true
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
   # be nice to be able to see the course first if you weren't expecting the
   # invitation.
-  add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
-  add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
-  add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
+  add_setting :allow_invitation_previews, boolean: true, root_only: true, default: false
+  add_setting :large_course_rosters, boolean: true, root_only: true, default: false
+  add_setting :edit_institution_email, boolean: true, root_only: true, default: true
+  add_setting :js_kaltura_uploader, boolean: true, root_only: true, default: false
   add_setting :google_docs_domain, root_only: true
   add_setting :dashboard_url, root_only: true
   add_setting :product_name, root_only: true
@@ -333,18 +333,18 @@ class Account < ActiveRecord::Base
   add_setting :disable_rce_media_uploads, boolean: true, default: false, inheritable: true
   add_setting :allow_gradebook_show_first_last_names, boolean: true, root_only: true, default: false
 
-  add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
+  add_setting :strict_sis_check, boolean: true, root_only: true, default: false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
 
-  add_setting :enable_gravatar, :boolean => true, :root_only => true, :default => true
+  add_setting :enable_gravatar, boolean: true, root_only: true, default: true
 
   # For setting the default dashboard (e.g. Student Planner/List View, Activity Stream, Dashboard Cards)
-  add_setting :default_dashboard_view, :inheritable => true
+  add_setting :default_dashboard_view, inheritable: true
 
-  add_setting :require_confirmed_email, :boolean => true, :root_only => true, :default => false
+  add_setting :require_confirmed_email, boolean: true, root_only: true, default: false
 
-  add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
-  add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
+  add_setting :enable_course_catalog, boolean: true, root_only: true, default: false
+  add_setting :usage_rights_required, boolean: true, default: false, inheritable: true
   add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
@@ -355,7 +355,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
   add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
 
-  add_setting :rce_favorite_tool_ids, :inheritable => true
+  add_setting :rce_favorite_tool_ids, inheritable: true
 
   add_setting :enable_as_k5_account, boolean: true, default: false, inheritable: true
   # Allow accounts with strict data residency requirements to turn off mobile
@@ -566,7 +566,7 @@ class Account < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => sis_source_id))
+    errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_source_id))
     throw :abort
   end
 
@@ -623,9 +623,9 @@ class Account < ActiveRecord::Base
       nil
     else
       OpenObject.new({
-                       :endpoint => endpoint,
-                       :default_action => settings[:equella_action] || 'selectOrAdd',
-                       :teaser => settings[:equella_teaser]
+                       endpoint: endpoint,
+                       default_action: settings[:equella_action] || 'selectOrAdd',
+                       teaser: settings[:equella_teaser]
                      })
     end
   end
@@ -717,7 +717,7 @@ class Account < ActiveRecord::Base
     opts[:order] ||= Course.best_unicode_collation_key("courses.name").asc
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses(
-      :include_crosslisted_courses => opts[:include_crosslisted_courses]
+      include_crosslisted_courses: opts[:include_crosslisted_courses]
     )
     associated_courses = associated_courses.active.order(opts[:order])
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
@@ -759,7 +759,7 @@ class Account < ActiveRecord::Base
 
   def self_enrollment_course_for(code)
     all_courses
-      .where(:self_enrollment_code => code)
+      .where(self_enrollment_code: code)
       .first
   end
 
@@ -1165,7 +1165,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_roles(include_inactive = false)
-    scope = Role.where(:account_id => account_chain_ids)
+    scope = Role.where(account_id: account_chain_ids)
     include_inactive ? scope.not_deleted : scope.active
   end
 
@@ -1189,7 +1189,7 @@ class Account < ActiveRecord::Base
     end
 
     shard.activate do
-      role_scope = Role.not_deleted.where(:name => role_name)
+      role_scope = Role.not_deleted.where(name: role_name)
       role_scope = if self.class.connection.adapter_name == 'PostgreSQL'
                      role_scope.where("account_id = ? OR
           account_id IN (
@@ -1201,7 +1201,7 @@ class Account < ActiveRecord::Base
             SELECT id FROM t
           )", id, id)
                    else
-                     role_scope.where(:account_id => account_chain.map(&:id))
+                     role_scope.where(account_id: account_chain.map(&:id))
                    end
 
       role_scope.first
@@ -1267,12 +1267,12 @@ class Account < ActiveRecord::Base
         end
       end
     else
-      @account_chain_ids ||= account_chain(:include_site_admin => true).filter_map { |a| a.active? ? a.id : nil }
+      @account_chain_ids ||= account_chain(include_site_admin: true).filter_map { |a| a.active? ? a.id : nil }
       Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
-          AccountUser.where(:account_id => account_chain_ids, :user_id => user).active.to_a
+          AccountUser.where(account_id: account_chain_ids, user_id: user).active.to_a
         end
       end
     end
@@ -1329,7 +1329,7 @@ class Account < ActiveRecord::Base
     can :create_courses
 
     # allow teachers to view term dates
-    given { |user| root_account? && !site_admin? && enrollments.active.of_instructor_type.where(:user_id => user).exists? }
+    given { |user| root_account? && !site_admin? && enrollments.active.of_instructor_type.where(user_id: user).exists? }
     can :read_terms
 
     # any logged in user can read global outcomes, but must be checked against the site admin
@@ -1341,7 +1341,7 @@ class Account < ActiveRecord::Base
     can :read_outcomes
 
     # any user with an admin enrollment in one of the courses can read
-    given { |user| user && courses.where(:id => user.enrollments.active.admin.pluck(:course_id)).exists? }
+    given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can :read
 
     given { |user| grants_right?(user, :lti_add_edit) }
@@ -1377,8 +1377,8 @@ class Account < ActiveRecord::Base
       entry.title     = name
       entry.updated   = updated_at
       entry.published = created_at
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "/accounts/#{id}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "/accounts/#{id}")
     end
   end
 
@@ -1594,7 +1594,7 @@ class Account < ActiveRecord::Base
       if !account && default_account_name && ((!special_account_id && !Rails.env.production?) || force_create)
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
-        account = special_accounts[special_account_type] = Account.new(:name => default_account_name)
+        account = special_accounts[special_account_type] = Account.new(name: default_account_name)
         GuardRail.activate(:primary) do
           account.save!
           Setting.set("#{special_account_type}_account_id", account.id)
@@ -1642,8 +1642,8 @@ class Account < ActiveRecord::Base
                end
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
-        scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
-          all_user_ids.merge Course.update_account_associations(courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+        scope.select([:id, :account_id]).find_in_batches(batch_size: 500) do |courses|
+          all_user_ids.merge Course.update_account_associations(courses, skip_user_account_associations: true, account_chain_cache: account_chain_cache)
         end
       end
 
@@ -1654,7 +1654,7 @@ class Account < ActiveRecord::Base
       end
 
       # Update the users' associations as well
-      User.update_account_associations(all_user_ids.to_a, :account_chain_cache => account_chain_cache)
+      User.update_account_associations(all_user_ids.to_a, account_chain_cache: account_chain_cache)
     end
   end
 
@@ -1760,46 +1760,46 @@ class Account < ActiveRecord::Base
     manage_settings = user && grants_right?(user, :manage_account_settings)
     tabs = []
     if root_account.site_admin?
-      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && grants_right?(user, :read_roster)
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && grants_right?(user, :manage_role_overrides)
-      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
-      tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if root_account? && grants_right?(user, :manage_site_settings)
-      tabs << { :id => TAB_RELEASE_NOTES, :label => t("Release Notes"), :css_class => "release_notes", :href => :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
-      tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && grants_right?(user, :view_jobs)
+      tabs << { id: TAB_USERS, label: t("People"), css_class: 'users', href: :account_users_path } if user && grants_right?(user, :read_roster)
+      tabs << { id: TAB_PERMISSIONS, label: t('#account.tab_permissions', "Permissions"), css_class: 'permissions', href: :account_permissions_path } if user && grants_right?(user, :manage_role_overrides)
+      tabs << { id: TAB_SUB_ACCOUNTS, label: t('#account.tab_sub_accounts', "Sub-Accounts"), css_class: 'sub_accounts', href: :account_sub_accounts_path } if manage_settings
+      tabs << { id: TAB_AUTHENTICATION, label: t('#account.tab_authentication', "Authentication"), css_class: 'authentication', href: :account_authentication_providers_path } if root_account? && manage_settings
+      tabs << { id: TAB_PLUGINS, label: t("#account.tab_plugins", "Plugins"), css_class: "plugins", href: :plugins_path, no_args: true } if root_account? && grants_right?(user, :manage_site_settings)
+      tabs << { id: TAB_RELEASE_NOTES, label: t("Release Notes"), css_class: "release_notes", href: :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
+      tabs << { id: TAB_JOBS, label: t("#account.tab_jobs", "Jobs"), css_class: "jobs", href: :jobs_path, no_args: true } if root_account? && grants_right?(user, :view_jobs)
     else
-      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && grants_right?(user, :read_course_list)
-      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && grants_right?(user, :read_roster)
-      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && grants_right?(user, :view_statistics)
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && grants_right?(user, :manage_role_overrides)
+      tabs << { id: TAB_COURSES, label: t('#account.tab_courses', "Courses"), css_class: 'courses', href: :account_path } if user && grants_right?(user, :read_course_list)
+      tabs << { id: TAB_USERS, label: t("People"), css_class: 'users', href: :account_users_path } if user && grants_right?(user, :read_roster)
+      tabs << { id: TAB_STATISTICS, label: t('#account.tab_statistics', "Statistics"), css_class: 'statistics', href: :statistics_account_path } if user && grants_right?(user, :view_statistics)
+      tabs << { id: TAB_PERMISSIONS, label: t('#account.tab_permissions', "Permissions"), css_class: 'permissions', href: :account_permissions_path } if user && grants_right?(user, :manage_role_overrides)
       if user && grants_right?(user, :manage_outcomes)
-        tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
+        tabs << { id: TAB_OUTCOMES, label: t('#account.tab_outcomes', "Outcomes"), css_class: 'outcomes', href: :account_outcomes_path }
       end
       if can_see_rubrics_tab?(user)
-        tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
+        tabs << { id: TAB_RUBRICS, label: t('#account.tab_rubrics', "Rubrics"), css_class: 'rubrics', href: :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && grants_right?(user, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path } if enable_user_notes && user && grants_right?(user, :manage_user_notes)
-      tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if root_account? && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
+      tabs << { id: TAB_GRADING_STANDARDS, label: t('#account.tab_grading_standards', "Grading"), css_class: 'grading_standards', href: :account_grading_standards_path } if user && grants_right?(user, :manage_grades)
+      tabs << { id: TAB_QUESTION_BANKS, label: t('#account.tab_question_banks', "Question Banks"), css_class: 'question_banks', href: :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      tabs << { id: TAB_SUB_ACCOUNTS, label: t('#account.tab_sub_accounts', "Sub-Accounts"), css_class: 'sub_accounts', href: :account_sub_accounts_path } if manage_settings
+      tabs << { id: TAB_FACULTY_JOURNAL, label: t('#account.tab_faculty_journal', "Faculty Journal"), css_class: 'faculty_journal', href: :account_user_notes_path } if enable_user_notes && user && grants_right?(user, :manage_user_notes)
+      tabs << { id: TAB_TERMS, label: t('#account.tab_terms', "Terms"), css_class: 'terms', href: :account_terms_path } if root_account? && manage_settings
+      tabs << { id: TAB_AUTHENTICATION, label: t('#account.tab_authentication', "Authentication"), css_class: 'authentication', href: :account_authentication_providers_path } if root_account? && manage_settings
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
         tabs << { id: TAB_SIS_IMPORT, label: t('#account.tab_sis_import', "SIS Import"),
                   css_class: 'sis_import', href: :account_sis_import_path }
       end
     end
 
-    tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && branding_allowed?
+    tabs << { id: TAB_BRAND_CONFIGS, label: t('#account.tab_brand_configs', "Themes"), css_class: 'brand_configs', href: :account_brand_configs_path } if manage_settings && branding_allowed?
 
     if root_account? && grants_right?(user, :manage_developer_keys)
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id }
+      tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
     end
 
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(tabs)
-    tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
+    tabs << { id: TAB_ADMIN_TOOLS, label: t('#account.tab_admin_tools', "Admin Tools"), css_class: 'admin_tools', href: :account_admin_tools_path } if can_see_admin_tools_tab?(user)
     if user && grants_right?(user, :moderate_user_content)
       tabs << {
         id: TAB_EPORTFOLIO_MODERATION,
@@ -1808,7 +1808,7 @@ class Account < ActiveRecord::Base
         href: :account_eportfolio_moderation_path
       }
     end
-    tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
+    tabs << { id: TAB_SETTINGS, label: t('#account.tab_settings', "Settings"), css_class: 'settings', href: :account_settings_path }
     tabs.delete_if { |t| t[:visibility] == 'admins' } unless grants_right?(user, :manage)
     tabs
   end
@@ -2145,14 +2145,14 @@ class Account < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  handle_asynchronously :update_user_dashboards, priority: Delayed::LOW_PRIORITY, max_attempts: 1
 
   def clear_k5_cache
     User.of_account(self).find_in_batches do |users|
       User.clear_cache_keys(users.pluck(:id), :k5_user)
     end
   end
-  handle_asynchronously :clear_k5_cache, priority: Delayed::LOW_PRIORITY, :max_attempts => 1
+  handle_asynchronously :clear_k5_cache, priority: Delayed::LOW_PRIORITY, max_attempts: 1
 
   def process_external_integration_keys(params_keys, current_user, keys = ExternalIntegrationKey.indexed_keys_for(self))
     return unless params_keys
@@ -2239,7 +2239,7 @@ class Account < ActiveRecord::Base
   def get_rce_favorite_tool_ids
     rce_favorite_tool_ids[:value] ||
       ContextExternalTool.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
-                         .where(:is_rce_favorite => true).pluck(:id).map { |id| Shard.global_id_for(id) }
+                         .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
   end
 
   def effective_course_template

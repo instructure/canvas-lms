@@ -95,7 +95,7 @@ module DataFixup
 
         # build course_id to account_id lookup map to speed things up
         course_ids = rows.map { |r| r['course_id'] }.uniq
-        account_course_map = Course.where(:id => course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }.to_h
+        account_course_map = Course.where(id: course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }.to_h
 
         batch_updates = []
         batch_inserts = []

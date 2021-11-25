@@ -120,11 +120,11 @@ describe Enrollment do
   end
 
   it "is pending if it is invited or creation_pending" do
-    enrollment_model(:workflow_state => 'invited')
+    enrollment_model(workflow_state: 'invited')
     expect(@enrollment).to be_pending
     @enrollment.destroy_permanently!
 
-    enrollment_model(:workflow_state => 'creation_pending')
+    enrollment_model(workflow_state: 'creation_pending')
     expect(@enrollment).to be_pending
   end
 
@@ -174,7 +174,7 @@ describe Enrollment do
 
   describe "sis_role" do
     it "returns role_name if present" do
-      role = custom_account_role('Assistant Grader', :account => Account.default)
+      role = custom_account_role('Assistant Grader', account: Account.default)
       e = TaEnrollment.new
       e.role_id = role.id
       expect(e.sis_role).to eq 'Assistant Grader'
@@ -249,7 +249,7 @@ describe Enrollment do
     end
 
     it "updates user_account_associations" do
-      course_with_teacher(:active_all => 1)
+      course_with_teacher(active_all: 1)
       expect(@user.associated_accounts).to eq [Account.default]
       @enrollment.destroy
       expect(@user.associated_accounts.reload).to eq []
@@ -257,7 +257,7 @@ describe Enrollment do
 
     it "removes assignment overrides if they are only linked to this enrollment" do
       course_with_student
-      assignment = assignment_model(:course => @course)
+      assignment = assignment_model(course: @course)
       ao = AssignmentOverride.new
       ao.assignment = assignment
       ao.title = "ADHOC OVERRIDE"
@@ -1172,7 +1172,7 @@ describe Enrollment do
 
   context "permissions" do
     before(:once) do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
     end
 
     it "allows post_to_forum permission on a course if date is current" do
@@ -1237,9 +1237,9 @@ describe Enrollment do
 
     it "grants read rights to account members with the ability to read_roster" do
       role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
-      user = account_admin_user(:role => role)
-      RoleOverride.create!(:context => Account.default, :permission => :read_roster,
-                           :role => role, :enabled => true)
+      user = account_admin_user(role: role)
+      RoleOverride.create!(context: Account.default, permission: :read_roster,
+                           role: role, enabled: true)
       @enrollment.save
 
       expect(@enrollment.user.grants_right?(user, :read)).to eq false
@@ -1291,11 +1291,11 @@ describe Enrollment do
     before(:once) do
       course_with_teacher
       course_with_student(course: @course)
-      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50, :rules => "drop_lowest:1")
-      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: 50, rules: "drop_lowest:1")
+      @assignment = @group.assignments.build(title: "some assignments", points_possible: 10)
       @assignment.context = @course
       @assignment.save!
-      @assignment2 = @group.assignments.build(:title => "some assignment 2", :points_possible => 40)
+      @assignment2 = @group.assignments.build(title: "some assignment 2", points_possible: 40)
       @assignment2.context = @course
       @assignment2.save!
     end
@@ -1340,16 +1340,16 @@ describe Enrollment do
 
   context "notifications" do
     it "sends out invitations if the course is already published" do
-      Notification.create!(:name => "Enrollment Registration")
-      course_with_teacher(:active_all => true)
+      Notification.create!(name: "Enrollment Registration")
+      course_with_teacher(active_all: true)
       user_with_pseudonym
       e = @course.enroll_student(@user)
       expect(e.messages_sent).to be_include("Enrollment Registration")
     end
 
     it "does not send out invitations immediately if the course restricts future viewing" do
-      Notification.create!(:name => "Enrollment Registration")
-      course_with_teacher(:active_all => true)
+      Notification.create!(name: "Enrollment Registration")
+      course_with_teacher(active_all: true)
       @course.restrict_student_future_view = true
       @course.restrict_enrollments_to_course_dates = true
       @course.start_at = 1.day.from_now
@@ -1369,18 +1369,18 @@ describe Enrollment do
     end
 
     it "does not send out invitations to an observer if the student doesn't receive an invitation (e.g. sis import)" do
-      Notification.create!(:name => "Enrollment Registration", :category => "Registration")
+      Notification.create!(name: "Enrollment Registration", category: "Registration")
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       student = user_with_pseudonym
       observer = user_with_pseudonym
       add_linked_observer(student, observer)
 
-      @course.enroll_student(student, :no_notify => true)
+      @course.enroll_student(student, no_notify: true)
       expect(student.messages).to be_empty
       expect(observer.messages).to be_empty
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @course.enroll_student(student)
       student.reload
       observer.reload
@@ -1389,7 +1389,7 @@ describe Enrollment do
     end
 
     it "does not send out invitations to an observer if the course is not published" do
-      Notification.create!(:name => "Enrollment Registration", :category => "Registration")
+      Notification.create!(name: "Enrollment Registration", category: "Registration")
 
       course_with_teacher
       student = user_with_pseudonym
@@ -1401,7 +1401,7 @@ describe Enrollment do
     end
 
     it "does not send out invitations if the course is not yet published" do
-      Notification.create!(:name => "Enrollment Registration")
+      Notification.create!(name: "Enrollment Registration")
       course_with_teacher
       user_with_pseudonym
       e = @course.enroll_student(@user)
@@ -1409,7 +1409,7 @@ describe Enrollment do
     end
 
     it "sends out invitations for previously-created enrollments when the course is published" do
-      n = Notification.create(:name => "Enrollment Registration", :category => "Registration")
+      n = Notification.create(name: "Enrollment Registration", category: "Registration")
       course_with_teacher
       user_with_pseudonym
       e = @course.enroll_student(@user)
@@ -1426,10 +1426,10 @@ describe Enrollment do
     end
 
     it "sends out notifications for enrollment acceptance correctly" do
-      teacher = user_with_pseudonym(:active_all => true)
-      n = Notification.create!(:name => "Enrollment Accepted")
-      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
-      course_with_teacher(:active_all => true, :user => teacher)
+      teacher = user_with_pseudonym(active_all: true)
+      n = Notification.create!(name: "Enrollment Accepted")
+      NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
+      course_with_teacher(active_all: true, user: teacher)
       student = user_factory
       e = @course.enroll_student(student)
       e.accept!
@@ -1438,16 +1438,16 @@ describe Enrollment do
 
     it "does not send out notifications for enrollment acceptance to admins who are section restricted and in other sections" do
       # even though section restrictions are still basically meaningless at this point
-      teacher = user_with_pseudonym(:active_all => true)
-      n = Notification.create!(:name => "Enrollment Accepted")
-      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
-      course_with_teacher(:active_all => true, :user => teacher)
+      teacher = user_with_pseudonym(active_all: true)
+      n = Notification.create!(name: "Enrollment Accepted")
+      NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
+      course_with_teacher(active_all: true, user: teacher)
       teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
       other_section = @course.course_sections.create!
-      e1 = @course.enroll_student(user_factory, :section => other_section)
+      e1 = @course.enroll_student(user_factory, section: other_section)
       e1.accept!
       expect(teacher.messages).to_not be_exists
-      e2 = @course.enroll_student(user_factory, :section => @course.default_section)
+      e2 = @course.enroll_student(user_factory, section: @course.default_section)
       e2.accept!
       expect(teacher.messages).to be_exists
     end
@@ -1500,12 +1500,12 @@ describe Enrollment do
 
   context "recompute_final_scores" do
     it "only recomputes once per student, per course" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @c1 = @course
-      @s2 = @course.course_sections.create!(:name => 's2')
-      @course.enroll_student(@user, :section => @s2, :allow_multiple_enrollments => true)
+      @s2 = @course.course_sections.create!(name: 's2')
+      @course.enroll_student(@user, section: @s2, allow_multiple_enrollments: true)
       expect(@user.student_enrollments.reload.count).to eq 2
-      course_with_student(:user => @user)
+      course_with_student(user: @user)
       @c2 = @course
       expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c1.id)
       expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c2.id)
@@ -1714,7 +1714,7 @@ describe Enrollment do
 
       context "as a student" do
         before :once do
-          course_with_student(:active_all => true)
+          course_with_student(active_all: true)
         end
 
         it "accepts into the right state based on availability dates on enrollment" do
@@ -1760,7 +1760,7 @@ describe Enrollment do
 
       context "as a teacher" do
         before :once do
-          course_with_teacher(:active_all => true)
+          course_with_teacher(active_all: true)
         end
 
         it "accepts into the right state based on availability dates on enrollment" do
@@ -1842,7 +1842,7 @@ describe Enrollment do
           @enrollment.workflow_state = 'active'
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(:active)
-          expect(Enrollment.where(:id => @enrollment).active_by_date.first).to eq @enrollment
+          expect(Enrollment.where(id: @enrollment).active_by_date.first).to eq @enrollment
         end
 
         it "returns completed" do
@@ -1852,7 +1852,7 @@ describe Enrollment do
           @term.save!
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(:completed)
-          expect(Enrollment.where(:id => @enrollment).active_by_date.first).to be_nil
+          expect(Enrollment.where(id: @enrollment).active_by_date.first).to be_nil
         end
 
         it "returns accepted for students (inactive for admins) if upcoming and available" do
@@ -1874,7 +1874,7 @@ describe Enrollment do
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :active : :inactive)
           if @enrollment.student?
-            expect(Enrollment.where(:id => @enrollment).active_by_date.first).to be_nil
+            expect(Enrollment.where(id: @enrollment).active_by_date.first).to be_nil
           end
         end
       end
@@ -2029,8 +2029,8 @@ describe Enrollment do
     end
 
     it "allows teacher access if both course and term have dates" do
-      @teacher_enrollment = course_with_teacher(:active_all => 1)
-      @student_enrollment = student_in_course(:active_all => 1)
+      @teacher_enrollment = course_with_teacher(active_all: 1)
+      @student_enrollment = student_in_course(active_all: 1)
       @term = @course.enrollment_term
 
       expect(@teacher_enrollment.state).to eq :active
@@ -2168,7 +2168,7 @@ describe Enrollment do
     end
 
     it "affects the active?/inactive?/completed? predicates" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @enrollment.start_at = 2.days.ago
       @enrollment.end_at = 2.days.from_now
       @enrollment.workflow_state = 'active'
@@ -2199,7 +2199,7 @@ describe Enrollment do
     end
 
     it "does not affect the explicitly_completed? predicate" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @enrollment.start_at = 2.days.ago
       @enrollment.end_at = 2.days.from_now
       @enrollment.workflow_state = 'active'
@@ -2223,7 +2223,7 @@ describe Enrollment do
     it "affects the completed_at" do
       yesterday = 1.day.ago
 
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @enrollment.start_at = 2.days.ago
       @enrollment.end_at = 2.days.from_now
       @enrollment.workflow_state = 'active'
@@ -2248,7 +2248,7 @@ describe Enrollment do
 
   context "audit_groups_for_deleted_enrollments" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     it "ungroups the user when the enrollment is deleted" do
@@ -2298,7 +2298,7 @@ describe Enrollment do
       category = group_category
       category.configure_self_signup(true, true)
       category.save
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
       group.add_user(user2)
       expect(category).not_to have_heterogenous_group
@@ -2332,7 +2332,7 @@ describe Enrollment do
       category = group_category
       category.configure_self_signup(true, false)
       category.save
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
       group.add_user(user2)
 
@@ -2350,35 +2350,35 @@ describe Enrollment do
     end
 
     it "ungroups the user from all groups, restricted and unrestricted when completely unenrolling from the course" do
-      user1 = user_model :name => "Andy"
-      user2 = user_model :name => "Bruce"
+      user1 = user_model name: "Andy"
+      user2 = user_model name: "Bruce"
 
-      section1 = @course.course_sections.create :name => "Section 1"
+      section1 = @course.course_sections.create name: "Section 1"
 
-      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user1, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(user2, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
 
       # created category for restricted groups
-      res_category = group_category :name => "restricted"
+      res_category = group_category name: "restricted"
       res_category.configure_self_signup(true, true)
       res_category.save
 
       # created category for unrestricted groups
-      unrestricted_category = group_category :name => "unrestricted"
+      unrestricted_category = group_category name: "unrestricted"
       unrestricted_category.configure_self_signup(true, false)
       unrestricted_category.save
 
       # Group 1 - restricted group
-      group1 = res_category.groups.create(:name => "Group1", :context => @course)
+      group1 = res_category.groups.create(name: "Group1", context: @course)
       group1.add_user(user1)
       group1.add_user(user2)
 
       # Group 2 - unrestricted group
-      group2 = unrestricted_category.groups.create(:name => "Group2 (Unrestricted)", :context => @course)
+      group2 = unrestricted_category.groups.create(name: "Group2 (Unrestricted)", context: @course)
       group2.add_user(user1)
       group2.add_user(user2)
 
-      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      user2.enrollments.where(course_section_id: section1.id).first.destroy
       group1.reload
       group2.reload
 
@@ -2390,31 +2390,31 @@ describe Enrollment do
     end
 
     it "ungroups the user from the restricted group when deleting enrollment to one section but user is still enrolled in another section" do
-      user1 = user_model :name => "Andy"
-      user2 = user_model :name => "Bruce"
+      user1 = user_model name: "Andy"
+      user2 = user_model name: "Bruce"
 
-      section1 = @course.course_sections.create :name => "Section 1"
-      section2 = @course.course_sections.create :name => "Section 2"
+      section1 = @course.course_sections.create name: "Section 1"
+      section2 = @course.course_sections.create name: "Section 2"
 
       # we should have more than one student enrolled in section to exercise common_to_section check.
-      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user1, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(user2, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
       # enroll user2 in a second section
-      @course.enroll_user(user2, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user2, 'StudentEnrollment', section: section2, enrollment_state: 'active', allow_multiple_enrollments: true)
 
       # set up a group category for restricted groups
       # and put both users in one of its groups
-      category = group_category :name => "restricted category"
+      category = group_category name: "restricted category"
       category.configure_self_signup(true, true)
       category.save
 
       # restricted group
-      group = category.groups.create(:name => "restricted group", :context => @course)
+      group = category.groups.create(name: "restricted group", context: @course)
       group.add_user(user1)
       group.add_user(user2)
 
       # remove user2 from the section (effectively unenrolled from a section of the course)
-      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      user2.enrollments.where(course_section_id: section1.id).first.destroy
       group.reload
 
       # user2 should be removed from the group
@@ -2424,30 +2424,30 @@ describe Enrollment do
     end
 
     it "does not ungroup the user from unrestricted group when deleting enrollment to one section but user is still enrolled in another section" do
-      user1 = user_model :name => "Andy"
-      user2 = user_model :name => "Bruce"
+      user1 = user_model name: "Andy"
+      user2 = user_model name: "Bruce"
 
-      section1 = @course.course_sections.create :name => "Section 1"
-      section2 = @course.course_sections.create :name => "Section 2"
+      section1 = @course.course_sections.create name: "Section 1"
+      section2 = @course.course_sections.create name: "Section 2"
 
       # we should have more than one student enrolled in section to exercise common_to_section check.
-      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(user2, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user1, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(user2, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
       # enroll user2 in a second section
-      @course.enroll_user(user2, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user2, 'StudentEnrollment', section: section2, enrollment_state: 'active', allow_multiple_enrollments: true)
 
       # set up a group category for unrestricted groups
-      unrestricted_category = group_category :name => "unrestricted category"
+      unrestricted_category = group_category name: "unrestricted category"
       unrestricted_category.configure_self_signup(true, false)
       unrestricted_category.save
 
       # unrestricted group
-      group = unrestricted_category.groups.create(:name => "unrestricted group", :context => @course)
+      group = unrestricted_category.groups.create(name: "unrestricted group", context: @course)
       group.add_user(user1)
       group.add_user(user2)
 
       # remove user2 from the section (effectively unenrolled from a section of the course)
-      user2.enrollments.where(:course_section_id => section1.id).first.destroy
+      user2.enrollments.where(course_section_id: section1.id).first.destroy
       group.reload
 
       # user2 should not be removed from group 2
@@ -2457,26 +2457,26 @@ describe Enrollment do
     end
 
     it "does not ungroup the user from restricted group when there's not another user in the group and user is still enrolled in another section" do
-      user1 = user_model :name => "Andy"
+      user1 = user_model name: "Andy"
 
-      section1 = @course.course_sections.create :name => "Section 1"
-      section2 = @course.course_sections.create :name => "Section 2"
+      section1 = @course.course_sections.create name: "Section 1"
+      section2 = @course.course_sections.create name: "Section 2"
 
       # enroll user in two sections
-      @course.enroll_user(user1, 'StudentEnrollment', :section => section1, :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(user1, 'StudentEnrollment', :section => section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(user1, 'StudentEnrollment', section: section1, enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(user1, 'StudentEnrollment', section: section2, enrollment_state: 'active', allow_multiple_enrollments: true)
 
       # set up a group category for restricted groups
-      restricted_category = group_category :name => "restricted category"
+      restricted_category = group_category name: "restricted category"
       restricted_category.configure_self_signup(true, true)
       restricted_category.save
 
       # restricted group
-      group = restricted_category.groups.create(:name => "restricted group", :context => @course)
+      group = restricted_category.groups.create(name: "restricted group", context: @course)
       group.add_user(user1)
 
       # remove user from the section (effectively unenrolled from a section of the course)
-      user1.enrollments.where(:course_section_id => section1.id).first.destroy
+      user1.enrollments.where(course_section_id: section1.id).first.destroy
       group.reload
 
       # he should not be removed from the group
@@ -2496,7 +2496,7 @@ describe Enrollment do
       category = group_category
       category.configure_self_signup(true, false)
       category.save
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
 
       # remove the user from the section (effectively unenrolled from the course)
@@ -2519,7 +2519,7 @@ describe Enrollment do
       category = group_category
       category.configure_self_signup(true, false)
       category.save
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
 
       # move a user to a new section
@@ -2619,8 +2619,8 @@ describe Enrollment do
 
     it "uncaches user enrollments when rejected" do
       enable_cache do
-        course_with_student(:active_course => 1)
-        User.where(:id => @user).update_all(:updated_at => 1.year.ago)
+        course_with_student(active_course: 1)
+        User.where(id: @user).update_all(updated_at: 1.year.ago)
         @user.reload
         expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.reject!
@@ -2632,8 +2632,8 @@ describe Enrollment do
 
     it "uncaches user enrollments when deleted" do
       enable_cache do
-        course_with_student(:active_course => 1)
-        User.where(:id => @user).update_all(:updated_at => 1.year.ago)
+        course_with_student(active_course: 1)
+        User.where(id: @user).update_all(updated_at: 1.year.ago)
         @user.reload
         expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.destroy
@@ -2650,7 +2650,7 @@ describe Enrollment do
         it "uses the right shard to find the enrollments" do
           @shard1.activate do
             account = Account.create!
-            course_with_student(:active_all => true, :account => account)
+            course_with_student(active_all: true, account: account)
           end
 
           @shard2.activate do
@@ -2670,7 +2670,7 @@ describe Enrollment do
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
-            course_factory(active_all: true, :account => account)
+            course_factory(active_all: true, account: account)
             user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
             communication_channel(@user, { username: 'jt@instructure.com' })
@@ -2725,7 +2725,7 @@ describe Enrollment do
 
   describe "effective_start_at" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @term = @course.enrollment_term
       @section = @enrollment.course_section
 
@@ -2784,7 +2784,7 @@ describe Enrollment do
 
   describe "effective_end_at" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @term = @course.enrollment_term
       @section = @enrollment.course_section
 
@@ -2837,8 +2837,8 @@ describe Enrollment do
   describe 'conclude' do
     it "removes the enrollment from User#cached_currentish_enrollments" do
       enable_cache do
-        course_with_student(:active_all => 1)
-        User.where(:id => @user).update_all(:updated_at => 1.day.ago)
+        course_with_student(active_all: 1)
+        User.where(id: @user).update_all(updated_at: 1.day.ago)
         @user.reload
         expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.conclude
@@ -2852,7 +2852,7 @@ describe Enrollment do
     it 'adds the enrollment to User#cached_currentish_enrollments' do
       enable_cache do
         course_with_student active_course: true, enrollment_state: 'completed'
-        User.where(:id => @student).update_all(:updated_at => 1.day.ago)
+        User.where(id: @student).update_all(updated_at: 1.day.ago)
         @student.reload
         expect(@student.cached_currentish_enrollments).to eq []
         @enrollment.unconclude
@@ -2864,12 +2864,12 @@ describe Enrollment do
   describe 'observing users' do
     before :once do
       @student = user_factory(active_all: true)
-      @parent = user_with_pseudonym(:active_all => true)
+      @parent = user_with_pseudonym(active_all: true)
       add_linked_observer(@student, @parent)
     end
 
     it 'gets new observer enrollments when an observed user gets a new enrollment' do
-      se = course_with_student(:active_all => true, :user => @student)
+      se = course_with_student(active_all: true, user: @student)
       pe = @parent.observer_enrollments.first
 
       expect(pe).not_to be_nil
@@ -2881,14 +2881,14 @@ describe Enrollment do
 
     it 'defaults observer enrollments to "active" state' do
       course_factory(active_all: true)
-      @course.enroll_student(@student, :enrollment_state => 'invited')
+      @course.enroll_student(@student, enrollment_state: 'invited')
       pe = @parent.observer_enrollments.where(course_id: @course).first
       expect(pe).not_to be_nil
       expect(pe.workflow_state).to eql 'active'
     end
 
     it "updates their observer enrollments when an observed user's enrollment is updated" do
-      se = course_with_student(:user => @student)
+      se = course_with_student(user: @student)
       pe = @parent.observer_enrollments.first
       expect(pe).not_to be_nil
 
@@ -2901,7 +2901,7 @@ describe Enrollment do
     end
 
     it "does not undelete observer enrollments if the student enrollment wasn't already deleted" do
-      se = course_with_student(:user => @student)
+      se = course_with_student(user: @student)
       pe = @parent.observer_enrollments.first
       expect(pe).not_to be_nil
       pe.destroy
@@ -2936,7 +2936,7 @@ describe Enrollment do
 
   describe '#can_be_deleted_by' do
     describe 'on a student enrollment without granular_permissions_manage_users' do
-      let(:user) { double(:id => 42) }
+      let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
@@ -2972,14 +2972,14 @@ describe Enrollment do
       it 'is false if a user is trying to remove their own enrollment' do
         allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        allow(@course).to receive_messages(:account => @course)
+        allow(@course).to receive_messages(account: @course)
         @enrollment.user_id = user.id
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
 
     describe 'on a student enrollment with granular_permissions_manage_users' do
-      let(:user) { double(:id => 42) }
+      let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
@@ -3009,14 +3009,14 @@ describe Enrollment do
       it 'is false if a user is trying to remove their own enrollment' do
         allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
-        allow(@course).to receive_messages(:account => @course)
+        allow(@course).to receive_messages(account: @course)
         @enrollment.user_id = user.id
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
 
     describe 'on an observer enrollment without granular_permissions_manage_users' do
-      let(:user) { double(:id => 42) }
+      let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
@@ -3044,7 +3044,7 @@ describe Enrollment do
     end
 
     describe "on an observer enrollment with granular_permission_manage_users" do
-      let(:user) { double(:id => 42) }
+      let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
@@ -3072,7 +3072,7 @@ describe Enrollment do
     end
 
     describe "on a teacher enrollment with granular_permission_manage_users" do
-      let(:user) { double(:id => 42) }
+      let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
@@ -3110,8 +3110,8 @@ describe Enrollment do
     before :once do
       course_with_student
       @assignments = [
-        assignment_model(:course => @course),
-        assignment_model(:course => @course)
+        assignment_model(course: @course),
+        assignment_model(course: @course)
       ]
     end
 
@@ -3300,7 +3300,7 @@ describe Enrollment do
   describe "update user account associations if necessary" do
     it "creates a user_account_association when restoring a deleted enrollment" do
       sub_account = Account.default.sub_accounts.create!
-      course = Course.create!(:account => sub_account)
+      course = Course.create!(account: sub_account)
       @enrollment = course.enroll_student(user_factory)
       expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
 
@@ -3337,7 +3337,7 @@ describe Enrollment do
       e.save!
     end
 
-    enrolls = Enrollment.where(:id => [restricted_enroll, future_enroll, active_enroll])
+    enrolls = Enrollment.where(id: [restricted_enroll, future_enroll, active_enroll])
                         .joins(:enrollment_state).order(Enrollment.state_by_date_rank_sql).to_a
     expect(enrolls).to eq [active_enroll, future_enroll, restricted_enroll]
   end
@@ -3400,7 +3400,7 @@ describe Enrollment do
 
     it "infers the appropriate workflow state for pending review submissions when restoring them" do
       quiz_with_graded_submission(
-        [{ question_data: { name: 'Q1', points_possible: 1, 'question_type' => 'essay_question' } }],
+        [{ question_data: { :name => 'Q1', :points_possible => 1, 'question_type' => 'essay_question' } }],
         user: @student,
         course: @course
       )

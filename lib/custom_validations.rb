@@ -21,7 +21,7 @@
 module CustomValidations
   module ClassMethods
     def validates_as_url(*fields, allowed_schemes: %w[http https])
-      validates_each(fields, :allow_nil => true) do |record, attr, value|
+      validates_each(fields, allow_nil: true) do |record, attr, value|
         value, = CanvasHttp.validate_url(value, allowed_schemes: allowed_schemes)
 
         record.send("#{attr}=", value)

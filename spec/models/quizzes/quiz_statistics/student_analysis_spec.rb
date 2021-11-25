@@ -27,9 +27,9 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   def survey_with_logged_out_submission
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
 
-    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment = @course.assignments.create(title: "Test Assignment")
     @assignment.workflow_state = "available"
     @assignment.submission_types = "online_quiz"
     @assignment.save
@@ -38,10 +38,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     @quiz.quiz_type = "survey"
 
     # make questions
-    questions = [{ :question_data => { :name => "test 1" } },
-                 { :question_data => { :name => "test 2" } },
-                 { :question_data => { :name => "test 3" } },
-                 { :question_data => { :name => "test 4" } }]
+    questions = [{ question_data: { name: "test 1" } },
+                 { question_data: { name: "test 2" } },
+                 { question_data: { name: "test 3" } },
+                 { question_data: { name: "test 4" } }]
 
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
@@ -87,15 +87,15 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.generate_quiz_data
     q.save!
 
-    @user1 = User.create! :name => "some_user 1"
-    @user2 = User.create! :name => "some_user 2"
-    @user3 = User.create! :name => "some_user 2"
-    student_in_course :course => @course, :user => @user1
-    student_in_course :course => @course, :user => @user2
-    student_in_course :course => @course, :user => @user3
+    @user1 = User.create! name: "some_user 1"
+    @user2 = User.create! name: "some_user 2"
+    @user3 = User.create! name: "some_user 2"
+    student_in_course course: @course, user: @user1
+    student_in_course course: @course, user: @user2
+    student_in_course course: @course, user: @user3
     sub = q.generate_submission(@user1)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 10, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.submission_data = [{ points: 10, text: "", correct: "undefined", question_id: question.id }]
     # simulate a positive fudge of 5 points:
     sub.score = 15
     sub.with_versioning(true, &:save!)
@@ -107,7 +107,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_scores]).to eq({ 50 => 1 })
     sub = q.generate_submission(@user2)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.submission_data = [{ points: 17, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 17
     sub.with_versioning(true, &:save!)
     stats = q.statistics
@@ -118,7 +118,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1 })
     sub = q.generate_submission(@user3)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.submission_data = [{ points: 20, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 20
     sub.with_versioning(true, &:save!)
     stats = q.statistics
@@ -130,10 +130,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'creates quiz statistics with essay questions and anonymous submissions' do
-    @user1 = User.create! :name => "some_user 1"
-    student_in_course :course => @course, :user => @user1
+    @user1 = User.create! name: "some_user 1"
+    student_in_course course: @course, user: @user1
     quiz = @course.quizzes.create!
-    quiz.update(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    quiz.update(published_at: Time.zone.now, quiz_type: 'survey', anonymous_submissions: true)
     quiz.quiz_questions.create!(question_data: essay_question_data)
     quiz.generate_quiz_data
     quiz.save
@@ -142,9 +142,9 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     qs.workflow_state = 'complete'
     qs.save
     expect do
-      quiz.quiz_statistics.build(:report_type => 'student_analysis',
-                                 :includes_all_versions => true,
-                                 :anonymous => true).report.generate(false)
+      quiz.quiz_statistics.build(report_type: 'student_analysis',
+                                 includes_all_versions: true,
+                                 anonymous: true).report.generate(false)
     end.to_not raise_error
   end
 
@@ -159,9 +159,9 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   context "csv" do
     before do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @quiz = @course.quizzes.create!
-      @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
+      @quiz.quiz_questions.create!(question_data: { name: "test 1" })
       @quiz.generate_quiz_data
       @quiz.published_at = Time.now
       @quiz.save!
@@ -175,7 +175,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
       # and one in progress
       @quiz.generate_submission(@student)
-      stats = CSV.parse(csv(:include_all_versions => true))
+      stats = CSV.parse(csv(include_all_versions: true))
       expect(stats.last.length).to eq 9
       stats.first.first == "section"
     end
@@ -202,7 +202,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     it 'succeeds with logged-out user submissions' do
       survey_with_logged_out_submission
-      stats = CSV.parse(csv(:include_all_versions => true))
+      stats = CSV.parse(csv(include_all_versions: true))
       expect(stats.last[0]).to eq ''
       expect(stats.last[1]).to eq ''
       expect(stats.last[2]).to eq ''
@@ -216,15 +216,15 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       section1 = @course.course_sections.first
       section1.sis_source_id = 'SISSection01'
       section1.save!
-      section2 = CourseSection.new(:course => @course, :name => "section2")
+      section2 = CourseSection.new(course: @course, name: "section2")
       section2.sis_source_id = 'SISSection02'
       section2.save!
-      @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active', :allow_multiple_enrollments => true, :section => section2)
+      @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active', allow_multiple_enrollments: true, section: section2)
       @student.save!
       # one complete submission
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
-      stats = CSV.parse(csv(:include_all_versions => true))
+      stats = CSV.parse(csv(include_all_versions: true))
       expect(stats.last[0]).to eq "nobody@example.com"
       expect(stats.last[1]).to eq @student.id.to_s
       expect(stats.last[2]).to eq "user_sis_id_01"
@@ -251,11 +251,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       section1 = @course.course_sections.first
       section1.sis_source_id = 'SISSection01'
       section1.save!
-      section2 = CourseSection.new(:course => @course, :name => "section2")
+      section2 = CourseSection.new(course: @course, name: "section2")
       section2.sis_source_id = 'SISSection02'
       section2.save!
-      @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active',
-                                                         :allow_multiple_enrollments => true, :section => section2)
+      @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active',
+                                                         allow_multiple_enrollments: true, section: section2)
       @student.save!
 
       @quiz.quiz_questions.create!({
@@ -273,24 +273,22 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = @quiz.quiz_statistics.build(
-        :report_type => 'student_analysis',
-        :includes_all_versions => true
-      ).report.generate(true, { :section_ids => section2.id })
+        report_type: 'student_analysis',
+        includes_all_versions: true
+      ).report.generate(true, { section_ids: section2.id })
       expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
     it 'deals with incomplete fill-in-multiple-blanks questions' do
-      @quiz.quiz_questions.create!(:question_data => { :name => "test 2",
-                                                       :question_type => 'fill_in_multiple_blanks_question',
-                                                       :question_text => "[ans0]",
-                                                       :answers =>
-          [{ 'answer_text' => 'foo', 'blank_id' => 'ans0', 'answer_weight' => '100' }] })
-      @quiz.quiz_questions.create!(:question_data => { :name => "test 3",
-                                                       :question_type => 'fill_in_multiple_blanks_question',
-                                                       :question_text => "[ans0] [ans1]",
-                                                       :answers =>
-           [{ 'answer_text' => 'bar', 'blank_id' => 'ans0', 'answer_weight' => '100' },
-            { 'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100' }] })
+      @quiz.quiz_questions.create!(question_data: { name: "test 2",
+                                                    question_type: 'fill_in_multiple_blanks_question',
+                                                    question_text: "[ans0]",
+                                                    answers: [{ 'answer_text' => 'foo', 'blank_id' => 'ans0', 'answer_weight' => '100' }] })
+      @quiz.quiz_questions.create!(question_data: { name: "test 3",
+                                                    question_type: 'fill_in_multiple_blanks_question',
+                                                    question_text: "[ans0] [ans1]",
+                                                    answers: [{ 'answer_text' => 'bar', 'blank_id' => 'ans0', 'answer_weight' => '100' },
+                                                              { 'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100' }] })
       @quiz.generate_quiz_data
       @quiz.save!
       expect(@quiz.quiz_questions.size).to eq 3
@@ -306,10 +304,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     it 'contains answers to numerical questions' do
-      @quiz.quiz_questions.create!(:question_data => { :name => "numerical_question",
-                                                       :question_type => 'numerical_question',
-                                                       :question_text => "[num1]",
-                                                       :answers => { 'answer_0' => { :numerical_answer_type => 'exact_answer' } } })
+      @quiz.quiz_questions.create!(question_data: { name: "numerical_question",
+                                                    question_type: 'numerical_question',
+                                                    question_text: "[num1]",
+                                                    answers: { 'answer_0' => { numerical_answer_type: 'exact_answer' } } })
 
       @quiz.quiz_questions.last.question_data[:answers].first[:exact] = 5
 
@@ -327,9 +325,9 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     it 'does not error out when no answers are present in a calculated_question' do
-      @quiz.quiz_questions.create!(:question_data => { :name => "calculated_question",
-                                                       :question_type => 'calculated_question',
-                                                       :question_text => "[num1]" })
+      @quiz.quiz_questions.create!(question_data: { name: "calculated_question",
+                                                    question_type: 'calculated_question',
+                                                    question_text: "[num1]" })
 
       @quiz.generate_quiz_data
       @quiz.save!
@@ -344,10 +342,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     it 'does not error out when answers is null in a text_only_question' do
-      @quiz.quiz_questions.create!(:question_data => { :name => "text_only_question",
-                                                       :question_type => 'text_only_question',
-                                                       :question_text => "[num1]",
-                                                       :answers => nil })
+      @quiz.quiz_questions.create!(question_data: { name: "text_only_question",
+                                                    question_type: 'text_only_question',
+                                                    question_text: "[num1]",
+                                                    answers: nil })
 
       @quiz.generate_quiz_data
       @quiz.save!
@@ -372,32 +370,32 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
-      stats = CSV.parse(csv(:include_all_versions => true))
+      stats = CSV.parse(csv(include_all_versions: true))
       expect(stats[1][3]).to eq 'school1'
     end
   end
 
   it "includes attachment display names for quiz file upload questions" do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     student = @student
     student.name = "Not Steve"
     student.save!
-    student2 = User.create!(:name => "Stevie Jeebie")
-    @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => :active)
-    q = @course.quizzes.create!(:title => "new quiz")
+    student2 = User.create!(name: "Stevie Jeebie")
+    @course.enroll_user(student2, 'StudentEnrollment', enrollment_state: :active)
+    q = @course.quizzes.create!(title: "new quiz")
     q.update_attribute :published_at, Time.now
-    question = q.quiz_questions.create! :question_data => {
-      :name => 'q1', :points_possible => 1,
-      :question_type => 'file_upload_question',
-      :question_text => 'ohai mark'
+    question = q.quiz_questions.create! question_data: {
+      name: 'q1', points_possible: 1,
+      question_type: 'file_upload_question',
+      question_text: 'ohai mark'
     }
     q.generate_quiz_data
     q.save!
     qs = q.generate_submission student
     io = fixture_file_upload('docs/doc.doc', 'application/msword', true)
-    attach = qs.attachments.create! :filename => "doc.doc",
-                                    :display_name => "attachment.png", :user => student,
-                                    :uploaded_data => io
+    attach = qs.attachments.create! filename: "doc.doc",
+                                    display_name: "attachment.png", user: student,
+                                    uploaded_data: io
     qs.submission_data["question_#{question.id}".to_sym] = [attach.id.to_s]
     qs.save!
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -408,17 +406,17 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     # make student2's submission first
     qs.updated_at = 3.days.ago
     qs.save!
-    stats = CSV.parse(csv({ :include_all_versions => true }, q.reload))
+    stats = CSV.parse(csv({ include_all_versions: true }, q.reload))
     stats = stats.sort_by { |s| s[1] } # sort by the id
     expect(stats.first[7]).to eq attach.display_name
   end
 
   it 'strips tags from html multiple-choice/multiple-answers' do
-    student_in_course(:active_all => true)
-    q = @course.quizzes.create!(:title => "new quiz")
+    student_in_course(active_all: true)
+    q = @course.quizzes.create!(title: "new quiz")
     q.update_attribute(:published_at, Time.now)
-    q.quiz_questions.create!(:question_data => { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
-    q.quiz_questions.create!(:question_data => { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
     q.generate_quiz_data
     q.save
     qs = q.generate_submission(@student)
@@ -454,7 +452,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'does not strip things that look like tags from essay questions' do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.zone.now)
     q.quiz_questions.create!(question_data: essay_question_data)
@@ -471,7 +469,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'strips tags from all student-provided answers' do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)
     q.quiz_questions.create!(question_data: short_answer_question_data)
@@ -504,11 +502,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'does not count teacher preview submissions' do
-    teacher_in_course(:active_all => true)
+    teacher_in_course(active_all: true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)
-    q.quiz_questions.create!(:question_data => { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
-    q.quiz_questions.create!(:question_data => { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
     q.generate_quiz_data
     q.save
     qs = q.generate_submission(@teacher, true)
@@ -524,10 +522,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'does not show student names for anonymous submissions' do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     q = @course.quizzes.create!
-    q.update(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
-    q.quiz_questions.create!(:question_data => { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
+    q.update(published_at: Time.zone.now, quiz_type: 'survey', anonymous_submissions: true)
+    q.quiz_questions.create!(question_data: { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
     q.generate_quiz_data
     q.save
     qs = q.generate_submission(@student)
@@ -546,8 +544,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     fake_student = @course.student_view_student
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)
-    q.quiz_questions.create!(:question_data => { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
-    q.quiz_questions.create!(:question_data => { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] })
+    q.quiz_questions.create!(question_data: { :name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100' }, { 'answer_text' => 'lolrus', 'answer_weight' => '100' }] })
     q.generate_quiz_data
     q.save
     qs = q.generate_submission(fake_student)

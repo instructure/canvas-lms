@@ -38,14 +38,14 @@ describe CutyCapt do
 
   context "url validation" do
     it "checks for an http scheme" do
-      ConfigFile.stub('cutycapt', { :path => 'not used' })
+      ConfigFile.stub('cutycapt', { path: 'not used' })
       expect(CutyCapt.verify_url("ftp://example.com/")).to be_falsey
       expect(CutyCapt.verify_url("http://example.com/")).to be_truthy
       expect(CutyCapt.verify_url("https://example.com/")).to be_truthy
     end
 
     it "checks for blacklisted domains" do
-      ConfigFile.stub('cutycapt', { :path => 'not used', :domain_blacklist => ['example.com'] })
+      ConfigFile.stub('cutycapt', { path: 'not used', domain_blacklist: ['example.com'] })
 
       expect(CutyCapt.verify_url("http://example.com/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://foo.example.com/blah")).to be_falsey
@@ -54,7 +54,7 @@ describe CutyCapt do
     end
 
     it "checks for blacklisted ip blocks" do
-      ConfigFile.stub('cutycapt', { :path => 'not used' })
+      ConfigFile.stub('cutycapt', { path: 'not used' })
 
       expect(CutyCapt.verify_url("http://10.0.1.1/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://169.254.169.254/blah")).to be_falsey
@@ -65,14 +65,14 @@ describe CutyCapt do
     end
 
     it "checks that the url resolves to something" do
-      ConfigFile.stub('cutycapt', { :path => 'not used' })
+      ConfigFile.stub('cutycapt', { path: 'not used' })
       expect(CutyCapt.verify_url("http://successfull")).to be_falsey
     end
   end
 
   context "execution" do
     it "times out cuty processes" do
-      ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
+      ConfigFile.stub('cutycapt', { path: '/bin/sleep', timeout: '1000' })
 
       allow(CutyCapt).to receive(:cuty_arguments).and_return(["/bin/sleep", "60"])
       expect do

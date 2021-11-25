@@ -23,8 +23,8 @@ module QuizQuestionsCommon
   include QuizzesCommon
 
   def create_oqaat_quiz(opts = {})
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
     @quiz = @course.quizzes.create
     quiz_question("Question 1", "What is the first question?", 1)
     quiz_question("Question 2", "What is the second question?", 2)
@@ -39,14 +39,14 @@ module QuizQuestionsCommon
 
   def quiz_question(name, question, _id)
     answers = [
-      { :weight => 100, :answer_text => "A", :answer_comments => "", :id => 1490 },
-      { :weight => 0, :answer_text => "B", :answer_comments => "", :id => 1020 },
-      { :weight => 0, :answer_text => "C", :answer_comments => "", :id => 7051 }
+      { weight: 100, answer_text: "A", answer_comments: "", id: 1490 },
+      { weight: 0, answer_text: "B", answer_comments: "", id: 1020 },
+      { weight: 0, answer_text: "C", answer_comments: "", id: 7051 }
     ]
-    data = { :question_name => name, :points_possible => 1, :question_text => question,
-             :answers => answers, :question_type => "multiple_choice_question" }
+    data = { question_name: name, points_possible: 1, question_text: question,
+             answers: answers, question_type: "multiple_choice_question" }
 
-    @quiz.quiz_questions.create!(:question_data => data)
+    @quiz.quiz_questions.create!(question_data: data)
   end
 
   def take_the_quiz
@@ -80,7 +80,7 @@ module QuizQuestionsCommon
   def navigate_directly_to_first_question
     # defang the navigate-away-freakout-dialog
     driver.execute_script "window.onbeforeunload = function(){};"
-    get course_quiz_question_path(:course_id => @course.id, :quiz_id => @quiz.id, :question_id => @quiz.quiz_questions.first.id)
+    get course_quiz_question_path(course_id: @course.id, quiz_id: @quiz.id, question_id: @quiz.quiz_questions.first.id)
     wait_for_ajaximations
   end
 

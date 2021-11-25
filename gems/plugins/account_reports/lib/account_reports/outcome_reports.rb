@@ -112,8 +112,8 @@ module AccountReports
 
     def student_assignment_outcome_map_scope
       parameters = {
-        :account_id => account.id,
-        :root_account_id => root_account.id
+        account_id: account.id,
+        root_account_id: root_account.id
       }
       students = root_account.pseudonyms.except(:preload)
                              .select(<<~SQL.squish)

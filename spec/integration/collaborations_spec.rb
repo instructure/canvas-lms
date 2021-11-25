@@ -22,23 +22,23 @@ require 'nokogiri'
 
 describe CollaborationsController, type: :request do
   it 'properly links to the user who posted the collaboration' do
-    PluginSetting.create!(:name => 'etherpad', :settings => {})
-    course_with_teacher_logged_in :active_all => true, :name => "teacher 1"
+    PluginSetting.create!(name: 'etherpad', settings: {})
+    course_with_teacher_logged_in active_all: true, name: "teacher 1"
 
     UserService.register(
-      :service => "google_drive",
-      :token => "token",
-      :secret => "secret",
-      :user => @user,
-      :service_domain => "drive.google.com",
-      :service_user_id => "service_user_id",
-      :service_user_name => "service_user_name"
+      service: "google_drive",
+      token: "token",
+      secret: "secret",
+      user: @user,
+      service_domain: "drive.google.com",
+      service_user_id: "service_user_id",
+      service_user_name: "service_user_name"
     )
 
     get "/courses/#{@course.id}/collaborations/"
     expect(response).to be_successful
 
-    post "/courses/#{@course.id}/collaborations/", params: { :collaboration => { :collaboration_type => "EtherPad", :title => "My Collab" } }
+    post "/courses/#{@course.id}/collaborations/", params: { collaboration: { collaboration_type: "EtherPad", title: "My Collab" } }
     expect(response).to be_redirect
 
     get "/courses/#{@course.id}/collaborations/"

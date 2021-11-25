@@ -363,7 +363,7 @@ class GradeChangeAuditApiController < AuditorApiController
     # to leak information, so just drop the event completely while the
     # assignment is still anonymous and muted.
     events = remove_anonymous ? remove_anonymous_events(events) : anonymize_events(events)
-    render :json => grade_change_events_compound_json(events, @current_user, session)
+    render json: grade_change_events_compound_json(events, @current_user, session)
   end
 
   def remove_anonymous_events(events)

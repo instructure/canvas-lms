@@ -35,47 +35,47 @@ describe ActiveRecord::Base do
     it "works" do
       start_times = [
         Time.zone.now,
-        Time.zone.now.advance(:days => -1),
-        Time.zone.now.advance(:days => -2),
-        Time.zone.now.advance(:days => -3)
+        Time.zone.now.advance(days: -1),
+        Time.zone.now.advance(days: -2),
+        Time.zone.now.advance(days: -3)
       ]
       create_courses(account, start_times)
 
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(column: :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
 
     it "justs do the last 20 days by default" do
       start_times = [
         Time.zone.now,
-        Time.zone.now.advance(:days => -19),
-        Time.zone.now.advance(:days => -20),
-        Time.zone.now.advance(:days => 1)
+        Time.zone.now.advance(days: -19),
+        Time.zone.now.advance(days: -20),
+        Time.zone.now.advance(days: 1)
       ]
       create_courses(account, start_times)
 
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
+      expect(account.courses.count_by_date(column: :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
   end
 
   describe "in batches" do
     before :once do
-      @c1 = course_factory(:name => 'course1', :active_course => true)
-      @c2 = course_factory(:name => 'course2', :active_course => true)
+      @c1 = course_factory(name: 'course1', active_course: true)
+      @c2 = course_factory(name: 'course2', active_course: true)
       @u1 = user_factory(name: 'userC', active_user: true)
       @u2 = user_factory(name: 'userB', active_user: true)
       @u3 = user_factory(name: 'userA', active_user: true)
-      @e1 = @c1.enroll_student(@u1, :enrollment_state => 'active')
-      @e2 = @c1.enroll_student(@u2, :enrollment_state => 'active')
-      @e3 = @c1.enroll_student(@u3, :enrollment_state => 'active')
-      @e4 = @c2.enroll_student(@u1, :enrollment_state => 'active')
-      @e5 = @c2.enroll_student(@u2, :enrollment_state => 'active')
-      @e6 = @c2.enroll_student(@u3, :enrollment_state => 'active')
+      @e1 = @c1.enroll_student(@u1, enrollment_state: 'active')
+      @e2 = @c1.enroll_student(@u2, enrollment_state: 'active')
+      @e3 = @c1.enroll_student(@u3, enrollment_state: 'active')
+      @e4 = @c2.enroll_student(@u1, enrollment_state: 'active')
+      @e5 = @c2.enroll_student(@u2, enrollment_state: 'active')
+      @e6 = @c2.enroll_student(@u3, enrollment_state: 'active')
     end
 
     shared_examples_for "batches" do
@@ -234,14 +234,14 @@ describe ActiveRecord::Base do
     end
 
     it "runs twice if it gets a RecordNotUnique" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
       # we don't catch the error the second time
-expect do
+      expect do
         User.unique_constraint_retry do
           tries += 1
           User.create!
-          Submission.create!(:user => @user, :assignment => @assignment)
+          Submission.create!(user: @user, assignment: @assignment)
         end
       end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(Submission.count).to eql 1
@@ -250,13 +250,13 @@ expect do
     end
 
     it "runs additional times if specified" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
       # we don't catch the error the last time
-expect do
+      expect do
         User.unique_constraint_retry(2) do
           tries += 1
-          Submission.create!(:user => @user, :assignment => @assignment)
+          Submission.create!(user: @user, assignment: @assignment)
         end
       end.to raise_error(ActiveRecord::RecordNotUnique)
       expect(tries).to eql 3
@@ -264,14 +264,14 @@ expect do
     end
 
     it "does not cause outer transactions to roll back if the second attempt succeeds" do
-      Submission.create!(:user => @user, :assignment => @assignment)
+      Submission.create!(user: @user, assignment: @assignment)
       tries = 0
       User.transaction do
         User.create!
         User.unique_constraint_retry do
           tries += 1
           User.create!
-          Submission.create!(:user => @user, :assignment => @assignment) if tries == 1
+          Submission.create!(user: @user, assignment: @assignment) if tries == 1
         end
         User.create!
       end
@@ -352,8 +352,8 @@ expect do
     it "works" do
       now = Time.now.utc
       User.bulk_insert [
-        { :name => "bulk_insert_1", :workflow_state => "registered", created_at: now, updated_at: now },
-        { :name => "bulk_insert_2", :workflow_state => "registered", created_at: now, updated_at: now }
+        { name: "bulk_insert_1", workflow_state: "registered", created_at: now, updated_at: now },
+        { name: "bulk_insert_2", workflow_state: "registered", created_at: now, updated_at: now }
       ]
       names = User.order(:name).pluck(:name)
       expect(names).to be_include("bulk_insert_1")
@@ -390,9 +390,9 @@ expect do
     before :once do
       User.create
       User.create
-      User.create(:locale => "en")
-      User.create(:locale => "en")
-      User.create(:locale => "es")
+      User.create(locale: "en")
+      User.create(locale: "en")
+      User.create(locale: "es")
     end
 
     it "returns distinct values" do
@@ -409,7 +409,7 @@ expect do
       ids = []
       5.times { ids << User.create!.id }
       batches = []
-      User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
+      User.where(id: ids).find_ids_in_batches(batch_size: 2) do |found_ids|
         batches << found_ids
       end
       expect(batches).to eq [ids[0, 2], ids[2, 2], ids[4, 1]]
@@ -424,7 +424,7 @@ expect do
 
     it "returns ids from the table in ranges" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[0], @ids[3]],
@@ -443,7 +443,7 @@ expect do
 
     it "accepts an option to start searching at a given id" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[3]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, start_at: @ids[3]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[3], @ids[6]], [@ids[7], @ids[9]]]
@@ -451,7 +451,7 @@ expect do
 
     it "accepts an option to end at a given id" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :end_at => @ids[5]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, end_at: @ids[5]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[0], @ids[3]], [@ids[4], @ids[5]]]
@@ -459,7 +459,7 @@ expect do
 
     it "accepts both options to start and end at given ids" do
       batches = []
-      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[2], :end_at => @ids[7]) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(batch_size: 4, start_at: @ids[2], end_at: @ids[7]) do |*found_ids|
         batches << found_ids
       end
       expect(batches).to eq [[@ids[2], @ids[5]], [@ids[6], @ids[7]]]
@@ -473,7 +473,7 @@ expect do
 
     it "fails with dot in nested column name" do
       expect do
-        User.where(:name => { "users.id" => @user }).first
+        User.where(name: { "users.id" => @user }).first
       end.to raise_error(TypeError)
     end
 
@@ -493,11 +493,11 @@ expect do
 
   describe "update_all/delete_all with_joins" do
     before :once do
-      @u1 = User.create!(:name => 'a')
-      @u2 = User.create!(:name => 'b')
-      @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
-      @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
-      @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
+      @u1 = User.create!(name: 'a')
+      @u2 = User.create!(name: 'b')
+      @p1 = @u1.pseudonyms.create!(unique_id: 'pa', account: Account.default)
+      @p1_2 = @u1.pseudonyms.create!(unique_id: 'pa2', account: Account.default)
+      @p2 = @u2.pseudonyms.create!(unique_id: 'pb', account: Account.default)
       @p1_2.destroy
     end
 
@@ -506,7 +506,7 @@ expect do
     end
 
     it "does an update all with a join" do
-      expect(Pseudonym.joins(:user).active.where(:users => { :name => 'a' }).update_all(:unique_id => 'pa3')).to eq 1
+      expect(Pseudonym.joins(:user).active.where(users: { name: 'a' }).update_all(unique_id: 'pa3')).to eq 1
       expect(@p1.reload.unique_id).to eq 'pa3'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
@@ -516,14 +516,14 @@ expect do
       scope = Pseudonym.active.joins("INNER JOIN #{User.quoted_table_name} ON
         pseudonyms.user_id=users.id AND
         users.name='a'")
-      expect(scope.update_all(:unique_id => 'pa3')).to eq 1
+      expect(scope.update_all(unique_id: 'pa3')).to eq 1
       expect(@p1.reload.unique_id).to eq 'pa3'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
     end
 
     it "does a delete all with a join" do
-      expect(Pseudonym.joins(:user).active.where(:users => { :name => 'a' }).delete_all).to eq 1
+      expect(Pseudonym.joins(:user).active.where(users: { name: 'a' }).delete_all).to eq 1
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(@u1.reload).not_to be_deleted
       expect(@p1_2.reload.unique_id).to eq 'pa2'
@@ -532,19 +532,19 @@ expect do
 
     # in rails 4, the where conditions use bind values for association scopes
     it "does an update all with a join on associations" do
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'b' }).update_all(:unique_id => 'pa3')
+      @u1.pseudonyms.joins(:user).active.where(users: { name: 'b' }).update_all(unique_id: 'pa3')
       expect(@p1.reload.unique_id).to_not eq 'pa3'
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'a' }).update_all(:unique_id => 'pa3')
+      @u1.pseudonyms.joins(:user).active.where(users: { name: 'a' }).update_all(unique_id: 'pa3')
       expect(@p1.reload.unique_id).to eq 'pa3'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
     end
 
     it "does a delete all with a join on associations" do
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'b' }).delete_all
+      @u1.pseudonyms.joins(:user).active.where(users: { name: 'b' }).delete_all
       expect(@u1.reload).not_to be_deleted
       expect(@p1.reload.unique_id).to eq 'pa'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
-      @u1.pseudonyms.joins(:user).active.where(:users => { :name => 'a' }).delete_all
+      @u1.pseudonyms.joins(:user).active.where(users: { name: 'a' }).delete_all
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(@u1.reload).not_to be_deleted
       expect(@p1_2.reload.unique_id).to eq 'pa2'
@@ -868,14 +868,14 @@ expect do
 
   describe "temp_record" do
     it "does not reload the base association for normal invertible associations" do
-      c = Course.create!(:name => "some name")
-      Course.where(:id => c).update_all(:name => "sadness")
+      c = Course.create!(name: "some name")
+      Course.where(id: c).update_all(name: "sadness")
       expect(c.enrollments.temp_record.course.name).to eq c.name
     end
 
     it "does not reload the base association for polymorphic associations" do
-      c = Course.create!(:name => "some name")
-      Course.where(:id => c).update_all(:name => "sadness")
+      c = Course.create!(name: "some name")
+      Course.where(id: c).update_all(name: "sadness")
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end

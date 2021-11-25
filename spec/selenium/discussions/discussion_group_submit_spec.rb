@@ -26,12 +26,12 @@ describe "discussion assignments" do
   include AssignmentsCommon
 
   before :once do
-    course_with_teacher(:active_all => true)
-    @course.assignment_groups.create!(:name => "Assignment Group")
-    @category1 = @course.group_categories.create!(:name => "category 1")
+    course_with_teacher(active_all: true)
+    @course.assignment_groups.create!(name: "Assignment Group")
+    @category1 = @course.group_categories.create!(name: "category 1")
     @category1.configure_self_signup(true, false)
     @category1.save!
-    @g1 = @course.groups.create!(:name => "some group", :group_category => @category1)
+    @g1 = @course.groups.create!(name: "some group", group_category: @category1)
     @g1.save!
   end
 
@@ -73,7 +73,7 @@ describe "discussion assignments" do
                                                             title: 'assignment topic title',
                                                             message: 'assignment topic message',
                                                             group_category: @category1)
-      @student1 = user_with_pseudonym(:username => 'student1@example.com', :active_all => 1)
+      @student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
       @course.enroll_student(@student1).accept!
       @g1.add_user @student1
     end

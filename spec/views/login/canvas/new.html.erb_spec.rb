@@ -34,7 +34,7 @@ describe "login/canvas/new.html.erb" do
   end
 
   it "uses ldap route for the ldap 'controller'" do
-    Account.default.authentication_providers.create!(:auth_type => 'ldap')
+    Account.default.authentication_providers.create!(auth_type: 'ldap')
 
     controller.request.path_parameters[:controller] = 'login/ldap'
     render

@@ -27,7 +27,7 @@ module Twitter
         twitter_consumer,
         request_token,
         request_secret
-      ).get_access_token(:oauth_verifier => oauth_verifier)
+      ).get_access_token(oauth_verifier: oauth_verifier)
       Twitter::Connection.new(access_token)
     end
 
@@ -72,7 +72,7 @@ module Twitter
 
     def self.request_token(success_url)
       consumer = twitter_consumer
-      consumer.get_request_token(:oauth_callback => success_url)
+      consumer.get_request_token(oauth_callback: success_url)
     end
 
     def self.twitter_consumer(key = nil, secret = nil)
@@ -82,11 +82,11 @@ module Twitter
       key ||= twitter_config['api_key']
       secret ||= twitter_config['secret_key']
       OAuth::Consumer.new(key, secret, {
-                            :site => "https://api.twitter.com",
-                            :request_token_path => "/oauth/request_token",
-                            :access_token_path => "/oauth/access_token",
-                            :authorize_path => "/oauth/authorize",
-                            :signature_method => "HMAC-SHA1"
+                            site: "https://api.twitter.com",
+                            request_token_path: "/oauth/request_token",
+                            access_token_path: "/oauth/access_token",
+                            authorize_path: "/oauth/authorize",
+                            signature_method: "HMAC-SHA1"
                           })
     end
     private_class_method :twitter_consumer

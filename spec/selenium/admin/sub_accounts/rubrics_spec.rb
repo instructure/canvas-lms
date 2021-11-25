@@ -24,7 +24,7 @@ describe "sub account shared rubric specs" do
   include_context "in-process server selenium tests"
   include RubricsCommon
 
-  let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
+  let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
   let(:rubric_url) { "/accounts/#{account.id}/rubrics" }
   let(:who_to_login) { 'admin' }
 

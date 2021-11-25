@@ -21,13 +21,13 @@
 describe AuthenticationProvider::SAML do
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
-    @account = Account.create!(:name => "account")
+    @account = Account.create!(name: "account")
     @file_that_exists = File.expand_path(__FILE__)
   end
 
   it "sets the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
-    @aac = @account.authentication_providers.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(auth_type: "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     @account.reload
     expect(@account.settings[:saml_entity_id]).to eq "http://bob.cody.instructure.com/saml2"
@@ -36,14 +36,14 @@ describe AuthenticationProvider::SAML do
   it "uses the entity id set on the account" do
     @account.settings[:saml_entity_id] = 'my_entity'
     @account.save!
-    @aac = @account.authentication_providers.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(auth_type: "saml")
     expect(@aac.entity_id).to eq "my_entity"
   end
 
   it "unsets the entity id when it gets deleted" do
     @account.settings[:saml_entity_id] = 'my_entity'
     @account.save!
-    @aac = @account.authentication_providers.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(auth_type: "saml")
     @aac.destroy
     expect(@account.settings).not_to have_key(:saml_entity_id)
   end
@@ -51,19 +51,19 @@ describe AuthenticationProvider::SAML do
   it "does not unset the entity id when it gets deleted if another config exists" do
     @account.settings[:saml_entity_id] = 'my_entity'
     @account.save!
-    @aac = @account.authentication_providers.create!(:auth_type => "saml")
-    @aac2 = @account.authentication_providers.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(auth_type: "saml")
+    @aac2 = @account.authentication_providers.create!(auth_type: "saml")
     @aac.destroy
     expect(@account.settings[:saml_entity_id]).to eq 'my_entity'
   end
 
   it "sets requested_authn_context to nil if empty string" do
-    @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "")
+    @aac = @account.authentication_providers.create!(auth_type: "saml", requested_authn_context: "")
     expect(@aac.requested_authn_context).to eq nil
   end
 
   it "allows requested_authn_context to be set to anything" do
-    @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "anything")
+    @aac = @account.authentication_providers.create!(auth_type: "saml", requested_authn_context: "anything")
     expect(@aac.requested_authn_context).to eq "anything"
   end
 
@@ -203,7 +203,7 @@ describe AuthenticationProvider::SAML do
 
   describe '.sp_metadata_for_account' do
     it 'includes federated attributes' do
-      ap = @account.authentication_providers.build(:auth_type => 'saml')
+      ap = @account.authentication_providers.build(auth_type: 'saml')
       ap.federated_attributes = { 'display_name' => { 'attribute' => 'name' } }
       ap.save!
       # ignore invalid saml key configuration in specs

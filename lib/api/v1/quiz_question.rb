@@ -22,7 +22,7 @@ module Api::V1::QuizQuestion
   include Api::V1::Json
 
   API_ALLOWED_QUESTION_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       id
       quiz_id
       position

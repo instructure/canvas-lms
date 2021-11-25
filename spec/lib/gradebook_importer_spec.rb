@@ -292,27 +292,27 @@ describe GradebookImporter do
     it "Lookups with either Student Name, ID, SIS User ID, or SIS Login ID" do
       course_model
 
-      student_in_course(:name => "Some Name", active_all: true)
+      student_in_course(name: "Some Name", active_all: true)
       @u1 = @user
 
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       @user.pseudonym.sis_user_id = "SISUSERID"
       @user.pseudonym.save!
       student_in_course(user: @user, active_all: true)
       @u2 = @user
 
-      user_with_pseudonym(:active_all => true, :username => "something_that_has_not_been_taken")
+      user_with_pseudonym(active_all: true, username: "something_that_has_not_been_taken")
       student_in_course(user: @user, active_all: true)
       @u3 = @user
 
-      user_with_pseudonym(:active_all => true, :username => "inactive_login")
+      user_with_pseudonym(active_all: true, username: "inactive_login")
       @user.pseudonym.destroy
       student_in_course(user: @user, active_all: true)
       @u4 = @user
 
-      user_with_pseudonym(:active_all => true, :username => "inactive_login")
+      user_with_pseudonym(active_all: true, username: "inactive_login")
       @user.pseudonym.destroy
-      @user.pseudonyms.create!(:unique_id => 'active_login', :account => Account.default)
+      @user.pseudonyms.create!(unique_id: 'active_login', account: Account.default)
       student_in_course(user: @user, active_all: true)
       @u5 = @user
 
@@ -399,16 +399,16 @@ describe GradebookImporter do
     it "allows ids that look like numbers" do
       course_model
 
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       @user.pseudonym.sis_user_id = "0123456"
       @user.pseudonym.save!
       student_in_course(user: @user, active_all: true)
       @u0 = @user
 
       # user with an sis-id that is a number
-      user_with_pseudonym(:active_all => true, :username => "octal_ud")
+      user_with_pseudonym(active_all: true, username: "octal_ud")
       @user.pseudonym.destroy
-      @user.pseudonyms.create!(:unique_id => '0231163', :account => Account.default)
+      @user.pseudonyms.create!(unique_id: '0231163', account: Account.default)
       student_in_course(user: @user, active_all: true)
       @u1 = @user
 
@@ -457,8 +457,8 @@ describe GradebookImporter do
 
   it "parses new and existing assignments" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
-    @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1')
+    @assignment3 = @course.assignments.create!(name: 'Assignment 3')
     importer_with_rows(
       'Student,ID,Section,Assignment 1,Assignment 2',
       'Some Student,,,,'
@@ -573,8 +573,8 @@ describe GradebookImporter do
 
   it "does not include missing assignments if no new assignments" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
-    @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1')
+    @assignment3 = @course.assignments.create!(name: 'Assignment 3')
     importer_with_rows(
       'Student,ID,Section,Assignment 1',
       'Some Student,,,'
@@ -585,7 +585,7 @@ describe GradebookImporter do
 
   it "does not include assignments with no changes" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     importer_with_rows(
       "Student,ID,Section,Assignment 1"
     )
@@ -595,8 +595,8 @@ describe GradebookImporter do
 
   it "doesn't include readonly assignments" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 2', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 2', points_possible: 10)
     importer_with_rows(
       'Student,ID,Section,Assignment 1,Readonly,Assignment 2',
       '    Points Possible,,,,(read only),'
@@ -607,7 +607,7 @@ describe GradebookImporter do
 
   it "includes assignments that changed only in points possible" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     importer_with_rows(
       "Student,ID,Section,Assignment 1",
       "Points Possible,,,20"
@@ -619,7 +619,7 @@ describe GradebookImporter do
 
   it "does not create assignments for the totals columns after assignments" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     importer_with_rows(
       "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
       "Points Possible,,,20,,,,,"
@@ -630,8 +630,8 @@ describe GradebookImporter do
 
   it "does not create assignments for arbitrarily placed totals columns" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
-    @assignment2 = @course.assignments.create!(:name => 'Assignment 2', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
+    @assignment2 = @course.assignments.create!(name: 'Assignment 2', points_possible: 10)
     importer_with_rows(
       "Student,ID,Section,Final Score,Assignment 1,Current Points,Assignment 2,Final Points,Current Score,Final Grade",
       "Points Possible,,,(read only),20,(read only),20,,,"
@@ -643,7 +643,7 @@ describe GradebookImporter do
 
   it "does not create assignments for unposted columns" do
     course_model
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     importer_with_rows(
       "Student,ID,Section,Assignment 1,Current Points,Final Points,Unposted Current Score," \
       "Unposted Final Score,Unposted Final Grade",
@@ -693,7 +693,7 @@ describe GradebookImporter do
   it "does not include assignments that don't have any grade changes" do
     course_with_student
     course_with_teacher(course: @course)
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     @assignment1.grade_student(@student, grade: 10, grader: @teacher)
     importer_with_rows(
       "Student,ID,Section,Assignment 1",
@@ -716,7 +716,7 @@ describe GradebookImporter do
 
   it "includes assignments that the grade changed for an existing user" do
     course_with_student(active_all: true)
-    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
     @assignment1.grade_student(@student, grade: 8, grader: @teacher)
     importer_with_rows(
       "Student,ID,Section,Assignment 1",
@@ -1302,9 +1302,9 @@ describe GradebookImporter do
       student
     end
     let(:assignment) do
-      course.assignments.create!(:name => 'Assignment 1',
-                                 :grading_type => "pass_fail",
-                                 :points_possible => 6)
+      course.assignments.create!(name: 'Assignment 1',
+                                 grading_type: "pass_fail",
+                                 points_possible: 6)
     end
     let(:assignments) { [assignment] }
     let(:students) { [student] }

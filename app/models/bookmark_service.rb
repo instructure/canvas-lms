@@ -62,10 +62,10 @@ class BookmarkService < UserService
       if data.instance_of?(Array) && data.first.is_a?(Hash)
         data.each do |bookmark|
           bookmarks << {
-            :title => bookmark['title'],
-            :url => bookmark['url'],
-            :description => bookmark['desc'],
-            :tags => bookmark['tags'].split(/\s/).join(",")
+            title: bookmark['title'],
+            url: bookmark['url'],
+            description: bookmark['desc'],
+            tags: bookmark['tags'].split(/\s/).join(",")
           }
         end
       else
@@ -81,10 +81,10 @@ class BookmarkService < UserService
         document = Nokogiri::XML(response.body)
         document.search('/posts/post').each do |post|
           bookmarks << {
-            :title => post['description'],
-            :url => post['href'],
-            :description => post['description'],
-            :tags => post['tags']
+            title: post['description'],
+            url: post['href'],
+            description: post['description'],
+            tags: post['tags']
           }
         end
       else

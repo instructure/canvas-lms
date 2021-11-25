@@ -198,7 +198,7 @@ module Api::V1::DiscussionTopics
         elsif opts[:plain_messages]
           topic.message # used for searching by body on index
         elsif opts[:text_only]
-          html_to_text(topic.message, :preserve_links => true)
+          html_to_text(topic.message, preserve_links: true)
         else
           api_user_content(topic.message, context)
         end

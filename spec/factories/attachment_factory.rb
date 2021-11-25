@@ -52,7 +52,7 @@ module Factories
   end
 
   def valid_attachment_attributes(opts = {})
-    @context = opts[:context] || @context || @course || course_model(:reusable => true)
+    @context = opts[:context] || @context || @course || course_model(reusable: true)
     if opts.key?(:folder)
       folder = opts[:folder]
     else
@@ -63,11 +63,11 @@ module Factories
       folder = @folder
     end
     @attributes_res = {
-      :context => @context,
-      :size => 100,
-      :folder => folder,
-      :content_type => 'application/loser',
-      :filename => 'unknown.loser'
+      context: @context,
+      size: 100,
+      folder: folder,
+      content_type: 'application/loser',
+      filename: 'unknown.loser'
     }
   end
 
@@ -95,7 +95,7 @@ module Factories
   end
 
   def crocodocable_attachment_model(opts = {})
-    attachment_model({ :content_type => 'application/pdf' }.merge(opts))
+    attachment_model({ content_type: 'application/pdf' }.merge(opts))
   end
 
   alias_method :canvadocable_attachment_model, :crocodocable_attachment_model
@@ -114,10 +114,10 @@ module Factories
 
   def create_attachment_for_file_upload_submission!(submission, opts = {})
     defaults = {
-      :filename => "doc.doc",
-      :display_name => "doc.doc",
-      :user => @user,
-      :uploaded_data => dummy_io,
+      filename: "doc.doc",
+      display_name: "doc.doc",
+      user: @user,
+      uploaded_data: dummy_io,
     }
     submission.attachments.create! defaults.merge(opts)
   end

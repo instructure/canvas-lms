@@ -45,11 +45,11 @@ describe ContextModulesHelper do
       topic = t_course.discussion_topics.create
       topic.workflow_state = 'active'
       topic.save!
-      student_in_course(:course => t_course)
+      student_in_course(course: t_course)
       item = t_module.add_item(type: 'discussion_topic', id: topic.id)
       expect(module_item_unpublishable?(item)).to be_truthy
       item.reload
-      topic.discussion_entries.create!(:user => @student)
+      topic.discussion_entries.create!(user: @student)
       expect(module_item_unpublishable?(item)).to be_falsey
     end
   end
@@ -69,7 +69,7 @@ describe ContextModulesHelper do
 
     it "returns the content's can_publish?" do
       assignment = t_course.assignments.create(workflow_state: 'unpublished')
-      student_in_course(:course => t_course)
+      student_in_course(course: t_course)
       item = t_module.add_item(type: 'assignment', id: assignment.id)
       expect(assignment.can_publish?).to be_truthy
       expect(module_item_publishable?(item)).to be_truthy
@@ -94,11 +94,11 @@ describe ContextModulesHelper do
 
     it 'returns New Quiz for lti-quiz type' do
       tool = t_course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       assignment = t_course.assignments.create(
         submission_types: 'external_tool',
@@ -112,11 +112,11 @@ describe ContextModulesHelper do
 
     it 'returns Quiz for lti-quiz type if is_student' do
       tool = t_course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       assignment = t_course.assignments.create(
         submission_types: 'external_tool',

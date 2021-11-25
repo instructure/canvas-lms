@@ -51,10 +51,10 @@ module GoogleDrive
 
     def to_hash
       {
-        :name => display_name,
-        :document_id => @document_id,
-        :extension => extension,
-        :alternate_url => { :href => alternate_url }
+        name: display_name,
+        document_id: @document_id,
+        extension: extension,
+        alternate_url: { href: alternate_url }
       }
     end
 

@@ -139,9 +139,9 @@ describe ConditionalRelease::Service do
 
         it "caches across admins" do
           old_teacher = @teacher
-          teacher_in_course(:course => @course)
+          teacher_in_course(course: @course)
           data = described_class.active_rules(@course, old_teacher, nil)
-          @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
+          @course.conditional_release_rules.update_all(deleted_at: Time.now.utc) # skip callbacks
           expect(described_class.active_rules(@course, @teacher, nil)).to eq data # doesn't matter who accesses it if they have rights
         end
 
@@ -205,7 +205,7 @@ describe ConditionalRelease::Service do
 
         it "caches" do
           data = described_class.rules_for(@course, @student, nil)
-          @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
+          @course.conditional_release_rules.update_all(deleted_at: Time.now.utc) # skip callbacks
           expect(described_class.rules_for(@course, @student, nil)).to eq data
         end
 
@@ -226,9 +226,9 @@ describe ConditionalRelease::Service do
     context "releasing content after disabling feature flag" do
       before :once do
         Account.default.allow_feature!(:conditional_release)
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @course.enable_feature!(:conditional_release)
-        @module = @course.context_modules.create!(:workflow_state => "active")
+        @module = @course.context_modules.create!(workflow_state: "active")
       end
 
       def release_content
@@ -240,7 +240,7 @@ describe ConditionalRelease::Service do
         assignment_override_model(assignment: assmt,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
                                   set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
-        tag = @module.add_item(:id => assmt.id, :type => "assignment")
+        tag = @module.add_item(id: assmt.id, type: "assignment")
         expect(@course.module_items_visible_to(@student).to_a).to eq []
 
         release_content
@@ -252,7 +252,7 @@ describe ConditionalRelease::Service do
         assignment_override_model(quiz: quiz,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
                                   set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
-        tag = @module.add_item(:id => quiz.id, :type => "quiz")
+        tag = @module.add_item(id: quiz.id, type: "quiz")
         expect(@course.module_items_visible_to(@student).to_a).to eq []
 
         release_content
@@ -261,7 +261,7 @@ describe ConditionalRelease::Service do
 
       it "releases mastery paths assigned wiki pages" do
         wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
-        tag = @module.add_item(:id => @page.id, :type => "wiki_page")
+        tag = @module.add_item(id: @page.id, type: "wiki_page")
         expect(@course.module_items_visible_to(@student).to_a).to eq []
 
         release_content

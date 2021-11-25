@@ -28,14 +28,14 @@ describe QuizzesHelper do
     end
 
     it "is false if quiz not manageable" do
-      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(context: @course)
 
       allow(self).to receive(:can_publish).and_return(false)
       expect(needs_unpublished_warning?(quiz)).to be_falsey
     end
 
     it "is false if quiz is available with no unpublished changes" do
-      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = 'available'
       quiz.last_edited_at = 10.minutes.ago
       quiz.published_at   = Time.now
@@ -45,7 +45,7 @@ describe QuizzesHelper do
     end
 
     it "is true if quiz is not available" do
-      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = 'created'
 
       allow(self).to receive(:can_publish).and_return(true)
@@ -53,7 +53,7 @@ describe QuizzesHelper do
     end
 
     it "is true if quiz has unpublished changes" do
-      quiz = Quizzes::Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = 'available'
       quiz.last_edited_at = Time.now
       quiz.published_at   = 10.minutes.ago
@@ -65,14 +65,14 @@ describe QuizzesHelper do
 
   describe "#attachment_id_for" do
     it "returns the attachment id if attachment exists" do
-      question = { :id => 1 }
-      @attachments = { 1 => { :id => "11" } }
+      question = { id: 1 }
+      @attachments = { 1 => { id: "11" } }
       @stored_params = { "question_1" => ["1"] }
       expect(attachment_id_for(question)).to eq "11"
     end
 
     it "returns empty string when no attachments stored" do
-      question = { :id => 1 }
+      question = { id: 1 }
       @stored_params = {}
       @attachments = {}
       expect(attachment_id_for(question)).to eq nil
@@ -172,13 +172,13 @@ describe QuizzesHelper do
     end
 
     it 'is wrapped by a span when a CSS class, id, or style is given' do
-      expect(score_out_of_points_possible(1.5, 3, :class => "score_value")).to eq( \
+      expect(score_out_of_points_possible(1.5, 3, class: "score_value")).to eq( \
         '<span class="score_value">1.5</span> out of 3'
       )
-      expect(score_out_of_points_possible(1.5, 3, :id => "score")).to eq( \
+      expect(score_out_of_points_possible(1.5, 3, id: "score")).to eq( \
         '<span id="score">1.5</span> out of 3'
       )
-      expect(score_out_of_points_possible(1.5, 3, :style => "width:100%")).to eq( \
+      expect(score_out_of_points_possible(1.5, 3, style: "width:100%")).to eq( \
         '<span style="width:100%">1.5</span> out of 3'
       )
     end
@@ -200,9 +200,9 @@ describe QuizzesHelper do
       @answer_list = [{ blank_id: 'color', answer: 'red' }]
 
       html = fill_in_multiple_blanks_question(
-        :question => { :question_text => @question_text },
-        :answer_list => @answer_list,
-        :answers => @answers
+        question: { question_text: @question_text },
+        answer_list: @answer_list,
+        answers: @answers
       )
 
       expect(html).to eq %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />)
@@ -215,9 +215,9 @@ describe QuizzesHelper do
       }]
 
       html = fill_in_multiple_blanks_question(
-        :question => { :question_text => @question_text },
-        :answer_list => malicious_answer_list,
-        :answers => @answers
+        question: { question_text: @question_text },
+        answer_list: malicious_answer_list,
+        answers: @answers
       )
 
       expect(html).to eq %|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
@@ -226,9 +226,9 @@ describe QuizzesHelper do
 
     it 'adds an appropriate label' do
       html = fill_in_multiple_blanks_question(
-        :question => { :question_text => @question_text },
-        :answer_list => @answer_list,
-        :answers => @answers
+        question: { question_text: @question_text },
+        answer_list: @answer_list,
+        answers: @answers
       )
 
       expect(html).to match(/aria-label/)
@@ -256,8 +256,8 @@ describe QuizzesHelper do
       html = fill_in_multiple_blanks_question(
         question: { question_text: ActiveSupport::SafeBuffer.new(broken_question_text) },
         answer_list: [
-          { :blank_id => "color1", :answer => "red" },
-          { :blank_id => "color2", :answer => "black" }
+          { blank_id: "color1", answer: "red" },
+          { blank_id: "color2", answer: "black" }
         ], answers: @answers
       )
       expect(html).not_to match "{{"
@@ -313,36 +313,36 @@ describe QuizzesHelper do
 
   describe "#quiz_edit_text" do
     it "returns correct string for survey" do
-      quiz = double(:survey? => true)
+      quiz = double(survey?: true)
       expect(quiz_edit_text(quiz)).to eq "Edit Survey"
     end
 
     it "returns correct string for quiz" do
-      quiz = double(:survey? => false)
+      quiz = double(survey?: false)
       expect(quiz_edit_text(quiz)).to eq "Edit Quiz"
     end
   end
 
   describe "#quiz_delete_text" do
     it "returns correct string for survey" do
-      quiz = double(:survey? => true)
+      quiz = double(survey?: true)
       expect(quiz_delete_text(quiz)).to eq "Delete Survey"
     end
 
     it "returns correct string for quiz" do
-      quiz = double(:survey? => false)
+      quiz = double(survey?: false)
       expect(quiz_delete_text(quiz)).to eq "Delete Quiz"
     end
   end
 
   describe "#score_affected_by_regrade" do
     it "returns true if kept score differs from score before regrade" do
-      submission = double(:score_before_regrade => 5, :kept_score => 10, :score => 5)
+      submission = double(score_before_regrade: 5, kept_score: 10, score: 5)
       expect(score_affected_by_regrade?(submission)).to be_truthy
     end
 
     it "returns false if kept score equals score before regrade" do
-      submission = double(:score_before_regrade => 5, :kept_score => 5, :score => 0)
+      submission = double(score_before_regrade: 5, kept_score: 5, score: 0)
       expect(score_affected_by_regrade?(submission)).to be_falsey
     end
   end

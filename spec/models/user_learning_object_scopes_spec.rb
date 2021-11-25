@@ -21,7 +21,7 @@
 describe UserLearningObjectScopes do
   describe "assignments_visible_in_course" do
     before do
-      @teacher_enrollment = course_with_teacher(:active_course => true)
+      @teacher_enrollment = course_with_teacher(active_course: true)
       @course_section = @course.course_sections.create
       @student1 = User.create
       @student2 = User.create
@@ -29,7 +29,7 @@ describe UserLearningObjectScopes do
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
       @unpublished_assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: false)
       @unpublished_assignment.unpublish
-      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @course.enroll_student(@student2, enrollment_state: 'active')
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student1)
       create_section_override_for_assignment(@assignment, { course_section: @section })
@@ -54,8 +54,8 @@ describe UserLearningObjectScopes do
     context "as observer" do
       before do
         @observer = User.create
-        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2,
-                                                                                    :enrollment_state => 'active', :allow_multiple_enrollments => true)
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2,
+                                                                                    enrollment_state: 'active', allow_multiple_enrollments: true)
       end
 
       context "observer watching student with visibility" do
@@ -84,8 +84,8 @@ describe UserLearningObjectScopes do
 
   describe "assignments_for_student" do
     before :once do
-      course_with_student(:active_all => true)
-      assignment_quiz([], :course => @course, :user => @user)
+      course_with_student(active_all: true)
+      assignment_quiz([], course: @course, user: @user)
     end
 
     def create_assignment_with_override(opts = {})
@@ -133,7 +133,7 @@ describe UserLearningObjectScopes do
       it "includes assignments with no due date but have overrides that are due" do
         @quiz.due_at = nil
         @quiz.save!
-        section = @course.course_sections.create! :name => "Test"
+        section = @course.course_sections.create! name: "Test"
         @student = student_in_section section
         override = @quiz.assignment.assignment_overrides.build
         override.title = "Shows up in todos"
@@ -284,12 +284,12 @@ describe UserLearningObjectScopes do
       before :once do
         @u = User.create!
 
-        @c1 = course_with_student(:active_all => true, :user => @u).course
-        @q1 = assignment_quiz([], :course => @c1, :user => @user)
+        @c1 = course_with_student(active_all: true, user: @u).course
+        @q1 = assignment_quiz([], course: @c1, user: @user)
 
-        @e2 = course_with_student(:active_all => true, :user => @u)
+        @e2 = course_with_student(active_all: true, user: @u)
         @c2 = @e2.course
-        @q2 = assignment_quiz([], :course => @c2, :user => @user)
+        @q2 = assignment_quiz([], course: @c2, user: @user)
         @e2.conclude
         DueDateCacher.recompute(@q1.assignment)
         DueDateCacher.recompute(@q2.assignment)
@@ -307,9 +307,9 @@ describe UserLearningObjectScopes do
       end
 
       it "does not include assignments from soft concluded courses" do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
-        assignment_quiz([], :course => @course, :user => @user)
+        assignment_quiz([], course: @course, user: @user)
         @quiz.unlock_at = nil
         @quiz.lock_at = nil
         @quiz.due_at = 3.days.from_now
@@ -355,8 +355,8 @@ describe UserLearningObjectScopes do
     end
 
     it "always has the only_visible_to_overrides attribute" do
-      course_with_student(:active_all => true)
-      assignment_quiz([], :course => @course, :user => @user)
+      course_with_student(active_all: true)
+      assignment_quiz([], course: @course, user: @user)
       @quiz.unlock_at = nil
       @quiz.lock_at = nil
       @quiz.due_at = 2.days.from_now
@@ -369,7 +369,7 @@ describe UserLearningObjectScopes do
 
   describe "assignments_needing_submitting" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
     end
 
     it "excludes assignments with due dates in the past" do
@@ -394,7 +394,7 @@ describe UserLearningObjectScopes do
 
   describe "#submitted_assignments" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
     end
 
     it "excludes assignments that don't have a submission" do
@@ -406,7 +406,7 @@ describe UserLearningObjectScopes do
 
   describe "ungraded_quizzes" do
     before(:once) do
-      course_with_student :active_all => true
+      course_with_student active_all: true
       @quiz = @course.quizzes.create!(title: "some quiz", quiz_type: "survey", due_at: 1.day.from_now)
       @quiz.publish!
     end
@@ -510,7 +510,7 @@ describe UserLearningObjectScopes do
       specs_require_sharding
       it "includes quizzes from other shards" do
         other_user = @shard1.activate { user_factory }
-        student_in_course course: @course, user: other_user, :active_all => true
+        student_in_course course: @course, user: other_user, active_all: true
         expect(other_user.ungraded_quizzes(needing_submitting: true)).to include @quiz
       end
     end
@@ -523,9 +523,9 @@ describe UserLearningObjectScopes do
 
       add_section("section1")
       @course.enroll_user(@reviewer, 'StudentEnrollment',
-                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          section: @course_section, enrollment_state: 'active', allow_multiple_enrollments: true)
       @course.enroll_user(@reviewee, 'StudentEnrollment',
-                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          section: @course_section, enrollment_state: 'active', allow_multiple_enrollments: true)
 
       assignment_model(course: @course, peer_reviews: true)
 
@@ -554,7 +554,7 @@ describe UserLearningObjectScopes do
       # have nothing to do.
       add_section("section2")
       @course.enroll_user(@reviewer, 'StudentEnrollment',
-                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          section: @course_section, enrollment_state: 'active', allow_multiple_enrollments: true)
       override = @assignment.assignment_overrides.build
       override.set = @course_section
       override.save!
@@ -567,27 +567,27 @@ describe UserLearningObjectScopes do
   context "assignments_needing_grading" do
     before :once do
       # create courses and sections
-      @course1 = course_with_teacher(:active_all => true).course
-      @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
-      @section1b = @course1.course_sections.create!(:name => 'section B')
-      @section2b = @course2.course_sections.create!(:name => 'section B')
+      @course1 = course_with_teacher(active_all: true).course
+      @course2 = course_with_teacher(active_all: true, user: @teacher).course
+      @section1b = @course1.course_sections.create!(name: 'section B')
+      @section2b = @course2.course_sections.create!(name: 'section B')
 
       # put a student in each section
-      @student_a = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
-      @student_b = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
+      @student_a = user_with_pseudonym(active_all: true, name: 'StudentA', username: 'studentA@instructure.com')
+      @student_b = user_with_pseudonym(active_all: true, name: 'StudentB', username: 'studentB@instructure.com')
       @course1.enroll_student(@student_a).update_attribute(:workflow_state, 'active')
       @section1b.enroll_user(@student_b, 'StudentEnrollment', 'active')
       @course2.enroll_student(@student_a).update_attribute(:workflow_state, 'active')
       @section2b.enroll_user(@student_b, 'StudentEnrollment', 'active')
 
       # set up a TA, section-limited in one course and not the other
-      @ta = user_with_pseudonym(:active_all => true, :name => 'TA', :username => 'ta@instructure.com')
-      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-      @course2.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => false)
+      @ta = user_with_pseudonym(active_all: true, name: 'TA', username: 'ta@instructure.com')
+      @course1.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active', limit_privileges_to_course_section: true)
+      @course2.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active', limit_privileges_to_course_section: false)
 
       # make some assignments and submissions
       [@course1, @course2].each do |course|
-        assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+        assignment = course.assignments.create!(title: "some assignment", submission_types: ['online_text_entry'])
         [@student_a, @student_b].each do |student|
           assignment.submit_homework student, body: "submission for #{student.name}"
         end
@@ -629,7 +629,7 @@ describe UserLearningObjectScopes do
       @course1.assignments.first.grade_student(@student_a, grade: "1", grader: @teacher)
       @course1.assignments.first.grade_student(@student_b, grade: '1', grader: @teacher)
       expect(@teacher.assignments_needing_grading.size).to eq 1
-      @course1.assignments.first.submit_homework(@student_a, :body => "Changed my mind!")
+      @course1.assignments.first.submit_homework(@student_a, body: "Changed my mind!")
       expect(@teacher.assignments_needing_grading.size).to eq 2
       expect(@teacher.assignments_needing_grading).to include @course1.assignments.first
     end
@@ -649,8 +649,8 @@ describe UserLearningObjectScopes do
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
-      @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
-                                                :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+      @course1.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active', section: @section1b,
+                                                allow_multiple_enrollments: true, limit_privileges_to_course_section: true)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2
@@ -719,7 +719,7 @@ describe UserLearningObjectScopes do
           @course3.enroll_teacher(@teacher).accept!
           @course3.enroll_student(@student_a).accept!
           @course3.enroll_student(@student_b).accept!
-          @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+          @assignment3 = @course3.assignments.create!(title: "some assignment", submission_types: ['online_text_entry'])
           @assignment3.submit_homework @student_a, body: "submission for A"
         end
       end
@@ -741,14 +741,14 @@ describe UserLearningObjectScopes do
         )
 
         @shard1.activate do
-          @assignment3.submit_homework @student_b, :submission_type => "online_text_entry", :body => "submission for B"
+          @assignment3.submit_homework @student_b, submission_type: "online_text_entry", body: "submission for B"
         end
         @teacher = User.find(@teacher.id)
         expect(@teacher.assignments_needing_grading.size).to eq 3
       end
 
       it "applies a global limit" do
-        expect(@teacher.assignments_needing_grading(:limit => 1).length).to eq 1
+        expect(@teacher.assignments_needing_grading(limit: 1).length).to eq 1
       end
 
       it 'does not fail with the dynamic setting turned off' do
@@ -764,7 +764,7 @@ describe UserLearningObjectScopes do
 
     context "differentiated assignments" do
       before :once do
-        @a2 = @course1.assignments.create!(:title => "some assignment 2", :submission_types => ['online_text_entry'])
+        @a2 = @course1.assignments.create!(title: "some assignment 2", submission_types: ['online_text_entry'])
         [@student_a, @student_b].each do |student|
           @a2.submit_homework student, body: "submission for #{student.name}"
         end
@@ -827,14 +827,14 @@ describe UserLearningObjectScopes do
   context "#assignments_needing_moderation" do
     before :once do
       # create courses and sections
-      @course1 = course_with_teacher(:active_all => true).course
-      @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
-      @section1b = @course1.course_sections.create!(:name => 'section B')
-      @section2b = @course2.course_sections.create!(:name => 'section B')
+      @course1 = course_with_teacher(active_all: true).course
+      @course2 = course_with_teacher(active_all: true, user: @teacher).course
+      @section1b = @course1.course_sections.create!(name: 'section B')
+      @section2b = @course2.course_sections.create!(name: 'section B')
 
       # put a student in each section
-      @student_a = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
-      @student_b = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
+      @student_a = user_with_pseudonym(active_all: true, name: 'StudentA', username: 'studentA@instructure.com')
+      @student_b = user_with_pseudonym(active_all: true, name: 'StudentB', username: 'studentB@instructure.com')
       @course1.enroll_student(@student_a).update_attribute(:workflow_state, 'active')
       @section1b.enroll_user(@student_b, 'StudentEnrollment', 'active')
       @course2.enroll_student(@student_a).update_attribute(:workflow_state, 'active')
@@ -895,8 +895,8 @@ describe UserLearningObjectScopes do
 
     it "does not give a count for non-moderators" do
       assmt = @course2.assignments.first
-      assmt.grade_student(@student_a, :grade => "1", :grader => @teacher, :provisional => true)
-      ta = ta_in_course(:course => @course, :active_all => true).user
+      assmt.grade_student(@student_a, grade: "1", grader: @teacher, provisional: true)
+      ta = ta_in_course(course: @course, active_all: true).user
       expect(ta.assignments_needing_moderation.length).to eq 0
     end
   end
@@ -998,15 +998,15 @@ describe UserLearningObjectScopes do
         before :once do
           @u = User.create!
 
-          @c1 = course_with_student(:active_all => true, :user => @u).course
-          @dt1 = discussion_topic_model(:context => @c1)
+          @c1 = course_with_student(active_all: true, user: @u).course
+          @dt1 = discussion_topic_model(context: @c1)
           @dt1.todo_date = Time.zone.now
           @dt1.save!
           @dt1.publish!
 
-          @e2 = course_with_student(:active_all => true, :user => @u)
+          @e2 = course_with_student(active_all: true, user: @u)
           @c2 = @e2.course
-          @dt2 = discussion_topic_model(:context => @c2)
+          @dt2 = discussion_topic_model(context: @c2)
           @dt2.todo_date = Time.zone.now
           @dt2.save!
           @dt2.publish!
@@ -1202,14 +1202,14 @@ describe UserLearningObjectScopes do
       before :once do
         @u = User.create!
 
-        @c1 = course_with_student(:active_all => true, :user => @u).course
-        @wp1 = wiki_page_model(:course => @c1)
+        @c1 = course_with_student(active_all: true, user: @u).course
+        @wp1 = wiki_page_model(course: @c1)
         @wp1.todo_date = Time.zone.now
         @wp1.save!
 
-        @e2 = course_with_student(:active_all => true, :user => @u)
+        @e2 = course_with_student(active_all: true, user: @u)
         @c2 = @e2.course
-        @wp2 = wiki_page_model(:course => @c2)
+        @wp2 = wiki_page_model(course: @c2)
         @wp2.todo_date = Time.zone.now
         @wp2.save!
         @e2.conclude

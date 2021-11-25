@@ -95,14 +95,14 @@ describe ObserverEnrollment do
 
   context "notifications" do
     it "doesn't send enrollment notifications if already registered" do
-      Notification.create!(:name => "Enrollment Notification")
-      user_with_pseudonym(:active_all => true)
+      Notification.create!(name: "Enrollment Notification")
+      user_with_pseudonym(active_all: true)
       e = @course1.enroll_user(@user, 'ObserverEnrollment')
       expect(e.messages_sent).to be_empty
     end
 
     it "does send enrollment notifications if not already registered" do
-      Notification.create!(:name => "Enrollment Registration")
+      Notification.create!(name: "Enrollment Registration")
       user_with_pseudonym
       e = @course1.enroll_user(@user, 'ObserverEnrollment')
       expect(e.messages_sent).to_not be_empty

@@ -25,11 +25,11 @@ describe 'appointment_canceled_by_user.sms' do
 
   it "renders" do
     user = user_model
-    appointment_participant_model(:participant => user)
+    appointment_participant_model(participant: user)
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
-                     :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because" })
+                     data: { updating_user_name: user.name,
+                             cancel_reason: "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
@@ -39,14 +39,14 @@ describe 'appointment_canceled_by_user.sms' do
     user = user_model
     @course = course_model
     cat = group_category
-    @group = cat.groups.create(:context => @course)
+    @group = cat.groups.create(context: @course)
     @group.users << user
-    appointment_participant_model(:participant => @group, :course => @course)
+    appointment_participant_model(participant: @group, course: @course)
     @event.cancel_reason = 'just because'
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
-                     :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because" })
+                     data: { updating_user_name: user.name,
+                             cancel_reason: "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)

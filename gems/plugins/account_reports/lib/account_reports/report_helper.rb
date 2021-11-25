@@ -119,7 +119,7 @@ module AccountReports::ReportHelper
 
   def add_term_scope(scope, table = 'courses')
     if term
-      scope.where(table => { :enrollment_term_id => term })
+      scope.where(table => { enrollment_term_id: term })
     else
       scope
     end
@@ -127,7 +127,7 @@ module AccountReports::ReportHelper
 
   def add_course_scope(scope, table = 'courses')
     if course
-      scope.where(table => { :id => course.id })
+      scope.where(table => { id: course.id })
     else
       scope
     end
@@ -149,7 +149,7 @@ module AccountReports::ReportHelper
 
   def add_course_enrollments_scope(scope, table = 'enrollments')
     if course
-      scope.where(table => { :course_id => course })
+      scope.where(table => { course_id: course })
     else
       scope
     end
@@ -178,7 +178,7 @@ module AccountReports::ReportHelper
 
   def extra_text_term(account_report = @account_report)
     account_report.parameters ||= {}
-    add_extra_text(I18n.t('account_reports.default.extra_text_term', "Term: %{term_name};", :term_name => term_name))
+    add_extra_text(I18n.t('account_reports.default.extra_text_term', "Term: %{term_name};", term_name: term_name))
   end
 
   def check_report_key(key)
@@ -188,27 +188,27 @@ module AccountReports::ReportHelper
   def report_extra_text
     if check_report_key(:enrollment_term_id)
       add_extra_text(I18n.t('account_reports.default.term_text', "Term: %{term_name};",
-                            :term_name => term_name))
+                            term_name: term_name))
     end
 
     if start_at && check_report_key(:start_at)
       add_extra_text(I18n.t('account_reports.default.start_text',
-                            "Start At: %{start_at};", :start_at => default_timezone_format(start_at)))
+                            "Start At: %{start_at};", start_at: default_timezone_format(start_at)))
     end
 
     if end_at && check_report_key(:end_at)
       add_extra_text(I18n.t('account_reports.default.end_text',
-                            "End At: %{end_at};", :end_at => default_timezone_format(end_at)))
+                            "End At: %{end_at};", end_at: default_timezone_format(end_at)))
     end
 
     if course && check_report_key(:course_id)
       add_extra_text(I18n.t('account_reports.default.course_text',
-                            "For Course: %{course};", :course => course.id))
+                            "For Course: %{course};", course: course.id))
     end
 
     if section && check_report_key(:section_id)
       add_extra_text(I18n.t('account_reports.default.section_text',
-                            "For Section: %{section};", :section => section.id))
+                            "For Section: %{section};", section: section.id))
     end
   end
 
@@ -296,7 +296,7 @@ module AccountReports::ReportHelper
       I18n.t(
         'account_reports.default.message',
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
-        :type => type, :account => account.name, :options => options
+        type: type, account: account.name, options: options
       ),
       file
     )

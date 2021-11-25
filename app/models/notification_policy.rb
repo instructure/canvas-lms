@@ -21,7 +21,7 @@
 class NotificationPolicy < ActiveRecord::Base
   include NotificationPreloader
   belongs_to :communication_channel
-  has_many :delayed_messages, inverse_of: :notification_policy, :dependent => :destroy
+  has_many :delayed_messages, inverse_of: :notification_policy, dependent: :destroy
 
   validates :communication_channel_id, :frequency, presence: true
   validates :frequency, inclusion: { in: [Notification::FREQ_IMMEDIATELY,
@@ -38,15 +38,15 @@ class NotificationPolicy < ActiveRecord::Base
       joins(:communication_channel)
         .where("communication_channels.user_id=? AND communication_channels.workflow_state<>'retired'", context)
     when Notification
-      where(:notification_id => context)
+      where(notification_id: context)
     else
       all
     end
   }
 
-  scope :by_frequency, ->(freq) { where(:frequency => Array(freq).map(&:to_s)) }
+  scope :by_frequency, ->(freq) { where(frequency: Array(freq).map(&:to_s)) }
 
-  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
+  scope :in_state, ->(state) { where(workflow_state: state.to_s) }
 
   def self.setup_for(user, params)
     # Check for user preference settings first. Some communication related options are available on the page.

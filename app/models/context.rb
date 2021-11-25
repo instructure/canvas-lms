@@ -67,24 +67,24 @@ module Context
       # If already existed and has been updated
       if entry.entry_changed? && entry.asset
         entry.asset.update(
-          :title => entry.title,
-          :message => entry.message
+          title: entry.title,
+          message: entry.message
         )
       elsif !entry.asset
         announcement = announcements.build(
-          :title => entry.title,
-          :message => entry.message
+          title: entry.title,
+          message: entry.message
         )
         announcement.external_feed_id = feed.id
         announcement.user = user
         announcement.save
-        entry.update(:asset => announcement)
+        entry.update(asset: announcement)
       end
     end
   end
 
   def self.sorted_rubrics(context)
-    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
+    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(rubric: :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
   end
 
@@ -107,9 +107,9 @@ module Context
     associations = associations.select(&:rubric).uniq { |a| [a.rubric_id, a.context.asset_string] }
     contexts = associations.group_by { |a| a.context.asset_string }.map do |code, code_associations|
       {
-        :rubrics => code_associations.length,
-        :context_code => code,
-        :name => code_associations.first.context_name
+        rubrics: code_associations.length,
+        context_code: code,
+        name: code_associations.first.context_name
       }
     end
     Canvas::ICU.collate_by(contexts) { |r| r[:name] }
@@ -189,7 +189,7 @@ module Context
     result = {}
     ids_by_type.each do |type, ids|
       klass = Object.const_get(type, false)
-      klass.where(:id => ids).pluck(:id, :name).map { |id, name| result[[type, id]] = name }
+      klass.where(id: ids).pluck(:id, :name).map { |id, name| result[[type, id]] = name }
     end
     result
   end
@@ -253,7 +253,7 @@ module Context
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
 
-    media_obj = MediaObject.where(:media_id => params[:media_object_id]).first if params[:media_object_id]
+    media_obj = MediaObject.where(media_id: params[:media_object_id]).first if params[:media_object_id]
     context = media_obj.context if media_obj
 
     return nil unless context

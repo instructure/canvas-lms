@@ -89,7 +89,7 @@ module BookmarkedCollection
             col_name = col_name.to_s
             @columns << col_name
             @column_definitions[col_name] = validate_definition(
-              existing_column_definition(col_name).merge(definition).merge(:custom => true)
+              existing_column_definition(col_name).merge(definition).merge(custom: true)
             )
           end
         else
@@ -122,7 +122,7 @@ module BookmarkedCollection
 
     def existing_column_definition(col_name)
       col = @model.columns_hash[col_name]
-      col ? { :type => col.type, :null => col.null } : {}
+      col ? { type: col.type, null: col.null } : {}
     end
 
     def validate_definition(definition)

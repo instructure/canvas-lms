@@ -19,7 +19,7 @@
 #
 
 class StudentEnrollment < Enrollment
-  belongs_to :student, :foreign_key => :user_id, :class_name => 'User'
+  belongs_to :student, foreign_key: :user_id, class_name: 'User'
   after_save :evaluate_modules, if: proc { |e|
     # if enrollment switches sections or is created
     e.saved_change_to_course_section_id? || e.saved_change_to_course_id? ||
@@ -38,7 +38,7 @@ class StudentEnrollment < Enrollment
     ContextModuleProgression.for_user(user_id)
                             .joins(:context_module)
                             .readonly(false)
-                            .where(:context_modules => { :context_type => 'Course', :context_id => course_id })
+                            .where(context_modules: { context_type: 'Course', context_id: course_id })
                             .each(&:mark_as_outdated!)
   end
 

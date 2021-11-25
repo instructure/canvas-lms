@@ -43,7 +43,7 @@ module Assignments
 
     attr_reader :assignment, :user, :course_proxy
 
-    delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
+    delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, to: :course_proxy
 
     def initialize(assignment, user = nil, course_proxy = nil)
       @assignment = assignment

@@ -54,19 +54,19 @@ describe "Respondus SOAP API", type: :request do
 
   before do
     setting = PluginSetting.where(name: 'qti_converter').new
-    setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({ :enabled => 'true' })
+    setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({ enabled: 'true' })
     setting.save!
     setting = PluginSetting.where(name: 'respondus_soap_endpoint').new
-    setting.settings = { :enabled => 'true' }
+    setting.settings = { enabled: 'true' }
     setting.save!
-    user_with_pseudonym :active_user => true,
-                        :username => "nobody@example.com",
-                        :password => "asdfasdf"
+    user_with_pseudonym active_user: true,
+                        username: "nobody@example.com",
+                        password: "asdfasdf"
     @user.save!
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     @course.enroll_teacher(@user).accept
-    @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
-    @question_bank = AssessmentQuestionBank.create!(:title => 'questionbank1', :context => @course)
+    @quiz = Quizzes::Quiz.create!(title: 'quiz1', context: @course)
+    @question_bank = AssessmentQuestionBank.create!(title: 'questionbank1', context: @course)
   end
 
   it "identifies the server without user credentials" do
@@ -119,7 +119,7 @@ Implemented for: Canvas LMS)
 
   describe "delegated auth" do
     before do
-      @account = account_with_cas(:account => Account.default)
+      @account = account_with_cas(account: Account.default)
     end
 
     it "errors if token is required" do
@@ -134,7 +134,7 @@ Implemented for: Canvas LMS)
       uname = 'oauth_access_token'
       # we already test the oauth flow in spec/apis/oauth_spec, so shortcut here
       @key = DeveloperKey.create!
-      @token = AccessToken.create!(:user => @user, :developer_key => @key)
+      @token = AccessToken.create!(user: @user, developer_key: @key)
       soap_response = soap_request('ValidateAuth',
                                    uname, @token.full_token,
                                    '',
@@ -168,9 +168,9 @@ Implemented for: Canvas LMS)
   end
 
   it "rejects a session created for a different user" do
-    user2 = user_with_pseudonym :active_user => true,
-                                :username => "nobody2@example.com",
-                                :password => "test1234"
+    user2 = user_with_pseudonym active_user: true,
+                                username: "nobody2@example.com",
+                                password: "test1234"
     user2.save!
 
     status, _details, context = soap_request('ValidateAuth',

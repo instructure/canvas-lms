@@ -78,7 +78,7 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a student" do
       before :once do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
       end
 
       it "is unauthorized if there are no open sessions" do
@@ -125,7 +125,7 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a student" do
       before :once do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
       end
 
       it "is unauthorized if there are no existing sessions" do
@@ -196,7 +196,7 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         post_create({ text: 'Poll Choice 1' }, true)
         expect(response.code).to eq '401'
       end
@@ -237,7 +237,7 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         put_update({ text: 'New Text' }, true)
         expect(response.code).to eq '401'
       end
@@ -270,7 +270,7 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         delete_destroy
 
         expect(response.code).to eq '401'

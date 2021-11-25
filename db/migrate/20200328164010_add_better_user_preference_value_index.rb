@@ -5,7 +5,7 @@ class AddBetterUserPreferenceValueIndex < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    UserPreferenceValue.where(:value => UserPreferenceValue::EXTERNAL).delete_all
+    UserPreferenceValue.where(value: UserPreferenceValue::EXTERNAL).delete_all
 
     DataFixup::DeleteDuplicateRows.run(UserPreferenceValue.where(sub_key: nil), :user_id, :key)
 

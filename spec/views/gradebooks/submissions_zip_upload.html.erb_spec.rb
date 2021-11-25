@@ -25,7 +25,7 @@ describe "/gradebooks/submissions_zip_upload", type: :view do
     course_with_student
     view_context
     assign(:students, [@user])
-    assign(:assignment, @course.assignments.create!(:title => "some assignment"))
+    assign(:assignment, @course.assignments.create!(title: "some assignment"))
     assign(:comments, [])
     assign(:failures, [])
   end

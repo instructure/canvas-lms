@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 
 describe PseudonymsController, type: :request do
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     account_admin_user
     @account = @user.account
   end
@@ -30,15 +30,15 @@ describe PseudonymsController, type: :request do
   describe "pseudonym listing" do
     before do
       @account_path = "/api/v1/accounts/#{@account.id}/logins"
-      @account_path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :account_id => @account.id.to_param }
+      @account_path_options = { controller: 'pseudonyms', action: 'index', format: 'json', account_id: @account.id.to_param }
       @user_path = "/api/v1/users/#{@student.id}/logins"
-      @user_path_options = { :controller => 'pseudonyms', :action => 'index', :format => 'json', :user_id => @student.id.to_param }
+      @user_path_options = { controller: 'pseudonyms', action: 'index', format: 'json', user_id: @student.id.to_param }
     end
 
     context "An authorized user with a valid query" do
       it "returns a list of pseudonyms" do
         json = api_call(:get, @account_path, @account_path_options, {
-                          :user => { :id => @student.id }
+                          user: { id: @student.id }
                         })
         expect(json).to eq(@student.pseudonyms.map do |p|
           {
@@ -55,17 +55,17 @@ describe PseudonymsController, type: :request do
       end
 
       it "returns multiple pseudonyms if they exist" do
-        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(unique_id: id) }
         json = api_call(:get, @account_path, @account_path_options, {
-                          :user => { :id => @student.id }
+                          user: { id: @student.id }
                         })
         expect(json.count).to eql 2
       end
 
       it "paginates results" do
-        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
-        json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ :per_page => '1' }), {
-                          :user => { :id => @student.id }
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(unique_id: id) }
+        json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ per_page: '1' }), {
+                          user: { id: @student.id }
                         })
         expect(json.count).to eql 1
         headers = response.headers['Link'].split(',')
@@ -76,17 +76,17 @@ describe PseudonymsController, type: :request do
       end
 
       it "returns all pseudonyms for a user" do
-        new_account = Account.create!(:name => 'Extra Account')
-        @student.pseudonyms.create!(:unique_id => 'one@example.com', :account => Account.default)
-        @student.pseudonyms.create!(:unique_id => 'two@example.com', :account => new_account)
+        new_account = Account.create!(name: 'Extra Account')
+        @student.pseudonyms.create!(unique_id: 'one@example.com', account: Account.default)
+        @student.pseudonyms.create!(unique_id: 'two@example.com', account: new_account)
 
         json = api_call(:get, @user_path, @user_path_options)
         expect(json.count).to eql 2
       end
 
       it "does not included deleted pseudonyms" do
-        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(:unique_id => id) }
-        to_delete = @student.pseudonyms.create!(:unique_id => "to-delete@example.com")
+        %w[one@example.com two@example.com].each { |id| @student.pseudonyms.create!(unique_id: id) }
+        to_delete = @student.pseudonyms.create!(unique_id: "to-delete@example.com")
         to_delete.destroy
 
         json = api_call(:get, @user_path, @user_path_options)
@@ -95,7 +95,7 @@ describe PseudonymsController, type: :request do
       end
 
       it "includes suspended pseudonyms" do
-        to_suspend = @student.pseudonyms.create!(:unique_id => "to-delete@example.com")
+        to_suspend = @student.pseudonyms.create!(unique_id: "to-delete@example.com")
         to_suspend.update!(workflow_state: 'suspended')
 
         json = api_call(:get, @user_path, @user_path_options)
@@ -108,7 +108,7 @@ describe PseudonymsController, type: :request do
     context "An authorized user with an empty query" do
       it "returns an empty array" do
         json = api_call(:get, @account_path, @account_path_options, {
-                          :user => { :id => @student.id }
+                          user: { id: @student.id }
                         })
         expect(json).to be_empty
       end
@@ -121,7 +121,7 @@ describe PseudonymsController, type: :request do
 
       it "returns 401 unauthorized when listing account pseudonyms" do
         raw_api_call(:get, @account_path, @account_path_options, {
-                       :user => { :id => @student.id }
+                       user: { id: @student.id }
                      })
         expect(response.code).to eql '401'
       end
@@ -136,18 +136,18 @@ describe PseudonymsController, type: :request do
   describe "pseudonym creation" do
     before do
       @path = "/api/v1/accounts/#{@account.id}/logins"
-      @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @account.id.to_param }
+      @path_options = { controller: 'pseudonyms', action: 'create', format: 'json', account_id: @account.id.to_param }
     end
 
     context "an authorized user" do
       it "creates a new pseudonym" do
         json = api_call(:post, @path, @path_options, {
-                          :user => { :id => @student.id },
-                          :login => {
-                            :password => 'abcd1234',
-                            :sis_user_id => '12345',
-                            :unique_id => 'test@example.com',
-                            :declared_user_type => 'teacher',
+                          user: { id: @student.id },
+                          login: {
+                            password: 'abcd1234',
+                            sis_user_id: '12345',
+                            unique_id: 'test@example.com',
+                            declared_user_type: 'teacher',
                           }
                         })
         expect(json).to eq({
@@ -165,28 +165,28 @@ describe PseudonymsController, type: :request do
       end
 
       it "returns 400 if account_id is not a root account" do
-        @subaccount = Account.create!(:parent_account => @account)
+        @subaccount = Account.create!(parent_account: @account)
         @path = "/api/v1/accounts/#{@subaccount.id}/logins"
-        @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @subaccount.id.to_param }
+        @path_options = { controller: 'pseudonyms', action: 'create', format: 'json', account_id: @subaccount.id.to_param }
         raw_api_call(:post, @path, @path_options, {
-                       :user => { :id => @student.id },
-                       :login => {
-                         :password => 'abcd1234',
-                         :sis_user_id => '12345',
-                         :unique_id => 'duplicate@example.com'
+                       user: { id: @student.id },
+                       login: {
+                         password: 'abcd1234',
+                         sis_user_id: '12345',
+                         unique_id: 'duplicate@example.com'
                        }
                      })
         expect(response.code).to eql '400'
       end
 
       it "returns 400 on duplicate pseudonyms" do
-        @student.pseudonyms.create(:unique_id => 'duplicate@example.com')
+        @student.pseudonyms.create(unique_id: 'duplicate@example.com')
         raw_api_call(:post, @path, @path_options, {
-                       :user => { :id => @student.id },
-                       :login => {
-                         :password => 'abcd1234',
-                         :sis_user_id => '12345',
-                         :unique_id => 'duplicate@example.com'
+                       user: { id: @student.id },
+                       login: {
+                         password: 'abcd1234',
+                         sis_user_id: '12345',
+                         unique_id: 'duplicate@example.com'
                        }
                      })
         expect(response.code).to eql '400'
@@ -215,11 +215,11 @@ describe PseudonymsController, type: :request do
       it "returns 401" do
         @user = @student
         raw_api_call(:post, @path, @path_options, {
-                       :user => { :id => @admin.id },
-                       :login => {
-                         :password => 'abcd1234',
-                         :sis_user_id => '12345',
-                         :unique_id => 'test@example.com'
+                       user: { id: @admin.id },
+                       login: {
+                         password: 'abcd1234',
+                         sis_user_id: '12345',
+                         unique_id: 'test@example.com'
                        }
                      })
         expect(response.code).to eql '401'
@@ -239,9 +239,9 @@ describe PseudonymsController, type: :request do
 
   describe "pseudonym updates" do
     before :once do
-      @student.pseudonyms.create!(:unique_id => 'student@example.com')
-      @admin.pseudonyms.create!(:unique_id => 'admin@example.com')
-      @teacher.pseudonyms.create!(:unique_id => 'teacher@example.com')
+      @student.pseudonyms.create!(unique_id: 'student@example.com')
+      @admin.pseudonyms.create!(unique_id: 'admin@example.com')
+      @teacher.pseudonyms.create!(unique_id: 'teacher@example.com')
       @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
       @path_options = {
         controller: 'pseudonyms',
@@ -259,11 +259,11 @@ describe PseudonymsController, type: :request do
     context "an authorized user" do
       it "is able to update a pseudonym" do
         json = api_call(:put, @path, @path_options, {
-                          :login => {
-                            :unique_id => 'student+new@example.com',
-                            :password => 'password123',
-                            :sis_user_id => 'new-12345',
-                            :declared_user_type => 'teacher',
+                          login: {
+                            unique_id: 'student+new@example.com',
+                            password: 'password123',
+                            sis_user_id: 'new-12345',
+                            declared_user_type: 'teacher',
                           }
                         })
         expect(json).to eq({
@@ -304,8 +304,8 @@ describe PseudonymsController, type: :request do
 
       it "returns 400 if the unique_id already exists" do
         raw_api_call(:put, @path, @path_options, {
-                       :login => {
-                         :unique_id => 'teacher@example.com'
+                       login: {
+                         unique_id: 'teacher@example.com'
                        }
                      })
         expect(response.code).to eql '400'
@@ -319,14 +319,14 @@ describe PseudonymsController, type: :request do
       it "returns 200 if a user's sis id is updated to its current value" do
         @student.pseudonym.update_attribute(:sis_user_id, 'old-12345')
         json = api_call(:put, @path, @path_options, {
-                          :login => { :sis_user_id => 'old-12345' }
+                          login: { sis_user_id: 'old-12345' }
                         })
         expect(json['sis_user_id']).to eql 'old-12345'
       end
 
       it "returns 200 if changing only sis id" do
         json = api_call(:put, @path, @path_options, {
-                          :login => { :sis_user_id => 'old-12345' }
+                          login: { sis_user_id: 'old-12345' }
                         })
         expect(json['sis_user_id']).to eql 'old-12345'
       end
@@ -336,7 +336,7 @@ describe PseudonymsController, type: :request do
         a.settings[:admins_can_change_passwords] = true
         a.save!
         json = api_call(:put, @path, @path_options, {
-                          :login => { :sis_user_id => 'old-12345' }
+                          login: { sis_user_id: 'old-12345' }
                         })
         expect(json['sis_user_id']).to eql 'old-12345'
       end
@@ -387,12 +387,12 @@ describe PseudonymsController, type: :request do
 
       it "does not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
-        @student.pseudonyms.create!(:unique_id => 'other@example.com')
+        @student.pseudonyms.create!(unique_id: 'other@example.com')
         to_delete.destroy
 
         raw_api_call(:put, @path, @path_options, {
-                       :login => {
-                         :unique_id => 'changed@example.com'
+                       login: {
+                         unique_id: 'changed@example.com'
                        }
                      })
         expect(response.code).to eql '404'
@@ -403,8 +403,8 @@ describe PseudonymsController, type: :request do
       it "returns 401" do
         @path = "/api/v1/accounts/#{@account.id}/logins/#{@teacher.pseudonym.id}"
         @user = @student
-        raw_api_call(:put, @path, @path_options.merge({ :id => @teacher.pseudonym.id.to_param }), {
-                       :login => { :unique_id => 'teacher+new@example.com' }
+        raw_api_call(:put, @path, @path_options.merge({ id: @teacher.pseudonym.id.to_param }), {
+                       login: { unique_id: 'teacher+new@example.com' }
                      })
         expect(response.code).to eql '401'
       end
@@ -426,17 +426,17 @@ describe PseudonymsController, type: :request do
 
   describe "pseudonym deletion" do
     before :once do
-      @student.pseudonyms.create!(:unique_id => 'student@example.com')
+      @student.pseudonyms.create!(unique_id: 'student@example.com')
       @path = "/api/v1/users/#{@student.id}/logins/#{@student.pseudonym.id}"
-      @path_options = { :controller => 'pseudonyms',
-                        :action => 'destroy', :format => 'json',
-                        :user_id => @student.id.to_param, :id => @student.pseudonym.id.to_param }
+      @path_options = { controller: 'pseudonyms',
+                        action: 'destroy', format: 'json',
+                        user_id: @student.id.to_param, id: @student.pseudonym.id.to_param }
     end
 
     context "an authorized user" do
       it "is able to delete a pseudonym" do
         pseudonym = @student.pseudonym
-        @student.pseudonyms.create!(:unique_id => 'student1@example.com')
+        @student.pseudonyms.create!(unique_id: 'student1@example.com')
         json = api_call(:delete, @path, @path_options)
         expect(@student.pseudonyms.active.count).to eql 1
         expect(json).to eq({
@@ -467,7 +467,7 @@ describe PseudonymsController, type: :request do
 
       it "does not allow re-deleting a login that has already been deleted" do
         to_delete = @student.pseudonyms.first
-        @student.pseudonyms.create!(:unique_id => 'other@example.com')
+        @student.pseudonyms.create!(unique_id: 'other@example.com')
         to_delete.destroy
 
         raw_api_call(:delete, @path, @path_options)

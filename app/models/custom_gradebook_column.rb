@@ -20,7 +20,7 @@
 
 class CustomGradebookColumn < ActiveRecord::Base
   include Workflow
-  acts_as_list :scope => :course_id
+  acts_as_list scope: :course_id
 
   belongs_to :course
   has_many :custom_gradebook_column_data
@@ -33,7 +33,7 @@ class CustomGradebookColumn < ActiveRecord::Base
                       in: GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES,
                       message: "cannot use gradebook importer reserved names"
                     },
-                    :allow_nil => true
+                    allow_nil: true
 
   before_create :set_root_account_id
 

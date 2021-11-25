@@ -20,7 +20,7 @@
 module CollaborationsSpecsCommon
   def ensure_plugin(type)
     type = 'google_drive' if type == 'google_docs'
-    PluginSetting.create!(:name => type, :settings => {})
+    PluginSetting.create!(name: type, settings: {})
   end
 
   def new_collaborations_form(type)
@@ -72,7 +72,7 @@ module CollaborationsSpecsCommon
   def display_available_collaborators(type)
     ensure_plugin(type)
 
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
@@ -83,7 +83,7 @@ module CollaborationsSpecsCommon
   def select_collaborators(type)
     ensure_plugin(type)
 
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
@@ -95,7 +95,7 @@ module CollaborationsSpecsCommon
   end
 
   def select_from_all_course_groups(type, title)
-    group_model(:context => @course, :name => "grup grup")
+    group_model(context: @course, name: "grup grup")
 
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
@@ -115,14 +115,14 @@ module CollaborationsSpecsCommon
       submit_form('.edit_collaboration')
     end
     @collaboration.reload
-    collaborator = @collaboration.collaborators.where(:group_id => @group).first
+    collaborator = @collaboration.collaborators.where(group_id: @group).first
     expect(collaborator).to_not be_blank
   end
 
   def deselect_collaborators(type)
     ensure_plugin(type)
 
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
@@ -189,12 +189,12 @@ module CollaborationsSpecsCommon
 
     @collaboration1 = Collaboration.typed_collaboration_instance(title)
     @collaboration1.context = @course
-    @collaboration1.attributes = { :title => "My Collab 1" }
+    @collaboration1.attributes = { title: "My Collab 1" }
     @collaboration1.user = @user
     @collaboration1.save!
     @collaboration2 = Collaboration.typed_collaboration_instance(title)
     @collaboration2.context = @course
-    @collaboration2.attributes = { :title => "My Collab 2" }
+    @collaboration2.attributes = { title: "My Collab 2" }
     @collaboration2.user = @user
     @collaboration2.save!
 

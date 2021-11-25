@@ -43,23 +43,23 @@ module Turnitin
       @shared_secret = shared_secret
       @testing = testing
       @functions = {
-        :create_user => '1', # instructor or student
-        :create_course => '2', # instructor only
-        :enroll_student => '3', # student only
-        :create_assignment => '4', # instructor only
-        :submit_paper => '5', # student or teacher
-        :generate_report => '6',
-        :show_paper => '7',
-        :delete_paper => '8',
-        :change_password => '9',
-        :list_papers => '10',
-        :check_user_paper => '11',
-        :view_admin_statistics => '12',
-        :view_grade_mark => '13',
-        :report_turnaround_times => '14',
-        :submission_scores => '15',
-        :login_user => '17',
-        :logout_user => '18',
+        create_user: '1', # instructor or student
+        create_course: '2', # instructor only
+        enroll_student: '3', # student only
+        create_assignment: '4', # instructor only
+        submit_paper: '5', # student or teacher
+        generate_report: '6',
+        show_paper: '7',
+        delete_paper: '8',
+        change_password: '9',
+        list_papers: '10',
+        check_user_paper: '11',
+        view_admin_statistics: '12',
+        view_grade_mark: '13',
+        report_turnaround_times: '14',
+        submission_scores: '15',
+        login_user: '17',
+        logout_user: '18',
       }
     end
 
@@ -92,32 +92,32 @@ module Turnitin
     end
 
     def createStudent(user)
-      sendRequest(:create_user, 2, :user => user, :utp => '1')
+      sendRequest(:create_user, 2, user: user, utp: '1')
     end
 
     def createTeacher(user)
-      sendRequest(:create_user, 2, :user => user, :utp => '2')
+      sendRequest(:create_user, 2, user: user, utp: '2')
     end
 
     def createCourse(course)
-      sendRequest(:create_course, 2, :course => course, :user => course, :utp => '2')
+      sendRequest(:create_course, 2, course: course, user: course, utp: '2')
     end
 
     def enrollStudent(course, student)
-      sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
+      sendRequest(:enroll_student, 2, user: student, course: course, utp: '1', tem: email(course))
     end
 
     def self.default_assignment_turnitin_settings
       {
-        :originality_report_visibility => 'immediate',
-        :s_paper_check => '1',
-        :internet_check => '1',
-        :journal_check => '1',
-        :exclude_biblio => '1',
-        :exclude_quoted => '1',
-        :exclude_type => '0',
-        :exclude_value => '',
-        :submit_papers_to => '1'
+        originality_report_visibility: 'immediate',
+        s_paper_check: '1',
+        internet_check: '1',
+        journal_check: '1',
+        exclude_biblio: '1',
+        exclude_quoted: '1',
+        exclude_type: '0',
+        exclude_value: '',
+        submit_papers_to: '1'
       }
     end
 
@@ -163,15 +163,15 @@ module Turnitin
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
       response = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
-                                                                                                          :user => course,
-                                                                                                          :course => course,
-                                                                                                          :assignment => assignment,
-                                                                                                          :utp => '2',
-                                                                                                          :dtstart => "#{today.strftime} 00:00:00",
-                                                                                                          :dtdue => "#{today.strftime} 00:00:00",
-                                                                                                          :dtpost => "#{today.strftime} 00:00:00",
-                                                                                                          :late_accept_flag => '1',
-                                                                                                          :post => true
+                                                                                                          user: course,
+                                                                                                          course: course,
+                                                                                                          assignment: assignment,
+                                                                                                          utp: '2',
+                                                                                                          dtstart: "#{today.strftime} 00:00:00",
+                                                                                                          dtdue: "#{today.strftime} 00:00:00",
+                                                                                                          dtpost: "#{today.strftime} 00:00:00",
+                                                                                                          late_accept_flag: '1',
+                                                                                                          post: true
                                                                                                         }))
 
       response.success? ? { assignment_id: response.assignment_id } : response.error_hash
@@ -183,21 +183,21 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       opts = {
-        :post => true,
-        :utp => '1',
-        :user => student,
-        :course => course,
-        :assignment => assignment,
-        :tem => email(course)
+        post: true,
+        utp: '1',
+        user: student,
+        course: course,
+        assignment: assignment,
+        tem: email(course)
       }
       responses = {}
       if submission.submission_type == 'online_upload'
         attachments = submission.attachments.select { |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
-          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open, :ptype => '2' }.merge!(opts))
+          responses[a.asset_string] = sendRequest(:submit_paper, '2', { ptl: a.display_name, pdata: a.open, ptype: '2' }.merge!(opts))
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
-        responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))
+        responses[submission.asset_string] = sendRequest(:submit_paper, '2', { ptl: assignment.title, pdata: submission.plaintext_body, ptype: "1" }.merge!(opts))
       else
         raise "Unsupported submission type for turnitin integration: #{submission.submission_type}"
       end
@@ -214,7 +214,7 @@ module Turnitin
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       res = nil
-      res = sendRequest(:generate_report, 2, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment) if object_id
+      res = sendRequest(:generate_report, 2, oid: object_id, utp: '2', user: course, course: course, assignment: assignment) if object_id
       data = {}
       if res
         data[:similarity_score] = res.css("originalityscore").first.try(:content)
@@ -229,7 +229,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:generate_report, 1, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment)
+      sendRequest(:generate_report, 1, oid: object_id, utp: '2', user: course, course: course, assignment: assignment)
     end
 
     def submissionStudentReportUrl(submission, asset_string)
@@ -237,7 +237,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:generate_report, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:generate_report, 1, oid: object_id, utp: '1', user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def submissionPreviewUrl(submission, asset_string)
@@ -245,7 +245,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:show_paper, 1, oid: object_id, utp: '1', user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def submissionDownloadUrl(submission, asset_string)
@@ -253,12 +253,12 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:show_paper, 1, oid: object_id, utp: '1', user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def listSubmissions(assignment)
       course = assignment.context
-      sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
+      sendRequest(:list_papers, 2, assignment: assignment, course: course, user: course, utp: '1', tem: email(course))
     end
 
     # From the turnitin api docs: To calculate the MD5, concatenate the data
@@ -304,13 +304,13 @@ module Turnitin
       assignment = args.delete :assignment
       post = args.delete :post
       params = args.merge({
-                            :gmtime => Time.now.utc.strftime("%Y%m%d%H%M")[0, 11],
-                            :fid => @functions[command],
-                            :fcmd => fcmd.to_s,
-                            :encrypt => '0',
-                            :aid => @account_id,
-                            :src => '15',
-                            :dis => '1'
+                            gmtime: Time.now.utc.strftime("%Y%m%d%H%M")[0, 11],
+                            fid: @functions[command],
+                            fcmd: fcmd.to_s,
+                            encrypt: '0',
+                            aid: @account_id,
+                            src: '15',
+                            dis: '1'
                           })
       if user
         params[:uid] = id(user)

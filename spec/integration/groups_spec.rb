@@ -22,9 +22,9 @@ require 'nokogiri'
 
 describe GroupsController do
   it "generates the correct 'Add Announcement' link" do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
-    group_category = @course.group_categories.build(:name => "worldCup")
-    @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
+    course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
+    group_category = @course.group_categories.build(name: "worldCup")
+    @group = Group.create!(name: "group1", group_category: group_category, context: @course)
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
     expect(response).to be_successful
@@ -35,11 +35,11 @@ describe GroupsController do
 
   it "does not rendering 'pending' page when joining a self-signup group" do
     enable_cache do
-      course_with_student_logged_in(:active_all => true)
-      category1 = @course.group_categories.create!(:name => "category 1")
+      course_with_student_logged_in(active_all: true)
+      category1 = @course.group_categories.create!(name: "category 1")
       category1.configure_self_signup(true, false)
       category1.save!
-      g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+      g1 = @course.groups.create!(name: "some group", group_category: category1)
 
       get "/courses/#{@course.id}/groups/#{g1.id}?join=1"
       expect(response.body).not_to match(/This group has received your request to join/)

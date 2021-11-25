@@ -365,7 +365,7 @@ describe ModeratedGrading::ProvisionalGrade do
         artifact: provisional_grade,
         assessment: {
           assessment_type: 'grading',
-          :"criterion_#{@rubric.criteria_object.first.id}" => {
+          "criterion_#{@rubric.criteria_object.first.id}": {
             points: 3,
             comments: "good 4 u"
           }
@@ -396,7 +396,7 @@ describe ModeratedGrading::ProvisionalGrade do
         artifact: provisional_grade,
         assessment: {
           assessment_type: 'grading',
-          :"criterion_#{@rubric.criteria_object.first.id}" => {
+          "criterion_#{@rubric.criteria_object.first.id}": {
             points: 3,
             comments: "good 4 u"
           }
@@ -419,7 +419,7 @@ describe ModeratedGrading::ProvisionalGrade do
         artifact: provisional_grade,
         assessment: {
           assessment_type: 'grading',
-          :"criterion_#{@rubric.criteria_object.first.id}" => {
+          "criterion_#{@rubric.criteria_object.first.id}": {
             points: 3,
             comments: "good 4 u"
           }
@@ -444,7 +444,7 @@ describe ModeratedGrading::ProvisionalGrade do
           artifact: provisional_grade,
           assessment: {
             assessment_type: 'grading',
-            :"criterion_#{@rubric.criteria_object.first.id}" => {
+            "criterion_#{@rubric.criteria_object.first.id}": {
               points: 3,
               comments: "good 4 u"
             }
@@ -468,7 +468,7 @@ describe ModeratedGrading::ProvisionalGrade do
         artifact: provisional_grade,
         assessment: {
           assessment_type: :grading,
-          :"criterion_#{@rubric.criteria_object.first.id}" => {
+          "criterion_#{@rubric.criteria_object.first.id}": {
             points: 3,
             comments: "good 4 u"
           }

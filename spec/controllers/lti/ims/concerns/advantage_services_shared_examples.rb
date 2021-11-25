@@ -139,11 +139,11 @@ shared_examples_for "advantage services" do
     # rubocop:disable RSpec/LetSetup
     context 'with tool attached to root account and course attached to deeply nested sub-account' do
       # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
+      let(:sub_account_1) { root_account.sub_accounts.create!(name: "sub-account-1") }
       # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
+      let(:sub_account_2) { root_account.sub_accounts.create!(name: "sub-account-2") }
       # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
+      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(name: "sub-account-1-1") }
       # place :course at the very bottom of account hierarchy. tool we care about will be way up at :root_account
       let(:course_account) { sub_account_1_1 }
       # place another tool (associated w same developer key) in a separate branch of the account hierarchy to make
@@ -169,11 +169,11 @@ shared_examples_for "advantage services" do
 
     context 'with tool attached to sub-account and course attached to another sub-account thereof' do
       # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
+      let(:sub_account_1) { root_account.sub_accounts.create!(name: "sub-account-1") }
       # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
+      let(:sub_account_2) { root_account.sub_accounts.create!(name: "sub-account-2") }
       # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
+      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(name: "sub-account-1-1") }
       # place :tool in the middle of the account hierarchy
       let(:tool_context) { sub_account_1 }
       # place :course at the very bottom of account hierarchy. tool we care about will be one level up at :sub_account_1
@@ -201,11 +201,11 @@ shared_examples_for "advantage services" do
 
     context 'with tool and course attached to same deeply nested sub-account' do
       # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
+      let(:sub_account_1) { root_account.sub_accounts.create!(name: "sub-account-1") }
       # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
+      let(:sub_account_2) { root_account.sub_accounts.create!(name: "sub-account-2") }
       # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
+      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(name: "sub-account-1-1") }
       # place :tool iat the very bottom of account hierarchy
       let(:tool_context) { sub_account_1_1 }
       # also place :course at the very bottom of account hierarchy. tool we care about is at the same level
@@ -235,11 +235,11 @@ shared_examples_for "advantage services" do
     # in a tool lookup miss (:tool is "lower" than :course in account hierarchy)
     context 'with course attached to sub-account and tool attached to another sub-account thereof' do
       # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
+      let(:sub_account_1) { root_account.sub_accounts.create!(name: "sub-account-1") }
       # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
+      let(:sub_account_2) { root_account.sub_accounts.create!(name: "sub-account-2") }
       # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
+      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(name: "sub-account-1-1") }
       # place :course in the middle of the account hierarchy. tool we care about will be one level down at sub_account_1_1
       let(:course_account) { sub_account_1 }
       # place :tool at the very bottom of account hierarchy. course care about will be one level up at :sub_account_1
@@ -270,9 +270,9 @@ shared_examples_for "advantage services" do
     # another negative test, this time where :course and :tool are in completely disjoint account hierarchy branches
     context 'with course attached to sub-account and tool attached to another sub-account' do
       # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
+      let(:sub_account_1) { root_account.sub_accounts.create!(name: "sub-account-1") }
       # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
+      let(:sub_account_2) { root_account.sub_accounts.create!(name: "sub-account-2") }
       # place :course in one account hierarchy branch
       let(:course_account) { sub_account_1 }
       # place :tool in the other account hierarchy branch

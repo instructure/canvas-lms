@@ -158,10 +158,10 @@ class Quizzes::QuizQuestion::Base
       next unless !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
 
       answers << {
-        :id => answer_md5,
-        :responses => 1,
-        :user_ids => [response[:user_id]],
-        :text => response[:text]
+        id: answer_md5,
+        responses: 1,
+        user_ids: [response[:user_id]],
+        text: response[:text]
       }
     end
     @question_data.answers = answers

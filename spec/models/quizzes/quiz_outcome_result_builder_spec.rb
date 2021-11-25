@@ -22,7 +22,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   describe "quiz level learning outcome results" do
     before :once do
       build_course_quiz_questions_and_a_bank
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -81,14 +81,14 @@ describe Quizzes::QuizOutcomeResultBuilder do
       before :once do
         course_with_student(active_all: true)
         @quiz = @course.quizzes.create!(title: 'test quiz')
-        @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
-        @outcome2 = @course.created_learning_outcomes.create!(:short_description => 'new outcome #2')
+        @outcome = @course.created_learning_outcomes.create!(short_description: 'new outcome')
+        @outcome2 = @course.created_learning_outcomes.create!(short_description: 'new outcome #2')
 
-        @bank = @course.assessment_question_banks.create!(:title => 'bank1')
-        @bank2 = @course.assessment_question_banks.create!(:title => 'bank2')
+        @bank = @course.assessment_question_banks.create!(title: 'bank1')
+        @bank2 = @course.assessment_question_banks.create!(title: 'bank2')
 
-        @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
-        @outcome2.align(@bank2, @bank2.context, :mastery_score => 0.5)
+        @outcome.align(@bank, @bank.context, mastery_score: 0.7)
+        @outcome2.align(@bank2, @bank2.context, mastery_score: 0.5)
 
         @a1 = @bank.assessment_questions.create!(question_data: question_data(true))
         @a3 = @bank.assessment_questions.create!(question_data: question_data)
@@ -99,7 +99,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         @q2 = @quiz.quiz_questions.create!(assessment_question: @a2, question_data: @a2.question_data)
         @q4 = @quiz.quiz_questions.create!(assessment_question: @a4, question_data: @a4.question_data)
 
-        @quiz.generate_quiz_data(:persist => true)
+        @quiz.generate_quiz_data(persist: true)
         @sub = @quiz.generate_submission(@user)
         @sub.submission_data = {}
         answer_a_question(@q1, @sub)
@@ -155,15 +155,15 @@ describe Quizzes::QuizOutcomeResultBuilder do
 
     before :once do
       build_course_quiz_questions_and_a_bank
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub1 = submission
       @sub2 = submission
       # 2nd attempt: both questions answered correctly
       answer_and_grade(@sub2, true)
       # align a second outcome in-between attempts
-      @outcome2 = @course.created_learning_outcomes.create!(:short_description => 'another outcome')
+      @outcome2 = @course.created_learning_outcomes.create!(short_description: 'another outcome')
       @bank = @q1.assessment_question.assessment_question_bank
-      @outcome2.align(@bank, @bank.context, :mastery_score => 0.7)
+      @outcome2.align(@bank, @bank.context, mastery_score: 0.7)
       # 1st attempt: only one question answered correctly
       answer_and_grade(@sub1)
       @quiz_results = @outcome.reload.learning_outcome_results.active.where(user_id: @user).to_a
@@ -194,7 +194,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
       @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
       @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -216,7 +216,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       build_course_quiz_questions_and_a_bank({}, { scoring_policy: "keep_latest" })
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -256,7 +256,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       build_course_quiz_questions_and_a_bank
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -291,7 +291,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   describe "quizzes with a mix of auto-gradeable and non-auto-gradeable questions" do
     before :once do
       build_course_quiz_questions_and_a_bank(q2: { 'question_type' => 'essay_question', 'answers' => [] })
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @quiz.save!
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
@@ -317,7 +317,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   describe "quizzes that aren't graded or complete" do
     before :once do
       build_course_quiz_questions_and_a_bank({ 'question_type' => 'essay_question', 'answers' => [] })
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -361,7 +361,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   describe "ungraded quizzes and surveys" do
     before :once do
       build_course_quiz_questions_and_a_bank
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -401,7 +401,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       q2_data = @q2.question_data
       q2_data[:points_possible] = 0.0
       @q2.update_attribute('question_data', q2_data)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -414,7 +414,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
 
     it "removes an existing question result when re-assessed if points changed to 0" do
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -426,7 +426,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       q2_data = @q2.question_data
       q2_data[:points_possible] = 0.0
       @q2.update_attribute('question_data', q2_data)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -452,7 +452,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       q2_data = @q2.question_data
       q2_data[:points_possible] = 0.0
       @q2.update_attribute('question_data', q2_data)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -464,7 +464,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
 
     it "removes an existing result when re-assessed if points changed to 0" do
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)
@@ -478,7 +478,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       q2_data = @q2.question_data
       q2_data[:points_possible] = 0.0
       @q2.update_attribute('question_data', q2_data)
-      @quiz.generate_quiz_data(:persist => true)
+      @quiz.generate_quiz_data(persist: true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
       answer_a_question(@q1, @sub)

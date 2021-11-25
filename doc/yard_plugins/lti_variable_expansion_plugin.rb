@@ -30,7 +30,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     object = register YARD::CodeObjects::MethodObject.new(namespace, variable_substitution)
     return if object.tags(:internal).any?
 
-    parse_block(statement, :owner => object)
+    parse_block(statement, owner: object)
 
     deprecated_str = ''
     deprecated_str = ' *[deprecated]*' if object.tags(:deprecated).count > 0

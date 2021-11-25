@@ -38,7 +38,7 @@ class AccessToken < ActiveRecord::Base
   serialize :scopes, Array
   validate :must_only_include_valid_scopes, unless: :deleted?
 
-  has_many :notification_endpoints, -> { where(:workflow_state => "active") }, dependent: :destroy
+  has_many :notification_endpoints, -> { where(workflow_state: "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
@@ -60,7 +60,7 @@ class AccessToken < ActiveRecord::Base
   # yet been implemented)
 
   scope :active, -> { not_deleted.where("permanent_expires_at IS NULL OR permanent_expires_at>?", Time.now.utc) }
-  scope :not_deleted, -> { where(:workflow_state => "active") }
+  scope :not_deleted, -> { where(workflow_state: "active") }
 
   TOKEN_SIZE = 64
 

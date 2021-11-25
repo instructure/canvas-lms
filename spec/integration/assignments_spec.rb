@@ -22,23 +22,23 @@ require 'nokogiri'
 
 describe "assignments" do
   def multiple_section_submissions
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @student1 = @student
-    @s2enrollment = student_in_course(:active_all => true)
+    @s2enrollment = student_in_course(active_all: true)
     @student2 = @user
 
     @section = @course.course_sections.create!
     @s2enrollment.course_section = @section
     @s2enrollment.save!
 
-    @assignment = @course.assignments.create!(:title => "Test 1", :submission_types => "online_upload")
+    @assignment = @course.assignments.create!(title: "Test 1", submission_types: "online_upload")
 
-    @submission1 = @assignment.submit_homework(@student1, :submission_type => "online_text_entry", :body => "hi")
-    @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
+    @submission1 = @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "hi")
+    @submission2 = @assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "there")
   end
 
   def create_assignment_section_override(section, due_at)
-    override = assignment_override_model(:assignment => @assignment)
+    override = assignment_override_model(assignment: @assignment)
     override.set = section
     override.override_due_at(due_at)
     override.save!
@@ -47,7 +47,7 @@ describe "assignments" do
   it "lists ungraded and total submissions for teacher correctly" do
     multiple_section_submissions
 
-    course_with_teacher_logged_in(:course => @course, :active_all => true)
+    course_with_teacher_logged_in(course: @course, active_all: true)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
@@ -57,7 +57,7 @@ describe "assignments" do
   it "lists ungraded and total submissions for ta correctly" do
     multiple_section_submissions
 
-    @taenrollment = course_with_ta(:course => @course, :active_all => true)
+    @taenrollment = course_with_ta(course: @course, active_all: true)
     @taenrollment.limit_privileges_to_course_section = true
     @taenrollment.save!
     user_session(@ta)
@@ -69,10 +69,10 @@ describe "assignments" do
   end
 
   it "shows student view student submission as needing grading" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
     @fake_student = @course.student_view_student
-    assignment_model(:course => @course, :submission_types => 'online_text_entry', :title => 'Assignment 1')
-    @assignment.submit_homework(@fake_student, :submission_type => 'online_text_entry', :body => "my submission")
+    assignment_model(course: @course, submission_types: 'online_text_entry', title: 'Assignment 1')
+    @assignment.submit_homework(@fake_student, submission_type: 'online_text_entry', body: "my submission")
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -84,8 +84,8 @@ describe "assignments" do
     include TextHelper
 
     before do
-      course_with_teacher_logged_in(:active_all => true)
-      assignment_model(:course => @course, :due_at => 3.days.from_now)
+      course_with_teacher_logged_in(active_all: true)
+      assignment_model(course: @course, due_at: 3.days.from_now)
       @assignment.update_attribute :due_at, 2.days.from_now
       @cs1 = @course.default_section
       @cs2 = @course.course_sections.create!
@@ -124,12 +124,12 @@ end
 
 describe "download submissions link" do
   before do
-    course_with_teacher_logged_in(:active_all => true)
-    assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
-    @student = User.create!(:name => 'student1')
+    course_with_teacher_logged_in(active_all: true)
+    assignment_model(course: @course, submission_types: 'online_url', title: 'Assignment 1')
+    @student = User.create!(name: 'student1')
     @student.register!
     @student.workflow_state = 'active'
-    @student2 = User.create!(:name => 'student2')
+    @student2 = User.create!(name: 'student2')
     @student2.register
     @student2.workflow_state = 'active'
     @student2.save
@@ -219,12 +219,12 @@ end
 
 describe "ratio of submissions graded" do
   before do
-    course_with_teacher_logged_in(:active_all => true)
-    assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
-    @student = User.create!(:name => 'student1')
+    course_with_teacher_logged_in(active_all: true)
+    assignment_model(course: @course, submission_types: 'online_url', title: 'Assignment 1')
+    @student = User.create!(name: 'student1')
     @student.register!
     @student.workflow_state = 'active'
-    @student2 = User.create!(:name => 'student2')
+    @student2 = User.create!(name: 'student2')
     @student2.register
     @student2.workflow_state = 'active'
     @student2.save
@@ -465,7 +465,7 @@ describe "assignments_2 feature flag and parameter" do
     HTML
 
     it "excludes verifiers if course is not public" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       user_session(@student)
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
       assignment = @course.assignments.create(

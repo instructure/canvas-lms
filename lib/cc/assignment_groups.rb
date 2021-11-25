@@ -28,7 +28,7 @@ module CC
       else
         group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
-        document = Builder::XmlMarkup.new(:target => group_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: group_file, indent: 2)
       end
 
       document.instruct!
@@ -43,7 +43,7 @@ module CC
           add_exported_asset(group)
 
           migration_id = create_key(group)
-          groups_node.assignmentGroup(:identifier => migration_id) do |group_node|
+          groups_node.assignmentGroup(identifier: migration_id) do |group_node|
             group_node.title group.name
             group_node.position group.position
             group_node.group_weight group.group_weight if group.group_weight

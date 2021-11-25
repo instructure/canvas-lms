@@ -75,14 +75,14 @@ describe "announcements" do
         course_with_teacher(active_course: true)
         @section = @course.course_sections.create!(name: 'test section')
 
-        @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+        @announcement = @course.announcements.create!(user: @teacher, message: 'hello my favorite section!')
         @announcement.is_section_specific = true
         @announcement.course_sections = [@section]
         @announcement.save!
 
         @student1, @student2 = create_users(2, return_type: :record)
-        @course.enroll_student(@student1, :enrollment_state => 'active')
-        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @course.enroll_student(@student1, enrollment_state: 'active')
+        @course.enroll_student(@student2, enrollment_state: 'active')
         student_in_section(@section, user: @student1)
       end
 
@@ -135,9 +135,9 @@ describe "announcements" do
       end
 
       it "adds an attachment to a graded topic", priority: "1" do
-        what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
+        what_to_create == DiscussionTopic ? @course.discussion_topics.create!(title: 'graded attachment topic', user: @user) : announcement_model(title: 'graded attachment topic', user: @user)
         if what_to_create == DiscussionTopic
-          what_to_create.last.update(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
+          what_to_create.last.update(assignment: @course.assignments.create!(name: 'graded topic assignment'))
         end
         get url
         expect_new_page_load { f('.ic-announcement-row h3').click }
@@ -148,7 +148,7 @@ describe "announcements" do
 
       it "edits a topic", priority: "1" do
         edit_name = 'edited discussion name'
-        topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
+        topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
         expect_new_page_load { f(".edit-btn").click }
 
@@ -176,8 +176,8 @@ describe "announcements" do
     end
 
     it "displayed delayed post note on page of delayed announcement" do
-      a = @course.announcements.create!(:title => "Announcement", :message => "foobers",
-                                        :delayed_post_at => 1.week.from_now)
+      a = @course.announcements.create!(title: "Announcement", message: "foobers",
+                                        delayed_post_at: 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
       expect(f('.discussion-fyi')).to include_text(
         'The content of this announcement will not be visible to users until'
@@ -197,7 +197,7 @@ describe "announcements" do
     end
 
     it "removes delayed_post_at when unchecking delay_posting", priority: "1" do
-      topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
+      topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
 

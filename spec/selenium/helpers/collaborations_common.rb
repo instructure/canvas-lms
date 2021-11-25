@@ -77,8 +77,8 @@ module CollaborationsCommon
   def create_collaboration!(collaboration_type, title = 'New collaboration')
     plugin_type = collaboration_type
     plugin_type = 'google_drive' if plugin_type == 'google_docs'
-    unless PluginSetting.where(:name => plugin_type).exists?
-      PluginSetting.create!(:name => plugin_type, :settings => {})
+    unless PluginSetting.where(name: plugin_type).exists?
+      PluginSetting.create!(name: plugin_type, settings: {})
     end
 
     name = Collaboration.collaboration_types.detect { |t| t[:type] == collaboration_type }[:name]
@@ -91,7 +91,7 @@ module CollaborationsCommon
   end
 
   def manually_create_collaboration(collaboration_name)
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"

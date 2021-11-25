@@ -122,7 +122,7 @@ describe "master courses - child courses - module item locking" do
       @assmt_mod_tag = @mod.add_item(id: @assmt.id, type: "assignment")
       @page_mod_tag  = @mod.add_item(id: @page.id, type: "wiki_page")
       @topic_mod_tag = @mod.add_item(id: @topic.id, type: "discussion_topic")
-      @header_tag = @mod.add_item(:type => 'context_module_sub_header', :title => 'header')
+      @header_tag = @mod.add_item(type: 'context_module_sub_header', title: 'header')
     end
 
     before do

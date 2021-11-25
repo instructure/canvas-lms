@@ -85,7 +85,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     it 'must return the parsed response body when the export status indicated completion' do
       response_body = { foo: 'bar', baz: 'qux' }.to_json
       stub_request(:get, fetch_url)
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       migrator.instance_variable_set(:@export_status, 'completed')
       expect(migrator.retrieve_export).to eq({ 'foo' => 'bar', 'baz' => 'qux' })
     end
@@ -93,7 +93,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     it 'must raise an exception when the response status is something other than 200' do
       response_body = { foo: 'bar', baz: 'qux' }.to_json
       stub_request(:get, fetch_url)
-        .to_return(:status => 404, :body => response_body, :headers => {})
+        .to_return(status: 404, body: response_body, headers: {})
       expect { migrator.retrieve_export }
         .to raise_error RuntimeError, /404/
     end
@@ -132,7 +132,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
         fetch_url: 'https://lti.example.com/export/42',
       }.to_json
       stub_request(:post, export_url)
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       @options = {}
       @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
     end

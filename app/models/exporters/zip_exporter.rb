@@ -105,7 +105,7 @@ module Exporters
     end
 
     def mock_session
-      @user && { :user_id => @user.id } # used for public_to_auth_users courses
+      @user && { user_id: @user.id } # used for public_to_auth_users courses
     end
 
     def process_folder(folder)

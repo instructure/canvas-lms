@@ -23,7 +23,7 @@ module Api::V1::ObserverAlert
   include ApplicationHelper
 
   API_ALLOWED_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       id
       title
       user_id

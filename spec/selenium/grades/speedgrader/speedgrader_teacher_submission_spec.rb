@@ -271,7 +271,7 @@ describe "speed grader submissions" do
 
     it "deletes an attachment" do
       filename, fullpath, _data = get_file("graded.png")
-      student_in_course(:user => user_with_pseudonym)
+      student_in_course(user: user_with_pseudonym)
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       add_attachment_student_assignment(filename, @student, fullpath)

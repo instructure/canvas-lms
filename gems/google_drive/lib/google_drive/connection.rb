@@ -60,8 +60,8 @@ module GoogleDrive
 
     def download(document_id, extensions)
       response = client_execute!(
-        :api_method => drive.files.get,
-        :parameters => { :fileId => normalize_document_id(document_id) }
+        api_method: drive.files.get,
+        parameters: { fileId: normalize_document_id(document_id) }
       )
 
       file = response.data.to_hash
@@ -75,7 +75,7 @@ module GoogleDrive
       loop do
         raise(ConnectionException) if redirect_limit <= 0
 
-        result = client_execute(:uri => @uri)
+        result = client_execute(uri: @uri)
 
         case result.status
         when 200
@@ -102,16 +102,16 @@ module GoogleDrive
 
     def create_doc(name)
       file_data = {
-        :title => name,
-        :mimeType => 'application/vnd.google-apps.document'
+        title: name,
+        mimeType: 'application/vnd.google-apps.document'
       }
 
       force_token_update
       file = drive.files.insert.request_schema.new(file_data)
 
       result = client_execute(
-        :api_method => drive.files.insert,
-        :body_object => file
+        api_method: drive.files.insert,
+        body_object: file
       )
 
       if result.status == 200
@@ -124,8 +124,8 @@ module GoogleDrive
     def delete_doc(document_id)
       force_token_update
       result = client_execute(
-        :api_method => drive.files.delete,
-        :parameters => { :fileId => normalize_document_id(document_id) }
+        api_method: drive.files.delete,
+        parameters: { fileId: normalize_document_id(document_id) }
       )
       if result.error? && !result.error_message.include?('File not found')
         raise ConnectionException, result.error_message
@@ -140,10 +140,10 @@ module GoogleDrive
         next if user_id.blank? || /@/.match(user_id)
 
         result = client_execute(
-          :api_method => drive.permissions.delete,
-          :parameters => {
-            :fileId => normalize_document_id(document_id),
-            :permissionId => user_id
+          api_method: drive.permissions.delete,
+          parameters: {
+            fileId: normalize_document_id(document_id),
+            permissionId: user_id
           }
         )
         if result.error? && !result.error_message.starts_with?("Permission not found")
@@ -165,14 +165,14 @@ module GoogleDrive
       force_token_update
       users.each do |user_id|
         new_permission = drive.permissions.insert.request_schema.new({
-                                                                       :id => user_id,
-                                                                       :type => 'user',
-                                                                       :role => 'writer'
+                                                                       id: user_id,
+                                                                       type: 'user',
+                                                                       role: 'writer'
                                                                      })
         result = client_execute(
-          :api_method => drive.permissions.insert,
-          :body_object => new_permission,
-          :parameters => { :fileId => normalize_document_id(document_id) }
+          api_method: drive.permissions.insert,
+          body_object: new_permission,
+          parameters: { fileId: normalize_document_id(document_id) }
         )
         if result.error?
           raise ConnectionException, result.error_message
@@ -182,7 +182,7 @@ module GoogleDrive
 
     def authorized?
       force_token_update
-      client_execute(:api_method => drive.about.get).status == 200
+      client_execute(api_method: drive.about.get).status == 200
     rescue ConnectionException, NoTokenError, Google::APIClient::AuthorizationError
       false
     end

@@ -22,12 +22,12 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {
-        :client_id => '',
-        :client_secret => '',
-        :redirect_uri => '',
-        :auth_uri => '',
-        :token_uri => '',
-        :client_secret_json => ''
+        client_id: '',
+        client_secret: '',
+        redirect_uri: '',
+        auth_uri: '',
+        token_uri: '',
+        client_secret_json: ''
       }
     elsif (res = check_json(settings))
       plugin_setting.errors.add(:base, res)
@@ -36,12 +36,12 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
       if settings['client_secret_json'].present?
         parsed = JSON.parse(settings['client_secret_json'])['web']
         to_return = {
-          :client_id => parsed['client_id'],
-          :client_secret => parsed['client_secret'],
-          :redirect_uri => parsed['redirect_uris'][0], # we only care about the first one
-          :auth_uri => parsed['auth_uri'],
-          :token_uri => parsed['token_uri'],
-          :client_secret_json => ""
+          client_id: parsed['client_id'],
+          client_secret: parsed['client_secret'],
+          redirect_uri: parsed['redirect_uris'][0], # we only care about the first one
+          auth_uri: parsed['auth_uri'],
+          token_uri: parsed['token_uri'],
+          client_secret_json: ""
         }
       else
         to_return = settings.to_hash.with_indifferent_access

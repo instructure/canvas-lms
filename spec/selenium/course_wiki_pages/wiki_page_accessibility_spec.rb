@@ -34,10 +34,10 @@ describe "Wiki Pages" do
   context "Accessibility" do
     before :once do
       account_model
-      course_with_teacher :account => @account
-      @course.wiki_pages.create!(:title => "Foo")
-      @course.wiki_pages.create!(:title => "Bar")
-      @course.wiki_pages.create!(:title => "Baz")
+      course_with_teacher account: @account
+      @course.wiki_pages.create!(title: "Foo")
+      @course.wiki_pages.create!(title: "Bar")
+      @course.wiki_pages.create!(title: "Baz")
     end
 
     before do
@@ -197,11 +197,11 @@ describe "Wiki Pages" do
     context "Revisions Page" do
       before :once do
         account_model
-        course_with_teacher :account => @account, :active_all => true
+        course_with_teacher account: @account, active_all: true
         @timestamps = %w[2015-01-01 2015-01-02 2015-01-03].map { |d| Time.zone.parse(d) }
 
         Timecop.freeze(@timestamps[0]) do      # rev 1
-          @vpage = @course.wiki_pages.build :title => 'bar'
+          @vpage = @course.wiki_pages.build title: 'bar'
           @vpage.workflow_state = 'unpublished'
           @vpage.body = 'draft'
           @vpage.save!

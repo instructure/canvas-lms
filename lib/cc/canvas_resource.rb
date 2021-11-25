@@ -64,7 +64,7 @@ module CC
           :href => syl_rel_path,
           :intendeduse => "syllabus"
         ) do |res|
-          res.file(:href => syl_rel_path)
+          res.file(href: syl_rel_path)
         end
       end
 
@@ -77,10 +77,10 @@ module CC
         :href => canvas_export_path
       ) do |res|
         resources.each do |resource|
-          res.file(:href => resource) if resource
+          res.file(href: resource) if resource
         end
 
-        res.file(:href => canvas_export_path)
+        res.file(href: canvas_export_path)
       end
     end
 
@@ -122,7 +122,7 @@ module CC
       else
         course_file = File.new(File.join(@canvas_resource_dir, CCHelper::COURSE_SETTINGS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
-        document = Builder::XmlMarkup.new(:target => course_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: course_file, indent: 2)
       end
 
       document.instruct!

@@ -57,14 +57,14 @@ describe Messages::PeerReviewsHelper do
     context 'anonymous peer reviews disabled' do
       it 'returns author name' do
         submission_model
-        comment = @submission.add_comment(:comment => "new comment")
+        comment = @submission.add_comment(comment: "new comment")
         expect(submission_comment_author(comment, @user)).to eq(comment.author_name)
       end
 
       it 'returns anonymous' do
         @user2 = user_model
         submission_model
-        comment = @submission.add_comment(:comment => "new comment", :user => @user2)
+        comment = @submission.add_comment(comment: "new comment", user: @user2)
         @submission.assignment.update_attribute(:anonymous_peer_reviews, true)
         comment.reload
         expect(submission_comment_author(comment, @user)).to eq(I18n.t(:anonymous_user, 'Anonymous User'))
@@ -74,14 +74,14 @@ describe Messages::PeerReviewsHelper do
     context 'anonymous peer reviews enabled' do
       it 'returns submittor' do
         submission_model
-        comment = @submission.add_comment(:comment => "new comment")
+        comment = @submission.add_comment(comment: "new comment")
         expect(submission_comment_submittor(comment, @user)).to eq(@submission.user.short_name)
       end
 
       it 'returns anonymous' do
         @user2 = user_model
         submission_model
-        comment = @submission.add_comment(:comment => "new comment", :user => @user2)
+        comment = @submission.add_comment(comment: "new comment", user: @user2)
         @submission.assignment.update_attribute(:anonymous_peer_reviews, true)
         comment.reload
         expect(submission_comment_submittor(comment, @user2)).to eq(I18n.t(:anonymous_user, 'Anonymous User'))

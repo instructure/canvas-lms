@@ -28,8 +28,8 @@ describe "conversations new" do
     @s1 = user_factory(name: "first student")
     @s2 = user_factory(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-    cat = @course.group_categories.create(:name => "the groups")
-    @group = cat.groups.create(:name => "the group", :context => @course)
+    cat = @course.group_categories.create(name: "the groups")
+    @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
   end
 
@@ -65,7 +65,7 @@ describe "conversations new" do
 
       it "allows admins with read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
-        user_logged_in({ :user => user })
+        user_logged_in({ user: user })
         conversations
         compose to: [@s1], subject: 'context-free', body: 'hallo!'
         c = @s1.conversations.last.conversation
@@ -76,7 +76,7 @@ describe "conversations new" do
       it "does not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
         RoleOverride.manage_role_override(Account.default, admin_role, 'read_roster', override: false, locked: false)
-        user_logged_in({ :user => user })
+        user_logged_in({ user: user })
         conversations
         f('#compose-btn').click
         wait_for_animations
@@ -91,11 +91,11 @@ describe "conversations new" do
       end
 
       it "allows non-admins to send a message to an account-level group", priority: "2" do
-        @group = Account.default.groups.create(:name => "the group")
+        @group = Account.default.groups.create(name: "the group")
         @group.add_user(@s1)
         @group.add_user(@s2)
         @group.save
-        user_logged_in({ :user => @s1 })
+        user_logged_in({ user: @s1 })
         conversations
         f('#compose-btn').click
         wait_for_ajaximations
@@ -110,11 +110,11 @@ describe "conversations new" do
       end
 
       it "allows messages to be sent individually for account-level groups", priority: "2" do
-        @group = Account.default.groups.create(:name => "the group")
+        @group = Account.default.groups.create(name: "the group")
         @group.add_user(@s1)
         @group.add_user(@s2)
         @group.save
-        user_logged_in({ :user => @s1 })
+        user_logged_in({ user: @s1 })
         conversations
         f('#compose-btn').click
         wait_for_ajaximations
@@ -131,7 +131,7 @@ describe "conversations new" do
 
       it "allows admins to message users from their profiles", priority: "2" do
         user = account_admin_user
-        user_logged_in({ :user => user })
+        user_logged_in({ user: user })
         get "/accounts/#{Account.default.id}/users"
         fj('[data-automation="users list"] tr a:has([name="IconMessage"])').click
         wait_for_ajaximations

@@ -33,9 +33,9 @@ describe Quizzes::QuizSubmissionEventsController do
     end
 
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      quiz_model(:course => @course)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student, false)
     end
 

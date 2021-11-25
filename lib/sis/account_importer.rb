@@ -28,7 +28,7 @@ module SIS
         end
       end
       importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Account.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        Account.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 

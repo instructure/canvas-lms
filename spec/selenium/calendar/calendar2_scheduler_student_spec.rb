@@ -33,7 +33,7 @@ describe "scheduler" do
         a.settings[:agenda_view]      = true
         a.save!
       end
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
     end
 
     before do
@@ -55,7 +55,7 @@ describe "scheduler" do
 
     it "reserves appointment groups via Find Appointment mode" do
       my_course = @course
-      create_appointment_group(:contexts => [my_course])
+      create_appointment_group(contexts: [my_course])
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
@@ -72,10 +72,10 @@ describe "scheduler" do
     end
 
     it "reserves group appointment groups via Find Appointment Mode" do
-      gc = @course.group_categories.create!(:name => "Blah Groups")
-      group = gc.groups.create! :name => 'Blah Group', :context => @course
+      gc = @course.group_categories.create!(name: "Blah Groups")
+      group = gc.groups.create! name: 'Blah Group', context: @course
       group.add_user @student
-      create_appointment_group(:sub_context_codes => [gc.asset_string], :title => "Bleh Group Thing")
+      create_appointment_group(sub_context_codes: [gc.asset_string], title: "Bleh Group Thing")
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click

@@ -570,8 +570,8 @@ class SisImportsApiController < ApplicationController
       raise "invalid import type parameter" unless SisBatch.valid_import_types.key?(params[:import_type])
 
       if !api_request? && @account.current_sis_batch.try(:importing?)
-        return render :json => { :error => true, :error_message => t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress => true },
-                      :as_text => true
+        return render json: { error: true, error_message: t(:sis_import_in_process_notice, "An SIS import is already in process."), batch_in_progress: true },
+                      as_text: true
       end
 
       file_obj = nil
@@ -603,7 +603,7 @@ class SisImportsApiController < ApplicationController
           request2 = Rack::Request.new(env)
           charset = request2.media_type_params['charset']
           if charset.present? && !charset.casecmp?('utf-8')
-            return render :json => { :error => t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, :status => :bad_request
+            return render json: { error: t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, status: :bad_request
           end
 
           params[:extension] ||= { "application/zip" => "zip",
@@ -622,7 +622,7 @@ class SisImportsApiController < ApplicationController
                                      params[:batch_mode_term_id])
         end
         unless batch_mode_term || params[:multi_term_batch_mode]
-          return render :json => { :message => "Batch mode specified, but the given batch_mode_term_id cannot be found." }, :status => :bad_request
+          return render json: { message: "Batch mode specified, but the given batch_mode_term_id cannot be found." }, status: :bad_request
         end
       end
 

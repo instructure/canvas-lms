@@ -27,7 +27,7 @@ class SubAccountsController < ApplicationController
   # authorized to act on all its sub-accounts too.
 
   def sub_accounts_of(account, current_depth = 0)
-    account_data = @accounts[account.id] = { :account => account, :course_count => 0 }
+    account_data = @accounts[account.id] = { account: account, course_count: 0 }
     sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key('name')).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
@@ -67,8 +67,8 @@ class SubAccountsController < ApplicationController
           redirect_to @accounts.first if @accounts.length == 1
         end
         format.json do
-          render :json => @accounts.map { |a|
-            { :label => a.name, :url => account_url(a), :id => a.id }
+          render json: @accounts.map { |a|
+            { label: a.name, url: account_url(a), id: a.id }
           }
           return
         end
@@ -81,7 +81,7 @@ class SubAccountsController < ApplicationController
     sub_accounts_of(@context)
     unless @accounts[:accounts_to_get_sub_account_count].empty?
       counts = Account.active
-                      .where(:parent_account_id => @accounts[:accounts_to_get_sub_account_count])
+                      .where(parent_account_id: @accounts[:accounts_to_get_sub_account_count])
                       .group(:parent_account_id).count
       counts.each do |account_id, count|
         @accounts[account_id][:sub_account_count] = count
@@ -100,8 +100,8 @@ class SubAccountsController < ApplicationController
 
   def show
     @sub_account = subaccount_or_self(params[:id])
-    ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{ :sub_accounts => [:parent_account, :root_account] }])
-    sub_account_json = @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count])
+    ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{ sub_accounts: [:parent_account, :root_account] }])
+    sub_account_json = @sub_account.as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
     sort_key = Account.best_unicode_collation_key('accounts.name')
     sub_accounts = @sub_account.sub_accounts.order(sort_key).as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
     sub_account_json[:account][:sub_accounts] = sub_accounts
@@ -147,9 +147,9 @@ class SubAccountsController < ApplicationController
       end
     end
     if @sub_account.save
-      render :json => account_json(@sub_account, @current_user, session, [])
+      render json: account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: :bad_request
+      render json: @sub_account.errors, status: :bad_request
     end
   end
 
@@ -157,9 +157,9 @@ class SubAccountsController < ApplicationController
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
     if @sub_account.update(account_params)
-      render :json => account_json(@sub_account, @current_user, session, [])
+      render json: account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: :bad_request
+      render json: @sub_account.errors, status: :bad_request
     end
   end
 

@@ -70,10 +70,10 @@ class UserListV2
 
   def as_json(**)
     {
-      :users => @resolved_results,
-      :duplicates => @duplicate_results,
-      :missing => @missing_results,
-      :errors => @errors
+      users: @resolved_results,
+      duplicates: @duplicate_results,
+      missing: @missing_results,
+      errors: @errors
     }
   end
 
@@ -115,8 +115,8 @@ class UserListV2
         user_id = Shard.relative_id_for(user_id, Shard.current, original_shard)
         account_id = Shard.relative_id_for(account_id, Shard.current, original_shard)
       end
-      @all_results << { :address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid),
-                        :user_name => user_name, :account_id => account_id, :account_name => account_name }
+      @all_results << { address: address, user_id: user_id, user_token: User.token(user_id, user_uuid),
+                        user_name: user_name, account_id: account_id, account_name: account_name }
     end
   end
 
@@ -149,7 +149,7 @@ class UserListV2
     return unless @duplicate_results.any?
 
     duplicate_user_ids = @duplicate_results.map { |set| set.pluck(:user_id) }.flatten.uniq
-    user_map = User.where(:id => duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
+    user_map = User.where(id: duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
 
     @duplicate_results.each do |set|
       set.each do |dup_hash|
@@ -182,7 +182,7 @@ class UserListV2
     unique_ids = @addresses.map { |a| a[:address].downcase }
 
     search_for_results(restricted_shards) do |account_ids|
-      Pseudonym.active.where(:account_id => account_ids)
+      Pseudonym.active.where(account_id: account_ids)
                .where("LOWER(unique_id) IN (?)", unique_ids).joins(:user, :account)
                .pluck(:unique_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
     end
@@ -198,9 +198,9 @@ class UserListV2
 
     ids = @addresses.pluck(:address)
     search_for_results(restricted_shards) do |account_ids|
-      rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account)
+      rows = Pseudonym.active.where(account_id: account_ids, sis_user_id: ids).joins(:user, :account)
                       .pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
-      rows += Pseudonym.active.where(:account_id => account_ids, :integration_id => ids).joins(:user, :account)
+      rows += Pseudonym.active.where(account_id: account_ids, integration_id: ids).joins(:user, :account)
                        .pluck(:integration_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
       rows
     end

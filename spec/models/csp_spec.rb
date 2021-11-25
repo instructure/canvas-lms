@@ -21,7 +21,7 @@ require_relative '../spec_helper'
 
 describe Csp do
   def create_tool(context, attrs)
-    context.context_external_tools.create!({ :name => "a", :consumer_key => '12345', :shared_secret => 'secret' }.merge(attrs))
+    context.context_external_tools.create!({ name: "a", consumer_key: '12345', shared_secret: 'secret' }.merge(attrs))
   end
 
   describe "account setting inheritance" do
@@ -185,9 +185,9 @@ describe Csp do
     end
 
     it "gets all tool domains in the chain" do
-      create_tool(@root, :domain => "example1.com")
-      create_tool(@sub1, :domain => "example2.com")
-      create_tool(@sub2, :url => "https://example3.com/launchnstuff")
+      create_tool(@root, domain: "example1.com")
+      create_tool(@sub1, domain: "example2.com")
+      create_tool(@sub2, url: "https://example3.com/launchnstuff")
 
       expect(@sub1.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com"])
       expect(@sub2.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
@@ -204,7 +204,7 @@ describe Csp do
     it "invalidates the tool domain cache" do
       enable_cache do
         expect(@sub2.csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
-        root_tool = create_tool(@root, :domain => "example1.com")
+        root_tool = create_tool(@root, domain: "example1.com")
         expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example1.com", "*.example1.com"]
         expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example1.com", "*.example1.com"]
         root_tool.update_attribute(:domain, "example2.com")
@@ -255,11 +255,11 @@ describe Csp do
 
     it "invalidates the cache for course-level tools" do
       enable_cache do
-        create_tool(@course, :url => "https://course.example.com/blah")
+        create_tool(@course, url: "https://course.example.com/blah")
         expect(@course.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["course.example.com", "*.course.example.com"])
 
         Timecop.freeze(1.minute.from_now) do
-          create_tool(@course, :url => "https://example2.com/whee/woo")
+          create_tool(@course, url: "https://example2.com/whee/woo")
         end
         expect(@course.reload.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["course.example.com", "*.course.example.com", "example2.com", "*.example2.com"])
       end
@@ -267,8 +267,8 @@ describe Csp do
 
     it "ties all the domains together" do
       @root.add_domain!("example1.com")
-      create_tool(@sub, :domain => "example2.com")
-      create_tool(@course, :domain => "example3.com")
+      create_tool(@sub, domain: "example2.com")
+      create_tool(@course, domain: "example3.com")
       expect(@course.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
     end
   end

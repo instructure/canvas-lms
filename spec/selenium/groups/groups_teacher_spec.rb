@@ -290,7 +290,7 @@ describe "new groups" do
 
       button = f('.move-select button[type="submit"]')
       # have to wait for instUI animations
-keep_trying_until do
+      keep_trying_until do
         button.click
         true
       end

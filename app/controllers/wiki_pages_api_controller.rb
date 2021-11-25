@@ -138,9 +138,9 @@
 #
 class WikiPagesApiController < ApplicationController
   before_action :require_context
-  before_action :get_wiki_page, :except => [:create, :index]
-  before_action :require_wiki_page, :except => %i[create update update_front_page index]
-  before_action :was_front_page, :except => [:index]
+  before_action :get_wiki_page, except: [:create, :index]
+  before_action :require_wiki_page, except: %i[create update update_front_page index]
+  before_action :was_front_page, except: [:index]
   before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
   end
@@ -179,7 +179,7 @@ class WikiPagesApiController < ApplicationController
 
     new_page = @page.duplicate
     new_page.save!
-    render :json => wiki_page_json(new_page, @current_user, session)
+    render json: wiki_page_json(new_page, @current_user, session)
   end
 
   # @API Update/create front page
@@ -280,7 +280,7 @@ class WikiPagesApiController < ApplicationController
       if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
-      render :json => wiki_pages_json(wiki_pages, @current_user, session, :master_course_status => mc_status)
+      render json: wiki_pages_json(wiki_pages, @current_user, session, master_course_status: mc_status)
     end
   end
 
@@ -331,9 +331,9 @@ class WikiPagesApiController < ApplicationController
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
-        render :json => wiki_page_json(@page, @current_user, session)
+        render json: wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
+        render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -350,7 +350,7 @@ class WikiPagesApiController < ApplicationController
   def show
     if authorized_action(@page, @current_user, :read)
       log_asset_access(@page, "wiki", @wiki)
-      render :json => wiki_page_json(@page, @current_user, session)
+      render json: wiki_page_json(@page, @current_user, session)
     end
   end
 
@@ -406,9 +406,9 @@ class WikiPagesApiController < ApplicationController
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
-        render :json => wiki_page_json(@page, @current_user, session)
+        render json: wiki_page_json(@page, @current_user, session)
       else
-        render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
+        render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
   end
@@ -428,11 +428,11 @@ class WikiPagesApiController < ApplicationController
 
       if @was_front_page
         @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
-        render :json => @page.errors, :status => :bad_request
+        render json: @page.errors, status: :bad_request
       else
         @page.destroy
         process_front_page
-        render :json => wiki_page_json(@page, @current_user, session)
+        render json: wiki_page_json(@page, @current_user, session)
       end
     end
   end
@@ -451,7 +451,7 @@ class WikiPagesApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, @page, :revisions])
       scope = @page.versions
       revisions = Api.paginate(scope, self, route)
-      render :json => wiki_page_revisions_json(revisions, @current_user, session, @page.current_version)
+      render json: wiki_page_revisions_json(revisions, @current_user, session, @page.current_version)
     end
   end
 
@@ -506,7 +506,7 @@ class WikiPagesApiController < ApplicationController
           end
           output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
         end
-        render :json => output_json
+        render json: output_json
       end
     end
   end
@@ -534,9 +534,9 @@ class WikiPagesApiController < ApplicationController
       @page.url = @revision.url
       @page.user_id = @current_user.id if @current_user
       if @page.save
-        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
+        render json: wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
       else
-        render :json => @page.errors, :status => :bad_request
+        render json: @page.errors, status: :bad_request
       end
     end
   end
@@ -562,7 +562,7 @@ class WikiPagesApiController < ApplicationController
 
     # create a new page if the page was not found
     unless @page
-      @page = @wiki.build_wiki_page(@current_user, :url => @url)
+      @page = @wiki.build_wiki_page(@current_user, url: @url)
       if is_front_page_action?
         @page.workflow_state = 'active'
         @set_front_page = true
@@ -574,9 +574,9 @@ class WikiPagesApiController < ApplicationController
   def require_wiki_page
     if !@page || @page.new_record?
       if is_front_page_action?
-        render :status => :not_found, :json => { :message => 'No front page has been set' }
+        render status: :not_found, json: { message: 'No front page has been set' }
       else
-        render :status => :not_found, :json => { :message => 'page not found' }
+        render status: :not_found, json: { message: 'page not found' }
       end
     end
   end

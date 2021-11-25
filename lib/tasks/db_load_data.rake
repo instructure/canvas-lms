@@ -33,7 +33,7 @@ namespace :db do
   end
 
   desc "Load environment"
-  task :load_environment => [:generate_security_key, :environment] do
+  task load_environment: [:generate_security_key, :environment] do
     raise "Please configure domain.yml" unless HostUrl.default_host
   end
 
@@ -44,7 +44,7 @@ namespace :db do
   end
 
   desc "Make sure all message templates have notifications in the db"
-  task :evaluate_notification_templates => :load_environment do
+  task evaluate_notification_templates: :load_environment do
     Dir.glob(Rails.root.join('app/messages/*.erb')) do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
@@ -59,21 +59,21 @@ namespace :db do
   end
 
   desc "Find or create the notifications"
-  task :load_notifications => :load_environment do
+  task load_notifications: :load_environment do
     # Load the "notification_types.yml" file that provides initial values for the notifications.
     categories = YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
     categories.each do |category|
       category['notifications'].each do |notification|
-        create_notification({ :name => notification['name'],
-                              :delay_for => notification['delay_for'],
-                              :category => category['category'] })
+        create_notification({ name: notification['name'],
+                              delay_for: notification['delay_for'],
+                              category: category['category'] })
       end
     end
     puts "\nNotifications Loaded"
   end
 
   desc "Create default accounts"
-  task :create_default_accounts => :environment do
+  task create_default_accounts: :environment do
     Account.default(true)
     Account.site_admin(true)
 
@@ -85,7 +85,7 @@ namespace :db do
   end
 
   desc "Create an administrator user"
-  task :configure_admin => :load_environment do
+  task configure_admin: :load_environment do
     def create_admin(email, password)
       pseudonym = Account.site_admin.pseudonyms.active.by_unique_id(email).first
       pseudonym ||= Account.default.pseudonyms.active.by_unique_id(email).first
@@ -95,9 +95,9 @@ namespace :db do
         # don't pass the password in the create call, because that way is extra
         # picky. the admin should know what they're doing, and we'd rather not
         # fail here.
-        pseudonym = user.pseudonyms.create!(:unique_id => email,
-                                            :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin)
-        user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
+        pseudonym = user.pseudonyms.create!(unique_id: email,
+                                            password: "validpassword", password_confirmation: "validpassword", account: Account.site_admin)
+        user.communication_channels.create!(path: email) { |cc| cc.workflow_state = 'active' }
       end
       # set the password later.
       pseudonym.password = pseudonym.password_confirmation = password
@@ -148,7 +148,7 @@ namespace :db do
   end
 
   desc "Configure usage statistics collection"
-  task :configure_statistics_collection => [:load_environment] do
+  task configure_statistics_collection: [:load_environment] do
     gather_data = ENV["CANVAS_LMS_STATS_COLLECTION"] || ""
     gather_data = "opt_out" if gather_data.empty?
 
@@ -179,17 +179,17 @@ namespace :db do
   end
 
   desc "Configure default settings"
-  task :configure_default_settings => :load_environment do
+  task configure_default_settings: :load_environment do
     Setting.set("support_multiple_account_types", "false")
     Setting.set("show_opensource_linkback", "true")
   end
 
   desc "generate data"
-  task :generate_data => %i[configure_default_settings load_notifications
-                            evaluate_notification_templates]
+  task generate_data: %i[configure_default_settings load_notifications
+                         evaluate_notification_templates]
 
   desc "Configure Default Account Name"
-  task :configure_account_name => :load_environment do
+  task configure_account_name: :load_environment do
     if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
       require 'highline/import'
 
@@ -214,12 +214,12 @@ namespace :db do
   end
 
   desc "Create all the initial data, including notifications and admin account"
-  task :load_initial_data => %i[create_default_accounts configure_admin configure_account_name configure_statistics_collection generate_data] do
+  task load_initial_data: %i[create_default_accounts configure_admin configure_account_name configure_statistics_collection generate_data] do
     puts "\nInitial data loaded"
   end # Task: load_initial_data
 
   desc "Useful initial setup task"
-  task :initial_setup => [:environment, :generate_security_key] do
+  task initial_setup: [:environment, :generate_security_key] do
     Switchman::Shard.default(reload: true)
     Rake::Task['db:migrate'].invoke
     ActiveRecord::Base.connection.schema_cache.clear!

@@ -127,9 +127,9 @@ describe FilePreviewsController do
 
   it "fulfills module completion requirements" do
     attachment_model content_type: 'application/msword'
-    mod = @course.context_modules.create!(:name => "some module")
-    tag = mod.add_item(:id => @attachment.id, :type => 'attachment')
-    mod.completion_requirements = { tag.id => { :type => 'must_view' } }
+    mod = @course.context_modules.create!(name: "some module")
+    tag = mod.add_item(id: @attachment.id, type: 'attachment')
+    mod.completion_requirements = { tag.id => { type: 'must_view' } }
     mod.save!
     expect(mod.evaluate_for(@user).workflow_state).to eq "unlocked"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }

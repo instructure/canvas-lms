@@ -55,7 +55,7 @@ module HasContentTags
   end
 
   def relock_modules!(relocked_modules = [], student_ids = nil)
-    ContextModule.where(:id => ContentTag.where(:content_id => self, :content_type => self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
+    ContextModule.where(id: ContentTag.where(content_id: self, content_type: self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
       mod.relock_progressions(relocked_modules, student_ids)
     end
   end

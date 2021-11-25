@@ -94,7 +94,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         )
 
         # reload and preload stuff
-        conversations = ConversationParticipant.where(:id => batch.conversations)
+        conversations = ConversationParticipant.where(id: batch.conversations)
                                                .preload(:conversation)
                                                .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))

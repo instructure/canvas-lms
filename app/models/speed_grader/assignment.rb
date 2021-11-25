@@ -53,11 +53,11 @@ module SpeedGrader
       enrollment_json_fields = %i[course_section_id workflow_state user_id]
 
       res = assignment.as_json(
-        :include => [
-          { :context => { :only => :id } },
+        include: [
+          { context: { only: :id } },
           :rubric_association
         ],
-        :include_root => false
+        include_root: false
       )
 
       res['context']['concluded'] = assignment.context.concluded?
@@ -95,7 +95,7 @@ module SpeedGrader
 
       # include all the rubric assessments if a moderator
       all_provisional_rubric_assessments =
-        grading_role == :moderator ? assignment.visible_rubric_assessments_for(current_user, :provisional_moderator => true) : []
+        grading_role == :moderator ? assignment.visible_rubric_assessments_for(current_user, provisional_moderator: true) : []
 
       ActiveRecord::Associations::Preloader.new.preload(assignment, :moderated_grading_selections) if provisional_grader_or_moderator?
 
@@ -138,7 +138,7 @@ module SpeedGrader
         end
         enrollment_json
       end
-      res[:context][:quiz] = assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
+      res[:context][:quiz] = assignment.quiz.as_json(include_root: false, only: [:anonymous_submissions])
 
       attachment_includes = %i[crocodoc_document canvadoc root_attachment]
       # Preload attachments for later looping
@@ -199,7 +199,7 @@ module SpeedGrader
         # attachments again via the submission method that creates a
         # new query.
         json['attachments'] = attachments_for_submission[sub].map do |att|
-          att.as_json(:only => %i[mime_class comment_id id submitter_id])
+          att.as_json(only: %i[mime_class comment_id id submitter_id])
         end
 
         sub_attachments = []

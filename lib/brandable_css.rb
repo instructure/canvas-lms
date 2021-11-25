@@ -305,7 +305,7 @@ module BrandableCSS
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
         # eg: you want to test a controller action and you don't care that it links
         # to a css file that hasn't been created yet.
-        default_value = { :combinedChecksum => "Error: unknown css checksum. you need to run brandable_css" }.freeze
+        default_value = { combinedChecksum: "Error: unknown css checksum. you need to run brandable_css" }.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
     end

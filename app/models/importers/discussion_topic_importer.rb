@@ -152,8 +152,8 @@ module Importers
       end
 
       if options[:has_group_category]
-        item.group_category ||= context.group_categories.active.where(:name => options[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
+        item.group_category ||= context.group_categories.active.where(name: options[:group_category]).first
+        item.group_category ||= context.group_categories.active.where(name: I18n.t("Project Groups")).first_or_create
       elsif migration.for_master_course_import? && !item.is_announcement
         if item.for_group_discussion? && !item.can_group?
           # when this is false you can't actually unset the category in the UI so we'll keep it consistent here

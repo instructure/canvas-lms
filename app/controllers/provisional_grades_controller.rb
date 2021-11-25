@@ -185,7 +185,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
     submission = pg.submission
     selection = @assignment.moderated_grading_selections.where(student_id: submission.user_id).first
-    return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+    return render json: { message: 'student not in moderation set' }, status: :bad_request unless selection
 
     selection.provisional_grade = pg
     selection.save!
@@ -227,14 +227,14 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     end
 
     unless @assignment.moderated_grading?
-      return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
+      return render json: { message: "Assignment does not use moderated grading" }, status: :bad_request
     end
     if @assignment.grades_published?
-      return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
+      return render json: { message: "Assignment grades have already been published" }, status: :bad_request
     end
 
     submissions = @assignment.submissions.preload(:all_submission_comments,
-                                                  { :provisional_grades => :rubric_assessments })
+                                                  { provisional_grades: :rubric_assessments })
     selections = @assignment.moderated_grading_selections.index_by(&:student_id)
 
     graded_submissions = submissions.select do |submission|
@@ -279,6 +279,6 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     @context.clear_todo_list_cache_later(:admins) # just in case nothing got published
     @assignment.updating_user = @current_user
     @assignment.update_attribute(:grades_published_at, Time.now.utc)
-    render :json => { :message => "OK" }
+    render json: { message: "OK" }
   end
 end

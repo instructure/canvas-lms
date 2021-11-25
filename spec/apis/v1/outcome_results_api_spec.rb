@@ -88,7 +88,7 @@ describe "Outcome Results API", type: :request do
       assessor: outcome_teacher,
       artifact: submission,
       assessment: {
-        assessment_type: 'grading',
+        :assessment_type => 'grading',
         "criterion_#{criterion[:id]}".to_sym => {
           points: points
         }
@@ -317,23 +317,23 @@ describe "Outcome Results API", type: :request do
 
         context 'Student filters in LMGB FF' do
           before do
-            @concluded_student = User.create!(:name => 'Student - Concluded')
+            @concluded_student = User.create!(name: 'Student - Concluded')
             @concluded_student.register!
             @course.enroll_student(@concluded_student)
             create_outcome_assessment(student: @concluded_student)
             @concluded_student.enrollments.first.conclude
 
-            @inactive_student = User.create!(:name => 'Student - Inactive')
+            @inactive_student = User.create!(name: 'Student - Inactive')
             @inactive_student.register!
             @course.enroll_student(@inactive_student)
             create_outcome_assessment(student: @inactive_student)
             @inactive_student.enrollments.first.deactivate
 
-            @no_results_student = User.create!(:name => 'Student - No Results')
+            @no_results_student = User.create!(name: 'Student - No Results')
             @no_results_student.register!
             @course.enroll_student(@no_results_student)
 
-            @observer = User.create!(:name => 'Observer')
+            @observer = User.create!(name: 'Observer')
             @observer.register!
             @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @no_results_student.id, enrollment_state: 'active')
 
@@ -660,7 +660,7 @@ describe "Outcome Results API", type: :request do
           create_outcome_assessment(new: true)
           @outcome
         end
-        @outcome_group = @course.learning_outcome_groups.create!(:title => 'groupage')
+        @outcome_group = @course.learning_outcome_groups.create!(title: 'groupage')
         @outcomes += Array.new(3) do
           create_outcome_assessment(new: true)
           @outcome

@@ -54,7 +54,7 @@ class RubricAssociation < ActiveRecord::Base
   after_save :update_alignments
 
   before_create :touch_association
-  before_update :touch_association, :if => :will_save_change_to_rubric_id? # apparently we change the rubric sometimes
+  before_update :touch_association, if: :will_save_change_to_rubric_id? # apparently we change the rubric sometimes
   before_destroy :touch_association
   serialize :summary_data
 
@@ -105,10 +105,10 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
-  scope :bookmarked, -> { where(:bookmarked => true) }
-  scope :for_purpose, ->(purpose) { where(:purpose => purpose) }
-  scope :for_grading, -> { where(:purpose => 'grading') }
-  scope :for_context_codes, ->(codes) { where(:context_code => codes) }
+  scope :bookmarked, -> { where(bookmarked: true) }
+  scope :for_purpose, ->(purpose) { where(purpose: purpose) }
+  scope :for_grading, -> { where(purpose: 'grading') }
+  scope :for_context_codes, ->(codes) { where(context_code: codes) }
   scope :include_rubric, -> { preload(:rubric) }
   scope :before, ->(date) { where("rubric_associations.created_at<?", date) }
 
@@ -205,7 +205,7 @@ class RubricAssociation < ActiveRecord::Base
 
   def remind_user(assessee)
     assessment_request = assessment_requests.where(user_id: assessee).first
-    assessment_request ||= assessment_requests.build(:user => assessee)
+    assessment_request ||= assessment_requests.build(user: assessee)
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
   end
@@ -231,7 +231,7 @@ class RubricAssociation < ActiveRecord::Base
     # but only if not already associated
     if association_id && association_type == 'Assignment'
       association_object.submissions.each do |sub|
-        sub.assessment_requests.where(:rubric_association_id => nil).update_all(:rubric_association_id => id, :workflow_state => 'assigned')
+        sub.assessment_requests.where(rubric_association_id: nil).update_all(rubric_association_id: id, workflow_state: 'assigned')
       end
     end
   end
@@ -309,7 +309,7 @@ class RubricAssociation < ActiveRecord::Base
       if group
         provisional_grader = opts[:artifact].is_a?(ModeratedGrading::ProvisionalGrade) && opts[:assessor]
         artifacts_to_assess = students_to_assess.map do |student|
-          association_object.find_asset_for_assessment(self, student, :provisional_grader => provisional_grader).first
+          association_object.find_asset_for_assessment(self, student, provisional_grader: provisional_grader).first
         end
       else
         artifacts_to_assess = [opts[:artifact]]
@@ -375,7 +375,7 @@ class RubricAssociation < ActiveRecord::Base
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
-      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => rubric, :assessment_type => params[:assessment_type])
+      assessment ||= association.rubric_assessments.build(assessor: opts[:assessor], artifact: artifact, user: artifact.student, rubric: rubric, assessment_type: params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
 

@@ -23,34 +23,34 @@ describe EnrollmentState do
   describe "#enrollments_needing_calculation" do
     it "finds enrollments that need calculation" do
       course_factory
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
 
-      invalidated_enroll1 = student_in_course(:course => @course)
-      EnrollmentState.where(:enrollment_id => invalidated_enroll1).update_all(:state_is_current => false)
-      invalidated_enroll2 = student_in_course(:course => @course)
-      EnrollmentState.where(:enrollment_id => invalidated_enroll2).update_all(:access_is_current => false)
+      invalidated_enroll1 = student_in_course(course: @course)
+      EnrollmentState.where(enrollment_id: invalidated_enroll1).update_all(state_is_current: false)
+      invalidated_enroll2 = student_in_course(course: @course)
+      EnrollmentState.where(enrollment_id: invalidated_enroll2).update_all(access_is_current: false)
 
       expect(EnrollmentState.enrollments_needing_calculation.to_a).to match_array([invalidated_enroll1, invalidated_enroll2])
     end
 
     it "is able to use a scope" do
       course_factory
-      enroll = student_in_course(:course => @course)
-      EnrollmentState.where(:enrollment_id => enroll).update_all(:state_is_current => false)
+      enroll = student_in_course(course: @course)
+      EnrollmentState.where(enrollment_id: enroll).update_all(state_is_current: false)
 
-      expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where.not(:id => nil)).to_a).to eq [enroll]
-      expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where(:id => nil)).to_a).to be_empty
+      expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where.not(id: nil)).to_a).to eq [enroll]
+      expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where(id: nil)).to_a).to be_empty
     end
   end
 
   describe "#process_states_for" do
     before :once do
       course_factory(active_all: true)
-      @enrollment = student_in_course(:course => @course)
+      @enrollment = student_in_course(course: @course)
     end
 
     it "reprocesses invalidated states" do
-      EnrollmentState.where(:enrollment_id => @enrollment).update_all(:state_is_current => false, :state => "somethingelse")
+      EnrollmentState.where(enrollment_id: @enrollment).update_all(state_is_current: false, state: "somethingelse")
 
       @enrollment.reload
       EnrollmentState.process_states_for(@enrollment)
@@ -61,7 +61,7 @@ describe EnrollmentState do
     end
 
     it "reprocesses invalidated accesses" do
-      EnrollmentState.where(:enrollment_id => @enrollment).update_all(:access_is_current => false, :restricted_access => true)
+      EnrollmentState.where(enrollment_id: @enrollment).update_all(access_is_current: false, restricted_access: true)
 
       @enrollment.reload
       EnrollmentState.process_states_for(@enrollment)
@@ -75,13 +75,13 @@ describe EnrollmentState do
   describe "state invalidation" do
     it "invalidates enrollments after enrollment term date change" do
       course_factory(active_all: true)
-      other_enroll = student_in_course(:course => @course)
+      other_enroll = student_in_course(course: @course)
 
       term = Account.default.enrollment_terms.create!
       course_factory(active_all: true)
       @course.enrollment_term = term
       @course.save!
-      term_enroll = student_in_course(:course => @course)
+      term_enroll = student_in_course(course: @course)
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(not_eq(other_enroll))
 
@@ -107,8 +107,8 @@ describe EnrollmentState do
       course_factory(active_all: true)
       @course.enrollment_term = term
       @course.save!
-      other_enroll = teacher_in_course(:course => @course)
-      term_enroll = student_in_course(:course => @course)
+      other_enroll = teacher_in_course(course: @course)
+      term_enroll = student_in_course(course: @course)
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(term_enroll)
 
@@ -133,7 +133,7 @@ describe EnrollmentState do
       course_factory(active_all: true)
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-      enroll = student_in_course(:course => @course)
+      enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
@@ -153,7 +153,7 @@ describe EnrollmentState do
 
     it "invalidates enrollments after changing course setting overriding term dates" do
       course_factory(active_all: true)
-      enroll = student_in_course(:course => @course)
+      enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
@@ -179,10 +179,10 @@ describe EnrollmentState do
 
     it "invalidates enrollments after changing course section dates" do
       course_factory(active_all: true)
-      other_enroll = student_in_course(:course => @course)
+      other_enroll = student_in_course(course: @course)
 
       section = @course.course_sections.create!
-      enroll = student_in_course(:course => @course, :section => section)
+      enroll = student_in_course(course: @course, section: section)
       enroll_state = enroll.enrollment_state
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course_section).to eq section }
@@ -207,16 +207,16 @@ describe EnrollmentState do
 
   describe "access invalidation" do
     def restrict_view(account, type)
-      account.settings[type] = { :value => true, :locked => false }
+      account.settings[type] = { value: true, locked: false }
       account.save!
     end
 
     it "invalidates access for future students when account future access settings are changed" do
       course_factory(active_all: true)
-      other_enroll = student_in_course(:course => @course)
+      other_enroll = student_in_course(course: @course)
       other_state = other_enroll.enrollment_state
 
-      future_enroll = student_in_course(:course => @course)
+      future_enroll = student_in_course(course: @course)
       start_at = 2.days.from_now
       future_enroll.start_at = start_at
       future_enroll.end_at = 3.days.from_now
@@ -244,17 +244,17 @@ describe EnrollmentState do
 
     it "invalidates access for past students when past access settings are changed" do
       course_factory(active_all: true)
-      other_enroll = student_in_course(:course => @course)
+      other_enroll = student_in_course(course: @course)
       other_state = other_enroll.enrollment_state
 
       sub_account = Account.default.sub_accounts.create!
 
-      course_factory(active_all: true, :account => sub_account)
+      course_factory(active_all: true, account: sub_account)
       @course.start_at = 3.days.ago
       @course.conclude_at = 2.days.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-      past_enroll = student_in_course(:course => @course)
+      past_enroll = student_in_course(course: @course)
 
       past_state = past_enroll.enrollment_state
       expect(past_state.state).to eq 'completed'
@@ -280,7 +280,7 @@ describe EnrollmentState do
       @course.conclude_at = 4.days.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-      enroll = student_in_course(:course => @course)
+      enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
       expect(enroll_state.state).to eq 'pending_invited'
@@ -304,7 +304,7 @@ describe EnrollmentState do
       @course.conclude_at = 4.days.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-      enroll = student_in_course(:course => @course)
+      enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
       expect(enroll_state.state).to eq 'pending_invited'
@@ -332,7 +332,7 @@ describe EnrollmentState do
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
 
-      enroll = student_in_course(:course => @course)
+      enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
       expect(enroll_state.state).to eq 'pending_invited'
 
@@ -351,8 +351,8 @@ describe EnrollmentState do
   end
 
   it "does not cache the wrong state when setting to 'invited'" do
-    course_factory(:active_all => true)
-    e = student_in_course(:course => @course)
+    course_factory(active_all: true)
+    e = student_in_course(course: @course)
     e.reject!
     RequestCache.enable do
       e.workflow_state = 'invited'

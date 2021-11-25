@@ -120,7 +120,7 @@
 #
 class ContextModulesApiController < ApplicationController
   before_action :require_context
-  before_action :find_student, :only => [:index, :show]
+  before_action :find_student, only: [:index, :show]
   include Api::V1::ContextModule
 
   # @API List modules
@@ -179,7 +179,7 @@ class ContextModulesApiController < ApplicationController
         opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
       end
 
-      render :json => modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
+      render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
 
@@ -214,7 +214,7 @@ class ContextModulesApiController < ApplicationController
       includes = Array(params[:include])
       ActiveRecord::Associations::Preloader.new.preload(mod, content_tags: :content) if includes.include?('items')
       prog = @student ? mod.evaluate_for(@student) : nil
-      render :json => module_json(mod, @student || @current_user, session, prog, includes)
+      render json: module_json(mod, @student || @current_user, session, prog, includes)
     end
   end
 
@@ -233,13 +233,13 @@ class ContextModulesApiController < ApplicationController
           content_tag.content_type == 'Attachment'
         end
         result_json['ENV_UPDATE'] = attachment_tags.map do |attachment_tag|
-          { :id => attachment_tag.id.to_s,
-            :content_id => attachment_tag.content_id,
-            :content_details => content_details(attachment_tag, @current_user, :for_admin => true) }
+          { id: attachment_tag.id.to_s,
+            content_id: attachment_tag.content_id,
+            content_details: content_details(attachment_tag, @current_user, for_admin: true) }
         end
-        render :json => result_json
+        render json: result_json
       else
-        render :json => { error: 'cannot save new module' }, status: :bad_request
+        render json: { error: 'cannot save new module' }, status: :bad_request
       end
     end
   end
@@ -271,13 +271,13 @@ class ContextModulesApiController < ApplicationController
   def batch_update
     if authorized_action(@context, @current_user, :manage_content)
       event = params[:event]
-      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless event.present?
-      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w[publish unpublish delete].include? event
-      return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
+      return render(json: { message: 'need to specify event' }, status: :bad_request) unless event.present?
+      return render(json: { message: 'invalid event' }, status: :bad_request) unless %w[publish unpublish delete].include? event
+      return render(json: { message: 'must specify module_ids[]' }, status: :bad_request) unless params[:module_ids].present?
 
       module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
       modules = @context.context_modules.not_deleted.where(id: module_ids)
-      return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
+      return render(json: { message: 'no modules found' }, status: :not_found) if modules.empty?
 
       completed_ids = []
       modules.each do |mod|
@@ -295,7 +295,7 @@ class ContextModulesApiController < ApplicationController
         completed_ids << mod.id
       end
 
-      render :json => { :completed => completed_ids }
+      render json: { completed: completed_ids }
     end
   end
 
@@ -337,8 +337,8 @@ class ContextModulesApiController < ApplicationController
   # @returns Module
   def create
     if authorized_action(@context.context_modules.temp_record, @current_user, :create)
-      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
-      return render :json => { :message => "missing module name" }, :status => :bad_request unless params[:module][:name].present?
+      return render json: { message: "missing module parameter" }, status: :bad_request unless params[:module]
+      return render json: { message: "missing module name" }, status: :bad_request unless params[:module][:name].present?
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
@@ -350,9 +350,9 @@ class ContextModulesApiController < ApplicationController
       @module.workflow_state = 'unpublished'
 
       if @module.save && set_position
-        render :json => module_json(@module, @current_user, session, nil)
+        render json: module_json(@module, @current_user, session, nil)
       else
-        render :json => @module.errors, :status => :bad_request
+        render json: @module.errors, status: :bad_request
       end
     end
   end
@@ -399,7 +399,7 @@ class ContextModulesApiController < ApplicationController
   def update
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
-      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
+      return render json: { message: "missing module parameter" }, status: :bad_request unless params[:module]
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
@@ -426,9 +426,9 @@ class ContextModulesApiController < ApplicationController
         json = module_json(@module, @current_user, session, nil)
         json['relock_warning'] = true if relock_warning || @module.relock_warning?
         json['publish_warning'] = publish_warning.present?
-        render :json => json
+        render json: json
       else
-        render :json => @module.errors, :status => :bad_request
+        render json: @module.errors, status: :bad_request
       end
     end
   end
@@ -448,7 +448,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :delete)
       @module.destroy
-      render :json => module_json(@module, @current_user, session, nil)
+      render json: module_json(@module, @current_user, session, nil)
     end
   end
 
@@ -471,7 +471,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
       @module.relock_progressions
-      render :json => module_json(@module, @current_user, session, nil)
+      render json: module_json(@module, @current_user, session, nil)
     end
   end
 

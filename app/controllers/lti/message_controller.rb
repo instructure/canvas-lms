@@ -223,10 +223,10 @@ module Lti
       sequence_asset = tag.try(:content)
       if sequence_asset
         env_hash[:SEQUENCE] = {
-          :ASSET_ID => sequence_asset.id,
-          :COURSE_ID => @context.id,
+          ASSET_ID: sequence_asset.id,
+          COURSE_ID: @context.id,
         }
-        js_hash = { :LTI => env_hash }
+        js_hash = { LTI: env_hash }
         js_env(js_hash)
       end
     end

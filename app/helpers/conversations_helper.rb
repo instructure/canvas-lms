@@ -88,7 +88,7 @@ module ConversationsHelper
   end
 
   def contexts_for(audience, context_tags)
-    result = { :courses => {}, :groups => {} }
+    result = { courses: {}, groups: {} }
     return result if audience.empty?
 
     context_tags.each do |tag|

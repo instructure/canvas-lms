@@ -64,7 +64,7 @@ describe InfoController do
       v_id = (last_partition.sub("versions_", "").to_i * Version.partition_size) + 1
 
       # don't have to make a real version anymore, just an object that _could_ make a version
-      Course.create.wiki_pages.create!(:id => v_id, :title => "t")
+      Course.create.wiki_pages.create!(id: v_id, title: "t")
 
       Timecop.freeze(4.years.from_now) do # and jump forward a ways
         get "health_prognosis"
@@ -257,25 +257,25 @@ describe InfoController do
       account = Account.create!
       allow(account.help_links_builder).to receive(:default_links).and_return([
                                                                                 {
-                                                                                  :available_to => ['student'],
-                                                                                  :text => 'Ask Your Instructor a Question',
-                                                                                  :subtext => 'Questions are submitted to your instructor',
-                                                                                  :url => '#teacher_feedback',
-                                                                                  :is_default => 'true'
+                                                                                  available_to: ['student'],
+                                                                                  text: 'Ask Your Instructor a Question',
+                                                                                  subtext: 'Questions are submitted to your instructor',
+                                                                                  url: '#teacher_feedback',
+                                                                                  is_default: 'true'
                                                                                 },
                                                                                 {
-                                                                                  :available_to => %w[user student teacher admin observer unenrolled],
-                                                                                  :text => 'Search the Canvas Guides',
-                                                                                  :subtext => 'Find answers to common questions',
-                                                                                  :url => 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
-                                                                                  :is_default => 'true'
+                                                                                  available_to: %w[user student teacher admin observer unenrolled],
+                                                                                  text: 'Search the Canvas Guides',
+                                                                                  subtext: 'Find answers to common questions',
+                                                                                  url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
+                                                                                  is_default: 'true'
                                                                                 },
                                                                                 {
-                                                                                  :available_to => %w[user student teacher admin observer unenrolled],
-                                                                                  :text => 'Report a Problem',
-                                                                                  :subtext => 'If Canvas misbehaves, tell us about it',
-                                                                                  :url => '#create_ticket',
-                                                                                  :is_default => 'true'
+                                                                                  available_to: %w[user student teacher admin observer unenrolled],
+                                                                                  text: 'Report a Problem',
+                                                                                  subtext: 'If Canvas misbehaves, tell us about it',
+                                                                                  url: '#create_ticket',
+                                                                                  is_default: 'true'
                                                                                 }
                                                                               ])
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)

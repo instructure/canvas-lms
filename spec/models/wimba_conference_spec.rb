@@ -30,7 +30,7 @@ describe WimbaConference do
     WimbaConference.class_eval do
       # set up a simple double that mimics basic API functionality
       def send_request(action, opts = {})
-        @mocked_users ||= { :added => [], :admins => [], :joined => [] }
+        @mocked_users ||= { added: [], admins: [], joined: [] }
         extra = ''
         if action == 'Init'
           @auth_cookie = 'authcookie=secret'
@@ -67,7 +67,7 @@ describe WimbaConference do
   end
 
   before do
-    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { :domain => "wimba.test" })])
+    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { domain: "wimba.test" })])
     email = "email@email.com"
     allow(@user).to receive(:email).and_return(email)
   end
@@ -82,11 +82,11 @@ describe WimbaConference do
 
   it "confirms valid config" do
     expect(WimbaConference.new.valid_config?).to be_truthy
-    expect(WimbaConference.new(:conference_type => "Wimba").valid_config?).to be_truthy
+    expect(WimbaConference.new(conference_type: "Wimba").valid_config?).to be_truthy
   end
 
   it "is active if an admin has joined" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     # this makes it active
     conference.initiate_conference
     expect(conference.admin_join_url(@user)).not_to be_nil
@@ -96,20 +96,20 @@ describe WimbaConference do
   end
 
   it "is closed if it has not been initiated" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     expect(conference.conference_status).to eql(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "is closed if no admins have joined" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     conference.initiate_conference
     expect(conference.conference_status).to eql(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "generates join urls correctly" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     conference.initiate_conference
     # join urls for admins and participants look the same (though token will vary by user), since
     # someone's admin/participant-ness is negotiated beforehand through api calls and isn't
@@ -120,18 +120,18 @@ describe WimbaConference do
   end
 
   it "returns archive urls correctly" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     conference.initiate_conference
     conference.admin_join_url(@user)
     conference.started_at = 1.hour.ago
     conference.ended_at = 1.hour.ago
     conference.save
     urls = conference.external_url_for("archive", @user)
-    expect(urls).to eql [{ :id => "abc123", :name => "ABC 123" }, { :id => "def456", :name => "DEF 456" }]
+    expect(urls).to eql [{ id: "abc123", name: "ABC 123" }, { id: "def456", name: "DEF 456" }]
   end
 
   it "does not return archive urls if the conference hasn't started" do
-    conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 120, :context => course_factory)
+    conference = WimbaConference.create!(title: "my conference", user: @user, duration: 120, context: course_factory)
     expect(conference.external_url_for("archive", @user)).to be_empty
   end
 end

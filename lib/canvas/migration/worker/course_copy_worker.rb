@@ -48,7 +48,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
       if ce.workflow_state == 'exported_for_course_copy'
         # use the exported attachment as the import archive
         cm.attachment = ce.attachment
-        cm.migration_settings[:migration_ids_to_import] ||= { :copy => {} }
+        cm.migration_settings[:migration_ids_to_import] ||= { copy: {} }
         cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
         # set any attachments referenced in html to be copied
         ce.selected_content['attachments'] ||= {}
@@ -66,7 +66,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.workflow_state = :pre_processed
           cm.update_import_progress(10)
 
-          cm.context.copy_attachments_from_course(source, :content_export => ce, :content_migration => cm)
+          cm.context.copy_attachments_from_course(source, content_export: ce, content_migration: cm)
           cm.update_import_progress(20)
 
           cm.import_content
@@ -91,8 +91,8 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
 
   def self.enqueue(content_migration)
     Delayed::Job.enqueue(new(content_migration.id),
-                         :priority => Delayed::LOW_PRIORITY,
-                         :max_attempts => 1,
-                         :strand => content_migration.strand)
+                         priority: Delayed::LOW_PRIORITY,
+                         max_attempts: 1,
+                         strand: content_migration.strand)
   end
 end

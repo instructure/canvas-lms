@@ -40,7 +40,7 @@ module UserLearningObjectScopes
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
+      asset.ignores.create!(user: self, purpose: purpose, permanent: permanent)
     rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
         ignore = asset.ignores.where(user_id: self, purpose: purpose).first

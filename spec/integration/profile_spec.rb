@@ -30,7 +30,7 @@ describe ProfileController do
 
   it "respects account setting for editing names" do
     a = Account.create!
-    u = user_with_pseudonym(:account => a, :active_user => true)
+    u = user_with_pseudonym(account: a, active_user: true)
     u.short_name = 'Bracken'
     u.save!
     p = u.pseudonyms.first
@@ -39,7 +39,7 @@ describe ProfileController do
     get '/profile/settings'
     expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).not_to be_empty
 
-    put '/profile', params: { :user => { :short_name => 'Cody' } }
+    put '/profile', params: { user: { short_name: 'Cody' } }
     expect(response).to be_redirect
     expect(u.reload.short_name).to eq 'Cody'
 
@@ -50,13 +50,13 @@ describe ProfileController do
     get '/profile/settings'
     expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).to be_empty
 
-    put '/profile', params: { :user => { :short_name => 'JT' } }
+    put '/profile', params: { user: { short_name: 'JT' } }
     expect(response).to be_redirect
     expect(u.reload.short_name).to eq 'Cody'
   end
 
   it "does not show student view student edit profile or other services options" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
     enter_student_view
 
     get '/profile/settings'

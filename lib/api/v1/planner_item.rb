@@ -43,10 +43,10 @@ module Api::V1::PlannerItem
     planner_override = item.planner_override_for(user)
     planner_override.plannable = item if planner_override
     context_data(item, use_effective_code: true).merge({
-                                                         :plannable_id => item.id,
-                                                         :planner_override => planner_override_json(planner_override, user, session, item.class_name),
-                                                         :plannable_type => PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
-                                                         :new_activity => new_activity(item, user, opts)
+                                                         plannable_id: item.id,
+                                                         planner_override: planner_override_json(planner_override, user, session, item.class_name),
+                                                         plannable_type: PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
+                                                         new_activity: new_activity(item, user, opts)
                                                        }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at

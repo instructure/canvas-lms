@@ -20,10 +20,10 @@
 describe DiscussionEntryParticipant do
   describe 'create' do
     before(:once) do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @topic = @course.discussion_topics.create(:title => "some topic")
-      @entry = @topic.discussion_entries.create(:message => "some message", :user => @student)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create(title: "some topic")
+      @entry = @topic.discussion_entries.create(message: "some message", user: @student)
       @participant = @entry.find_existing_participant(@student)
     end
 

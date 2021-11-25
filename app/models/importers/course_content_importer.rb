@@ -39,7 +39,7 @@ module Importers
         migration.add_attachment_path(path, file['migration_id'])
         if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
           if file['errored']
-            migration.add_warning(t(:file_import_warning, "File %{file} could not be found", :file => File.basename(file['path_name'])))
+            migration.add_warning(t(:file_import_warning, "File %{file} could not be found", file: File.basename(file['path_name'])))
           else
             valid_paths << path
           end
@@ -59,13 +59,13 @@ module Importers
           end
         end
         unzip_opts = {
-          :course => migration.context,
-          :filename => data['all_files_export']['file_path'],
-          :valid_paths => valid_paths,
-          :callback => callback,
-          :logger => logger,
-          :rename_files => migration.migration_settings[:files_import_allow_rename],
-          :migration_id_map => migration.attachment_path_id_lookup,
+          course: migration.context,
+          filename: data['all_files_export']['file_path'],
+          valid_paths: valid_paths,
+          callback: callback,
+          logger: logger,
+          rename_files: migration.migration_settings[:files_import_allow_rename],
+          migration_id_map: migration.attachment_path_id_lookup,
         }
         if (root_path = migration.migration_settings[:files_import_root_path])
           unzip_opts[:root_directory] = Folder.assert_path(
@@ -167,7 +167,7 @@ module Importers
         end
 
         module_id = migration.migration_settings[:insert_into_module_id].presence
-        unless module_id && course.context_modules.where(:id => module_id).exists? # we're importing into a module so don't create new ones
+        unless module_id && course.context_modules.where(id: module_id).exists? # we're importing into a module so don't create new ones
           Importers::ContextModuleImporter.process_migration(data, migration)
         end
 
@@ -234,7 +234,7 @@ module Importers
            migration.migration_settings[:publish_after_completion] &&
            course.unpublished?
           # i could just do it directly but this way preserves the audit trail
-          course.update_one({ :event => 'offer' }, migration.user, :blueprint_sync)
+          course.update_one({ event: 'offer' }, migration.user, :blueprint_sync)
         end
 
         if course.changed?
@@ -492,7 +492,7 @@ module Importers
         course.image_url = image_url
         course.image_id = nil
       elsif (image_ref = settings[:image_identifier_ref]) &&
-            (image_att = course.attachments.where(:migration_id => image_ref).active.first)
+            (image_att = course.attachments.where(migration_id: image_ref).active.first)
         course.image_id = image_att.id
         course.image_url = nil
       end

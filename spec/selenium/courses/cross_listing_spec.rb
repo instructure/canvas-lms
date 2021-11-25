@@ -26,9 +26,9 @@ describe "cross-listing" do
     course_with_teacher_logged_in
     @course1       = @course
     @course2       = course_with_teacher(
-      :active_course => true,
-      :user => @user,
-      :active_enrollment => true
+      active_course: true,
+      user: @user,
+      active_enrollment: true
     ).course
 
     @course2.update_attribute(:name, 'my course')
@@ -85,9 +85,9 @@ describe "cross-listing" do
     # so, we have two courses with the teacher enrolled in both.
     course_with_teacher_logged_in
     course = @course
-    other_course = course_with_teacher(:active_course => true,
-                                       :user => @user,
-                                       :active_enrollment => true).course
+    other_course = course_with_teacher(active_course: true,
+                                       user: @user,
+                                       active_enrollment: true).course
     other_course.update_attribute(:name, "cool course")
     section = course.course_sections.first
 

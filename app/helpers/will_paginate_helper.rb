@@ -29,18 +29,18 @@ module WillPaginateHelper
 
     def page_number(page)
       if page == current_page
-        tag(:em, page, :class => 'current', "aria-label": page_title(page))
+        tag(:em, page, class: 'current', "aria-label": page_title(page))
       else
-        link(page, page, :rel => rel_value(page), "aria-label": page_title(page))
+        link(page, page, rel: rel_value(page), "aria-label": page_title(page))
       end
     end
 
     def previous_or_next_page(page, text, classname)
       title = page_title(page, classname)
       if page
-        link(text, page, :class => classname, "aria-label": title)
+        link(text, page, class: classname, "aria-label": title)
       else
-        tag(:span, text, :class => classname + ' disabled', "aria-label": title)
+        tag(:span, text, class: classname + ' disabled', "aria-label": title)
       end
     end
 
@@ -50,7 +50,7 @@ module WillPaginateHelper
       return I18n.t('Previous Page') if classname == 'previous_page'
       return I18n.t('Next Page') if classname == 'next_page'
 
-      I18n.t('Page %{pageNum}', :pageNum => page.to_s)
+      I18n.t('Page %{pageNum}', pageNum: page.to_s)
     end
   end
 end

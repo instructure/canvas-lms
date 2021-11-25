@@ -24,7 +24,7 @@ module CC
     attr_accessor :exporter, :weblinks, :basic_ltis
     attr_reader :options
 
-    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :create_key, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :create_key, to: :exporter
 
     def initialize(exporter, opts = {})
       @exporter = exporter
@@ -55,7 +55,7 @@ module CC
 
     def create_document
       @file = File.new(File.join(export_dir, MANIFEST), 'w')
-      @document = Builder::XmlMarkup.new(:target => @file, :indent => 2)
+      @document = Builder::XmlMarkup.new(target: @file, indent: 2)
       @document.instruct!
       @document.manifest({ "identifier" => create_key(course, "common_cartridge_") }.merge(namespace_hash)) do |manifest_node|
         manifest_node.metadata do |md|
@@ -79,7 +79,7 @@ module CC
 
       # write any errors to the manifest file
       unless @exporter.errors.empty?
-        @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
+        @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", export_id: @exporter.export_id)
         @exporter.errors.each do |error|
           @document.comment! error.first
         end

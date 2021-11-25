@@ -34,7 +34,7 @@ module CC::Importer
         res[:href] = r_node['href']
         res[:files] = []
         r_node.css('file').each do |file_node|
-          res[:files] << { :href => file_node[:href] }
+          res[:files] << { href: file_node[:href] }
         end
 
         blti_resources << res
@@ -179,7 +179,7 @@ module CC::Importer
       lti_tools.each do |tool|
         next unless tool[:assignment_points_possible]
 
-        asmnt = { :migration_id => tool[:migration_id] }
+        asmnt = { migration_id: tool[:migration_id] }
         asmnt[:title] = tool[:title]
         asmnt[:description] = tool[:description]
         asmnt[:submission_format] = "external_tool"

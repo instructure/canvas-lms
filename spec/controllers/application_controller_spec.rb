@@ -33,7 +33,7 @@ RSpec.describe ApplicationController do
         url: "http://www.example.com",
         method: "GET",
         headers: {},
-        format: double(:html? => true),
+        format: double(html?: true),
         user_agent: nil,
         remote_ip: '0.0.0.0',
         base_url: 'https://canvas.test',
@@ -117,7 +117,7 @@ RSpec.describe ApplicationController do
 
       it "sets items" do
         expect(HostUrl).to receive(:file_host).with(Account.default, "www.example.com").and_return("files.example.com")
-        controller.js_env :FOO => 'bar'
+        controller.js_env FOO: 'bar'
         expect(controller.js_env[:FOO]).to eq 'bar'
         expect(controller.js_env[:files_domain]).to eq 'files.example.com'
       end
@@ -160,28 +160,28 @@ RSpec.describe ApplicationController do
         end
 
         it "sets the env var to true when the user can use it" do
-          course_with_teacher(:active_all => true)
+          course_with_teacher(active_all: true)
           controller.instance_variable_set(:@current_user, @teacher)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
         end
 
         it "sets the env var to false when the user can't use it" do
-          course_with_student(:active_all => true)
+          course_with_student(active_all: true)
           controller.instance_variable_set(:@current_user, @student)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
         it "sets the env var to false when the context is a group" do
-          course_with_teacher(:active_all => true)
+          course_with_teacher(active_all: true)
           controller.instance_variable_set(:@current_user, @teacher)
           controller.instance_variable_set(:@context, group_model)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
         it "sets the env var to false when the user can't use it in a course context" do
-          course_with_student(:active_all => true)
+          course_with_student(active_all: true)
           course = @course
-          course_with_teacher(:active_all => true, user: @student)
+          course_with_teacher(active_all: true, user: @student)
           controller.instance_variable_set(:@current_user, @student)
           controller.instance_variable_set(:@context, course)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
@@ -196,19 +196,19 @@ RSpec.describe ApplicationController do
       end
 
       it "allows multiple items" do
-        controller.js_env :A => 'a', :B => 'b'
+        controller.js_env A: 'a', B: 'b'
         expect(controller.js_env[:A]).to eq 'a'
         expect(controller.js_env[:B]).to eq 'b'
       end
 
       it "does not allow overwriting a key" do
-        controller.js_env :REAL_SLIM_SHADY => 'please stand up'
-        expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
+        controller.js_env REAL_SLIM_SHADY: 'please stand up'
+        expect { controller.js_env(REAL_SLIM_SHADY: 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
       end
 
       it "overwrites a key if told explicitly to do so" do
-        controller.js_env :REAL_SLIM_SHADY => 'please stand up'
-        controller.js_env({ :REAL_SLIM_SHADY => 'poser' }, true)
+        controller.js_env REAL_SLIM_SHADY: 'please stand up'
+        controller.js_env({ REAL_SLIM_SHADY: 'poser' }, true)
         expect(controller.js_env[:REAL_SLIM_SHADY]).to eq 'poser'
       end
 
@@ -433,7 +433,7 @@ RSpec.describe ApplicationController do
 
     describe "clean_return_to" do
       before do
-        req = double('request obj', :protocol => 'https://', :host_with_port => 'canvas.example.com')
+        req = double('request obj', protocol: 'https://', host_with_port: 'canvas.example.com')
         allow(controller).to receive(:request).and_return(req)
       end
 
@@ -499,21 +499,21 @@ RSpec.describe ApplicationController do
     describe "safe_domain_file_user" do
       before :once do
         @user = User.create!
-        @attachment = @user.attachments.new(:filename => 'foo.png')
+        @attachment = @user.attachments.new(filename: 'foo.png')
         @attachment.content_type = 'image/png'
         @attachment.save!
       end
 
       before do
         # safe_domain_file_url wants to use request.protocol
-        allow(controller).to receive(:request).and_return(double("request", :protocol => '', :host_with_port => '', :url => ''))
+        allow(controller).to receive(:request).and_return(double("request", protocol: '', host_with_port: '', url: ''))
 
-        @common_params = { :only_path => true }
+        @common_params = { only_path: true }
       end
 
       it "includes inline=1 in url by default" do
         expect(controller).to receive(:file_download_url)
-          .with(@attachment, @common_params.merge(:inline => 1))
+          .with(@attachment, @common_params.merge(inline: 1))
           .and_return('')
         expect(HostUrl).to receive(:file_host_with_shard).with(42, '').and_return(['myfiles', Shard.default])
         controller.instance_variable_set(:@domain_root_account, 42)
@@ -537,7 +537,7 @@ RSpec.describe ApplicationController do
 
       it "includes download_frd=1 and not include inline=1 in url when specified as for download" do
         expect(controller).to receive(:file_download_url)
-          .with(@attachment, @common_params.merge(:download_frd => 1))
+          .with(@attachment, @common_params.merge(download_frd: 1))
           .and_return('')
         controller.send(:safe_domain_file_url, @attachment, download: true)
       end
@@ -545,7 +545,7 @@ RSpec.describe ApplicationController do
       it "prepends a unique file subdomain if configured" do
         override_dynamic_settings(private: { canvas: { attachment_specific_file_domain: true } }) do
           expect(controller).to receive(:file_download_url)
-            .with(@attachment, @common_params.merge(:inline => 1))
+            .with(@attachment, @common_params.merge(inline: 1))
             .and_return("/files/#{@attachment.id}")
           expect(controller.send(:safe_domain_file_url, @attachment, host_and_shard: ['canvasfiles.com', Shard.default])).to eq "a#{@attachment.shard.id}-#{@attachment.id}.canvasfiles.com/files/#{@attachment.id}"
         end
@@ -562,7 +562,7 @@ RSpec.describe ApplicationController do
         @pseudonym.update_attribute(:sis_user_id, 'test1')
         controller.instance_variable_set(:@domain_root_account, Account.default)
         allow(controller).to receive(:named_context_url).with(@user, :context_url).and_return('')
-        allow(controller).to receive(:params).and_return({ :user_id => 'sis_user_id:test1' })
+        allow(controller).to receive(:params).and_return({ user_id: 'sis_user_id:test1' })
         allow(controller).to receive(:api_request?).and_return(true)
         controller.send(:get_context)
         expect(controller.instance_variable_get(:@context)).to eq @user
@@ -574,7 +574,7 @@ RSpec.describe ApplicationController do
         @section.update_attribute(:sis_source_id, 'test1')
         controller.instance_variable_set(:@domain_root_account, Account.default)
         allow(controller).to receive(:named_context_url).with(@section, :context_url).and_return('')
-        allow(controller).to receive(:params).and_return({ :course_section_id => 'sis_section_id:test1' })
+        allow(controller).to receive(:params).and_return({ course_section_id: 'sis_section_id:test1' })
         allow(controller).to receive(:api_request?).and_return(true)
         controller.send(:get_context)
         expect(controller.instance_variable_get(:@context)).to eq @section
@@ -592,9 +592,9 @@ RSpec.describe ApplicationController do
         controller.send(:assign_localizer)
         I18n.set_locale_with_localizer # this is what t() triggers
         expect(I18n.locale.to_s).to eq "es"
-        course_model(:locale => "ru")
+        course_model(locale: "ru")
         allow(controller).to receive(:named_context_url).with(@course, :context_url).and_return('')
-        allow(controller).to receive(:params).and_return({ :course_id => @course.id })
+        allow(controller).to receive(:params).and_return({ course_id: @course.id })
         allow(controller).to receive(:api_request?).and_return(false)
         allow(controller).to receive(:session).and_return({})
         allow(controller).to receive(:js_env).and_return({})
@@ -885,9 +885,9 @@ RSpec.describe ApplicationController do
           )
           tool.url = "http://www.example.com/basic_lti"
           tool.resource_selection = {
-            :url => "http://#{HostUrl.default_host}/selection_test",
-            :selection_width => 400,
-            :selection_height => 400
+            url: "http://#{HostUrl.default_host}/selection_test",
+            selection_width: 400,
+            selection_height: 400
           }
           tool.settings[:selection_width] = 500
           tool.settings[:selection_height] = 300
@@ -1321,12 +1321,12 @@ RSpec.describe ApplicationController do
         end
 
         it 'returns the full path for the redirect url' do
-          expect(controller).to receive(:named_context_url).with(course, :context_url, { :include_host => true })
+          expect(controller).to receive(:named_context_url).with(course, :context_url, { include_host: true })
           expect(controller).to receive(:named_context_url).with(
             course,
             :context_external_content_success_url,
             'external_tool_redirect',
-            { :include_host => true }
+            { include_host: true }
           ).and_return('wrong_url')
           allow(controller).to receive(:render)
           allow(controller).to receive_messages(js_env: [])
@@ -1395,9 +1395,9 @@ RSpec.describe ApplicationController do
     describe 'external_tools_display_hashes' do
       it 'returns empty array if context is group' do
         @course = course_model
-        @group = @course.groups.create!(:name => "some group")
-        tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-        tool.account_navigation = { :url => "http://example.com", :icon_url => "http://example.com", :enabled => true }
+        @group = @course.groups.create!(name: "some group")
+        tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
+        tool.account_navigation = { url: "http://example.com", icon_url: "http://example.com", enabled: true }
         tool.save!
 
         allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
@@ -1408,14 +1408,14 @@ RSpec.describe ApplicationController do
 
       it 'returns array of tools if context is not group' do
         @course = course_model
-        tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-        tool.account_navigation = { :url => "http://example.com", :icon_url => "http://example.com", :enabled => true, :canvas_icon_class => 'icon-commons' }
+        tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
+        tool.account_navigation = { url: "http://example.com", icon_url: "http://example.com", enabled: true, canvas_icon_class: 'icon-commons' }
         tool.save!
 
         allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
         external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-        expect(external_tools).to eq([{ :id => tool.id, :title => "bob", :base_url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }])
+        expect(external_tools).to eq([{ id: tool.id, title: "bob", base_url: "http://example.com", icon_url: "http://example.com", canvas_icon_class: 'icon-commons' }])
       end
 
       it "doesn't return tools that are mapped to disabled feature flags" do
@@ -1428,7 +1428,7 @@ RSpec.describe ApplicationController do
 
         @course.enable_feature!(:analytics_2)
         external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-        expect(external_tools).to include({ :id => tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2 })
+        expect(external_tools).to include({ id: tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2 })
       end
     end
 
@@ -1446,8 +1446,8 @@ RSpec.describe ApplicationController do
 
       before :once do
         @course = course_model
-        @group = @course.groups.create!(:name => "some group")
-        @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+        @group = @course.groups.create!(name: "some group")
+        @tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
 
         @tool_settings = %i[
           user_navigation course_navigation account_navigation resource_selection
@@ -1610,9 +1610,9 @@ RSpec.describe ApplicationController do
 
         @shard1.activate do
           account = Account.create!
-          teacher_in_course(:user => @user, :active_all => true, :account => account)
-          @other_group = group_model(:context => @course)
-          group_model(:context => @course)
+          teacher_in_course(user: @user, active_all: true, account: account)
+          @other_group = group_model(context: @course)
+          group_model(context: @course)
           @group.add_user(@user)
         end
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
@@ -1624,11 +1624,11 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@context, @user)
 
         course_factory
-        student_in_course(:user => @user, :course => @course)
+        student_in_course(user: @user, course: @course)
         expect(@course).to_not be_available
         expect(@user.cached_currentish_enrollments).to be_empty
-        @other_group = group_model(:context => @course)
-        group_model(:context => @course)
+        @other_group = group_model(context: @course)
+        group_model(context: @course)
         @group.add_user(@user)
 
         controller.send(:get_all_pertinent_contexts, include_groups: true)
@@ -1971,7 +1971,7 @@ RSpec.describe ApplicationController do
   describe "show_student_view_button? helper" do
     context "for teachers" do
       before :once do
-        course_with_teacher :active_all => true
+        course_with_teacher active_all: true
       end
 
       before do
@@ -2018,7 +2018,7 @@ RSpec.describe ApplicationController do
 
     context "for students" do
       before :once do
-        course_with_student :active_all => true
+        course_with_student active_all: true
       end
 
       before do
@@ -2182,8 +2182,8 @@ RSpec.describe ApplicationController do
 
   describe "k5_user? helper" do
     before :once do
-      course_with_teacher :active_all => true
-      @student1 = student_in_course(:context => @course).user
+      course_with_teacher active_all: true
+      @student1 = student_in_course(context: @course).user
       toggle_k5_setting(@course.account)
     end
 
@@ -2349,10 +2349,10 @@ describe WikiPagesController do
     it "populates js_env with policy rights" do
       allow(controller).to receive(:default_url_options).and_return({})
 
-      course_with_teacher_logged_in :active_all => true
+      course_with_teacher_logged_in active_all: true
       controller.instance_variable_set(:@context, @course)
 
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq(@course.wiki.check_policy(@teacher).index_with { true })
@@ -2363,8 +2363,8 @@ end
 describe CoursesController do
   describe "set_js_wiki_data" do
     before do
-      course_with_teacher_logged_in :active_all => true
-      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      course_with_teacher_logged_in active_all: true
+      @course.wiki_pages.create!(title: 'blah').set_as_front_page!
       @course.reload
       @course.default_view = "wiki"
       @course.show_announcements_on_home_page = true
@@ -2390,18 +2390,18 @@ describe CoursesController do
   describe "set_master_course_js_env_data" do
     before do
       controller.instance_variable_set(:@domain_root_account, Account.default)
-      account_admin_user(:active_all => true)
+      account_admin_user(active_all: true)
       controller.instance_variable_set(:@current_user, @user)
 
       @master_course = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      @master_page = @course.wiki_pages.create!(:title => "blah", :body => "bloo")
+      @master_page = @course.wiki_pages.create!(title: "blah", body: "bloo")
       @tag = @template.content_tag_for(@master_page)
 
       @child_course = course_factory
       @template.add_child_course!(@child_course)
 
-      @child_page = @child_course.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
+      @child_page = @child_course.wiki_pages.create!(title: "bloo", body: "bloo", migration_id: @tag.migration_id)
     end
 
     it "populates master-side data (unrestricted)" do
@@ -2412,13 +2412,13 @@ describe CoursesController do
     end
 
     it "populates master-side data (restricted)" do
-      @tag.update_attribute(:restrictions, { :content => true })
+      @tag.update_attribute(:restrictions, { content: true })
 
       controller.set_master_course_js_env_data(@master_page, @master_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_master_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_truthy
-      expect(data['master_course_restrictions']).to eq({ :content => true })
+      expect(data['master_course_restrictions']).to eq({ content: true })
     end
 
     it "populates child-side data (unrestricted)" do
@@ -2429,13 +2429,13 @@ describe CoursesController do
     end
 
     it "populates child-side data (restricted)" do
-      @tag.update_attribute(:restrictions, { :content => true })
+      @tag.update_attribute(:restrictions, { content: true })
 
       controller.set_master_course_js_env_data(@child_page, @child_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_child_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_truthy
-      expect(data['master_course_restrictions']).to eq({ :content => true })
+      expect(data['master_course_restrictions']).to eq({ content: true })
     end
   end
 

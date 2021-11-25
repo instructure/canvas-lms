@@ -52,31 +52,31 @@ describe "QuizRegrading" do
     quiz_model(course: @course)
     @regrade = @quiz.quiz_regrades.where(quiz_id: @quiz.id, quiz_version: @quiz.version_number).first_or_create(user: @student)
     @true_false_question = create_quiz_question!({
-                                                   :points_possible => 1,
-                                                   :question_type => 'true_false_question',
-                                                   :question_name => 'True/False Question',
-                                                   :answers => [
-                                                     { :text => 'true', :id => 1, :weight => 100 },
-                                                     { :text => 'false', :id => 2, :weight => 0 }
+                                                   points_possible: 1,
+                                                   question_type: 'true_false_question',
+                                                   question_name: 'True/False Question',
+                                                   answers: [
+                                                     { text: 'true', id: 1, weight: 100 },
+                                                     { text: 'false', id: 2, weight: 0 }
                                                    ]
                                                  })
     @multiple_choice_question = create_quiz_question!({
-                                                        :points_possible => 1,
-                                                        :question_type => 'multiple_choice_question',
-                                                        :question_name => 'Multiple Choice Question',
-                                                        :answers => [
-                                                          { :text => "correct", :id => 3, :weight => 100 },
-                                                          { :text => "nope", :id => 4, :weight => 0 }
+                                                        points_possible: 1,
+                                                        question_type: 'multiple_choice_question',
+                                                        question_name: 'Multiple Choice Question',
+                                                        answers: [
+                                                          { text: "correct", id: 3, weight: 100 },
+                                                          { text: "nope", id: 4, weight: 0 }
                                                         ]
                                                       })
     @multiple_answers_question = create_quiz_question!({
-                                                         :points_possible => 1,
-                                                         :question_type => 'multiple_answers_question',
-                                                         :question_name => 'Multiple Answers Question',
-                                                         :answers => [
-                                                           { :text => "correct1", :id => 5, :weight => 100 },
-                                                           { :text => "correct2", :id => 6, :weight => 100 },
-                                                           { :text => "nope", :id => 7, :weight => 0 }
+                                                         points_possible: 1,
+                                                         question_type: 'multiple_answers_question',
+                                                         question_name: 'Multiple Answers Question',
+                                                         answers: [
+                                                           { text: "correct1", id: 5, weight: 100 },
+                                                           { text: "correct2", id: 6, weight: 100 },
+                                                           { text: "nope", id: 7, weight: 0 }
                                                          ]
                                                        })
     @maq_qqr = @regrade.quiz_question_regrades.create!(quiz_question_id: @multiple_answers_question.id, regrade_option: 'no_regrade')

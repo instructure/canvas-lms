@@ -32,7 +32,7 @@ module Importers
 
       outline['root_folder'] = true
       begin
-        import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
+        import_from_migration(outline.merge({ outline_folders_to_import: to_import }), migration.context, migration)
       rescue
         migration.add_warning("Error importing the course outline.", $!)
       end
@@ -71,7 +71,7 @@ module Importers
       hash = hash.with_indifferent_access
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
-      item ||= context.wiki_pages.temp_record(:wiki => context.wiki)
+      item ||= context.wiki_pages.temp_record(wiki: context.wiki)
       item.mark_as_importing!(migration)
 
       # force the url to be the same as the url_name given, since there are
@@ -124,7 +124,7 @@ module Importers
         next if sub_item[:type] == 'embedded_content'
 
         Importers::WikiPageImporter.import_from_migration(sub_item.merge({
-                                                                           :outline_folders_to_import => hash[:outline_folders_to_import]
+                                                                           outline_folders_to_import: hash[:outline_folders_to_import]
                                                                          }), context, migration)
       end
       return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
@@ -208,14 +208,14 @@ module Importers
         allow_save = false if description.blank?
       elsif hash[:page_type] == 'module_toc'
       elsif hash[:topics]
-        item.title = t('title_for_topics_category', '%{category} Topics', :category => hash[:category_name])
+        item.title = t('title_for_topics_category', '%{category} Topics', category: hash[:category_name])
         description = (hash[:category_description]).to_s
         description += "\n\n<ul>\n"
         topic_count = 0
         hash[:topics].each do |topic|
           topic = Importers::DiscussionTopicImporter.import_from_migration(topic.merge({
-                                                                                         :topics_to_import => hash[:topics_to_import],
-                                                                                         :topic_entries_to_import => hash[:topic_entries_to_import]
+                                                                                         topics_to_import: hash[:topics_to_import],
+                                                                                         topic_entries_to_import: hash[:topic_entries_to_import]
                                                                                        }), context, migration)
           if topic
             topic_count += 1
@@ -230,7 +230,7 @@ module Importers
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH
           migration.add_warning(t('warnings.truncated_wiki_title',
-                                  "The title of the following wiki page was truncated: %{title}", :title => item.title))
+                                  "The title of the following wiki page was truncated: %{title}", title: item.title))
           item.title.splice!(0...WikiPage::TITLE_LENGTH) # truncate too-long titles
         end
 

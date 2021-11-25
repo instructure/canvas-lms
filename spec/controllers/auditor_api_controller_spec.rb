@@ -42,7 +42,7 @@ describe AuditorApiController do
 
   context 'query_options' do
     it 'returns hash of audit api parameters' do
-      start_time = 5.hours.ago.change(:usec => 0)
+      start_time = 5.hours.ago.change(usec: 0)
       end_time = start_time + 2.hours
 
       # No params

@@ -27,14 +27,14 @@ describe PaginatedCollection do
       proxy = PaginatedCollection.build { |pager| pager }
       expect(proxy).to be_a_kind_of(PaginatedCollection::Proxy)
 
-      expect(proxy.paginate(:per_page => 5).size).to eq 0
+      expect(proxy.paginate(per_page: 5).size).to eq 0
     end
   end
 
   describe '#paginate' do
     it 'uses the provided collection' do
-      expect { PaginatedCollection.build { [] }.paginate(:per_page => 5) }.to raise_error(ArgumentError)
-      items = PaginatedCollection.build { |pager| pager.replace([1, 2]) }.paginate(:page => 1, :per_page => 5)
+      expect { PaginatedCollection.build { [] }.paginate(per_page: 5) }.to raise_error(ArgumentError)
+      items = PaginatedCollection.build { |pager| pager.replace([1, 2]) }.paginate(page: 1, per_page: 5)
       expect(items).to eq [1, 2]
       expect(items.size).to eq 2
       expect(items.current_page).to eq 1
@@ -55,12 +55,12 @@ describe PaginatedCollection do
         result
       end
 
-      p1 = proxy.paginate(:page => 1, :per_page => 2)
+      p1 = proxy.paginate(page: 1, per_page: 2)
       expect(p1.current_page).to eq 1
       expect(p1.next_page).to eq 2
       expect(p1.previous_page).to be_nil
 
-      p2 = proxy.paginate(:page => 2, :per_page => 2)
+      p2 = proxy.paginate(page: 2, per_page: 2)
       expect(p2.current_page).to eq 2
       expect(p2.next_page).to be_nil
       expect(p2.previous_page).to eq 1

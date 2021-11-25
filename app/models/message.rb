@@ -49,7 +49,7 @@ class Message < ActiveRecord::Base
       @id, @created_at = id, created_at
     end
 
-    delegate :dispatch_at, :to => :message
+    delegate :dispatch_at, to: :message
 
     def deliver
       message.deliver
@@ -60,7 +60,7 @@ class Message < ActiveRecord::Base
     def message
       return @message if @message.present?
 
-      @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(id: @id, created_at: @created_at).first || Message.where(id: @id).first
       raise QueuedNotFound if @message.nil?
 
       @message
@@ -76,8 +76,8 @@ class Message < ActiveRecord::Base
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
   belongs_to :user
-  belongs_to :root_account, :class_name => 'Account'
-  has_many   :attachments, :as => :context, :inverse_of => :context
+  belongs_to :root_account, class_name: 'Account'
+  has_many   :attachments, as: :context, inverse_of: :context
 
   attr_writer :delayed_messages
   attr_accessor :output_buffer
@@ -120,68 +120,68 @@ class Message < ActiveRecord::Base
   # State machine
   workflow do
     state :created do
-      event :stage, :transitions_to => :staged do
+      event :stage, transitions_to: :staged do
         self.dispatch_at = Time.now.utc + delay_for
         if to != 'dashboard'
           MessageDispatcher.dispatch(self)
         end
       end
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed # needed for dashboard messages
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed # needed for dashboard messages
     end
 
     state :staged do
-      event :dispatch, :transitions_to => :sending
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed # needed for dashboard messages
+      event :dispatch, transitions_to: :sending
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed # needed for dashboard messages
     end
 
     state :sending do
-      event :complete_dispatch, :transitions_to => :sent do
+      event :complete_dispatch, transitions_to: :sent do
         self.sent_at ||= Time.now
       end
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :cancel, :transitions_to => :cancelled
-      event :close, :transitions_to => :closed
-      event :errored_dispatch, :transitions_to => :staged do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :cancel, transitions_to: :cancelled
+      event :close, transitions_to: :closed
+      event :errored_dispatch, transitions_to: :staged do
         # A little delay so we don't churn so much when the server is down.
         self.dispatch_at = Time.now.utc + 5.minutes
       end
     end
 
     state :sent do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :close, :transitions_to => :closed
-      event :bounce, :transitions_to => :bounced do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :close, transitions_to: :closed
+      event :bounce, transitions_to: :bounced do
         # Permenant reminder that this bounced.
         communication_channel.bounce_count += 1
         communication_channel.save!
         self.is_bounced = true
       end
-      event :recycle, :transitions_to => :staged
+      event :recycle, transitions_to: :staged
     end
 
     state :bounced do
-      event :close, :transitions_to => :closed
+      event :close, transitions_to: :closed
     end
 
     state :dashboard do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :close, :transitions_to => :closed
-      event :cancel, :transitions_to => :closed
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :close, transitions_to: :closed
+      event :cancel, transitions_to: :closed
     end
 
     state :cancelled
 
     state :transmission_error do
-      event :close, :transitions_to => :closed
+      event :close, transitions_to: :closed
     end
 
     state :closed do
-      event :set_transmission_error, :transitions_to => :transmission_error
-      event :send_message, :transitions_to => :closed do
+      event :set_transmission_error, transitions_to: :transmission_error
+      event :send_message, transitions_to: :closed do
         self.sent_at ||= Time.now
       end
     end
@@ -197,13 +197,13 @@ class Message < ActiveRecord::Base
     shard.activate do
       self.updated_at = Time.now.utc
       updates = changes_to_save.transform_values(&:last)
-      self.class.in_partition(attributes).where(:id => id, :created_at => created_at).update_all(updates)
+      self.class.in_partition(attributes).where(id: id, created_at: created_at).update_all(updates)
       clear_changes_information
     end
   end
 
   # Named scopes
-  scope :for, ->(context) { where(:context_type => context.class.base_class.to_s, :context_id => context) }
+  scope :for, ->(context) { where(context_type: context.class.base_class.to_s, context_id: context) }
 
   scope :after, ->(date) { where("messages.created_at>?", date) }
   scope :more_recent_than, ->(date) { where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
@@ -212,19 +212,19 @@ class Message < ActiveRecord::Base
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  scope :to_email, -> { where(:path_type => ['email', 'sms']) }
+  scope :to_email, -> { where(path_type: ['email', 'sms']) }
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
-  scope :by_name, ->(notification_name) { where(:notification_name => notification_name) }
+  scope :by_name, ->(notification_name) { where(notification_name: notification_name) }
 
   scope :before, ->(date) { where("messages.created_at<?", date) }
 
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, -> { where(:workflow_state => %w[created staged sending]) }
+  scope :cancellable, -> { where(workflow_state: %w[created staged sending]) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
@@ -232,7 +232,7 @@ class Message < ActiveRecord::Base
   # Where user can be a User or id, name needs to be the Notification name.
   scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
-  scope :in_state, ->(state) { where(:workflow_state => Array(state).map(&:to_s)) }
+  scope :in_state, ->(state) { where(workflow_state: Array(state).map(&:to_s)) }
 
   scope :at_timestamp, ->(timestamp) { where("created_at >= ? AND created_at < ?", Time.at(timestamp.to_i), Time.at(timestamp.to_i + 1)) }
 
@@ -464,10 +464,10 @@ class Message < ActiveRecord::Base
 
     if dashboard?
       messages = Message.in_state(:dashboard).where(
-        :notification_id => notification_id,
-        :context_id => context_id,
-        :context_type => context_type,
-        :user_id => user_id
+        notification_id: notification_id,
+        context_id: context_id,
+        context_type: context_type,
+        user_id: user_id
       )
 
       (messages - [self]).each(&:close)
@@ -566,7 +566,7 @@ class Message < ActiveRecord::Base
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = ActionView::OutputBuffer.new
-    inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, :bufvar => '@output_buffer').src, binding, template_path)
+    inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, bufvar: '@output_buffer').src, binding, template_path)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding, __FILE__, __LINE__
     setter.call(inner_html)
 
@@ -598,7 +598,7 @@ class Message < ActiveRecord::Base
     if path_type == 'email'
       footer_path = Canvas::MessageHelper.find_message_path('_email_footer.email.erb')
       raw_footer_message = File.read(footer_path)
-      footer_message = eval(Erubi::Engine.new(raw_footer_message, :bufvar => "@output_buffer").src, nil, footer_path)
+      footer_message = eval(Erubi::Engine.new(raw_footer_message, bufvar: "@output_buffer").src, nil, footer_path)
       # currently, _email_footer.email.erb only contains a way for users to change notification prefs
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
@@ -998,7 +998,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(**)
-    super(:only => %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])['message']
+    super(only: %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])['message']
   end
 
   protected

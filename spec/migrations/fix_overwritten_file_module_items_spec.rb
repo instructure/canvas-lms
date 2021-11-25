@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe DataFixup::FixOverwrittenFileModuleItems do
   it "sets could_be_locked on the replacement attachments" do
     course_factory
-    att1 = attachment_with_context(@course, :display_name => "a")
+    att1 = attachment_with_context(@course, display_name: "a")
     att2 = attachment_with_context(@course)
     att2.display_name = "a"
     att2.handle_duplicates(:overwrite)

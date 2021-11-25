@@ -33,7 +33,7 @@ class ContentTag < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   belongs_to :content, polymorphic: [], exhaustive: false
-  validates :content_type, inclusion: { :allow_nil => true, :in => CONTENT_TYPES }
+  validates :content_type, inclusion: { allow_nil: true, in: CONTENT_TYPES }
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
@@ -42,7 +42,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
-  belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
+  belongs_to :learning_outcome_content, class_name: 'LearningOutcome', foreign_key: :content_id
   has_many :learning_outcome_results
   belongs_to :root_account, class_name: 'Account'
 
@@ -51,9 +51,9 @@ class ContentTag < ActiveRecord::Base
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
-  validates :context, presence: { :unless => proc { |tag| tag.context_id && tag.context_type } }
+  validates :context, presence: { unless: proc { |tag| tag.context_id && tag.context_type } }
   validates :workflow_state, presence: true
-  validates :comments, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :comments, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   before_save :associate_external_tool
   before_save :default_values
   before_save :set_root_account
@@ -71,7 +71,7 @@ class ContentTag < ActiveRecord::Base
 
   validate :check_for_restricted_content_changes
 
-  acts_as_list :scope => :context_module
+  acts_as_list scope: :context_module
 
   set_policy do
     given { |user, session| context&.grants_right?(user, session, :manage_content) }
@@ -80,17 +80,17 @@ class ContentTag < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :unpublish, :transitions_to => :unpublished
+      event :unpublish, transitions_to: :unpublished
     end
     state :unpublished do
-      event :publish, :transitions_to => :active
+      event :publish, transitions_to: :active
     end
     state :deleted
   end
 
   alias_method :published?, :active?
 
-  scope :active, -> { where(:workflow_state => 'active') }
+  scope :active, -> { where(workflow_state: 'active') }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
@@ -121,7 +121,7 @@ class ContentTag < ActiveRecord::Base
 
   def touch_context_if_learning_outcome
     if (tag_type == 'learning_outcome_association' || tag_type == 'learning_outcome') && skip_touch.blank?
-      context_type.constantize.where(:id => context_id).update_all(:updated_at => Time.now.utc)
+      context_type.constantize.where(id: context_id).update_all(updated_at: Time.now.utc)
     end
   end
 
@@ -348,12 +348,12 @@ class ContentTag < ActiveRecord::Base
       # and there are no other links to the same outcome in the same context...
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
-                             .where(:context_type => context_type, :context_id => context_id, :content_id => outcome)
+                             .where(context_type: context_type, context_id: context_id, content_id: outcome)
                              .where("id<>?", self).first
       unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
-        alignment_conditions = { :learning_outcome_id => outcome.id }
+        alignment_conditions = { learning_outcome_id: outcome.id }
         native = outcome.context_type == context_type && outcome.context_id == context_id
         if native
           @should_destroy_outcome = true
@@ -403,11 +403,11 @@ class ContentTag < ActiveRecord::Base
   def locked_for?(user, opts = {})
     return unless context_module && !context_module.deleted?
 
-    context_module.locked_for?(user, opts.merge({ :tag => self }))
+    context_module.locked_for?(user, opts.merge({ tag: self }))
   end
 
   def available_for?(user, opts = {})
-    context_module.available_for?(user, opts.merge({ :tag => self }))
+    context_module.available_for?(user, opts.merge({ tag: self }))
   end
 
   def send_items_to_stream
@@ -431,7 +431,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.update_for(asset, exclude_tag: nil)
-    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted
+    tags = ContentTag.where(content_id: asset, content_type: asset.class.to_s).not_deleted
     tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
     tags = tags.select(%i[id tag_type content_type context_module_id]).to_a
     return if tags.empty?
@@ -440,19 +440,19 @@ class ContentTag < ActiveRecord::Base
 
     # update title
     tag_ids = tags.select(&:sync_title_to_asset_title?).map(&:id)
-    attr_hash = { :updated_at => Time.now.utc }
-    { :display_name => :title, :name => :title, :title => :title }.each do |attr, val|
+    attr_hash = { updated_at: Time.now.utc }
+    { display_name: :title, name: :title, title: :title }.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
     end
-    ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
+    ContentTag.where(id: tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
     tag_ids = tags.select(&:sync_workflow_state_to_asset?).map(&:id)
-    attr_hash = { :updated_at => Time.now.utc }
+    attr_hash = { updated_at: Time.now.utc }
 
     workflow_state = asset_workflow_state(asset)
     attr_hash[:workflow_state] = workflow_state if workflow_state
-    ContentTag.where(:id => tag_ids).update_all(attr_hash) if attr_hash[:workflow_state] && !tag_ids.empty?
+    ContentTag.where(id: tag_ids).update_all(attr_hash) if attr_hash[:workflow_state] && !tag_ids.empty?
 
     # update the module timestamp
     ContentTag.touch_context_modules(module_ids)
@@ -506,7 +506,7 @@ class ContentTag < ActiveRecord::Base
     content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
-  scope :for_tagged_url, ->(url, tag) { where(:url => url, :tag => tag) }
+  scope :for_tagged_url, ->(url, tag) { where(url: url, tag: tag) }
   scope :for_context, lambda { |context|
     case context
     when Account
@@ -521,8 +521,8 @@ class ContentTag < ActiveRecord::Base
       ON caa.course_id = content_tags.context_id AND content_tags.context_type = 'Course'
       AND caa.account_id = #{account.id}")
   }
-  scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
-  scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
+  scope :learning_outcome_alignments, -> { where(tag_type: 'learning_outcome') }
+  scope :learning_outcome_links, -> { where(tag_type: 'learning_outcome_association', associated_asset_type: 'LearningOutcomeGroup', content_type: 'LearningOutcome') }
 
   # Scopes For Differentiated Assignment Filtering:
 
@@ -680,11 +680,11 @@ class ContentTag < ActiveRecord::Base
   end
 
   def to_json(options = {})
-    super({ :methods => :quiz_lti }.merge(options))
+    super({ methods: :quiz_lti }.merge(options))
   end
 
   def as_json(options = {})
-    super({ :methods => :quiz_lti }.merge(options))
+    super({ methods: :quiz_lti }.merge(options))
   end
 
   def clear_total_outcomes_cache

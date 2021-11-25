@@ -77,7 +77,7 @@ describe "assignment groups" do
     end
 
     it "clears a due date", priority: "2" do
-      assign = @course.assignments.create!(:title => "due tomorrow", :due_at => Time.zone.now + 2.days)
+      assign = @course.assignments.create!(title: "due tomorrow", due_at: Time.zone.now + 2.days)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
       fj(".date_field:first[data-date-type='due_at']").clear
@@ -91,7 +91,7 @@ describe "assignment groups" do
       allow(ConditionalRelease::Service).to receive(:jwt_for).and_return(:jwt)
 
       default_section = @course.course_sections.first
-      other_section = @course.course_sections.create!(:name => "other section")
+      other_section = @course.course_sections.create!(name: "other section")
       default_section_due = Time.zone.now + 1.day
       other_section_due = Time.zone.now + 2.days
 
@@ -126,8 +126,8 @@ describe "assignment groups" do
     end
 
     it "does not show inactive students when setting overrides" do
-      student_in_course(:course => @course, :name => "real student")
-      enrollment = student_in_course(:course => @course, :name => "inactive student")
+      student_in_course(course: @course, name: "real student")
+      enrollment = student_in_course(course: @course, name: "inactive student")
       enrollment.deactivate
 
       assign = create_assignment!
@@ -150,8 +150,8 @@ describe "assignment groups" do
       date = Time.zone.now
       date2 = Time.zone.now - 10.days
       due_date = Time.zone.now + 5.days
-      section1 = @course.course_sections.create!(:name => "Section 9", :restrict_enrollments_to_section_dates => true, :start_at => date)
-      section2 = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => date2)
+      section1 = @course.course_sections.create!(name: "Section 9", restrict_enrollments_to_section_dates: true, start_at: date)
+      section2 = @course.course_sections.create!(name: "Section 31", restrict_enrollments_to_section_dates: true, end_at: date2)
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)
@@ -173,7 +173,7 @@ describe "assignment groups" do
 
     it "properly validates identical calendar dates when saving and editing", priority: "2" do
       shared_date = "October 12 2014 at 23:59:00"
-      other_section = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => shared_date)
+      other_section = @course.course_sections.create!(name: "Section 31", restrict_enrollments_to_section_dates: true, end_at: shared_date)
       visit_new_assignment_page
       wait_for_ajaximations
 
@@ -211,7 +211,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
     end
 
     it "shows the available date range when overrides are set", priority: "2" do

@@ -32,16 +32,16 @@ describe Folder do
   it "infers its full name if it has a parent folder" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
-    child = f.active_sub_folders.build(:name => "child")
+    child = f.active_sub_folders.build(name: "child")
     child.context = @course
     child.save!
     expect(child.parent_folder).to eql(f)
     expect(child.full_name).to eql("course files/child")
-    grandchild = child.sub_folders.build(:name => "grandchild")
+    grandchild = child.sub_folders.build(name: "grandchild")
     grandchild.context = @course
     grandchild.save!
     expect(grandchild.full_name).to eql("course files/child/grandchild")
-    great_grandchild = grandchild.sub_folders.build(:name => "great_grandchild")
+    great_grandchild = grandchild.sub_folders.build(name: "great_grandchild")
     great_grandchild.context = @course
     great_grandchild.save!
     expect(great_grandchild.full_name).to eql("course files/child/grandchild/great_grandchild")
@@ -57,7 +57,7 @@ describe Folder do
   it "trims trailing whitespaces from folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
-    child = f.active_sub_folders.build(:name => "space cadet            ")
+    child = f.active_sub_folders.build(name: "space cadet            ")
     child.context = @course
     child.save!
     expect(child.parent_folder).to eql(f)
@@ -67,12 +67,12 @@ describe Folder do
   it "adds an iterator to duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
-    child = f.active_sub_folders.build(:name => "child")
+    child = f.active_sub_folders.build(name: "child")
     child.context = @course
     child.save!
     expect(child.parent_folder).to eql(f)
     expect(child.full_name).to eql("course files/child")
-    child2 = f.active_sub_folders.build(:name => "child")
+    child2 = f.active_sub_folders.build(name: "child")
     child2.context = @course
     child2.save!
     expect(child2.parent_folder).to eql(f)
@@ -82,14 +82,14 @@ describe Folder do
   it "allows the iterator to increase beyond 10 for duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
-    child = f.active_sub_folders.build(:name => "child")
+    child = f.active_sub_folders.build(name: "child")
     child.context = @course
     child.save!
     expect(child.parent_folder).to eql(f)
     expect(child.full_name).to eql("course files/child")
 
     2.upto(11) do |i|
-      duplicate = f.active_sub_folders.build(:name => "child")
+      duplicate = f.active_sub_folders.build(name: "child")
       duplicate.context = @course
       duplicate.save!
       expect(duplicate.parent_folder).to eql(f)
@@ -98,9 +98,9 @@ describe Folder do
   end
 
   it "does not allow recursive folder structures" do
-    f1 = @course.folders.create!(:name => "f1")
-    f2 = f1.sub_folders.create!(:name => "f2", :context => @course)
-    f3 = f2.sub_folders.create!(:name => "f3", :context => @course)
+    f1 = @course.folders.create!(name: "f1")
+    f2 = f1.sub_folders.create!(name: "f2", context: @course)
+    f3 = f2.sub_folders.create!(name: "f3", context: @course)
     f1.parent_folder = f3
     expect(f1.save).to eq false
     expect(f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }).to be_present
@@ -109,7 +109,7 @@ describe Folder do
   it "does not allow root folders to have their names changed" do
     f1 = Folder.root_folders(@course).first
     f1.reload
-    f1.update(:name => "something")
+    f1.update(name: "something")
     expect(f1.save).to eq false
     expect(f1.errors.detect { |e| e.first.to_s == 'name' }).to be_present
   end
@@ -117,7 +117,7 @@ describe Folder do
   describe "set folder root account id" do
     before(:once) do
       student_in_course
-      group_model(:context => @course)
+      group_model(context: @course)
     end
 
     it "when context is group" do
@@ -148,13 +148,13 @@ describe Folder do
   end
 
   it "files without an explicit folder_id should be inferred" do
-    f = @course.folders.create!(:name => "unfiled")
+    f = @course.folders.create!(name: "unfiled")
     a = f.active_file_attachments.build
     a.context = @course
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.new
-    nil_a.update(:uploaded_data => default_uploaded_data)
+    nil_a.update(uploaded_data: default_uploaded_data)
     expect(nil_a.folder_id).not_to be_nil
     expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
@@ -167,18 +167,18 @@ describe Folder do
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.new
-    nil_a.update(:uploaded_data => default_uploaded_data)
+    nil_a.update(uploaded_data: default_uploaded_data)
     expect(f.active_file_attachments).to be_include(a)
     expect(f.active_file_attachments).to be_include(nil_a)
   end
 
   it "does not return files without a folder_id if it's not the 'unfiled' folder" do
-    f = @course.folders.create!(:name => "not_unfiled")
+    f = @course.folders.create!(name: "not_unfiled")
     a = f.active_file_attachments.build
     a.context = @course
     a.uploaded_data = default_uploaded_data
     a.save!
-    nil_a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+    nil_a = @course.attachments.create!(uploaded_data: default_uploaded_data)
     expect(f.active_file_attachments).to be_include(a)
     expect(f.active_file_attachments).not_to be_include(nil_a)
   end
@@ -186,14 +186,14 @@ describe Folder do
   it "implements the not_locked scope correctly" do
     not_locked = [
       Folder.root_folders(@course).first,
-      @course.folders.create!(:name => "not locked 1", :locked => false),
-      @course.folders.create!(:name => "not locked 2", :lock_at => 1.day.from_now),
-      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.day.ago)
+      @course.folders.create!(name: "not locked 1", locked: false),
+      @course.folders.create!(name: "not locked 2", lock_at: 1.day.from_now),
+      @course.folders.create!(name: "not locked 3", lock_at: 2.days.ago, unlock_at: 1.day.ago)
     ]
     locked = [
-      @course.folders.create!(:name => "locked 1", :locked => true),
-      @course.folders.create!(:name => "locked 2", :lock_at => 1.day.ago),
-      @course.folders.create!(:name => "locked 3", :lock_at => 1.day.ago, :unlock_at => 1.day.from_now)
+      @course.folders.create!(name: "locked 1", locked: true),
+      @course.folders.create!(name: "locked 2", lock_at: 1.day.ago),
+      @course.folders.create!(name: "locked 3", lock_at: 1.day.ago, unlock_at: 1.day.from_now)
     ]
     expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
     expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
@@ -202,8 +202,8 @@ describe Folder do
   it "does not create multiple root folders for a course" do
     skip('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
 
-    @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible')
-    expect { @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible') }.to raise_error(ActiveRecord::RecordNotUnique)
+    @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: 'visible')
+    expect { @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: 'visible') }.to raise_error(ActiveRecord::RecordNotUnique)
 
     @course.reload
     expect(@course.folders.count).to eq 1
@@ -308,12 +308,12 @@ describe Folder do
   describe "all_visible_folder_ids" do
     before(:once) do
       @root_folder = Folder.root_folders(@course).first
-      @normal_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "normal")
-      @normal_sub1 = @normal_folder.active_sub_folders.create!(:context => @course, :name => "normal_sub1")
-      @normal_sub2 = @normal_sub1.active_sub_folders.create!(:context => @course, :name => "normal_sub2")
-      @locked_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "locked", :lock_at => 1.week.ago)
-      @locked_sub1 = @locked_folder.active_sub_folders.create!(:context => @course, :name => "locked_sub1")
-      @locked_sub2 = @locked_sub1.active_sub_folders.create!(:context => @course, :name => "locked_sub2")
+      @normal_folder = @root_folder.active_sub_folders.create!(context: @course, name: "normal")
+      @normal_sub1 = @normal_folder.active_sub_folders.create!(context: @course, name: "normal_sub1")
+      @normal_sub2 = @normal_sub1.active_sub_folders.create!(context: @course, name: "normal_sub2")
+      @locked_folder = @root_folder.active_sub_folders.create!(context: @course, name: "locked", lock_at: 1.week.ago)
+      @locked_sub1 = @locked_folder.active_sub_folders.create!(context: @course, name: "locked_sub1")
+      @locked_sub2 = @locked_sub1.active_sub_folders.create!(context: @course, name: "locked_sub2")
     end
 
     it "excludes all descendants of locked folders" do
@@ -325,8 +325,8 @@ describe Folder do
     before(:once) do
       @course.offer!
       @root_folder = Folder.root_folders(@course).first
-      student_in_course(:course => @course, :active_all => true)
-      teacher_in_course(:course => @course, :active_all => true)
+      student_in_course(course: @course, active_all: true)
+      teacher_in_course(course: @course, active_all: true)
     end
 
     it "grants right to students and teachers" do
@@ -347,7 +347,7 @@ describe Folder do
       end
 
       it "still grants rights to teachers even if the teacher enrollment is concluded" do
-        @teacher.enrollments.where(:course_id => @course).first.complete!
+        @teacher.enrollments.where(course_id: @course).first.complete!
         expect(@course.grants_right?(@teacher, :manage_files_add)).to be_falsey
         expect(@course.grants_right?(@teacher, :manage_files_edit)).to be_falsey
         expect(@course.grants_right?(@teacher, :manage_files_delete)).to be_falsey
@@ -382,7 +382,7 @@ describe Folder do
   describe "submissions folders" do
     it "restricts valid contexts for submissions folders" do
       student_in_course
-      group_model(:context => @course)
+      group_model(context: @course)
 
       sf = Folder.new(name: 'test')
       sf.submission_context_code = 'root'

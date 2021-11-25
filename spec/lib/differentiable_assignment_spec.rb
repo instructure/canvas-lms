@@ -41,7 +41,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "visible_to_user?" do
     context "student" do
-      before { student_in_course(:course => @course) }
+      before { student_in_course(course: @course) }
 
       it "with a visibility it should be true" do
         allow(differentiable_view).to receive(:where).and_return([:a_record])
@@ -58,7 +58,7 @@ shared_examples_for "a differentiable_object" do
       before do
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
-        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @course.enroll_student(@student2, enrollment_state: 'active')
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
@@ -69,7 +69,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing only a section (with or without an override)" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
         end
 
         it "is visible" do
@@ -79,7 +79,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing a student with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
         end
 
@@ -90,7 +90,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing a student without visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
         end
 
@@ -101,8 +101,8 @@ shared_examples_for "a differentiable_object" do
 
       context "observing two students, one with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student1.id)
-          @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active', associated_user_id: @student1.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
         end
 
         it "is visible" do
@@ -112,8 +112,8 @@ shared_examples_for "a differentiable_object" do
 
       context "observing two students, neither with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student3.id)
-          @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active', associated_user_id: @student3.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
         end
 
         it "is not visible" do
@@ -136,14 +136,14 @@ shared_examples_for "a differentiable_object" do
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "filters for students" do
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
       expect(call_filter).to eq :filtered
     end
 
     context "observer" do
       before do
         @observer = User.create(name: "observer")
-        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
       end
 
       it "does not filter when no observed students" do
@@ -152,7 +152,7 @@ shared_examples_for "a differentiable_object" do
       end
 
       it "filters with observed students" do
-        student_in_course(:course => @course)
+        student_in_course(course: @course)
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
         @user = @observer_enrollment.user
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
@@ -161,7 +161,7 @@ shared_examples_for "a differentiable_object" do
     end
 
     it "does not filter for the teacher" do
-      teacher_in_course(:course => @course)
+      teacher_in_course(course: @course)
       expect(call_filter).to eq :not_filtered
     end
 
@@ -173,7 +173,7 @@ shared_examples_for "a differentiable_object" do
     it "does not filter if user not in course" do
       original_user = @user
       # override @user and @course
-      student_in_course(:course => course_factory)
+      student_in_course(course: course_factory)
       @user = original_user
       expect(call_filter).to eq :not_filtered
     end
@@ -182,14 +182,14 @@ end
 
 describe Assignment do
   let(:differentiable_view) { AssignmentStudentVisibility }
-  let(:differentiable) { assignment_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+  let(:differentiable) { assignment_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a differentiable_object"
 end
 
 describe Quizzes::Quiz do
   let(:differentiable_view) { Quizzes::QuizStudentVisibility }
-  let(:differentiable) { quiz_model(:due_at => 5.days.ago, :only_visible_to_overrides => true) }
+  let(:differentiable) { quiz_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a differentiable_object"
 end

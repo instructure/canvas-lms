@@ -19,7 +19,7 @@
 
 require 'lti2_spec_helper'
 
-RSpec.shared_context "plagiarism_platform", :shared_context => :metadata do
+RSpec.shared_context "plagiarism_platform", shared_context: :metadata do
   include_context 'lti2_spec_helper'
 
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }

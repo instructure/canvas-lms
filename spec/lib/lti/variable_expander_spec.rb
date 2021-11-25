@@ -759,8 +759,8 @@ module Lti
 
         it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
           course.save!
-          m1 = course.context_modules.create!(:name => "mod1")
-          m2 = course.context_modules.create!(:name => "mod2")
+          m1 = course.context_modules.create!(name: "mod1")
+          m2 = course.context_modules.create!(name: "mod2")
           exp_hash = { test: '$com.instructure.Course.available_canvas_resources' }
           variable_expander.expand_variables!(exp_hash)
           expect(JSON.parse(exp_hash[:test])).to eq [{ "id" => m1.id, "name" => m1.name }, { "id" => m2.id, "name" => m2.name }]
@@ -772,8 +772,8 @@ module Lti
 
         it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
           course.save!
-          m1 = course.assignment_groups.create!(:name => "mod1")
-          m2 = course.assignment_groups.create!(:name => "mod2")
+          m1 = course.assignment_groups.create!(name: "mod1")
+          m2 = course.assignment_groups.create!(name: "mod2")
           exp_hash = { test: '$com.instructure.Course.available_canvas_resources' }
           variable_expander.expand_variables!(exp_hash)
           expect(JSON.parse(exp_hash[:test])).to eq [{ "id" => m1.id, "name" => m1.name }, { "id" => m2.id, "name" => m2.name }]
@@ -1348,7 +1348,7 @@ module Lti
 
         it 'has substitution for $Canvas.externalTool.global_id' do
           course.save!
-          tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+          tool = course.context_external_tools.create!(domain: 'example.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'anonymous', name: 'tool')
           expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
           exp_hash = { test: '$Canvas.externalTool.global_id' }
           expander.expand_variables!(exp_hash)
@@ -1365,7 +1365,7 @@ module Lti
 
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
-          tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+          tool = course.context_external_tools.create!(domain: 'example.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'anonymous', name: 'tool')
           expect(controller).to receive(:named_context_url).with(course, :api_v1_context_external_tools_update_url,
                                                                  tool.id, include_host: true).and_return("url")
           expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
@@ -1678,7 +1678,7 @@ module Lti
           user.save
           user.email = 'someone@somewhere'
           cc1 = user.communication_channels.first
-          pseudonym1 = cc1.user.pseudonyms.build(:unique_id => cc1.path, :account => root_account)
+          pseudonym1 = cc1.user.pseudonyms.build(unique_id: cc1.path, account: root_account)
           pseudonym1.sis_communication_channel_id = cc1.id
           pseudonym1.communication_channel_id = cc1.id
           pseudonym1.sis_user_id = "some_sis_id"
@@ -1980,7 +1980,7 @@ module Lti
       end
 
       it 'has substitution for $Canvas.membership.permissions' do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         exp_hash = { test: '$Canvas.membership.permissions<moderate_forum,read_forum,create_forum>' }
         expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
 
@@ -1989,7 +1989,7 @@ module Lti
       end
 
       it 'substitutes $Canvas.membership.permissions inside substring' do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         exp_hash = { test: 'string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}' }
         expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
 

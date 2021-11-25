@@ -344,7 +344,7 @@ describe MicrosoftSync::GraphService::Http do
     let(:http) { described_class.new('mytenant', extra_tag: 'foo') }
     let(:initial_url) { 'https://graph.microsoft.com/v1.0/some/list' }
     let(:continue_url) { initial_url + '?cont=123' }
-    let(:continue_response) { json_200_response(value: { a: 1 }, '@odata.nextLink' => continue_url) }
+    let(:continue_response) { json_200_response(:value => { a: 1 }, '@odata.nextLink' => continue_url) }
     let(:finished_response) { json_200_response(value: { b: 2 }) }
     let(:extra_opts) { {} }
 

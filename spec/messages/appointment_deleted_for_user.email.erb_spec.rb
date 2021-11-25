@@ -24,12 +24,12 @@ describe 'appointment_deleted_for_user.email' do
   include MessagesCommon
 
   it "renders" do
-    user = user_model(:name => 'bob')
-    appointment_participant_model(:participant => user)
+    user = user_model(name: 'bob')
+    appointment_participant_model(participant: user)
 
     generate_message(:appointment_deleted_for_user, :email, @event,
-                     :data => { :updating_user_name => @teacher.name,
-                                :cancel_reason => "just because" })
+                     data: { updating_user_name: @teacher.name,
+                             cancel_reason: "just because" })
 
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
@@ -41,16 +41,16 @@ describe 'appointment_deleted_for_user.email' do
   end
 
   it "renders for groups" do
-    user = user_model(:name => 'bob')
+    user = user_model(name: 'bob')
     @course = course_model
     cat = group_category
-    @group = cat.groups.create(:context => @course)
+    @group = cat.groups.create(context: @course)
     @group.users << user
-    appointment_participant_model(:participant => @group, :course => @course)
+    appointment_participant_model(participant: @group, course: @course)
 
     generate_message(:appointment_deleted_for_user, :email, @event,
-                     :data => { :updating_user_name => @teacher.name,
-                                :cancel_reason => "just because" })
+                     data: { updating_user_name: @teacher.name,
+                             cancel_reason: "just because" })
 
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
@@ -64,14 +64,14 @@ describe 'appointment_deleted_for_user.email' do
   end
 
   it "excludes reschedule instructions if appointment group isn't active" do
-    user = user_model(:name => 'bob')
-    appointment_participant_model(:participant => user)
+    user = user_model(name: 'bob')
+    appointment_participant_model(participant: user)
     @appointment_group.destroy(@teacher)
     @event.reload
 
     generate_message(:appointment_deleted_for_user, :email, @event,
-                     :data => { :updating_user_name => @teacher.name,
-                                :cancel_reason => "just because" })
+                     data: { updating_user_name: @teacher.name,
+                             cancel_reason: "just because" })
 
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')

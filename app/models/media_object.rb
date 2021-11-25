@@ -28,7 +28,7 @@ class MediaObject < ActiveRecord::Base
     [:course, :group, :conversation_message, :account, :assignment,
      :assessment_question, { context_user: 'User' }], exhaustive: false
   belongs_to :attachment
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
   validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
@@ -141,7 +141,7 @@ class MediaObject < ActiveRecord::Base
                    .refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
-        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
+        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(media_entry_id: nil) unless attachment_ids.empty?
       end
       res
     end
@@ -163,14 +163,14 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(:media_id => media_id))
+      create!(**create_opts.merge(media_id: media_id))
     end
   end
 
   def update_title_on_kaltura
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
-    res = client.mediaUpdate(media_id, :name => user_entered_title)
+    res = client.mediaUpdate(media_id, name: user_entered_title)
     unless res[:error]
       self.title = user_entered_title
       save
@@ -333,9 +333,9 @@ class MediaObject < ActiveRecord::Base
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, ->(media_id) { where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
+  scope :by_media_id, ->(media_id) { where(media_id: media_id).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
 
-  scope :by_media_type, ->(media_type) { where(:media_type => media_type) }
+  scope :by_media_type, ->(media_type) { where(media_type: media_type) }
 
   workflow do
     state :active

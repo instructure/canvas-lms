@@ -45,7 +45,7 @@ class LearningOutcome < ActiveRecord::Base
     message: lambda do
       t(
         "calculation_method must be one of the following: %{calc_methods}",
-        :calc_methods => OutcomeCalculationMethod::CALCULATION_METHODS.to_s
+        calc_methods: OutcomeCalculationMethod::CALCULATION_METHODS.to_s
       )
     end
   }
@@ -125,9 +125,9 @@ class LearningOutcome < ActiveRecord::Base
       else
         errors.add(:calculation_int, t(
                                        "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
-                                       :calculation_int => calculation_int,
-                                       :valid_calculation_ints_min => valid_ints.min,
-                                       :valid_calculation_ints_max => valid_ints.max
+                                       calculation_int: calculation_int,
+                                       valid_calculation_ints_min: valid_ints.min,
+                                       valid_calculation_ints_max: valid_ints.max
                                      ))
       end
     end
@@ -214,8 +214,8 @@ class LearningOutcome < ActiveRecord::Base
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
       asset.learning_outcome_alignments
-           .where(:learning_outcome_id => defunct_outcome_ids)
-           .update_all(:workflow_state => 'deleted')
+           .where(learning_outcome_id: defunct_outcome_ids)
+           .update_all(workflow_state: 'deleted')
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
@@ -283,8 +283,8 @@ class LearningOutcome < ActiveRecord::Base
       ratings = hash[:enable] ? hash[:ratings].values : (hash[:ratings] || [])
       ratings.each do |rating|
         criterion[:ratings] << {
-          :description => rating[:description] || t(:no_comment, "No Comment"),
-          :points => rating[:points].to_f || 0
+          description: rating[:description] || t(:no_comment, "No Comment"),
+          points: rating[:points].to_f || 0
         }
       end
       criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
@@ -306,14 +306,14 @@ class LearningOutcome < ActiveRecord::Base
     # triggered by ContentTag#destroy and the checks have already run, we don't
     # need to do it again. in case of console, we don't care to force the
     # checks. so just an update_all of workflow_state will do.
-    ContentTag.learning_outcome_links.active.where(:content_id => self).update_all(:workflow_state => 'deleted')
+    ContentTag.learning_outcome_links.active.where(content_id: self).update_all(workflow_state: 'deleted')
 
     # in case this got called in a console, delete the alignments also. the UI
     # won't (shouldn't) allow deleting the outcome if there are still
     # alignments, so this will be a no-op in that case. either way, these are
     # not outcome links, so ContentTag#destroy is just changing the
     # workflow_state; use update_all for efficiency.
-    ContentTag.learning_outcome_alignments.active.where(:learning_outcome_id => self).update_all(:workflow_state => 'deleted')
+    ContentTag.learning_outcome_alignments.active.where(learning_outcome_id: self).update_all(workflow_state: 'deleted')
 
     self.workflow_state = 'deleted'
     save!
@@ -365,7 +365,7 @@ class LearningOutcome < ActiveRecord::Base
     ids.each do |id|
       to_delete << id unless tags.any? { |t| t.content_id == id }
     end
-    LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+    LearningOutcome.where(id: to_delete).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
   end
 
   def self.ensure_presence_in_context(outcome_ids, context)
@@ -377,7 +377,7 @@ class LearningOutcome < ActiveRecord::Base
     missing_outcomes.each { |o| context.root_outcome_group.add_outcome(o) }
   end
 
-  scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
+  scope(:for_context_codes, ->(codes) { where(context_code: codes) })
   scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
   scope(:active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) })
   scope(:has_result_for_user,
@@ -391,7 +391,7 @@ class LearningOutcome < ActiveRecord::Base
             .order(best_unicode_collation_key('short_description'))
         end)
 
-  scope :global, -> { where(:context_id => nil) }
+  scope :global, -> { where(context_id: nil) }
 
   def propagate_changes_to_rubrics
     # exclude new outcomes

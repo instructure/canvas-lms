@@ -33,13 +33,13 @@ describe "assignments" do
 
     before do
       @due_date = Time.now.utc + 2.days
-      @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)
+      @assignment = @course.assignments.create!(title: 'default assignment', name: 'default assignment', due_at: @due_date)
     end
 
     it "orders undated assignments by title and dated assignments by first due" do
-      @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
-      @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
-      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
+      @second_assignment = @course.assignments.create!(title: 'assignment 2', name: 'assignment 2', due_at: nil)
+      @third_assignment = @course.assignments.create!(title: 'assignment 3', name: 'assignment 3', due_at: nil)
+      @fourth_assignment = @course.assignments.create!(title: 'assignment 4', name: 'assignment 4', due_at: @due_date - 1.day)
 
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
@@ -52,7 +52,7 @@ describe "assignments" do
     end
 
     it "highlights mini-calendar dates where stuff is due" do
-      @course.assignments.create!(:title => 'test assignment', :name => 'test assignment', :due_at => @due_date)
+      @course.assignments.create!(title: 'test assignment', name: 'test assignment', due_at: @due_date)
 
       get "/courses/#{@course.id}/assignments/syllabus"
       wait_for_ajaximations
@@ -60,19 +60,19 @@ describe "assignments" do
     end
 
     it "does not show submission data when muted" do
-      assignment = @course.assignments.create!(:title => 'test assignment', :name => 'test assignment')
+      assignment = @course.assignments.create!(title: 'test assignment', name: 'test assignment')
 
-      assignment.update(:submission_types => "online_url,online_upload", muted: false)
+      assignment.update(submission_types: "online_url,online_upload", muted: false)
       submission = assignment.submit_homework(@student)
       submission.submission_type = "online_url"
       submission.save!
 
-      submission.add_comment(:author => @teacher, :comment => "comment before muting")
+      submission.add_comment(author: @teacher, comment: "comment before muting")
       assignment.mute!
-      assignment.update_submission(@student, :hidden => true, :comment => "comment after muting")
+      assignment.update_submission(@student, hidden: true, comment: "comment after muting")
 
       outcome_with_rubric
-      @rubric.associate_with(assignment, @course, :purpose => "grading")
+      @rubric.associate_with(assignment, @course, purpose: "grading")
 
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       details = f(".details")
@@ -82,9 +82,9 @@ describe "assignments" do
 
     it "has group comment radio buttons for individually graded group assignments" do
       u1 = @user
-      student_in_course(:course => @course)
-      assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload,online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
-      group = assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      student_in_course(course: @course)
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload,online_text_entry", group_category: GroupCategory.create!(name: "groups", context: @course), grade_group_students_individually: true)
+      group = assignment.group_category.groups.create!(name: 'g1', context: @course)
       group.users << u1
       group.users << @user
 
@@ -99,14 +99,14 @@ describe "assignments" do
 
     it "has hidden group comment input for group graded group assignments" do
       u1 = @user
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
       assignment = @course.assignments.create!(
-        :title => "some assignment",
-        :submission_types => "online_url,online_upload,online_text_entry",
-        :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-        :grade_group_students_individually => false
+        title: "some assignment",
+        submission_types: "online_url,online_upload,online_text_entry",
+        group_category: GroupCategory.create!(name: "groups", context: @course),
+        grade_group_students_individually: false
       )
-      group = assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      group = assignment.group_category.groups.create!(name: 'g1', context: @course)
       group.users << u1
       group.users << @user
 
@@ -120,8 +120,8 @@ describe "assignments" do
     end
 
     it "does not show assignments in an unpublished course" do
-      new_course = Course.create!(:name => 'unpublished course')
-      assignment = new_course.assignments.create!(:title => "some assignment")
+      new_course = Course.create!(name: 'unpublished course')
+      assignment = new_course.assignments.create!(title: "some assignment")
       new_course.enroll_user(@user, 'StudentEnrollment')
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
@@ -132,30 +132,30 @@ describe "assignments" do
     it "verifies lock until date is enforced" do
       assignment_name = 'locked assignment'
       unlock_time = 1.day.from_now
-      locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
+      locked_assignment = @course.assignments.create!(name: assignment_name, unlock_at: unlock_time)
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
       expect(f('#content')).to include_text(format_date_for_view(unlock_time))
-      locked_assignment.update(:unlock_at => Time.now)
+      locked_assignment.update(unlock_at: Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
     end
 
     it "verifies due date is enforced" do
-      due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
+      due_date_assignment = @course.assignments.create!(name: 'due date assignment', due_at: 5.days.ago)
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
-      due_date_assignment.update(:due_at => 2.days.from_now)
+      due_date_assignment.update(due_at: 2.days.from_now)
       refresh_page # to show the updated assignment
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
 
     it "shows assignment data if locked by due date or lock date" do
-      assignment = @course.assignments.create!(:name => 'locked assignment',
-                                               :due_at => 5.days.ago,
-                                               :lock_at => 3.days.ago)
+      assignment = @course.assignments.create!(name: 'locked assignment',
+                                               due_at: 5.days.ago,
+                                               lock_at: 3.days.ago)
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
@@ -163,9 +163,9 @@ describe "assignments" do
     end
 
     it "does not show assignment data if locked by unlock date" do
-      assignment = @course.assignments.create!(:name => 'not unlocked assignment',
-                                               :due_at => 5.days.from_now,
-                                               :unlock_at => 3.days.from_now)
+      assignment = @course.assignments.create!(name: 'not unlocked assignment',
+                                               due_at: 5.days.from_now,
+                                               unlock_at: 3.days.from_now)
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css(".student-assignment-overview")
@@ -174,7 +174,7 @@ describe "assignments" do
     context "overridden lock_at" do
       before do
         setup_sections_and_overrides_all_future
-        @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
+        @course.enroll_user(@student, 'StudentEnrollment', section: @section2, enrollment_state: 'active')
       end
 
       it "shows overridden lock dates for student" do
@@ -185,7 +185,7 @@ describe "assignments" do
       end
 
       it "allows submission when within override locks" do
-        @assignment.update(:submission_types => 'online_text_entry')
+        @assignment.update(submission_types: 'online_text_entry')
         # Change unlock dates to be valid for submission
         @override.unlock_at = Time.now.utc - 1.day # available now
         @override.save!
@@ -214,7 +214,7 @@ describe "assignments" do
       end
 
       it "expands the comments box on click" do
-        @assignment.update(:submission_types => 'online_upload')
+        @assignment.update(submission_types: 'online_upload')
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -229,7 +229,7 @@ describe "assignments" do
       it "validates file upload restrictions" do
         _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
         _filename_zip, fullpath_zip, _data_zip, _tempfile_zip = get_file("testfile5.zip")
-        @assignment.update(:submission_types => 'online_upload', :allowed_extensions => '.txt')
+        @assignment.update(submission_types: 'online_upload', allowed_extensions: '.txt')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
 
@@ -248,7 +248,7 @@ describe "assignments" do
 
     context "google drive" do
       before do
-        PluginSetting.create!(:name => 'google_drive', :settings => {})
+        PluginSetting.create!(name: 'google_drive', settings: {})
         setup_google_drive
       end
 
@@ -257,7 +257,7 @@ describe "assignments" do
       end
 
       it "has a google doc tab if google docs is enabled", priority: "1" do
-        @assignment.update(:submission_types => 'online_upload')
+        @assignment.update(submission_types: 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         wait_for_animations
@@ -280,7 +280,7 @@ describe "assignments" do
           allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
           # create assignment
-          @assignment.update(:submission_types => 'online_upload')
+          @assignment.update(submission_types: 'online_upload')
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           f('.submit_assignment_link').click
           f("a[href*='submit_google_doc_form']").click
@@ -311,7 +311,7 @@ describe "assignments" do
         allow(google_drive_connection).to receive(:authorized?).and_return(nil)
         allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
-        @assignment.update(:submission_types => 'online_upload')
+        @assignment.update(submission_types: 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         f("a[href*='submit_google_doc_form']").click
@@ -350,7 +350,7 @@ describe "assignments" do
     end
 
     it "defaults to grouping by date" do
-      @course.assignments.create!(:title => 'undated assignment', :name => 'undated assignment')
+      @course.assignments.create!(title: 'undated assignment', name: 'undated assignment')
 
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
@@ -382,7 +382,7 @@ describe "assignments" do
 
     it "does not show empty groups" do
       # assuming two undated and two future assignments created above
-      empty_ag = @course.assignment_groups.create!(:name => "Empty")
+      empty_ag = @course.assignment_groups.create!(name: "Empty")
 
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
@@ -403,7 +403,7 @@ describe "assignments" do
       ag.group_weight = 90
       ag.save!
 
-      empty_ag = @course.assignment_groups.create!(:name => "Empty", :group_weight => 10)
+      empty_ag = @course.assignment_groups.create!(name: "Empty", group_weight: 10)
 
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }

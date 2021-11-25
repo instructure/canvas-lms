@@ -218,9 +218,9 @@ describe "instfs file uploads" do
 
   context 'when using instfs as a teacher' do
     before do
-      course_with_teacher_logged_in(:username => 'coolteacher@example.com')
+      course_with_teacher_logged_in(username: 'coolteacher@example.com')
       enable_instfs
-      enrollment = student_in_course(:workflow_state => 'active', :name => "coolguy", :course_section => @section)
+      enrollment = student_in_course(workflow_state: 'active', name: "coolguy", course_section: @section)
       enrollment.accept!
       @student_folder = Folder.root_folders(@student).first
       @ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_upload" })
@@ -256,7 +256,7 @@ describe "instfs file uploads" do
       expect_valid_instfs_link(image_element_source, file_path)
     end
 
-    it "uploads course image cards to instfs", :skip => "Test is obsolete. Fix in LS-2472", priority: "1" do
+    it "uploads course image cards to instfs", skip: "Test is obsolete. Fix in LS-2472", priority: "1" do
       file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/courses/#{@course.id}/settings"
       wait_for_ajaximations
@@ -307,7 +307,7 @@ describe "instfs file uploads" do
       get "/logout"
       f('#Button--logout-confirm').click
       wait_for_new_page_load
-      user_logged_in(:user => @student)
+      user_logged_in(user: @student)
       get "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
       wait_for_ajaximations
       file_link = f(".comment_attachments a").attribute("href")
@@ -317,7 +317,7 @@ describe "instfs file uploads" do
     it 'uploads submission discussion files to instfs', priority: "1" do
       ass = @course.assignments.create!({ title: "some assignment", submission_types: "online_text_entry" })
       ass.submit_homework(@student, submission_type: 'online_text_entry', body: "so cool")
-      user_logged_in(:user => @student)
+      user_logged_in(user: @student)
       get "/courses/#{@course.id}/assignments/#{ass.id}/submissions/#{@student.id}"
       wait_for_ajaximations
       filename = "file_mail.txt"
@@ -342,7 +342,7 @@ describe "instfs file uploads" do
       file_path = File.join(RSpec.configuration.fixture_path, "files/instructure.png")
       quiz = @course.quizzes.create
       quiz.workflow_state = "available"
-      quiz.quiz_questions.create!(:question_data => {
+      quiz.quiz_questions.create!(question_data: {
                                     :name => "1stQ",
                                     'question_type' => 'file_upload_question',
                                     'question_text' => 'cooool',
@@ -351,7 +351,7 @@ describe "instfs file uploads" do
       quiz.save!
 
       # take the quiz as the student
-      user_logged_in(:user => @student)
+      user_logged_in(user: @student)
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/take"
       wait_for_ajaximations
       f('#take_quiz_link').click

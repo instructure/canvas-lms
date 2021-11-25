@@ -22,11 +22,11 @@ class UserNote < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
+  belongs_to :creator, class_name: 'User', foreign_key: :created_by_id
 
   validates :user_id, :created_by_id, :workflow_state, presence: true
-  validates :note, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates :note, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   after_save :update_last_user_note
 
   sanitize_field :note, CanvasSanitize::SANITIZE
@@ -60,7 +60,7 @@ class UserNote < ActiveRecord::Base
   def formatted_note(truncate = nil)
     extend TextHelper
     res = note
-    res = truncate_html(note, :max_length => truncate, :words => true) if truncate
+    res = truncate_html(note, max_length: truncate, words: true) if truncate
     res
   end
 

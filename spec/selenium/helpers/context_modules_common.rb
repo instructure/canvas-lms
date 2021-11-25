@@ -27,7 +27,7 @@ module ContextModulesCommon
   def create_modules(number_to_create, published = false)
     modules = []
     number_to_create.times do |i|
-      m = @course.context_modules.create!(:name => "module #{i}")
+      m = @course.context_modules.create!(name: "module #{i}")
       m.unpublish! unless published
       modules << m
     end
@@ -45,47 +45,47 @@ module ContextModulesCommon
   end
 
   def module_setup
-    @module = @course.context_modules.create!(:name => "module")
+    @module = @course.context_modules.create!(name: "module")
 
     # create module items
     # add first and last module items to get previous and next displayed
-    @assignment1 = @course.assignments.create!(:title => 'first item in module')
-    @assignment2 = @course.assignments.create!(:title => 'assignment')
-    @assignment3 = @course.assignments.create!(:title => 'last item in module')
-    @quiz = @course.quizzes.create!(:title => 'quiz assignment')
+    @assignment1 = @course.assignments.create!(title: 'first item in module')
+    @assignment2 = @course.assignments.create!(title: 'assignment')
+    @assignment3 = @course.assignments.create!(title: 'last item in module')
+    @quiz = @course.quizzes.create!(title: 'quiz assignment')
     @quiz.publish!
-    @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
-    @discussion = @course.discussion_topics.create!(:title => 'discussion')
+    @wiki = @course.wiki_pages.create!(title: "wiki", body: 'hi')
+    @discussion = @course.discussion_topics.create!(title: 'discussion')
 
     # add items to module
-    @module.add_item :type => 'assignment', :id => @assignment1.id
-    @module.add_item :type => 'assignment', :id => @assignment2.id
-    @module.add_item :type => 'quiz', :id => @quiz.id
-    @module.add_item :type => 'wiki_page', :id => @wiki.id
-    @module.add_item :type => 'discussion_topic', :id => @discussion.id
-    @module.add_item :type => 'assignment', :id => @assignment3.id
+    @module.add_item type: 'assignment', id: @assignment1.id
+    @module.add_item type: 'assignment', id: @assignment2.id
+    @module.add_item type: 'quiz', id: @quiz.id
+    @module.add_item type: 'wiki_page', id: @wiki.id
+    @module.add_item type: 'discussion_topic', id: @discussion.id
+    @module.add_item type: 'assignment', id: @assignment3.id
 
     # add external tool
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
-                                                   :shared_secret => "secret", :domain => 'example.com',
-                                                   :custom_fields => { 'a' => '1', 'b' => '2' })
+    @tool = @course.context_external_tools.create!(name: "new tool", consumer_key: "key",
+                                                   shared_secret: "secret", domain: 'example.com',
+                                                   custom_fields: { 'a' => '1', 'b' => '2' })
     @external_tool_tag = @module.add_item({
-                                            :type => 'context_external_tool',
-                                            :title => 'Example',
-                                            :url => 'http://www.example.com',
-                                            :new_tab => '0'
+                                            type: 'context_external_tool',
+                                            title: 'Example',
+                                            url: 'http://www.example.com',
+                                            new_tab: '0'
                                           })
     @external_tool_tag.publish!
     # add external url
     @external_url_tag = @module.add_item({
-                                           :type => 'external_url',
-                                           :title => 'pls view',
-                                           :url => 'http://example.com/lolcats'
+                                           type: 'external_url',
+                                           title: 'pls view',
+                                           url: 'http://example.com/lolcats'
                                          })
     @external_url_tag.publish!
 
     # add another assignment at the end to create a bookend, provides next and previous for external url
-    @module.add_item :type => 'assignment', :id => @assignment3.id
+    @module.add_item type: 'assignment', id: @assignment3.id
   end
 
   def test_relock
@@ -97,7 +97,7 @@ module ContextModulesCommon
   end
 
   def create_context_module(module_name)
-    @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
+    @course.context_modules.create!(name: module_name, require_sequential_progress: true)
   end
 
   def go_to_modules
@@ -143,9 +143,9 @@ module ContextModulesCommon
 
   def mark_as_done_setup
     @mark_done_module = create_context_module('Mark Done Module')
-    page = @course.wiki_pages.create!(:title => "The page", :body => 'hi')
-    @tag = @mark_done_module.add_item({ :id => page.id, :type => 'wiki_page' })
-    @mark_done_module.completion_requirements = { @tag.id => { :type => 'must_mark_done' } }
+    page = @course.wiki_pages.create!(title: "The page", body: 'hi')
+    @tag = @mark_done_module.add_item({ id: page.id, type: 'wiki_page' })
+    @mark_done_module.completion_requirements = { @tag.id => { type: 'must_mark_done' } }
     @mark_done_module.save!
   end
 
@@ -157,10 +157,10 @@ module ContextModulesCommon
   end
 
   def create_additional_assignment_for_module_1
-    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
-    @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' },
-                                          @tag_4.id => { :type => 'must_view' } }
+    @assignment_4 = @course.assignments.create!(title: "assignment 4")
+    @tag_4 = @module_1.add_item({ id: @assignment_4.id, type: 'assignment' })
+    @module_1.completion_requirements = { @tag_1.id => { type: 'must_view' },
+                                          @tag_4.id => { type: 'must_view' } }
     @module_1.save!
   end
 
@@ -299,28 +299,28 @@ module ContextModulesCommon
   end
 
   def course_module
-    @module = @course.context_modules.create!(:name => "some module")
+    @module = @course.context_modules.create!(name: "some module")
   end
 
   def add_modules_and_set_prerequisites
-    @module1 = @course.context_modules.create!(:name => "First module")
-    @module2 = @course.context_modules.create!(:name => "Second module")
-    @module3 = @course.context_modules.create!(:name => "Third module")
+    @module1 = @course.context_modules.create!(name: "First module")
+    @module2 = @course.context_modules.create!(name: "Second module")
+    @module3 = @course.context_modules.create!(name: "Third module")
     @module3.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
     @module3.save!
   end
 
   def add_non_requirement
-    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
+    @assignment_4 = @course.assignments.create!(title: "assignment 4")
+    @tag_4 = @module_1.add_item({ id: @assignment_4.id, type: 'assignment' })
     @module_1.save!
   end
 
   def add_min_score_assignment
-    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
-    @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' },
-                                          @tag_4.id => { :type => 'min_score', :min_score => 90 } }
+    @assignment_4 = @course.assignments.create!(title: "assignment 4")
+    @tag_4 = @module_1.add_item({ id: @assignment_4.id, type: 'assignment' })
+    @module_1.completion_requirements = { @tag_1.id => { type: 'must_view' },
+                                          @tag_4.id => { type: 'min_score', min_score: 90 } }
     @module_1.require_sequential_progress = false
     @module_1.save!
   end

@@ -127,7 +127,7 @@ module CanvasKaltura
         # @cache_play_list_seconds of nil means cache indefinitely
         if @cache_play_list_seconds != 0 && !sources.empty? && all_assets_are_done_converting
           if @cache_play_list_seconds
-            CanvasKaltura.cache.write(cache_key, sources, :expires_in => @cache_play_list_seconds)
+            CanvasKaltura.cache.write(cache_key, sources, expires_in: @cache_play_list_seconds)
           else
             CanvasKaltura.cache.write(cache_key, sources)
           end
@@ -160,11 +160,11 @@ module CanvasKaltura
 
     def thumbnail_url(entryId, opts = {})
       opts = {
-        :width => 140,
-        :height => 100,
-        :vid_sec => 5,
-        :bgcolor => "ffffff",
-        :type => "2",
+        width: 140,
+        height: 100,
+        vid_sec: 5,
+        bgcolor: "ffffff",
+        type: "2",
       }.merge(opts)
 
       "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" \
@@ -180,17 +180,17 @@ module CanvasKaltura
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
       result = getRequest(:session, :start,
-                          :secret => secret,
-                          :partnerId => partnerId,
-                          :userId => userId,
-                          :type => type)
+                          secret: secret,
+                          partnerId: partnerId,
+                          userId: userId,
+                          type: type)
       @ks = result.content
     end
 
     def mediaGet(entryId)
       result = getRequest(:media, :get,
-                          :ks => @ks,
-                          :entryId => entryId)
+                          ks: @ks,
+                          entryId: entryId)
       return nil unless result
 
       item = {}
@@ -202,8 +202,8 @@ module CanvasKaltura
 
     def mediaUpdate(entryId, attributes)
       hash = {
-        :ks => @ks,
-        :entryId => entryId
+        ks: @ks,
+        entryId: entryId
       }
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
@@ -220,8 +220,8 @@ module CanvasKaltura
 
     def mediaDelete(entryId)
       hash = {
-        :ks => @ks,
-        :entryId => entryId
+        ks: @ks,
+        entryId: entryId
       }
       getRequest(:media, :delete, hash)
     end
@@ -239,8 +239,8 @@ module CanvasKaltura
 
     def bulkUploadGet(id)
       result = getRequest(:bulkUpload, :get,
-                          :ks => @ks,
-                          :id => id)
+                          ks: @ks,
+                          id: id)
       return nil unless result
 
       parseBulkUpload(result)
@@ -254,9 +254,9 @@ module CanvasKaltura
       data[:entries] = []
       csv.each do |row|
         data[:entries] << {
-          :name => row[0],
-          :entryId => row[-3],
-          :originalId => row[11]
+          name: row[0],
+          entryId: row[-3],
+          originalId: row[11]
         }
       end
       data[:id] = result.css('id')[0].content
@@ -267,9 +267,9 @@ module CanvasKaltura
 
     def bulkUploadCsv(csv)
       result = postRequest(:bulkUpload, :add,
-                           :ks => @ks,
-                           :conversionProfileId => -1,
-                           :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv"))
+                           ks: @ks,
+                           conversionProfileId: -1,
+                           csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
       unless result.css('logFileUrl').any?
         code = result.css('error > code').first.try(:content)
         message = result.css('error > message').first.try(:content)
@@ -298,8 +298,8 @@ module CanvasKaltura
 
     def flavorAssetGetByEntryId(entryId)
       result = getRequest(:flavorAsset, :getByEntryId,
-                          :ks => @ks,
-                          :entryId => entryId)
+                          ks: @ks,
+                          entryId: entryId)
       return nil unless result
 
       items = []
@@ -322,8 +322,8 @@ module CanvasKaltura
 
     def flavorAssetGetDownloadUrl(assetId)
       result = getRequest(:flavorAsset, :getDownloadUrl,
-                          :ks => @ks,
-                          :id => assetId)
+                          ks: @ks,
+                          id: assetId)
       return result.content if result
     end
 

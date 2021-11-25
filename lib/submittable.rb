@@ -21,7 +21,7 @@ module Submittable
   def self.included(klass)
     klass.belongs_to :assignment
     klass.belongs_to :old_assignment, class_name: 'Assignment'
-    klass.has_many :assignment_student_visibilities, :through => :assignment
+    klass.has_many :assignment_student_visibilities, through: :assignment
 
     klass.scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
       without_assignment_in_course(course_ids)
@@ -48,7 +48,7 @@ module Submittable
       # section-specific discussions, so here get the ones visible to everyone in the
       # course, and below get the ones that are visible to the right section.
       ids_visible_to_all = if opts[:item_type] == :discussion
-                             without_assignment_in_course(opts[:course_id]).where(:is_section_specific => false).pluck(:id)
+                             without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
                            else
                              without_assignment_in_course(opts[:course_id]).pluck(:id)
                            end
@@ -56,9 +56,9 @@ module Submittable
       # Now get the section-specific discussions that are in the proper sections.
       ids_visible_to_sections = if opts[:item_type] == :discussion
                                   user_sections = Enrollment.active.where(
-                                    :course_id => opts[:course_id], :user_id => opts[:user_id]
+                                    course_id: opts[:course_id], user_id: opts[:user_id]
                                   ).pluck(:course_section_id)
-                                  DiscussionTopicSectionVisibility.active.where(:course_section_id => user_sections).pluck(:discussion_topic_id).uniq
+                                  DiscussionTopicSectionVisibility.active.where(course_section_id: user_sections).pluck(:discussion_topic_id).uniq
                                 else
                                   []
                                 end
@@ -114,7 +114,7 @@ module Submittable
     old_assignment.workflow_state = 'published'
     name = self.class.name.underscore
     old_assignment.saved_by = name.to_sym
-    old_assignment.save(:validate => false)
+    old_assignment.save(validate: false)
     old_assignment
   end
 

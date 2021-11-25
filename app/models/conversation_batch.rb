@@ -22,16 +22,16 @@ class ConversationBatch < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  belongs_to :root_conversation_message, :class_name => 'ConversationMessage'
+  belongs_to :root_conversation_message, class_name: 'ConversationMessage'
   belongs_to :context, polymorphic: [:account, :course, { context_group: 'Group' }]
 
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 
   validates :user_id, :workflow_state, :root_conversation_message_id, presence: true
-  validates :subject, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :subject, length: { maximum: maximum_string_length, allow_nil: true }
 
-  scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
+  scope :in_progress, -> { where(workflow_state: ['created', 'sending']) }
 
   attr_accessor :mode
 
@@ -47,7 +47,7 @@ class ConversationBatch < ActiveRecord::Base
                                                                            context_type: context_type, context_id: context_id)
       update_attribute :workflow_state, 'sending'
 
-      ModelCache.with_cache(:conversations => existing_conversations, :users => { :id => user_map }) do
+      ModelCache.with_cache(conversations: existing_conversations, users: { id: user_map }) do
         should_cc_author = true
 
         recipient_ids.each_slice(chunk_size) do |ids|

@@ -29,20 +29,20 @@ describe 'Course Modules' do
     course_with_teacher(active_all: true, course_name: 'Modules Course')
 
     # create two modules in course
-    @module1 = @course.context_modules.create!(:name => "First Module")
-    @module2 = @course.context_modules.create!(:name => "Second Module")
+    @module1 = @course.context_modules.create!(name: "First Module")
+    @module2 = @course.context_modules.create!(name: "Second Module")
 
     # create module items(assignments)
-    @assignment1 = @course.assignments.create!(:title => 'A1 in module1')
-    @assignment2 = @course.assignments.create!(:title => 'A2 in module2')
-    @assignment3 = @course.assignments.create!(:title => 'A3 in module1')
-    @assignment4 = @course.assignments.create!(:title => 'A3 in module2')
+    @assignment1 = @course.assignments.create!(title: 'A1 in module1')
+    @assignment2 = @course.assignments.create!(title: 'A2 in module2')
+    @assignment3 = @course.assignments.create!(title: 'A3 in module1')
+    @assignment4 = @course.assignments.create!(title: 'A3 in module2')
 
     # add items to module
-    @module1.add_item :type => 'assignment', :id => @assignment1.id
-    @module2.add_item :type => 'assignment', :id => @assignment2.id
-    @module1.add_item :type => 'assignment', :id => @assignment3.id
-    @module2.add_item :type => 'assignment', :id => @assignment4.id
+    @module1.add_item type: 'assignment', id: @assignment1.id
+    @module2.add_item type: 'assignment', id: @assignment2.id
+    @module1.add_item type: 'assignment', id: @assignment3.id
+    @module2.add_item type: 'assignment', id: @assignment4.id
   end
 
   context 'with modules menu' do

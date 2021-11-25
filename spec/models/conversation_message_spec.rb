@@ -21,12 +21,12 @@
 describe ConversationMessage do
   context "notifications" do
     before :once do
-      Notification.create(:name => "Conversation Message", :category => "TestImmediately")
-      Notification.create(:name => "Added To Conversation", :category => "TestImmediately")
+      Notification.create(name: "Conversation Message", category: "TestImmediately")
+      Notification.create(name: "Added To Conversation", category: "TestImmediately")
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @students = []
-      3.times { @students << student_in_course(:active_all => true).user }
+      3.times { @students << student_in_course(active_all: true).user }
       @first_student = @students.first
       @initial_students = @students.first(2)
       @last_student = @students.last
@@ -42,7 +42,7 @@ describe ConversationMessage do
     end
 
     def add_message(options = {})
-      @conversation.add_message("message", options.merge(:root_account_id => @account.id))
+      @conversation.add_message("message", options.merge(root_account_id: @account.id))
     end
 
     def add_last_student
@@ -120,9 +120,9 @@ describe ConversationMessage do
       message = conversation_message.messages_sent["Conversation Message"].first
 
       expect(message.context).to eq conversation_message
-      message.context.reply_from(:user => message.user, :purpose => 'general',
-                                 :subject => message.subject,
-                                 :text => "Reply to notification")
+      message.context.reply_from(user: message.user, purpose: 'general',
+                                 subject: message.subject,
+                                 text: "Reply to notification")
       # The initial message, the one the sent the notification,
       # and the response to the notification
       expect(@conversation.messages.size).to eq 3
@@ -183,11 +183,11 @@ describe ConversationMessage do
     end
 
     it "does not create a conversation stream item for a submission comment" do
-      assignment_model(:course => @course)
+      assignment_model(course: @course)
       @assignment.workflow_state = 'published'
       @assignment.save
-      @submission = @assignment.submit_homework(@user, :body => 'some message')
-      @submission.add_comment(:author => @user, :comment => "hello")
+      @submission = @assignment.submit_homework(@user, body: 'some message')
+      @submission.add_comment(author: @user, comment: "hello")
 
       expect(StreamItem.all.select { |i| i.asset_string.include?('conversation_') }).to be_empty
     end
@@ -243,22 +243,22 @@ describe ConversationMessage do
 
   context "infer_defaults" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
     end
 
     it "sets has_attachments if there are attachments" do
-      a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
-      m = @teacher.initiate_conversation([@student]).add_message("ohai", :attachment_ids => [a.id])
+      a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
+      m = @teacher.initiate_conversation([@student]).add_message("ohai", attachment_ids: [a.id])
       expect(m.read_attribute(:has_attachments)).to be_truthy
       expect(m.conversation.reload.has_attachments).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
 
     it "sets has_attachments if there are forwareded attachments" do
-      a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
-      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", :attachment_ids => [a.id])
-      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
+      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", attachment_ids: [a.id])
+      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
       expect(m2.read_attribute(:has_attachments)).to be_truthy
       expect(m2.conversation.reload.has_attachments).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
@@ -270,7 +270,7 @@ describe ConversationMessage do
       mc.media_id = 'asdf'
       mc.context = mc.user = @teacher
       mc.save
-      m = @teacher.initiate_conversation([@student]).add_message("ohai", :media_comment => mc)
+      m = @teacher.initiate_conversation([@student]).add_message("ohai", media_comment: mc)
       expect(m.read_attribute(:has_media_objects)).to be_truthy
       expect(m.conversation.reload.has_media_objects).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
@@ -282,8 +282,8 @@ describe ConversationMessage do
       mc.media_id = 'asdf'
       mc.context = mc.user = @teacher
       mc.save
-      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", :media_comment => mc)
-      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", media_comment: mc)
+      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
       expect(m2.read_attribute(:has_media_objects)).to be_truthy
       expect(m2.conversation.reload.has_media_objects).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
@@ -298,34 +298,34 @@ describe ConversationMessage do
     it "ignores replies on deleted accounts" do
       student_in_course
       conversation = @teacher.initiate_conversation([@user])
-      cm = conversation.add_message("initial message", :root_account_id => Account.default.id)
+      cm = conversation.add_message("initial message", root_account_id: Account.default.id)
 
       Account.default.destroy
       cm.reload
 
       expect do
         cm.reply_from({
-                        :purpose => 'general',
-                        :user => @teacher,
-                        :subject => "an email reply",
-                        :html => "body",
-                        :text => "body"
+                        purpose: 'general',
+                        user: @teacher,
+                        subject: "an email reply",
+                        html: "body",
+                        text: "body"
                       })
       end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "replies only to the message author on conversations2 conversations" do
       users = Array.new(3) { course_with_student(course: @course).user }
-      conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
-      conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
-      cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
+      conversation = Conversation.initiate(users, false, context_type: 'Course', context_id: @course.id)
+      conversation.add_message(users[0], "initial message", root_account_id: Account.default.id)
+      cm2 = conversation.add_message(users[1], "subsequent message", root_account_id: Account.default.id)
       expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({
-                             :purpose => 'general',
-                             :user => users[2],
-                             :subject => "an email reply",
-                             :html => "body",
-                             :text => "body"
+                             purpose: 'general',
+                             user: users[2],
+                             subject: "an email reply",
+                             html: "body",
+                             text: "body"
                            })
       expect(cm3.conversation_message_participants.size).to eq 2
       expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [users[1].id, users[2].id].sort
@@ -334,16 +334,16 @@ describe ConversationMessage do
     it "marks conversations as read for the replying author" do
       student_in_course
       cp = @teacher.initiate_conversation([@user])
-      cm = cp.add_message("initial message", :root_account_id => Account.default.id)
+      cm = cp.add_message("initial message", root_account_id: Account.default.id)
 
       cp2 = cp.conversation.conversation_participants.where(user_id: @user).first
       expect(cp2.workflow_state).to eq 'unread'
       cm.reply_from({
-                      :purpose => 'general',
-                      :user => @user,
-                      :subject => "an email reply",
-                      :html => "body",
-                      :text => "body"
+                      purpose: 'general',
+                      user: @user,
+                      subject: "an email reply",
+                      html: "body",
+                      text: "body"
                     })
       cp2.reload
       expect(cp2.workflow_state).to eq 'read'

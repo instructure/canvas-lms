@@ -255,7 +255,7 @@ module Lti
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Capabilities') do |exception|
-          expect(exception.as_json).to eq({ invalid_capabilities: ["extra_capability"], "error" => "Invalid Capabilities" })
+          expect(exception.as_json).to eq({ :invalid_capabilities => ["extra_capability"], "error" => "Invalid Capabilities" })
         end
       end
 
@@ -263,7 +263,7 @@ module Lti
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.security_contract.services.first.action = ['DELETE']
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Services') do |exception|
-          expect(exception.as_json).to eq({ invalid_services: [{ id: "ToolProxy.collection", actions: ["DELETE"] }], "error" => "Invalid Services" })
+          expect(exception.as_json).to eq({ :invalid_services => [{ id: "ToolProxy.collection", actions: ["DELETE"] }], "error" => "Invalid Services" })
         end
       end
 
@@ -271,7 +271,7 @@ module Lti
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.tool_profile.resource_handlers.first.messages.first.parameter = [::IMS::LTI::Models::Parameter.new(name: 'extra_test', variable: 'Custom.Variable')]
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Capabilities') do |exception|
-          expect(exception.as_json).to eq({ invalid_capabilities: ["Custom.Variable"], "error" => "Invalid Capabilities" })
+          expect(exception.as_json).to eq({ :invalid_capabilities => ["Custom.Variable"], "error" => "Invalid Capabilities" })
         end
       end
 
@@ -279,7 +279,7 @@ module Lti
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.security_contract.shared_secret = nil
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
-          expect(exception.as_json).to eq({ invalid_security_contract: [:shared_secret], "error" => "Invalid SecurityContract" })
+          expect(exception.as_json).to eq({ :invalid_security_contract => [:shared_secret], "error" => "Invalid SecurityContract" })
         end
       end
 
@@ -394,7 +394,7 @@ module Lti
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }
           .to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
           expect(exception.as_json).to eq({
-                                            invalid_security_contract: [
+                                            :invalid_security_contract => [
                                               :shared_secret,
                                               :tp_half_shared_secret
                                             ],

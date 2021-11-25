@@ -40,7 +40,7 @@ describe "GradeChangeAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
+      allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)

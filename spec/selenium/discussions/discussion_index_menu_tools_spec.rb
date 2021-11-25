@@ -25,8 +25,8 @@ describe 'discussion index menu tool placement' do
   before do
     course_with_teacher_logged_in
 
-    @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-    @tool.discussion_topic_index_menu = { :url => "http://www.example.com", :text => "Import Stuff" }
+    @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+    @tool.discussion_topic_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
     @tool.save!
 
     Account.default.enable_feature!(:commons_favorites)

@@ -23,8 +23,8 @@ require_relative '../../import_helper'
 describe "Importing Learning Outcome Groups" do
   before :once do
     @context = course_model
-    @migration = ContentMigration.create!(:context => @context)
-    @migration.migration_ids_to_import = { :copy => {} }
+    @migration = ContentMigration.create!(context: @context)
+    @migration.migration_ids_to_import = { copy: {} }
     @migration.outcome_to_id_map = {}
   end
 
@@ -113,7 +113,7 @@ describe "Importing Learning Outcome Groups" do
     expect(@context.learning_outcome_groups.count).to eq 2
 
     # make a new group within the context and move the imported group into it
-    parent_group = LearningOutcomeGroup.create!(:title => "subgroup", context: @context, learning_outcome_group: course_root_group)
+    parent_group = LearningOutcomeGroup.create!(title: "subgroup", context: @context, learning_outcome_group: course_root_group)
     imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
     imported_group.update!(learning_outcome_group: parent_group)
 

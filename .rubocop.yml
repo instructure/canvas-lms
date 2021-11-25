@@ -166,6 +166,8 @@ Style/FloatDivision:
   Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/FormatStringToken:
   Enabled: false # I18n requires template style, but ohter code uses annotated style, and there are some trivial unannotted that don't really need to be annotated
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
@@ -425,10 +427,6 @@ Style/GuardClause:
   Enabled: false
 Style/HashAsLastArrayItem:
   Severity: convention
-  AutoCorrect: false
-Style/HashSyntax:
-  EnforcedStyle: ruby19_no_mixed_keys
-  Enabled: false
   AutoCorrect: false
 Style/InfiniteLoop:
   Severity: convention

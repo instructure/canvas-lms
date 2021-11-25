@@ -23,8 +23,8 @@ class ContextExternalTool < ActiveRecord::Base
   include SearchTermHelper
   include PermissionsHelper
 
-  has_many :content_tags, :as => :content
-  has_many :context_external_tool_placements, :autosave => true
+  has_many :content_tags, as: :content
+  has_many :context_external_tool_placements, autosave: true
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
@@ -36,10 +36,10 @@ class ContextExternalTool < ActiveRecord::Base
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :name, :consumer_key, :shared_secret, presence: true
-  validates :name, length: { :maximum => maximum_string_length }
-  validates :config_url, presence: { :if => ->(t) { t.config_type == "by_url" } }
-  validates :config_xml, presence: { :if => ->(t) { t.config_type == "by_xml" } }
-  validates :domain, length: { :maximum => 253, :allow_blank => true }
+  validates :name, length: { maximum: maximum_string_length }
+  validates :config_url, presence: { if: ->(t) { t.config_type == "by_url" } }
+  validates :config_xml, presence: { if: ->(t) { t.config_type == "by_xml" } }
+  validates :domain, length: { maximum: 253, allow_blank: true }
   validate :url_or_domain_is_set
   validate :validate_urls
   serialize :settings
@@ -53,8 +53,8 @@ class ContextExternalTool < ActiveRecord::Base
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
 
   CUSTOM_EXTENSION_KEYS = {
-    :file_menu => [:accept_media_types].freeze,
-    :editor_button => [:use_tray].freeze
+    file_menu: [:accept_media_types].freeze,
+    editor_button: [:use_tray].freeze
   }.freeze
 
   DISABLED_STATE = 'disabled'
@@ -84,7 +84,7 @@ class ContextExternalTool < ActiveRecord::Base
     # all other permissions (as needed) granted by the current context so all users with the same
     # set of computed permissions will share the same global nav cache
     def global_navigation_granted_permissions(root_account:, user:, context:, session: nil)
-      return { :original_visibility => 'members' } unless user
+      return { original_visibility: 'members' } unless user
 
       permissions_hash = {}
       # still use the original visibility setting
@@ -94,7 +94,7 @@ class ContextExternalTool < ActiveRecord::Base
       ) do
         # let them see admin level tools if there are any courses they can manage
         if root_account.grants_right?(user, :manage_content) ||
-           GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
+           GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(root_account_id: root_account).exists? }
           'admins'
         else
           'members'
@@ -160,20 +160,20 @@ class ContextExternalTool < ActiveRecord::Base
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: '_blank' } }))
       tools.map do |tool|
         {
-          :name => tool.label_for(:editor_button, I18n.locale),
-          :id => tool.id,
-          :favorite => tool.is_rce_favorite_in_context?(context),
-          :url => tool.editor_button(:url),
-          :icon_url => tool.editor_button(:icon_url),
-          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
-          :width => tool.editor_button(:selection_width),
-          :height => tool.editor_button(:selection_height),
-          :use_tray => tool.editor_button(:use_tray) == "true",
-          :description => if tool.description
-                            Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
-                          else
-                            ""
-                          end
+          name: tool.label_for(:editor_button, I18n.locale),
+          id: tool.id,
+          favorite: tool.is_rce_favorite_in_context?(context),
+          url: tool.editor_button(:url),
+          icon_url: tool.editor_button(:icon_url),
+          canvas_icon_class: tool.editor_button(:canvas_icon_class),
+          width: tool.editor_button(:selection_width),
+          height: tool.editor_button(:selection_height),
+          use_tray: tool.editor_button(:use_tray) == "true",
+          description: if tool.description
+                         Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
+                       else
+                         ""
+                       end
         }
       end
     end
@@ -294,7 +294,7 @@ class ContextExternalTool < ActiveRecord::Base
       extension_keys += custom_keys
     end
     extension_keys += {
-      :visibility => ->(v) { %w[members admins public].include?(v) || v.nil? }
+      visibility: ->(v) { %w[members admins public].include?(v) || v.nil? }
     }.to_a
 
     # merge with existing settings so that no caller can complain
@@ -382,7 +382,7 @@ class ContextExternalTool < ActiveRecord::Base
       context_external_tool_placements.reload if context_external_tool_placements.loaded?
     end
     (placements - old_placements).each do |new_placement|
-      context_external_tool_placements.new(:placement_type => new_placement)
+      context_external_tool_placements.new(placement_type: new_placement)
     end
   end
   private :sync_placements!
@@ -511,7 +511,7 @@ class ContextExternalTool < ActiveRecord::Base
                     converter.convert_blti_xml(config_xml)
                   end
     rescue CC::Importer::BLTIConverter::CCImportError => e
-      tool_hash = { :error => e.message }
+      tool_hash = { error: e.message }
     end
 
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'

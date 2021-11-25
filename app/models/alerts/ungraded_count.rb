@@ -23,7 +23,7 @@ module Alerts
       @ungraded_count_for_student = {}
       ungraded_counts = course.submissions
                               .group("submissions.user_id")
-                              .where(:user_id => student_ids)
+                              .where(user_id: student_ids)
                               .where(Submission.needs_grading_conditions)
                               .except(:order)
                               .count

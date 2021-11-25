@@ -42,7 +42,7 @@ describe "eportfolios" do
 
   context "eportfolio created with user" do
     before do
-      eportfolio_model({ :user => @user, :name => "student content" })
+      eportfolio_model({ user: @user, name: "student content" })
     end
 
     it "starts the download of ePortfolio contents", priority: "1" do
@@ -178,8 +178,8 @@ describe "eportfolios" do
 
     it "does not have new section option when adding submission" do
       @assignment = @course.assignments.create!(
-        :title => "hardest assignment ever",
-        :submission_types => "online_url,online_upload"
+        title: "hardest assignment ever",
+        submission_types: "online_url,online_upload"
       )
       @submission = @assignment.submit_homework(@student)
       @submission.submission_type = "online_url"
@@ -234,14 +234,14 @@ describe "eportfolios file upload" do
 
   before :once do
     @password = "asdfasdf"
-    @student = user_with_pseudonym :active_user => true,
-                                   :username => "student@example.com",
-                                   :password => @password
+    @student = user_with_pseudonym active_user: true,
+                                   username: "student@example.com",
+                                   password: @password
     @student.save!
-    @course = course_factory :active_course => true
+    @course = course_factory active_course: true
     @course.enroll_student(@student).accept!
     @course.reload
-    eportfolio_model({ :user => @user, :name => "student content" })
+    eportfolio_model({ user: @user, name: "student content" })
   end
 
   def test_file_upload

@@ -307,12 +307,12 @@ describe EpubExport do
 
   context "notifications" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @ce = @course.content_exports.create! { |ce| ce.user = @user }
       @epub = EpubExport.create!(course: @course, user: @user, content_export: @ce)
 
-      Notification.create!(:name => 'Content Export Finished', :category => 'Migration')
-      Notification.create!(:name => 'Content Export Failed', :category => 'Migration')
+      Notification.create!(name: 'Content Export Finished', category: 'Migration')
+      Notification.create!(name: 'Content Export Failed', category: 'Migration')
     end
 
     it "sends notifications immediately" do
@@ -348,9 +348,9 @@ describe EpubExport do
     EpubExports::CreateService.new(@course, @student, :epub_export).save
     run_jobs
 
-    epub_export = @course.epub_exports.where(:user_id => @student).first
+    epub_export = @course.epub_exports.where(user_id: @student).first
     expect(epub_export).to be_generated
-    path = epub_export.epub_attachment.open(:need_local_file => true).path
+    path = epub_export.epub_attachment.open(need_local_file: true).path
     zip_file = Zip::File.open(path)
     html = zip_file.read(zip_file.entries.map(&:name).detect { |n| n.include?("assignments") })
     expect(html).to include("here you go &lt;/html&gt; lol")

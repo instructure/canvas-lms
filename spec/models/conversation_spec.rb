@@ -50,7 +50,7 @@ describe Conversation do
 
     it "populates subject if provided" do
       users = create_users(2, return_type: :record)
-      expect(Conversation.initiate(users, nil, :subject => 'lunch').subject).to eq 'lunch'
+      expect(Conversation.initiate(users, nil, subject: 'lunch').subject).to eq 'lunch'
     end
 
     it 'sets the root account ids even for root accounts' do
@@ -66,9 +66,9 @@ describe Conversation do
 
       it "creates the conversation on the appropriate shard" do
         users = []
-        users << user_factory(:name => 'a')
-        @shard1.activate { users << user_factory(:name => 'b') }
-        @shard2.activate { users << user_factory(:name => 'c') }
+        users << user_factory(name: 'a')
+        @shard1.activate { users << user_factory(name: 'b') }
+        @shard2.activate { users << user_factory(name: 'c') }
         Shard.with_each_shard([Shard.default, @shard1, @shard2]) do
           conversation = Conversation.initiate(users, false)
           expect(conversation.shard).to eq Shard.current
@@ -112,13 +112,13 @@ describe Conversation do
       end
 
       it "keeps the counts from double-incrementing" do
-        @user1 = user_factory(:name => 'a')
-        @shard1.activate { @user2 = user_factory(:name => 'b') }
+        @user1 = user_factory(name: 'a')
+        @shard1.activate { @user2 = user_factory(name: 'b') }
         conversation = Conversation.initiate([@user1, @user2], false)
         message1 = conversation.add_message(@user1, 'first message')
-        cp1 = conversation.conversation_participants.where(:user_id => @user1).first
-        cp2 = conversation.conversation_participants.where(:user_id => @user2).first
-        cs_cp = conversation.conversation_participants.shard(@shard1).where(:user_id => @user2).first
+        cp1 = conversation.conversation_participants.where(user_id: @user1).first
+        cp2 = conversation.conversation_participants.where(user_id: @user2).first
+        cs_cp = conversation.conversation_participants.shard(@shard1).where(user_id: @user2).first
         cp2.process_new_message([@user2, "reply1"], [@user1, @user2], [message1.id], [])
         @shard1.activate do
           cs_cp.process_new_message([@user1, "reply2"], [@user1, @user2], [message1.id], [])
@@ -185,14 +185,14 @@ describe Conversation do
 
       it "adds participants to the proper shards" do
         users = []
-        users << user_factory(:name => 'a')
-        users << user_factory(:name => 'b')
-        users << user_factory(:name => 'c')
+        users << user_factory(name: 'a')
+        users << user_factory(name: 'b')
+        users << user_factory(name: 'c')
         conversation = Conversation.initiate(users, false)
         conversation.add_message(users.first, 'test')
         expect(conversation.conversation_participants.size).to eq 3
         @shard1.activate do
-          users << user_factory(:name => 'd')
+          users << user_factory(name: 'd')
           conversation.add_participants(users.first, [users.last])
           expect(conversation.conversation_participants.reload.size).to eq 4
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
@@ -200,7 +200,7 @@ describe Conversation do
           expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)
         end
         @shard2.activate do
-          users << user_factory(:name => 'e')
+          users << user_factory(name: 'e')
           conversation.add_participants(users.first, users[-2..])
           expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
@@ -289,7 +289,7 @@ describe Conversation do
         @subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
         expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@subscribed_guy.conversations.unread.size).to eql 0
-        @unsubscribed_guy.conversations.first.update(:subscribed => false)
+        @unsubscribed_guy.conversations.first.update(subscribed: false)
         expect(@unsubscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@unsubscribed_guy.conversations.unread.size).to eql 0
 
@@ -311,7 +311,7 @@ describe Conversation do
         expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@subscribed_guy.conversations.unread.size).to eql 0
 
-        root_convo.add_message(@sender, 'test2', :only_users => [@recipient])
+        root_convo.add_message(@sender, 'test2', only_users: [@recipient])
 
         expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@subscribed_guy.conversations.unread.size).to eql 0
@@ -369,11 +369,11 @@ describe Conversation do
       expect(subscription_guy.reload.unread_conversations_count).to eql 1
       expect(subscription_guy.conversations.unread.size).to eql 1
 
-      subscription_guy.conversations.first.update(:subscribed => false)
+      subscription_guy.conversations.first.update(subscribed: false)
       expect(subscription_guy.reload.unread_conversations_count).to eql 0
       expect(subscription_guy.conversations.unread.size).to eql 0
 
-      archive_guy.conversations.first.update(:workflow_state => "archived", :subscribed => false)
+      archive_guy.conversations.first.update(workflow_state: "archived", subscribed: false)
       expect(archive_guy.conversations.archived.size).to eql 1
     end
 
@@ -384,23 +384,23 @@ describe Conversation do
       root_convo = Conversation.initiate([sender, flip_flopper_guy, archive_guy, subscription_guy], false)
       root_convo.add_message(sender, 'test')
 
-      flip_flopper_guy.conversations.first.update(:subscribed => false)
+      flip_flopper_guy.conversations.first.update(subscribed: false)
       expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
       expect(flip_flopper_guy.conversations.unread.size).to eql 0
       # no new messages in the interim, he should stay "marked-as-read"
-      flip_flopper_guy.conversations.first.update(:subscribed => true)
+      flip_flopper_guy.conversations.first.update(subscribed: true)
       expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
       expect(flip_flopper_guy.conversations.unread.size).to eql 0
 
-      subscription_guy.conversations.first.update(:subscribed => false)
-      archive_guy.conversations.first.update(:workflow_state => "archived", :subscribed => false)
+      subscription_guy.conversations.first.update(subscribed: false)
+      archive_guy.conversations.first.update(workflow_state: "archived", subscribed: false)
 
       message = root_convo.add_message(sender, 'you wish you were subscribed!')
       message.update_attribute(:created_at, Time.now.utc + 1.minute)
       last_message_at = message.reload.created_at
 
-      subscription_guy.conversations.first.update(:subscribed => true)
-      archive_guy.conversations.first.update(:subscribed => true)
+      subscription_guy.conversations.first.update(subscribed: true)
+      archive_guy.conversations.first.update(subscribed: true)
 
       expect(subscription_guy.reload.unread_conversations_count).to eql 1
       expect(subscription_guy.conversations.unread.size).to eql 1
@@ -446,16 +446,16 @@ describe Conversation do
     end
 
     it "broadcasts conversation created", priority: "1" do
-      n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
+      n2 = Notification.create(name: "Conversation Created", category: "TestImmediately")
 
       [sender].each do |user|
         channel = communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
 
-        NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
+        NotificationPolicy.create(notification: n2, communication_channel: channel, frequency: "immediately")
       end
 
       recipients = create_users(5, return_type: :record)
-      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true)
+      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', cc_author: true)
 
       # check that our sender recieved a conversation created notification
       expect(conversation.messages_sent).to include("Conversation Created")
@@ -465,11 +465,11 @@ describe Conversation do
       Conversation.initiate([sender, recipient], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.update_attribute(:workflow_state, "unread")
-      convo.add_message('another test', :update_for_sender => false) # as if it were a bulk private message
+      convo.add_message('another test', update_for_sender: false) # as if it were a bulk private message
       expect(convo.reload.unread?).to be_truthy
 
       convo.update_attribute(:workflow_state, "archived")
-      convo.add_message('one more test', :update_for_sender => false)
+      convo.add_message('one more test', update_for_sender: false)
       expect(convo.reload.archived?).to be_truthy
 
       convo.update_attribute(:workflow_state, "unread")
@@ -491,7 +491,7 @@ describe Conversation do
       convo.remove_messages(message)
       expect(convo.last_message_at).to be_nil
 
-      convo.add_message('bulk message', :update_for_sender => false)
+      convo.add_message('bulk message', update_for_sender: false)
       convo.reload
       expect(convo.last_message_at).to be_nil
     end
@@ -513,7 +513,7 @@ describe Conversation do
       end
 
       Timecop.freeze(expected_times.last) do
-        convo.add_message('bulk message', :update_for_sender => false)
+        convo.add_message('bulk message', update_for_sender: false)
         convo.reload
         expect(convo.last_authored_at).to eql expected_times.last
         expect(convo.visible_last_authored_at).to eql expected_times.last
@@ -527,7 +527,7 @@ describe Conversation do
       recipient = recipients.last
       rconvo = recipient.conversations.first
       expect(rconvo.unread?).to be_truthy
-      rconvo.update(:subscribed => false)
+      rconvo.update(subscribed: false)
       expect(rconvo.unread?).to be_falsey
 
       convo = sender.conversations.first
@@ -535,7 +535,7 @@ describe Conversation do
       message.update_attribute(:created_at, Time.now.utc + 1.minute)
 
       expect(rconvo.reload.unread?).to be_falsey
-      rconvo.update(:subscribed => true)
+      rconvo.update(subscribed: true)
       expect(rconvo.unread?).to be_truthy
     end
 
@@ -549,7 +549,7 @@ describe Conversation do
       expect(rconvo.unread?).to be_truthy
       rconvo.update_attribute(:workflow_state, "read")
 
-      convo.add_message(sender, 'another test', :only_users => [recipients.first])
+      convo.add_message(sender, 'another test', only_users: [recipients.first])
 
       expect(rconvo.reload.unread?).to be_falsey
     end
@@ -558,14 +558,14 @@ describe Conversation do
   context "context tags" do
     context "current_context_strings" do
       it "does not double-count duplicate enrollments" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true).user
         course1 = @course
 
-        course_with_student(:active_all => true, :user => u1)
+        course_with_student(active_all: true, user: u1)
         course2 = @course
         other_section = course2.course_sections.create
-        course2.enroll_student(u1, :allow_multiple_enrollments => true, :section => other_section)
+        course2.enroll_student(u1, allow_multiple_enrollments: true, section: other_section)
         expect(u1.enrollments.size).to eql 3
 
         conversation = Conversation.initiate([u1, u2], true)
@@ -577,16 +577,16 @@ describe Conversation do
 
     context "initial tags" do
       it "saves all valid tags on the conversation" do # NOTE: this will change if/when we allow arbitrary tags
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         conversation = Conversation.initiate([u1, u2], true)
-        conversation.add_message(u1, 'test', :tags => [@course.asset_string, "asdf", "lol"])
+        conversation.add_message(u1, 'test', tags: [@course.asset_string, "asdf", "lol"])
         expect(conversation.tags).to eql [@course.asset_string]
       end
 
       it "sets initial empty tags on the conversation and conversation_participant" do
         u1 = student_in_course.user
-        u2 = student_in_course(:course => @course).user
+        u2 = student_in_course(course: @course).user
         conversation = Conversation.initiate([u1, u2], true)
         expect(conversation.read_attribute(:tags)).not_to be_nil
         expect(conversation.tags).to eql []
@@ -597,23 +597,23 @@ describe Conversation do
       end
 
       it "ignores explicit context tags not shared by at least two participants" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         u3 = user_factory
         @course1 = @course
         @course2 = course_factory(active_all: true)
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string, @course2.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string, @course2.asset_string])
         expect(conversation.tags).to eql [@course1.asset_string]
       end
 
       it "saves all visible tags on the conversation_participant" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         u3 = user_factory
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course.asset_string])
         expect(conversation.tags).to eql [@course.asset_string]
         expect(u1.conversations.first.tags).to eql [@course.asset_string]
         expect(u2.conversations.first.tags).to eql [@course.asset_string]
@@ -621,12 +621,12 @@ describe Conversation do
       end
 
       it "defaults all tags to common ones over the 50% threshold if none are specified" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         @course1 = @course
         @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
+        u3 = student_in_course(active_all: true, course: @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test')
         expect(conversation.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
@@ -636,14 +636,14 @@ describe Conversation do
       end
 
       it "defaults the conversation_participant tags to common ones over the 50% threshold if no specified tags match" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         @course1 = @course
         @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
+        u3 = student_in_course(active_all: true, course: @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         expect(conversation.tags).to eql [@course1.asset_string]
         expect(u1.conversations.first.tags).to eql [@course1.asset_string]
         expect(u2.conversations.first.tags).to eql [@course1.asset_string] # just the one, since it was explicit
@@ -654,12 +654,12 @@ describe Conversation do
         specs_require_sharding
 
         it "sets all tags on the other shard's participants" do
-          course1 = @shard1.activate { course_factory(:account => Account.create!, :active_all => true) }
-          course2 = @shard2.activate { course_factory(:account => Account.create!, :active_all => true) }
-          user1 = student_in_course(:course => course1, :active_all => true).user
-          user2 = student_in_course(:course => course2, :active_all => true).user
-          student_in_course(:course => course2, :user => user1, :active_all => true)
-          student_in_course(:course => course1, :user => user2, :active_all => true)
+          course1 = @shard1.activate { course_factory(account: Account.create!, active_all: true) }
+          course2 = @shard2.activate { course_factory(account: Account.create!, active_all: true) }
+          user1 = student_in_course(course: course1, active_all: true).user
+          user2 = student_in_course(course: course2, active_all: true).user
+          student_in_course(course: course2, user: user1, active_all: true)
+          student_in_course(course: course1, user: user2, active_all: true)
           conversation = Conversation.initiate([user1, user2], false)
           conversation.add_message(user1, 'test')
           expect(user1.conversations.first.tags.sort).to eql [course1.asset_string, course2.asset_string].sort
@@ -670,8 +670,8 @@ describe Conversation do
 
     context "deletion" do
       it "removes tags when all messages are deleted" do
-        u1 = student_in_course(:active_all => true).user
-        u2 = student_in_course(:active_all => true, :course => @course).user
+        u1 = student_in_course(active_all: true).user
+        u2 = student_in_course(active_all: true, course: @course).user
         conversation = Conversation.initiate([u1, u2], true)
         conversation.add_message(u1, 'test')
         expect(conversation.tags).to eql [@course.asset_string]
@@ -698,14 +698,14 @@ describe Conversation do
       let_once(:conversation) do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         conversation
       end
 
       it "adds new tags to the conversation" do
         expect(conversation.tags).to eql [@course1.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string])
         expect(conversation.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
       end
 
@@ -714,7 +714,7 @@ describe Conversation do
         expect(u2.conversations.first.tags).to eq [@course1.asset_string]
         expect(u3.conversations.first.tags).to eq [@course2.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string, "course_0"])
         expect(u1.conversations.first.tags).to eq [@course1.asset_string]
         expect(u2.conversations.first.tags.sort).to eq [@course1.asset_string, @course2.asset_string].sort
         expect(u3.conversations.first.tags).to eq [@course2.asset_string]
@@ -728,7 +728,7 @@ describe Conversation do
         ConversationParticipant.where(id: broken_one).update_all(user_id: -1, tags: '')
 
         conversation.reload
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string, "course_0"])
         expect(u1.conversations.first.tags).to eq [@course1.asset_string]
         expect(u2.conversations.first.tags.sort).to eq [@course1.asset_string]
         expect(broken_one.reload.tags).to eq []
@@ -745,21 +745,21 @@ describe Conversation do
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         cp = u2.conversations.first
         expect(cp.messages.human.first.tags).to eql [@course1.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string, "course_0"])
         expect(cp.messages.human.first.tags).to eql [@course2.asset_string]
       end
 
       it "saves the previous message tags on the conversation_message_participant if there are no new visible ones" do
         conversation = Conversation.initiate([u1, u2], true)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         cp = u2.conversations.first
         expect(cp.messages.human.first.tags).to eql [@course1.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => ["course_0"])
+        conversation.add_message(u1, 'another', tags: ["course_0"])
         expect(cp.messages.human.first.tags).to eql [@course1.asset_string]
       end
 
@@ -767,12 +767,12 @@ describe Conversation do
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         cp = u2.conversations.first
         expect(cp.tags).to eql [@course1.asset_string]
         expect(cp.messages.human.first.tags).to eql [@course1.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string])
         expect(cp.reload.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
         expect(cp.messages.human.first.tags).to eql [@course2.asset_string]
 
@@ -788,9 +788,9 @@ describe Conversation do
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
       it "does not save tags on the conversation_message_participant" do
-        u3 = student_in_course(:active_all => true, :course => @course1).user
+        u3 = student_in_course(active_all: true, course: @course1).user
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         expect(u1.conversations.first.messages.human.first.tags).to eql []
         expect(u2.conversations.first.messages.human.first.tags).to eql []
         expect(u3.conversations.first.messages.human.first.tags).to eql []
@@ -798,13 +798,13 @@ describe Conversation do
 
       it "does not recompute the conversation_participant's tags when removing messages" do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
+        u3 = student_in_course(active_all: true, course: @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         cp = u2.conversations.first
         expect(cp.tags).to eql [@course1.asset_string]
 
-        conversation.add_message(u1, 'another', :tags => [@course2.asset_string])
+        conversation.add_message(u1, 'another', tags: [@course2.asset_string])
         expect(cp.reload.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
 
         cp.remove_messages(cp.messages.human.first)
@@ -813,16 +813,16 @@ describe Conversation do
 
       it "adds tags specified along with new recipients" do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
-        u3 = student_in_course(:active_all => true, :course => @course2).user
-        u4 = student_in_course(:active_all => true, :course => @course2).user
+        u3 = student_in_course(active_all: true, course: @course2).user
+        u4 = student_in_course(active_all: true, course: @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
-        conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
+        conversation.add_message(u1, 'test', tags: [@course1.asset_string])
         expect(conversation.tags).to eql [@course1.asset_string]
         expect(u1.conversations.first.tags).to eql [@course1.asset_string]
         expect(u2.conversations.first.tags).to eql [@course1.asset_string]
         expect(u3.conversations.first.tags).to eql [@course2.asset_string]
 
-        conversation.add_participants(u2, [u4], :tags => [@course2.asset_string])
+        conversation.add_participants(u2, [u4], tags: [@course2.asset_string])
         expect(conversation.reload.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
         expect(u1.conversations.first.tags).to eql [@course1.asset_string]
         expect(u2.conversations.first.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
@@ -833,14 +833,14 @@ describe Conversation do
 
     context "migration" do
       before :once do
-        @u1 = student_in_course(:active_all => true).user
-        @u2 = student_in_course(:active_all => true, :course => @course).user
+        @u1 = student_in_course(active_all: true).user
+        @u2 = student_in_course(active_all: true, course: @course).user
         @course1 = @course
         @course2 = course_factory(active_all: true)
         @course2.enroll_student(@u2).update_attribute(:workflow_state, 'active')
-        @u3 = student_in_course(:active_all => true, :course => @course2).user
+        @u3 = student_in_course(active_all: true, course: @course2).user
         @conversation = Conversation.initiate([@u1, @u2, @u3], false)
-        @conversation.add_message(@u1, 'test', :tags => [@course1.asset_string])
+        @conversation.add_message(@u1, 'test', tags: [@course1.asset_string])
         Conversation.update_all "tags = NULL"
         ConversationParticipant.update_all "tags = NULL"
         ConversationMessageParticipant.update_all "tags = NULL"
@@ -872,13 +872,13 @@ describe Conversation do
 
     context 'tag updates' do
       before :once do
-        @teacher    = teacher_in_course(:active_all => true).user
-        @student    = student_in_course(:active_all => true, :course => @course).user
+        @teacher    = teacher_in_course(active_all: true).user
+        @student    = student_in_course(active_all: true, course: @course).user
         @old_course = @course
       end
 
-      let_once(:student1) { student_in_course(:active_all => true, :course => @old_course).user }
-      let_once(:student2) { student_in_course(:active_all => true, :course => @old_course).user }
+      let_once(:student1) { student_in_course(active_all: true, course: @old_course).user }
+      let_once(:student2) { student_in_course(active_all: true, course: @old_course).user }
 
       it "removes old tags and add new ones" do
         conversation = Conversation.initiate([@teacher, @student], true)
@@ -955,7 +955,7 @@ describe Conversation do
       end
 
       it "includes concluded group contexts when no active ones exist" do
-        group      = Group.create!(:context => @old_course)
+        group      = Group.create!(context: @old_course)
         [student1, student2].each { |s| group.users << s }
 
         conversation = Conversation.initiate([student1, student2], true)
@@ -972,7 +972,7 @@ describe Conversation do
       end
 
       it "replaces concluded group contexts with active ones" do
-        old_group = Group.create!(:context => @old_course)
+        old_group = Group.create!(context: @old_course)
         [student1, student2].each { |s| old_group.users << s }
 
         conversation = Conversation.initiate([student1, student2], true)
@@ -984,7 +984,7 @@ describe Conversation do
         new_course = course_factory
         new_course.offer!
         [student1, student2].each { |s| new_course.enroll_student(s).accept! }
-        new_group = Group.create!(:context => new_course)
+        new_group = Group.create!(context: new_course)
         new_group.users << student1
         new_group.users << student2
 
@@ -1012,8 +1012,8 @@ describe Conversation do
       a1 = account_model
       a2 = account_model
       conversation = Conversation.initiate([u1, u2], true)
-      conversation.add_message(u1, 'ohai', :root_account_id => a1.id)
-      conversation.add_message(u2, 'ohai yourself', :root_account_id => a2.id)
+      conversation.add_message(u1, 'ohai', root_account_id: a1.id)
+      conversation.add_message(u2, 'ohai yourself', root_account_id: a2.id)
       expect(conversation.root_account_ids).to eql [a1.id, a2.id]
     end
 
@@ -1070,14 +1070,14 @@ describe Conversation do
       it "uses global ids" do
         @shard1.activate do
           @account = account_model
-          new_course = course_factory(:account => @account)
+          new_course = course_factory(account: @account)
           u1 = user_factory
           u2 = user_factory
           conversation = Conversation.initiate([u1, u2], false, context_type: 'Course', context_id: new_course.id)
           expect(conversation.root_account_ids).to eql [@account.global_id]
 
           conversation.add_message(u1, 'ohai')
-          admin = account_admin_user(:account => @account, :active_all => true)
+          admin = account_admin_user(account: @account, active_all: true)
           expect(u1.conversations.for_masquerading_user(admin, u1).first).to be_present
         end
       end
@@ -1090,8 +1090,8 @@ describe Conversation do
     source.add_participants(sender, [source_user]) if source_user
     target.add_participants(sender, [target_user]) if target_user
     target_user = source_user || target_user
-    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => source }).count }
-    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => target }).count }
+    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(user_id: target_user, conversation_messages: { conversation_id: source }).count }
+    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(user_id: target_user, conversation_messages: { conversation_id: target }).count }
 
     source.merge_into(target)
 
@@ -1113,13 +1113,13 @@ describe Conversation do
       specs_require_sharding
 
       before :once do
-        @sender = User.create!(:name => 'a')
+        @sender = User.create!(name: 'a')
         @conversation1 = Conversation.initiate([@sender], false)
         @conversation2 = Conversation.initiate([@sender], false)
         @conversation3 = @shard1.activate { Conversation.initiate([@sender], false) }
-        @user1 = User.create!(:name => 'b')
-        @user2 = @shard1.activate { User.create!(:name => 'c') }
-        @user3 = @shard2.activate { User.create!(:name => 'd') }
+        @user1 = User.create!(name: 'b')
+        @user2 = @shard1.activate { User.create!(name: 'c') }
+        @user3 = @shard2.activate { User.create!(name: 'd') }
         @conversation1.add_message(@sender, 'message1')
         @conversation2.add_message(@sender, 'message2')
         @conversation3.add_message(@sender, 'message3')

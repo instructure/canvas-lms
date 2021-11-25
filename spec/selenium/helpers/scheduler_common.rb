@@ -123,8 +123,8 @@ module SchedulerCommon
 
   def create_appointment_group_manual(opts = {})
     opts = {
-      :publish => true,
-      :new_appointment_text => 'new appointment group'
+      publish: true,
+      new_appointment_text: 'new appointment group'
     }.with_indifferent_access.merge(opts)
 
     expect do

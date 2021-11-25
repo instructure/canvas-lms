@@ -41,7 +41,7 @@ class MarkDonePresenter
       end
     return unless item_context.is_a?(Course)
 
-    item_ids = GuardRail.activate(:secondary) { item_context.module_items_visible_to(@user).where(:content_type => @asset.class.name, :content_id => @asset.id).reorder(nil).pluck(:id) }
+    item_ids = GuardRail.activate(:secondary) { item_context.module_items_visible_to(@user).where(content_type: @asset.class.name, content_id: @asset.id).reorder(nil).pluck(:id) }
     item_ids.first if item_ids.count == 1
   end
 
@@ -62,7 +62,7 @@ class MarkDonePresenter
     progression = if @module.context_module_progressions.loaded?
                     @module.context_module_progressions.find { |p| p[:user_id] == @user.id }
                   else
-                    @module.context_module_progressions.where(:user_id => @user.id).first
+                    @module.context_module_progressions.where(user_id: @user.id).first
                   end
     return false unless progression
 
@@ -70,8 +70,8 @@ class MarkDonePresenter
   end
 
   def api_url
-    @ctrl.api_v1_course_context_module_item_done_path(:course_id => @context.id,
-                                                      :module_id => @item.context_module_id,
-                                                      :id => @item.id)
+    @ctrl.api_v1_course_context_module_item_done_path(course_id: @context.id,
+                                                      module_id: @item.context_module_id,
+                                                      id: @item.id)
   end
 end

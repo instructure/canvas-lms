@@ -46,7 +46,7 @@ class Login::OtpController < ApplicationController
     end
 
     send_otp unless configuring?
-    add_meta_tag(:name => "viewport", :id => "vp", :content => "initial-scale=1.0,user-scalable=yes,width=device-width")
+    add_meta_tag(name: "viewport", id: "vp", content: "initial-scale=1.0,user-scalable=yes,width=device-width")
   end
 
   def send_via_sms
@@ -59,7 +59,7 @@ class Login::OtpController < ApplicationController
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :phone_number)
       path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, '')}@#{params[:otp_login][:carrier]}"
       cc = @current_user.communication_channels.sms.by_path(path).first
-      cc ||= @current_user.communication_channels.sms.create!(:path => path)
+      cc ||= @current_user.communication_channels.sms.create!(path: path)
       if cc.retired?
         cc.workflow_state = 'unconfirmed'
         cc.save!
@@ -108,12 +108,12 @@ class Login::OtpController < ApplicationController
         old_cookie = cookies['canvas_otp_remember_me']
         old_cookie = nil unless @current_user.validate_otp_secret_key_remember_me_cookie(old_cookie)
         cookies['canvas_otp_remember_me'] = {
-          :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
-          :expires => now + 30.days,
-          :domain => remember_me_cookie_domain,
-          :httponly => true,
-          :secure => CanvasRails::Application.config.session_options[:secure],
-          :path => '/login'
+          value: @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
+          expires: now + 30.days,
+          domain: remember_me_cookie_domain,
+          httponly: true,
+          secure: CanvasRails::Application.config.session_options[:secure],
+          path: '/login'
         }
       end
       if session.delete(:pending_otp)
@@ -141,7 +141,7 @@ class Login::OtpController < ApplicationController
     user.save!
     user.one_time_passwords.scope.delete_all
 
-    render :json => {}
+    render json: {}
   end
 
   protected

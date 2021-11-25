@@ -26,10 +26,10 @@ describe 'appointment_canceled_by_user.email' do
   it "renders" do
     user = user_model
     course_with_student(course: @course, active_enrollment: true)
-    appointment_participant_model(:participant => user, :updating_user => @user)
+    appointment_participant_model(participant: user, updating_user: @user)
     generate_message(:appointment_canceled_by_user, :email, @event,
-                     :user => @user, :data => { :updating_user_name => user.name,
-                                                :cancel_reason => "because" })
+                     user: @user, data: { updating_user_name: user.name,
+                                          cancel_reason: "because" })
 
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
@@ -44,14 +44,14 @@ describe 'appointment_canceled_by_user.email' do
     @course = course_model
     cat = group_category
     user_model
-    @group = cat.groups.create(:context => @course)
+    @group = cat.groups.create(context: @course)
     @group.users << user << @user
-    appointment_participant_model(:participant => @group, :course => @course, :updating_user => @user)
+    appointment_participant_model(participant: @group, course: @course, updating_user: @user)
     @event.cancel_reason = 'just because'
 
     generate_message(:appointment_canceled_by_user, :email, @event,
-                     :user => @user, :data => { :updating_user_name => user.name,
-                                                :cancel_reason => "just because" })
+                     user: @user, data: { updating_user_name: user.name,
+                                          cancel_reason: "just because" })
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
     expect(@message.body).to include('just because')

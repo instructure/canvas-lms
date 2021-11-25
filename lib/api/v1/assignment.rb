@@ -33,7 +33,7 @@ module Api::V1::Assignment
                 rubric_association].freeze
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       id
       position
       description
@@ -68,7 +68,7 @@ module Api::V1::Assignment
   }.freeze
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
-    :only => %w[
+    only: %w[
       graders_anonymous_to_graders
       grader_comments_visible_to_graders
       grader_names_visible_to_final_grader
@@ -233,8 +233,8 @@ module Api::V1::Assignment
       tool_attributes['custom_params'] = assignment.primary_resource_link&.custom
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
-                                           :launch_type => 'assessment',
-                                           :assignment_id => assignment.id)
+                                           launch_type: 'assessment',
+                                           assignment_id: assignment.id)
     end
 
     # the webhook_info is for internal use only and is not intended to be used with
@@ -872,7 +872,7 @@ module Api::V1::Assignment
                 else
                   users = current_user_and_observed(include_observed: has_observed_users)
                   @context.submissions
-                          .where(:assignment_id => assignments.map(&:id))
+                          .where(assignment_id: assignments.map(&:id))
                           .for_user(users)
                 end
 

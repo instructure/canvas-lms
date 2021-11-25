@@ -47,7 +47,7 @@ describe "course settings/blueprint" do
 
   before :once do
     account_admin_user
-    course_factory :active_all => true
+    course_factory active_all: true
   end
 
   describe "as admin" do

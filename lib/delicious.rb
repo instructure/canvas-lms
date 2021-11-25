@@ -62,7 +62,7 @@ module Delicious
 
   def delicious_post_bookmark(service, tag_url, _title, desc, tags)
     http, request = delicious_generate_request('https://api.del.icio.us/v1/posts/add', 'POST', service.service_user_name, service.decrypted_password)
-    request.set_form_data({ :url => tag_url, :description => desc, :tags => tags.map { |t| t.to_s.gsub(/\s/, "_") }.join(" ") })
+    request.set_form_data({ url: tag_url, description: desc, tags: tags.map { |t| t.to_s.gsub(/\s/, "_") }.join(" ") })
     response = http.request(request)
     case response
     when Net::HTTPSuccess

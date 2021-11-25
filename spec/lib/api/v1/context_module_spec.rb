@@ -54,7 +54,7 @@ describe Api::V1::ContextModule do
       course_with_student(course: @course)
 
       @cm = ContextModule.new(context: @course)
-      @cm.prerequisites = { :type => "context_module", :name => 'test', :id => 1 }
+      @cm.prerequisites = { type: "context_module", name: 'test', id: 1 }
       @cm.save!
 
       @tool = @course.context_external_tools.create(name: "a", domain: "instructure.com", consumer_key: '12345', shared_secret: 'secret', url: 'http://www.toolurl.com')

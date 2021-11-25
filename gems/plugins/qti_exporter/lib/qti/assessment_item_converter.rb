@@ -57,10 +57,10 @@ module Qti
         @qti_data = opts[:qti_data]
       end
 
-      @question = { :answers => [],
-                    :correct_comments => "",
-                    :incorrect_comments => "",
-                    :question_text => "" }
+      @question = { answers: [],
+                    correct_comments: "",
+                    incorrect_comments: "",
+                    question_text: "" }
     end
 
     # This should be implemented in the children classes to do the type-specific parsing

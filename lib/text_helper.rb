@@ -37,8 +37,8 @@ module TextHelper
       start_date_display
     else
       I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
-             :start_date_and_time => start_date_display,
-             :end_date_and_time => Utils::DatePresenter.new(end_date).as_string(style))
+             start_date_and_time: start_date_display,
+             end_date_and_time: Utils::DatePresenter.new(end_date).as_string(style))
     end
   end
 
@@ -67,7 +67,7 @@ module TextHelper
   end
 
   def time_ago_in_words_with_ago(time)
-    I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
+    I18n.t('#time.with_ago', '%{time} ago', time: (time_ago_in_words time rescue ''))
   end
 
   # more precise than distance_of_time_in_words, and takes a number of seconds,
@@ -78,16 +78,16 @@ module TextHelper
     case seconds
     when  0...60
       I18n.t('datetime.distance_in_words.x_seconds',
-             { :one => "1 second", :other => "%{count} seconds" },
-             :count => seconds.round)
+             { one: "1 second", other: "%{count} seconds" },
+             count: seconds.round)
     when 60...3600
       I18n.t('datetime.distance_in_words.x_minutes',
-             { :one => "1 minute", :other => "%{count} minutes" },
-             :count => (seconds / 60.0).round)
+             { one: "1 minute", other: "%{count} minutes" },
+             count: (seconds / 60.0).round)
     else
       I18n.t('datetime.distance_in_words.about_x_hours',
-             { :one => "about 1 hour", :other => "about %{count} hours" },
-             :count => (seconds / 3600.0).round)
+             { one: "about 1 hour", other: "about %{count} hours" },
+             count: (seconds / 3600.0).round)
     end
   end
 
@@ -204,10 +204,10 @@ module TextHelper
   end
 
   def self.make_subject_reply_to(subject)
-    blank_re = I18n.t('#subject_reply_to', "Re: %{subject}", :subject => '')
+    blank_re = I18n.t('#subject_reply_to', "Re: %{subject}", subject: '')
     return subject if subject.starts_with?(blank_re)
 
-    I18n.t('#subject_reply_to', "Re: %{subject}", :subject => subject)
+    I18n.t('#subject_reply_to', "Re: %{subject}", subject: subject)
   end
 
   class MarkdownSafeBuffer < String; end

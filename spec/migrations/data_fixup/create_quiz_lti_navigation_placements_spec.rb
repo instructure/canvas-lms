@@ -38,7 +38,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       # create 2 Quiz LTI tools on 2 different accounts
       2.times do
         ContextExternalTool.create!(
-          context: account_model(:root_account => root_account, :parent_account => root_account),
+          context: account_model(root_account: root_account, parent_account: root_account),
           consumer_key: 'key',
           shared_secret: 'secret',
           name: 'Quizzes 2',
@@ -52,7 +52,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
 
     let_once(:some_tool) do
       ContextExternalTool.create!(
-        context: account_model(:root_account => root_account, :parent_account => root_account),
+        context: account_model(root_account: root_account, parent_account: root_account),
         consumer_key: 'key',
         shared_secret: 'secret',
         name: 'Some tool',

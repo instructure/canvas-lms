@@ -214,7 +214,7 @@ class UnzipAttachment
 
   # Actually creates the folder in the database.
   def assert_folder(root, dir)
-    folder = Folder.new(:parent_folder_id => root.id, :name => dir)
+    folder = Folder.new(parent_folder_id: root.id, name: dir)
     folder.context = context
     folder.save!
     folder
@@ -226,7 +226,7 @@ class UnzipAttachment
     @folders = nil if reset
     return @folders if @folders
 
-    @folders = OpenStruct.new(:root_directory => context_files_folder)
+    @folders = OpenStruct.new(root_directory: context_files_folder)
   end
 end
 

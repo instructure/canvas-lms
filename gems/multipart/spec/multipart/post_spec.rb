@@ -29,7 +29,7 @@ describe Multipart::Post do
     file = Tempfile.new(["test", "txt"])
     file.write("file on disk")
     file.rewind
-    query, header = subject.prepare_query(:a => "string", :b => file)
+    query, header = subject.prepare_query(a: "string", b: file)
     params = parse_params(query, header)
     expect(params["a"]).to eq("string")
     expect(params["b"][:filename]).to eq(File.basename(file.path))
@@ -37,7 +37,7 @@ describe Multipart::Post do
   end
 
   it "prepare_queries with a StringIO" do
-    query, header = subject.prepare_query(:a => "string", :b => StringIO.new("file in mem"))
+    query, header = subject.prepare_query(a: "string", b: StringIO.new("file in mem"))
     params = parse_params(query, header)
     expect(params["a"]).to eq("string")
     expect(params["b"][:filename]).to eq("b")
@@ -60,7 +60,7 @@ describe Multipart::Post do
     file = Tempfile.new(["test", "txt"])
     file.write("file in mem")
     file.rewind
-    stream, header = subject.prepare_query_stream(:a => "string", :b => file)
+    stream, header = subject.prepare_query_stream(a: "string", b: file)
     params = parse_params(stream.read, header)
     expect(params["a"]).to eq("string")
     expect(params["b"][:filename]).to eq(File.basename(file.path))

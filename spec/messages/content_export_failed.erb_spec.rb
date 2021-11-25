@@ -24,7 +24,7 @@ describe 'content_export_failed' do
   include MessagesCommon
 
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @ce = @course.content_exports.create!(user: @student)
   end
 

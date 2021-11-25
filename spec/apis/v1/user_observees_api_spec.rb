@@ -251,10 +251,10 @@ describe UserObserveesController, type: :request do
     it "only returns linked root accounts the admin has rights for" do
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: Account.default)
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: external_account)
-      json = raw_observers_call(:user_id => multi_student.id, :api_user => allowed_admin)
+      json = raw_observers_call(user_id: multi_student.id, api_user: allowed_admin)
       expect(json.first["observation_link_root_account_ids"]).to eq [Account.default.id]
 
-      json2 = raw_observers_call(:user_id => multi_student.id, :api_user => multi_admin)
+      json2 = raw_observers_call(user_id: multi_student.id, api_user: multi_admin)
       expect(json2.first["observation_link_root_account_ids"]).to match_array [Account.default.id, external_account.id]
     end
   end
@@ -313,7 +313,7 @@ describe UserObserveesController, type: :request do
       student.avatar_image_url = "/relative/canvas/path"
       student.save!
       add_linked_observer(student, parent)
-      opts = { :avatars => true }
+      opts = { avatars: true }
       json = raw_index_call(opts)
       expect(json.map { |o| o['id'] }).to eq [student.id]
       expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
@@ -331,7 +331,7 @@ describe UserObserveesController, type: :request do
       student.save!
       add_linked_observer(student, parent)
       parent.account.set_service_availability(:avatars, false)
-      opts = { :avatars => true }
+      opts = { avatars: true }
       json = raw_index_call(opts)
       expect(json.map { |o| o['id'] }).to eq [student.id]
       expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
@@ -340,10 +340,10 @@ describe UserObserveesController, type: :request do
     it "only returns linked root accounts the admin has rights for" do
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: Account.default)
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: external_account)
-      json = raw_index_call(:user_id => multi_parent.id, :api_user => allowed_admin)
+      json = raw_index_call(user_id: multi_parent.id, api_user: allowed_admin)
       expect(json.first["observation_link_root_account_ids"]).to eq [Account.default.id]
 
-      json2 = raw_index_call(:user_id => multi_parent.id, :api_user => multi_admin)
+      json2 = raw_index_call(user_id: multi_parent.id, api_user: multi_admin)
       expect(json2.first["observation_link_root_account_ids"]).to match_array [Account.default.id, external_account.id]
     end
   end
@@ -603,7 +603,7 @@ describe UserObserveesController, type: :request do
 
     it 'removes an observee by id (for external accounts)' do
       add_linked_observer(external_student, external_parent, root_account: external_account)
-      course_factory(:account => external_account).enroll_user(external_student)
+      course_factory(account: external_account).enroll_user(external_student)
       observer_enrollment = external_parent.observer_enrollments.first
 
       json = delete_call(user_id: external_parent.id, observee_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
@@ -640,7 +640,7 @@ describe UserObserveesController, type: :request do
       add_linked_observer(student, parent)
       delete_call(api_user: parent, expected_status: 200)
       expect(parent.reload.linked_students).to eq []
-      expect(UserObservationLink.where(:observer_id => parent).first.workflow_state).to eq 'deleted'
+      expect(UserObservationLink.where(observer_id: parent).first.workflow_state).to eq 'deleted'
     end
   end
 

@@ -22,17 +22,17 @@ class AddDefaultSectionsUniqueIndex < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    course_ids_to_fix = CourseSection.active.group(:course_id).where(:default_section => true)
+    course_ids_to_fix = CourseSection.active.group(:course_id).where(default_section: true)
                                      .having("COUNT(*) > 1").pluck(:course_id)
     course_ids_to_fix.each do |course_id|
-      CourseSection.where(:course_id => course_id, :default_section => true)
-                   .order(:id).offset(1).update_all(:default_section => false)
+      CourseSection.where(course_id: course_id, default_section: true)
+                   .order(:id).offset(1).update_all(default_section: false)
     end
-    add_index :course_sections, :course_id, :unique => true, :where => "default_section = 't' AND workflow_state <> 'deleted'",
-                                            :name => "index_course_sections_unique_default_section"
+    add_index :course_sections, :course_id, unique: true, where: "default_section = 't' AND workflow_state <> 'deleted'",
+                                            name: "index_course_sections_unique_default_section"
   end
 
   def down
-    remove_index :course_sections, :name => "index_course_sections_unique_default_section"
+    remove_index :course_sections, name: "index_course_sections_unique_default_section"
   end
 end

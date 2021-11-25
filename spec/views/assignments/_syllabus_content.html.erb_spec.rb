@@ -25,12 +25,12 @@ describe "/assignments/_syllabus_content" do
     def setup_and_render_context(type, opts = {})
       case type
       when :anonymous
-        course_factory :active_all => true
+        course_factory active_all: true
       when :non_enrolled_user
-        course_factory :active_all => true
+        course_factory active_all: true
         user_factory
       when :enrolled_user
-        course_with_student :active_all => true
+        course_with_student active_all: true
       end
 
       if opts[:is_public]
@@ -45,24 +45,24 @@ describe "/assignments/_syllabus_content" do
     end
 
     before do
-      course_factory :active_all => true
+      course_factory active_all: true
       @course.is_public = true
       @course.save!
     end
 
     example 'anonymous user (public course)' do
-      setup_and_render_context :anonymous, :is_public => true
-      expect(@controller.js_env).to include(:CAN_READ => true)
+      setup_and_render_context :anonymous, is_public: true
+      expect(@controller.js_env).to include(CAN_READ: true)
     end
 
     example 'non-enrolled user (public course)' do
-      setup_and_render_context :non_enrolled_user, :is_public => true
-      expect(@controller.js_env).to include(:CAN_READ => true)
+      setup_and_render_context :non_enrolled_user, is_public: true
+      expect(@controller.js_env).to include(CAN_READ: true)
     end
 
     example 'enrolled user (non-public course)' do
       setup_and_render_context :enrolled_user
-      expect(@controller.js_env).to include(:CAN_READ => true)
+      expect(@controller.js_env).to include(CAN_READ: true)
     end
   end
 end

@@ -30,7 +30,7 @@ describe BrandConfig do
     @parent_account = Account.default
     @parent_config = BrandConfig.create(variables: { "ic-brand-primary" => "#321" })
 
-    @subaccount = Account.create!(:parent_account => @parent_account)
+    @subaccount = Account.create!(parent_account: @parent_account)
     @subaccount_bc = BrandConfig.for(
       variables: { "ic-brand-global-nav-bgd" => "#123" },
       parent_md5: @parent_config.md5,

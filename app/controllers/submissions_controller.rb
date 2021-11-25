@@ -92,7 +92,7 @@ class SubmissionsController < SubmissionsBaseController
   include Submissions::ShowHelper
   include Api::V1::Submission
 
-  before_action :get_course_from_section, :only => :create
+  before_action :get_course_from_section, only: :create
   before_action :require_context
 
   include K5Mode
@@ -295,7 +295,7 @@ class SubmissionsController < SubmissionsBaseController
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           redirect_to course_assignment_url(@context, @assignment)
         end
-        format.json { render :json => e.record.errors, :status => :bad_request }
+        format.json { render json: e.record.errors, status: :bad_request }
       end
       return
     end
@@ -327,8 +327,8 @@ class SubmissionsController < SubmissionsBaseController
                    status: :created,
                    location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
-            render :json => @submission.as_json(:include => :submission_comments, :methods => :late), :status => :created,
-                   :location => course_gradebook_url(@submission.assignment.context)
+            render json: @submission.as_json(include: :submission_comments, methods: :late), status: :created,
+                   location: course_gradebook_url(@submission.assignment.context)
           end
         end
       else
@@ -336,7 +336,7 @@ class SubmissionsController < SubmissionsBaseController
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           render :show, id: @submission.assignment.context.id
         end
-        format.json { render :json => @submission.errors, :status => :bad_request }
+        format.json { render json: @submission.errors, status: :bad_request }
       end
     end
   end
@@ -439,7 +439,7 @@ class SubmissionsController < SubmissionsBaseController
 
   def verify_api_call_has_attachment
     if params[:submission][:submission_type] == 'online_upload' && params[:submission][:attachments].blank?
-      render(:json => { :message => "No valid file ids given" }, :status => :bad_request)
+      render(json: { message: "No valid file ids given" }, status: :bad_request)
       return false
     end
     true
@@ -457,7 +457,7 @@ class SubmissionsController < SubmissionsBaseController
     # that'll take some further investigation/testing.
     submission_type = params[:submission][:submission_type]
     unless allowed_api_submission_type?(submission_type)
-      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => :bad_request)
+      render(json: { message: "Invalid submission[submission_type] given" }, status: :bad_request)
       return false
     end
 
@@ -467,10 +467,10 @@ class SubmissionsController < SubmissionsBaseController
     submission_params = (['submission_type'] + API_SUBMISSION_TYPES[submission_type]).sort
     params[:submission].slice!(*submission_params)
     if params[:submission].keys.sort != submission_params
-      render(:json => {
-               :message => "Invalid parameters for submission_type #{submission_type}. " \
-                           "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
-             }, :status => :bad_request)
+      render(json: {
+               message: "Invalid parameters for submission_type #{submission_type}. " \
+                        "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
+             }, status: :bad_request)
       return false
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
@@ -629,15 +629,15 @@ class SubmissionsController < SubmissionsBaseController
 
           format.html do
             send_file(attachment.full_filename, {
-                        :type => attachment.content_type_with_encoding,
-                        :disposition => 'inline'
+                        type: attachment.content_type_with_encoding,
+                        disposition: 'inline'
                       })
           end
 
           format.zip do
             send_file(attachment.full_filename, {
-                        :type => attachment.content_type_with_encoding,
-                        :disposition => 'inline'
+                        type: attachment.content_type_with_encoding,
+                        disposition: 'inline'
                       })
           end
         else
@@ -645,7 +645,7 @@ class SubmissionsController < SubmissionsBaseController
           format.html { redirect_to inline_url }
           format.zip { redirect_to inline_url }
         end
-        format.json { render :json => attachment.as_json(:methods => :readable_size) }
+        format.json { render json: attachment.as_json(methods: :readable_size) }
       else
         flash[:notice] = t('still_zipping', "File zipping still in process...")
 
@@ -657,7 +657,7 @@ class SubmissionsController < SubmissionsBaseController
           redirect_to named_context_url(context, :context_assignment_url, assignment.id)
         end
 
-        format.json { render :json => attachment }
+        format.json { render json: attachment }
       end
     end
   end

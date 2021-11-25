@@ -33,16 +33,16 @@ module Canvas
       @id = id.to_s
       @tag = tag.to_s if tag
       @meta = {
-        :name => id.to_s.humanize,
-        :description => nil,
-        :website => nil,
-        :author => nil,
-        :author_website => nil,
-        :version => nil,
-        :settings_partial => nil,
-        :settings => nil,
-        :encrypted_settings => nil,
-        :base => nil
+        name: id.to_s.humanize,
+        description: nil,
+        website: nil,
+        author: nil,
+        author_website: nil,
+        version: nil,
+        settings_partial: nil,
+        settings: nil,
+        encrypted_settings: nil,
+        base: nil
       }.with_indifferent_access
     end
 

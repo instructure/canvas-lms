@@ -100,7 +100,7 @@ describe Types::LearningOutcomeGroupType do
 
   context "when doesn't have edit permission" do
     before(:once) do
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", :override => false)
+      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", override: false)
     end
 
     it "returns false for canEdit" do
@@ -167,10 +167,10 @@ describe Types::LearningOutcomeGroupType do
 
   describe '#not_imported_outcomes_count' do
     before(:once) do
-      @course = course_model :name => 'course', :account => @account, :workflow_state => 'created'
-      @parent_course_group = @course.learning_outcome_groups.create!(:title => 'parent course group')
-      @child_course_group1 = @course.learning_outcome_groups.create!(:title => 'child course group level 1')
-      @child_course_group2 = @course.learning_outcome_groups.create!(:title => 'child course group level 2')
+      @course = course_model name: 'course', account: @account, workflow_state: 'created'
+      @parent_course_group = @course.learning_outcome_groups.create!(title: 'parent course group')
+      @child_course_group1 = @course.learning_outcome_groups.create!(title: 'child course group level 1')
+      @child_course_group2 = @course.learning_outcome_groups.create!(title: 'child course group level 2')
       @child_course_group1.learning_outcome_group = @parent_course_group
       @child_course_group1.save!
       @child_course_group2.learning_outcome_group = @child_course_group1

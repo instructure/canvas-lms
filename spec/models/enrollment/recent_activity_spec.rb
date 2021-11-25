@@ -37,7 +37,7 @@ class Enrollment
     end
 
     describe "recording updates" do
-      before(:once) { course_with_student(:active_all => 1) }
+      before(:once) { course_with_student(active_all: 1) }
 
       let(:recent_activity) { Enrollment::RecentActivity.new(@enrollment) }
       let(:now) { Time.zone.now }
@@ -73,8 +73,8 @@ class Enrollment
 
         it "updates total_activity_time based on the maximum" do
           section2 = @course.course_sections.create!
-          enrollment2 = @course.enroll_student(@student, :allow_multiple_enrollments => true, :section => section2)
-          Enrollment.where(:id => enrollment2).update_all(:total_activity_time => 39.minutes.to_i)
+          enrollment2 = @course.enroll_student(@student, allow_multiple_enrollments: true, section: section2)
+          Enrollment.where(id: enrollment2).update_all(total_activity_time: 39.minutes.to_i)
 
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)

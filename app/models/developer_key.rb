@@ -35,11 +35,11 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
 
   has_many :page_views
-  has_many :access_tokens, -> { where(:workflow_state => "active") }
+  has_many :access_tokens, -> { where(workflow_state: "active") }
   has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
   has_many :context_external_tools
 
-  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile', inverse_of: :developer_key
+  has_one :tool_consumer_profile, class_name: 'Lti::ToolConsumerProfile', inverse_of: :developer_key
   has_one :tool_configuration, class_name: 'Lti::ToolConfiguration', dependent: :destroy, inverse_of: :developer_key
   serialize :scopes, Array
 
@@ -185,7 +185,7 @@ class DeveloperKey < ActiveRecord::Base
         end
         return @special_keys[default_key_name] = key if key
 
-        key = DeveloperKey.create!(:name => default_key_name)
+        key = DeveloperKey.create!(name: default_key_name)
         key.developer_key_account_bindings.update_all(workflow_state: 'on')
         key.update(auto_expire_tokens: false)
         Setting.set("#{default_key_name}_developer_key_id", key.id)

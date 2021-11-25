@@ -25,17 +25,17 @@ if Qti.migration_executable
       unzipped_file_path = create_temp_dir!
       @dir = create_temp_dir!
 
-      @course = Course.create!(:name => 'tester')
-      @migration = ContentMigration.create(:context => @course)
+      @course = Course.create!(name: 'tester')
+      @migration = ContentMigration.create(context: @course)
 
-      converter = Qti::Converter.new(:export_archive_path => @archive_file_path, :base_download_dir => unzipped_file_path, :content_migration => @migration)
+      converter = Qti::Converter.new(export_archive_path: @archive_file_path, base_download_dir: unzipped_file_path, content_migration: @migration)
       converter.export
       @course_data = converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
       @migration.set_default_settings
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
@@ -104,13 +104,13 @@ if Qti.migration_executable
 
     it "uses new attachments for imports with same file names" do
       # run a second migration and check that there are different attachments on the questions
-      migration = ContentMigration.create(:context => @course)
-      converter = Qti::Converter.new(:export_archive_path => @archive_file_path, :content_migration => migration, :id_prepender => 'test2')
+      migration = ContentMigration.create(context: @course)
+      converter = Qti::Converter.new(export_archive_path: @archive_file_path, content_migration: migration, id_prepender: 'test2')
       converter.export
       course_data = converter.course.with_indifferent_access
       course_data['all_files_export'] ||= {}
       course_data['all_files_export']['file_path'] = course_data['all_files_zip']
-      migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
       migration.migration_settings[:id_prepender] = 'test2'
       Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
@@ -130,22 +130,20 @@ if Qti.migration_executable
   end
 
   QTI_EXPORT_ASSESSMENT = {
-    :assessments =>
-            [{ :migration_id => "A1001",
-               :questions =>
-                      [{ :migration_id => "QUE_1003", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1007", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1014", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1018", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1022", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1031", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1037", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1043", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1049", :question_type => "question_reference" },
-                       { :migration_id => "QUE_1053", :question_type => "question_reference" }],
-               :question_count => 10,
-               :quiz_type => nil,
-               :quiz_name => "Quiz",
-               :title => "Quiz" }]
+    assessments: [{ migration_id: "A1001",
+                    questions: [{ migration_id: "QUE_1003", question_type: "question_reference" },
+                                { migration_id: "QUE_1007", question_type: "question_reference" },
+                                { migration_id: "QUE_1014", question_type: "question_reference" },
+                                { migration_id: "QUE_1018", question_type: "question_reference" },
+                                { migration_id: "QUE_1022", question_type: "question_reference" },
+                                { migration_id: "QUE_1031", question_type: "question_reference" },
+                                { migration_id: "QUE_1037", question_type: "question_reference" },
+                                { migration_id: "QUE_1043", question_type: "question_reference" },
+                                { migration_id: "QUE_1049", question_type: "question_reference" },
+                                { migration_id: "QUE_1053", question_type: "question_reference" }],
+                    question_count: 10,
+                    quiz_type: nil,
+                    quiz_name: "Quiz",
+                    title: "Quiz" }]
   }.with_indifferent_access
 end

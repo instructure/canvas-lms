@@ -35,7 +35,7 @@ module CC
 
       document.instruct!
       document.late_policy(
-        identifier: create_key(late_policy),
+        :identifier => create_key(late_policy),
         "xmlns" => CCHelper::CANVAS_NAMESPACE,
         "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
         "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"

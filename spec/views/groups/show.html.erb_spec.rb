@@ -23,7 +23,7 @@ require_relative '../views_helper'
 describe "/groups/show" do
   it "renders" do
     course_with_student
-    @group = @course.groups.create!(:name => "some group")
+    @group = @course.groups.create!(name: "some group")
     view_context(@group, @user)
     assign(:group, @group)
     assign(:topics, [])

@@ -327,9 +327,9 @@ class OutcomeResultsController < ApplicationController
         build_outcome_paths
         send_data(
           outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
-          :type => "text/csv",
-          :filename => t('outcomes_filename', "Outcomes").tr(' ', "_") + "-" + @context.name.to_s.tr(' ', "_") + ".csv",
-          :disposition => "attachment"
+          type: "text/csv",
+          filename: t('outcomes_filename', "Outcomes").tr(' ', "_") + "-" + @context.name.to_s.tr(' ', "_") + ".csv",
+          disposition: "attachment"
         )
       end
     end

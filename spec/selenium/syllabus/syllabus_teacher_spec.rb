@@ -29,12 +29,12 @@ describe "course syllabus" do
   context "with syllabus course summary option for a course" do
     before :once do
       # course_with_teacher :active_all => true
-      @course1 = Course.create!(:name => "First Course1")
-      @teacher1 = User.create!(:name => "First Teacher")
+      @course1 = Course.create!(name: "First Course1")
+      @teacher1 = User.create!(name: "First Teacher")
       @teacher1.accept_terms
       @teacher1.register!
-      @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
-      @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+      @course1.enroll_teacher(@teacher1, enrollment_state: 'active')
+      @assignment1 = @course1.assignments.create!(title: 'Assignment First', points_possible: 10)
     end
 
     before do

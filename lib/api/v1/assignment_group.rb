@@ -36,7 +36,7 @@ module Api::V1::AssignmentGroup
     includes ||= []
     opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
-    hash = api_json(group, user, session, :only => %w[id name position group_weight sis_source_id integration_data])
+    hash = api_json(group, user, session, only: %w[id name position group_weight sis_source_id integration_data])
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')

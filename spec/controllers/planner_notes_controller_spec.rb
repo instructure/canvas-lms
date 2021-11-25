@@ -37,8 +37,8 @@ describe PlannerNotesController do
       get :index
       assert_unauthorized
 
-      post :create, params: { :title => "thing",
-                              :todo_date => 1.day.from_now }
+      post :create, params: { title: "thing",
+                              todo_date: 1.day.from_now }
       assert_unauthorized
     end
   end
@@ -382,7 +382,7 @@ describe PlannerNotesController do
         end
 
         it "can't delete other people's notes" do
-          user_session(user_factory(:active_all => true))
+          user_session(user_factory(active_all: true))
           delete :destroy, params: { id: @student_note.id }
           expect(response).to be_not_found
           expect(@student_note.reload).to be_active
@@ -411,9 +411,9 @@ describe PlannerNotesController do
         it "returns http not found for notes not yours" do
           u = user_factory(active_all: true)
           u_note = u.planner_notes.create(
-            :title => "Other User's Note",
-            :details => "Other Details",
-            :todo_date => 1.week.from_now
+            title: "Other User's Note",
+            details: "Other Details",
+            todo_date: 1.week.from_now
           )
           get :show, params: { id: u_note.id }
           expect(response).to have_http_status(:not_found)

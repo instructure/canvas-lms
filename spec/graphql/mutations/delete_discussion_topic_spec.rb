@@ -21,7 +21,7 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 describe Mutations::DeleteDiscussionTopic do
   before(:once) do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
   end
 
   let(:sender) { @teacher }

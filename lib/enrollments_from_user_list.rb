@@ -87,11 +87,11 @@ class EnrollmentsFromUserList
 
     @enrolled_users[user.id] = true
     enrollment = @course.enroll_user(user, @enrollment_type,
-                                     :section => @section,
-                                     :limit_privileges_to_course_section => @limit_privileges_to_course_section,
-                                     :allow_multiple_enrollments => true,
-                                     :role => @role,
-                                     :skip_touch_user => true)
+                                     section: @section,
+                                     limit_privileges_to_course_section: @limit_privileges_to_course_section,
+                                     allow_multiple_enrollments: true,
+                                     role: @role,
+                                     skip_touch_user: true)
     if enrollment
       @enrollments << enrollment
       if enrollment.need_touch_user

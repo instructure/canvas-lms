@@ -31,39 +31,39 @@ describe "assignment batch edit" do
       # reference date
       @date = Time.zone.now.change(usec: 0)
       # Course
-      @course1 = Course.create!(:name => "First Course1")
+      @course1 = Course.create!(name: "First Course1")
       # Teacher
       @teacher1 = User.create!
-      @teacher1 = User.create!(:name => "First Teacher")
+      @teacher1 = User.create!(name: "First Teacher")
       @teacher1.accept_terms
       @teacher1.register!
-      @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
+      @course1.enroll_teacher(@teacher1, enrollment_state: 'active')
       # Student1 and Student2 and Student3
-      @student1 = User.create!(:name => "First Student")
+      @student1 = User.create!(name: "First Student")
       @student1.accept_terms
       @student1.register!
-      @course1.enroll_student(@student1, :enrollment_state => 'active')
-      @student2 = User.create!(:name => "Second Student")
+      @course1.enroll_student(@student1, enrollment_state: 'active')
+      @student2 = User.create!(name: "Second Student")
       @student2.accept_terms
       @student2.register!
-      @course1.enroll_student(@student2, :enrollment_state => 'active')
-      @student3 = User.create!(:name => "Third Student")
+      @course1.enroll_student(@student2, enrollment_state: 'active')
+      @student3 = User.create!(name: "Third Student")
       @student3.accept_terms
       @student3.register!
-      @course1.enroll_student(@student3, :enrollment_state => 'active')
+      @course1.enroll_student(@student3, enrollment_state: 'active')
       # Two Assignments, one with overrides and one with no due date
       @assignment1 = @course1.assignments.create!(
-        :title => 'First Overrides Assignment',
-        :points_possible => 10,
-        :submission_types => "online_url,online_upload,online_text_entry",
-        :due_at => @date + 1.day,
-        :lock_at => @date + 3.days,
-        :unlock_at => @date - 3.days
+        title: 'First Overrides Assignment',
+        points_possible: 10,
+        submission_types: "online_url,online_upload,online_text_entry",
+        due_at: @date + 1.day,
+        lock_at: @date + 3.days,
+        unlock_at: @date - 3.days
       )
       @assignment2 = @course1.assignments.create!(
-        :title => 'Second Assignment',
-        :points_possible => 10,
-        :submission_types => "online_text_entry"
+        title: 'Second Assignment',
+        points_possible: 10,
+        submission_types: "online_text_entry"
       )
       # add some overrides for Assignment1
       @override1 = create_adhoc_override_for_assignment(@assignment1,

@@ -146,7 +146,7 @@ describe ObserverAlert do
     end
 
     it 'creates an alert when a user has a threshold for course announcements' do
-      a = announcement_model(:context => @course)
+      a = announcement_model(context: @course)
       alert1 = ObserverAlert.where(student: @student, observer: @observer)
       expect(alert1.count).to eq 1
       alert = alert1.first
@@ -220,7 +220,7 @@ describe ObserverAlert do
       @student3 = student_in_course(active_all: true, course: @course).user
       @observer3 = course_with_observer(course: @course, associated_user_id: @student3.id, active_all: true).user
       observer_alert_threshold_model(student: @student3, observer: @observer3, alert_type: 'assignment_missing')
-      @assignment.submit_homework(@student3, :submission_type => 'online_text_entry', :body => 'done')
+      @assignment.submit_homework(@student3, submission_type: 'online_text_entry', body: 'done')
 
       # student with multiple observers
       @student4 = student_in_course(active_all: true, course: @course).user

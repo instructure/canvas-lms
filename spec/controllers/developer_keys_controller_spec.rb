@@ -28,7 +28,7 @@ describe DeveloperKeysController do
 
   context "Site admin" do
     before do
-      account_admin_user(:account => Account.site_admin)
+      account_admin_user(account: Account.site_admin)
     end
 
     describe "GET 'index'" do

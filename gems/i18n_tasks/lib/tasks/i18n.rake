@@ -6,7 +6,7 @@ require 'shellwords'
 
 namespace :i18n do
   desc "Verifies all translation calls"
-  task :check => :i18n_environment do
+  task check: :i18n_environment do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     def I18nliner.manual_translations
@@ -20,7 +20,7 @@ namespace :i18n do
     puts "\nRuby..."
     require 'i18nliner/commands/check'
 
-    options = { :only => ENV['ONLY'] }
+    options = { only: ENV['ONLY'] }
     @command = I18nliner::Commands::Check.run(options)
     @command.success? or exit 1
     @translations = @command.translations
@@ -39,7 +39,7 @@ namespace :i18n do
   end
 
   desc "Generates a new en.yml file for all translations"
-  task :generate => :check do
+  task generate: :check do
     def deep_sort_hash_by_keys(value)
       sort = lambda do |node|
         case node
@@ -116,7 +116,7 @@ namespace :i18n do
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js => :i18n_environment do
+  task generate_js: :i18n_environment do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     locales = I18n.available_locales
@@ -162,7 +162,7 @@ namespace :i18n do
   end
 
   desc "Generate the pseudo-translation file lolz"
-  task :generate_lolz => [:generate, :environment] do
+  task generate_lolz: [:generate, :environment] do
     strings_processed = 0
     process_lolz = proc do |val|
       case val
@@ -215,7 +215,7 @@ namespace :i18n do
   end
 
   desc "Exports new/changed English strings to be translated"
-  task :export => :environment do
+  task export: :environment do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     begin
@@ -236,7 +236,7 @@ namespace :i18n do
         puts "Enter path or hash of previous export base (omit to export all):"
         arg = $stdin.gets.strip
         if arg.blank?
-          last_export = { :type => :none }
+          last_export = { type: :none }
         elsif /\A[a-f0-9]{7,}\z/.match?(arg)
           puts "Fetching previous export..."
           ret = `git show --name-only --oneline #{arg}`
@@ -244,7 +244,7 @@ namespace :i18n do
             if ret.include?(base_filename)
               `git checkout #{arg}`
               if (previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil)
-                last_export = { :type => :commit, :data => previous }
+                last_export = { type: :commit, data: previous }
               else
                 warn "Unable to load en.yml file"
               end
@@ -259,7 +259,7 @@ namespace :i18n do
           puts "Loading previous export..."
           if File.exist?(arg)
             if (previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil)
-              last_export = { :type => :file, :data => previous }
+              last_export = { type: :file, data: previous }
             else
               warn "Unable to load yml file"
             end

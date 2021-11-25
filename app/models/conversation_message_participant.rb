@@ -29,7 +29,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
   belongs_to :user
   # deprecated
   belongs_to :conversation_participant
-  delegate :author, :author_id, :generated, :body, :to => :conversation_message
+  delegate :author, :author_id, :generated, :body, to: :conversation_message
 
   before_create :set_root_account_ids
 
@@ -38,7 +38,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
 
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
     joins(:conversation_participant)
-      .where(:conversation_id => conversation_id, :conversation_message_id => message_id)
+      .where(conversation_id: conversation_id, conversation_message_id: message_id)
   }
 
   workflow do

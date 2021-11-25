@@ -31,13 +31,13 @@ module CC::Importer::Standard
           if path && File.exist?(path) && Attachment.mimetype(path).include?('html')
             case res[:intended_use]
             when "assignment"
-              new_assignments << { :migration_id => res[:migration_id], :description => File.read(path) }
+              new_assignments << { migration_id: res[:migration_id], description: File.read(path) }
             when "syllabus"
               @course[:course] ||= {}
               @course[:course][:syllabus_body] = File.read(path)
             else
               if @convert_html_to_pages
-                new_pages << { :migration_id => res[:migration_id], :text => File.read(path) }
+                new_pages << { migration_id: res[:migration_id], text: File.read(path) }
               end
             end
           end

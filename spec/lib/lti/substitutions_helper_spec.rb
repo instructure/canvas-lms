@@ -227,14 +227,14 @@ module Lti
 
       it 'returns enrollments in an account for a user' do
         set_up_persistance!
-        enrollment = account.account_users.create!(:user => user)
+        enrollment = account.account_users.create!(user: user)
 
         expect(subject.account_enrollments).to eq [enrollment]
       end
 
       it 'does not return deleted account enrollments' do
         set_up_persistance!
-        enrollment = account.account_users.create!(:user => user)
+        enrollment = account.account_users.create!(user: user)
         enrollment.destroy
 
         expect(subject.account_enrollments).to eq []
@@ -242,7 +242,7 @@ module Lti
 
       it 'returns enrollments in an account chain for a user' do
         set_up_persistance!
-        enrollment = root_account.account_users.create!(:user => user)
+        enrollment = root_account.account_users.create!(user: user)
 
         expect(subject.account_enrollments).to eq [enrollment]
       end
@@ -261,7 +261,7 @@ module Lti
       it "returns the user's roles" do
         set_up_persistance!
         student_in_course(user: user, course: course, active_enrollment: true)
-        account.account_users.create!(:user => user)
+        account.account_users.create!(user: user)
         lis_roles = subject.current_lis_roles
 
         expect(lis_roles).to include 'Learner'
@@ -608,10 +608,10 @@ module Lti
       describe "section substitutions" do
         before do
           course.save!
-          @sec1 = course.course_sections.create(:name => 'sec1')
+          @sec1 = course.course_sections.create(name: 'sec1')
           @sec1.sis_source_id = 'def'
           @sec1.save!
-          @sec2 = course.course_sections.create!(:name => 'sec2')
+          @sec2 = course.course_sections.create!(name: 'sec2')
           @sec2.sis_source_id = 'abc'
           @sec2.save!
           # course.reload
@@ -668,7 +668,7 @@ module Lti
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
-          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
+          pseudonym = cc.user.pseudonyms.build(unique_id: cc.path, account: root_account)
           pseudonym.sis_communication_channel_id = cc.id
           pseudonym.communication_channel_id = cc.id
           pseudonym.sis_user_id = "some_sis_id"
@@ -744,7 +744,7 @@ module Lti
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
-          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
+          pseudonym = cc.user.pseudonyms.build(unique_id: cc.path, account: root_account)
           pseudonym.sis_communication_channel_id = cc.id
           pseudonym.communication_channel_id = cc.id
           pseudonym.sis_user_id = "some_sis_id"

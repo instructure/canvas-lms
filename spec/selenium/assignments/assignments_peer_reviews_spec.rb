@@ -54,8 +54,8 @@ describe "assignments" do
       course_with_teacher_logged_in
       student = student_in_course.user
 
-      gc = GroupCategory.create(:name => "Inconceivable", :context => @course)
-      @course.groups.create!(:group_category => gc)
+      gc = GroupCategory.create(name: "Inconceivable", context: @course)
+      @course.groups.create!(group_category: gc)
       @assignment = assignment_model({
                                        course: @course,
                                        peer_reviews: true,
@@ -75,10 +75,10 @@ describe "assignments" do
     context "rubric assessments" do
       before :once do
         course_factory(active_course: true)
-        user_factory(:active_all => true)
+        user_factory(active_all: true)
         @student1 = @user
-        student_in_course(:user => @student1, :active_all => true)
-        @student2 = student_in_course(:active_all => true).user
+        student_in_course(user: @student1, active_all: true)
+        @student2 = student_in_course(active_all: true).user
 
         @assignment = assignment_model({ course: @course, peer_reviews: true, automatic_peer_reviews: false })
       end
@@ -192,19 +192,19 @@ describe "assignments" do
     let!(:rubric) { rubric_model }
     let!(:association) do
       rubric.associate_with(assignment, review_course, {
-                              :purpose => 'grading', :use_for_grading => true
+                              purpose: 'grading', use_for_grading: true
                             })
     end
     let!(:assessment) do
       association.assess({
-                           :user => reviewed,
-                           :assessor => reviewer,
-                           :artifact => submission,
-                           :assessment => {
-                             :assessment_type => 'peer_review',
-                             :criterion_crit1 => {
-                               :points => 5,
-                               :comments => "Hey, it's a comment."
+                           user: reviewed,
+                           assessor: reviewer,
+                           artifact: submission,
+                           assessment: {
+                             assessment_type: 'peer_review',
+                             criterion_crit1: {
+                               points: 5,
+                               comments: "Hey, it's a comment."
                              }
                            }
                          })

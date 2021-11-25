@@ -241,10 +241,10 @@
 #
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :get_course
-  before_action :get_template, :except => %i[import_details imports_index imports_show subscriptions_index]
-  before_action :get_subscription, :only => %i[import_details imports_index imports_show]
+  before_action :get_template, except: %i[import_details imports_index imports_show subscriptions_index]
+  before_action :get_subscription, only: %i[import_details imports_index imports_show]
   before_action :require_course_level_manage_rights
-  before_action :require_account_level_manage_rights, :only => [:update_associations]
+  before_action :require_account_level_manage_rights, only: [:update_associations]
 
   include Api::V1::Course
   include Api::V1::MasterCourses
@@ -262,7 +262,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def show
-    render :json => master_template_json(@template, @current_user, session)
+    render json: master_template_json(@template, @current_user, session)
   end
 
   # @API Get associated course information
@@ -285,7 +285,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     json = courses.map do |course|
       course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
     end
-    render :json => json
+    render json: json
   end
 
   # @API Update associated courses
@@ -317,22 +317,22 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
       ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
       if (ids_to_add & ids_to_remove).any?
-        return render :json => { :message => "cannot add and remove a course at the same time" }, :status => :bad_request
+        return render json: { message: "cannot add and remove a course at the same time" }, status: :bad_request
       end
 
       if ids_to_add.any?
-        valid_ids_to_add = @course.account.associated_courses.where.not(:workflow_state => "deleted")
-                                  .not_master_courses.where(:id => ids_to_add).pluck(:id)
+        valid_ids_to_add = @course.account.associated_courses.where.not(workflow_state: "deleted")
+                                  .not_master_courses.where(id: ids_to_add).pluck(:id)
         invalid_ids = ids_to_add - valid_ids_to_add
         if invalid_ids.any?
-          return render :json => { :message => "invalid courses to add (#{invalid_ids.join(", ")})" }, :status => :bad_request
+          return render json: { message: "invalid courses to add (#{invalid_ids.join(", ")})" }, status: :bad_request
         end
 
-        data = MasterCourses::ChildSubscription.active.where(:child_course_id => valid_ids_to_add).pluck(:master_template_id, :child_course_id)
+        data = MasterCourses::ChildSubscription.active.where(child_course_id: valid_ids_to_add).pluck(:master_template_id, :child_course_id)
         template_pairs, other_pairs = data.partition { |template_id, _c_id| template_id == @template.id }
         if other_pairs.any?
           # i still think there's a case for multiple inheritance but for now...
-          return render :json => { :message => "cannot add courses already associated with other templates (#{other_pairs.map(&:last).join(", ")})" }, :status => :bad_request
+          return render json: { message: "cannot add courses already associated with other templates (#{other_pairs.map(&:last).join(", ")})" }, status: :bad_request
         end
 
         valid_ids_to_add -= template_pairs.map(&:last) # ignore existing active subscriptions
@@ -340,10 +340,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
 
       if ids_to_remove.any?
-        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).preload(:child_course).each(&:destroy)
+        @template.child_subscriptions.active.where(child_course_id: ids_to_remove).preload(:child_course).each(&:destroy)
       end
 
-      render :json => { :success => true }
+      render json: { success: true }
     end
   end
 
@@ -375,9 +375,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns BlueprintMigration
   def queue_migration
     if @template.active_migration_running?
-      return render :json => { :message => "Cannot queue a migration while one is currently running" }, :status => :bad_request
+      return render json: { message: "Cannot queue a migration while one is currently running" }, status: :bad_request
     elsif !@template.child_subscriptions.active.exists?
-      return render :json => { :message => "No associated courses to migrate to" }, :status => :bad_request
+      return render json: { message: "No associated courses to migrate to" }, status: :bad_request
     end
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
@@ -386,7 +386,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
-    render :json => master_migration_json(migration, @current_user, session)
+    render json: master_migration_json(migration, @current_user, session)
   end
 
   # @API Set or remove restrictions on a blueprint course object
@@ -418,10 +418,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def restrict_item
     content_type = params[:content_type]
     unless %w[assignment attachment discussion_topic external_tool lti-quiz quiz wiki_page].include?(content_type)
-      return render :json => { :message => "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, :status => :bad_request
+      return render json: { message: "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, status: :bad_request
     end
     unless params.key?(:restricted)
-      return render :json => { :message => "Must set 'restricted'" }, :status => :bad_request
+      return render json: { message: "Must set 'restricted'" }, status: :bad_request
     end
 
     scope =
@@ -433,11 +433,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       when 'lti-quiz'
         @course.assignments.active
       else
-        @course.send(content_type.pluralize).where.not(:workflow_state => 'deleted')
+        @course.send(content_type.pluralize).where.not(workflow_state: 'deleted')
       end
-    item = scope.where(:id => params[:content_id]).first
+    item = scope.where(id: params[:content_id]).first
     unless item
-      return render :json => { :message => "Could not find content: #{content_type} #{params[:content_id]}" }, :status => :not_found
+      return render json: { message: "Could not find content: #{content_type} #{params[:content_id]}" }, status: :not_found
     end
 
     mc_tag = @template.content_tag_for(item)
@@ -451,9 +451,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
     mc_tag.save if mc_tag.changed?
     if mc_tag.valid?
-      render :json => { :success => true }
+      render json: { success: true }
     else
-      render :json => mc_tag.errors, :status => :bad_request
+      render json: mc_tag.errors, status: :bad_request
     end
   end
 
@@ -466,7 +466,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns [ChangeRecord]
   def unsynced_changes
     cutoff_time = @template.last_export_started_at
-    return render :json => [{ asset_name: @template.course.name, change_type: 'initial_sync' }] unless cutoff_time
+    return render json: [{ asset_name: @template.course.name, change_type: 'initial_sync' }] unless cutoff_time
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []
@@ -480,7 +480,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                      when 'DiscussionTopic'
                        @course.discussion_topics.only_discussion_topics
                      else
-                       klass.constantize.where(:context_id => @course, :context_type => 'Course')
+                       klass.constantize.where(context_id: @course, context_type: 'Course')
                      end
 
         remaining_count = max_records - items.size
@@ -504,7 +504,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
     changes << changed_syllabus_json(@course) if @course.syllabus_updated_at&.>(cutoff_time)
 
-    render :json => changes
+    render json: changes
   end
 
   # @API List blueprint migrations
@@ -522,7 +522,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     # sort id desc
     migrations = Api.paginate(@template.master_migrations.order("id DESC"), self, api_v1_course_blueprint_migrations_url)
     ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
-    render :json => migrations.map { |migration| master_migration_json(migration, @current_user, session) }
+    render json: migrations.map { |migration| master_migration_json(migration, @current_user, session) }
   end
 
   # @API Show a blueprint migration
@@ -538,7 +538,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns BlueprintMigration
   def migrations_show
     migration = @template.master_migrations.find(params[:id])
-    render :json => master_migration_json(migration, @current_user, session)
+    render json: master_migration_json(migration, @current_user, session)
   end
 
   # @API Get migration details
@@ -553,10 +553,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @returns [ChangeRecord]
   def migration_details
-    @mm = @template.master_migrations.where(:id => params[:id]).first!
-    return render :json => [] unless @mm.export_results.key?(:selective)
+    @mm = @template.master_migrations.where(id: params[:id]).first!
+    return render json: [] unless @mm.export_results.key?(:selective)
 
-    subscriptions = @template.child_subscriptions.where(:id => @mm.export_results[:selective][:subscriptions])
+    subscriptions = @template.child_subscriptions.where(id: @mm.export_results[:selective][:subscriptions])
     tag_association = @template.content_tags
 
     render_changes(tag_association, subscriptions)
@@ -576,7 +576,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     scope = @course.master_course_subscriptions.active
     subs = Api.paginate(scope, self, api_v1_course_blueprint_subscriptions_url)
     # TODO: preload subscription -> master template -> course if we ever support multiple subscriptions
-    render :json => subs.map { |sub| child_subscription_json(sub) }
+    render json: subs.map { |sub| child_subscription_json(sub) }
   end
 
   # @API List blueprint imports
@@ -595,15 +595,15 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def imports_index
     # maybe add child_subscription_id as a column if we expect people to use this endpoint
     migrations = @course.content_migrations
-                        .where(:migration_type => 'master_course_import', :child_subscription_id => @subscription)
+                        .where(migration_type: 'master_course_import', child_subscription_id: @subscription)
                         .order('id DESC')
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
     ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
-    render :json => migrations.map { |migration|
-                      master_migration_json(migration.master_migration, @current_user,
-                                            session, :child_migration => migration,
-                                                     :subscription => @subscription)
-                    }
+    render json: migrations.map { |migration|
+                   master_migration_json(migration.master_migration, @current_user,
+                                         session, child_migration: migration,
+                                                  subscription: @subscription)
+                 }
   end
 
   # @API Show a blueprint import
@@ -619,10 +619,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns BlueprintMigration
   def imports_show
     migration = @course.content_migrations
-                       .where(:migration_type => 'master_course_import', :child_subscription_id => @subscription)
+                       .where(migration_type: 'master_course_import', child_subscription_id: @subscription)
                        .find(params[:id])
-    render :json => master_migration_json(migration.master_migration, @current_user, session,
-                                          :child_migration => migration, :subscription => @subscription)
+    render json: master_migration_json(migration.master_migration, @current_user, session,
+                                       child_migration: migration, subscription: @subscription)
   end
 
   # @API Get import details
@@ -637,9 +637,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @returns [ChangeRecord]
   def import_details
-    migration = @course.content_migrations.where(:migration_type => 'master_course_import', :id => params[:id]).first!
+    migration = @course.content_migrations.where(migration_type: 'master_course_import', id: params[:id]).first!
     @mm = migration.master_migration
-    return render :json => [] unless @mm.export_results.key?(:selective) && @mm.export_results[:selective][:subscriptions].include?(@subscription.id)
+    return render json: [] unless @mm.export_results.key?(:selective) && @mm.export_results[:selective][:subscriptions].include?(@subscription.id)
 
     tag_association = @subscription.content_tags
 
@@ -682,7 +682,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def get_exceptions_by_subscription(subscriptions)
-    results = @mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results).to_h
+    results = @mm.migration_results.where(child_subscription_id: subscriptions).where.not(results: nil).pluck(:child_subscription_id, :results).to_h
 
     exceptions = {}
     subscriptions.each do |sub|
@@ -692,10 +692,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       next unless skipped_items.present?
 
       get_syllabus_exception!(skipped_items, sub, exceptions)
-      sub.content_tags.where(:migration_id => skipped_items).each do |child_tag|
+      sub.content_tags.where(migration_id: skipped_items).each do |child_tag|
         exceptions[child_tag.migration_id] ||= []
-        exceptions[child_tag.migration_id] << { :course_id => sub.child_course_id,
-                                                :conflicting_changes => change_classes(
+        exceptions[child_tag.migration_id] << { course_id: sub.child_course_id,
+                                                conflicting_changes: change_classes(
                                                   child_tag.content_type.constantize, child_tag.downstream_changes
                                                 ) }
       end
@@ -706,7 +706,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def get_syllabus_exception!(skipped_items, child_subscription, exceptions)
     if skipped_items.delete(:syllabus)
       exceptions['syllabus'] ||= []
-      exceptions['syllabus'] << { :course_id => child_subscription.child_course_id, :conflicting_changes => ['content'] }
+      exceptions['syllabus'] << { course_id: child_subscription.child_course_id, conflicting_changes: ['content'] }
     end
   end
 
@@ -717,7 +717,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     %i[created updated deleted].each do |action|
       migration_ids = @mm.export_results[:selective][action].values.flatten
-      tags = tag_association.where(:migration_id => migration_ids).preload(:content).to_a
+      tags = tag_association.where(migration_id: migration_ids).preload(:content).to_a
       restricted_ids = find_restricted_ids(tags)
       tags.each do |tag|
         next if tag.content_type == 'AssignmentGroup' # these are noise, since they're touched with each assignment
@@ -728,14 +728,14 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
     changes << changed_syllabus_json(@course, exceptions) if updated_syllabus
     changes << changed_settings_json(@course) if @mm.migration_settings[:copy_settings]
-    render :json => changes
+    render json: changes
   end
 
   def find_restricted_ids(tags)
     master_tags = if tags.first.is_a?(MasterCourses::MasterContentTag)
                     tags
                   else
-                    @mm.master_template.content_tags.where(:migration_id => tags.map(&:migration_id))
+                    @mm.master_template.content_tags.where(migration_id: tags.map(&:migration_id))
                   end
 
     master_tags.each_with_object(Set.new) do |tag, ids|

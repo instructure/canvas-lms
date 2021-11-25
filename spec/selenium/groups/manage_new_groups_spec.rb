@@ -53,7 +53,7 @@ describe "manage groups" do
     end
 
     it "allows a teacher to create a group set, a group, and add a user" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       student_in_course
       student_in_course
 
@@ -148,7 +148,7 @@ describe "manage groups" do
     end
 
     it "supports student-organized groups" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       student_in_course
       student_in_course
 
@@ -251,8 +251,8 @@ describe "manage groups" do
   end
 
   it "lets students create groups and invite other users" do
-    course_with_student_logged_in(:active_all => true)
-    student_in_course(:course => @course, :active_all => true, :name => "other student")
+    course_with_student_logged_in(active_all: true)
+    student_in_course(course: @course, active_all: true, name: "other student")
     other_student = @student
 
     get "/courses/#{@course.id}/groups"

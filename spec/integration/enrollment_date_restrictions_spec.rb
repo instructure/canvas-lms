@@ -22,18 +22,18 @@ require 'nokogiri'
 
 describe "enrollment_date_restrictions" do
   before do
-    Account.default.tap { |a| a.settings[:restrict_student_future_view] = { :value => true } }.save!
+    Account.default.tap { |a| a.settings[:restrict_student_future_view] = { value: true } }.save!
   end
 
   it "does not list inactive enrollments in the course list" do
     @student = user_with_pseudonym
-    @enrollment1 = course_factory(:course_name => "Course 1", :active_all => 1)
-    e1 = student_in_course(:user => @student, :active_all => 1)
+    @enrollment1 = course_factory(course_name: "Course 1", active_all: 1)
+    e1 = student_in_course(user: @student, active_all: 1)
 
-    @enrollment2 = course_factory(:course_name => "Course 2", :active_all => 1)
+    @enrollment2 = course_factory(course_name: "Course 2", active_all: 1)
 
-    @course.update(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
-    e2 = student_in_course(:user => @student, :active_all => 1)
+    @course.update(start_at: 2.days.from_now, conclude_at: 4.days.from_now, restrict_enrollments_to_course_dates: true)
+    e2 = student_in_course(user: @student, active_all: 1)
     expect(e1.state).to eq :active
     expect(e1.state_based_on_date).to eq :active
     expect(e2.state).to eq :active
@@ -53,7 +53,7 @@ describe "enrollment_date_restrictions" do
 
   it "does not show deleted enrollments in past enrollments when course is completed" do
     @student = user_with_pseudonym
-    e1 = student_in_course(:user => @student, :active_all => 1)
+    e1 = student_in_course(user: @student, active_all: 1)
 
     e1.destroy
     expect(e1.workflow_state).to eq 'deleted'
@@ -85,10 +85,10 @@ describe "enrollment_date_restrictions" do
     @course2.restrict_enrollments_to_course_dates = true
     @course2.save!
 
-    @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-    @course2.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-    @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-    @course4.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+    @course1.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+    @course2.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+    @course3.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+    @course4.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
     user_session(@user)
 
     get '/grades'
@@ -103,8 +103,8 @@ describe "enrollment_date_restrictions" do
   end
 
   it "does not included date-inactive courses when searching for pertinent contexts" do
-    course_with_teacher(:active_all => 1)
-    student_in_course(:active_all => 1)
+    course_with_teacher(active_all: 1)
+    student_in_course(active_all: 1)
     user_session(@student)
 
     @course.start_at = 2.days.from_now

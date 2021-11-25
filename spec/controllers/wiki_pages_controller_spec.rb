@@ -26,7 +26,7 @@ describe WikiPagesController do
 
   describe "GET 'front_page'" do
     it "redirects" do
-      get 'front_page', params: { :course_id => @course.id }
+      get 'front_page', params: { course_id: @course.id }
       expect(response).to be_redirect
       expect(response.location).to match(%r{/courses/#{@course.id}/pages})
     end
@@ -47,7 +47,7 @@ describe WikiPagesController do
 
     describe "GET 'show_redirect'" do
       it "redirects" do
-        get 'show_redirect', params: { :course_id => @course.id, :id => @page.url }
+        get 'show_redirect', params: { course_id: @course.id, id: @page.url }
         expect(response).to be_redirect
         expect(response.location).to match(%r{/courses/#{@course.id}/pages/#{@page.url}})
       end

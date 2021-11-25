@@ -19,11 +19,11 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_action :load_account, :only => %i[health_check readiness deep]
-  skip_before_action :load_user, :only => %i[health_check readiness deep browserconfig]
+  skip_before_action :load_account, only: %i[health_check readiness deep]
+  skip_before_action :load_user, only: %i[health_check readiness deep browserconfig]
 
   def styleguide
-    render :layout => "layouts/styleguide"
+    render layout: "layouts/styleguide"
   end
 
   def message_redirect
@@ -47,7 +47,7 @@ class InfoController < ApplicationController
       end
     end
 
-    render :json => links
+    render json: links
   end
 
   def health_check
@@ -95,9 +95,9 @@ class InfoController < ApplicationController
     }
     failed = checks.reject { |_k, v| v }.map(&:first)
     if failed.any?
-      render :json => { :status => "failed upcoming health checks - #{failed.join(", ")}" }, :status => :internal_server_error
+      render json: { status: "failed upcoming health checks - #{failed.join(", ")}" }, status: :internal_server_error
     else
-      render :json => { :status => "canvas will be ok, probably" }
+      render json: { status: "canvas will be ok, probably" }
     end
   end
 
@@ -319,7 +319,7 @@ class InfoController < ApplicationController
 
     if CutyCapt.enabled? && CutyCapt.screencap_service
       ret[:screencap] = lambda do
-        Tempfile.create('example.png', :encoding => 'ascii-8bit') do |f|
+        Tempfile.create('example.png', encoding: 'ascii-8bit') do |f|
           CutyCapt.screencap_service.snapshot_url_to_file("about:blank", f)
         end
       end

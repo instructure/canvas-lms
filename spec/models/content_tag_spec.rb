@@ -102,22 +102,22 @@ describe ContentTag do
 
   describe "#sync_workflow_state_to_asset?" do
     it "true when content_type is Quiz" do
-      content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag = ContentTag.new(content_type: "Quiz")
       expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is Quizzes::Quiz" do
-      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag = ContentTag.new(content_type: "Quizzes::Quiz")
       expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is Assignment" do
-      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag = ContentTag.new(content_type: "Assignment")
       expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
     it "true when content_type is WikiPage" do
-      content_tag = ContentTag.new(:content_type => "WikiPage")
+      content_tag = ContentTag.new(content_type: "WikiPage")
       expect(content_tag.sync_workflow_state_to_asset?).to be_truthy
     end
 
@@ -128,36 +128,36 @@ describe ContentTag do
 
   describe "#content_type_quiz?" do
     it "true when content_type is Quiz" do
-      content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag = ContentTag.new(content_type: "Quiz")
       expect(content_tag.content_type_quiz?).to be_truthy
     end
 
     it "true when content_type is Quizzes::Quiz" do
-      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag = ContentTag.new(content_type: "Quizzes::Quiz")
       expect(content_tag.content_type_quiz?).to be_truthy
     end
 
     it "false when content_type is not valid" do
-      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag = ContentTag.new(content_type: "Assignment")
       expect(content_tag.content_type_quiz?).to be_falsey
     end
   end
 
   describe "#scoreable?" do
     it "true when quiz" do
-      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag = ContentTag.new(content_type: "Quizzes::Quiz")
 
       expect(content_tag.scoreable?).to be_truthy
     end
 
     it "true when gradeable" do
-      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag = ContentTag.new(content_type: "Assignment")
 
       expect(content_tag.scoreable?).to be_truthy
     end
 
     it "false when neither quiz nor gradeable" do
-      content_tag = ContentTag.new(:content_type => "DiscussionTopic")
+      content_tag = ContentTag.new(content_type: "DiscussionTopic")
 
       expect(content_tag.scoreable?).to be_falsey
     end
@@ -188,14 +188,14 @@ describe ContentTag do
   it "returns content for a assignment" do
     course_factory
     assignment = course_factory.assignments.create!
-    tag = ContentTag.new(:content => assignment, :context => @course)
+    tag = ContentTag.new(content: assignment, context: @course)
     expect(tag.assignment).to eq assignment
   end
 
   it "returns associated assignment for a quiz" do
     course_factory
     quiz = course_factory.quizzes.create!
-    tag = ContentTag.new(:content => quiz, :context => @course)
+    tag = ContentTag.new(content: quiz, context: @course)
     expect(tag.assignment).to eq quiz.assignment
   end
 
@@ -207,7 +207,7 @@ describe ContentTag do
   it "includes tags from a course in the for_context named scope" do
     course_factory
     quiz = @course.quizzes.create!
-    tag = ContentTag.create!(:content => quiz, :context => @course)
+    tag = ContentTag.create!(content: quiz, context: @course)
     tags = ContentTag.for_context(@course)
     expect(tags).not_to be_empty
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
@@ -215,8 +215,8 @@ describe ContentTag do
 
   it "includes tags from an account in the for_context named scope" do
     account = Account.default
-    outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => '<p>This is <b>awesome</b>.</p>')
-    tag = ContentTag.create!(:content => outcome, :context => account)
+    outcome = account.created_learning_outcomes.create!(title: 'outcome', description: '<p>This is <b>awesome</b>.</p>')
+    tag = ContentTag.create!(content: outcome, context: account)
     tags = ContentTag.for_context(account)
     expect(tags).not_to be_empty
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
@@ -225,7 +225,7 @@ describe ContentTag do
   it "includes tags from courses under an account in the for_context named scope" do
     course_factory
     quiz = @course.quizzes.create!
-    tag = ContentTag.create!(:content => quiz, :context => @course)
+    tag = ContentTag.create!(content: quiz, context: @course)
     tags = ContentTag.for_context(@course.account)
     expect(tags).not_to be_empty
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
@@ -233,13 +233,13 @@ describe ContentTag do
 
   it "does not rename the linked external tool if the tag is renamed" do
     course_factory
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => { 'a' => '1', 'b' => '2' })
-    @module = @course.context_modules.create!(:name => "module")
+    @tool = @course.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret", domain: 'example.com', custom_fields: { 'a' => '1', 'b' => '2' })
+    @module = @course.context_modules.create!(name: "module")
     @tag = @module.add_item({
-                              :type => 'context_external_tool',
-                              :title => 'Example',
-                              :url => 'http://www.example.com',
-                              :new_tab => '0'
+                              type: 'context_external_tool',
+                              title: 'Example',
+                              url: 'http://www.example.com',
+                              new_tab: '0'
                             })
     @tag.update_asset_name!
     @tool.reload
@@ -250,13 +250,13 @@ describe ContentTag do
 
   it "does not rename the tag if the linked external tool is renamed" do
     course_factory
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => { 'a' => '1', 'b' => '2' })
-    @module = @course.context_modules.create!(:name => "module")
+    @tool = @course.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret", domain: 'example.com', custom_fields: { 'a' => '1', 'b' => '2' })
+    @module = @course.context_modules.create!(name: "module")
     @tag = @module.add_item({
-                              :type => 'context_external_tool',
-                              :title => 'Example',
-                              :url => 'http://www.example.com',
-                              :new_tab => '0'
+                              type: 'context_external_tool',
+                              title: 'Example',
+                              url: 'http://www.example.com',
+                              new_tab: '0'
                             })
     ContentTag.update_for(@tool)
     @tool.reload
@@ -267,12 +267,12 @@ describe ContentTag do
 
   it "renames the linked assignment if the tag is renamed" do
     course_factory
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
+    @assignment = @course.assignments.create!(title: "some assignment")
+    @module = @course.context_modules.create!(name: "module")
     @tag = @module.add_item({
-                              :type => 'assignment',
-                              :title => 'some assignment (renamed)',
-                              :id => @assignment.id
+                              type: 'assignment',
+                              title: 'some assignment (renamed)',
+                              id: @assignment.id
                             })
     @tag.update_asset_name!
     @tag.reload
@@ -283,12 +283,12 @@ describe ContentTag do
 
   it "renames the tag if the linked assignment is renamed" do
     course_factory
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
+    @assignment = @course.assignments.create!(title: "some assignment")
+    @module = @course.context_modules.create!(name: "module")
     @tag = @module.add_item({
-                              :type => 'assignment',
-                              :title => 'some assignment',
-                              :id => @assignment.id
+                              type: 'assignment',
+                              title: 'some assignment',
+                              id: @assignment.id
                             })
     @tag.reload
     expect(@tag.title).to eq 'some assignment'
@@ -325,11 +325,11 @@ describe ContentTag do
       before do
         course_factory
         @quiz = course_factory.quizzes.create!
-        @module = @course.context_modules.create!(:name => "module")
+        @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({
-                                  :type => 'quiz',
-                                  :title => 'some quiz',
-                                  :id => @quiz.id
+                                  type: 'quiz',
+                                  title: 'some quiz',
+                                  id: @quiz.id
                                 })
         @tag.reload
       end
@@ -358,28 +358,28 @@ describe ContentTag do
   describe "duplicate_able?" do
     before :once do
       course_factory
-      @module = @course.context_modules.create!(:name => "module")
+      @module = @course.context_modules.create!(name: "module")
     end
 
     it "returns true for discussion_topic tags" do
-      topic = @course.discussion_topics.create! :title => "topic"
-      topic_tag = @module.add_item({ :type => 'DiscussionTopic', :id => topic.id })
+      topic = @course.discussion_topics.create! title: "topic"
+      topic_tag = @module.add_item({ type: 'DiscussionTopic', id: topic.id })
       expect(topic_tag).to be_duplicate_able
     end
 
     it "returns true for wiki_page tags" do
-      page = @course.wiki_pages.create! :title => "page"
-      page_tag = @module.add_item({ :type => 'WikiPage', :id => page.id })
+      page = @course.wiki_pages.create! title: "page"
+      page_tag = @module.add_item({ type: 'WikiPage', id: page.id })
       expect(page_tag).to be_duplicate_able
     end
 
     it "defers to Assignment#can_duplicate? for assignment tags" do
-      assignment1 = @course.assignments.create! :title => "assignment1"
-      assignment2 = @course.assignments.create! :title => "assignment2"
+      assignment1 = @course.assignments.create! title: "assignment1"
+      assignment2 = @course.assignments.create! title: "assignment2"
       allow_any_instantiation_of(assignment1).to receive(:can_duplicate?).and_return(true)
       allow_any_instantiation_of(assignment2).to receive(:can_duplicate?).and_return(false)
-      assignment1_tag = @module.add_item({ :type => 'Assignment', :id => assignment1.id })
-      assignment2_tag = @module.add_item({ :type => 'Assignment', :id => assignment2.id })
+      assignment1_tag = @module.add_item({ type: 'Assignment', id: assignment1.id })
+      assignment2_tag = @module.add_item({ type: 'Assignment', id: assignment2.id })
       expect(assignment1_tag).to be_duplicate_able
       expect(assignment2_tag).not_to be_duplicate_able
     end
@@ -387,9 +387,9 @@ describe ContentTag do
 
   it "does not attempt to update asset name attribute if it's over the db limit" do
     course_factory
-    @page = @course.wiki_pages.create!(:title => "some page")
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({ :type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id })
+    @page = @course.wiki_pages.create!(title: "some page")
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: 'WikiPage', title: 'oh noes!' * 35, id: @page.id })
 
     @tag.update_asset_name!
 
@@ -399,9 +399,9 @@ describe ContentTag do
 
   it "properly trims asset name for assignments" do
     course_factory
-    @assign = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({ :type => 'Assignment', :title => 'oh noes!' * 35, :id => @assign.id })
+    @assign = @course.assignments.create!(title: "some assignment")
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: 'Assignment', title: 'oh noes!' * 35, id: @assign.id })
 
     @tag.update_asset_name!
 
@@ -411,11 +411,11 @@ describe ContentTag do
 
   it "publish/unpublishes the tag if the linked wiki page is published/unpublished" do
     course_factory
-    @page = @course.wiki_pages.create!(:title => "some page")
+    @page = @course.wiki_pages.create!(title: "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({ :type => 'WikiPage', :title => 'some page', :id => @page.id })
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: 'WikiPage', title: 'some page', id: @page.id })
     expect(@tag.workflow_state).to eq 'unpublished'
 
     @page.reload
@@ -433,12 +433,12 @@ describe ContentTag do
 
   it "publish/unpublishes the linked wiki page (and its tags) if the tag is published/unpublished" do
     course_factory
-    @page = @course.wiki_pages.create!(:title => "some page")
+    @page = @course.wiki_pages.create!(title: "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
-    @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({ :type => 'WikiPage', :title => 'some page', :id => @page.id })
-    @tag2 = @module.add_item({ :type => 'WikiPage', :title => 'some page', :id => @page.id })
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: 'WikiPage', title: 'some page', id: @page.id })
+    @tag2 = @module.add_item({ type: 'WikiPage', title: 'some page', id: @page.id })
 
     @tag.reload
     @tag.workflow_state = 'active'
@@ -460,9 +460,9 @@ describe ContentTag do
   end
 
   it "publishes the linked file when the tag is published" do
-    file = attachment_model(:locked => true)
-    mod = @course.context_modules.create!(:name => "module")
-    tag = mod.add_item(:type => "attachment", :id => file.id)
+    file = attachment_model(locked: true)
+    mod = @course.context_modules.create!(name: "module")
+    tag = mod.add_item(type: "attachment", id: file.id)
     expect(tag).to be_unpublished
     tag.workflow_state = 'active'
     tag.save!
@@ -493,10 +493,10 @@ describe ContentTag do
 
   it "does not rename tag if linked attachment is renamed" do
     course_factory
-    att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
+    att = Attachment.create!(filename: 'important title.txt', display_name: "important title.txt", uploaded_data: StringIO.new("It's what's on the inside of the file that doesn't matter.'"), folder: Folder.unfiled_folder(@course), context: @course)
 
-    a_module = @course.context_modules.create!(:name => "module")
-    tag = a_module.add_item({ :type => 'attachment', :title => 'important title.txt', :id => att.id })
+    a_module = @course.context_modules.create!(name: "module")
+    tag = a_module.add_item({ type: 'attachment', title: 'important title.txt', id: att.id })
     tag.update_asset_name!
 
     att.display_name = "no longer important.txt"
@@ -507,10 +507,10 @@ describe ContentTag do
 
   it "does not rename attachment if linked tag is renamed" do
     course_factory
-    att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
+    att = Attachment.create!(filename: 'important title.txt', display_name: "important title.txt", uploaded_data: StringIO.new("It's what's on the inside of the file that doesn't matter.'"), folder: Folder.unfiled_folder(@course), context: @course)
 
-    a_module = @course.context_modules.create!(:name => "module")
-    tag = a_module.add_item({ :type => 'attachment', :title => 'Differently Important Title', :id => att.id })
+    a_module = @course.context_modules.create!(name: "module")
+    tag = a_module.add_item({ type: 'attachment', title: 'Differently Important Title', id: att.id })
     tag.update_asset_name!
 
     att.reload
@@ -520,16 +520,16 @@ describe ContentTag do
   include_examples "url validation tests"
   it "checks url validity" do
     quiz = course_factory.quizzes.create!
-    test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
+    test_url_validation(ContentTag.create!(content: quiz, context: @course))
   end
 
   it "touches the module after committing the save" do
     course_factory
     mod = @course.context_modules.create!
     yesterday = 1.day.ago
-    ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
+    ContextModule.where(id: mod).update_all(updated_at: yesterday)
     ContextModule.transaction do
-      mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+      mod.add_item type: 'context_module_sub_header', title: 'blah'
       expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
     end
     expect(mod.reload.updated_at).to be > 5.seconds.ago
@@ -551,18 +551,18 @@ describe ContentTag do
 
   it "allows skipping touches on save" do
     course_factory
-    @assignment = @course.assignments.create!(:title => "some assignment")
-    @module = @course.context_modules.create!(:name => "module")
+    @assignment = @course.assignments.create!(title: "some assignment")
+    @module = @course.context_modules.create!(name: "module")
     @tag = @module.add_item({
-                              :type => 'assignment',
-                              :title => 'some assignment (renamed)',
-                              :id => @assignment.id
+                              type: 'assignment',
+                              title: 'some assignment (renamed)',
+                              id: @assignment.id
                             })
     @tag.update_asset_name!
     @tag.reload
 
     yesterday = 1.day.ago
-    ContextModule.where(:id => @module).update_all(:updated_at => yesterday)
+    ContextModule.where(id: @module).update_all(updated_at: yesterday)
 
     @tag.skip_touch = true
     @tag.save
@@ -587,12 +587,12 @@ describe ContentTag do
 
     context "assignments" do
       before do
-        @assignment = @course.assignments.create!(:title => "some assignment", :only_visible_to_overrides => true)
-        @module = @course.context_modules.create!(:name => "module")
+        @assignment = @course.assignments.create!(title: "some assignment", only_visible_to_overrides: true)
+        @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({
-                                  :type => 'assignment',
-                                  :title => 'some assignment',
-                                  :id => @assignment.id
+                                  type: 'assignment',
+                                  title: 'some assignment',
+                                  id: @assignment.id
                                 })
       end
 
@@ -608,19 +608,19 @@ describe ContentTag do
 
     context "discussions" do
       def attach_assignment_to_discussion
-        @assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: true)
+        @assignment = @course.assignments.create!(title: "some discussion assignment", only_visible_to_overrides: true)
         @assignment.submission_types = 'discussion_topic'
         @assignment.save!
         @topic.assignment_id = @assignment.id
         @topic.save!
       end
       before do
-        discussion_topic_model(:user => @course.instructors.first, :context => @course)
-        @module = @course.context_modules.create!(:name => "module")
+        discussion_topic_model(user: @course.instructors.first, context: @course)
+        @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({
-                                  :type => 'discussion_topic',
-                                  :title => 'some discussion',
-                                  :id => @topic.id
+                                  type: 'discussion_topic',
+                                  title: 'some discussion',
+                                  id: @topic.id
                                 })
       end
 
@@ -643,11 +643,11 @@ describe ContentTag do
     context "quizzes" do
       before do
         @quiz = @course.quizzes.create!(only_visible_to_overrides: true)
-        @module = @course.context_modules.create!(:name => "module")
+        @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({
-                                  :type => 'quiz',
-                                  :title => 'some quiz',
-                                  :id => @quiz.id
+                                  type: 'quiz',
+                                  title: 'some quiz',
+                                  id: @quiz.id
                                 })
       end
 
@@ -663,9 +663,9 @@ describe ContentTag do
 
     context "other" do
       it "properly returns wiki pages" do
-        @page = @course.wiki_pages.create!(:title => "some page")
-        @module = @course.context_modules.create!(:name => "module")
-        @tag = @module.add_item({ :type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id })
+        @page = @course.wiki_pages.create!(title: "some page")
+        @module = @course.context_modules.create!(name: "module")
+        @tag = @module.add_item({ type: 'WikiPage', title: 'oh noes!' * 35, id: @page.id })
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
     end
@@ -673,16 +673,16 @@ describe ContentTag do
 
   describe "destroy" do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     it "updates completion requirements on its associated ContextModule" do
-      @module = @course.context_modules.create!(:name => "some module")
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @assignment2 = @course.assignments.create!(:title => "some assignment2")
+      @module = @course.context_modules.create!(name: "some module")
+      @assignment = @course.assignments.create!(title: "some assignment")
+      @assignment2 = @course.assignments.create!(title: "some assignment2")
 
-      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
-      @tag2 = @module.add_item({ :id => @assignment2.id, :type => 'assignment' })
+      @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
+      @tag2 = @module.add_item({ id: @assignment2.id, type: 'assignment' })
 
       @module.completion_requirements = [{ id: @tag.id, type: 'must_submit' },
                                          { id: @tag2.id, type: 'must_submit' }]
@@ -737,16 +737,16 @@ describe ContentTag do
 
     it "deletes outcome link and the associated friendly description" do
       account = Account.default
-      outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => 'standard outcome description')
-      description = OutcomeFriendlyDescription.create!(:context => account, :description => 'friendly outcome description', :learning_outcome => outcome)
-      outcome_link = ContentTag.create!(:content => outcome, :context => account)
+      outcome = account.created_learning_outcomes.create!(title: 'outcome', description: 'standard outcome description')
+      description = OutcomeFriendlyDescription.create!(context: account, description: 'friendly outcome description', learning_outcome: outcome)
+      outcome_link = ContentTag.create!(content: outcome, context: account)
       outcome_links = ContentTag.for_context(account)
       expect(outcome_links).not_to be_empty
       expect(outcome_links.find { |link| link.id == outcome_link.id }).to_not be_nil
 
       outcome_link.destroy
       outcome_links = ContentTag.active.for_context(account)
-      description = OutcomeFriendlyDescription.where(:id => description.id).first
+      description = OutcomeFriendlyDescription.where(id: description.id).first
       expect(outcome_links.find { |link| link.id == outcome_link.id }).to be_nil
       expect(description.workflow_state).to eq('deleted')
     end
@@ -800,13 +800,13 @@ describe ContentTag do
 
   it "syncs tag published state with attachment locked state" do
     course_factory
-    att = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new("blah"),
-                             :folder => Folder.unfiled_folder(@course), :context => @course)
+    att = Attachment.create!(filename: 'blah.txt', uploaded_data: StringIO.new("blah"),
+                             folder: Folder.unfiled_folder(@course), context: @course)
     att.locked = true
     att.save!
 
-    a_module = @course.context_modules.create!(:name => "module")
-    tag = a_module.add_item({ :type => 'attachment', :id => att.id })
+    a_module = @course.context_modules.create!(name: "module")
+    tag = a_module.add_item({ type: 'attachment', id: att.id })
     expect(tag.unpublished?).to be_truthy
 
     att.locked = false
@@ -860,7 +860,7 @@ describe ContentTag do
   describe 'quiz_lti' do
     it 'returns true when the assignment content is quiz_lti' do
       course_factory
-      assignment = new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      assignment = new_quizzes_assignment(course: @course, title: 'Some New Quiz')
       tag = ContentTag.create!(context: @course, content: assignment)
       expect(tag.quiz_lti).to be true
     end

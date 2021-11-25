@@ -26,7 +26,7 @@ module Api::V1::AssignmentOverride
     fields.concat(%i[due_at all_day all_day_date]) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
     fields << :lock_at if override.lock_at_overridden
-    api_json(override, @current_user, session, :only => fields).tap do |json|
+    api_json(override, @current_user, session, only: fields).tap do |json|
       case override.set_type
       when 'ADHOC'
         json[:student_ids] = if override.preloaded_student_ids
@@ -89,7 +89,7 @@ module Api::V1::AssignmentOverride
   end
 
   def find_group(assignment, group_id, group_category_id = nil)
-    scope = Group.active.where(:context_type => 'Course').where.not(group_category_id: nil)
+    scope = Group.active.where(context_type: 'Course').where.not(group_category_id: nil)
     if assignment
       scope = scope.where(
         context_id: assignment.context_id,
@@ -104,7 +104,7 @@ module Api::V1::AssignmentOverride
 
   def find_section(context, section_id)
     scope = CourseSection.active
-    scope = scope.where(:course_id => context) if context
+    scope = scope.where(course_id: context) if context
     section = api_find(scope, section_id)
     raise ActiveRecord::RecordNotFound unless section.grants_right?(@current_user, session, :read)
 
@@ -314,7 +314,7 @@ module Api::V1::AssignmentOverride
       unless defunct_student_ids.empty?
         override.changed_student_ids.merge(defunct_student_ids)
         override.assignment_override_students
-                .where(:user_id => defunct_student_ids.to_a)
+                .where(user_id: defunct_student_ids.to_a)
                 .in_batches
                 .delete_all
       end
@@ -390,7 +390,7 @@ module Api::V1::AssignmentOverride
   def invisible_users_and_overrides_for_user(context, user, existing_overrides)
     # get the student overrides the user can't see and ensure those overrides are included
     visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
-    invisible_user_ids = context.enrollments.where.not(:user_id => visible_user_ids).distinct.pluck(:user_id)
+    invisible_user_ids = context.enrollments.where.not(user_id: visible_user_ids).distinct.pluck(:user_id)
     invisible_override_ids = existing_overrides.select do |ov|
       ov.set_type == 'ADHOC' &&
         !ov.visible_student_overrides(visible_user_ids)

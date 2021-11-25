@@ -30,26 +30,26 @@ describe "master courses - add and remove course associations" do
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
 
     # create some courses
-    @master_course = course_factory(:active_all => true)
+    @master_course = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master_course)
     @course0 = Course.create!(
-      :account => @account, :name => "AlphaDog", :course_code => "CCC1", :sis_source_id => "SIS_A1"
+      account: @account, name: "AlphaDog", course_code: "CCC1", sis_source_id: "SIS_A1"
     )
     @course0.offer!
     @course1 = Course.create!(
-      :account => @account, :name => "AlphaMale", :course_code => "CCC2", :sis_source_id => "SIS_A2"
+      account: @account, name: "AlphaMale", course_code: "CCC2", sis_source_id: "SIS_A2"
     )
     @course1.offer!
     c = Course.create!(
-      :account => @account, :name => "Alphabet", :course_code => "CCC3", :sis_source_id => "SIS_A3"
+      account: @account, name: "Alphabet", course_code: "CCC3", sis_source_id: "SIS_A3"
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "BetaCarotine", :course_code => "DDD4", :sis_source_id => "SIS_B4"
+      account: @account, name: "BetaCarotine", course_code: "DDD4", sis_source_id: "SIS_B4"
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "BetaGetOuttaHere", :course_code => "DDD5", :sis_source_id => "SIS_B5"
+      account: @account, name: "BetaGetOuttaHere", course_code: "DDD5", sis_source_id: "SIS_B5"
     )
     c.offer!
 

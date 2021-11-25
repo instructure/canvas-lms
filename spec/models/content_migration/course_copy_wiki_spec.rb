@@ -24,8 +24,8 @@ describe ContentMigration do
     include_context "course copy"
 
     it "copies wiki page attributes" do
-      page = @copy_from.wiki_pages.create!(:title => "title", :body => "<address><ul></ul></address>",
-                                           :editing_roles => "teachers", :todo_date => Time.zone.now)
+      page = @copy_from.wiki_pages.create!(title: "title", body: "<address><ul></ul></address>",
+                                           editing_roles: "teachers", todo_date: Time.zone.now)
 
       run_course_copy
 
@@ -37,7 +37,7 @@ describe ContentMigration do
     end
 
     it "resets user on re-import" do
-      page = @copy_from.wiki_pages.create!(:title => "reset me", :body => "<p>blah</p>")
+      page = @copy_from.wiki_pages.create!(title: "reset me", body: "<p>blah</p>")
 
       run_course_copy
 
@@ -54,10 +54,10 @@ describe ContentMigration do
     end
 
     it "does not escape links to wiki urls" do
-      page1 = @copy_from.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
+      page1 = @copy_from.wiki_pages.create!(title: "keepthese%20percent signs", body: "blah")
 
       body = %(<p>Link to module item: <a href="/courses/%s/pages/%s#header">some assignment</a></p>)
-      page2 = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, page1.url])
+      page2 = @copy_from.wiki_pages.create!(title: "some page", body: body % [@copy_from.id, page1.url])
 
       run_course_copy
 
@@ -77,7 +77,7 @@ describe ContentMigration do
       main_page = @copy_from.wiki.front_page
       main_page.body = %(<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>)
       main_page.save!
-      @copy_from.wiki_pages.create!(:title => "Online: Unit Pages", :body => %(<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>))
+      @copy_from.wiki_pages.create!(title: "Online: Unit Pages", body: %(<a href="/courses/#{@copy_from.id}/wiki/#{main_page.id}">whoa</a>))
       run_course_copy
       expect(@copy_to.wiki.front_page.body).to eq %(<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/online-unit-pages">wut</a>)
       expect(@copy_to.wiki_pages.where(url: "online-unit-pages").first!.body).to eq %(<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>)
@@ -107,7 +107,7 @@ describe ContentMigration do
     end
 
     it "re-imports updated/deleted page" do
-      page = @copy_from.wiki_pages.create!(:title => "blah", :body => "<p>orig</p>")
+      page = @copy_from.wiki_pages.create!(title: "blah", body: "<p>orig</p>")
 
       run_course_copy
 
@@ -126,8 +126,8 @@ describe ContentMigration do
 
     context "wiki front page" do
       it "copies wiki front page setting if there is no front page" do
-        @copy_from.wiki_pages.create!(:title => "Front Page")
-        real_front_page = @copy_from.wiki_pages.create!(:title => "actual front page")
+        @copy_from.wiki_pages.create!(title: "Front Page")
+        real_front_page = @copy_from.wiki_pages.create!(title: "actual front page")
         @copy_from.wiki.set_front_page_url!(real_front_page.url)
 
         run_course_copy
@@ -137,7 +137,7 @@ describe ContentMigration do
       end
 
       it "does not set 'Front Page' as the front page" do
-        @copy_from.wiki_pages.create!(:title => "Front Page")
+        @copy_from.wiki_pages.create!(title: "Front Page")
 
         run_course_copy
 
@@ -146,10 +146,10 @@ describe ContentMigration do
       end
 
       it "does not overwrite current front page" do
-        copy_from_front_page = @copy_from.wiki_pages.create!(:title => "stuff and stuff")
+        copy_from_front_page = @copy_from.wiki_pages.create!(title: "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)
 
-        copy_to_front_page = @copy_to.wiki_pages.create!(:title => "stuff and stuff and even more stuf")
+        copy_to_front_page = @copy_to.wiki_pages.create!(title: "stuff and stuff and even more stuf")
         @copy_to.wiki.set_front_page_url!(copy_to_front_page.url)
 
         run_course_copy
@@ -158,10 +158,10 @@ describe ContentMigration do
       end
 
       it "overwrites current front page if default_view setting is also changed to wiki" do
-        copy_from_front_page = @copy_from.wiki_pages.create!(:title => "stuff and stuff")
+        copy_from_front_page = @copy_from.wiki_pages.create!(title: "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)
 
-        copy_to_front_page = @copy_to.wiki_pages.create!(:title => "stuff and stuff and even more stuf")
+        copy_to_front_page = @copy_to.wiki_pages.create!(title: "stuff and stuff and even more stuf")
         @copy_to.wiki.set_front_page_url!(copy_to_front_page.url)
 
         @copy_from.update_attribute(:default_view, 'wiki')
@@ -171,21 +171,21 @@ describe ContentMigration do
 
         @copy_to.reload
         expect(@copy_to.default_view).to eq 'wiki'
-        new_front_page = @copy_to.wiki_pages.where(:migration_id => mig_id(copy_from_front_page)).first
+        new_front_page = @copy_to.wiki_pages.where(migration_id: mig_id(copy_from_front_page)).first
         expect(@copy_to.wiki.front_page).to eq new_front_page
       end
 
       it "remains with no front page if other front page is not selected for copy" do
-        front_page = @copy_from.wiki_pages.create!(:title => "stuff and stuff")
+        front_page = @copy_from.wiki_pages.create!(title: "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(front_page.url)
 
-        other_page = @copy_from.wiki_pages.create!(:title => "stuff and other stuff")
+        other_page = @copy_from.wiki_pages.create!(title: "stuff and other stuff")
 
         @copy_to.wiki.unset_front_page!
 
         # only select one of each type
         @cm.copy_options = {
-          :wiki_pages => { mig_id(other_page) => "1", mig_id(front_page) => "0" }
+          wiki_pages: { mig_id(other_page) => "1", mig_id(front_page) => "0" }
         }
         @cm.save!
 

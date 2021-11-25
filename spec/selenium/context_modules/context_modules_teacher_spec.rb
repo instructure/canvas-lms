@@ -28,16 +28,16 @@ describe "context modules" do
     before(:once) do
       course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
-      @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
-      @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-                                                 :submission_types => 'online_text_entry',
-                                                 :due_at => 2.days.from_now,
-                                                 :points_possible => 10)
-      @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
+      @quiz = @course.assignments.create!(title: 'quiz assignment', submission_types: 'online_quiz')
+      @assignment = @course.assignments.create!(title: 'assignment 1', submission_types: 'online_text_entry')
+      @assignment2 = @course.assignments.create!(title: 'assignment 2',
+                                                 submission_types: 'online_text_entry',
+                                                 due_at: 2.days.from_now,
+                                                 points_possible: 10)
+      @assignment3 = @course.assignments.create!(title: 'assignment 3', submission_types: 'online_text_entry')
 
-      @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
-      @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+      @ag1 = @course.assignment_groups.create!(name: "Assignment Group 1")
+      @ag2 = @course.assignment_groups.create!(name: "Assignment Group 2")
       @course.reload
     end
 
@@ -77,8 +77,8 @@ describe "context modules" do
     it "rearranges child objects in same module", priority: "1" do
       modules = create_modules(1, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-      item1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
-      item2 = modules[0].add_item({ :id => @assignment2.id, :type => 'assignment' })
+      item1 = modules[0].add_item({ id: @assignment.id, type: 'assignment' })
+      item2 = modules[0].add_item({ id: @assignment2.id, type: 'assignment' })
       get "/courses/#{@course.id}/modules"
       # setting gui drag icons to pass to driver.action.drag_and_drop
       selector1 = "#context_module_item_#{item1.id} .move_item_link"
@@ -94,8 +94,8 @@ describe "context modules" do
     it "rearranges child object to new module", priority: "1" do
       modules = create_modules(2, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-      item1_mod1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
-      item1_mod2 = modules[1].add_item({ :id => @assignment2.id, :type => 'assignment' })
+      item1_mod1 = modules[0].add_item({ id: @assignment.id, type: 'assignment' })
+      item1_mod2 = modules[1].add_item({ id: @assignment2.id, type: 'assignment' })
       get "/courses/#{@course.id}/modules"
       # setting gui drag icons to pass to driver.action.drag_and_drop
       selector1 = "#context_module_item_#{item1_mod1.id} .move_item_link"
@@ -183,9 +183,9 @@ describe "context modules" do
 
     it "adds the 'with-completion-requirements' class to rows that have requirements" do
       mod = @course.context_modules.create! name: 'TestModule'
-      tag = mod.add_item({ :id => @assignment.id, :type => 'assignment' })
+      tag = mod.add_item({ id: @assignment.id, type: 'assignment' })
 
-      mod.completion_requirements = { tag.id => { :type => 'must_view' } }
+      mod.completion_requirements = { tag.id => { type: 'must_view' } }
       mod.save
 
       get "/courses/#{@course.id}/modules"
@@ -271,8 +271,8 @@ describe "context modules" do
     end
 
     it "rearranges modules" do
-      m1 = @course.context_modules.create!(:name => 'module 1')
-      m2 = @course.context_modules.create!(:name => 'module 2')
+      m1 = @course.context_modules.create!(name: 'module 1')
+      m2 = @course.context_modules.create!(name: 'module 2')
 
       get "/courses/#{@course.id}/modules"
       sleep 2 # not sure what we are waiting on but drag and drop will not work, unless we wait
@@ -333,7 +333,7 @@ describe "context modules" do
 
     context "multiple overridden due dates", priority: "2" do
       def create_section_override(section, due_at)
-        override = assignment_override_model(:assignment => @assignment)
+        override = assignment_override_model(assignment: @assignment)
         override.set = section
         override.override_due_at(due_at)
         override.save!
@@ -341,7 +341,7 @@ describe "context modules" do
 
       it "indicates when course sections have multiple due dates" do
         modules = create_modules(1, true)
-        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ id: @assignment.id, type: 'assignment' })
 
         cs1 = @course.default_section
         cs2 = @course.course_sections.create!
@@ -357,7 +357,7 @@ describe "context modules" do
       it "does not indicate multiple due dates if the sections' dates are the same" do
         skip("needs to ignore base if all visible sections are overridden")
         modules = create_modules(1, true)
-        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ id: @assignment.id, type: 'assignment' })
 
         cs1 = @course.default_section
         cs2 = @course.course_sections.create!
@@ -374,7 +374,7 @@ describe "context modules" do
 
       it "uses assignment due date if there is no section override" do
         modules = create_modules(1, true)
-        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ id: @assignment.id, type: 'assignment' })
 
         cs1 = @course.default_section
         @course.course_sections.create!
@@ -392,15 +392,15 @@ describe "context modules" do
       it "only uses the sections the user is restricted to" do
         skip("needs to ignore base if all visible sections are overridden")
         modules = create_modules(1, true)
-        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ id: @assignment.id, type: 'assignment' })
 
         cs1 = @course.default_section
         cs2 = @course.course_sections.create!
         cs3 = @course.course_sections.create!
 
         user_logged_in
-        @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
-        @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+        @course.enroll_user(@user, 'TaEnrollment', section: cs1, allow_multiple_enrollments: true, limit_privileges_to_course_section: true).accept!
+        @course.enroll_user(@user, 'TaEnrollment', section: cs2, allow_multiple_enrollments: true, limit_privileges_to_course_section: true).accept!
 
         due_at = 3.days.from_now
         create_section_override(cs1, due_at)
@@ -421,7 +421,7 @@ describe "context modules" do
       expect(f(selector)).not_to include_text "Multiple Due Dates"
 
       # add a second due date
-      new_section = @course.course_sections.create!(:name => 'New Section')
+      new_section = @course.course_sections.create!(name: 'New Section')
       override = @assignment2.assignment_overrides.build
       override.set = new_section
       override.due_at = Time.zone.now + 1.day
@@ -439,9 +439,9 @@ describe "context modules" do
     end
 
     it "publishes a file from the modules page", priority: "1" do
-      @module = @course.context_modules.create!(:name => "some module")
-      @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
-      @tag = @module.add_item({ :id => @file.id, :type => 'attachment' })
+      @module = @course.context_modules.create!(name: "some module")
+      @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
+      @tag = @module.add_item({ id: @file.id, type: 'attachment' })
       expect(@file.reload).not_to be_published
       get "/courses/#{@course.id}/modules"
       f("[data-id='#{@file.id}'] > button.published-status").click
@@ -456,9 +456,9 @@ describe "context modules" do
       @course.default_view = 'modules'
       @course.save!
 
-      @module = @course.context_modules.create!(:name => "some module")
-      @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
-      @tag = @module.add_item({ :id => @file.id, :type => 'attachment' })
+      @module = @course.context_modules.create!(name: "some module")
+      @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data)
+      @tag = @module.add_item({ id: @file.id, type: 'attachment' })
 
       get "/courses/#{@course.id}"
       expect(f(".context_module_item.attachment .icon-publish")).to be_displayed
@@ -528,7 +528,7 @@ describe "context modules" do
       page = @course.wiki_pages.create title: 'A Page'
       page.workflow_state = 'unpublished'
       page.save!
-      tag = mod.add_item({ :id => page.id, :type => 'wiki_page' })
+      tag = mod.add_item({ id: page.id, type: 'wiki_page' })
       get "/courses/#{@course.id}/modules"
       expect(f("#context_module_item_#{tag.id}")).to contain_css(".item_link")
       expect(f("#context_module_item_#{tag.id}")).to contain_css("a.for-nvda")

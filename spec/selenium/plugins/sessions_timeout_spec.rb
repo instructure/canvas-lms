@@ -48,9 +48,9 @@ describe "Sessions Timeout" do
   end
 
   it "logs the user out after the session is expired" do
-    plugin_setting = PluginSetting.new(:name => "sessions", :settings => { "session_timeout" => "1" })
+    plugin_setting = PluginSetting.new(name: "sessions", settings: { "session_timeout" => "1" })
     plugin_setting.save!
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     login_as
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
 

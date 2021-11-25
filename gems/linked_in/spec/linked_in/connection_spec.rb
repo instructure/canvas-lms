@@ -80,7 +80,7 @@ describe LinkedIn::Connection do
         access_token = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
         expect(OAuth::RequestToken).to receive(:new).with(consumer, token, secret).and_return(request_token)
-        expect(request_token).to receive(:get_access_token).with(:oauth_verifier => oauth_verifier).and_return(access_token)
+        expect(request_token).to receive(:get_access_token).with(oauth_verifier: oauth_verifier).and_return(access_token)
 
         linkedin = LinkedIn::Connection.from_request_token(token, secret, oauth_verifier)
         expect(linkedin.access_token).to eq(access_token)
@@ -92,7 +92,7 @@ describe LinkedIn::Connection do
         consumer = double
         oauth_callback = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
-        expect(consumer).to receive(:get_request_token).with(:oauth_callback => oauth_callback)
+        expect(consumer).to receive(:get_request_token).with(oauth_callback: oauth_callback)
 
         LinkedIn::Connection.request_token(oauth_callback)
       end
@@ -102,11 +102,11 @@ describe LinkedIn::Connection do
       it "user the supplied parameters" do
         consumer = double(get_request_token: "present")
         expect(OAuth::Consumer).to receive(:new).with('my_key', 'my_secret', {
-                                                        :site => "https://api.linkedin.com",
-                                                        :request_token_path => "/uas/oauth/requestToken",
-                                                        :access_token_path => "/uas/oauth/accessToken",
-                                                        :authorize_path => "/uas/oauth/authorize",
-                                                        :signature_method => "HMAC-SHA1"
+                                                        site: "https://api.linkedin.com",
+                                                        request_token_path: "/uas/oauth/requestToken",
+                                                        access_token_path: "/uas/oauth/accessToken",
+                                                        authorize_path: "/uas/oauth/authorize",
+                                                        signature_method: "HMAC-SHA1"
                                                       }).and_return(consumer)
 
         LinkedIn::Connection.config_check({

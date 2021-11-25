@@ -24,12 +24,12 @@ require 'nokogiri'
 
 describe UserContent, type: :request do
   before :once do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     attachment_model
   end
 
   it "translates course file download links to directly-downloadable urls" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
@@ -38,18 +38,18 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
   it "translates group file download links to directly-downloadable urls" do
-    @group = @course.groups.create!(:name => "course group")
-    attachment_model(:context => @group)
+    @group = @course.groups.create!(name: "course group")
+    attachment_model(context: @group)
     @group.add_user(@teacher)
-    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message => <<~HTML)
+    @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
@@ -58,8 +58,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
-                    { :controller => 'discussion_topics_api', :action => 'show',
-                      :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
+                    { controller: 'discussion_topics_api', action: 'show',
+                      format: 'json', group_id: @group.id.to_s, topic_id: @group_topic.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
@@ -67,10 +67,10 @@ describe UserContent, type: :request do
 
   it "translates file download links to directly-downloadable urls for deleted and replaced files" do
     @attachment.destroy
-    attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
+    attachment2 = Attachment.create!(folder: @attachment.folder, context: @attachment.context, filename: @attachment.filename, uploaded_data: StringIO.new("first"))
     expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
 
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
@@ -79,16 +79,16 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
   end
 
   it "does not corrupt absolute links" do
-    attachment_model(:context => @course)
-    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<~HTML)
+    attachment_model(context: @course)
+    @topic = @course.discussion_topics.create!(title: "course topic", user: @teacher, message: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
@@ -96,15 +96,15 @@ describe UserContent, type: :request do
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { :controller => 'discussion_topics_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                    { controller: 'discussion_topics_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, topic_id: @topic.id.to_s })
     doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
   it "does not remove wrap parameter on file download links" do
-    attachment_model(:context => @course)
-    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<~HTML)
+    attachment_model(context: @course)
+    @topic = @course.discussion_topics.create!(title: "course topic", user: @teacher, message: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1" alt="important">
@@ -112,14 +112,14 @@ describe UserContent, type: :request do
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { :controller => 'discussion_topics_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                    { controller: 'discussion_topics_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, topic_id: @topic.id.to_s })
     doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
   end
 
   it "translates file preview links to directly-downloadable preview urls" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
@@ -128,15 +128,15 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
   end
 
   it "translates media comment links to embedded video tags" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         Watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
@@ -145,8 +145,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     video = doc.at_css('video')
@@ -164,7 +164,7 @@ describe UserContent, type: :request do
   end
 
   it "translates media comment audio tags" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         Listen up: <a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>
@@ -173,8 +173,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     audio = doc.at_css('audio')
@@ -188,7 +188,7 @@ describe UserContent, type: :request do
   end
 
   it "does not translate links in content not viewable by user" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
@@ -198,21 +198,21 @@ describe UserContent, type: :request do
     # put a student in the course. this will be the active user during the API
     # call (necessary since the teacher has manage content rights and will thus
     # ignore the lock). lock the attachment so the student can't view it.
-    student_in_course(:course => @course, :active_all => true)
+    student_in_course(course: @course, active_all: true)
     @attachment.locked = true
     @attachment.save
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
   end
 
   it "prepends the hostname to all absolute-path links" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+    @assignment = @course.assignments.create!(title: "first assignment", description: <<~HTML)
       <p>
         Hello, students.<br>
         <img src='/equation_images/1234'>
@@ -225,8 +225,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { :controller => 'assignments_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { controller: 'assignments_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/equation_images/1234"
@@ -239,20 +239,20 @@ describe UserContent, type: :request do
   end
 
   it "does not choke on funny email addresses" do
-    @wiki_page = @course.wiki_pages.build(:title => "title")
+    @wiki_page = @course.wiki_pages.build(title: "title")
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
     api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-             { :controller => 'wiki_pages_api', :action => 'show',
-               :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+             { controller: 'wiki_pages_api', action: 'show',
+               format: 'json', course_id: @course.id.to_s, url: @wiki_page.url })
     assert_status(200)
   end
 
   context "data api endpoints" do
     context "course context" do
       it "processes links to each type of object" do
-        @wiki_page = @course.wiki_pages.build(:title => "title")
+        @wiki_page = @course.wiki_pages.build(title: "title")
         @wiki_page.body = <<~HTML
           <p>
             <a href='/courses/#{@course.id}/assignments'>assignments index</a>
@@ -279,8 +279,8 @@ describe UserContent, type: :request do
         @wiki_page.save!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-                        { :controller => 'wiki_pages_api', :action => 'show',
-                          :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+                        { controller: 'wiki_pages_api', action: 'show',
+                          format: 'json', course_id: @course.id.to_s, url: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json['body'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
@@ -310,8 +310,8 @@ describe UserContent, type: :request do
 
     context "group context" do
       it "processes links to each type of object" do
-        group_with_user(:active_all => true)
-        @wiki_page = @group.wiki_pages.build(:title => "title")
+        group_with_user(active_all: true)
+        @wiki_page = @group.wiki_pages.build(title: "title")
         @wiki_page.body = <<~HTML
           <p>
             <a href='/groups/#{@group.id}/wiki'>wiki index</a>
@@ -328,8 +328,8 @@ describe UserContent, type: :request do
         @wiki_page.save!
 
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
-                        { :controller => 'wiki_pages_api', :action => 'show',
-                          :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
+                        { controller: 'wiki_pages_api', action: 'show',
+                          format: 'json', group_id: @group.id.to_s, url: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json['body'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/groups/#{@group.id}/pages",
@@ -349,14 +349,14 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "processes links to each type of object" do
-        @topic = @course.discussion_topics.create!(:message => <<~HTML)
+        @topic = @course.discussion_topics.create!(message: <<~HTML)
           <a href='/users/#{@teacher.id}/files'>file index</a>
           <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
-                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s)
+                        controller: 'discussion_topics_api', action: 'show', format: 'json',
+                        course_id: @course.id.to_s, topic_id: @topic.id.to_s)
         doc = Nokogiri::HTML5.fragment(json['message'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
@@ -422,7 +422,7 @@ describe UserContent, type: :request do
     context "with verified user-context file links" do
       before do
         user_factory
-        attachment_model :context => @user
+        attachment_model context: @user
       end
 
       def confirm_url_stability(url)

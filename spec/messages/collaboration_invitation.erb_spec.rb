@@ -23,8 +23,8 @@ require_relative 'messages_helper'
 describe 'collaboration_invitation' do
   before :once do
     course_with_student
-    @collaboration = @course.collaborations.create!(:user => @user, :title => "my collab")
-    @object = @collaboration.collaborators.create!(:user => @user)
+    @collaboration = @course.collaborations.create!(user: @user, title: "my collab")
+    @object = @collaboration.collaborators.create!(user: @user)
   end
 
   let(:asset) { @object }

@@ -37,7 +37,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @quiz = @course.quizzes.create({ title: 'Test Quiz' })
       api_index({}, { raw: true })
       assert_status(401)
@@ -45,7 +45,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
     context 'with privileged access' do
       before(:once) do
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
         @quiz = @course.quizzes.create({ title: 'Test Quiz' })
       end
 
@@ -120,15 +120,15 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     before :once do
-      teacher_in_course(:active_all => true)
+      teacher_in_course(active_all: true)
       @me = @user
-      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], :user => @user, :course => @course
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], user: @user, course: @course
       @user = @me
     end
 
     it "creates a new report" do
       expect(Quizzes::QuizStatistics.count).to eq 0
-      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
+      json = api_create({ quiz_report: { report_type: "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
       expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
@@ -136,7 +136,7 @@ describe Quizzes::QuizReportsController, type: :request do
     it "reuses an existing report" do
       @quiz.statistics_csv('item_analysis')
       expect(Quizzes::QuizStatistics.count).to eq 1
-      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
+      json = api_create({ quiz_report: { report_type: "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
       expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
@@ -211,7 +211,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
   describe "DELETE /courses/:course_id/quizzes/:quiz_id/reports/:id [#abort]" do
     before :once do
-      teacher_in_course(:active_all => true)
+      teacher_in_course(active_all: true)
 
       simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], {
         user: @teacher,
@@ -238,7 +238,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       api_abort
       assert_status(401)
     end
@@ -294,7 +294,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @quiz = @course.quizzes.create({ title: 'Test Quiz' })
       @report = @quiz.current_statistics_for('student_analysis')
       api_show({}, raw: true)
@@ -303,7 +303,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
     context 'with privileged access' do
       before :once do
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
         @quiz = @course.quizzes.create({ title: 'Test Quiz' })
         @report = @quiz.current_statistics_for('student_analysis')
       end
@@ -335,7 +335,7 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.generate_csv
           @report.reload
 
-          json = api_show({ :include => ['file'] }, { jsonapi: true })
+          json = api_show({ include: ['file'] }, { jsonapi: true })
           expect(json['quiz_reports'][0]['file']).to be_present
           expect(json['quiz_reports'][0]['file']['id']).to eq @report.csv_attachment.id
         end
@@ -344,7 +344,7 @@ describe Quizzes::QuizReportsController, type: :request do
           @report.generate_csv_in_background
           @report.reload
 
-          json = api_show({ :include => ['progress'] }, { jsonapi: true })
+          json = api_show({ include: ['progress'] }, { jsonapi: true })
 
           expect(json['quiz_reports'][0]['file']).not_to be_present
           expect(json['quiz_reports'][0]['progress']).to be_present
