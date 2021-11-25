@@ -130,8 +130,8 @@ class Submission < ActiveRecord::Base
   serialize :turnitin_data, Hash
 
   validates :assignment_id, :user_id, presence: true
-  validates :body, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
-  validates :published_grade, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :body, length: { maximum: maximum_long_text_length, allow_blank: true }
+  validates :published_grade, length: { maximum: maximum_string_length, allow_blank: true }
   validates_as_url :url
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true

@@ -40,7 +40,7 @@ class DelayedMessage < ActiveRecord::Base
     ]
   belongs_to :communication_channel
 
-  validates :summary, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :summary, length: { maximum: maximum_text_length, allow_blank: true }
   validates :link, length: { maximum: maximum_text_length, allow_blank: true }
   validates :communication_channel_id, :workflow_state, presence: true
 

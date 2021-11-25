@@ -56,7 +56,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   validates :title, length: { maximum: maximum_string_length }
   validates :location_name, length: { maximum: maximum_string_length }
-  validates :description, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :participant_visibility, inclusion: { in: ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
     next unless record.new_appointments.present? || record.validation_event_override

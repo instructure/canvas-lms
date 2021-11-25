@@ -43,7 +43,7 @@ class Collaboration < ActiveRecord::Base
   TITLE_MAX_LENGTH = 255
   validates :title, :workflow_state, :context_id, :context_type, presence: true
   validates :title, length: { maximum: TITLE_MAX_LENGTH }
-  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :description, length: { maximum: maximum_text_length, allow_blank: true }
 
   serialize :data
 

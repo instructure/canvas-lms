@@ -53,7 +53,7 @@ class ContentTag < ActiveRecord::Base
   # context is not yet saved.
   validates :context, presence: { unless: proc { |tag| tag.context_id && tag.context_type } }
   validates :workflow_state, presence: true
-  validates :comments, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :comments, length: { maximum: maximum_text_length, allow_blank: true }
   before_save :associate_external_tool
   before_save :default_values
   before_save :set_root_account

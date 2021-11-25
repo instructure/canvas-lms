@@ -30,7 +30,7 @@ class WebConference < ActiveRecord::Base
   has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
-  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 

@@ -25,8 +25,8 @@ class UserNote < ActiveRecord::Base
   belongs_to :creator, class_name: 'User', foreign_key: :created_by_id
 
   validates :user_id, :created_by_id, :workflow_state, presence: true
-  validates :note, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
-  validates :title, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :note, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_blank: true }
   after_save :update_last_user_note
 
   sanitize_field :note, CanvasSanitize::SANITIZE
